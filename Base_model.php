@@ -190,6 +190,10 @@ class Base_model extends \CI_Model{
      * @return mixed
      */
     public function _meta(){
+        if(!$this->db->table_exists($this->table_name())):
+            throw new OrmExceptions(sprintf("The table %s does not exist", $this->table_name()));
+        endif;
+
         if(empty($this->_model_meta )){
             $this->_model_meta = $this->db->field_data($this->table_name());
             $this->_fields_loaded = TRUE;

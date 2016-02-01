@@ -1033,6 +1033,140 @@ class Queryset implements \IteratorAggregate, \Countable{
             throw new OrmExceptions(sprintf("add() expects an array"));
         }
 
+        // if the array is empty exit
+        if(empty($related)):
+            return;
+        endif;
+
+        // Some possibilities to consider
+        $loop_position =0;
+        foreach ($related as $items) :
+
+            // if a Queryset was passed in
+            if($items instanceof Queryset):
+                $items = $items->value();
+
+                if(is_array($items)):
+                    $toadd = $items;
+                    // remove it from array
+                    array_splice($related, $loop_position, 1);
+
+                    // merge with the values of the queryset
+                    $related = array_merge($related, $toadd);
+                endif;
+            endif;
+
+            // if array is passed in
+            if(is_array($items)):
+                $toadd = $items;
+                // remove it from array
+                array_splice($related, $loop_position, 1);
+
+                // merge with the values of the queryset
+                $related = array_merge($related, $toadd);
+            endif;
+            $loop_position++;
+        endforeach;
+
+
+
+        $related_ids = array();
+        $related_model = NULL;
+
+        foreach ($related as $item) {
+            if(!is_object($item)):
+                throw new TypeError(sprintf("add() expects an array of objects"));
+            endif;
+
+            // get the related model name to save
+            if(!empty($related_model) && $related_model!==get_class($item)):
+                throw new TypeError(
+                    sprintf("Multiple types provided, add() expects only one type per call, see documentation"));
+            endif;
+
+            // get primary key of the model
+            $pk = $this->_related_model_primary_key(get_class($item));
+
+            //  set only if its empty
+            if(empty($related_model)):
+                $related_model = get_class($item);
+            endif;
+
+            // get id of related model
+            if(is_object($item) && isset($item->{$pk})):
+                $related_ids[] = $item->{$pk};
+            endif;
+
+        }
+
+        // save related models many to many
+
+        $this->_savem2m($related_model, $related_ids);
+
+    }
+
+    /**
+     * Removes all related objects of a particular model
+     *
+     * <h4>USAGE:</h4>
+     *
+     * To clear all the permissions that the role admin has
+     *
+     * <pre><code>$this->role->get(['name'=>'admin')->clear('permission_model');</code></pre>
+     *
+     * @param $related_model_name
+     * @throws OrmExceptions
+     */
+    public function clear($related_model_name){
+        $current_pk = $this->_current_model_primary_key();
+        $related_pk = $this->_related_model_primary_key($related_model_name);
+
+
+        // check that we have the parent model to get its related data.
+        if(!isset($this->_context->{$current_pk})):
+            throw new OrmExceptions(sprintf("Trying to clear related data of nothing."));
+        endif;
+
+        $join_table = $this->_get_join_table($related_model_name);
+
+        $current_table_short_name = $this->_current_table_short_name();
+        $this->_database->where([$current_table_short_name."_".$current_pk=>$this->_context->{$current_pk}]);
+        $this->_database->delete($join_table);
+
+    }
+
+    /**
+     * Clear the specified model(s) from a particular model.
+     *
+     * <h4>USAGE:</h4>
+     *
+     * To permission can_edit, can_delete from the role admin has
+     *
+     * <pre><code>$can_edit = $this->permission_model->get(['name'=>'can_edit']);
+     * $can_delete = $this->permission_model->get(['name'=>'can_delete']);
+     * $this->role->get(['name'=>'admin')->remove([$can_delete, $can_edit]);</code></pre>
+     *
+     * @param array $related
+     * @throws OrmExceptions
+     * @throws TypeError
+     */
+    public function remove($related=[]){
+        $current_pk = $this->_current_model_primary_key();
+
+        // check that we have the parent model to get its related data.
+        if(!isset($this->_context->{$current_pk})):
+            throw new OrmExceptions(sprintf("Trying to remove related data of nothing."));
+        endif;
+
+        if(!is_array($related)){
+            throw new OrmExceptions(sprintf("remove() expects an array"));
+        }
+
+        // if the array is empty exit
+        if(empty($related)):
+            return;
+        endif;
+
         // Some possibilities to consider
         $loop_position =0;
         foreach ($related as $items) :
@@ -1069,19 +1203,21 @@ class Queryset implements \IteratorAggregate, \Countable{
         $related_model = NULL;
         foreach ($related as $item) {
 
-            // get primary key of the model
-            $pk = $this->_related_model_primary_key(get_class($item));
+            // ensure we got and object
             if(!is_object($item)):
-                throw new TypeError(sprintf("add() expects an array of objects"));
+                throw new TypeError(sprintf("remove() expects an array of objects"));
             endif;
 
-            // get the related model name to save
+            // ensure we only have one type of related model
             if(!empty($related_model) && $related_model!==get_class($item)):
                 throw new TypeError(
-                    sprintf("Multiple types provided, add() expects only one type per call, see documentation"));
+                    sprintf("Multiple types provided, remove() expects only one type per call, see documentation"));
             endif;
 
-            //  set only if its empty
+            // get primary key of the model
+            $pk = $this->_related_model_primary_key(get_class($item));
+
+            //  set only if its empty name of the model
             if(empty($related_model)):
                 $related_model = get_class($item);
             endif;
@@ -1093,9 +1229,17 @@ class Queryset implements \IteratorAggregate, \Countable{
 
         }
 
-        // save related models many to many
+        $join_table = $this->_get_join_table($related_model);
 
-        $this->_savem2m($related_model, $related_ids);
+        $related_model_short_name = $this->_related_table_short_name($related_model);
+        $related_pk = $this->_related_model_primary_key($related_model);
+
+        $current_table_short_name = $this->_current_table_short_name();
+        $this->_database->where([$current_table_short_name."_".$current_pk=>$this->_context->{$current_pk}]);
+        $this->_database->where_in($related_model_short_name."_".$related_pk, $related_ids);
+        $this->_database->delete($join_table);
+
+        var_dump($this->_database->last_query());
 
     }
 
@@ -1891,17 +2035,21 @@ class Queryset implements \IteratorAggregate, \Countable{
             $this->_context->slug = url_title($this->_context->name, 'dash', TRUE);
 
         }
+
         // actual saving
         $pk = $this->_current_model_primary_key();
+
         if(isset($this->_context->{$pk}) && !empty($this->_context->{$pk})):
+            $pk_value = $this->_context->{$pk};
             $this->_database->where($pk, $this->_context->{$pk});
             $this->_database->update($this->_context->table_name(), $this->_context);
         else:
             $this->_database->insert($this->_context->table_name(), $this->_context);
+            $pk_value = $this->_database->insert_id();
         endif;
 
         // get saved model
-        return $this->get($this->_database->insert_id());
+        return $this->get($pk_value);
     }
 
 
