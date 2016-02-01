@@ -1369,7 +1369,7 @@ class Queryset implements \IteratorAggregate, \Countable{
         // if is array
         if(is_array($this->_query_result)){
             foreach ($this->_query_result as $row) {
-                $pk = $this->_related_model_primary_key(get_class($this->_query_result));
+                $pk = $this->_related_model_primary_key(get_class($row));
                 $primary_result_ids[] = $row->{$pk};
             }
 
