@@ -1,4 +1,7 @@
 <?php
+/**
+ * Orm Errors
+ */
 
 /**
  * Errors from POWERORM
