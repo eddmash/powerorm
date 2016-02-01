@@ -1,8 +1,11 @@
 # powerorm
 A simple ORM library with no configurations required for Codeigniter
 
+To load the orm see here
 
-To use this Orm you need to understand jus two classes.
+http://eddmash.github.io/powerorm/classes/Orm.html
+
+To use this Orm you need to understand just two classes.
 
  - The Base_model class which your models will extend http://eddmash.github.io/powerorm/classes/Base_model.html and 
  - The Queryset class which allows for database interaction http://eddmash.github.io/powerorm/classes/Queryset.html.
@@ -13,3 +16,4 @@ Find the Documentation and Examples here
 
 
 http://eddmash.github.io/powerorm/
+ 
