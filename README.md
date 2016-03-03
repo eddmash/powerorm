@@ -207,5 +207,4 @@ e.g. inside the controller
 # Requirements on 
  - CodeIgniter 3.0+
  - php 5.4+
- - on MYsql 5.6.5
- 
+ - on MYsql 5.6.5 

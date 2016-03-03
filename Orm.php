@@ -2,7 +2,6 @@
 /**
  * Orm Loader
  */
-
 /**
  *
  */
@@ -12,6 +11,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @ignore
  */
 define('POWERORM_VERSION', '1.0.0');
+
 /**
  * class that Loads the ORM LIBRARY
  *
@@ -46,6 +46,7 @@ class Orm{
         // load the CI model class
         include_once(BASEPATH."core/Model.php");
 
+
         // statements
         require_once("db/_loader_.php");
 
@@ -60,6 +61,7 @@ class Orm{
 
         // load some utils
         include_once("tools.php");
+
     }
 }
 
