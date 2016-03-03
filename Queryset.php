@@ -139,10 +139,10 @@ require_once('OrmExceptions.php');
  * The method tells the orm to eagerly load the article and authors in one go when the Queryset is being evaluated.
  * which will result in two sql queries as shown below:
  *
- * <pre><code>$articles = $this->with('author')->article_model->all()
+ * <pre><code>$articles = $this->with(['author' =>'author'])->article_model->all()
  *
  * foreach($articles as $article){
- *      $article->related_one('author')->name;
+ *      $article->author->name;
  * }
  *
  * // one to fetch all the articles
@@ -619,10 +619,10 @@ class Queryset implements \IteratorAggregate, \Countable{
                     $related_model_name = preg_split("/::/", $key)[0];
                     $related_model_search_key = preg_split("/::/", $key)[1];
 
-                    $related_where[$related_model_search_key] = $value;
+                    $related_where[$related_model_search_key] = (is_object($value))?$this->_object_pk_value($value):$value;
 
                 else:
-                    $where_condition[$key] = $value;
+                    $where_condition[$key] = (is_object($value))?$this->_object_pk_value($value):$value;
                 endif;
             endforeach;
 
@@ -653,7 +653,6 @@ class Queryset implements \IteratorAggregate, \Countable{
 
             // foreign key table
             $foreign_key_table = $this->_search_foreignkey($related_model_name, $foreign_key);
-
 
             // ************************* Try Many To One and One To Many **************************
 
@@ -730,6 +729,58 @@ class Queryset implements \IteratorAggregate, \Countable{
      */
     public function distinct(){
         $this->_database->distinct();
+        return $this;
+    }
+
+    /**
+     * Returns the Queryset with it objects grouped by the criteria provided.
+     *
+     * <h4>USAGE: </h4>
+     *
+     * To group countries by year of independence.
+     *
+     * <pre><code>$this->countries->all()->group_by(['independence_year']);</code></pre>
+     *
+     * @param array $criteria a list of fields to group the objects on.
+     * @return $this
+     * @throws OrmExceptions
+     */
+    public function group_by($criteria=[]){
+        if($this->_evaluated){
+            throw new OrmExceptions(sprintf("group_by() cannot be called on an evaluated Queryset"));
+        }
+        if(!is_array($criteria)){
+            throw new OrmExceptions(sprintf("group_by() expects an array"));
+        }
+
+        $this->_database->group_by($criteria);
+
+        return $this;
+    }
+
+    /**
+     * To limit filter down on the results of a group_by based on some criteria.
+     *
+     * <h4>USAGE: </h4>
+     *
+     * To group students having a balance of 2000 based on year of admission .
+     *
+     * <pre><code>$this->students->all()->group_by(['admission_year'])->having(['bal__gt'=>2000]);</code></pre>
+     *
+     * @param array $criteria
+     * @return $this
+     * @throws OrmExceptions
+     */
+    public function having($criteria=[]){
+        if($this->_evaluated){
+            throw new OrmExceptions(sprintf("having() cannot be called on an evaluated Queryset"));
+        }
+        if(!is_array($criteria)){
+            throw new OrmExceptions(sprintf("having() expects an array"));
+        }
+
+        $this->db->having($criteria);
+
         return $this;
     }
 
@@ -823,21 +874,24 @@ class Queryset implements \IteratorAggregate, \Countable{
      *
      * To Eager load related items of a single item
      *
-     * <pre><code>$category = $this->category_model->with("product_model")->get(array("id"=>1));
+     * Provide the name on which the eagerly loaded results will be accessed from in the example below all products of
+     * category with the `id = 1` will be accessed from the variable `products` .
      *
-     * $category->product_models; // the products are now accessible like so
+     * <pre><code>$category = $this->category_model->with(["products"=>"product_model"])->get(array("id"=>1));
      *
-     * foreach($rr->product_models as $product){
+     * $category->products; // the products are now accessible like so
+     *
+     * foreach($rr->products as $product){
      *          echo $product->name;
      * }</code></pre>
      *
      * To Eager Many To Many Relationship
      *
-     * <pre><code>$roles = $this->role->with('permission_model')->filter(array('user_model::id'=>1));
+     * <pre><code>$roles = $this->role->with(['permissions'=>'permission_model'])->filter(array('user_model::id'=>1));
      * foreach ($roles as $role) {
      *         echo $role ;
      *
-     *      foreach ($role->permission_models as $perm) {
+     *      foreach ($role->permissions as $perm) {
      *          echo $perm->name;
      *      }
      * }</code></pre>
@@ -845,24 +899,35 @@ class Queryset implements \IteratorAggregate, \Countable{
      *
      * To Eager Load more than one relationship , this eager loads a user roles and products.
      *
-     * <pre><code>$usr= $this->user_model->with(["products", 'role'])->get(["id"=>1]);
+     * <pre><code>$usr= $this->user_model->with(["products"=>"product_model", 'roles'=>"role_model"])->get(["id"=>1]);
      *
      *
      * </code></pre>
      *
      * @param string|array $eager_model_name the name/names of models to eager load.
      * @return Queryset
+     * @throws OrmExceptions
      */
     public function with($eager_model_name){
         $this->_eager_load = TRUE;
 
-        if(is_string($eager_model_name)):
-            $this->_models_to_eager_load[] = $eager_model_name;
+        if(!is_array($eager_model_name)):
+            throw new OrmExceptions("with() expected an array");
         endif;
+
+        // ensure that name to mount eager models on is set
+        foreach ($eager_model_name as $key=>$name) :
+            if(is_numeric($key)):
+                throw new OrmExceptions(sprintf("with() requires a name on which to store `%s` objects", $name));
+            endif;
+        endforeach;
+
 
         if(is_array($eager_model_name)):
             $this->_models_to_eager_load = $eager_model_name;
         endif;
+
+
         return $this;
     }
 
@@ -882,7 +947,6 @@ class Queryset implements \IteratorAggregate, \Countable{
         return $this->_query_result;
 
     }
-
 
     /**
      * Shows the `sql` statement to be executed at certain point of the queryset chaining.
@@ -1239,8 +1303,6 @@ class Queryset implements \IteratorAggregate, \Countable{
         $this->_database->where_in($related_model_short_name."_".$related_pk, $related_ids);
         $this->_database->delete($join_table);
 
-        var_dump($this->_database->last_query());
-
     }
 
     /**
@@ -1460,7 +1522,7 @@ class Queryset implements \IteratorAggregate, \Countable{
             // get data from the table rows
             foreach ($fetch_result as $row_obj) {
                 $class_instance = $this->_clone_model($model_name);
-                // ToDo its doing multiple sql calls because we are getting the meta data of the table with each initialization of an model object
+
                 foreach ($row_obj as $column=>$value) {
 
                     $class_instance->{$column} = $value;
@@ -1513,7 +1575,7 @@ class Queryset implements \IteratorAggregate, \Countable{
         // if is array
         if(is_array($this->_query_result)){
             foreach ($this->_query_result as $row) {
-                $pk = $this->_related_model_primary_key(get_class($row));
+                $pk = $row->primary_key();
                 $primary_result_ids[] = $row->{$pk};
             }
 
@@ -1522,7 +1584,7 @@ class Queryset implements \IteratorAggregate, \Countable{
         // if primary result was an object
         if(is_object($this->_query_result)){
             // get primary key
-            $pk = $this->_related_model_primary_key(get_class($this->_query_result));
+            $pk = $this->_query_result->primary_key();
             $primary_result_ids[] = $this->_query_result->{$pk};
         }
 
@@ -1541,63 +1603,99 @@ class Queryset implements \IteratorAggregate, \Countable{
         }
 
         // loop through all the models we area eager loading
-        foreach ($this->_models_to_eager_load as $eager_load_model_name) {
+        foreach ($this->_models_to_eager_load as $mount_point=>$eager_load_model_name) {
+            $foreign_key = NULL;
+            // look for relationship
+            if(preg_match("/::/", $eager_load_model_name)):
+                $foreign_key = preg_split("/::/", $eager_load_model_name)[1];
+                $eager_load_model_name = preg_split("/::/", $eager_load_model_name)[0];
+            endif;
 
             // load the model
             $this->_load_related_model($eager_load_model_name);
 
+            // table names
+            $eager_table_name = $this->_context->{$eager_load_model_name}->table_name();
+            $eager_table_short_name = $this->_related_table_short_name($eager_load_model_name);
 
             // get the table with the foreign key
-            if($this->_search_foreignkey($eager_load_model_name)):
+            if($foreign_key_table = $this->_search_foreignkey($eager_load_model_name, $foreign_key)):
 
-                // create a new Quuerset, based on the model to eager load
+                // create a new Querset, based on the model to eager load
                 $q = new Queryset($this->_context->{$eager_load_model_name});
 
                 // perform a where in on the eager model using the primary result ids
-                $current_pk = $this->_current_model_primary_key();
+                $primary_result_pk = $this->_current_model_primary_key();
 
                 $args = array(
-                    get_class($this->_context)."::".$current_pk."__in" => $primary_result_ids
+                    get_class($this->_context)."::".$primary_result_pk."__in" => $primary_result_ids
                 );
 
-                $eager_models = $q->distinct()->filter($args);
+                $eager_models = $q->distinct()->filter($args, $foreign_key);
+
 
                 // if primary result was an array
                 // mount the eagerly loaded data on the primary results
                 if(is_array($primary_results)):
 
                     foreach ($primary_results as $primary_result):
-                        // creates  the eagerly loaded data class variable
-                        if(!property_exists($primary_result, $eager_load_model_name."s")):
-                            $primary_result->{$eager_load_model_name."s"} = array();
+
+                        // creates  the eagerly loaded data mount point on the primary results
+                        if(!property_exists($primary_result, $mount_point)):
+                            $primary_result->{$mount_point} = NULL;
                         endif;
 
-                        // works for one to many
-                        foreach ($eager_models as $model_eager) :
+                        // ***************************** Many to One side Eager Loading ****************************
+                        // load data on mount point
+                        // in product has one category, the product is the primary result here
+                        if($foreign_key_table === $primary_result->table_name()):
+                            foreach ($eager_models as $eager_model) :
+                                $eager_pk = $eager_model->primary_key();
+                                $foreign_key = ($foreign_key)? $foreign_key : $eager_table_short_name.'_'.$eager_pk;
 
-                            if($model_eager->{$primary_result_table_name.'_'.$current_pk}===$primary_result->{$current_pk}):
-                                $primary_result->{$eager_load_model_name."s"}[]=$model_eager;
-                            endif;
+                                if($primary_result->{$foreign_key}===$eager_model->{$eager_pk}):
+                                    $primary_result->{$mount_point}=$eager_model;
+                                endif;
+                            endforeach;
+                        endif;
 
-                        endforeach;
+                        // ************************ One to Many side Eager Loading ****************************
+                        // in category has many products
+                        // works for one to many i.e. category is the primary result
+                        if($foreign_key_table !== $primary_result->table_name()):
+                            $primary_result->{$mount_point} = [];
+                            foreach ($eager_models as $model_eager) :
+                                $foreign_key = ($foreign_key)? $foreign_key : $primary_result_table_name.'_'.$primary_result_pk;
+
+                                if($model_eager->{$foreign_key}===$primary_result->{$primary_result_pk}):
+                                    $primary_result->{$mount_point}[]=$model_eager;
+                                endif;
+
+                            endforeach;
+                        endif;
 
                     endforeach;
 
                 endif;
             else:
-                // Many to Many Eager Loading
+                // ***************************************** Many to Many Eager Loading *********************
                 $join_table = $this->_get_join_table($eager_load_model_name);
                 $current_short_name = $this->_current_table_short_name();
                 $current_pk = $this->_current_model_primary_key();
 
-                $select = $this->_context->{$eager_load_model_name}->table_name().".* ,$join_table.$current_short_name"."_".$current_pk;
+                $select = $eager_table_name.".* ,$join_table.$current_short_name"."_".$current_pk;
                 $this->_database->select($select);
                 $this->_database->from($this->_context->table_name());
-                $this->_m2m_join($eager_load_model_name);
-                $this->_database->where_in($this->_context->table_name().'.'.$current_pk, $primary_result_ids);
+
+                // create the joins
+                $this->_m2m_join($eager_load_model_name, NULL, $foreign_key);
+
+                // the where clause
+                $this->__where_clause(get_class($this->_context), [$current_pk."__in"=>$primary_result_ids]);
 
                 $query = $this->_database->get();
 
+                // convert results into there respective models
                 $result_cast = $this->_cast_to_model($query->result(), $eager_load_model_name);
 
 
@@ -1607,15 +1705,15 @@ class Queryset implements \IteratorAggregate, \Countable{
 
                     foreach ($primary_results as $primary_result):
                         // creates  the eagerly loaded data class variable
-                        if(!property_exists($primary_result, $eager_load_model_name."s")):
-                            $primary_result->{$eager_load_model_name."s"} = array();
+                        if(!property_exists($primary_result, $mount_point)):
+                            $primary_result->{$mount_point} = array();
                         endif;
 
                         // works for one to many
                         foreach ($result_cast as $model_eager) :
 
                             if($model_eager->{$primary_result_table_name.'_'.$current_pk}===$primary_result->{$current_pk}):
-                                $primary_result->{$eager_load_model_name."s"}[]=$model_eager;
+                                $primary_result->{$mount_point}[]=$model_eager;
                             endif;
 
                         endforeach;
@@ -1778,32 +1876,32 @@ class Queryset implements \IteratorAggregate, \Countable{
         $related_table_short_name = $this->_related_table_short_name($related_model_name);
         $current_table_short_name = $this->_current_table_short_name();
 
-        // foreign key table
-        $foreign_key = (isset($foreign_key))?$foreign_key: NULL;
 
         $foreign_key_table = $this->_search_foreignkey($related_model_name, $foreign_key);
 
 
         // ================================= ONE TO MANY ===================================
 
-
         if($foreign_key_table===$this->_context->table_name()):
+            // foreign key table
+            $foreign_key = (isset($foreign_key))?$foreign_key: $related_table_short_name."_".$related_pk;
             // if someone is trying to filter the Many side
             // e.g if some is trying to get all products that fall under a certain category
             // in a relationship where the category is the one side and the product is the many side
             // $this->product_model->filter(array('category_model::id'=>5)));
-            $on = $foreign_key_table.".".$related_table_short_name."_".$related_pk."=".$related_table_name.".".$related_pk;
+            $on = $foreign_key_table.".".$foreign_key."=".$related_table_name.".".$related_pk;
             $this->_database->join($related_table_name, $on);
         else:
-
+            // foreign key is not in the current table
+            // foreign key table
+            $foreign_key = (isset($foreign_key))?$foreign_key: $current_table_short_name."_".$current_pk;
             // ========================================== MANY TO ONE =============================
-
 
             // if someone is trying to filter the One side in a one to many relationship
             // e.g if some is trying to get the category a product belongs to
             // in a relationship where the category is the one side and the product is the many side
             // $this->category_model->filter(array('product_model::1d'=>5)));
-            $on = $this->_context->table_name().".".$current_pk."=".$related_table_name.".".$current_table_short_name."_".$current_pk;
+            $on = $this->_context->table_name().".".$current_pk."=".$related_table_name.".".$foreign_key;
             $this->_database->join($this->_context->{$related_model_name}->table_name(), $on);
         endif;
 
@@ -1837,11 +1935,11 @@ class Queryset implements \IteratorAggregate, \Countable{
      */
     public function _related($model_name){
         $current_pk = $this->_current_model_primary_key();
-        $related_pk = $this->_related_model_primary_key($model_name);
         // check that we have the parent model to get its related data.
         if(!isset($this->_context->{$current_pk})):
             throw new OrmExceptions(sprintf("Trying to get related data of nothing."));
         endif;
+
 
         $related_model_name = NULL;
         $foreign_key = NULL;
@@ -1852,6 +1950,8 @@ class Queryset implements \IteratorAggregate, \Countable{
         else:
             $related_model_name = $model_name;
         endif;
+
+        $related_pk = $this->_related_model_primary_key($related_model_name);
 
         // related model instance
         $this->_load_related_model($related_model_name);
@@ -1885,7 +1985,9 @@ class Queryset implements \IteratorAggregate, \Countable{
 
         // foreign key table
         $foreign_key_table = $this->_search_foreignkey($related_model_name, $foreign_key);
+
         if($foreign_key_table && !$one2one):
+
             // try one to many and Many to One
             $this->_m2o_join($related_model_name, NULL, $foreign_key);
         endif;
@@ -1894,6 +1996,7 @@ class Queryset implements \IteratorAggregate, \Countable{
         // ************************* Try Many To Many **************************
 
         if($foreign_key_table==FALSE && !$one2one):
+
             $this->_m2m_join($related_model_name, NULL, $foreign_key);
         endif;
 
@@ -1949,31 +2052,31 @@ class Queryset implements \IteratorAggregate, \Countable{
 
         $current_table_id=$this->_current_table_short_name().'_'.$this->_current_model_primary_key();
 
-        // search foreign key of current table on the related table
-        if($this->_database->field_exists($current_table_id, $this->_context->{$related_model_name}->table_name())){
-            $present = $this->_context->{$related_model_name}->table_name();
-        }
-
         $related_model_name_id = $related_table_name_short.'_'.$this->_related_model_primary_key($related_model_name);
 
 
         if($present==FALSE && $foreign_key){
 
             // search foreign key of current table on the related table
-            if($this->_database->field_exists($foreign_key, $this->_context->{$related_model_name}->table_name())){
+            if(in_array($foreign_key, $this->_context->{$related_model_name}->fields_names())){
                 $present = $this->_context->{$related_model_name}->table_name();
             }
 
+
             // search foreign key of the related table on current table
-            if($this->_database->field_exists($foreign_key, $this->_context->table_name())){
+            if(in_array($foreign_key, $this->_context->fields_names())){
                 $present = $this->_context->table_name();
             }
         }
 
-        // ToDo search in related table
         // search foreign key of the related table on current model
         if($present==FALSE && in_array($related_model_name_id, $this->_context->fields_names())){
             $present = $this->_context->table_name();
+        }
+
+        // search foreign key of current table on the related table
+        if(in_array($current_table_id, $this->_context->{$related_model_name}->fields_names())){
+            $present = $this->_context->{$related_model_name}->table_name();
         }
 
 
@@ -2019,7 +2122,6 @@ class Queryset implements \IteratorAggregate, \Countable{
         endif;
     }
 
-
     /**
      * Does the actual saving
      * @internal
@@ -2039,6 +2141,28 @@ class Queryset implements \IteratorAggregate, \Countable{
         // actual saving
         $pk = $this->_current_model_primary_key();
 
+        // got through the fields trying to find to find field with objects as value
+
+        foreach ($this->_context->fields_names() as $field) {
+
+            // assumes current context is the many side being saved that is it has the foreign key
+            if(is_object($this->_context->{$field}) && $this->_context->{$field} instanceof Queryset):
+                // evaluate the Queryset
+                $field_value = $this->_context->{$field}->value();
+
+                $field_model_name = get_class($field_value);
+                $related_pk = $this->_related_model_primary_key($field_model_name);
+                $this->_context->{$field} = $field_value->{$pk};
+            endif;
+
+            if(is_object($this->_context->{$field}) && !($this->_context->{$field} instanceof Queryset)):
+                $field_model_name = get_class($this->_context->{$field});
+                $related_pk = $this->_related_model_primary_key($field_model_name);
+                $this->_context->{$field} = $this->_context->{$field}->{$pk};
+            endif;
+        }
+
+
         if(isset($this->_context->{$pk}) && !empty($this->_context->{$pk})):
             $pk_value = $this->_context->{$pk};
             $this->_database->where($pk, $this->_context->{$pk});
@@ -2051,8 +2175,6 @@ class Queryset implements \IteratorAggregate, \Countable{
         // get saved model
         return $this->get($pk_value);
     }
-
-
 
     /**
      * Save Many to Many relations
@@ -2133,6 +2255,18 @@ class Queryset implements \IteratorAggregate, \Countable{
         endforeach;
 
         return $primary_key_column;
+    }
+
+    /**
+     * @ignore
+     * @param $object
+     * @return mixed
+     *
+     */
+    public function _object_pk_value($object){
+        // this will get the query set
+        $pk = $object->primary_key();
+        return $object->{$pk};
     }
 
     /**

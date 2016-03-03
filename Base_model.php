@@ -149,7 +149,6 @@ class Base_model extends \CI_Model{
      * @return mixed
      */
     public function __call($method, $args){
-        // ToDo what if the object is already created
 
         // create a Queryset if method is class and is present in Queryset
         if (!method_exists($this, $method) &&
@@ -287,6 +286,22 @@ class Base_model extends \CI_Model{
         return $this->_get_queryset();
     }
 
+    /**
+     * Returns the name of the primary key column
+     * @return string
+     */
+    public function primary_key(){
+        $table_columns = $this->meta();
+
+        $primary_key_column = NULL;
+        foreach ($table_columns as $col) :
+            if($col->primary_key):
+                $primary_key_column = $col->name;
+            endif;
+        endforeach;
+
+        return $primary_key_column;
+    }
 
 
 
@@ -396,28 +411,6 @@ class Base_model extends \CI_Model{
             $this->last_updated_on = date('Y-m-d H:i:s');
         }
     }
-
-    /**
-     * ToDo remove from base model
-     * @ignore
-     * @param bool $owner_field
-     * @return bool
-     */
-    public function is_owner($owner_field=FALSE){
-        $status = FALSE;
-        $user_id = $this->auth->user->id;
-
-        if($owner_field==False && $this->user_id == $user_id){
-            $status = TRUE;
-        }
-
-        if($owner_field!=False && $this->{$owner_field} == $user_id){
-            $status = TRUE;
-        }
-
-        return $status;
-    }
-
 
 
 

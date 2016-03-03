@@ -10,4 +10,8 @@
  */
 class OrmErrors extends ErrorException{}
 
+/**
+ * Raised by Orm
+ * Class TypeError
+ */
 class TypeError extends OrmErrors{}
