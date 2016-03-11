@@ -190,7 +190,7 @@ class Queryset implements \IteratorAggregate, \Countable
      * @var object Holds a copy of the database connection the current queryset will use
      * @internal
      */
-    protected $_database;
+//    protected $_database;
 
     /**
      * @var bool Indacates if a Queryset has been evaluated.
@@ -250,15 +250,16 @@ class Queryset implements \IteratorAggregate, \Countable
      *
      */
     /**
-     * @param $model the model the Queryset works on.
+     * @param \PModel $model the model the Queryset works on.
+     * @param object $database the database to use.
      */
-    public function __construct($model)
+    public function __construct($database, $model)
     {
 
         $this->_active_model_object = $model;
 
         // setup database
-        $this->_database();
+        $this->_database($database);
 
     }
 
@@ -283,7 +284,6 @@ class Queryset implements \IteratorAggregate, \Countable
      */
     public function __get($property)
     {
-
         $value = NULL;
         // check if queryset is already evaluated
         if (!$this->_evaluated):
@@ -982,6 +982,7 @@ class Queryset implements \IteratorAggregate, \Countable
                 endif;
 
                 if($field_object instanceof HasOne):
+                    var_dump($db_value);
                     return $field_object->related_model->filter(["$act_name::$act_pk"=>$db_value])->first();
                 endif;
 
@@ -1453,22 +1454,30 @@ class Queryset implements \IteratorAggregate, \Countable
         return FALSE;
     }
 
-    protected function _database()
+    /**
+     * Creates a copy of the database connection.
+     * @internal
+     * @param $database
+     */
+    protected function _database($database)
     {
+        // This is because codeigniter creates a single object for each group,
+        // Since we are using lazy loading, this means if we dont create a copy of the database connection,
+        // the first queryset method to execute will clear out the object, meaning consecutive methods will raise an
+        // error since no table will be set for action.
         $_ci =& get_instance();
-        // load database
-        $_ci->load->database();
-        if (ENVIRONMENT == 'development'):
-            // for development only
-            $_ci->output->enable_profiler(TRUE);
-            $this->db_id = uniqid();
-            $_ci->{$this->db_id} = $this->_shallow_copy($_ci->db);
-            // create a copy of the database to ensure its unique for each queryset
-            $this->_database = $_ci->{$this->db_id};
 
+
+        if ($_ci->output->enable_profiler):
+            // only if the profiler is on, otherwise it doesnt make sense.
+
+            $db_id = $this->_model_name($this->_active_model_object)."_model_".uniqid();
+            $_ci->{$db_id} = $database;
+            // create a copy of the database to ensure its unique for each queryset
+            $this->_database = $_ci->{$db_id};
         else:
             // create a copy the database to ensure its unique for each queryset
-            $this->_database = $this->_shallow_copy($_ci->db);
+            $this->_database = $database;
         endif;
 
         $this->_database->reset_query();

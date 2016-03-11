@@ -160,12 +160,6 @@ abstract class PModel extends \CI_Model
         if ($this->_signal):
             $this->signal->dispatch('powerorm.model.post_init', $this);
         endif;
-
-        // load the database if it has not been loaded
-        if (!isset($this->db)):
-            $this->load->database();
-        endif;
-
     }
 
 
@@ -252,18 +246,33 @@ abstract class PModel extends \CI_Model
      * @internal
      * @return Queryset
      */
-    public function _get_queryset()
+    public function _get_queryset($opts)
     {
-        return new Queryset($this);
+        return new Queryset($this->_get_db($opts), $this);
     }
 
     /**
      * Creates a Queryset that is used to interaract with the database
      * @return Queryset
      */
-    public function queryset()
+    public function queryset($opts)
     {
-        return $this->_get_queryset();
+        return $this->_get_queryset($opts);
+    }
+
+    public function _get_db($opts){
+        $use_db_group = '';
+        if(array_key_exists('use_db_group', $opts)):
+            $use_db_group = $opts['use_db_group'];
+        endif;
+
+        if(!empty($use_db_group)):
+            $database = $this->load->database($use_db_group, TRUE);
+        else:
+            $database = $this->load->database('', TRUE);;
+        endif;
+
+        return $database;
     }
 
 
@@ -435,21 +444,21 @@ abstract class PModel extends \CI_Model
      * ============================================= QUERY METHODS ============================================
      */
 
-    public function get($conditions){
-        return $this->queryset()->get($conditions);
+    public function get($conditions, $opts=[]){
+        return $this->queryset($opts)->get($conditions);
     }
 
-    public function filter($conditions)
+    public function filter($conditions, $opts=[])
     {
-        return $this->queryset()->filter($conditions);
+        return $this->queryset($opts)->filter($conditions);
     }
 
-    public function all(){
-        return $this->queryset()->all();
+    public function all($opts=[]){
+        return $this->queryset($opts)->all();
     }
 
-    public function exclude($conditions){
-        return $this->queryset()->exclude($conditions);
+    public function exclude($conditions, $opts=[]){
+        return $this->queryset($opts)->exclude($conditions);
     }
 
     /**
@@ -489,7 +498,7 @@ abstract class PModel extends \CI_Model
      * $role = $cat->save();</code></pre>
      * @return mixed
      */
-    public function save(){
+    public function save($opts=[]){
         // run this in transaction
         $this->db->trans_start();
 
@@ -498,7 +507,7 @@ abstract class PModel extends \CI_Model
             $this->signal->dispatch('powerorm.model.pre_save', $this);
         endif;
 
-        $save_model=$this->queryset()->_save();
+        $save_model=$this->queryset($opts)->_save();
 
         // alert everyone of the save
         if(class_exists('Signal', FALSE)):
@@ -515,8 +524,8 @@ abstract class PModel extends \CI_Model
         return $save_model;
     }
 
-    public function with($conditions){
-        return $this->queryset()->_eager_load($conditions);
+    public function with($conditions, $opts=[]){
+        return $this->queryset($opts)->_eager_load($conditions);
     }
 
     /**
@@ -553,7 +562,7 @@ abstract class PModel extends \CI_Model
      * @throws OrmExceptions
      * @throws TypeError
      */
-    public function add($related=[]){
+    public function add($related=[], $using_db_group=''){
         if(!is_array($related)){
             throw new OrmExceptions(sprintf("add() expects an array of models"));
         }
@@ -584,7 +593,7 @@ abstract class PModel extends \CI_Model
 
         // save related models many to many
 
-        $this->queryset()->_m2m_save($related);
+        $this->queryset($using_db_group)->_m2m_save($related);
 
     }
 
