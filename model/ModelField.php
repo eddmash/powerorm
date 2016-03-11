@@ -1,13 +1,15 @@
 <?php
 //namespace powerorm\model;
 
-use powerorm\model\OrmExceptions;
+use powerorm\exceptions\OrmExceptions;
 use powerorm\model\RelationObject;
 use powerorm\form;
 
 
 /**
  * Class ModelField
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class ModelField{
     public $name=Null;
@@ -62,10 +64,6 @@ class ModelField{
     }
 
     public function __validate_name(){
-
-    }
-
-    public function check(){
 
     }
 
@@ -151,6 +149,10 @@ class ModelField{
     }
 
     public function clean($context, $value){
+
+    }
+
+    public function check(){
 
     }
 
@@ -338,6 +340,7 @@ class RelatedField extends ModelField{
 
     public $related_model;
     public $model;
+    public $inverse = TRUE;
 
     protected $on_update;
     protected $on_delete;
@@ -386,7 +389,7 @@ class ForeignKey extends RelatedField{
         $opts = $this->_prepare_form_field();
 
         // fetch all the records in the related model
-        $opts['type'] = 'dropdown';
+        $opts['type'] = 'multiselect';
         $opts['form_display_field'] = $this->form_display_field;
         $opts['form_value_field'] = $this->form_value_field;
         $opts['choices'] = $this->related_model->all();
@@ -402,7 +405,8 @@ class ForeignKey extends RelatedField{
     }
 
     public function db_column_name(){
-        return $this->name.'_'.$this->related_model->meta->primary_key->db_column_name();
+        $related_model_pk = strtolower($this->related_model->meta->primary_key->db_column_name());
+        return sprintf('%1$s_%2$s', strtolower($this->name), $related_model_pk);
     }
 
     public function constraint_name($prefix){
@@ -422,6 +426,19 @@ class OneToOne extends ForeignKey{
         $this->O2O = TRUE;
         $this->unique = TRUE;
 
+    }
+
+    public function form_field(){
+
+        $opts = $this->_prepare_form_field();
+
+        // fetch all the records in the related model
+        $opts['type'] = 'dropdown';
+        $opts['form_display_field'] = $this->form_display_field;
+        $opts['form_value_field'] = $this->form_value_field;
+        $opts['choices'] = $this->related_model->all();
+
+        return new form\FormField($opts);
     }
 }
 
@@ -443,22 +460,10 @@ class ManyToMany extends RelatedField{
 }
 
 
-abstract class InverseRelation{
-    public $name;
-    public $model_name;
-
-    public function __construct($model_name){
-        $this->model_name = $model_name;
-    }
-
-    public function queryset(){
-        return '';
-    }
-
-    public function __get($key){
-//        return
-    }
+abstract class InverseRelation extends RelatedField{
+    public $inverse = TRUE;
 }
 
 class HasMany extends InverseRelation{}
+
 class HasOne extends InverseRelation{}

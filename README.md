@@ -1,5 +1,5 @@
 # powerorm 
-A light weight orm inspired by Django ORM for Codeigniter.
+A light weight easy to use CodeIgniter ORM.
 
 # Introduction
 I created this project because i required a lightweight easy to use orm that i could use in my Codeigniter projects 
@@ -10,27 +10,36 @@ That is, i wanted to avoid the repetitive actions of creating migration files, c
 database and also wanted to be able to see all my database table fields on my models without me going to the database 
 tables themselves and use this fields to interact with the database.
 
+This ORM is heavily inspired by Django ORM. Because i personally love how there orm works.
 
 # Dependecies
 This orm heavily relies on the core libraries provided with CodeIgniter without making any alterations on them.
+This means that any configuration made for the following libraries will affect how the ORM operates
 
 - The CodeIgniter Migration library
 
-- The CodeIgniter Database classes
+- The CodeIgniter Database classes 
+- The QueryBuilder Class.
 
 # Configuration
  - Enable migrations 
- Locate `application/config/migration.php` and enable migration. ```$config['migration_enabled'] = TRUE;```
+    Locate `application/config/migration.php` and enable migration. ```$config['migration_enabled'] = TRUE;```
+ - Enable query builder class 
+    Locate `application/config/database.php` and enable migration. ```$query_builder = TRUE;```
  - Load the **powerorm** library. preferable on autoload. ```$autoload['libraries'] = array('powerorm/orm',);```
+ 
 
 # Features
+ - Allows to fully think of the database and its table in an object oriented manner i.e. 
+    table are represented by model and columns are represented by fields.
  - Create automatic migration files
+ - All fields visible on the model, no need to look at the database table when you want to interact with the database.
  - Provides database interaction methods
  
 # How It works
 
 The orm takes each model created to represent a database table, it also takes any fields defined in the **fields()**
- method to represent a column of that table. 
+ method to represent a column in that table. 
  
 # Usage 
 
@@ -90,9 +99,7 @@ Once you have the models created, on the command line/ terminal, run the followi
 Once the files have been generated you can run the following command to actually create the tables in the database.
 
 `php index.php migrations/migrate`
-
-This will generate all the migration required to create the above models table in the database
-
+ 
 Looking at the roles model, it will generate a migration file that looks as shown below:
 
     // Migration for the model role

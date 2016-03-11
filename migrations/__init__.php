@@ -1,5 +1,4 @@
-<?php
-include_once("Exceptions.php");
+<?php 
 include_once("RunSql.php");
 include_once("operations/Operation.php");
 include_once("operations/Model.php");

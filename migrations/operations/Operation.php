@@ -1,10 +1,11 @@
 <?php
 namespace powerorm\migrations\operations;
+
 /**
- * Created by http://eddmash.com.
- * User: eddmash
- * Date: 2/21/16
- * Time: 12:16 AM
+ * Class Operation
+ * @package powerorm\migrations\operations
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class Operation{
 
@@ -15,7 +16,8 @@ abstract class Operation{
 
     public function db_table(){
         if(isset($this->options['table_name'])):
-            return $this->options['table_name'];
+            $name = $this->options['table_name'];
+            return $name;
         endif;
     }
 }

@@ -2,9 +2,14 @@
 namespace powerorm\migrations\operations;
 
 
+use powerorm\db\MysqlStatements;
 
-use powerorm\migrations\MysqlStatements;
-
+/**
+ * Class AddField
+ * @package powerorm\migrations\operations
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class AddField extends Operation
 {
     public $model_name;
@@ -36,6 +41,7 @@ class AddField extends Operation
 
     public function state(){
         $model = ['model_name'=>$this->model_name,'operation'=>'add_field'];
+        $model = array_merge($model, $this->options);
 
         foreach ($this->fields as $field) :
             $fields['fields'][$field->name] = $field->skeleton();
@@ -46,6 +52,12 @@ class AddField extends Operation
     }
 }
 
+/**
+ * Class DropField
+ * @package powerorm\migrations\operations
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class DropField extends Operation
 {
     public $model_name;
@@ -75,6 +87,7 @@ class DropField extends Operation
 
     public function state(){
         $model = ['model_name'=>$this->model_name,'operation'=>'drop_field'];
+        $model = array_merge($model, $this->options);
 
         foreach ($this->fields as $field) :
             $fields['fields'][$field->name] = $field->skeleton();
@@ -85,6 +98,12 @@ class DropField extends Operation
     }
 }
 
+/**
+ * Class AlterField
+ * @package powerorm\migrations\operations
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class AlterField extends Operation{
 
     public $model_name;
@@ -251,6 +270,7 @@ class AlterField extends Operation{
 
     public function state(){
         $model = ['model_name'=>$this->model_name,'operation'=>'modify_field'];
+        $model = array_merge($model, $this->options);
 
         $fields_collection['fields'] =[];
         foreach ($this->fields as $name=>$fields) :
@@ -262,4 +282,97 @@ class AlterField extends Operation{
         return array_merge($model, $fields_collection);
     }
 
+}
+
+
+class AddM2MField extends Operation{
+    public $model_name;
+    public $fields;
+    public $options;
+    public $proxy;
+
+    public function __construct($name, $fields, $proxy, $options){
+        $this->model_name = $name;
+        $this->proxy = $proxy;
+        $this->fields = $fields;
+        $this->options = $options;
+    }
+
+    public function up(){
+
+        $table = MysqlStatements::create_table($this->db_table());
+        $fields = MysqlStatements::add_table_field($this->proxy->meta->fields);
+        $triggers =  MysqlStatements::date_fields_triggers($this->db_table(), $this->proxy->meta->fields);
+        return array_merge($fields, $table, $triggers);
+
+    }
+
+    public function down()
+    {
+        return array_merge(MysqlStatements::drop_table($this->db_table()),
+            MysqlStatements::date_fields_drop_triggers($this->db_table(), $this->proxy->meta->fields));
+    }
+
+    public function message()
+    {
+        return "add_m2m_field";
+    }
+
+    public function state(){
+        $model = ['model_name'=>$this->model_name,'operation'=>'add_m2m_field'];
+        $model = array_merge($model, $this->options);
+
+        $fields['fields'] = [];
+        foreach ($this->fields as $field_name=>$field_obj) :
+            $fields['fields'][$field_name] = $field_obj->skeleton();
+        endforeach ;
+
+        return array_merge($model, $fields);
+    }
+}
+
+class DropM2MField extends Operation{
+    public $model_name;
+    public $fields;
+    public $options;
+    public $proxy;
+
+    public function __construct($name, $fields, $proxy, $options){
+        $this->model_name = $name;
+        $this->proxy = $proxy;
+        $this->fields = $fields;
+        $this->options = $options;
+    }
+    public function up()
+    {
+        return array_merge(MysqlStatements::drop_table($this->db_table()),
+            MysqlStatements::date_fields_drop_triggers($this->db_table(), $this->proxy->meta->fields));
+    }
+
+    public function down(){
+
+        $table = MysqlStatements::create_table($this->db_table());
+        $fields = MysqlStatements::add_table_field($this->proxy->meta->fields);
+        $triggers =  MysqlStatements::date_fields_triggers($this->db_table(), $this->proxy->meta->fields);
+        return array_merge($fields, $table, $triggers);
+
+    }
+
+
+    public function message()
+    {
+        return "drop_m2m_field";
+    }
+
+    public function state(){
+        $model = ['model_name'=>$this->model_name,'operation'=>'drop_m2m_field'];
+        $model = array_merge($model, $this->options);
+
+        $fields['fields'] = [];
+        foreach ($this->fields as $field_name=>$field_obj) :
+            $fields['fields'][$field_name] = $field_obj->skeleton();
+        endforeach ;
+
+        return array_merge($model, $fields);
+    }
 }

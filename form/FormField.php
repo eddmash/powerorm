@@ -1,9 +1,15 @@
 <?php
 namespace powerorm\form;
 
-use powerorm\form\FormException;
-use powerorm\model\Queryset;
+use powerorm\exceptions\FormException;
+use powerorm\queries\Queryset;
 
+/**
+ * Class FormField
+ * @package powerorm\form
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class FormField{
     public $type;
     public $name;
@@ -70,7 +76,7 @@ class FormField{
         $widget = NULL;
         switch($this->type):
             case "hidden":
-                $widget = form_hidden($this->name, $this->value);
+                $widget = form_hidden($this->get_widget_name(), $this->value);
                 break;
             case "password":
                 $widget = form_password($field_attr);
@@ -84,20 +90,11 @@ class FormField{
             case "dropdown":
                 $widget = $this->_dropdown_widget();
                 break;
+            case "multiselect":
+                $widget = $this->_dropdown_widget(TRUE);
+                break;
             case "textarea":
                 $widget = form_textarea($field_attr);
-                break;
-            case "multiselect":
-//                $this->name = $this->name."[]";
-//                $field_attr['type']='multiselect';
-//                $selected = array();
-//
-//                foreach ($this->_values as $choice) {
-//                    $pk = $choice->primary_key();
-//                    array_push($selected, $choice->{$pk});
-//                }
-//
-//                $widget = form_multiselect($this->name, $this->_choices, $selected, $field_attr);
                 break;
             case "currency":
                 $this->type = 'select';
@@ -153,7 +150,7 @@ class FormField{
             $checked = $this->_checkbox_value($value, $sys_name);
 
             $widget .= sprintf('<span class="checkbox-widget"> %1$s &nbsp; %2$s &nbsp; </span>',
-                        form_checkbox("$this->name[]", $sys_name, $checked), $human_readable);
+                        form_checkbox($this->get_widget_name(), $sys_name, $checked), $human_readable);
         endforeach;
 
         return $widget;
@@ -169,16 +166,15 @@ class FormField{
             $checked = $this->_checkbox_value($value, $sys_name);
 
             $widget .= sprintf('<span class="radio-widget"> %1$s &nbsp; %2$s &nbsp; </span>',
-                form_radio("$this->name[]", $sys_name, $checked), $human_readable);
+                form_radio($this->get_widget_name(), $sys_name, $checked), $human_readable);
         endforeach;
 
         return $widget;
 
     }
 
-    public function _dropdown_widget(){
+    public function _dropdown_widget($multiselect=FALSE){
         $widget = '';
-
         $value = $this->_choices_value($this->value);
 
         $checked = [];
@@ -188,13 +184,17 @@ class FormField{
                 $checked[] = $opt;
             endif;
         endforeach;
+
         $choices = $this->_prepare_choices($this->choices);
 
         if(!empty($this->empty_label)):
-            $choices = array_merge([" "=>$this->empty_label], $choices);
+            $choices = [" "=>$this->empty_label] + $choices;
         endif;
-
-        $widget .=  form_dropdown($this->name, $choices, $checked) ;
+        if($multiselect):
+            $widget .=  form_multiselect($this->get_widget_name(), $choices, $checked) ;
+        else:
+            $widget .=  form_dropdown($this->get_widget_name(), $choices, $checked) ;
+        endif;
 
         return $widget;
     }
@@ -205,7 +205,7 @@ class FormField{
         endif;
 
         $attrs = array(
-            'name' => $this->name,
+            'name' => $this->get_widget_name(),
             'placeholder' => ucwords(str_replace('_', ' ', $this->name.' ...')),
             'id'  =>  $this->name,
             'maxlength'  =>  $this->max_length,
@@ -232,7 +232,7 @@ class FormField{
     public function _choices_value($values){
         $value = $values;
 
-        if($value instanceof \Queryset):
+        if($value instanceof Queryset):
             $value = $value->value();
         endif;
 
@@ -252,6 +252,7 @@ class FormField{
 
         return $value;
     }
+
     public function _prepare_choices($choices){
 
         $form_choices = $choices;
@@ -262,14 +263,14 @@ class FormField{
             if(is_array($choices)):
                 $form_choices = [];
                 foreach ($choices as $choice) :
-                    $form_choices = array_merge($form_choices, $this->_prepare_choices($choice));
+                    $form_choices = $form_choices + $this->_prepare_choices($choice);
                 endforeach;
 
             endif;
 
         endif;
 
-        if(is_object($choices)):
+        if(is_object($choices) && $choices instanceof \PModel):
 
             $form_choices = [];
 
@@ -335,5 +336,18 @@ class FormField{
     public function set_value($value){
         $this->value= $value;
     }
+
+    public function __set($field_name, $field_value){
+        $this->value= $field_value;
+    }
+
+    public function get_widget_name(){
+        $name = $this->name;
+        if(in_array($this->type, ['multiselect', 'checkbox'])):
+            $name = $name."[]";
+        endif;
+        return $name;
+    }
+
 }
 

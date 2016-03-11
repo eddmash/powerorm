@@ -6,10 +6,14 @@
  * Time: 11:28 AM
  */
 
-namespace powerorm\migrations;
+namespace powerorm\db;
 
-use powerorm\db\Statements;
-
+/**
+ * Create Mysql related sql statements
+ * @package powerorm\db
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class MysqlStatements implements Statements{
     public static $create_table = 'RunSql::create_table("%1$s", %2$s, %3$s);';
     public static $drop_table = 'RunSql::drop_table("%1$s", %2$s);';
@@ -167,17 +171,20 @@ class MysqlStatements implements Statements{
     public static function drop_table_field($table, $fields){
         $field_sql = [];
 
+        $dbprefix = get_instance()->db->dbprefix;
+
         // drop foreignkey
         if(MysqlStatements::drop_fk_constraint($fields) != NULL):
+
             foreach (MysqlStatements::drop_fk_constraint($fields) as $index) :
-                $field_sql[] = MysqlStatements::_string_drop_constraint($table, $index);
+                $field_sql[] = MysqlStatements::_string_drop_constraint($dbprefix.$table, $index);
             endforeach;
         endif;
 
         // drop indexes
         if(MysqlStatements::drop_indexes($fields) != NULL):
             foreach (MysqlStatements::drop_indexes($fields) as $index) :
-                $field_sql[] = MysqlStatements::_string_drop_constraint($table, $index);
+                $field_sql[] = MysqlStatements::_string_drop_constraint($dbprefix.$table, $index);
             endforeach;
         endif;
 
@@ -333,7 +340,7 @@ class MysqlStatements implements Statements{
      * @return array|null
      */
     public static function fk_constraint($fields){
-
+        $dbprefix = get_instance()->db->dbprefix;
         $action = [];
         foreach ($fields as $field) :
             $field = $field->options();
@@ -347,6 +354,7 @@ class MysqlStatements implements Statements{
 
                 $related_model = $field['related_model'];
                 $related_model_table = $related_model->meta->db_table;
+                $table_name = sprintf('%1$s%2$s', $dbprefix, strtolower($related_model_table));
                 $related_pk = $related_model->meta->primary_key->name;
 
                 $foreign_key = sprintf(
@@ -356,7 +364,7 @@ class MysqlStatements implements Statements{
                     ON UPDATE %4$s
                     ON DELETE %5$s',
                     $field['db_column'],
-                    strtolower($related_model_table),
+                    $table_name,
                     $related_pk,
                     $on_update,
                     $on_delete,
@@ -375,6 +383,7 @@ class MysqlStatements implements Statements{
     }
 
     public static function drop_fk_constraint($fields_collection){
+
         $action = '';
         if(empty($fields_collection)):
             return NULL;
@@ -429,7 +438,8 @@ class MysqlStatements implements Statements{
     }
 
     public static function date_fields_triggers($table, $fields){
-
+        $dbprefix = get_instance()->db->dbprefix;
+        $table = sprintf('%1$s%2$s', $dbprefix, strtolower($table));
         $date_fields_on_update = [];
         $date_fields_on_create = [];
 
@@ -467,6 +477,8 @@ class MysqlStatements implements Statements{
     }
 
     public static function date_fields_drop_triggers($table, $fields){
+        $dbprefix = get_instance()->db->dbprefix;
+        $table = sprintf('%1$s%2$s', $dbprefix, strtolower($table));
 
         $date_fields_on_update = [];
         $date_fields_on_create = [];

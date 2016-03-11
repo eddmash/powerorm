@@ -46,21 +46,26 @@ class Orm{
         // load the CI model class
         include_once(BASEPATH."core/Model.php");
 
+        // load some utility tools aka helpers
+        include_once("tools.php");
+
+        // exceptions
+        require_once("exceptions/__init__.php");
 
         // statements
-        require_once("db/_loader_.php");
+        require_once("db/__init__.php");
 
         // migrations
-        require_once("migrations/_loader_.php");
+        require_once("migrations/__init__.php");
+
+        // Queries
+        require_once("queries/__init__.php");
 
         // model
-        require_once("model/_loader_.php");
+        require_once("model/__init__.php");
 
         // forms
-        require_once("form/_loader_.php");
-
-        // load some utils
-        include_once("tools.php");
+        require_once("form/__init__.php");
 
     }
 }

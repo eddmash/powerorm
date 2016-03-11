@@ -1,6 +1,12 @@
 <?php
 namespace powerorm\model;
 
+/**
+ * Class Meta
+ * @package powerorm\model
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class Meta{
     public $model_name;
     public $db_table;

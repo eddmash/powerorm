@@ -15,7 +15,7 @@ use powerorm\migrations\ProjectState;
 
 /**
  * Responsible for creating migration files
- * @package powerorm
+ * @package powerorm\migrations
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -127,7 +127,7 @@ class Migrator
 
         $migration_file = Migrator::_format("<?php", NULL);
         $migration_file .= $linebreak;
-        $migration_file .= Migrator::_format("use powerorm\\migrations\\RunSql;", NULL);
+        $migration_file .= Migrator::_format('use powerorm\migrations\RunSql;', NULL);
         $migration_file .= $linebreak;
         $migration_file .=Migrator::_format("class $class_name extends CI_Migration{", NULL);
         $migration_file .= $linebreak;
@@ -194,7 +194,6 @@ class Migrator
      */
     public static function _validate_stamp($migration_stamp){
         $past = Migrator::last_stamp();
-
 
         if($migration_stamp == 'timestamp' && (strlen($past)==3)):
             throw new AmbiguityError("Migration files seem to use `sequential` but the config file is set to `timestamp` ");
@@ -264,7 +263,7 @@ class Migrator
 
         foreach ($model_files as $file) :
             $file = basename($file, '.php');
-            return (int)preg_split('/_/', $file, 2)[0];
+            return preg_split('/_/', $file, 2)[0];
         endforeach;
 
     }

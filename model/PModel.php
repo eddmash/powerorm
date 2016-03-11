@@ -9,9 +9,11 @@
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+use powerorm\exceptions\OrmExceptions;
+use powerorm\exceptions\TypeError;
 use powerorm\form;
 use powerorm\model\Meta;
-use powerorm\model\Queryset;
+use powerorm\queries\Queryset;
 use powerorm\model\ProxyModel;
 
 /**
@@ -73,23 +75,25 @@ use powerorm\model\ProxyModel;
  * - Queryset is evaluated to get data from the database.{@see Queryset} for more.
  *
  *
- * @package powerorm
+ * @package powerorm\model
+ * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-abstract class PModel extends \CI_Model{
+abstract class PModel extends \CI_Model
+{
 
     /**
      * Holds the name that this model represents
      * @var string
      * @ignore
      */
-    protected $table_name= '';
+    protected $table_name = '';
 
     /**
      * @ignore
      * @var bool
      */
-    private $_fields_loaded= FALSE;
+    private $_fields_loaded = FALSE;
 
     /**
      * @ignore
@@ -106,12 +110,13 @@ abstract class PModel extends \CI_Model{
     /**
      * @ignore
      */
-    public function __construct(){
-        if(class_exists('Signal', FALSE)):
+    public function __construct()
+    {
+        if (class_exists('Signal', FALSE)):
             $this->_signal = TRUE;
         endif;
 
-        if($this->_signal):
+        if ($this->_signal):
             $this->signal->dispatch('powerorm.model.pre_init', $this);
         endif;
 
@@ -119,32 +124,46 @@ abstract class PModel extends \CI_Model{
         parent::__construct();
 
         // set model fields
-        if(is_subclass_of($this, 'PModel')){
-            // set default table name
-            if(empty($this->table_name)):
-                $this->table_name = strtolower(get_class($this));
-            endif;
+        if (is_subclass_of($this, 'PModel')) {
 
             // create meta for this model
             $this->meta = new Meta();
-            $this->meta->model_name = get_class($this);
+
+            if ($this instanceof ProxyModel):
+                $this->meta->proxy_model = TRUE;
+                $this->meta->model_name = $this->model_name;
+            else:
+                $this->meta->model_name = get_class($this);
+
+                // set default table name
+                if (empty($this->table_name)):
+                    $this->table_name = strtolower(get_class($this));
+                endif;
+            endif;
+
+
             $this->meta->db_table = $this->table_name();
 
             //load fields
             $this->fields();
 
             // try to find if a primary key was set
-            if(empty($this->meta->primary_key) && !isset($this->id)):
+            if (empty($this->meta->primary_key) && !isset($this->id)):
 
-                $this->id = new AutoField(['primary_key'=>TRUE]);
+                $this->id = new AutoField(['primary_key' => TRUE]);
 
             endif;
 
             $this->class_variables_loader();
         }
 
-        if($this->_signal):
+        if ($this->_signal):
             $this->signal->dispatch('powerorm.model.post_init', $this);
+        endif;
+
+        // load the database if it has not been loaded
+        if (!isset($this->db)):
+            $this->load->database();
         endif;
 
     }
@@ -166,26 +185,28 @@ abstract class PModel extends \CI_Model{
      * @param $args
      * @return mixed
      */
-    public function __call($method, $args){
-
-        // create a Queryset if method is class and is present in Queryset
-        if (!method_exists($this, $method) && is_subclass_of($this, 'PModel') &&
-            in_array($method, get_class_methods('powerorm\model\Queryset'))):
-            $q = $this->_get_queryset();
-
-            if(empty($args)):
-                // invoke from the queryset
-                return call_user_func(array($q, $method));
-            else:
-                // invoke from the queryset
-                if(is_array($args)):
-                    return call_user_func_array(array($q, $method), $args);
-                else:
-                    return call_user_func(array($q, $method), $args);
-                endif;
-            endif;
-        endif;
-    }
+//    public function __call($method, $args)
+//    {
+//
+//        // create a Queryset if method is class and is present in Queryset
+//        if (!method_exists($this, $method) && is_subclass_of($this, 'PModel') &&
+//            in_array($method, get_class_methods('powerorm\queries\Queryset'))
+//        ):
+//            $q = $this->_get_queryset();
+//
+//            if (empty($args)):
+//                // invoke from the queryset
+//                return call_user_func(array($q, $method));
+//            else:
+//                // invoke from the queryset
+//                if (is_array($args)):
+//                    return call_user_func_array(array($q, $method), $args);
+//                else:
+//                    return call_user_func(array($q, $method), $args);
+//                endif;
+//            endif;
+//        endif;
+//    }
 
 
     /**
@@ -204,10 +225,24 @@ abstract class PModel extends \CI_Model{
      * @param string $name
      * @return string
      */
-    public function table_name($name=NULL){
-        $table_name = $this->config->item('db_table_prefix').$this->table_name;
-        if(NULL!=$name){
-            $table_name = $this->config->item('db_table_prefix').$name;
+    public function table_name($name = NULL)
+    {
+        $table_name = $this->table_name;
+        if (NULL != $name) {
+            $table_name = $name;
+        }
+        return $table_name;
+    }
+
+    public function get_table_name(){
+        return $this->table_name();
+    }
+
+    public function full_table_name($name = NULL)
+    {
+        $table_name = sprintf('%1$s%2$s', $this->db->dbprefix, $this->table_name);
+        if (NULL != $name) {
+            $table_name = sprintf('%1$s%2$s', $this->db->dbprefix, $name);
         }
         return $table_name;
     }
@@ -217,7 +252,8 @@ abstract class PModel extends \CI_Model{
      * @internal
      * @return Queryset
      */
-    public function _get_queryset(){
+    public function _get_queryset()
+    {
         return new Queryset($this);
     }
 
@@ -225,7 +261,8 @@ abstract class PModel extends \CI_Model{
      * Creates a Queryset that is used to interaract with the database
      * @return Queryset
      */
-    public function queryset(){
+    public function queryset()
+    {
         return $this->_get_queryset();
     }
 
@@ -261,13 +298,14 @@ abstract class PModel extends \CI_Model{
      * }</code></pre>
      * @return array
      */
-    public static function permissions(){
+    public static function permissions()
+    {
         return array(
-            "can_add"=> "Can Add",
-            "can_delete"=> "Can Delete",
-            "can_update"=> "Can Update",
-            "can_view"=> "Can View",
-            "can_list"=> "Can List",
+            "can_add" => "Can Add",
+            "can_delete" => "Can Delete",
+            "can_update" => "Can Update",
+            "can_view" => "Can View",
+            "can_list" => "Can List",
         );
     }
 
@@ -284,7 +322,8 @@ abstract class PModel extends \CI_Model{
      * @param bool $slug if set to true returns the url as a slug e.g. user/admin
      * @return string
      */
-    public function get_uri($slug=FALSE){
+    public function get_uri($slug = FALSE)
+    {
 
 
         return '';
@@ -300,20 +339,22 @@ abstract class PModel extends \CI_Model{
      * @param $field_name
      * @param $field_obj
      */
-    public function __set($field_name, $field_obj){
+    public function __set($field_name, $field_obj)
+    {
         $this->_meta_loader($field_name, $field_obj);
         $this->class_variables_loader();
 
     }
 
-    public function _meta_loader($field_name, $field_obj){
-        if(!isset($this->$field_name)):
+    public function _meta_loader($field_name, $field_obj)
+    {
+        if (!isset($this->$field_name)):
 
             $this->$field_name = '';
 
         endif;
 
-        if(is_subclass_of($field_obj, 'ModelField')):
+        if (is_subclass_of($field_obj, 'ModelField')):
 
             // add field to meta data to keep track
             $field_obj->name = $field_obj->db_column = $field_name;
@@ -321,7 +362,7 @@ abstract class PModel extends \CI_Model{
 
         endif;
 
-        if(!isset($this->$field_name) && is_subclass_of($field_obj, 'InverseRelation')):
+        if (!isset($this->$field_name) && is_subclass_of($field_obj, 'InverseRelation')):
             $this->$field_name = '';
             // add field to meta data to keep track
             $field_obj->name = $field_name;
@@ -329,35 +370,39 @@ abstract class PModel extends \CI_Model{
         endif;
     }
 
-    public function _model_name($model){
+    public function _model_name($model)
+    {
         $model_name = $model->meta->model_name;
-        if($model instanceof ProxyModel):
+        if ($model instanceof ProxyModel):
             $model_name = $model->model_name;
         endif;
 
         return $model_name;
     }
 
-    public function class_variables_loader(){
+    public function class_variables_loader()
+    {
 
-        foreach (get_class_vars(get_class($this)) as $field_name=>$value) :
+        foreach (get_class_vars(get_class($this)) as $field_name => $value) :
 
-            if(!isset($this->$field_name)):
+            if (!isset($this->$field_name)):
                 continue;
             endif;
-            $field_obj=$this->$field_name;
+            $field_obj = $this->$field_name;
 
             $this->_meta_loader($field_name, $field_obj);
 
         endforeach;
     }
 
-    public function __toString(){
+    public function __toString()
+    {
         $pk = $this->meta->primary_key->name;
         return sprintf('< %1$s %2$s >', ucwords(strtolower(get_class($this))), $this->$pk);
     }
 
-    public function clean_fields(){
+    public function clean_fields()
+    {
         foreach ($this->meta->fields as $field) :
             $field_value = $this->{$field->name};
             $field->clean($this, $field_value);
@@ -365,12 +410,182 @@ abstract class PModel extends \CI_Model{
 
     }
 
-    public function model_clean(){
+    public function model_clean()
+    {
+        $this->clean_fields();
+    }
+
+    /**
+     * Used by migrations to provide any thing that needs to be run before the migrtion process starts
+     */
+    public function checks(){
 
     }
 
-    public function as_form(){
+    public function form_builder()
+    {
         return new form\ModelForm($this);
+    }
+    
+    public function toForm(){
+        return $this->form_builder()->form();
+    }
+
+    /**
+     * ============================================= QUERY METHODS ============================================
+     */
+
+    public function get($conditions){
+        return $this->queryset()->get($conditions);
+    }
+
+    public function filter($conditions)
+    {
+        return $this->queryset()->filter($conditions);
+    }
+
+    public function all(){
+        return $this->queryset()->all();
+    }
+
+    public function exclude($conditions){
+        return $this->queryset()->exclude($conditions);
+    }
+
+    /**
+     * Creates or Updates an object in the database,
+     *
+     * <h4>How it differentiates between update and create</h4>
+     *
+     * This methods does an update if the model contains a value on its primary key value else it creates.
+     *
+     * On create or update this method will return the created object.
+     *
+     * <h4>Signal Emitted</h4>
+     * If the {@link https://github.com/eddmash/powerdispatch} is enabled, this method emits two signals
+     *
+     * - <strong>powerorm.model.pre_save</strong>
+     *
+     *      allowing any receivers listening for that signal to take some customized action.
+     *
+     * - <strong>powerorm.model.post_save</strong>
+     *
+     *      allowing any receivers listening for that signal to take some customized action.
+     *
+     * <h4>USAGE</h4>
+     *
+     * To create an new object
+     *
+     * <pre><code>$role = new role();
+     * $role->name = "ceo";
+     * $role = $role->save();</code></pre>
+     *
+     * To update existing an new object
+     *
+     * e.g. assuming the above object got a primary key of `3` we can update its name as follows
+     *
+     * <pre><code> $role = $this->role->get(3);
+     * $role->name = "chief executive officer";
+     * $role = $cat->save();</code></pre>
+     * @return mixed
+     */
+    public function save(){
+        // run this in transaction
+        $this->db->trans_start();
+
+        // alert everyone else of intended save
+        if(class_exists('Signal', FALSE)):
+            $this->signal->dispatch('powerorm.model.pre_save', $this);
+        endif;
+
+        $save_model=$this->queryset()->_save();
+
+        // alert everyone of the save
+        if(class_exists('Signal', FALSE)):
+            $this->signal->dispatch('powerorm.model.post_save', $this);
+        endif;
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE)
+        {
+            show_error("sorry the operation was not successful");
+        }
+
+        return $save_model;
+    }
+
+    public function with($conditions){
+        return $this->queryset()->_eager_load($conditions);
+    }
+
+    /**
+     * Stores Many To Many relationship
+     *
+     * This methods expects and array, the array should contain object of related model or
+     * a Queryset object of the related model
+     *
+     * <h4><strong>! Important </strong>Each call of this method can only handle one type of related model and expect
+     * the related models to have already been saved in the database</h4>
+     *
+     * e.g. the following will raise an OrmExceptions,
+     *
+     * <pre><code>$user = $this->user_model->get(1);
+     * $role = $this->role->get(1);
+     * $perm = $this->permission_model->get(1);
+     * $user->add([$role, $perm]);
+     * </code></pre>
+     *
+     * use two calls
+     *
+     * <pre><code>$user = $this->user_model->get(1);
+     * $role = $this->role->get(1);
+     * $perm = $this->permission_model->get(1);
+     * $user->add([$role]);
+     * $user->add([$perm]);
+     *
+     * // passing a Queryset
+     * $role = $this->role->all());
+     * $user->add([$role]);
+     * </code></pre>
+     *
+     * @param array $related the objects of related models to associate with the current model
+     * @throws OrmExceptions
+     * @throws TypeError
+     */
+    public function add($related=[]){
+        if(!is_array($related)){
+            throw new OrmExceptions(sprintf("add() expects an array of models"));
+        }
+
+        // if the array is empty exit
+        if(empty($related)):
+            return;
+        endif;
+
+        $related_model = '';
+        // Some possibilities to consider
+        foreach ($related as $item) :
+            // if a Queryset was passed in
+            if(!is_subclass_of($item, 'PModel')):
+                throw new OrmExceptions(
+                    sprintf('add() expects an array of objects that extend the %1$s but got a %2$s',
+                        'PModel', gettype($item)));
+            endif;
+
+            // get the related model name to save
+            if(!empty($related_model) && $related_model!==get_class($item)):
+                throw new TypeError(
+                    sprintf("Multiple types provided, add() expects only one type per call, see documentation"));
+            endif;
+
+            $related_model = get_class($item);
+        endforeach;
+
+        // save related models many to many
+
+        $this->queryset()->_m2m_save($related);
+
     }
 
 }

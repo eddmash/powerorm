@@ -1,15 +1,15 @@
 <?php
 namespace powerorm\form;
 
-use powerorm\form\FormField;
-use powerorm\form\FormException;
-use powerorm\model\OrmExceptions;
+use powerorm\exceptions\FormException;
+use powerorm\exceptions\OrmExceptions;
+use powerorm\exceptions\ValueError;
 
 /**
- * Created by http://eddmash.com.
- * User: eddmash
- * Date: 2/16/16
- * Time: 11:27 AM
+ * Class Form
+ * @package powerorm\form
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Form{
     protected $_ci;
@@ -23,6 +23,128 @@ class Form{
 
         // use the global form_validation object
         $this->validator = $this->_ci->form_validation;
+    }
+
+    /**
+     * Gets a single field instance in the form fields array and returns it
+     * @param $name
+     * @param bool|FALSE $id
+     * @return int|null
+     */
+    public function get_field($name){
+        foreach ($this->fields as $field) :
+
+            if($field->name == $name):
+                return $field;
+                break;
+            endif;
+
+        endforeach;
+    }
+
+    /**
+     * Creates the form opening tag
+     * @param string $action
+     * @param array $attributes
+     * @param array $hidden
+     * @return string
+     *
+     */
+    public function open($action = '', $attributes = array(), $hidden = array()){
+        $this->_ci->load->helper('url');
+
+        if(strlen($action)<=0):
+            $action = current_url();
+        endif;
+
+        // create a multipart form or a normal form
+        $form_open = '';
+        if($this->_is_multipart()):
+            $form_open = form_open_multipart($action, $attributes, $hidden);
+        else:
+            $form_open = form_open($action, $attributes, $hidden);
+        endif;
+
+        if(isset($this->_form_help)):
+            $form_open .= "<p class='help-block form-help-text'>$this->_form_help</p>";
+        endif;
+
+        return $form_open;
+    }
+
+    /**
+     * Create the form closing tags and displays any errors that have not been dispaly explicitly
+     * @param string $extra
+     * @return string
+     */
+    public function close($extra = ''){
+        return form_close($extra);
+    }
+
+    /**
+     * Return the HTML widget (input, radio, textarea e.t.c) for the specified field.
+     * @param $name
+     * @param array $args
+     * @return mixed
+     */
+    public function field_widget($name, $args=array()){
+        return $this->get_field($name)->widget($args);
+    }
+
+    /**
+     * Returns the form label
+     * @param $name
+     * @param array $args
+     * @return mixed
+     */
+    public function field_label($name, $args=array()){
+        return $this->get_field($name)->label($args);
+    }
+
+    /**
+     * Creates a form fieldset.
+     * @param $legend_text
+     * @param array $attrs
+     * @return string
+     */
+    public function open_fieldset($legend_text, $attrs=array()){
+        return form_fieldset($legend_text, $attrs);
+    }
+
+    /**
+     * Closes a form fieldset
+     * @param string $extra
+     * @return string
+     */
+    public function close_fieldset($extra=''){
+        return form_fieldset_close($extra);
+    }
+
+    /**
+     * @ignore
+     * Checks if a fields array has any field of type file or image and  prepares the form for uploading
+     * @return bool
+     */
+    public function _is_multipart(){
+        $is_multipart = FALSE;
+
+        foreach ($this->fields as $field) :
+            if($field->type=='file' || $field->type=='image'):
+                $is_multipart = TRUE;
+
+                // stop looping, there is no need to loop anymore
+                // since we have found atleast one field with the required types
+                break;
+
+            endif;
+        endforeach;
+
+        // load the upload library
+        $this->_ci->load->library('upload');
+
+        $this->multipart = $is_multipart;
+        return $is_multipart;
+
     }
 
     public function _load_model($model_name){
@@ -54,12 +176,13 @@ class Form{
         return TRUE;
     }
 
-    public function create(){
+    public function form(){
         foreach ($this->fields as $field_name => $field_value) :
             $this->fields[$field_name] = $field_value;
         endforeach;
 
         $this->ready = TRUE;
+        return $this;
     }
 
     public function validation_rules(){
@@ -70,7 +193,7 @@ class Form{
         // cycle through the fields setting there validation rules
         foreach ($this->fields as $field) :
 
-            $this->validator->set_rules($field->name, $field->name, $field->validation_rules());
+            $this->validator->set_rules($field->get_widget_name(), $field->get_widget_name(), $field->validation_rules());
 
         endforeach;
     }
@@ -89,7 +212,6 @@ class Form{
 
     public function _populate_fields(){
         $post = $this->_ci->input->post();
-
         foreach ($this->fields as $field_name=>$field_obj) :
             if(!array_key_exists($field_name,$post)):
                 continue;
@@ -121,8 +243,14 @@ class Form{
     public function __set($field_name, $field_value){
 
         if(array_key_exists($field_name, $this->fields)):
-            $this->fields[$field_name]->set_value($field_value);
+            $this->fields[$field_name] = $field_value;
+
         endif;
+    }
+
+    public function __isset($field){
+        return $this->get_field($field);
+
     }
 
 }
@@ -142,6 +270,11 @@ class ModelForm extends Form{
     }
 
     public function ignore($fields_names){
+        if(!is_array($fields_names)):
+            throw new OrmExceptions(
+                sprintf('setting ignore() expects an array of arguments but got a %s', gettype($fields_names)));
+        endif;
+
         if($this->only):
             throw new OrmExceptions('setting only() and ignore() is not allowed on the same form');
         endif;
@@ -164,7 +297,7 @@ class ModelForm extends Form{
 
     public function only($fields_names){
         if($this->ignored):
-            throw new \OrmExceptions('setting only() and ignore() is not allowed on the same form');
+            throw new OrmExceptions('setting only() and ignore() is not allowed on the same form');
         endif;
 
         if(!is_array($fields_names)):
@@ -199,7 +332,7 @@ class ModelForm extends Form{
         return TRUE;
     }
 
-    public function create(){
+    public function form(){
 
         // load all the fields in the model
         if(empty($this->fields)):
@@ -210,11 +343,26 @@ class ModelForm extends Form{
 
         endif;
 
-        parent::create();
+        return parent::form();
     }
 
     public function initial(){
 
+    }
+    /**
+     * Saves the forms model_instance into the database
+     * @param null $model_name
+     * @param null $values
+     * @return mixed
+     */
+    public function save(){
+        //  update model instance fields with the form data
+        foreach ($this->fields as $field):
+            if(array_key_exists($field->name, get_object_vars($this->model_object))):
+                $this->model_object->{$field->name} = $field->value;
+            endif;
+        endforeach;
+        return $this->model_object->save();
     }
 
     public function _no(){

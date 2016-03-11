@@ -2,15 +2,20 @@
 /**
  * ORM QuerySet implementation.
  */
-namespace powerorm\model;
-
-use powerorm\model\OrmExceptions;
-
 
 
 /**
  *
  */
+namespace powerorm\queries;
+
+
+use powerorm\exceptions\MultipleObjectsReturned;
+use powerorm\exceptions\ObjectDoesNotExist;
+use powerorm\exceptions\OrmExceptions;
+use powerorm\exceptions\TypeError;
+use powerorm\model\ProxyModel;
+
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 
@@ -161,11 +166,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *
  *  To avoid this issues using this orm, use the {@see Queryset::with()} method.
  *
- * @package powerorm
- * @since 1.0.0
+ * @package powerorm\queries
+ * @since   1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Queryset implements \IteratorAggregate, \Countable{
+class Queryset2 implements \IteratorAggregate, \Countable{
 
     /**
      * @var string Holds the method to be invoked when Queryset is being evaluated
@@ -232,8 +237,9 @@ class Queryset implements \IteratorAggregate, \Countable{
      */
     protected $_models_to_eager_load = array();
 
-    protected $lookup_options = ['eq', 'in', 'gt', 'lt', 'gte', 'lte', 'contains',
-        'startswith', 'endswith', 'isnull', 'not', 'notin'];
+    protected $dbprefix;
+
+    protected $_ci;
 
     /**
      *  ============================================OVERRIDEN MAGIC METHODS =========================
@@ -252,13 +258,13 @@ class Queryset implements \IteratorAggregate, \Countable{
      * @ignore
      */
     public function __construct($context){
+        $this->_ci =& get_instance();
         // load database
-        $context->load->database();
+        $this->_ci->load->database();
 
         $this->_context = $context;
 
-        $this->_context->output->enable_profiler(TRUE);
-
+        $this->_ci->output->enable_profiler(TRUE);
         // for development only
         $id = uniqid();
         get_instance()->{$id} = clone $context->db;
@@ -294,7 +300,7 @@ class Queryset implements \IteratorAggregate, \Countable{
         if(!$this->_evaluated):
             $this->_eval_queryset();
         endif;
-        
+
         return $this->_query_result->{$property};
     }
 
@@ -364,7 +370,7 @@ class Queryset implements \IteratorAggregate, \Countable{
         return $this->_eval_queryset();
     }
 
-        // ToDo serialization , to json too
+    // ToDo serialization , to json too
 //    public function __sleep(){
 //        $this->_eval_queryset();
 //        return array('_query_result');
@@ -498,8 +504,6 @@ class Queryset implements \IteratorAggregate, \Countable{
      * @param array|int $values an array of field and the value to look for, or an integer-primary key.
      * @see filter() To fetch more than one item based on some conditions.
      * @return object
-     * @throws BadMethodCallException
-     * @throws InvalidArgumentException
      * @throws MultipleObjectsReturned
      * @throws ObjectDoesNotExist
      */
@@ -517,7 +521,7 @@ class Queryset implements \IteratorAggregate, \Countable{
      * <pre><code>$this->User_model->all()</code></pre>
      *
      * @return Queryset
-     * @throws BadMethodCallException
+     * @throws OrmExceptions
      */
     public function all(){
         $this->invoke_method = 'result';
@@ -656,35 +660,39 @@ class Queryset implements \IteratorAggregate, \Countable{
 
         // a relationship is passed in
         if(!empty($related_model_name)):
+//            var_dump($this->_context->meta->relations_fields);
 
-            $this->_load_related_model($related_model_name);
+            $related_model = $this->_load_related_model($related_model_name);
+            $foreign_key_model = $this->_search_foreignkey($this->_context, $related_model);
 
-            $foreign_key = (!empty($foreign_key))? $foreign_key : NULL;
+//            $foreign_key = (!empty($foreign_key))? $foreign_key : NULL;
 
             // ToDo self referencing
-            $one2one = (strtolower(get_class($this->_context))===strtolower($related_model_name))? TRUE : FALSE;
-            // ************************* Try Recursive  **************************
-            if($one2one):
+//            $one2one = (strtolower(get_class($this->_context))===strtolower($related_model_name))? TRUE : FALSE;
+//            // ************************* Try Recursive  **************************
+//            if($one2one):
+//
+//            endif;
+//
+//            // foreign key table
+//            $foreign_key_table = $this->_search_foreignkey($related_model_name, $foreign_key);
+//
+//            // ************************* Try Many To One and One To Many **************************
+//
+//            // if the foreign_key_table is not the current table
+            if(!empty($foreign_key_model)):
+//                // try one to many and Many to One
+//                $this->_m2o_join($related_model_name, $related_where, $foreign_key);
+                $this->_join_m2o($foreign_key_model, $related_model);
 
             endif;
-
-            // foreign key table
-            $foreign_key_table = $this->_search_foreignkey($related_model_name, $foreign_key);
-
-            // ************************* Try Many To One and One To Many **************************
-
-            // if the foreign_key_table is not the current table
-            if($foreign_key_table):
-                // try one to many and Many to One
-                $this->_m2o_join($related_model_name, $related_where, $foreign_key);
-            endif;
-
-
-            // ************************* Try Many To Many **************************
-
-            if($foreign_key_table==FALSE):
-                $this->_m2m_join($related_model_name, $related_where, $foreign_key);
-            endif;
+            $this->dump_sql();
+//
+//            // ************************* Try Many To Many **************************
+//
+//            if($foreign_key_table==FALSE):
+//                $this->_m2m_join($related_model_name, $related_where, $foreign_key);
+//            endif;
 
         endif;
 
@@ -693,6 +701,22 @@ class Queryset implements \IteratorAggregate, \Countable{
         endif;
 
         return $this;
+    }
+
+    public function _join_m2o($foreign_key_model, $related_model){
+        $full_related_table_name = $this->full_table_name($related_model->table_name());
+        $full_current_table_name = $this->full_table_name($this->_context->table_name());
+        // if current model is the foreign key model
+        if($foreign_key_model->meta->model_name == $this->_context->meta->model_name):
+            $on = $full_related_table_name."=".$full_current_table_name;
+            $this->_database->join($related_model->table_name(), $on);
+        endif;
+
+
+    }
+
+    public function full_table_name($table_name){
+        return $this->_ci->db->dbprefix.$table_name;
     }
 
     /**
@@ -730,7 +754,7 @@ class Queryset implements \IteratorAggregate, \Countable{
         if(!$this->_table_set):
             $this->_database->from($this->_context->table_name());
         endif;
-;
+        ;
         return $this;
     }
 
@@ -932,14 +956,6 @@ class Queryset implements \IteratorAggregate, \Countable{
             throw new OrmExceptions("with() expected an array");
         endif;
 
-        // ensure that name to mount eager models on is set
-//        foreach ($eager_model_name as $key=>$name) :
-//            if(is_numeric($key)):
-//                throw new OrmExceptions(sprintf("with() requires a name on which to store `%s` objects", $name));
-//            endif;
-//        endforeach;
-
-
         if(is_array($eager_model_name)):
             $eager_model_name_ = [];
             foreach ($eager_model_name as $name) :
@@ -948,29 +964,6 @@ class Queryset implements \IteratorAggregate, \Countable{
 
             $this->_models_to_eager_load = $eager_model_name_;
         endif;
-        return $this;
-    }
-
-    public function with_old($eager_model_name){
-        $this->_eager_load = TRUE;
-
-        if(!is_array($eager_model_name)):
-            throw new OrmExceptions("with() expected an array");
-        endif;
-
-        // ensure that name to mount eager models on is set
-        foreach ($eager_model_name as $key=>$name) :
-            if(is_numeric($key)):
-                throw new OrmExceptions(sprintf("with() requires a name on which to store `%s` objects", $name));
-            endif;
-        endforeach;
-
-
-        if(is_array($eager_model_name)):
-            $this->_models_to_eager_load = $eager_model_name;
-        endif;
-
-
         return $this;
     }
 
@@ -1473,6 +1466,8 @@ class Queryset implements \IteratorAggregate, \Countable{
 
         return $this;
     }
+
+
     /**
      * ==================================  UTILITY METHODS =======================================
      *  -----------------------------------------------------------------------------------------------
@@ -1678,6 +1673,7 @@ class Queryset implements \IteratorAggregate, \Countable{
      * @return mixed
      */
     public function _result_mapping($db_result_object, $target_class){
+        var_dump($db_result_object);
         $target_class = ucwords(strtolower($target_class));
 
         $target_object = $this->model_instance($target_class);
@@ -1693,32 +1689,54 @@ class Queryset implements \IteratorAggregate, \Countable{
         endforeach;
 
         foreach ($target_object->meta->fields as $field_name=>$field_object):
-//            $field_object = $target_object->meta->fields[$field_name];
+
             $column_name = $field_object->db_column_name();
 
-            // column value in the database
-            $value = $db_result_object->$column_name;
-
-            // if this is a relationship and its is not eagerly loaded, return a Queryset for the relation
-            if(!$this->_eager_load && is_subclass_of($field_object, 'RelatedField') && !empty($value)):
-
-                $value = $field_object->related_model->get_querset($value);
+            // Many To Many field
+            if(!property_exists($field_object, 'M2M')):
+                // column value in the database
+                $value = $db_result_object->$column_name;
+                $value = $this->_map_relations($field_object, $value);
+                // map it
+                $target_object->{$field_name} = $value;
             endif;
+        
+            if(property_exists($field_object, 'M2M') && $field_object->M2M):
+                if(empty($field_object->through)):
+                    $proxy = new ProxyModel($target_object->meta, $field_object->related_model->meta);
 
-            // set this values here to avoid having to loop over the results again get them when eager loading
-            if($this->_eager_load && is_subclass_of($field_object, 'RelatedField') &&
-                in_array(strtolower($field_object->related_model->meta->model_name), $this->_models_to_eager_load)):
-                $model_name = strtolower($field_object->related_model->meta->model_name);
+                    $model_pk = $this->_current_model_primary_key();
+                    $model_pk_value = $db_result_object->{$model_pk};
 
-                $this->eager_values[$model_name][] = $value;
+
+
+                endif;
             endif;
+            
 
-
-            // map it
-            $target_object->{$field_name} = $value;
         endforeach;
 
         return $target_object;
+    }
+
+    public function _map_relations($field_object, $db_value){
+        $value = $db_value;
+        // if this is a relationship and its is not eagerly loaded, return a Queryset for the relation
+        if(!$this->_eager_load && is_subclass_of($field_object, 'RelatedField') && !empty($db_value)):
+
+            $value = $field_object->related_model->get_querset($db_value);
+        endif;
+
+
+        // set this values here to avoid having to loop over the results again get them when eager loading
+        if($this->_eager_load &&
+            is_subclass_of($field_object, 'RelatedField') &&
+            in_array(strtolower($field_object->related_model->meta->model_name), $this->_models_to_eager_load)):
+
+            $model_name = strtolower($field_object->related_model->meta->model_name);
+            $this->eager_values[$model_name][] = $value;
+        endif;
+        return $value;
     }
 
     /**
@@ -2143,7 +2161,7 @@ class Queryset implements \IteratorAggregate, \Countable{
      */
     protected function _get_join_table($related_model_name){
 
-        $current_table_name=str_replace($this->_context->config->item('db_table_prefix'), '',$this->_context->table_name());
+        $current_table_name=str_replace($this->_database->dbprefix, '',$this->_context->table_name());
 
         // get related table
         $join_table = $this->_context->{$related_model_name}->table_name().'_'.$current_table_name;
@@ -2162,44 +2180,23 @@ class Queryset implements \IteratorAggregate, \Countable{
      * @internal
      * @return bool|string
      */
-    protected function _search_foreignkey($related_model_name, $foreign_key=NULL){
+    protected function _search_foreignkey($current, $candidate){
 
-        $present = FALSE;
+        $candidate_name = $candidate->meta->model_name;
+        $current_name = $current->meta->model_name;
+        // search fk on current
+        foreach ($current->meta->relations_fields as $field) :
+            if($field->related_model->meta->model_name == $candidate_name):
+                return $current;
+            endif;
+        endforeach;
 
-        // short name without the prefix e.g. user instead of betacom_user
-        $related_table_name_short= $this->_related_table_short_name($related_model_name);
-
-        $current_table_id=$this->_current_table_short_name().'_'.$this->_current_model_primary_key();
-
-        $related_model_name_id = $related_table_name_short.'_'.$this->_related_model_primary_key($related_model_name);
-
-
-        if($present==FALSE && $foreign_key){
-
-            // search foreign key of current table on the related table
-            if(in_array($foreign_key, $this->_context->{$related_model_name}->meta->fields_names())){
-                $present = $this->_context->{$related_model_name}->table_name();
-            }
-
-
-            // search foreign key of the related table on current table
-            if(in_array($foreign_key, $this->_context->meta->fields_names())){
-                $present = $this->_context->table_name();
-            }
-        }
-
-        // search foreign key of the related table on current model
-        if($present==FALSE && in_array($related_model_name_id, $this->_context->meta->fields_names())){
-            $present = $this->_context->table_name();
-        }
-
-        // search foreign key of current table on the related table
-        if(in_array($current_table_id, $this->_context->{$related_model_name}->meta->fields_names())){
-            $present = $this->_context->{$related_model_name}->table_name();
-        }
-
-
-        return $present;
+        // search fk on current
+        foreach ($candidate->meta->relations_fields as $field) :
+            if($field->related_model->meta->model_name == $current_name):
+                return $candidate;
+            endif;
+        endforeach;
     }
 
     /**
@@ -2209,7 +2206,7 @@ class Queryset implements \IteratorAggregate, \Countable{
      * @return mixed
      */
     protected function _related_table_short_name($model_name){
-        return str_replace($this->_context->config->item('db_table_prefix'), '',$this->_context->{$model_name}->table_name());
+        return str_replace($this->_database->dbprefix, '',$this->_context->{$model_name}->table_name());
     }
 
     /**
@@ -2218,7 +2215,7 @@ class Queryset implements \IteratorAggregate, \Countable{
      */
     protected function _current_table_short_name(){
 
-        return str_replace($this->_context->config->item('db_table_prefix'), '',$this->_context->table_name());
+        return str_replace($this->_database-> dbprefix, '',$this->_context->table_name());
     }
 
     /**
@@ -2236,15 +2233,18 @@ class Queryset implements \IteratorAggregate, \Countable{
      * @param $related_model_name
      */
     public function _load_related_model($related_model_name){
-        if(!isset($this->_context->{$related_model_name})):
-            $this->_context->load->model($related_model_name);
+
+        if(!isset($this->_ci->{$related_model_name})):
+            $this->_ci->load->model($related_model_name);
         endif;
+        return $this->_ci->{$related_model_name};
     }
 
     /**
      * Does the actual saving
      * @internal
-     * @return mixed
+     * @return object
+     * @throws OrmExceptions
      */
     public function _save(){
 
@@ -2380,182 +2380,4 @@ class Queryset implements \IteratorAggregate, \Countable{
 
     }
 
-}
-
-class Where{
-
-    public $table_name;
-    public $conditions;
-    public $_database;
-
-    protected $lookup_options = ['eq', 'in', 'gt', 'lt',
-        'gte', 'lte', 'contains', 'startswith',
-        'endswith', 'isnull', 'not', 'notin'];
-
-    public function __construct($database, $table_name=NULL, $conditions){
-        $this->_database =& $database;
-        $this->table_name = $table_name;
-        $this->conditions = $conditions;
-    }
-
-    public function validate_lookup($lookup){
-        if(!in_array($lookup, $this->lookup_options)):
-            throw new OrmExceptions(sprintf("`%s` is not a valid lookup parameter", $lookup));
-        endif;
-    }
-
-    /**
-     * Creates the different types of where clause based on looksup provided in the condition e.g ['name__exact'=>"john"]
-     * @internal
-     * @param string $table_name
-     * @param $conditions
-     * @throws OrmExceptions
-     */
-    public function _where($table_name=NULL, $conditions){
-        // default lookup is equal
-        $lookup = 'eq';
-        $lookup_pattern = "/__/";
-        $where_concat_pattern = "/^~[.]*/";
-
-        // create where clause from the conditions given
-        foreach ($conditions as $key=>$value) {
-
-            // check which where clause to use
-            if(preg_match($lookup_pattern, $key)):
-                $options = preg_split($lookup_pattern, $key);
-                $key = $options[0];
-                $lookup = strtolower($options[1]);
-            endif;
-
-            // determin how to combine where statements
-            $use_or = preg_match($where_concat_pattern, $key);
-
-            // get the actual key
-            if($use_or):
-                $key = preg_split($where_concat_pattern, $key)[1];
-            endif;
-
-            // validate lookups
-            $this->validate_lookup($lookup);
-
-            $table_name = strtolower($table_name);
-
-            // append table name to key
-            if(!empty($table_name)):
-                $key = $table_name.".$key";
-            endif;
-
-            // check if we need to use OR to combine
-            if($use_or):
-
-                $this->_or_where_concat($lookup, $key, $value);
-
-            else:
-                // otherwise use and
-                $this->_and_where_concat($lookup, $key, $value);
-            endif;
-
-        }
-
-    }
-
-    public function _and_where_concat($lookup,$key, $value){
-        switch($lookup):
-            case 'eq':
-                $this->_database->where($key, $value);
-                break;
-            case 'in':
-                $this->_database->where_in($key, $value);
-                break;
-            case 'gt':
-                $this->_database->where("$key >", $value);
-                break;
-            case 'lt':
-                $this->_database->where("$key <", $value);
-                break;
-            case 'gte':
-                $this->_database->where("$key >=", $value);
-                break;
-            case 'lte':
-                $this->_database->where("$key <=", $value);
-                break;
-            case 'contains':
-                $this->_database->like($key, $value, 'both');
-                break;
-            case 'startswith':
-                $this->_database->like($key, $value, 'after');
-                break;
-            case 'endswith':
-                $this->_database->like($key, $value, 'before');
-                break;
-            case 'between':
-                if(!is_array($value) || (is_array($value) && count($value)!=2)){
-                    throw new OrmExceptions(
-                        sprintf("filter() using between expected value to be an array, with two values only"));
-                }
-                $this->_database->where("$key BETWEEN $value[0] AND $value[1] ");
-                break;
-            case 'isnull':
-                $this->_database->where($key, $value);
-                break;
-            case 'not':
-                $this->_database->where("$key !=", $value);
-                break;
-            case 'notin':
-                $this->_database->where_not_in($key, $value);
-                break;
-        endswitch;
-    }
-
-    public function _or_where_concat($lookup,$key, $value){
-        switch($lookup):
-            case NULL:
-                $this->_database->or_where($key, $value);
-                break;
-            case 'in':
-                $this->_database->or_where_in($key, $value);
-                break;
-            case 'gt':
-                $this->_database->or_where("$key >", $value);
-                break;
-            case 'lt':
-                $this->_database->or_where("$key <", $value);
-                break;
-            case 'gte':
-                $this->_database->or_where("$key >=", $value);
-                break;
-            case 'lte':
-                $this->_database->or_where("$key <=", $value);
-                break;
-            case 'contains':
-                $this->_database->or_like($key, $value, 'both');
-                break;
-            case 'startswith':
-                $this->_database->or_like($key, $value, 'after');
-                break;
-            case 'endswith':
-                $this->_database->or_like($key, $value, 'before');
-                break;
-            case 'between':
-                if(!is_array($value) || (is_array($value) && count($value)!=2)){
-                    throw new OrmExceptions(
-                        sprintf("filter() usin between expected value to be an array, with two values only"));
-                }
-                $this->_database->or_where("$key BETWEEN $value[0] AND $value[1] ");
-                break;
-            case 'isnull':
-                $this->_database->or_where($key, $value);
-                break;
-            case 'not':
-                $this->_database->or_where("$key !=", $value);
-                break;
-            case 'notin':
-                $this->_database->or_where_not_in($key, $value);
-                break;
-        endswitch;
-    }
-
-    public function statement(){
-        return $this->_where($this->table_name, $this->conditions);
-    }
 }

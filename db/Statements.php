@@ -1,6 +1,12 @@
 <?php
 namespace powerorm\db;
 
+/**
+ * SQL statements to be used in creating migration files
+ * @package powerorm\db
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 interface Statements
 {
     public static function create_table($name, $check_exist, $attrs);

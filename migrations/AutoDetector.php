@@ -1,23 +1,69 @@
 <?php
 namespace powerorm\migrations;
 
+use powerorm\exceptions\OrmExceptions;
+use powerorm\migrations\operations\AddM2MField;
 use powerorm\migrations\operations\AddModel;
-use powerorm\migrations\operations\AlterColumn;
 use powerorm\migrations\operations\AlterField;
 use powerorm\migrations\operations\DropField;
+use powerorm\migrations\operations\DropM2MField;
 use powerorm\migrations\operations\DropModel;
 use powerorm\migrations\operations\AddField;
-use powerorm\model\OrmExceptions;
+use powerorm\model\ProxyModel;
 
+/**
+ * Class AutoDetector
+ * @package powerorm\migrations
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class AutoDetector{
     public $operations = [];
     public $current_state;
+    public $proxies = [];
 
     // use proxy objects to create migration this is to allow storing model state in file
     // add reference after creating table
     public function __construct($current_state, $history_state){
-        $this->current_state = $current_state;
         $this->history_state = $history_state;
+        $this->current_state = $this->_prepare($current_state);
+    }
+
+    public function _prepare($current_state){
+        $current_state->models = $this->_model_resolution_order($current_state->models);
+        return $current_state;
+    }
+
+    public function _model_resolution_order($models){
+        $order_models = [];
+
+        // loop as many times as the size of models passed in.
+        $i = 0;
+        while($i< count($models)):
+
+            foreach ($models as $name=>$model) :
+                if(empty($model->relations_fields)):
+                    $order_models[$name]= $model;
+                endif;
+
+                $existing_models = array_merge(array_keys($order_models), $this->migrated_models());
+
+                $dependencies = [];
+                foreach ($model->relations_fields as $field) :
+                    $dependencies[] = strtolower($field->related_model->meta->model_name);
+
+                    $missing =array_diff($dependencies, $existing_models);
+
+                    if(count($missing)==0):
+                        $order_models[$name]= $model;
+                    endif;
+
+                endforeach;
+
+            endforeach;
+            $i++;
+        endwhile;
+        return $order_models;
     }
 
     public function get_operations(){
@@ -28,109 +74,9 @@ class AutoDetector{
         return array_keys($this->history_state->models);
     }
 
-    public function _dependency_check($operation, $history){
-        // get already existing models
-        $existing_models = $this->migrated_models();
-
-        if(!empty($history)):
-
-            // get names of models they act on, this means they create or act on mode that already created
-            foreach ($history as $e_op) :
-                $existing_models[] = ucwords(strtolower($e_op['operation']->model_name));
-            endforeach;
-        endif;
-
-        // do the models that the operation depends on exist
-        return array_diff($operation['dependency'], $existing_models);
-    }
-    
-    public function _self_referencing($model, $dependency){
-        return [ucwords(strtolower($model)), ucwords(strtolower($model))] == $dependency;
-    }
-
-    public function _optimize($operations){
-        foreach ($operations as  $index=>&$main_operation) :
-
-            // look forward through all the other operations and see if the can be merged
-            // if merged remove them from the operations
-            // if none add it to the new array
-            foreach ($operations as  $candidate_index=>$candidate_operation) :
-
-                // get operations between start and position of AddModel
-                $history = array_slice($this->operations, 0, $index+1);
-
-                // check if the candidate depends on models that don't exist
-                $pending = $this->_dependency_check($candidate_operation, $history);
-
-                // if they act on same model they can merge
-                if($main_operation['model_name'] == $candidate_operation['model_name'] &&
-                    empty($pending) &&
-                    $index!=$candidate_index):
-
-                    // IF A MERGE HAS HAPPENED REMOVE THE CURRENT CANDINDATE FROM THE LIST OF OPERATIONS
-                    $combined = $this->_merge($main_operation, $candidate_operation);
-
-                    if($combined):
-                        // use unset over array_splice, since unset preserves the keys
-                        unset($operations[$candidate_index]);
-                    endif;
-                endif;
-            endforeach;
-
-        endforeach;
-
-        return array_values($operations);
-    }
-    /**
-     * Orders the operations so that operations don't depend on models that dont exist.
-     * @throws OrmExceptions
-     */
-    public function _operation_resolution_order(){
-        $ordered_ops = [];
-        $dependent_ops = [];
-
-        // holds names of models that already exist/ are to be created
-        $created_models = $this->migrated_models();
-
-        // first those that depend on nothing
-        // those that depend on one model and is not self referencing
-        foreach ($this->operations as $op) :
-            $mod_name = $op['model_name'];
-            // no dependency mostly AddModel operation
-            // ToDo also add the migrated ones
-            if(empty($op['dependency'])):
-                $ordered_ops[] = $op;
-                $created_models[] = $op['model_name'];
-                continue;
-            endif;
-
-            // with dependency come later
-            if(!empty($op['dependency'])):
-                $dependent_ops[] = $op;
-            endif;
-        endforeach;
-
-        // if an op is to be merged and depends on two models, look between which of the
-        // two and merge to it if the operation depends on it else add it as an alter table
-        foreach ($dependent_ops as $dep_op) :
-
-            if(in_array($dep_op['model_name'], $created_models)):
-                $ordered_ops[] = $dep_op;
-            else:
-                throw new OrmExceptions(
-                    sprintf('Trying %1$s that depends on model `%2$s` that does not seem to exist',
-                        get_class($dep_op), $dep_op['model_name']));
-            endif;
-        endforeach;
-
-
-        $this->operations = $ordered_ops;
-
-    }
-
     public function operations_todo($model_name, $operation, $dependency){
         $this->operations[] = [
-            'model_name'=>$model_name,
+            'model_name'=>strtolower($model_name),
             'operation'=> $operation,
             'dependency'=>$dependency
         ];
@@ -162,7 +108,7 @@ class AutoDetector{
             $past_model_names = [];
         endif;
 
-        $current_models = $this->current_state->models;
+        $current_models = $this->_model_resolution_order($this->current_state->models);
 
 
         $current_model_names = array_keys($current_models);
@@ -173,6 +119,7 @@ class AutoDetector{
         foreach ($added_models as $added_model) :
 
             $model_state = $current_models[$added_model];
+
 
             // create model operation
             $this->operations_todo(
@@ -187,11 +134,18 @@ class AutoDetector{
             foreach ($model_state->relations_fields as $field) :
                 $field_depends_on = [ucwords(strtolower($field->related_model->meta->model_name)),
                     ucwords(strtolower($added_model))];
+                if($field->inverse):
+                    continue;
+                endif;
+                if($field->M2M):
+                   $this->_add_m2m_field($model_state, $field, $field_depends_on);
+                else:
+                    $this->operations_todo($added_model,
+                        new AddField($added_model, $field, ['table_name'=>$model_state->db_table]),
+                        $field_depends_on
+                    );
+                endif;
 
-                $this->operations_todo($added_model,
-                    new AddField($added_model, $field, ['table_name'=>$model_state->db_table]),
-                    $field_depends_on
-                );
             endforeach;
 
         endforeach;
@@ -206,17 +160,26 @@ class AutoDetector{
         $current_models = $this->current_state->models;
 
         $current_model_names = array_keys($current_models);
-        $past_model_names = $this->migrated_models();
+        $past_model_names = array_keys($this->history_state->models);
 
         $deleted_models = array_values(array_diff($past_model_names, $current_model_names));
 
         foreach ($deleted_models as $deleted_model) :
-            $this->operations[] = new DropModel($deleted_model, $this->history_state->models[$deleted_model]);
+            $model_state = $this->history_state->models[$deleted_model];
+            $name = $model_state->db_table;
+            if(preg_match("/_fake_/", $name)):
+                $name = str_replace('_fake_\\', '', $name);
+            endif;
+            $this->operations_todo(
+                $deleted_model,
+                new DropModel($deleted_model, $model_state->local_fields, ['table_name'=>$name]),
+                []
+            );
         endforeach;
 
 
     }
-    
+
     public function find_added_fields(){
         if(empty($this->history_state->models)):
           return;
@@ -224,9 +187,12 @@ class AutoDetector{
 
         // search for each model in the migrations, if present get its fields
         // note those that we added
-        foreach ($this->current_state->models as $model_name => $model_obj) :
+        foreach ($this->current_state->models as $model_name => $model_meta) :
+            if(!isset($this->history_state->models[$model_name])):
+                continue;
+            endif;
             $model_past_state = $this->history_state->models[$model_name];
-            $current_fields = array_keys($model_obj->fields);
+            $current_fields = array_keys($model_meta->fields);
             $past_fields = array_keys($model_past_state->fields);
 
             $new_fields_names = array_values(array_diff($current_fields, $past_fields));
@@ -236,16 +202,25 @@ class AutoDetector{
             endif;
 
             foreach ($new_fields_names as $field_name) :
-                $field = $model_obj->fields[$field_name];
+                $field = $model_meta->fields[$field_name];
                 $field_depends_on = [];
+
+                if(isset($field->inverse) && $field->inverse):
+                    continue;
+                endif;
                 if(isset($field->related_model)):
                     $field_depends_on = [ucwords(strtolower($field->related_model->meta->model_name)),
                         ucwords(strtolower($model_name))];
                 endif;
-                $this->operations_todo($model_name,
-                    new AddField($model_name, $field, ['table_name'=>$model_obj->db_table]),
-                    $field_depends_on
-                );
+
+                if($field->M2M):
+                    $this->_add_m2m_field($model_meta, $field, $field_depends_on);
+                else:
+                    $this->operations_todo($model_name,
+                        new AddField($model_name, $field, ['table_name'=>$model_meta->db_table]),
+                        $field_depends_on
+                    );
+                endif;
             endforeach;
         endforeach;
 
@@ -261,13 +236,16 @@ class AutoDetector{
         // search for each model in the migrations, if present get its fields
         // note those that we added
         foreach ($this->current_state->models as $model_name => $model_obj) :
-
+            if(!isset($this->history_state->models[$model_name])):
+                continue;
+            endif;
             $model_past_state = $this->history_state->models[$model_name];
 
             $current_fields = array_keys($model_obj->fields);
             $past_fields = array_keys($model_past_state->fields);
 
             $dropped_fields_names = array_values(array_diff($past_fields, $current_fields));
+
 
             if(empty($dropped_fields_names)):
                 continue;
@@ -282,9 +260,13 @@ class AutoDetector{
                         ucwords(strtolower($model_name))];
                 endif;
 
-                $this->operations_todo($model_name,
-                    new DropField($model_name, $field, ['table_name'=>$model_obj->db_table]), $field_depends_on
-                );
+                if($field->M2M):
+                    $this->_drop_m2m_field($model_obj, $field, $field_depends_on);
+                else:
+                    $this->operations_todo($model_name,
+                        new DropField($model_name, $field, ['table_name'=>$model_obj->db_table]), $field_depends_on
+                    );
+                endif;
             endforeach;
         endforeach;
 
@@ -298,12 +280,19 @@ class AutoDetector{
 
         $date_fields = [];
         foreach ($this->current_state->models as $model_name => $model_obj) :
+            if(!isset($this->history_state->models[$model_name])):
+                continue;
+            endif;
             $model_past_state = $this->history_state->models[$model_name];
 
             $past_fields = $model_past_state->fields;
 
             $unique_fields = [];
             foreach ($model_obj->fields as $name=>$field) :
+
+                if(isset($field->inverse) && $field->inverse):
+                    continue;
+                endif;
 
                 // if there is nothing in the past no need to go on
                 if(!isset($past_fields[$name])):
@@ -348,7 +337,162 @@ class AutoDetector{
 
         endforeach;
 
-        var_dump($date_fields);
+    }
+
+    public function _dependency_check($operation, $history){
+        // get already existing models
+        $existing_models = $this->migrated_models();
+
+        if(!empty($history)):
+
+            // get names of models they act on, this means they create or act on a modes thats already created
+            foreach ($history as $e_op) :
+                $existing_models[] = ucwords(strtolower($e_op['operation']->model_name));
+            endforeach;
+        endif;
+
+        // do the models that the operation depends on exist
+        return array_diff($operation['dependency'], $existing_models);
+    }
+
+    public function _self_referencing($model, $dependency){
+        return [ucwords(strtolower($model)), ucwords(strtolower($model))] == $dependency;
+    }
+
+    public function _optimize($operations){
+        foreach ($operations as  $index=>&$main_operation) :
+
+            // look forward through all the other operations and see if the can be merged
+            // if merged remove them from the operations
+            // if none add it to the new array
+            foreach ($operations as  $candidate_index=>$candidate_operation) :
+
+                // get operations between start and position of AddModel
+                $history = array_slice($this->operations, 0, $index+1);
+
+                // check if the candidate depends on models that don't exist
+                $pending = $this->_dependency_check($candidate_operation, $history);
+
+                // if they act on same model they can merge
+                if($main_operation['model_name'] == $candidate_operation['model_name'] &&
+                    empty($pending) &&
+                    $index!=$candidate_index):
+
+                    // IF A MERGE HAS HAPPENED REMOVE THE CURRENT CANDINDATE FROM THE LIST OF OPERATIONS
+                    $combined = $this->_merge($main_operation, $candidate_operation);
+
+                    if($combined):
+                        // use unset over array_splice, since unset preserves the keys
+                        unset($operations[$candidate_index]);
+                    endif;
+                endif;
+            endforeach;
+
+        endforeach;
+
+        return array_values($operations);
+    }
+
+    /**
+     * Orders the operations so that operations don't depend on models that dont exist.
+     * @throws OrmExceptions
+     */
+    public function _operation_resolution_order(){
+        var_dump("-resolution");
+        $ordered_ops = [];
+        $dependent_ops = [];
+        $proxy_ops = [];
+
+        // holds names of models that already exist/ are to be created
+        $created_models = $this->migrated_models();
+
+        // first those that depend on nothing
+        // those that depend on one model and is not self referencing
+        foreach ($this->operations as $op) :
+            $mod_name = $op['model_name'];
+            // no dependency mostly AddModel operation
+            if(empty($op['dependency'])):
+                $ordered_ops[] = $op;
+                $created_models[] = $op['model_name'];
+                continue;
+            endif;
+
+            // if this is not a proxy model.
+            $is_proxy_model = isset($op['operation']->options['proxy_model']) && $op['operation']->options['proxy_model'];
+
+            // with dependency come later
+            if($is_proxy_model):
+                $proxy_ops[] = $op;
+                continue;
+            endif;
+
+            // with dependency come later
+            if(!empty($op['dependency'])):
+                $dependent_ops[] = $op;
+            endif;
+        endforeach;
+
+        // those with dependency come next
+        foreach ($dependent_ops as $dep_op) :
+
+            if(in_array($dep_op['model_name'], $created_models)):
+                $ordered_ops[] = $dep_op;
+            else:
+                throw new OrmExceptions(
+                    sprintf('Trying `%1$s` that depends on model `%2$s` that does not seem to exist',
+                        get_class($dep_op['operation']), $dep_op['model_name']));
+            endif;
+        endforeach;
+
+        foreach ($proxy_ops as $dep_op) :
+
+            $deps =[];
+            foreach ($dep_op['dependency'] as $dep) :
+                $deps[] = strtolower($dep);
+            endforeach;
+            $mission_dep = array_diff($deps, $created_models);
+
+            if(count($mission_dep)==0):
+                $ordered_ops[] = $dep_op;
+            else:
+                throw new OrmExceptions(
+                    sprintf('Trying `%1$s` that depends on model `%2$s` that does not seem to exist',
+                        get_class($dep_op['operation']), json_encode($mission_dep)));
+            endif;
+        endforeach;
+        $this->operations = $ordered_ops;
+
+    }
+
+    public function _add_m2m_field($owner_meta, $field, $field_depends_on){
+
+        if(empty($field->through)):
+            $inverse_meta = $field->related_model->meta;
+            $proxy = new ProxyModel($owner_meta,$inverse_meta);
+            $name = strtolower($owner_meta->model_name);
+
+            $this->operations_todo(
+                $name,
+                new AddM2MField($name, [$field->name=>$field], $proxy,
+                    ['table_name'=>$proxy->meta->db_table, 'proxy_model'=>$proxy->meta->proxy_model]),
+                $field_depends_on);
+        endif;
+    }
+
+    public function _drop_m2m_field($owner_meta, $field, $field_depends_on){
+
+        if(empty($field->through)):
+            $inverse_meta = $field->related_model->meta;
+            $proxy = new ProxyModel($owner_meta,$inverse_meta);
+            $name = strtolower($owner_meta->model_name);
+
+            $this->operations_todo(
+                $name,
+                new DropM2MField($name, [$field->name=>$field], $proxy,
+                    ['table_name'=>$proxy->meta->db_table, 'proxy_model'=>$proxy->meta->proxy_model]),
+                $field_depends_on);
+        endif;
+
     }
 
     public function _merge(&$operation, $candidate_operation){
@@ -430,3 +574,5 @@ class AutoDetector{
         return $m2m_fields;
     }
 }
+
+// ToDo very serious validation on foreignkey constraint, based on cascade passed in.

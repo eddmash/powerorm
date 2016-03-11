@@ -4,6 +4,12 @@ namespace powerorm\migrations;
 // go through all the models and get there model state
 // based on current project state find if there is any operation needed
 // by comparing the it with the project state of application based on migration
+/**
+ * Class ProjectState
+ * @package powerorm\migrations
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class ProjectState{
     public $_model_paths = APPPATH.'models/';
 
@@ -40,7 +46,9 @@ class ProjectState{
      */
     public function _from_models(){
         foreach ($this->get_model_classes() as $model_name) :
-            $this->models[$model_name] = $this->_load_model($model_name)->meta;
+            $model_obj=  $this->_load_model($model_name);
+            $model_obj->checks();
+            $this->models[$model_name] = $model_obj->meta;
         endforeach;
     }
 

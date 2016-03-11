@@ -1,6 +1,12 @@
 <?php
 namespace powerorm\migrations;
 
+/**
+ * Class MigrationLoader
+ * @package powerorm\migrations
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class MigrationLoader{
 
     public $_migrations_path = APPPATH.'migrations/';
@@ -27,19 +33,8 @@ class MigrationLoader{
         foreach ($this->migration_states() as $state) :
 
             $class_name = ucwords(strtolower($state['model_name']));
-            $class = 'namespace _fake_;
 
-            class %1$s extends \PModel{
-                 public function fields(){}
-            }';
-
-            if(!class_exists('_fake_\\'.$class_name, FALSE)):
-                eval(sprintf($class, $class_name));
-            endif;
-
-            $class_name = '_fake_\\'.$class_name;
-            $new_model = new $class_name();
-
+            $new_model = $this->_define_load_class($class_name);
             // add fields
             foreach ($state['fields'] as $field_name=>$field_state) :
                 $new_model->{$field_name} = $this->to_field($field_state);
@@ -49,6 +44,25 @@ class MigrationLoader{
 
         endforeach;
         return $models;
+    }
+
+    public function _define_load_class($class_name){
+        // we create a new namespace and define new classes because,
+        // we might be dealing with a model that has been dropped
+        // Meaning if we try to load the model using the normal codeigniter way,
+        // we will get and error of model does not exist
+        $class = 'namespace _fake_;
+
+            class %1$s extends \PModel{
+                 public function fields(){}
+            }';
+
+        if(!class_exists('_fake_\\'.$class_name, FALSE)):
+            eval(sprintf($class, $class_name));
+        endif;
+
+        $class_name = '_fake_\\'.$class_name;
+        return new $class_name();
     }
 
     /**
@@ -138,10 +152,15 @@ class MigrationLoader{
 
                 if($m_state['model_name'] == $inner_state['model_name'] && $index != $in_index):
 
-                    // ToDo take care of all operations
                     $state = $this->_state_harmony($m_state, $inner_state);
 
                     if(!empty($state)):
+                        unset($migration_states[$in_index]);
+                    endif;
+
+                    // drop model
+                    if($m_state['operation']=='add_model' && $inner_state['operation']=='drop_model'):
+                        unset($migration_states[$index]);
                         unset($migration_states[$in_index]);
                     endif;
                 endif;
@@ -163,7 +182,25 @@ class MigrationLoader{
 
         endif;
 
+        if($migration_state['operation']=='add_model' && $candidate_state['operation']=='add_m2m_field'):
+            $add_fields = $candidate_state['fields'];
+
+            foreach ($add_fields as $name=>$field) :
+                $migration_state['fields'][$name] = $field;
+            endforeach;
+
+        endif;
+
         if($migration_state['operation']=='add_model' && $candidate_state['operation']=='drop_field'):
+            $add_fields = $candidate_state['fields'];
+
+            foreach ($add_fields as $name=>$field) :
+                 unset($migration_state['fields'][$name]);
+            endforeach;
+
+        endif;
+
+        if($migration_state['operation']=='add_model' && $candidate_state['operation']=='drop_m2m_field'):
             $add_fields = $candidate_state['fields'];
 
             foreach ($add_fields as $name=>$field) :
@@ -180,6 +217,8 @@ class MigrationLoader{
             endforeach;
 
         endif;
+
+
 
         return $migration_state;
     }
