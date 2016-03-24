@@ -1,5 +1,7 @@
 <?php
 namespace powerorm\model;
+use powerorm\model\field\InverseRelation;
+use powerorm\model\field\RelatedField;
 
 /**
  * Class Meta
@@ -15,20 +17,26 @@ class Meta{
     public $relations_fields = [];
     public $local_fields = [];
     public $inverse_fields = [];
+    public $trigger_fields = [];
 
     public function load_field($field_obj){
         $this->fields[$field_obj->name] = $field_obj;
         $this->set_pk($field_obj);
 
-        if(is_subclass_of($field_obj, 'RelatedField')):
+        if($field_obj instanceof RelatedField):
             $this->relations_fields[$field_obj->name] = $field_obj;
         else:
             $this->local_fields[$field_obj->name] = $field_obj;
         endif;
+        $this->load_inverse_field($field_obj);
     }
 
     public function load_inverse_field($field_obj){
-        $this->inverse_fields[$field_obj->name] = $field_obj;
+
+        if ($field_obj instanceof InverseRelation):
+            $this->inverse_fields[$field_obj->name] = $field_obj;
+        endif;
+
     }
 
     public function get_field($field_name){

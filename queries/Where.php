@@ -33,13 +33,14 @@ class Where{
         'not',
         'notin'];
 
-    public function __construct($database, $table_name=NULL){
-        $this->_database =& $database;
+    public function __construct($qbuilder, $table_name=NULL){
+        // pass by reference since we want this where to be associated with the other statements.
+        $this->_qbuilder =& $qbuilder;
         $this->table_name = $table_name;
     }
 
     public function validate_lookup($lookup){
-        if(!in_array($lookup, $this->lookup_options)):
+        if(!empty($lookup) && !in_array($lookup, $this->lookup_options)):
             throw new OrmExceptions(sprintf("`%s` is not a valid lookup parameter", $lookup));
         endif;
     }
@@ -63,6 +64,7 @@ class Where{
 
         // create where clause from the conditions given
         foreach ($conditions as $key=>$value) :
+
 
             // check which where clause to use
             if(preg_match($lookup_pattern, $key)):
@@ -110,101 +112,107 @@ class Where{
     public function _and_where_concat($lookup,$key, $value){
         switch($lookup):
             case 'eq':
-                $this->_database->where($key, $value);
+                $this->_qbuilder->where($key, $value);
                 break;
             case 'in':
-                $this->_database->where_in($key, $value);
+                $this->_qbuilder->where_in($key, $value);
                 break;
             case 'gt':
-                $this->_database->where("$key >", $value);
+                $this->_qbuilder->where("$key >", $value);
                 break;
             case 'lt':
-                $this->_database->where("$key <", $value);
+                $this->_qbuilder->where("$key <", $value);
                 break;
             case 'gte':
-                $this->_database->where("$key >=", $value);
+                $this->_qbuilder->where("$key >=", $value);
                 break;
             case 'lte':
-                $this->_database->where("$key <=", $value);
+                $this->_qbuilder->where("$key <=", $value);
                 break;
             case 'contains':
-                $this->_database->like($key, $value, 'both');
+                $this->_qbuilder->like($key, $value, 'both');
                 break;
             case 'startswith':
-                $this->_database->like($key, $value, 'after');
+                $this->_qbuilder->like($key, $value, 'after');
                 break;
             case 'endswith':
-                $this->_database->like($key, $value, 'before');
+                $this->_qbuilder->like($key, $value, 'before');
                 break;
             case 'between':
                 if(!is_array($value) || (is_array($value) && count($value)!=2)){
                     throw new OrmExceptions(
                         sprintf("filter() using between expected value to be an array, with two values only"));
                 }
-                $this->_database->where("$key BETWEEN $value[0] AND $value[1] ");
+                $this->_qbuilder->where("$key BETWEEN $value[0] AND $value[1] ");
                 break;
             case 'isnull':
-                $this->_database->where($key, $value);
+                //TODO NOTNULL
+                if($value):
+                    $value = NULL;
+                endif;
+                $this->_qbuilder->where($key, $value);
                 break;
             case 'not':
-                $this->_database->where("$key !=", $value);
+                $this->_qbuilder->where("$key !=", $value);
                 break;
             case 'notin':
-                $this->_database->where_not_in($key, $value);
+                $this->_qbuilder->where_not_in($key, $value);
                 break;
         endswitch;
     }
 
     public function _or_where_concat($lookup,$key, $value){
 
+
         switch($lookup):
             case 'eq':
-                $this->_database->or_where($key, $value);
+                $this->_qbuilder->or_where($key, $value);
                 break;
             case 'in':
-                $this->_database->or_where_in($key, $value);
+                $this->_qbuilder->or_where_in($key, $value);
                 break;
             case 'gt':
-                $this->_database->or_where("$key >", $value);
+                $this->_qbuilder->or_where("$key >", $value);
                 break;
             case 'lt':
-                $this->_database->or_where("$key <", $value);
+                $this->_qbuilder->or_where("$key <", $value);
                 break;
             case 'gte':
-                $this->_database->or_where("$key >=", $value);
+                $this->_qbuilder->or_where("$key >=", $value);
                 break;
             case 'lte':
-                $this->_database->or_where("$key <=", $value);
+                $this->_qbuilder->or_where("$key <=", $value);
                 break;
             case 'contains':
-                $this->_database->or_like($key, $value, 'both');
+                $this->_qbuilder->or_like($key, $value, 'both');
                 break;
             case 'startswith':
-                $this->_database->or_like($key, $value, 'after');
+                $this->_qbuilder->or_like($key, $value, 'after');
                 break;
             case 'endswith':
-                $this->_database->or_like($key, $value, 'before');
+                $this->_qbuilder->or_like($key, $value, 'before');
                 break;
             case 'between':
                 if(!is_array($value) || (is_array($value) && count($value)!=2)){
                     throw new OrmExceptions(
                         sprintf("filter() usin between expected value to be an array, with two values only"));
                 }
-                $this->_database->or_where("$key BETWEEN $value[0] AND $value[1] ");
+                $this->_qbuilder->or_where("$key BETWEEN $value[0] AND $value[1] ");
                 break;
             case 'isnull':
-                $this->_database->or_where($key, $value);
+                $this->_qbuilder->or_where($key, $value);
                 break;
             case 'not':
-                $this->_database->or_where("$key !=", $value);
+                $this->_qbuilder->or_where("$key !=", $value);
                 break;
             case 'notin':
-                $this->_database->or_where_not_in($key, $value);
+                $this->_qbuilder->or_where_not_in($key, $value);
                 break;
         endswitch;
     }
 
     public function clause($conditions){
-        return $this->_where($this->table_name, $conditions);
+
+        $this->_where($this->table_name, $conditions);
     }
 }

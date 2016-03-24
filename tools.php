@@ -9,6 +9,47 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // the Codeigniter instance
 $CI =& get_instance();
 
+if(!function_exists('checks_html_output')){
+
+    /**
+     * @param $checks
+     */
+    function checks_html_output($checks){
+
+        $out = "<span>Please resolve the following issues:</span><br><br><br>";
+        function inner_htm_display($checks, $out='', $indent=0)
+        {
+            $pad = 2;
+            if ($indent > 0):
+                $i = 0;
+                while ($i < $indent):
+                    $pad = $pad+ $indent;
+                    $i++;
+                endwhile;
+            endif;
+
+            foreach ($checks as $name => $value) :
+
+                if (!is_numeric($name)):
+                    $out .= "<span style='padding-left:".$pad."em;'>". $name . "</span><br>";
+                endif;
+
+
+                if (is_array($value)):
+                    $out .= inner_htm_display($value,'',2);
+                endif;
+
+                if (is_string($value)):
+                    $pad = $pad+2;
+                    $out .=  "<span style='padding-left: ".$pad."em;'>" . $value . "</span><br><br><br>";
+                endif;
+            endforeach;
+            return $out;
+        }
+
+        return inner_htm_display($checks, $out);
+    }
+}
 
 if(! function_exists('uploaded')){
 
@@ -252,8 +293,6 @@ if(!function_exists('stringify')):
         return $string_state;
     }
 endif;
-
-
 
 
 

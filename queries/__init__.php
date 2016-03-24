@@ -2,5 +2,5 @@
 // load the model field
 include_once("Where.php");
 
-// load exceptions
+// Queryset
 include_once("Queryset.php");

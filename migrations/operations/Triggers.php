@@ -1,16 +1,17 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: eddmash
+ * Date: 3/12/16
+ * Time: 8:12 PM
+ */
+
 namespace powerorm\migrations\operations;
 
 
 use powerorm\db\MysqlStatements;
 
-/**
- * Class AddModel
- * @package powerorm\migrations\operations
- * @since 1.0.0
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class AddModel extends Operation{
+class AddTriggers extends Operation{
     public $model_name;
     public $fields;
     public $options;
@@ -21,26 +22,23 @@ class AddModel extends Operation{
         $this->options = $options;
     }
 
-    public function up(){
-
-        $table = MysqlStatements::_porm_create_table($this->db_table());
-        $fields = MysqlStatements::add_table_field($this->fields);
-        return array_merge($fields, $table);
-
+    public function up()
+    {
+        return MysqlStatements::add_triggers($this->db_table(), $this->fields);
     }
 
     public function down()
     {
-        return MysqlStatements::_porm_drop_table($this->db_table());
+        return MysqlStatements::drop_triggers($this->db_table(), $this->fields);
     }
 
     public function message()
     {
-        return "create";
+        return 'add_triggers';
     }
 
     public function state(){
-        $model = ['model_name'=>$this->model_name,'operation'=>'add_model'];
+        $model = ['model_name'=>strtolower($this->model_name),'operation'=>'add_triggers'];
         $model = array_merge($model, $this->options);
 
         $fields['fields'] = [];
@@ -52,15 +50,7 @@ class AddModel extends Operation{
     }
 
 }
-
-/**
- * Class DropModel
- * @package powerorm\migrations\operations
- * @since 1.0.0
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class DropModel extends Operation
-{
+class DropTriggers extends Operation{
     public $model_name;
     public $fields;
     public $options;
@@ -70,25 +60,24 @@ class DropModel extends Operation
         $this->fields = $fields;
         $this->options = $options;
     }
+
     public function up()
     {
-        return MysqlStatements::_porm_drop_table($this->db_table());
+        return MysqlStatements::drop_triggers($this->db_table(), $this->fields);
     }
 
     public function down()
     {
-        $table = MysqlStatements::_porm_create_table($this->db_table());
-        $fields = MysqlStatements::add_table_field($this->fields);
-        return array_merge($fields, $table);
+        return MysqlStatements::add_triggers($this->db_table(), $this->fields);
     }
 
     public function message()
     {
-        return 'drop_table';
+        return 'drop_triggers';
     }
-    
+
     public function state(){
-        $model = ['model_name'=>$this->model_name,'operation'=>'drop_model'];
+        $model = ['model_name'=>strtolower($this->model_name),'operation'=>'drop_triggers'];
         $model = array_merge($model, $this->options);
 
         $fields['fields'] = [];

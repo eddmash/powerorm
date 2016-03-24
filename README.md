@@ -215,3 +215,5 @@ e.g. inside the controller
  - CodeIgniter 3.0+
  - php 5.4+
  - on MYsql 5.6.5 
+ 
+ 

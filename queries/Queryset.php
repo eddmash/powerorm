@@ -9,14 +9,17 @@
  */
 namespace powerorm\queries;
 
-
-use HasMany;
-use HasOne;
 use powerorm\exceptions\MultipleObjectsReturned;
 use powerorm\exceptions\ObjectDoesNotExist;
 use powerorm\exceptions\OrmExceptions;
 use powerorm\exceptions\ValueError;
+use powerorm\model\field\ForeignKey;
+use powerorm\model\field\HasMany;
+use powerorm\model\field\HasOne;
+use powerorm\model\field\InverseRelation;
+use powerorm\model\field\ManyToMany;
 use powerorm\model\ProxyModel;
+use powerorm\model\field\RelatedField;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -190,7 +193,7 @@ class Queryset implements \IteratorAggregate, \Countable
      * @var object Holds a copy of the database connection the current queryset will use
      * @internal
      */
-//    protected $_database;
+    protected $_qbuilder;
 
     /**
      * @var bool Indacates if a Queryset has been evaluated.
@@ -240,6 +243,20 @@ class Queryset implements \IteratorAggregate, \Countable
     protected $_fields_to_eager_load = array();
 
     /**
+     * Holds the where clauses
+     * @internal
+     * @var array
+     */
+    protected $_where_cache = [];
+
+    /**
+     * Holds the database connection resource.this only happens if profiler is turned on.
+     * @var array
+     * @internal
+     */
+    protected $conn_id;
+
+    /**
      *  ============================================OVERRIDEN MAGIC METHODS =========================
      *  -----------------------------------------------------------------------------------------------
      *  -----------------------------------------------------------------------------------------------
@@ -255,12 +272,9 @@ class Queryset implements \IteratorAggregate, \Countable
      */
     public function __construct($database, $model)
     {
-
         $this->_active_model_object = $model;
 
-        // setup database
-        $this->_database($database);
-
+        $this->_get_query_builder();
     }
 
     /**
@@ -271,8 +285,13 @@ class Queryset implements \IteratorAggregate, \Countable
      */
     public function __isset($property)
     {
+
         $result = $this->_eval_queryset();
-        return property_exists($result, $property);
+        if((!property_exists($result, $property))):
+            return property_exists($result, $property);
+        endif;
+
+        return (empty($this->_results_cache->{$property}))? FALSE:TRUE;
 
     }
 
@@ -305,10 +324,41 @@ class Queryset implements \IteratorAggregate, \Countable
         return sprintf('%s', $this->_results_cache);
     }
 
+    /**
+     * Evaluates the Queryset when a method is being accessed in the Queryset Result.
+     * @param $method
+     * @param $args
+     * @ignore
+     * @return mixed
+     */
+    public function __call($method, $args){
+
+        if(!method_exists($this,$method)):
+            if(!$this->_evaluated):
+                // evaluate the queryset
+                $this->_eval_queryset();
+            endif;
+
+            // if a method is being accessed that does not exist in the queryset
+            // look for it in the resulting model if the query has been evaluated
+            if($this->_evaluated):
+                if(empty($args)):
+                    return call_user_func(array($this->_results_cache, $method));
+                else:
+                    if(is_array($args)):
+                        return call_user_func_array(array($this->_results_cache, $method), $args);
+                    else:
+                        return call_user_func(array($this->_results_cache, $method), $args);
+                    endif;
+                endif;
+            endif;
+        endif;
+    }
+
     public function __clone()
     {
         // make a copy of the database
-        $this->_database = $this->_shallow_copy($this->_database);
+        $this->_qbuilder = $this->_shallow_copy($this->_qbuilder);
     }
 
     /**
@@ -318,8 +368,15 @@ class Queryset implements \IteratorAggregate, \Countable
      */
     public function count()
     {
-        $this->_output_type = 'num_rows';
-        return $this->_eval_queryset();
+        if($this->_evaluated):
+            return count($this->_results_cache);
+        endif;
+
+        $this->_prepare_builder();
+
+        $qb = $this->_shallow_copy($this->_qbuilder);
+
+        return $qb->get()->num_rows();
     }
 
     /**
@@ -338,6 +395,7 @@ class Queryset implements \IteratorAggregate, \Countable
 //        $this->_eval_queryset();
 //        return array('_results_cache');
 //    }
+
     /**
      * ============================================ QUERY OPERATION METHODS =========================
      *  -----------------------------------------------------------------------------------------------
@@ -442,6 +500,7 @@ class Queryset implements \IteratorAggregate, \Countable
         endforeach;
 
         $this->filter($conds);
+
         return $this;
     }
 
@@ -456,7 +515,7 @@ class Queryset implements \IteratorAggregate, \Countable
      * @return Querset
      */
     public function distinct(){
-        $this->_database->distinct();
+        $this->_qbuilder->distinct();
         return $this;
     }
 
@@ -491,12 +550,36 @@ class Queryset implements \IteratorAggregate, \Countable
                     sprintf('order_by() expects either ASC, DESC, RANDOM as ordering direction, but got %s', $direction));
             endif;
 
-            $this->_database->order_by($field, $direction);
+            $this->_qbuilder->order_by($field, $direction);
         endforeach;
 
 
         return $this;
 
+    }
+
+    public function group_by($condition){
+        if (!is_array($condition)) {
+            throw new ValueError(sprintf("Arguments should be in array form"));
+        }
+
+        // ToDo group by relationship
+        $new_cond = [];
+        foreach ($condition as $cond) :
+            if($this->_is_relation_field($cond,$this->_active_model_object)):
+                $field_obj = $this->_active_model_object->meta->relations_fields[$cond];
+
+                $new_cond[] = $field_obj->db_column_name();
+
+            else:
+
+                $new_cond[] = $cond;
+            endif;
+        endforeach;
+
+
+        $this->_qbuilder->group_by($new_cond);
+        return $this;
     }
 
     /**
@@ -525,7 +608,7 @@ class Queryset implements \IteratorAggregate, \Countable
             throw new ValueError('limit() Expects start to be a numeric value');
         endif;
 
-        $this->_database->limit($size, $start);
+        $this->_qbuilder->limit($size, $start);
 
         return $this;
     }
@@ -605,11 +688,35 @@ class Queryset implements \IteratorAggregate, \Countable
      * @param array $where (optional) values to limit the Queryset.
      * @return int
      */
-    public function size($conditions = array())
+    public function size()
     {
-        $this->filter($conditions);
-        $this->_output_type = 'num_rows';
         return $this->count();
+    }
+
+    public function is_empty(){
+
+        return ($this->size() == 0) ? TRUE : FALSE ;
+    }
+
+    public function delete(){
+
+    }
+    
+    public function clear(){
+    }
+
+    public function _reset(){
+
+        $this->_qbuilder->empty_table($this->_active_model_object->get_table_name());
+    }
+
+    //ToDo
+    public function raw($statement){
+    
+    }
+
+    // ToDo
+    public function only($fields=[]){
     }
 
     /**
@@ -634,13 +741,13 @@ class Queryset implements \IteratorAggregate, \Countable
      */
     public function _save()
     {
-
         $pk = $this->_model_pk_field($this->_active_model_object);
 
         // save related models
         // got through the fields trying to find field with objects as value
-        foreach ($this->_active_model_object->meta->relations_fields as $field) {
+        foreach ($this->_active_model_object->meta->relations_fields as $field=>$field_obj) {
             $field_value = $this->_active_model_object->{$field};
+
             // assumes current model is the owning side being saved that is it has the foreign key
             if (is_object($field_value) && $field_value instanceof Queryset):
                 // evaluate the Queryset
@@ -660,17 +767,34 @@ class Queryset implements \IteratorAggregate, \Countable
 
                 $this->_active_model_object->{$field} = $field_value->{$related_pk};
             endif;
+
+            // on MYsql, for foreignkeys that allow empty values, The fields should be set to NULL
+            // otherwise the following error is raised
+            // #1452 - Cannot add or update a child row: a foreign key constraint fails.
+
+            if($field_obj instanceof ForeignKey && $field_obj->null):
+                if(is_string($field_value)):
+                    $field_value = trim($field_value);
+                endif;
+                if(empty($field_value)):
+                    $this->_active_model_object->{$field} = NULL;
+                endif;
+            endif;
         }
         $model_rep = $this->_to_array($this->_active_model_object);
+
+
+        // now open connection
+        $this->_qbuilder->initialize();
 
         // determine if its an update or a new save
         if (isset($this->_active_model_object->{$pk}) && !empty($this->_active_model_object->{$pk})):
             $pk_value = $this->_active_model_object->{$pk};
-            $this->_database->where($pk, $pk_value);
-            $this->_database->update($this->_active_model_object->get_table_name(), $model_rep);
+            $this->_qbuilder->where($pk, $pk_value);
+            $this->_qbuilder->update($this->_active_model_object->get_table_name(), $model_rep);
         else:
-            $this->_database->insert($this->_active_model_object->get_table_name(), $model_rep);
-            $pk_value = $this->_database->insert_id();
+            $this->_qbuilder->insert($this->_active_model_object->get_table_name(), $model_rep);
+            $pk_value = $this->_qbuilder->insert_id();
         endif;
 
         // get saved model
@@ -681,6 +805,9 @@ class Queryset implements \IteratorAggregate, \Countable
         $rep = [];
 
         foreach ($model->meta->fields as $field) :
+            if($field instanceof ManyToMany || $field instanceof InverseRelation):
+                continue;
+            endif;
             $rep[$field->db_column_name()] = $this->_active_model_object->{$field->name};
         endforeach;
 
@@ -700,8 +827,18 @@ class Queryset implements \IteratorAggregate, \Countable
             $act_name = $this->_model_name($this->_active_model_object);
             $rel_name = $this->_model_name($related_model);
             $proxy = $this->_m2m_through_model($this->_active_model_object, $related_model);
-            $proxy->{$act_name} = $this->_active_model_object->{$this->_model_pk_field($this->_active_model_object)};
-            $proxy->{$rel_name} = $related_model->{$this->_model_pk_field($related_model)};
+
+            $act_value = $this->_active_model_object->{$this->_model_pk_field($this->_active_model_object)};
+            $rel_value = $related_model->{$this->_model_pk_field($related_model)};
+
+            // we need to avoid having duplicate rows e.g. M2M between role and perm
+            // we avoid having more than one row having role=1 and perm=1
+            if(!$proxy->filter([$act_name=>$act_value, $rel_name=>$rel_value])->is_empty()):
+                continue;
+            endif;
+
+            $proxy->{$act_name} = $act_value;
+            $proxy->{$rel_name} = $rel_value;
             $proxy->save();
         endforeach;
 
@@ -803,6 +940,7 @@ class Queryset implements \IteratorAggregate, \Countable
 
     public function _filter($conditions)
     {
+
         $this->_validate_condition($conditions);
 
         // look if we have filter conditions that span relationships
@@ -815,7 +953,8 @@ class Queryset implements \IteratorAggregate, \Countable
         $this->_from($table_name);
 
         if (!empty($split_conditions['normal_conditions'])):
-            $this->_where_clause($this->_database, $table_name,
+
+            $this->_where_clause($table_name,
                 $this->_prepare_where_conditions($split_conditions['normal_conditions']));
         endif;
 
@@ -834,7 +973,6 @@ class Queryset implements \IteratorAggregate, \Countable
                     $this->_m2m_join($proxy, $this->_active_model_object, $model_object, $conditions);
                 endif;
             endforeach;
-
 
         endif;
 
@@ -891,7 +1029,7 @@ class Queryset implements \IteratorAggregate, \Countable
     protected function _dump_sql()
     {
         echo '******************* Running the sql statement *******************************<br>';
-        echo $this->_database->get_compiled_select(NULL, FALSE);
+        echo $this->_qbuilder->get_compiled_select(NULL, FALSE);
         echo '<br>************************************************************************<br>';
     }
 
@@ -911,7 +1049,7 @@ class Queryset implements \IteratorAggregate, \Countable
 
 
             if (property_exists($field_object, 'related_model') &&
-                ($field_object->M2M || is_subclass_of($field_object, 'InverseRelation'))):
+                ($field_object->M2M || $field_object instanceof InverseRelation)):
 
                 $act_pk = $this->_model_pk_field($this->_active_model_object);
                 $value = $db_result_object->{$act_pk};
@@ -963,7 +1101,7 @@ class Queryset implements \IteratorAggregate, \Countable
     {
         $value = $db_value;
 
-        if (is_subclass_of($field_object, 'RelatedField')):
+        if ($field_object instanceof RelatedField):
 
             // owning side
             // if this is a relationship and its is not eagerly loaded, return a Queryset for the relation
@@ -982,7 +1120,7 @@ class Queryset implements \IteratorAggregate, \Countable
                 endif;
 
                 if($field_object instanceof HasOne):
-                    var_dump($db_value);
+
                     return $field_object->related_model->filter(["$act_name::$act_pk"=>$db_value])->first();
                 endif;
 
@@ -1011,9 +1149,12 @@ class Queryset implements \IteratorAggregate, \Countable
         // ensure model requested for eager loading are actually related to the current model
         $this->_related_check();
         foreach ($this->_fields_to_eager_load as $field_name) :
+            if(!isset($this->_eager_fields_values[$field_name])):
+                continue;
+            endif;
 
             // since one eager model can be used by the current results multiple times
-            // we just make sure we dont have repeatations of the the same eager model key
+            // we just make sure we dont have repetitions of the the same eager model key
             $field_values = array_unique($this->_eager_fields_values[$field_name]);
 
             // fetch the eager models with the values above
@@ -1040,10 +1181,10 @@ class Queryset implements \IteratorAggregate, \Countable
 
 
         if (count($not_relation_fields) > 0):
-            throw new OrmExceptions(sprintf('``%1$s` model has not relation to `%2$s` choices are [ %3$s ]',
+            throw new OrmExceptions(sprintf(' %1$s` model has no relation to %2$s choices are :  %3$s ',
                 $this->_model_name($this->_active_model_object),
-                implode(', ', $not_relation_fields),
-                implode(', ', $relation_fields)));
+                stringify($not_relation_fields),
+                stringify($relation_fields)));
         endif;
 
     }
@@ -1077,7 +1218,7 @@ class Queryset implements \IteratorAggregate, \Countable
      */
     protected function _eval_queryset()
     {
-        if (empty($this->_evaluated)):
+        if (!$this->_evaluated):
 
             // evaluate main object
             $main_result = $this->_evaluate();
@@ -1096,7 +1237,24 @@ class Queryset implements \IteratorAggregate, \Countable
      */
     protected function _evaluate()
     {
-        return $this->_db_results($this->_database->get());
+        $this->_prepare_builder();
+
+        return $this->_db_results($this->_qbuilder->get());
+    }
+
+    public function _prepare_builder(){
+
+        $this->_qbuilder->initialize();
+
+        if(!empty($this->_where_cache)):
+
+            // create the where conditions because they need a connection
+            foreach ($this->_where_cache as $table_name=>$conditions) :
+                $where = new Where($this->_qbuilder, $table_name);
+                $where->clause($conditions);
+            endforeach;
+
+        endif;
     }
 
     protected function _db_results($query)
@@ -1143,8 +1301,34 @@ class Queryset implements \IteratorAggregate, \Countable
             throw new ValueError(sprintf("Arguments should be in array form"));
         }
 
+        foreach ($conditions as $key=>$value) :
+            if(empty($value)):
+                throw new ValueError(sprintf("Lookup condition on model `%2\$s`  has an empty value: %1\$s ",
+                    stringify($conditions), $this->_active_model_object->meta->model_name));
+            endif;
+        endforeach;
+
+
         $this->_check_field_exist($conditions);
 
+    }
+
+    public function _field_exists($model_obj, $field){
+        $where_concat_pattern = "/^~[.]*/";
+
+        // determine how to combine where statements
+        $has_or = preg_match($where_concat_pattern, $field);
+
+        // get the actual key
+        if($has_or):
+            $field = preg_split($where_concat_pattern, $field)[1];
+        endif;
+
+        if (!property_exists($this->_active_model_object, $field)):
+            throw new OrmExceptions(
+                sprintf('The field `%1$s does not exist on model  %2$s, the choices are : %3$s`',
+                    $field, $this->_model_name($model_obj), stringify(array_keys($model_obj->meta->fields))));
+        endif;
     }
 
     protected function _check_field_exist($conditions)
@@ -1155,11 +1339,7 @@ class Queryset implements \IteratorAggregate, \Countable
 
         foreach ($split['normal_conditions'] as $key => $value) :
             $key = $this->_field_from_condition($key);
-            if (!property_exists($this->_active_model_object, $key)):
-                throw new OrmExceptions(
-                    sprintf('The field `%1$s does not exist on model  %2$s, the choices are %3$s`',
-                        $key, $this->_model_name($this->_active_model_object), implode(',', $fields)));
-            endif;
+            $this->_field_exists($this->_active_model_object, $key);
         endforeach;
 
         // ensure that there is an actual relationship between this model and the current one
@@ -1190,11 +1370,40 @@ class Queryset implements \IteratorAggregate, \Countable
                 $_relation_conditions[$related_model_name][$related_model_search_key] = $value;
 
             else:
-                $_normal_conditions[$key] = $value;
+
+                // look in the normal conditions and find it any of the fields is a relationship field
+                $key_test = $this->_field_from_condition($key);
+
+                // check field exists first
+                $this->_field_exists($this->_active_model_object, $key_test);
+
+                if($this->_is_relation_field($key_test,$this->_active_model_object)):
+                    $field_obj = $this->_active_model_object->meta->relations_fields[$key_test];
+
+                    $pk = $this->_model_pk_field($field_obj->related_model);
+                    $lookup = $this->_lookup_from_condition($key);
+
+                    if(!$this->_self_referncing($field_obj)):
+                        $new_lookup = $pk.'__'.$lookup;
+                        $_relation_conditions[$field_obj->model][$new_lookup] = $value;
+                    endif;
+
+                    $_normal_conditions[$key] = $value;
+                else:
+
+                    $_normal_conditions[$key] = $value;
+                endif;
             endif;
         endforeach;
 
+
         return ['normal_conditions' => $_normal_conditions, 'relation_conditions' => $_relation_conditions];
+    }
+    
+    public function _self_referncing($field_obj){
+        if($this->_stable_name($field_obj->model) == $this->_model_name($this->_active_model_object)):
+            return TRUE;
+        endif;
     }
 
     protected function _select($model_object)
@@ -1202,23 +1411,25 @@ class Queryset implements \IteratorAggregate, \Countable
         $t_name = $model_object->get_table_name();
         $fields = [];
 
+
         foreach ($model_object->meta->fields as $field) :
-            if (property_exists($field, 'M2M') && $field->M2M || $field instanceof \InverseRelation):
+            if (property_exists($field, 'M2M') && $field->M2M || $field instanceof InverseRelation):
                 continue;
             endif;
             $fields[] = $t_name.".".$field->db_column_name();
         endforeach;
 
+
         $fields = implode(',', $fields);
 
-        $this->_database->select($fields);
+        $this->_qbuilder->select($fields);
     }
 
     protected function _from($table_name)
     {
         if (!$this->_is_chained()):
             $this->_table_set = TRUE;
-            $this->_database->from($table_name);
+            $this->_qbuilder->from($table_name);
         endif;
     }
 
@@ -1236,19 +1447,25 @@ class Queryset implements \IteratorAggregate, \Countable
      * @param string $model_name
      * @param $conditions
      */
-    protected function _where_clause($database, $table_name, $conditions)
+    protected function _where_clause($table_name, $conditions)
     {
-
-        $where = new Where($database, $table_name);
-        $where->clause($conditions);
+        $this->_where_cache[$table_name]=$conditions;
     }
 
     protected function _prepare_where_conditions($conditions)
     {
         $ready_conditions = [];
         foreach ($conditions as $key => $value) :
+
             $field_name = $this->_field_from_condition($key);
+            $field_name = $this->_field_from_or($field_name);
+
             $new_key = $this->_active_model_object->meta->fields[$field_name]->db_column_name();
+
+
+            if($this->_has_or($key)):
+                $new_key = '~'.$new_key;
+            endif;
 
             if(!empty($this->_lookup_from_condition($key))):
                 $key = $new_key.'__'.$this->_lookup_from_condition($key);
@@ -1265,7 +1482,7 @@ class Queryset implements \IteratorAggregate, \Countable
     protected function _load_model($model_name)
     {
         $_ci =& get_instance();
-        $model_name = strtolower($model_name);
+        $model_name = $this->_stable_name($model_name);
         if (!isset($_ci->{$model_name})):
             $_ci->load->model($model_name);
         endif;
@@ -1286,7 +1503,7 @@ class Queryset implements \IteratorAggregate, \Countable
             $main_pk_name = $this->_stable_name($fk_info['field_name']);
 
             $this->_join($main_table, $main_pk_name, $joined_table_name, $joined_field_name);
-            $this->_where_clause($this->_database, $joined_table_name, $conditions);
+            $this->_where_clause($joined_table_name, $conditions);
         endif;
 
         // from inverse side lookup
@@ -1298,7 +1515,7 @@ class Queryset implements \IteratorAggregate, \Countable
             $joined_field_name = $this->_stable_name($fk_info['field_name']);
 
             $this->_join($main_table, $main_pk_name, $joined_table_name, $joined_field_name);
-            $this->_where_clause($this->_database, $joined_table_name, $conditions);
+            $this->_where_clause($joined_table_name, $conditions);
         endif;
 
         return $this;
@@ -1314,7 +1531,7 @@ class Queryset implements \IteratorAggregate, \Countable
         // first look for a relation field to the $candidate on the active model
         foreach ($active_model->meta->relations_fields as $field) :
             $related_model_name = $this->_model_name($field->related_model);
-            if (!$field->M2M && $related_model_name == $candidate_model_name && !$field instanceof \InverseRelation):
+            if (!$field->M2M && $related_model_name == $candidate_model_name && !$field instanceof InverseRelation):
                 return ['model_name' => $this->_model_name($active_model), 'field_name' => $field->db_column_name()];
             endif;
         endforeach;
@@ -1322,7 +1539,7 @@ class Queryset implements \IteratorAggregate, \Countable
         // if nothing look for a relation field to the active model on $candidate
         foreach ($candidate_model->meta->relations_fields as $field) :
             $related_model_name = $this->_model_name($field->related_model);
-            if (!$field->M2M && $related_model_name == $active_model_name && !$field instanceof \InverseRelation):
+            if (!$field->M2M && $related_model_name == $active_model_name && !$field instanceof InverseRelation):
                 return ['model_name' => $this->_model_name($candidate_model), 'field_name' => $field->db_column_name()];
             endif;
         endforeach;
@@ -1333,7 +1550,7 @@ class Queryset implements \IteratorAggregate, \Countable
     {
         $on = "$main_table.$main_pk_name=$joined_table_name.$joined_field_name";
 
-        $this->_database->join($joined_table_name, $on);
+        $this->_qbuilder->join($joined_table_name, $on);
     }
 
     protected function _m2m_through_model($active_model, $candidate_model)
@@ -1424,15 +1641,15 @@ class Queryset implements \IteratorAggregate, \Countable
         if (!empty($join_table_name)):
 
             // join with the join table
-            $this->_database->join($join_table_name,
+            $this->_qbuilder->join($join_table_name,
                 $current_table . "." . $current_pk . "=" . $join_table_name . "." . $owner_join_pt);
 
             // join the related table
-            $this->_database->join($related_table,
+            $this->_qbuilder->join($related_table,
                 $related_table . "." . $related_pk . "=" . $join_table_name . "." . $inverse_join_pt);
 
             if (!empty($where_condition)):
-                $this->_where_clause($this->_database, $this->_model_name($inverse_obj), $where_condition);
+                $this->_where_clause($inverse_obj->get_table_name(), $where_condition);
             endif;
 
         endif;
@@ -1446,41 +1663,12 @@ class Queryset implements \IteratorAggregate, \Countable
         // find owning side
         foreach ($this->_active_model_object->meta->relations_fields as $field):
             if ($this->_stable_name($field->model) == $this->_model_name($related_obj) &&
-                !$field instanceof \InverseRelation):
+                !$field instanceof InverseRelation):
                 return TRUE;
             endif;
         endforeach;
 
         return FALSE;
-    }
-
-    /**
-     * Creates a copy of the database connection.
-     * @internal
-     * @param $database
-     */
-    protected function _database($database)
-    {
-        // This is because codeigniter creates a single object for each group,
-        // Since we are using lazy loading, this means if we dont create a copy of the database connection,
-        // the first queryset method to execute will clear out the object, meaning consecutive methods will raise an
-        // error since no table will be set for action.
-        $_ci =& get_instance();
-
-
-        if ($_ci->output->enable_profiler):
-            // only if the profiler is on, otherwise it doesnt make sense.
-
-            $db_id = $this->_model_name($this->_active_model_object)."_model_".uniqid();
-            $_ci->{$db_id} = $database;
-            // create a copy of the database to ensure its unique for each queryset
-            $this->_database = $_ci->{$db_id};
-        else:
-            // create a copy the database to ensure its unique for each queryset
-            $this->_database = $database;
-        endif;
-
-        $this->_database->reset_query();
     }
 
     /**
@@ -1503,6 +1691,7 @@ class Queryset implements \IteratorAggregate, \Countable
             $options = preg_split($lookup_pattern, $field);
             $field = $options[0];
         endif;
+
         return $field;
     }
 
@@ -1513,6 +1702,45 @@ class Queryset implements \IteratorAggregate, \Countable
             $options = preg_split($lookup_pattern, $field);
             return strtolower($options[1]);
         endif;
+    }
+
+    public function _field_from_or($key){
+        // search for or condition
+        $where_concat_pattern = "/^~[.]*/";
+
+        // determine how to combine where statements
+        $has_or = preg_match($where_concat_pattern, $key);
+
+
+        // get the actual key
+        if($has_or):
+            $key = preg_split($where_concat_pattern, $key)[1];
+        endif;
+
+        return $key;
+    }
+
+    public function _has_or($key){
+        // search for or condition
+        $where_concat_pattern = "/^~[.]*/";
+
+        // determine how to combine where statements
+        return preg_match($where_concat_pattern, $key);
+
+    }
+
+    public function _is_relation_field($field, $model_obj){
+
+        foreach ($model_obj->meta->fields as $mod_field) :
+
+            if($this->_stable_name($mod_field->name) == $this->_stable_name($field) &&
+                $mod_field instanceof RelatedField):
+
+                return TRUE;
+            endif;
+        endforeach;
+
+        return FALSE;
     }
 
     public function _is_m2m($active, $related_obj){
@@ -1527,4 +1755,206 @@ class Queryset implements \IteratorAggregate, \Countable
         endif;
     }
 
+    public function _get_query_builder($params=''){
+        $ci =& get_instance();
+        
+        if($ci->output->enable_profiler):
+            $name = $this->_model_name($this->_active_model_object);
+            $this->conn_id = $name.'_'.uniqid();
+            $qb = query_builder($params);
+            $ci->{$this->conn_id} = $qb;
+            $this->_qbuilder = $qb;
+        else:
+            $this->_qbuilder = query_builder($params);
+        endif;
+
+
+    }
 }
+
+
+/**
+ * Borrowed from CI &DB(), disable creating a connection immediately, reason for this is because before a queryset is
+ * evaluated we don't actually need a connection we just need the query_builder class only
+ * @param string $params
+ * @param null $query_builder_override
+ * @return mixed
+ */
+function query_builder($params = '', $query_builder_override = NULL)
+{
+    // Load the DB config file if a DSN string wasn't passed
+    if (is_string($params) && strpos($params, '://') === FALSE)
+    {
+        // Is the config file in the environment folder?
+        if ( ! file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/database.php')
+            && ! file_exists($file_path = APPPATH.'config/database.php'))
+        {
+            show_error('The configuration file database.php does not exist.');
+        }
+
+        include($file_path);
+
+        // Make packages contain database config files,
+        // given that the controller instance already exists
+        if (class_exists('CI_Controller', FALSE))
+        {
+            foreach (get_instance()->load->get_package_paths() as $path)
+            {
+                if ($path !== APPPATH)
+                {
+                    if (file_exists($file_path = $path.'config/'.ENVIRONMENT.'/database.php'))
+                    {
+                        include($file_path);
+                    }
+                    elseif (file_exists($file_path = $path.'config/database.php'))
+                    {
+                        include($file_path);
+                    }
+                }
+            }
+        }
+
+        if ( ! isset($db) OR count($db) === 0)
+        {
+            show_error('No database connection settings were found in the database config file.');
+        }
+
+        if ($params !== '')
+        {
+            $active_group = $params;
+        }
+
+        if ( ! isset($active_group))
+        {
+            show_error('You have not specified a database connection group via $active_group in your config/database.php file.');
+        }
+        elseif ( ! isset($db[$active_group]))
+        {
+            show_error('You have specified an invalid database connection group ('.$active_group.') in your config/database.php file.');
+        }
+
+        $params = $db[$active_group];
+    }
+    elseif (is_string($params))
+    {
+        /**
+         * Parse the URL from the DSN string
+         * Database settings can be passed as discreet
+         * parameters or as a data source name in the first
+         * parameter. DSNs must have this prototype:
+         * $dsn = 'driver://username:password@hostname/database';
+         */
+        if (($dsn = @parse_url($params)) === FALSE)
+        {
+            show_error('Invalid DB Connection String');
+        }
+
+        $params = array(
+            'dbdriver'	=> $dsn['scheme'],
+            'hostname'	=> isset($dsn['host']) ? rawurldecode($dsn['host']) : '',
+            'port'		=> isset($dsn['port']) ? rawurldecode($dsn['port']) : '',
+            'username'	=> isset($dsn['user']) ? rawurldecode($dsn['user']) : '',
+            'password'	=> isset($dsn['pass']) ? rawurldecode($dsn['pass']) : '',
+            'database'	=> isset($dsn['path']) ? rawurldecode(substr($dsn['path'], 1)) : ''
+        );
+
+        // Were additional config items set?
+        if (isset($dsn['query']))
+        {
+            parse_str($dsn['query'], $extra);
+
+            foreach ($extra as $key => $val)
+            {
+                if (is_string($val) && in_array(strtoupper($val), array('TRUE', 'FALSE', 'NULL')))
+                {
+                    $val = var_export($val, TRUE);
+                }
+
+                $params[$key] = $val;
+            }
+        }
+    }
+
+    // No DB specified yet? Beat them senseless...
+    if (empty($params['dbdriver']))
+    {
+        show_error('You have not selected a database type to connect to.');
+    }
+
+    // Load the DB classes. Note: Since the query builder class is optional
+    // we need to dynamically create a class that extends proper parent class
+    // based on whether we're using the query builder class or not.
+    if ($query_builder_override !== NULL)
+    {
+        $query_builder = $query_builder_override;
+    }
+    // Backwards compatibility work-around for keeping the
+    // $active_record config variable working. Should be
+    // removed in v3.1
+    elseif ( ! isset($query_builder) && isset($active_record))
+    {
+        $query_builder = $active_record;
+    }
+
+    require_once(BASEPATH.'database/DB_driver.php');
+
+    if ( ! isset($query_builder) OR $query_builder === TRUE)
+    {
+        require_once(BASEPATH.'database/DB_query_builder.php');
+        if ( ! class_exists('CI_DB', FALSE))
+        {
+            /**
+             * CI_DB
+             *
+             * Acts as an alias for both CI_DB_driver and CI_DB_query_builder.
+             *
+             * @see	CI_DB_query_builder
+             * @see	CI_DB_driver
+             */
+            class CI_DB extends CI_DB_query_builder { }
+        }
+    }
+    elseif ( ! class_exists('CI_DB', FALSE))
+    {
+        /**
+         * @ignore
+         */
+        class CI_DB extends CI_DB_driver { }
+    }
+
+    // Load the DB driver
+    $driver_file = BASEPATH.'database/drivers/'.$params['dbdriver'].'/'.$params['dbdriver'].'_driver.php';
+
+    file_exists($driver_file) OR show_error('Invalid DB driver');
+    require_once($driver_file);
+
+    // Instantiate the DB adapter
+    $driver = 'CI_DB_'.$params['dbdriver'].'_driver';
+
+    $DB = new $driver($params);
+
+    // Check for a subdriver
+    if ( ! empty($DB->subdriver))
+    {
+        $driver_file = BASEPATH.'database/drivers/'.$DB->dbdriver.'/subdrivers/'.$DB->dbdriver.'_'.$DB->subdriver.'_driver.php';
+
+        if (file_exists($driver_file))
+        {
+            require_once($driver_file);
+            $driver = 'CI_DB_'.$DB->dbdriver.'_'.$DB->subdriver.'_driver';
+        }
+    }
+
+
+    if(!class_exists('powerorm\queries\P_QB', FALSE)):
+        eval(sprintf('namespace powerorm\queries; class P_QB extends \%s{}',$driver));
+    endif;
+
+    // load QueryBuilder
+    require_once('QueryBuilder.php');
+    return new QueryBuilder($params);
+}
+
+
+
+

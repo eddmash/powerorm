@@ -1,7 +1,6 @@
 <?php
 namespace powerorm\model;
-
-//require_once "PModel.php";
+use powerorm\model\field\ForeignKey;
 
 /**
  * Class ProxyModel
@@ -23,7 +22,7 @@ class ProxyModel extends \PModel{
     }
 
     public function fields(){
-        $this->{$this->owner_model} = new \ForeignKey(['model'=>$this->owner_model ]);
-        $this->{$this->inverse_model} = new \ForeignKey(['model'=>$this->inverse_model ]);
+        $this->{$this->owner_model} = new ForeignKey(['model'=>$this->owner_model ]);
+        $this->{$this->inverse_model} = new ForeignKey(['model'=>$this->inverse_model ]);
     }
 }

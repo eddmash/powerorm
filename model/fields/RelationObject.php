@@ -1,5 +1,5 @@
 <?php
-namespace powerorm\model;
+namespace powerorm\model\field;
 /**
  * Act a buffer for Relation Fields, to help avoid issues with
  *
@@ -11,17 +11,16 @@ class RelationObject{
 
     public $model_name;
     public $model;
-    public $_ci;
 
     public function __construct($model_name){
         $this->model_name = $model_name;
-        $this->_ci = & get_instance();
     }
 
     public function _model_object(){
+        $_ci = & get_instance();
         if(!isset($this->model)):
-            $this->_ci->load->model($this->model_name);
-            $this->model =  $this->_ci->{$this->model_name};
+            $_ci->load->model($this->model_name);
+            $this->model =  $_ci->{$this->model_name};
         endif;
     }
 

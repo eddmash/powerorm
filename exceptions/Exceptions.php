@@ -51,6 +51,13 @@ class ValueError extends OrmExceptions{}
 class FormException extends \Exception{}
 
 /**
+ * Class DuplicateField
+ * @package powerorm\exceptions
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class DuplicateField extends FormException{}
+/**
  * Class ObjectDoesNotExist
  * @package powerorm\exceptions
  * @since 1.0.0
@@ -65,3 +72,5 @@ class ObjectDoesNotExist extends OrmExceptions{}
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class MultipleObjectsReturned extends OrmExceptions{}
+
+class ValidationError extends OrmErrors{}

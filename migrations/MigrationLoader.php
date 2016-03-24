@@ -9,9 +9,10 @@ namespace powerorm\migrations;
  */
 class MigrationLoader{
 
-    public $_migrations_path = APPPATH.'migrations/';
+    public $_migrations_path;
 
     public function __construct(){
+        $this->_migrations_path = APPPATH.'migrations/';
         $this->load_migrations();
     }
 
@@ -25,22 +26,26 @@ class MigrationLoader{
 
     public function to_field($field_details){
         $field_class = $field_details['class'];
+
         return new $field_class($field_details['field_options']);
     }
 
     public function to_models(){
         $models = [];
+
         foreach ($this->migration_states() as $state) :
 
             $class_name = ucwords(strtolower($state['model_name']));
 
+
             $new_model = $this->_define_load_class($class_name);
             // add fields
             foreach ($state['fields'] as $field_name=>$field_state) :
+
                 $new_model->{$field_name} = $this->to_field($field_state);
             endforeach;
 
-            $models[$state['model_name']] = $new_model;
+            $models[strtolower($state['model_name'])] = $new_model;
 
         endforeach;
         return $models;
@@ -173,7 +178,9 @@ class MigrationLoader{
 
     public function _state_harmony(&$migration_state, $candidate_state){
 
-        if($migration_state['operation']=='add_model' && $candidate_state['operation']=='add_field'):
+        if($migration_state['operation']=='add_model' &&
+            in_array($candidate_state['operation'],['add_field', 'add_m2m_field', 'modify_field', 'add_triggers'])):
+
             $add_fields = $candidate_state['fields'];
 
             foreach ($add_fields as $name=>$field) :
@@ -182,14 +189,14 @@ class MigrationLoader{
 
         endif;
 
-        if($migration_state['operation']=='add_model' && $candidate_state['operation']=='add_m2m_field'):
-            $add_fields = $candidate_state['fields'];
-
-            foreach ($add_fields as $name=>$field) :
-                $migration_state['fields'][$name] = $field;
-            endforeach;
-
-        endif;
+//        if($migration_state['operation']=='add_model' && $candidate_state['operation']=='add_m2m_field'):
+//            $add_fields = $candidate_state['fields'];
+//
+//            foreach ($add_fields as $name=>$field) :
+//                $migration_state['fields'][$name] = $field;
+//            endforeach;
+//
+//        endif;
 
         if($migration_state['operation']=='add_model' && $candidate_state['operation']=='drop_field'):
             $add_fields = $candidate_state['fields'];
@@ -209,14 +216,23 @@ class MigrationLoader{
 
         endif;
 
-        if($migration_state['operation']=='add_model' && $candidate_state['operation']=='modify_field'):
-            $modified_fields = $candidate_state['fields'];
+//        if($migration_state['operation']=='add_model' && $candidate_state['operation']=='modify_field'):
+//            $modified_fields = $candidate_state['fields'];
+//
+//            foreach ($modified_fields as $name=>$field) :
+//                $migration_state['fields'][$name] = $field;
+//            endforeach;
+//
+//        endif;
 
-            foreach ($modified_fields as $name=>$field) :
-                $migration_state['fields'][$name] = $field;
-            endforeach;
-
-        endif;
+//        if($migration_state['operation']=='add_model' && $candidate_state['operation']=='add_triggers'):
+//            $add_fields = $candidate_state['fields'];
+//
+//            foreach ($add_fields as $name=>$field) :
+//                $migration_state['fields'][$name] = $field;
+//            endforeach;
+//
+//        endif;
 
 
 

@@ -4,6 +4,9 @@ namespace powerorm\migrations;
 // go through all the models and get there model state
 // based on current project state find if there is any operation needed
 // by comparing the it with the project state of application based on migration
+use PModel;
+use powerorm\checks\Checks;
+
 /**
  * Class ProjectState
  * @package powerorm\migrations
@@ -11,15 +14,14 @@ namespace powerorm\migrations;
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class ProjectState{
-    public $_model_paths = APPPATH.'models/';
+    public $_model_paths;
+
+    public function __construct(){
+        $this->_model_paths = APPPATH.'models/';
+    }
 
     // name and state pair
     public $models=[];
-    public $_ci;
-
-    public function __construct(){
-        $this->_ci =& get_instance();
-    }
 
     public static function from_models(){
         $state = new ProjectState();
@@ -30,7 +32,15 @@ class ProjectState{
     public static function from_migrations(){
         $state = new ProjectState();
         $state->_from_migrations();
+
+
         return $state;
+    }
+
+    public static function app_model_objects(){
+        $state = new ProjectState();
+
+        return $state->_app_models();
     }
 
     public function _from_migrations(){
@@ -45,19 +55,34 @@ class ProjectState{
      * Loads up all the models in the current project.
      */
     public function _from_models(){
-        foreach ($this->get_model_classes() as $model_name) :
-            $model_obj=  $this->_load_model($model_name);
-            $model_obj->checks();
-            $this->models[$model_name] = $model_obj->meta;
+
+        foreach ($this->_app_models() as $model_obj) :
+
+            if($model_obj instanceof PModel):
+
+                $this->models[strtolower($model_obj->meta->model_name)] = $model_obj->meta;
+            endif;
         endforeach;
     }
 
+    public function _app_models(){
+        $models = [];
+        foreach ($this->get_model_classes() as $model_name) :
+            $model_obj=  $this->_load_model($model_name);
+            if($model_obj instanceof PModel):
+                $models[strtolower($model_name)] = $model_obj;
+            endif;
+        endforeach;
+        return $models;
+    }
+
     public function _load_model($model_name){
-        if(!isset($this->_ci->{$model_name})):
-            $this->_ci->load->model($model_name);
+        $_ci =& get_instance();
+        if(!isset($_ci->{$model_name})):
+            $_ci->load->model($model_name);
         endif;
 
-        return $this->_ci->{$model_name};
+        return $_ci->{$model_name};
     }
 
     /**

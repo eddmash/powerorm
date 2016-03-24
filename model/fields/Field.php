@@ -1,27 +1,25 @@
 <?php
-//namespace powerorm\model;
+namespace powerorm\model\field;
 
 use powerorm\exceptions\OrmExceptions;
-use powerorm\model\RelationObject;
 use powerorm\form;
 
 
 /**
- * Class ModelField
+ * Class Field
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class ModelField{
+abstract class Field{
     public $name=Null;
-    protected $_ci;
     public $type;
-    public $null=TRUE;
+    public $null=FALSE;
     public $unique=FALSE;
     public $max_length=NULL;
     public $primary_key=FALSE;
     public $auto=FALSE;
     public $default=NULL;
-    public $signed=NULL;
+    public $signed=FALSE;
     public $constraint_name;
     public $db_column=Null;
     public $db_index=Null;
@@ -29,6 +27,7 @@ class ModelField{
     public $choices;
     public $form_widget;
     public $empty_label;
+    public $container_model;
 
     public function __construct($field_options = []){
 
@@ -48,9 +47,10 @@ class ModelField{
             $this->null = FALSE;
         endif;
 
-        $this->_ci =& get_instance();
+        if(!in_array('form_blank', $field_options)):
+            $this->form_blank = $this->null;
+        endif;
 
-        $this->check();
         $this->type = $this->db_type();
 
     }
@@ -90,7 +90,6 @@ class ModelField{
 
         $opts = get_object_vars($this);
 
-        unset($opts['_ci']);
         unset($opts['form_blank']);
         unset($opts['choices']);
         unset($opts['form_widget']);
@@ -112,10 +111,11 @@ class ModelField{
 
     public function form_field(){
 
-        return new form\FormField($this->_prepare_form_field());
+        return $this->_prepare_form_field();
     }
 
     public function _prepare_form_field(){
+
         $opts = [];
         $opts['type'] = (!empty($this->form_widget))? $this->form_widget: $this->form_type();
         $opts['name'] = $this->name;
@@ -152,8 +152,19 @@ class ModelField{
 
     }
 
+    /**
+     * Should return a list of checks Message instances.
+     * @return array
+     */
     public function check(){
+        return [];
+    }
 
+    public function add_check($checks, $new_check){
+        if(!empty($new_check)):
+            $checks = array_merge($checks, $new_check);
+        endif;
+        return $checks;
     }
 
     public function validate(){
@@ -166,15 +177,11 @@ class ModelField{
 /**
  * Class CharField
  */
-class CharField extends ModelField{
+class CharField extends Field{
 
     public function __construct($options=[]){
 
         parent::__construct($options);
-        if(empty($this->max_length)):
-            throw new OrmExceptions("CharField requires `max_length` to be set");
-        endif;
-
 
         if(!empty($this->max_length)):
             $this->type = strtoupper(sprintf('%1$s(%2$s)', $this->type, $this->max_length));
@@ -196,6 +203,22 @@ class CharField extends ModelField{
         return $type;
     }
 
+    public function check(){
+        $checks = parent::check();
+        $checks = $this->add_check($checks, $this->_max_length_check());
+        return $checks;
+    }
+
+    public function _max_length_check(){
+        if(empty($this->max_length)):
+            return [\powerorm\checks\check_error($this, sprintf('%s requires `max_length` to be set', get_class($this)))];
+        endif;
+
+        if(!empty($this->max_length) && $this->max_length < 0):
+            return [\powerorm\checks\check_error($this, sprintf('%s requires `max_length` to be a positive integer', get_class($this)))];
+        endif;
+    }
+
 }
 
 class EmailField extends CharField{
@@ -211,10 +234,74 @@ class EmailField extends CharField{
     }
 }
 
+class FileField extends CharField{
+    protected $passed_pk;
+    protected $passed_unique;
+    public $upload_to;
+
+    public function __construct($options=[]){
+        $options['max_length'] = 100;
+        $this->passed_pk = (array_key_exists('primary_key', $options))? TRUE: FALSE;
+        $this->passed_unique = (array_key_exists('unique', $options))? TRUE: FALSE;
+        parent::__construct($options);
+    }
+
+    public function form_type(){
+        return 'file';
+    }
+
+    public function check(){
+        $checks = parent::check();
+
+        $checks = $this->add_check($checks, $this->_check_primarykey());
+
+        $checks = $this->add_check($checks, $this->_check_unique());
+        return $checks;
+    }
+
+    public function _check_unique(){
+        if($this->passed_unique):
+            return [\powerorm\checks\check_error($this, sprintf("'unique' is not a valid argument for a %s.", get_class($this)))];
+        endif;
+        return [];
+    }
+
+    public function _check_primarykey(){
+        if($this->passed_pk):
+            return [\powerorm\checks\check_error($this,
+                sprintf("'primary_key' is not a valid argument for a %s.", get_class($this)))];
+        endif;
+        return [];
+    }
+
+    public function options(){
+        $opts = parent::options();
+        unset($opts['passed_unique']);
+        unset($opts['passed_pk']);
+        unset($opts['upload_to']);
+        return $opts;
+    }
+
+    public function form_field(){
+
+        $opts = parent::form_field();
+        $opts['upload_to'] = $this->upload_to;
+        return $opts;
+
+    }
+}
+
+class ImageField extends FileField{
+
+    public function form_type(){
+        return 'image';
+    }
+}
+
 /**
  * Class TextField
  */
-class TextField extends ModelField{
+class TextField extends Field{
 
     public function __construct($field_options = []){
         parent::__construct($field_options);
@@ -233,25 +320,12 @@ class TextField extends ModelField{
 
 }
 
-class DecimalField extends ModelField{
+class DecimalField extends Field{
     public $max_digits;
     public $decimal_places;
 
     public function __construct($field_options = []){
         parent::__construct($field_options);
-
-        if(empty($this->max_digits)):
-            throw new OrmExceptions(sprintf("%s requires `max_digits` to be set", get_class($this)));
-        endif;
-
-        if(empty($this->max_digits)):
-            throw new OrmExceptions(sprintf("%s requires `decimal_places` to be set", get_class($this)));
-        endif;
-
-        if($this->max_digits < $this->decimal_places):
-            throw new OrmExceptions(
-                sprintf("%s expects `decimal_places` to be less or equal to `max_digits`", get_class($this)));
-        endif;
     }
 
     public function db_type(){
@@ -261,16 +335,49 @@ class DecimalField extends ModelField{
     public function form_type(){
         return 'number';
     }
+
+    public function check(){
+        $checks = parent::check();
+        $checks = $this->add_check($checks,  $this->_decimal_places_check());
+        $checks = $this->add_check($checks,  $this->_check_max_digits());
+
+        return $checks;
+    }
+    public function _decimal_places_check(){
+        if(empty($this->decimal_places)):
+            return [check_error($this, sprintf("%s expects 'decimal_place' attribute to be set", get_class($this)))];
+        endif;
+
+        if(!is_numeric($this->decimal_places) && $this->decimal_places < 0):
+            return [check_error($this,
+                sprintf("%s expects 'decimal_place' attribute to be a positive integer", get_class($this)))];
+        endif;
+
+        return [];
+    }
+
+    public function _check_max_digits(){
+        if(empty($this->max_digits)):
+            return [check_error($this, sprintf("%s expects 'max_digits' attribute to be set", get_class($this)))];
+        endif;
+
+        if(!is_numeric($this->max_digits) && $this->decimal_places < 0):
+            return [check_error($this,
+                sprintf("%s expects 'max_digits' attribute to be a positive integer", get_class($this)))];
+        endif;
+
+        return [];
+    }
 }
 
 /**
  * Class IntegerField
  */
-class IntegerField extends ModelField{
+class IntegerField extends Field{
 
     public function __construct($options=[]){
         parent::__construct($options);
-        if(empty($this->signed)):
+        if(!$this->signed || $this->signed == 'UNSIGNED'):
             $this->signed = "UNSIGNED";
         else:
             $this->signed = "SIGNED";
@@ -294,21 +401,22 @@ class AutoField extends IntegerField{
     public function __construct($options=[]){
         parent::__construct($options);
         $this->auto = TRUE;
+        $this->signed = FALSE;
     }
 }
 
-class BooleanField extends ModelField{
+class BooleanField extends Field{
     public $default = FALSE;
     public function db_type(){
         return "BOOLEAN";
     }
 
     public function form_type(){
-        return 'checkbox';
+        return 'radio';
     }
 }
 
-class DateTimeField extends ModelField{
+class DateTimeField extends Field{
     public $on_creation=FALSE;
     public $on_update=FALSE;
 
@@ -335,135 +443,3 @@ class TimeField extends DateTimeField{
         return 'TIME';
     }
 }
-
-class RelatedField extends ModelField{
-
-    public $related_model;
-    public $model;
-    public $inverse = TRUE;
-
-    protected $on_update;
-    protected $on_delete;
-
-    public $M2M=FALSE;
-    public $M2O=FALSE;
-    public $O2O=FALSE;
-
-    public function __construct($field_options = []){
-
-        if(!array_key_exists('model', $field_options)):
-            throw new OrmExceptions(sprintf('%1$s requires a related model', get_class($this)));
-        endif;
-
-        parent::__construct($field_options);
-
-        // we are using proxy object for related model because we don't want to run into problems
-        // a problem will arise in circular dependacy where model A has foreign key to B, and B has a foreign key to A
-        $this->related_model = new RelationObject($this->model);
-
-
-    }
-
-    public function related_pk(){
-        return $this->related_model->meta->primary_key;
-    }
-
-
-}
-
-/**
- * Class ForeignKey
- */
-class ForeignKey extends RelatedField{
-    public $empty_label  = '---------';
-    public $form_display_field;
-    public $form_value_field;
-
-    public function __construct($field_options = []){
-        parent::__construct($field_options);
-        $this->M2O = TRUE;
-    }
-
-    public function form_field(){
-
-        $opts = $this->_prepare_form_field();
-
-        // fetch all the records in the related model
-        $opts['type'] = 'multiselect';
-        $opts['form_display_field'] = $this->form_display_field;
-        $opts['form_value_field'] = $this->form_value_field;
-        $opts['choices'] = $this->related_model->all();
-
-        return new form\FormField($opts);
-    }
-
-    public function options(){
-        $this->type = $this->related_pk()->type;
-        $this->signed = $this->related_pk()->signed;
-        $this->db_column = $this->db_column_name();
-        return parent::options();
-    }
-
-    public function db_column_name(){
-        $related_model_pk = strtolower($this->related_model->meta->primary_key->db_column_name());
-        return sprintf('%1$s_%2$s', strtolower($this->name), $related_model_pk);
-    }
-
-    public function constraint_name($prefix){
-        $prefix = "fk";
-        return parent::constraint_name($prefix);
-    }
-
-}
-
-/**
- * Class OneToOne
- */
-class OneToOne extends ForeignKey{
-    public function __construct($field_options = []){
-        parent::__construct($field_options);
-        $this->M2O = FALSE;
-        $this->O2O = TRUE;
-        $this->unique = TRUE;
-
-    }
-
-    public function form_field(){
-
-        $opts = $this->_prepare_form_field();
-
-        // fetch all the records in the related model
-        $opts['type'] = 'dropdown';
-        $opts['form_display_field'] = $this->form_display_field;
-        $opts['form_value_field'] = $this->form_value_field;
-        $opts['choices'] = $this->related_model->all();
-
-        return new form\FormField($opts);
-    }
-}
-
-/**
- * Class ManyToMany
- */
-class ManyToMany extends RelatedField{
-
-    public $through;
-
-    public function __construct($field_options = []){
-        parent::__construct($field_options);
-        $this->M2M = TRUE;
-        if(array_key_exists('through', $field_options)):
-            $this->through = $field_options['through'];
-        endif;
-    }
-
-}
-
-
-abstract class InverseRelation extends RelatedField{
-    public $inverse = TRUE;
-}
-
-class HasMany extends InverseRelation{}
-
-class HasOne extends InverseRelation{}

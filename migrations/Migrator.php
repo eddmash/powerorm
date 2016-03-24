@@ -8,10 +8,23 @@
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-use powerorm\migrations\AmbiguityError;
+use powerorm\checks\Checks;
+use powerorm\cli\ColorCLi;
+use powerorm\exceptions\AmbiguityError;
 use powerorm\migrations\AutoDetector;
 
 use powerorm\migrations\ProjectState;
+
+
+function load_migration_library(){
+    $ci =& get_instance();
+
+    if(!class_exists('Migration', FALSE) OR !isset($ci->migration)):
+        $ci->load->library('migration');
+    endif;
+}
+
+load_migration_library();
 
 /**
  * Responsible for creating migration files
@@ -22,8 +35,8 @@ use powerorm\migrations\ProjectState;
 class Migrator
 {
     public static $tab = "\t\t";
-    public static $model_path = APPPATH.'models/';
-    public static $_migrations_path = APPPATH.'migrations/';
+
+    public static $_migrations_path;
 
     /**
      *Initiates the migration files generation process.
@@ -31,7 +44,22 @@ class Migrator
     public static function makemigrations(){
         $detect = new AutoDetector(ProjectState::from_models(), ProjectState::from_migrations());
         Migrator::make_files($detect->get_operations());
+    }
 
+    public static function migrate(){
+        ColorCLi::info('Running Migration Files ...');
+        $version = get_instance()->migration->latest();
+        if(is_string($version)):
+            ColorCLi::success('Migration run successfully');
+        endif;
+    }
+
+    public static function rollback($version){
+        $db_version = get_instance()->migration->version($version);
+
+        if(is_string($db_version) && $db_version == $version):
+            ColorCLi::success(sprintf('Rolling back to migration version `%s` successfully', $version));
+        endif;
     }
 
     /**
@@ -173,15 +201,24 @@ class Migrator
 
         $template = Migrator::migration_template($operation, $timestamp);
 
+        Migrator::$_migrations_path =  APPPATH.'migrations/';
+        // create folder if it does not exist
+        if(!file_exists(Migrator::$_migrations_path)):
+            mkdir(Migrator::$_migrations_path);
+        endif;
+
 
         // absolute path to file
         $file = Migrator::$_migrations_path.$file_name.".php";
 
         $file_handle = fopen($file,"w");
-        fprintf($file_handle, $template);
-        fclose($file_handle);
+        if($file_handle):
+            fprintf($file_handle, $template);
+            fclose($file_handle);
 
-        chmod($file, 0777);
+            chmod($file, 0777);
+
+        endif;
 
 
     }

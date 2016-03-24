@@ -8,13 +8,14 @@
 
 namespace powerorm\db;
 
+
 /**
  * Create Mysql related sql statements
  * @package powerorm\db
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class MysqlStatements implements Statements{
+class MysqlStatements extends SqlStatements{
     public static $create_table = 'RunSql::create_table("%1$s", %2$s, %3$s);';
     public static $drop_table = 'RunSql::drop_table("%1$s", %2$s);';
     public static $add_field = 'RunSql::add_field("%1$s");';
@@ -26,7 +27,7 @@ class MysqlStatements implements Statements{
     public static $drop_constraint = 'RunSql::drop_constraint("%1$s", "%2$s");';
     public static $create_triggers = 'RunSql::create_trigger();';
 
-    public static function create_table($name, $check_exist=TRUE, $attrs="['ENGINE'=>'InnoDB']"){
+    public static function _porm_create_table($name, $check_exist=TRUE, $attrs="['ENGINE'=>'InnoDB']"){
 
         if($check_exist===FALSE):
             $check_exist = "FALSE";
@@ -37,7 +38,7 @@ class MysqlStatements implements Statements{
         return [sprintf(MysqlStatements::$create_table, $name, $check_exist, $attrs)];
     }
 
-    public static function drop_table($name, $check_exist=TRUE){
+    public static function _porm_drop_table($name, $check_exist=TRUE){
 
         if($check_exist===FALSE):
             $check_exist = "FALSE";
@@ -194,70 +195,6 @@ class MysqlStatements implements Statements{
         endforeach;
 
         return $field_sql;
-    }
-
-    public static function _string_drop_field($table, $field){
-        return sprintf(MysqlStatements::$drop_column, $table, $field);
-    }
-
-    public static function _string_drop_constraint($table, $field){
-        return sprintf(MysqlStatements::$drop_constraint, $table, $field);
-    }
-
-    public static function _string_custom_field_add($table, $field){
-        return sprintf('$this->db->query("ALTER TABLE %1$s ADD %2$s");', $table, $field);
-    }
-
-    public static function _string_custom_field_modify($table, $field){
-        return sprintf('$this->db->query("ALTER TABLE %1$s MODIFY %2$s");', $table, $field);
-    }
-
-    public static function _string_add_field($field){
-        return sprintf(MysqlStatements::$add_field, $field);
-    }
-
-    public static function _string_add_field_constraint($field){
-        return sprintf(MysqlStatements::$add_field_constraint, $field);
-    }
-
-    public static function _string_add_column_constraint($table, $field){
-        return sprintf(MysqlStatements::$add_column_constraint, $table, $field);
-    }
-
-    public static function _string_alter_add_field($table, $field){
-        return sprintf(MysqlStatements::$add_column, $table, $field);
-    }
-
-    public static function _string_modify_field($table, $field_options){
-
-        if(!empty($field_options)):
-            return sprintf(MysqlStatements::$modify_column, $table, stringify($field_options));
-        endif;
-    }
-
-    public static function to_db($field){
-        // [NOT NULL | NULL] [DEFAULT default_value] [AUTO_INCREMENT] [UNIQUE [KEY] | [PRIMARY] KEY]
-        $sql = [];
-
-        // use column name over field name because of the foreignkey relationships
-        $sql['db_column'] = $field['db_column'];
-
-        // datatype
-        $sql['type'] = $field['type'];
-
-        $sql['signed']= $field['signed'];
-
-//        $sql['null']=$field['null'];
-        $sql['null']= ($field['null'])? "NULL" :"NOT NULL";;
-
-        $sql = MysqlStatements::default_value($field, $sql);
-
-        // auto increment
-        if($field['auto']):
-            $sql['auto']= 'AUTO_INCREMENT';
-        endif;
-
-        return $sql;
     }
 
     public static function default_value($field, $sql){
@@ -437,22 +374,19 @@ class MysqlStatements implements Statements{
         return NULL;
     }
 
-    public static function date_fields_triggers($table, $fields){
+    public static function add_triggers($table, $fields){
         $dbprefix = get_instance()->db->dbprefix;
         $table = sprintf('%1$s%2$s', $dbprefix, strtolower($table));
         $date_fields_on_update = [];
         $date_fields_on_create = [];
 
         foreach ($fields as $field) :
-            if($field instanceof \DateTimeField || is_subclass_of($field, 'DateTimeField')):
-                if($field->on_update ):
-                    $date_fields_on_update[] = $field->db_column;
-                endif;
+            if($field->on_update ):
+                $date_fields_on_update[] = $field->db_column;
+            endif;
 
-                if($field->on_update  || $field->on_creation):
-                    $date_fields_on_create[] = $field->db_column;
-                endif;
-
+            if($field->on_update  || $field->on_creation):
+                $date_fields_on_create[] = $field->db_column;
             endif;
         endforeach;
 
@@ -476,7 +410,7 @@ class MysqlStatements implements Statements{
             
     }
 
-    public static function date_fields_drop_triggers($table, $fields){
+    public static function drop_triggers($table, $fields){
         $dbprefix = get_instance()->db->dbprefix;
         $table = sprintf('%1$s%2$s', $dbprefix, strtolower($table));
 
@@ -484,15 +418,12 @@ class MysqlStatements implements Statements{
         $date_fields_on_create = [];
 
         foreach ($fields as $field) :
-            if($field instanceof \DateTimeField || is_subclass_of($field, 'DateTimeField')):
-                if($field->on_update ):
-                    $date_fields_on_update[] = $field->db_column;
-                endif;
+            if($field->on_update ):
+                $date_fields_on_update[] = $field->db_column;
+            endif;
 
-                if($field->on_update  || $field->on_creation):
-                    $date_fields_on_create[] = $field->db_column;
-                endif;
-
+            if($field->on_update  || $field->on_creation):
+                $date_fields_on_create[] = $field->db_column;
             endif;
         endforeach;
 

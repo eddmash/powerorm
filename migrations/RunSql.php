@@ -172,7 +172,7 @@ class RunSql{
 
 
         RunSql::init();
-
+        RunSql::drop_trigger($time, $when, $table);
         RunSql::$_ci->db->query($trigger);
     }
 
@@ -190,12 +190,5 @@ class RunSql{
         RunSql::init();
 
         RunSql::$_ci->db->query($trigger);
-    }
-
-    /**
-     * We use this to show in the migration file that the current model being created a many to many relation
-     */
-    public function many_to_many_field($through){
-    
     }
 }

@@ -24,19 +24,18 @@ class AddField extends Operation
 
     public function up()
     {
-        $triggers =  MysqlStatements::date_fields_triggers($this->db_table(), $this->fields);
-        return array_merge(MysqlStatements::alter_table_add_field($this->db_table(), $this->fields), $triggers);
+//        $triggers =  MysqlStatements::date_fields_triggers($this->db_table(), $this->fields);
+        return MysqlStatements::alter_table_add_field($this->db_table(), $this->fields);
     }
 
     public function down()
     {
-        return array_merge(MysqlStatements::drop_table_field($this->db_table(), $this->fields),
-            MysqlStatements::date_fields_drop_triggers($this->db_table(), $this->fields));
+        return MysqlStatements::drop_table_field($this->db_table(), $this->fields);
     }
 
     public function message()
     {
-        return "add";
+        return "add_fields";
     }
 
     public function state(){
@@ -81,7 +80,7 @@ class DropField extends Operation
 
     public function message()
     {
-        return "drop";
+        return "drop_fields";
     }
 
 
@@ -265,7 +264,7 @@ class AlterField extends Operation{
 
     public function message()
     {
-        return 'modify_field';
+        return 'modify_fields';
     }
 
     public function state(){
@@ -284,7 +283,6 @@ class AlterField extends Operation{
 
 }
 
-
 class AddM2MField extends Operation{
     public $model_name;
     public $fields;
@@ -300,17 +298,15 @@ class AddM2MField extends Operation{
 
     public function up(){
 
-        $table = MysqlStatements::create_table($this->db_table());
+        $table = MysqlStatements::_porm_create_table($this->db_table());
         $fields = MysqlStatements::add_table_field($this->proxy->meta->fields);
-        $triggers =  MysqlStatements::date_fields_triggers($this->db_table(), $this->proxy->meta->fields);
-        return array_merge($fields, $table, $triggers);
+        return array_merge($fields, $table);
 
     }
 
     public function down()
     {
-        return array_merge(MysqlStatements::drop_table($this->db_table()),
-            MysqlStatements::date_fields_drop_triggers($this->db_table(), $this->proxy->meta->fields));
+        return MysqlStatements::_porm_drop_table($this->db_table());
     }
 
     public function message()
@@ -345,16 +341,14 @@ class DropM2MField extends Operation{
     }
     public function up()
     {
-        return array_merge(MysqlStatements::drop_table($this->db_table()),
-            MysqlStatements::date_fields_drop_triggers($this->db_table(), $this->proxy->meta->fields));
+        return MysqlStatements::_porm_drop_table($this->db_table());
     }
 
     public function down(){
 
-        $table = MysqlStatements::create_table($this->db_table());
+        $table = MysqlStatements::_porm_create_table($this->db_table());
         $fields = MysqlStatements::add_table_field($this->proxy->meta->fields);
-        $triggers =  MysqlStatements::date_fields_triggers($this->db_table(), $this->proxy->meta->fields);
-        return array_merge($fields, $table, $triggers);
+        return array_merge($fields, $table);
 
     }
 
