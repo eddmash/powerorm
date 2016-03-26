@@ -114,7 +114,7 @@
                         <ul class="dropdown-menu">
                             <li>
                                 <a href="../reports/errors.html">
-                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">9</span>
+                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">7</span>
                                 </a>
                             </li>
                             <li>
@@ -144,28 +144,28 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1728182028"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-406142540"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-1728182028" class="accordion-body collapse in">
+            <div id="namespace-406142540" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-953872968"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1291769995"></a>
                                 <a href="../namespaces/powerorm.html" style="margin-left: 30px; padding-left: 0">powerorm</a>
             </div>
-            <div id="namespace-953872968" class="accordion-body collapse ">
+            <div id="namespace-1291769995" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1413806662"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1414754872"></a>
                                 <a href="../namespaces/powerorm.queries.html" style="margin-left: 30px; padding-left: 0">queries</a>
             </div>
-            <div id="namespace-1413806662" class="accordion-body collapse ">
+            <div id="namespace-1414754872" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -385,9 +385,19 @@ USAGE:.</p>
             <article class="method">
                 <h3 class="public ">filter()</h3>
                 <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
-                <pre class="signature" style="margin-right: 54px;">filter(  <span class="argument">$conditions</span>) </pre>
-                <p><em></em></p>
-                
+                <pre class="signature" style="margin-right: 54px;">filter(  <span class="argument">$conditions</span>) : \powerorm\queries\Queryset</pre>
+                <p><em>Works like the get method but difference is it can return more than one item.and return a Queryset</em></p>
+                <p>Implements the where part of a query and returns rows limited by the where clause.</p>
+<h4>USAGE:</h4>
+<h4>Normal Filtering</h4>
+<p>To fetch all rows in the database with the name <code>john</code>.</p>
+<pre><code>$this->User_model->filter(array('name'=>'john'))</code></pre>
+<p>To fetch all rows in the database with the <code>name=john</code> and <code>age=20</code>.</p>
+<pre><code>$this->User_model->filter(array('name'=>'john', 'age'=20))</code></pre>
+<h4>Related Filter</h4>
+<p>To fetch all rows based on there related data e.g fetch user model where role is <code>admin</code>.</p>
+<pre><code>
+ $roles = $this->user_model->filter(array("role::name"=>"admin"));</code></pre>
 
                                     <h4>Parameters</h4>
                     <table class="table table-condensed table-hover">
@@ -398,14 +408,23 @@ USAGE:.</p>
                             </tr>
                                             </table>
                 
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\powerorm\exceptions\OrmExceptions</dt>
+                            <dd></dd>
+                                                                    </dl>
                 
-                				
+                                    <h4>Returns</h4>
+                    <a href="../classes/powerorm.queries.Queryset.html">\powerorm\queries\Queryset</a>
+                                    				
                             </article>
         </div>
         <aside class="span4 detailsbar">
             <h1><i class="icon-arrow-down"></i></h1>
                                                             <dl>
-                                                                            </dl>
+                                                                                            <dt>See also</dt>
+                                                                <dd><a href="../classes/powerorm.queries.Queryset.html#method_get"><span class="namespace-wrapper">To fetch only one item.</span></a></dd>
+                                                                </dl>
             <h2>Tags</h2>
             <table class="table table-condensed">
                                     <tr><td colspan="2"><em>None found</em></td></tr>
@@ -824,7 +843,7 @@ foreach ($users as $u) {
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on March 26th, 2016 at 22:51.
+                    on March 26th, 2016 at 23:23.
                 </section>
             </section>
         </section>
