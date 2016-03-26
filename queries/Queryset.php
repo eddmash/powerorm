@@ -331,7 +331,35 @@ class Queryset implements \IteratorAggregate, \Countable
 
         return $this->_eval_queryset();
     }
-
+    
+    /**
+     * Works like the get method but difference is it can return more than one item.and return a Queryset
+     *
+     * Implements the where part of a query and returns rows limited by the where clause.
+     *
+     * <h4>USAGE:</h4>
+     *
+     * <h4>Normal Filtering</h4>
+     * To fetch all rows in the database with the name `john`.
+     *      <pre><code>$this->User_model->filter(array('name'=>'john'))</code></pre>
+     *
+     * To fetch all rows in the database with the `name=john` and `age=20`.
+     *      <pre><code>$this->User_model->filter(array('name'=>'john', 'age'=20))</code></pre>
+     *
+     * <h4>Related Filter</h4>
+     *
+     * To fetch all rows based on there related data e.g fetch user model where role is `admin`.
+     *  <pre><code>
+     *  $roles = $this->user_model->filter(array("role::name"=>"admin"));</code></pre>
+     *
+     *
+     * @param array $where the where condition e.g. array('username'=>'john', 'password'="ad+as')
+     * @see get() To fetch only one item.
+     * @param string $foreign_key the name of the foreign key if filtering by related, defaults to adding
+     * `tablename_primarykey'
+     * @return Queryset
+     * @throws OrmExceptions
+     */
     public function filter($conditions){
         $this->_filter($conditions);
         return $this;
