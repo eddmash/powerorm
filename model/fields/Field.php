@@ -6,7 +6,7 @@ use powerorm\form;
 
 
 /**
- * Class Field
+ * This class represents a column in the database table.
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */

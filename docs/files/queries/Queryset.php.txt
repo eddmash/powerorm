@@ -331,7 +331,7 @@ class Queryset implements \IteratorAggregate, \Countable
 
         return $this->_eval_queryset();
     }
-
+    
     /**
      * Works like the get method but difference is it can return more than one item.and return a Queryset
      *
@@ -2072,6 +2072,7 @@ function query_builder($params = '', $query_builder_override = NULL)
     require_once('QueryBuilder.php');
     return new QueryBuilder($params);
 }
+
 
 
 

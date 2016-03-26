@@ -741,3 +741,4 @@ abstract class PModel extends \CI_Model
         return sprintf('< %1$s %2$s >', ucwords(strtolower(get_class($this))), $this->$pk);
     }
 }
+
