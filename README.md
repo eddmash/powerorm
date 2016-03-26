@@ -12,6 +12,14 @@ tables themselves and use this fields to interact with the database.
 
 This ORM is heavily inspired by Django ORM. Because i personally love how there orm works.
 
+# Install
+
+- Via Composer
+
+`composer require eddmash/powerorm`
+
+- Download or Clone package from github
+
 # Dependecies
 This orm heavily relies on the core libraries provided with CodeIgniter without making any alterations on them.
 This means that any configuration made for the following libraries will affect how the ORM operates
@@ -19,6 +27,7 @@ This means that any configuration made for the following libraries will affect h
 - The CodeIgniter Migration library
 
 - The CodeIgniter Database classes 
+
 - The QueryBuilder Class.
 
 # Configuration
