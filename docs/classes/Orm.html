@@ -136,10 +136,10 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1460376220"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-439204213"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-1460376220" class="accordion-body collapse in">
+            <div id="namespace-439204213" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                     
@@ -237,7 +237,6 @@ This allows for further refinement of the Queryset.</p>
 <p>The following are the methods don't return a Queryset:</p>
 <ul>
 <li>\Queryset::get()</li>
-<li>\Queryset::related_one()</li>
 <li>\Queryset::size()</li>
 <li>\Queryset::delete()</li>
 <li>\Queryset::value()</li>
@@ -263,10 +262,6 @@ using this Queryset you are able perform database lookups.</p>
 
 $this->user_model->filter(array('name'=>'john'))
 </code></pre>
-<p>To get all the permissions user john has</p>
-<pre><code>$this->user_model->get(array('name'=>'john'))->related('permission_model')</code></pre>
-<p>To count all the permissions user john has</p>
-<pre><code>$this->user_model->get(array('name'=>'john'))->related('permission_model')->size()</code></pre>
 <h4><strong>Getting Results</strong> (Lazily Loading and Evaluation)</h4>
 <p>To get results from the database, the Queryset object has to be evaluated, the reason for this is to hold
 off from hitting the database until its absolutely necessary, that is when the results are actually needed.</p>
@@ -314,7 +309,7 @@ which is something we can and should avoid.</p>
 <pre><code>$articles = $this->article_model->all()
 
 foreach($articles as $article){
-     $article->related_one('author')->name;
+     $article->author->name;
 }
 </code></pre>
 <p>Assuming we have 20 articles in the database, the above code will produce 20+1 queries to the database</p>
@@ -333,7 +328,7 @@ SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?</code></pre>
 <p>To solve this problem use the \Queryset::with().</p>
 <p>The method tells the orm to eagerly load the article and authors in one go when the Queryset is being evaluated.
 which will result in two sql queries as shown below:</p>
-<pre><code>$articles = $this->with(['author' =>'author'])->article_model->all()
+<pre><code>$articles = $this->with(['author'])->article_model->all()
 
 foreach($articles as $article){
      $article->author->name;
@@ -596,7 +591,7 @@ SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' IN (1,2,3,4,5)</cod
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on March 26th, 2016 at 19:51.
+                    on March 26th, 2016 at 21:00.
                 </section>
             </section>
         </section>

@@ -122,7 +122,6 @@ define('POWERORM_VERSION', '1.0.0');
  * <h4>Methods that don't return a Querset.</h4>
  * The following are the methods don't return a Queryset:
  * - {@see Queryset::get() }
- * - {@see Queryset::related_one() }
  * - {@see Queryset::size() }
  * - {@see Queryset::delete() }
  * - {@see Queryset::value() }
@@ -157,11 +156,6 @@ define('POWERORM_VERSION', '1.0.0');
  * $this->user_model->filter(array('name'=>'john'))
  * </code></pre>
  *
- * To get all the permissions user john has
- * <pre><code>$this->user_model->get(array('name'=>'john'))->related('permission_model')</code></pre>
- *
- * To count all the permissions user john has
- * <pre><code>$this->user_model->get(array('name'=>'john'))->related('permission_model')->size()</code></pre>
  *
  * <h4><strong>Getting Results</strong> (Lazily Loading and Evaluation)</h4>
  * To get results from the database, the Queryset object has to be evaluated, the reason for this is to hold
@@ -214,7 +208,7 @@ define('POWERORM_VERSION', '1.0.0');
  * <pre><code>$articles = $this->article_model->all()
  *
  * foreach($articles as $article){
- *      $article->related_one('author')->name;
+ *      $article->author->name;
  * }
  * </code></pre>
  *
@@ -238,7 +232,7 @@ define('POWERORM_VERSION', '1.0.0');
  * The method tells the orm to eagerly load the article and authors in one go when the Queryset is being evaluated.
  * which will result in two sql queries as shown below:
  *
- * <pre><code>$articles = $this->with(['author' =>'author'])->article_model->all()
+ * <pre><code>$articles = $this->with(['author'])->article_model->all()
  *
  * foreach($articles as $article){
  *      $article->author->name;
