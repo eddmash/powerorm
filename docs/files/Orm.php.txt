@@ -49,7 +49,6 @@ define('POWERORM_VERSION', '1.0.0');
  * );</code></pre>
  *
  * <h4><strong>PModel</strong></h4>
- *
  * The ORM Model that adds power to CI Model.
  *
  * This class provides the CI MODEL with power by doing two important things :
@@ -109,6 +108,10 @@ define('POWERORM_VERSION', '1.0.0');
  *
  * - Queryset is evaluated to get data from the database.
  *
+ * The PModel has more methods read more here
+ *
+ * {@link http://eddmash.github.io/powerorm/docs/classes/PModel.html}
+ *
  * <h4><strong>Queryset</strong></h4>
  *
  * Class for doing database lookups, The look up is done Lazily i.e. Lazy Loading.
@@ -121,12 +124,15 @@ define('POWERORM_VERSION', '1.0.0');
  *
  * <h4>Methods that don't return a Querset.</h4>
  * The following are the methods don't return a Queryset:
- * - {@see \powerorm\queries\Queryset::get() }
+ * - {@see Queryset::get() }
  * - {@see Queryset::size() }
  * - {@see Queryset::delete() }
  * - {@see Queryset::value() }
  * - {@see Queryset::save() }
  * - {@see Queryset::add() }
+ *
+ * Read more of this methods here 
+ * {@link http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html }
  *
  * <h4><strong>Creating A Queryset</strong></h4>
  * Each model that extends the `PModel` class automatically gets assigned a Queryset object,

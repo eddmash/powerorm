@@ -518,7 +518,7 @@ abstract class PModel extends \CI_Model
     }
 
     /**
-     * Returns a Form that reopresents the current model.
+     * Returns a Form that represents the current model.
      * @return $this
      * @throws OrmExceptions
      * @throws \powerorm\exceptions\DuplicateField
