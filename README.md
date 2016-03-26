@@ -219,6 +219,10 @@ e.g. inside the controller
         $this->load->view('user_view', $data);
     }
 
+# Find detailed information here
+
+http://eddmash.github.io/powerorm/docs/classes/Orm.html
+
 # Requirements on 
  - CodeIgniter 3.0+
  - php 5.4+
