@@ -121,8 +121,7 @@ define('POWERORM_VERSION', '1.0.0');
  *
  * <h4>Methods that don't return a Querset.</h4>
  * The following are the methods don't return a Queryset:
- * - {@see Queryset::get() }
- * - {@see Queryset::related_one() }
+ * - {@see Queryset::get() } 
  * - {@see Queryset::size() }
  * - {@see Queryset::delete() }
  * - {@see Queryset::value() }
