@@ -272,6 +272,7 @@ class Queryset implements \IteratorAggregate, \Countable
      */
 
     /**
+     *
      * Fetches exactly one record from the database table by matching the given lookup parameters.
      * This method Returns a Queryset for further refinement
      * USAGE:.
@@ -301,11 +302,9 @@ class Queryset implements \IteratorAggregate, \Countable
      *
      * @param array|int $values an array of field and the value to look for, or an integer-primary key.
      * @see filter() To fetch more than one item based on some conditions.
-     * @param $values
-     * @return array|bool|object
+     * @return  Queryset
      * @throws MultipleObjectsReturned
      * @throws ObjectDoesNotExist
-     * @throws ValueError
      */
     public function get($values)
     {
@@ -343,7 +342,8 @@ class Queryset implements \IteratorAggregate, \Countable
      *
      * To get All user in the database
      * <pre><code>$this->User_model->all()</code></pre>
-     * @return $this
+     *
+     * @return Queryset
      */
     public function all()
     {
@@ -353,24 +353,6 @@ class Queryset implements \IteratorAggregate, \Countable
         return $this;
     }
 
-    /**
-     * Returns a Queryset that does not include those provided in the criteria.
-     *
-     *
-     * <h4>USAGE: </h4>
-     *
-     * To exclude from a resulting Queryset
-     * <pre><code>$this->role->all()->exclude(['name'=>'ceo'])</code></pre>
-     *
-     *
-     * To exclude from the model itself
-     *
-     * <pre><code>$this->role->exclude(['name'=>'ceo'])</code></pre>
-     *
-     * @param $conditions
-     * @return $this
-     * @throws ValueError
-     */
     public function exclude($conditions)
     {
         $this->_validate_condition($conditions);
@@ -394,7 +376,7 @@ class Queryset implements \IteratorAggregate, \Countable
      * <h4>USAGE: </h4>
      *
      * <pre><code>$this->user_model->distinct()->filter(["name"=>"john"]);</code></pre>
-     * @return $this
+     * @return Querset
      */
     public function distinct(){
         $this->_qbuilder->distinct();
@@ -440,19 +422,6 @@ class Queryset implements \IteratorAggregate, \Countable
 
     }
 
-    /**
-     * Returns the Queryset with it objects grouped by the criteria provided.
-     *
-     * <h4>USAGE: </h4>
-     *
-     * To group countries by year of independence.
-     *
-     * <pre><code>$this->countries->all()->group_by(['independence_year']);</code></pre>
-     *
-     * @param $condition
-     * @return $this
-     * @throws ValueError
-     */
     public function group_by($condition){
         if (!is_array($condition)) {
             throw new ValueError(sprintf("Arguments should be in array form"));
@@ -549,8 +518,6 @@ class Queryset implements \IteratorAggregate, \Countable
     /**
      * This evaluates the Queryset and returns the results of the evaluation.
      *
-     * <strong>NB:</strong> use this method sparingly, using it defeats the purpose of the ORM, which is lazy loading.
-     *
      * <h4>USAGE</h4>
      *
      * The following will result in an array of products as opposed to a Queryset
@@ -577,7 +544,14 @@ class Queryset implements \IteratorAggregate, \Countable
      * <pre><code> $this->User_model->all()->size() </code></pre>
      *
      *
-     * @return mixed
+     * To count all users in the database with the `name=john.`
+     *
+     *
+     * <pre><code> $this->User_model->all()->size(array('name'=>'john')) </code></pre>
+     *
+     *
+     * @param array $where (optional) values to limit the Queryset.
+     * @return int
      */
     public function size()
     {
@@ -761,12 +735,45 @@ class Queryset implements \IteratorAggregate, \Countable
         return $this->_active_model_object;
     }
 
-
-
     /**
-     * @ignore
-     * @param $conditions
-     * @return $this
+     * Eager loading, this will solve the N+1 ISSUE
+     *
+     * <h4>USAGE:</h4>
+     *
+     * To Eager load related items of a single item
+     *
+     * Provide the name on which the eagerly loaded results will be accessed from in the example below all products of
+     * category with the `id = 1` will be accessed from the variable `products` .
+     *
+     * <pre><code>$category = $this->category_model->with(["products"=>"product_model"])->get(array("id"=>1));
+     *
+     * $category->products; // the products are now accessible like so
+     *
+     * foreach($rr->products as $product){
+     *          echo $product->name;
+     * }</code></pre>
+     *
+     * To Eager Many To Many Relationship
+     *
+     * <pre><code>$roles = $this->role->with(['permissions'=>'permission_model'])->filter(array('user_model::id'=>1));
+     * foreach ($roles as $role) {
+     *         echo $role ;
+     *
+     *      foreach ($role->permissions as $perm) {
+     *          echo $perm->name;
+     *      }
+     * }</code></pre>
+     *
+     *
+     * To Eager Load more than one relationship , this eager loads a user roles and products.
+     *
+     * <pre><code>$usr= $this->user_model->with(["products"=>"product_model", 'roles'=>"role_model"])->get(["id"=>1]);
+     *
+     *
+     * </code></pre>
+     *
+     * @param string|array $eager_model_name the name/names of models to eager load.
+     * @return Queryset
      */
     public function _eager_load($conditions)
     {
@@ -1995,7 +2002,6 @@ function query_builder($params = '', $query_builder_override = NULL)
             /**
              * CI_DB
              *
-             * @ignore
              * Acts as an alias for both CI_DB_driver and CI_DB_query_builder.
              *
              * @see	CI_DB_query_builder
@@ -2044,6 +2050,7 @@ function query_builder($params = '', $query_builder_override = NULL)
     require_once('QueryBuilder.php');
     return new QueryBuilder($params);
 }
+
 
 
 

@@ -121,7 +121,7 @@ define('POWERORM_VERSION', '1.0.0');
  *
  * <h4>Methods that don't return a Querset.</h4>
  * The following are the methods don't return a Queryset:
- * - {@see Queryset::get() }
+ * - {@see \powerorm\queries\Queryset::get() }
  * - {@see Queryset::size() }
  * - {@see Queryset::delete() }
  * - {@see Queryset::value() }
@@ -179,7 +179,7 @@ define('POWERORM_VERSION', '1.0.0');
  *       ...
  *   }</code></pre>.
  *
- * - When the {@see Queryset::value()} method of the Queryset is invoked.
+ * - When the {@see Queryset::value() } method of the Queryset is invoked.
  *
  *   <pre><code>$admin_role = $this->role->all()->value(); </code></pre>.
  *
