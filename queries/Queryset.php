@@ -331,7 +331,7 @@ class Queryset implements \IteratorAggregate, \Countable
 
         return $this->_eval_queryset();
     }
-    
+
     /**
      * Works like the get method but difference is it can return more than one item.and return a Queryset
      *
