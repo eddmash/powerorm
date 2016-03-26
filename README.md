@@ -96,7 +96,10 @@ Once you have the models created, on the command line/ terminal, run the followi
 
 `php index.php migrations/makemigrations`
 
-Once the files have been generated you can run the following command to actually create the tables in the database.
+This command detects any changes made to you models and creates the necessary migrations file.
+
+Once the files have been generated you can run the following command to actually executes the migrations fields to make 
+the database match the model state
 
 `php index.php migrations/migrate`
  
@@ -176,7 +179,7 @@ e.g. inside the controller
      public function index(){
         $this->load->model('user');
         
-        $this->user->all(); // fetch all users in the database tabble represented by model user
+        $this->user->all(); // fetch all users in the database table represented by model user
         
         $this->user->get(1); // get user with the primary key 1
         
@@ -192,18 +195,23 @@ e.g. inside the controller
      }
 
 ## 4. Form
-The PModel also provides a method that generated the form for a specific model.
+The PModel also provides a method that generates a form for a specific model.
 
 e.g. inside the controller
 
     public function index(){
         $this->load->model('user');
         
-        $form = $this->user->get(1)->as_form(); // generate form from the model returned by get()
+        // this will generate a general form for the model
+         $form_builder = $this->user->form_builder(); // get the form builder
         
-        $form->only(['password','username']);  // for the form only use password and username
+        // this will generate a form loaded with the values of this model
+        $form_builder = $this->user->get(1)->form_builder(); // get the form builder
         
-        $form->create(); // create the actual form
+        
+        $form_builder->only(['password','username']);  // build the form using only password and username
+        
+        $form = $form_builder->form(); // get the form
         
         $data['form'] = $form;
         
