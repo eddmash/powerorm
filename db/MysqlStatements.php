@@ -213,7 +213,7 @@ class MysqlStatements extends SqlStatements{
     }
 
     public static function boolean_default($field, $sql){
-        if(strtolower($field['type']) != 'boolean'):
+        if(!isset($field['type']) || strtolower($field['type']) != 'boolean'):
             return $sql;
         endif;
 

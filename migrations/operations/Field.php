@@ -123,13 +123,13 @@ class AlterField extends Operation{
     }
 
     public function _setup(){
-        foreach ($this->fields as $fields) :
+        foreach ($this->fields as $field) :
 
-            $past = $fields['past'];
-            $present = $fields['present'];
+            $past = $field['past'];
+            $present = $field['present'];
 
-            $this->forward[$present->name] = array_diff_assoc($present->options(), $past->options());
-            $this->backward[$present->name] = array_diff_assoc($past->options(), $present->options());
+            $this->forward[$present->name] = $this->_prepare(array_diff_assoc($present->options(), $past->options()), $field);
+            $this->backward[$present->name] = $this->_prepare(array_diff_assoc($past->options(), $present->options()), $field);
         endforeach;
 
         foreach ($this->forward as $name => &$forward) :
@@ -143,6 +143,20 @@ class AlterField extends Operation{
 
         $this->_clean();
 
+    }
+
+    public function _prepare($opts, $field, $forward=TRUE){
+
+        if(array_key_exists('null', $opts)):
+            $opts['null'] = ($opts['null'])? 'NULL':'NOT NULL';
+        endif;
+
+        if(!isset($opts['type'])):
+            $present = $field['present'];
+            $opts['type'] = $present->options()['type'];
+        endif;
+
+        return $opts;
     }
 
     public function _clean(){

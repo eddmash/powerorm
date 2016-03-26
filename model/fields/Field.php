@@ -18,7 +18,7 @@ abstract class Field{
     public $max_length=NULL;
     public $primary_key=FALSE;
     public $auto=FALSE;
-    public $default=NULL;
+    public $default=' ';
     public $signed=FALSE;
     public $constraint_name;
     public $db_column=Null;

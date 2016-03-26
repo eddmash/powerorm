@@ -32,23 +32,31 @@ abstract class SqlStatements implements Statements{
         // [NOT NULL | NULL] [DEFAULT default_value] [AUTO_INCREMENT] [UNIQUE [KEY] | [PRIMARY] KEY]
         $sql = [];
 
-        // use column name over field name because of the foreignkey relationships
-        $sql['db_column'] = $field['db_column'];
+        if(isset($field['db_column'])):
+            // use column name over field name because of the foreignkey relationships
+            $sql['db_column'] = $field['db_column'];
+        endif;
 
-        // datatype
-        $sql['type'] = $field['type'];
+        if(isset($field['type'])):
+            // datatype
+            $sql['type'] = $field['type'];
+        endif;
 
-        if(!empty($field['signed'])):
+        if(isset($field['signed']) && !empty($field['signed'])):
             $sql['signed']= $field['signed'];
         endif;
 
-//        $sql['null']=$field['null'];
-        $sql['null']= ($field['null'])? "NULL" :"NOT NULL";;
+        if(isset($field['null'])):
+            $sql['null']= ($field['null'])? "NULL" :"NOT NULL";
+        endif;
 
-        $sql = MysqlStatements::default_value($field, $sql);
+        if(isset($field['default'])):
+            $sql = MysqlStatements::default_value($field, $sql);
+        endif;
+
 
         // auto increment
-        if($field['auto']):
+        if(isset($field['auto']) && $field['auto']):
             $sql['auto']= 'AUTO_INCREMENT';
         endif;
 
