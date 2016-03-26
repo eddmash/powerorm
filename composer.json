@@ -1,6 +1,6 @@
 {
   "name": "eddmash/powerorm",
-  "type": "CodeIgniter library",
+  "type": "CodeIgniter-library",
   "keywords": ["orm", "CodeIgniter", "form"],
   "description": "A very simple but effective codeignter orm",
   "homepage": "https://github.com/eddmash/powerorm",
