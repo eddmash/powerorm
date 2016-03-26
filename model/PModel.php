@@ -22,62 +22,6 @@ use powerorm\model\ProxyModel;
 /**
  * The ORM Model that adds power to CI Model.
  *
- * This class provides the CI MODEL with power by doing two important things :
- *
- * - Assigns Model fields
- *
- * based on the table name provide, this model takes all the columns in that database table and creates model fields
- * for each one of them.
- *
- * - Provides easy interaction with the database.
- *
- * This class provides a Queryset object for each class that extends it. The Queryset class Acts like a proxy between
- * the database and the current model.
- *
- * The Queryset class provides several method for working with the database {@see Queryset } for more.
- *
- *
- * USAGE:
- * <h4><strong>Extending</strong></h4>
- * Extend this class from model classes e.g.
- *
- * <pre><code>User_model extends  PModel{
- *      protected $table_name= '';
- *      ...
- * }</code></pre>
- *
- * The `table_name` variable is optional, this tells the orm which database table this model represents. if not set
- * Table name is taken as model name without the model part e.g. user_model above the table would be `user`
- *
- * <h4><strong>Interacting with the database</strong></h4>
- *
- * Load model as usual
- * <pre><code>$this->load->model('user_model')</code></pre>
- * then
- * <pre><code>$this->user_model->get(array('name'=>'john'))</code></pre>
- * This will return object of the user_model.
- *
- * <h4><strong>How it works</strong></h4>
- * - The first Queryset method invoked on the model creates that models Queryset.
- *   Each of this methods below create a new Queryset instance.
- *  <pre><code>$this->user_model->get(array('name'=>'john'));
- * $this->user_model->all());</code></pre>
- *
- * - Several Queryset methods can be chained together to refine the query.
- *   <pre><code>$this->user_model->all()->filter(array('username'=>'admin'));
- * **************************************************
- * SELECT `user`.*
- * FROM `user`
- * *************************************************
- * $this->user_model->all()->filter(array('username'=>'admin'));
- * ----------
- * SELECT `user`.*
- * FROM `user`
- * WHERE `user`.`username` = 'admin'</code></pre>
- *
- * - Queryset is evaluated to get data from the database.{@see Queryset} for more.
- *
- *
  * @package powerorm\model
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

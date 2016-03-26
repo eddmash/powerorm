@@ -39,7 +39,7 @@ define('POWERORM_VERSION', '1.0.0');
 /**
  * class that Loads the ORM LIBRARY and all the necessary classes.
  *
- * Its actually Meant to get around CodeIgniter not using  namespaces
+ * Its actually Meant to get around CodeIgniter not using namespaces
  *
  * To start using the orm, load it like any other CODIGNTER library, preferably using autoload
  * <pre><code>$autoload['libraries'] = array(
@@ -54,22 +54,21 @@ define('POWERORM_VERSION', '1.0.0');
  *
  * This class provides the CI MODEL with power by doing two important things :
  *
+ * - Use model to determine how the database table it represent looks like
+ *
  * - Assigns Model fields
  *
- * based on the table name provide, this model takes all the columns in that database table and creates model fields
- * for each one of them.
+ *      Allows creating fields on the model, which represent columns in the database.
  *
  * - Provides easy interaction with the database.
  *
- * This class provides a Queryset object for each class that extends it. The Queryset class Acts like a proxy between
- * the database and the current model.
- *
- * The Queryset class provides several method for working with the database {@see Queryset } for more.
- *
+ *      This class provides a Queryset object for each class that extends it. The Queryset class Acts like a proxy between
+ *      the database and the current model.
  *
  * USAGE:
  * <h4><strong>Extending</strong></h4>
- * Extend this class from model classes e.g.
+ *
+ * Extend this class on model classes e.g.
  *
  * <pre><code>User_model extends  PModel{
  *      protected $table_name= '';
@@ -77,14 +76,17 @@ define('POWERORM_VERSION', '1.0.0');
  * }</code></pre>
  *
  * The `table_name` variable is optional, this tells the orm which database table this model represents. if not set
- * Table name is taken as model name without the model part e.g. user_model above the table would be `user`
+ * Table name is taken as model name e.g. user_model above the table would be `user_model`
  *
  * <h4><strong>Interacting with the database</strong></h4>
  *
- * Load model as usual
+ * Load model like any other codeigniter model
  * <pre><code>$this->load->model('user_model')</code></pre>
- * then
- * <pre><code>$this->user_model->get(array('name'=>'john'))</code></pre>
+ *
+ * Extending the  PModel, provides several methods that can be used to interact with the database, e.g. the get() method
+ * more on this later.
+ *
+ * <pre><code>$this->user_model->get(['name'=>'john'])</code></pre>
  * This will return object of the user_model.
  *
  * <h4><strong>How it works</strong></h4>
@@ -274,9 +276,6 @@ class Orm{
 
     }
 
-    private function load_libs(){
-
-    }
     /**
      * initializes the orm
      * @internal
@@ -314,74 +313,198 @@ class Orm{
     }
 
     // ********************* ORM Fields ************************************
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return AutoField
+     */
     public static function AutoField($opts=[]){
         return new AutoField($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return CharField
+     */
     public static function CharField($opts=[]){
         return new CharField($opts);
     }
+
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return FileField
+     */
     public static function FileField($opts=[]){
         return new FileField($opts);
     }
+
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return ImageField
+     */
     public static function ImageField($opts=[]){
         return new ImageField($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return BooleanField
+     */
     public static function BooleanField($opts=[]){
         return new BooleanField($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return EmailField
+     */
     public static function EmailField($opts=[]){
         return new EmailField($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return TextField
+     */
     public static function TextField($opts=[]){
         return new TextField($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return DecimalField
+     */
     public static function DecimalField($opts=[]){
         return new DecimalField($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return IntegerField
+     */
     public static function IntegerField($opts=[]){
         return new IntegerField($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return DateTimeField
+     */
     public static function DateTimeField($opts=[]){
         return new DateTimeField($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return DateField
+     */
     public static function DateField($opts=[]){
         return new DateField($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return TimeField
+     */
     public static function TimeField($opts=[]){
         return new TimeField($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return ForeignKey
+     */
     public static function ForeignKey($opts=[]){
         return new ForeignKey($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return OneToOne
+     */
     public static function OneToOne($opts=[]){
         return new OneToOne($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return ManyToMany
+     */
     public static function ManyToMany($opts=[]){
         return new ManyToMany($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return HasMany
+     */
     public static function HasMany($opts=[]){
         return new HasMany($opts);
     }
+
+    /**
+     * @ignore
+     * @param array $opts
+     * @return HasOne
+     */
     public static function HasOne($opts=[]){
         return new HasOne($opts);
     }
 
 
     //********************************** ORM Migrations*********************************
+
+
+    /**
+     *
+     * @ignore
+     */
     public static function makemigrations(){
         new MakeMigrations();
     }
-    
+
+    /**
+     *
+     * @ignore
+     */
     public static function migrate(){
         new Migrate();
     }
 
+
+    /**
+     * @ignore
+     * @param $opts
+     */
     public static function rollback($opts){
         new RollBack(['version'=>$opts]);
     }
 
     //********************************** ORM Form*********************************
 
+
+    /**
+     * @ignore
+     * @return Form
+     */
     public static function form_builder(){
         return new Form();
     }

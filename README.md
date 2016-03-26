@@ -86,7 +86,7 @@ The above 3 methods extend **PModel** , Extending this model requires that you i
 The Main purpose of this method is to create fields that the model will use to map to database table columns.
 
 The orm provides different field type that represent the different types of database columns 
-e.g. **CharField** represent **varchar** type, **http://f.com** for more.
+e.g. **CharField** represent **varchar** type,  .
 
 
 
