@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">4</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1460376220"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-1460376220" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/Orm.html">Orm</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/default.html">\</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\</small>Orm</h1>
+                    <p><em>class that Loads the ORM LIBRARY and all the necessary classes.</em></p>
+                    <p>Its actually Meant to get around CodeIgniter not using namespaces</p>
+<p>To start using the orm, load it like any other CODIGNTER library, preferably using autoload</p>
+<pre><code>$autoload['libraries'] = array(
+         'powerdispatch/signal',
+         'powerorm/orm', <------------------------------------ the orm
+         'powerauth/auth'
+);</code></pre>
+<h4><strong>PModel</strong></h4>
+<p>The ORM Model that adds power to CI Model.</p>
+<p>This class provides the CI MODEL with power by doing two important things :</p>
+<ul>
+<li>
+<p>Use model to determine how the database table it represent looks like</p>
+</li>
+<li>
+<p>Assigns Model fields</p>
+<p>Allows creating fields on the model, which represent columns in the database.</p>
+</li>
+<li>
+<p>Provides easy interaction with the database.</p>
+<p>This class provides a Queryset object for each class that extends it. The Queryset class Acts like a proxy between
+the database and the current model.</p>
+</li>
+</ul>
+<p>USAGE:</p>
+<h4><strong>Extending</strong></h4>
+<p>Extend this class on model classes e.g.</p>
+<pre><code>User_model extends  PModel{
+     protected $table_name= '';
+     ...
+}</code></pre>
+<p>The <code>table_name</code> variable is optional, this tells the orm which database table this model represents. if not set
+Table name is taken as model name e.g. user_model above the table would be <code>user_model</code></p>
+<h4><strong>Interacting with the database</strong></h4>
+<p>Load model like any other codeigniter model</p>
+<pre><code>$this->load->model('user_model')</code></pre>
+<p>Extending the  PModel, provides several methods that can be used to interact with the database, e.g. the get() method
+more on this later.</p>
+<pre><code>$this->user_model->get(['name'=>'john'])</code></pre>
+<p>This will return object of the user_model.</p>
+<h4><strong>How it works</strong></h4>
+<ul>
+<li>
+<p>The first Queryset method invoked on the model creates that models Queryset.
+Each of this methods below create a new Queryset instance.</p>
+<pre><code>$this->user_model->get(array('name'=>'john'));
+$this->user_model->all());</code></pre>
+</li>
+<li>
+<p>Several Queryset methods can be chained together to refine the query.</p>
+<pre><code>$this->user_model->all()->filter(array('username'=>'admin'));
+**************************************************
+SELECT `user`.*
+FROM `user`
+*************************************************
+$this->user_model->all()->filter(array('username'=>'admin'));
+----------
+SELECT `user`.*
+FROM `user`
+WHERE `user`.`username` = 'admin'</code></pre>
+</li>
+<li>Queryset is evaluated to get data from the database.</li>
+</ul>
+<h4><strong>Queryset</strong></h4>
+<p>Class for doing database lookups, The look up is done Lazily i.e. Lazy Loading.</p>
+<p>This class provides several methods for interacting with the database with one
+important thing to note is that some.</p>
+<p><strong><em>Most Methods return a Queryset object</em></strong> and not the database results.
+This allows for further refinement of the Queryset.</p>
+<h4>Methods that don't return a Querset.</h4>
+<p>The following are the methods don't return a Queryset:</p>
+<ul>
+<li>\Queryset::get()</li>
+<li>\Queryset::related_one()</li>
+<li>\Queryset::size()</li>
+<li>\Queryset::delete()</li>
+<li>\Queryset::value()</li>
+<li>\Queryset::save()</li>
+<li>\Queryset::add()</li>
+</ul>
+<h4><strong>Creating A Queryset</strong></h4>
+<p>Each model that extends the <code>PModel</code> class automatically gets assigned a Queryset object,
+using this Queryset you are able perform database lookups.</p>
+<p>Assuming we have a model class User_model that represents all users in the user database table.</p>
+<p>We can interact with it as follows:</p>
+<p>To get one user with the <code>name=john</code></p>
+<pre><code>$this->User_model->get(array('name'=>'john'))</code></pre>
+<p>To get All user in the database</p>
+<pre><code>$this->User_model->all()</code></pre>
+<h4><strong>Refining the Queryset</strong> (Method Chaining)</h4>
+<p>e.g count all users</p>
+<pre><code> $this->user_model->all()->size(array('name'=>'john')) </code></pre>
+<p>get all users with the name <code>name=john</code></p>
+<pre><code> $this->user_model->all()->filter(array('name'=>'john'))
+
+// which can also be handle as follows
+
+$this->user_model->filter(array('name'=>'john'))
+</code></pre>
+<p>To get all the permissions user john has</p>
+<pre><code>$this->user_model->get(array('name'=>'john'))->related('permission_model')</code></pre>
+<p>To count all the permissions user john has</p>
+<pre><code>$this->user_model->get(array('name'=>'john'))->related('permission_model')->size()</code></pre>
+<h4><strong>Getting Results</strong> (Lazily Loading and Evaluation)</h4>
+<p>To get results from the database, the Queryset object has to be evaluated, the reason for this is to hold
+off from hitting the database until its absolutely necessary, that is when the results are actually needed.</p>
+<p>A Queryset Evaluation takes place in the following situations :.</p>
+<ul>
+<li>
+<p>When looping through the Queryset using foreach.</p>
+<pre><code> $admins = $this->role->all();
+ foreach($admins as $admin){
+        ...
+ } </code></pre>
+</li>
+<li>
+<p>When using a Queryset like a string e.g. in an echo statement.</p>
+<pre><code>echo $this->role->get(array('name'=>'admin'));</code></pre>
+</li>
+<li>
+<p>When testing or existence of a property e.g. using isset().</p>
+<pre><code>$admin_role = $this->role->get(array('name'=>'admin'));
+if(isset($admin_role->description)){
+  ...
+}</code></pre>.
+</li>
+<li>
+<p>When the \Queryset::value() method of the Queryset is invoked.</p>
+<pre><code>$admin_role = $this->role->all()->value(); </code></pre>.
+
+<h4>See methods for more explanations and usage examples</h4>
+
+<h3>Some common issues when using ORMs to avoid</h3>
+</li>
+<li>
+<h4><strong>N+1 Problem</strong></h4>
+</li>
+</ul>
+<p>This problem occurs when the code needs to load the children of a parent-child relationship
+(the “many” in the “one-to-many”).</p>
+<p>Most ORMs have lazy-loading enabled by default, so queries are issued for the parent record, and then one query for
+EACH child record.</p>
+<p>As you can expect, doing N+1 queries instead of a single query will flood your database with queries,
+which is something we can and should avoid.</p>
+<p>Consider a simple blog application which has many articles published by different authors. i.e many to one</p>
+<p>We want to list articles along with their title and author’s name.</p>
+<p>This could be achieved using the following</p>
+<pre><code>$articles = $this->article_model->all()
+
+foreach($articles as $article){
+     $article->related_one('author')->name;
+}
+</code></pre>
+<p>Assuming we have 20 articles in the database, the above code will produce 20+1 queries to the database</p>
+<pre><code> // one to fetch all the articles
+
+select * from articles;
+
+// then based on the value of foreign_key to the author on each article, an author is
+// fetched resultin in 20 more queries hence the N+1.
+
+SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?</code></pre>
+<p>To solve this problem use the \Queryset::with().</p>
+<p>The method tells the orm to eagerly load the article and authors in one go when the Queryset is being evaluated.
+which will result in two sql queries as shown below:</p>
+<pre><code>$articles = $this->with(['author' =>'author'])->article_model->all()
+
+foreach($articles as $article){
+     $article->author->name;
+}
+
+// one to fetch all the articles
+
+SELECT 'articles'.* FROM 'articles'
+
+//one to fetch all authors
+
+SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' IN (1,2,3,4,5)</code></pre>
+<p>example borrowed from <a href="http://www.sitepoint.com/silver-bullet-n1-problem/"><a href="http://www.sitepoint.com/silver-bullet-n1-problem/">http://www.sitepoint.com/silver-bullet-n1-problem/</a></a></p>
+<p>To avoid this issues using this orm, use the \Queryset::with() method.</p>
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <em>No public methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/Orm.html#property_SET_NULL" class="">$SET_NULL</a><br />
+                                                                    <a href="../classes/Orm.html#property_CASCADE" class="">$CASCADE</a><br />
+                                                                    <a href="../classes/Orm.html#property_PROTECT" class="">$PROTECT</a><br />
+                                                                    <a href="../classes/Orm.html#property_SET_DEFAULT" class="">$SET_DEFAULT</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/Orm.html"><div class="path-wrapper">Orm.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">powerorm\model</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\Orm</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr>
+                            <th>
+                                since
+                            </th>
+                            <td>
+                                                                    
+                                                            </td>
+                        </tr>
+                                            <tr>
+                            <th>
+                                author
+                            </th>
+                            <td>
+                                                                    <p>Eddilbert Macharia (<a href="http://eddmash.com">http://eddmash.com</a>) <a href="mailto:edd.cowan@gmail.com">edd.cowan@gmail.com</a></p>
+                                                            </td>
+                        </tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_SET_NULL" name="property_SET_NULL" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$SET_NULL</h3>
+                <pre class="signature">$SET_NULL : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_CASCADE" name="property_CASCADE" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$CASCADE</h3>
+                <pre class="signature">$CASCADE : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_PROTECT" name="property_PROTECT" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$PROTECT</h3>
+                <pre class="signature">$PROTECT : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_SET_DEFAULT" name="property_SET_DEFAULT" class="anchor"></a>
+            <article class="property">
+                <h3 class="public ">$SET_DEFAULT</h3>
+                <pre class="signature">$SET_DEFAULT : </pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                
+                                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                            
+                                </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">Orm.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/Orm.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on March 26th, 2016 at 19:51.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>
