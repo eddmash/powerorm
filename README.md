@@ -101,6 +101,34 @@ e.g. **CharField** represent **varchar** type,  .
 
 
 ## 2. Migration
+Create a migrations controller and add the following methods:
+
+    class Migrations extends CI_Controller{
+            
+            /**
+            * Generate migration files.
+            */
+            public function makemigrations(){
+                ORM::makemigrations();
+            }
+        
+            /**
+             * Runs the latest migrations
+             */
+            public function migrate()
+            {
+                Orm::migrate();
+            }
+        
+            /**
+            * roll back to a previouse migration
+            */
+            public function rollback($version)
+            {
+                Orm::rollback($version);
+            }
+    }        
+        
 Once you have the models created, on the command line/ terminal, run the following command
 
 `php index.php migrations/makemigrations`
