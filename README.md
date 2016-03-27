@@ -20,6 +20,12 @@ This ORM is heavily inspired by Django ORM. Because i personally love how there 
 
 - Download or Clone package from github
 
+# Load the Library
+
+Load the library like any other Codeigniter library.
+
+`$autoload['libraries'] = array('session', 'powerorm/orm', 'powerauth/auth')`
+
 # Dependecies
 This orm heavily relies on the core libraries provided with CodeIgniter without making any alterations on them.
 This means that any configuration made for the following libraries will affect how the ORM operates
