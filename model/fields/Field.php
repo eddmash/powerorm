@@ -18,7 +18,7 @@ abstract class Field{
     public $max_length=NULL;
     public $primary_key=FALSE;
     public $auto=FALSE;
-    public $default=' ';
+    public $default;
     public $signed=FALSE;
     public $constraint_name;
     public $db_column=Null;
@@ -374,8 +374,6 @@ class DecimalField extends Field{
  * Class IntegerField
  */
 class IntegerField extends Field{
-
-    public $default;
 
     public function __construct($options=[]){
         parent::__construct($options);
