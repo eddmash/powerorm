@@ -11,25 +11,93 @@ use powerorm\queries\Queryset;
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class FormField{
+    /**
+     * The type of form field. this are any HTML FORM input type  textarea, text, checkbox, radio.
+     * @var string .
+     */
     public $type;
+
+    /**
+     * the name of the form field.
+     * @var string.
+     */
     public $name;
     public $unique;
+
+    /**
+     * The maxlength of the form field.
+     * @var string
+     */
     public $max_length;
+
+    /**
+     * The value to be set as default.
+     * @var string.
+     */
     public $default;
+
+    /**
+     * Set true if this fields is to be set to be required.
+     * @var bool
+     */
     public $blank=TRUE;
+
+    /**
+     * The value to be set as default.
+     * @var string
+     */
     public $value;
+
+    /**
+     * The label to displayed for the field.
+     * @var string.
+     */
     public $label_name;
+
+    /**
+     * any other attributes to be passed to the form field label.
+     * @var array
+     */
     public $label_attrs=[];
+
+    /**
+     * The choices to be passed to fields like checkbox, radio and dropdown/select
+     * @var
+     */
     public $choices;
+
+    /**
+     * Any validations to be run on the field e.g matches[password]
+     * @var
+     */
     public $validations;
+
+    /**
+     * @internal
+     * @var array
+     */
     protected $_errors = [];
+
+    /**
+     * Usually used for radiom checkbox and select/dropdown, this is the label to be used next to the values
+     * @var
+     */
     protected $form_display_field;
     public $form_value_field = '';
+
+    /**
+     * The default value
+     * @var
+     */
     public $empty_label;
     public $help_text;
     public $attrs;
     public $upload_to;
 
+    /**
+     * @ignore
+     * @param array $field_options
+     */
     public function __construct($field_options=[]){
 
         foreach ($field_options as $key=>$opt) :
@@ -49,6 +117,8 @@ class FormField{
 
             return '<p class="alert alert-danger">'.implode("\n", $this->_errors). '</p>';
         endif;
+
+        return '';
     }
 
     public function label($label=Null, $id=Null, $view_attrs=[]){
@@ -92,6 +162,7 @@ class FormField{
             case "radio":
                 $widget = $this->_choice_widget(TRUE);
                 break;
+            case 'select':
             case "dropdown":
                 $widget = $this->_dropdown_widget($field_attr);
                 break;
@@ -179,6 +250,11 @@ class FormField{
         return $this->_ensure_rule_exists($rules);
     }
 
+    /**
+     * @ignore
+     * @param bool|FALSE $radio
+     * @return string
+     */
     public function _choice_widget($radio=FALSE){
         $widget = '';
         $class = 'checkbox-widget';
@@ -214,6 +290,12 @@ class FormField{
 
     }
 
+    /**
+     * @ignore
+     * @param array $attrs
+     * @param bool|FALSE $multiselect
+     * @return string
+     */
     public function _dropdown_widget($attrs=[], $multiselect=FALSE){
         $widget = '';
 
@@ -268,6 +350,12 @@ class FormField{
 
     }
 
+    /**
+     * @ignore
+     * @param $view_attrs
+     * @return array
+     * @throws FormException
+     */
     public function _attrs($view_attrs){
         if(!is_array($view_attrs)):
             throw new FormException("Form widget() expects and array as argument");
@@ -312,6 +400,11 @@ class FormField{
         return $attrs;
     }
 
+    /**
+     * @ignore
+     * @param $values
+     * @return array|mixed
+     */
     public function _choices_value($values){
         $value = $values;
 
@@ -336,6 +429,11 @@ class FormField{
         return $value;
     }
 
+    /**
+     * @ignore
+     * @param $choices
+     * @return array
+     */
     public function _prepare_choices($choices){
 
         $form_choices = $choices;
@@ -379,6 +477,12 @@ class FormField{
         return $form_choices;
     }
 
+    /**
+     * @ignore
+     * @param $values
+     * @param $current
+     * @return bool
+     */
     public function _checkbox_value($values, $current){
 
         if(is_array($values) && in_array($current, $values)):
@@ -390,6 +494,12 @@ class FormField{
         endif;
     }
 
+    /**
+     * @ignore
+     * @param $values
+     * @param $current
+     * @return mixed
+     */
     public function _selected_value($values, $current){
 
         if(is_array($values) && in_array($current, $values)):
@@ -402,8 +512,13 @@ class FormField{
         endif;
     }
 
+    /**
+     * @ignore
+     * @return string
+     */
     public function _field_errors(){
-        if(empty($this->_errors())):
+        $errors = $this->_errors();
+        if(empty($errrors)):
             return '';
         endif;
 
@@ -412,11 +527,19 @@ class FormField{
         endif;
     }
 
+    /**
+     * @ignore
+     * @return mixed
+     */
     public function _errors(){
         $validation_object =&_get_validation_object();
         return $validation_object->error_array();
     }
 
+    /**
+     * @ignore
+     * @param $value
+     */
     public function set_value($value){
         $this->value= $value;
     }

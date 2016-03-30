@@ -7,4 +7,6 @@ include_once("Validations.php");
 include_once("FormField.php");
 
 // load model form
+include_once("Form.php");
+
 include_once("ModelForm.php");

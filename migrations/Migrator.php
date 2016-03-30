@@ -268,7 +268,8 @@ class Migrator
         endif;
 
         if($migration_stamp == 'sequential'):
-            if(empty(Migrator::last_stamp())):
+            $last_stamp = Migrator::last_stamp();
+            if(empty($last_stamp)):
                 $stamp = 1;
             else:
                 $stamp = Migrator::last_stamp()+1;

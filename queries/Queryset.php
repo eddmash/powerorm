@@ -1493,7 +1493,8 @@ class Queryset implements \IteratorAggregate, \Countable
                 $new_key = '~'.$new_key;
             endif;
 
-            if(!empty($this->_lookup_from_condition($key))):
+            $lookup =$this->_lookup_from_condition($key);
+            if(!empty($lookup)):
                 $key = $new_key.'__'.$this->_lookup_from_condition($key);
             else:
                 $key = $new_key;

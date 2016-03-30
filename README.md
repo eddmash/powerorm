@@ -18,7 +18,7 @@ This ORM is heavily inspired by Django ORM. Because i personally love how there 
 
 `composer require eddmash/powerorm`
 
-- Download or Clone package from github
+- Download or Clone package from github.
 
 # Load the Library
 
@@ -47,7 +47,8 @@ This means that any configuration made for the following libraries will affect h
 # Features
  - Allows to fully think of the database and its table in an object oriented manner i.e. 
     table are represented by model and columns are represented by fields.
- - Create automatic migration files
+ - Create automatic migrations.
+ - Create forms automatically based on models.
  - All fields visible on the model, no need to look at the database table when you want to interact with the database.
  - Provides database interaction methods
  
@@ -62,40 +63,42 @@ The orm takes each model created to represent a database table, it also takes an
 To Start using the orm, create models as you normally would in CodeIgniter and extend the **PModel** instead of 
 **CI_Model** as shown below .
     
+    
     class User extends PModel{
         
         public function fields(){
-            $this->username = new CharField(['max_length'=>25]);
-            $this->f_name = new CharField(['max_length'=>25]);
-            $this->l_name = new CharField(['max_length'=>25, 'form_widget'=>'textarea']);
-            $this->password = new CharField(['max_length'=>65]);
-            $this->age = new CharField(['max_length'=>65, 'form_widget'=>'currency', 'empty_label'=>'%%%%']);
-            $this->email = new EmailField();
-            $this->roles = new ManyToMany(['model'=>'role']); // Many To Many Relationship roles model
+            $this->username = ORM::CharField(['max_length'=>25]);
+            $this->f_name = ORM::CharField(['max_length'=>25]);
+            $this->l_name = ORM::CharField(['max_length'=>25, 'form_widget'=>'textarea']);
+            $this->password = ORM::CharField(['max_length'=>65]);
+            $this->age = ORM::CharField(['max_length'=>65, 'form_widget'=>'currency', 'empty_label'=>'%%%%']);
+            $this->email = ORM::EmailField();
+            $this->roles = ORM::ManyToMany(['model'=>'role']); // Many To Many Relationship roles model
         }
     }
     
     class Role extends PModel{
     
         public function fields(){
-            $this->name = new CharField(['max_length'=>25]);
-            $this->created_on = new DateTimeField(['on_creation'=>TRUE]);
-            $this->updated_on = new DateTimeField(['on_update'=>TRUE]);
+            $this->name = ORM::CharField(['max_length'=>25]);
+            $this->created_on = ORM::DateTimeField(['on_creation'=>TRUE]);
+            $this->updated_on = ORM::DateTimeField(['on_update'=>TRUE]);
         }
     }
     
     class Profile extends PModel{
     
         public function fields(){
-            $this->user = new OneToOneField(['model'=>'user', 'primary_key'=>TRUE]); // One To One Relationship to user model
-            $this->town = new CharField(['max_length'=>30, 'db_index'=>TRUE]);
-            $this->country = new CharField(['max_length'=>30, 'unique'=>TRUE,'null'=>FALSE, 'default'=>'kenya']);
-            $this->box = new CharField(['max_length'=>30]);
-            $this->code = new CharField(['max_length'=>30]); 
-            $this->ceo = new ForeignKey(['model'=>'user']);  // One To Many Relationship to user model
+            $this->user = ORM::OneToOneField(['model'=>'user', 'primary_key'=>TRUE]); // One To One Relationship to user model
+            $this->town = ORM::CharField(['max_length'=>30, 'db_index'=>TRUE]);
+            $this->country = ORM::CharField(['max_length'=>30, 'unique'=>TRUE,'null'=>FALSE, 'default'=>'kenya']);
+            $this->box = ORM::CharField(['max_length'=>30]);
+            $this->code = ORM::CharField(['max_length'=>30]); 
+            $this->ceo = ORM::ForeignKey(['model'=>'user']);  // One To Many Relationship to user model
         }
     
     } 
+     
     
 The above 3 methods extend **PModel** , Extending this model requires that you implement the **fields()** method.
 The Main purpose of this method is to create fields that the model will use to map to database table columns.

@@ -1,7 +1,7 @@
 {
   "name": "eddmash/powerorm",
   "type": "CodeIgniter-library",
-  "keywords": ["orm", "CodeIgniter", "form"],
+  "keywords": ["codeigniter", "orm", "form", "migrations"],
   "description": "A very simple but effective codeignter orm",
   "homepage": "https://github.com/eddmash/powerorm",
   "license": "MIT",

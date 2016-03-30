@@ -6,22 +6,118 @@ use powerorm\exceptions\DuplicateField;
 use powerorm\exceptions\FormException;
 use powerorm\exceptions\OrmExceptions;
 use powerorm\exceptions\ValueError;
-use powerorm\queries\Queryset;
 
 /**
- * Class Form
+ * A class for generating forms based on the models.
+ *
+ * We will be using the example below for explanation.
+ *
+ * <h4><strong>Using form in the Controller</strong></h4>
+ *
+ * Once the model has been load, you can pass it to the view like and other variable
+ * <pre><code>class User_controller extends CI_Controller{
+ *          public function login(){
+ *              $form_builder = $this->user_model->form_builder();
+ *              $form_builder->only(['username', 'password']);
+ *              $form_builder->customize([
+ *                          'username'=>['attrs'=>['placeholder'=>'username.....']],
+ *                          'password'=>['type'=>'password',
+ *                                          'attrs'=>['placeholder'=>'password...']]
+ *              ]);
+ *              $form = $form_builder->form();
+ *
+ *              // check model is valid
+ *              if($form->is_valid()){
+ *                  $username = $form->username;
+ *                  $password = $form->password;
+ *
+ *                  // authorize user with there credentials
+ *                  // check that use was authorized
+ *                  if($this->auth->login($username, $password)){
+ *                      // redirect to set_page
+ *                      redirect('profile');
+ *                  }
+ *              }
+ *
+ *              $data['form'] = $form;
+ *              $data['page_title']= "Welcome Back";
+ *              $this->load->view('auth/login', $data);
+ *          }
+ *
+ * }</code></pre>
+ *
+ *
+ *
+ * <h4><strong>Using the Form on View</strong></h4>
+ *
+ * The form class provides several methods that can be used to display the generated form.
+ *
+ * The simplest way to load the form is to loop trough all the fields present in the form. as shown below
+ *
+ * <pre><code>$form->open();
+ *      foreach($form->fields as $field):
+ *          $field->errors();
+ *          $field->label();
+ *          $field->widget(array("class"=>"form-control"));
+ *      endforeach;
+ * $form->close();</code></pre>
+ *
+ * Or accessing each field individually from the form itself; as shown below:
+ *
+ * <pre><code>$form->open();
+ *          $form->label('username');
+ *          $form->widget('username', ["class"=>"form-control"]);
+ *          $form->label('password');
+ *          $form->widget('password', ["class"=>"form-control"]);
+ *          $form->label('age');
+ *          $form->widget('age', ["class"=>"form-control"]);
+ * $form->close();</code></pre>
+ *
  * @package powerorm\form
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Form{
+    /**
+     * @ignore
+     * @var \CI_Controller
+     */
     protected $_ci;
+
+    /**
+     * Holds the fields on this form.
+     * @var array
+     */
     public $fields=[];
+
+    /**
+     * @ignore
+     * @var bool
+     */
     protected $ready = FALSE;
+
+    /**
+     * @ignore
+     * @var string
+     */
     protected $form_message = '';
+
+    /**
+     * @ignore
+     * @var
+     */
     public $_is_multipart;
+
+    /**
+     * @ignore
+     * @var array
+     */
     public $initial;
 
+    /**
+     * @ignore
+     * @param array $initial
+     */
     public function __construct($initial=[]){
         $this->_ci =& get_instance();
         $this->initial = $initial;
@@ -29,9 +125,13 @@ class Form{
 
     /**
      * Gets a single field instance in the form fields array and returns it
+     * <h4>Usage</h4>
+     * if a form has a fields username, you get the field object:
+     *
+     * <pre><code>$form->get_field('username);</code></pre>
+     *
      * @param $field_name
-     * @param bool|FALSE $id
-     * @return int|null
+     * @return string
      */
     public function get_field($field_name){
 
@@ -53,7 +153,8 @@ class Form{
     }
 
     /**
-     * Creates the form opening tag
+     * Creates the form opening tag.
+     * <h4>Usage</h4>
      * @param string $action
      * @param array $attributes
      * @param array $hidden
@@ -155,6 +256,10 @@ class Form{
 
     }
 
+    /**
+     * @internal
+     * @param $model_name
+     */
     public function _load_model($model_name){
         $model_name = ucwords(strtolower($model_name));
         if(!class_exists($model_name, FALSE)):
@@ -162,6 +267,11 @@ class Form{
         endif;
     }
 
+    /**
+     * @internal
+     * @param $opts
+     * @throws ValueError
+     */
     public function _validate_field($opts){
 
         if(!isset($opts['type'])):
@@ -237,6 +347,10 @@ class Form{
         endif;
     }
 
+    /**
+     * @ignore
+     * @throws FormException
+     */
     public function validation_rules(){
         if($this->ready === FALSE):
             throw new FormException("Trying to validate a non-existent form, did you call the form() method ?");
@@ -252,6 +366,11 @@ class Form{
 
     }
 
+    /**
+     * @ignore
+     * @return mixed
+     * @throws FormException
+     */
     public function validate(){
         // load all the field validations
         $this->validation_rules();
@@ -264,6 +383,10 @@ class Form{
 
     }
 
+    /**
+     *
+     * @internal
+     */
     public function _populate_fields(){
         $post = $this->_ci->input->post();
 
@@ -284,6 +407,11 @@ class Form{
 
     }
 
+    /**
+     * @internal
+     * @param $field_obj
+     * @return string
+     */
     public function _upload_value($field_obj){
 
         // if field cannot be blank and is not set
@@ -329,7 +457,7 @@ class Form{
         if(!preg_match('/(.)*\/$/', $field_obj->upload_to)):
             $field_obj->upload_to = $field_obj->upload_to.DIRECTORY_SEPARATOR;
         endif;
-        
+
         // set the upload directory
         if(!empty($field_obj->upload_to)):
             $this->_ci->upload->upload_path = $this->_ci->upload->upload_path.$field_obj->upload_to;
@@ -358,6 +486,10 @@ class Form{
         return $field_obj->upload_to.$this->_ci->upload->data('file_name');
     }
 
+    /**
+     * @internal
+     * @return bool
+     */
     public function _do_upload(){
         return FALSE;
     }
@@ -366,6 +498,10 @@ class Form{
         return $this->validate();
     }
 
+    /**
+     * @internal
+     * @return mixed
+     */
     public function _errors(){
         $validation_object =&_get_validation_object();
         return $validation_object->error_array();
@@ -380,6 +516,11 @@ class Form{
         endif;
     }
 
+    /**
+     * @ignore
+     * @param $field_name
+     * @return mixed
+     */
     public function __get($field_name){
 
         if(array_key_exists($field_name, $this->fields)):
@@ -387,6 +528,11 @@ class Form{
         endif;
     }
 
+    /**
+     * @ignore
+     * @param $field_name
+     * @param $field_value
+     */
     public function __set($field_name, $field_value){
 
         if(array_key_exists($field_name, $this->fields)):
@@ -394,6 +540,11 @@ class Form{
         endif;
     }
 
+    /**
+     * @ignore
+     * @param $field
+     * @return bool
+     */
     public function __isset($field){
         if(empty($this->fields)):
             return FALSE;
@@ -402,6 +553,11 @@ class Form{
 
     }
 
+    /**
+     * @ignore
+     * @param $name
+     * @return string
+     */
     public function _stable_name($name){
         return strtolower($name);
     }
@@ -410,14 +566,53 @@ class Form{
 
 class ModelForm extends Form{
 
+    /**
+     * @internal
+     * @var
+     */
     public $model_object;
+
+    /**
+     * @internal
+     * @var
+     */
     public $fields;
+
+    /**
+     * @internal
+     * @var
+     */
     public $none_model_fields;
+
+    /**
+     * @internal
+     * @var
+     */
     protected $field_customize;
+
+    /**
+     * @internal
+     * @var
+     */
     private $only;
+
+    /**
+     * @internal
+     * @var
+     */
     private $ignored;
+
+    /**
+     * @internal
+     * @var
+     */
     private $extra_fields;
 
+    /**
+     * @ignore
+     * @param PModel $context
+     * @param array $initial
+     */
     public function __construct(PModel $context, $initial=[]){
         parent::__construct($initial);
         $this->model_object = $context;
@@ -582,7 +777,13 @@ class ModelForm extends Form{
 
         return parent::form();
     }
-    
+
+    /**
+     * @ignore
+     * @param $field_name
+     * @param $from_model
+     * @return mixed
+     */
     public function _merge_options($field_name, $from_model){
 
         if(!empty($this->field_customize) && array_key_exists($field_name, $this->field_customize)):
@@ -593,6 +794,12 @@ class ModelForm extends Form{
         return $from_model;
     }
 
+    /**
+     * @ignore
+     * @param $new
+     * @param $old
+     * @return mixed
+     */
     public function _combine_opts($new, $old){
 
         foreach ($new as $key=>$value) :
@@ -627,6 +834,10 @@ class ModelForm extends Form{
         return $this->model_object->save();
     }
 
+    /**
+     * @ignore
+     * @return string
+     */
     public function __toString(){
         return sprintf('< %s Form >', ucwords(strtolower($this->model_object->meta->model_name)));
     }
