@@ -27,6 +27,7 @@ class RelatedField extends Field{
     public $empty_label  = '---------';
     public $form_display_field;
     public $form_value_field;
+    public $default;
 
     public function __construct($field_options = []){
 

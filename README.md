@@ -89,7 +89,7 @@ To Start using the orm, create models as you normally would in CodeIgniter and e
     class Profile extends PModel{
     
         public function fields(){
-            $this->user = ORM::OneToOneField(['model'=>'user', 'primary_key'=>TRUE]); // One To One Relationship to user model
+            $this->user = ORM::OneToOne(['model'=>'user', 'primary_key'=>TRUE]); // One To One Relationship to user model
             $this->town = ORM::CharField(['max_length'=>30, 'db_index'=>TRUE]);
             $this->country = ORM::CharField(['max_length'=>30, 'unique'=>TRUE,'null'=>FALSE, 'default'=>'kenya']);
             $this->box = ORM::CharField(['max_length'=>30]);

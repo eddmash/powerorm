@@ -375,6 +375,8 @@ class DecimalField extends Field{
  */
 class IntegerField extends Field{
 
+    public $default;
+
     public function __construct($options=[]){
         parent::__construct($options);
         if(!$this->signed || $this->signed == 'UNSIGNED'):
