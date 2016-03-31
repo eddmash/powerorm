@@ -15,19 +15,21 @@ abstract class Field{
     public $type;
     public $null=FALSE;
     public $unique=FALSE;
-    public $max_length=NULL;
+    public $max_length;
     public $primary_key=FALSE;
     public $auto=FALSE;
     public $default;
     public $signed=FALSE;
-    public $constraint_name;
     public $db_column=Null;
     public $db_index=Null;
+    public $container_model;
+
+    // form specifics
     public $form_blank=FALSE;
     public $choices;
     public $form_widget;
     public $empty_label;
-    public $container_model;
+    public $help_text;
 
     public function __construct($field_options = []){
 
@@ -88,15 +90,19 @@ abstract class Field{
             $this->constraint_name = $this->constraint_name($prefix);
         endif;
 
-        $opts = get_object_vars($this);
-
-        unset($opts['form_blank']);
-        unset($opts['choices']);
-        unset($opts['form_widget']);
-        unset($opts['empty_label']);
-        unset($opts['form_display_field']);
-        unset($opts['form_value_field']);
-        unset($opts['choices']);
+        $opts = [];
+        $opts['name'] = $this->name;
+        $opts['type'] = $this->type;
+        $opts['unique'] = $this->unique;
+        $opts['null'] = $this->null;
+        $opts['default'] = $this->default;
+        $opts['signed'] = $this->signed;
+        $opts['auto'] = $this->auto;
+        $opts['primary_key'] = $this->primary_key;
+        $opts['max_length'] = $this->max_length;
+        $opts['db_column'] = $this->db_column;
+        $opts['db_index'] = $this->db_index;
+        $opts['container_model'] = $this->container_model;
 
         return $opts;
     }
@@ -125,6 +131,7 @@ abstract class Field{
         $opts['blank'] = $this->form_blank;
         $opts['empty_label'] = $this->empty_label;
         $opts['choices'] = $this->choices;
+        $opts['help_text'] = $this->help_text;
 
         return $opts;
     }
@@ -274,14 +281,6 @@ class FileField extends CharField{
         return [];
     }
 
-    public function options(){
-        $opts = parent::options();
-        unset($opts['passed_unique']);
-        unset($opts['passed_pk']);
-        unset($opts['upload_to']);
-        return $opts;
-    }
-
     public function form_field(){
 
         $opts = parent::form_field();
@@ -343,13 +342,15 @@ class DecimalField extends Field{
 
         return $checks;
     }
+
     public function _decimal_places_check(){
         if(empty($this->decimal_places)):
-            return [check_error($this, sprintf("%s expects 'decimal_place' attribute to be set", get_class($this)))];
+            return [\powerorm\checks\check_error($this,
+                sprintf("%s expects 'decimal_place' attribute to be set", get_class($this)))];
         endif;
 
-        if(!is_numeric($this->decimal_places) && $this->decimal_places < 0):
-            return [check_error($this,
+        if(!is_numeric($this->decimal_places) || $this->decimal_places < 0):
+            return [\powerorm\checks\check_error($this,
                 sprintf("%s expects 'decimal_place' attribute to be a positive integer", get_class($this)))];
         endif;
 
@@ -358,15 +359,29 @@ class DecimalField extends Field{
 
     public function _check_max_digits(){
         if(empty($this->max_digits)):
-            return [check_error($this, sprintf("%s expects 'max_digits' attribute to be set", get_class($this)))];
+            return [\powerorm\checks\check_error($this,
+                sprintf("%s expects 'max_digits' attribute to be set", get_class($this)))];
         endif;
 
-        if(!is_numeric($this->max_digits) && $this->decimal_places < 0):
-            return [check_error($this,
+        if(!is_numeric($this->max_digits) || $this->max_digits < 0):
+            return [\powerorm\checks\check_error($this,
                 sprintf("%s expects 'max_digits' attribute to be a positive integer", get_class($this)))];
+        endif;
+        
+        // ensure max_digits is greater than decimal_places
+        if($this->max_digits < $this->decimal_places):
+            return [\powerorm\checks\check_error($this,
+                sprintf("%s expects 'max_digits' to be greate than 'decimal_places' ", get_class($this)))];
         endif;
 
         return [];
+    }
+
+    public function options(){
+        $opts = parent::options();
+        $opts['max_digits'] = $this->max_digits;
+        $opts['decimal_places'] = $this->decimal_places;
+        return $opts;
     }
 }
 

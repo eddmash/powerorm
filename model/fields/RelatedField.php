@@ -65,6 +65,7 @@ class RelatedField extends Field{
  * Class ForeignKey
  */
 class ForeignKey extends RelatedField{
+    public $constraint_name;
 
     public function __construct($field_options = []){
         parent::__construct($field_options);
@@ -75,7 +76,10 @@ class ForeignKey extends RelatedField{
         $this->type = $this->related_pk()->type;
         $this->signed = $this->related_pk()->signed;
         $this->db_column = $this->db_column_name();
-        return parent::options();
+
+        $opts = parent::options();
+        $opts['constraint_name'] = $this->constraint_name;
+        return $opts;
     }
 
     public function db_column_name(){
@@ -184,6 +188,12 @@ class ManyToMany extends RelatedField{
                 sprintf('%2$s field creates relationship to model `%1$s` that does not exist',
                     $this->model, get_class($this)));
         endif;
+    }
+
+    public function options(){
+        $opts = parent::options();
+        $opts['through'] = $this->through;
+        return $opts;
     }
 
 }

@@ -36,6 +36,10 @@ This means that any configuration made for the following libraries will affect h
 
 - The QueryBuilder Class.
 
+- The Form helpers.
+
+- The Form validation class.
+
 # Configuration
  - Enable migrations 
     Locate `application/config/migration.php` and enable migration. ```$config['migration_enabled'] = TRUE;```
@@ -153,74 +157,99 @@ Looking at the roles model, it will generate a migration file that looks as show
 
     // Migration for the model role
     
+    <?php
+    
     use powerorm\migrations\RunSql;
     
-    class Migration_Create_Role_1456906961_1171 extends CI_Migration{
+    class Migration_Create_Role_1458811308_1121 extends CI_Migration{
     
-        public $model= 'role';
-        public $depends= [];
+    	public $model= 'role';
+    	public $depends= [];
     
-        public function up(){
-            RunSql::add_field("name VARCHAR(25)  NULL");
-            RunSql::add_field("id INT UNSIGNED NOT NULL AUTO_INCREMENT");
-            RunSql::add_field_constraint("PRIMARY KEY (id)");
-            RunSql::create_table("ormtest_role", TRUE, ['ENGINE'=>'InnoDB']);
-        }
+    	public function up(){
+    		RunSql::add_field("name VARCHAR(30) NOT NULL");
+    		RunSql::add_field("slug VARCHAR(30) NOT NULL");
+    		RunSql::add_field("id INT NOT NULL AUTO_INCREMENT");
+    		RunSql::add_field_constraint("PRIMARY KEY (id)");
+    		RunSql::create_table("role", TRUE, ['ENGINE'=>'InnoDB']);
+    	}
     
-        public function down(){
-            RunSql::drop_table("ormtest_role", TRUE);
-        }
+    	public function down(){
+    		RunSql::drop_table("role", TRUE);
+    	}
     
-        public function state(){
-            return	[
-                'model_name'=>'role',
-                'operation'=>'add_model',
-                'fields'=>	[
-                    'name'=>	[
-                        'field_options'=>	[
-                            'name'=>'name',
-                            'type'=>'VARCHAR(25)',
-                            'null'=> TRUE,
-                            'unique'=> FALSE,
-                            'max_length'=>25,
-                            'primary_key'=> FALSE,
-                            'auto'=> FALSE,
-                            'default'=> NULL,
-                            'signed'=> NULL,
-                            'constraint_name'=>'',
-                            'db_column'=>'name',
-                            'db_index'=> NULL,
-                        ],
-                        'class'=>'CharField',
-                    ],
-                    'id'=>	[
-                        'field_options'=>	[
-                            'name'=>'id',
-                            'type'=>'INT',
-                            'null'=> FALSE,
-                            'unique'=> FALSE,
-                            'max_length'=> NULL,
-                            'primary_key'=> TRUE,
-                            'auto'=> TRUE,
-                            'default'=> NULL,
-                            'signed'=>'UNSIGNED',
-                            'constraint_name'=>'',
-                            'db_column'=>'id',
-                            'db_index'=> NULL,
-                        ],
-                        'class'=>'AutoField',
-                    ],
-                ],
-            ];
-        }
+    	public function state(){
+    		return	[
+    			'model_name'=>'role',
+    			'operation'=>'add_model',
+    			'table_name'=>'role',
+    			'fields'=>	[
+    				'name'=>	[
+    					'field_options'=>	[
+    						'name'=>'name',
+    						'type'=>'VARCHAR(30)',
+    						'null'=> FALSE,
+    						'unique'=> FALSE,
+    						'max_length'=>30,
+    						'primary_key'=> FALSE,
+    						'auto'=> FALSE,
+    						'default'=> NULL,
+    						'signed'=> FALSE,
+    						'constraint_name'=>'',
+    						'db_column'=>'name',
+    						'db_index'=> NULL,
+    						'container_model'=>'role',
+    					],
+    					'class'=>'powerorm\model\field\CharField',
+    				],
+    				'slug'=>	[
+    					'field_options'=>	[
+    						'name'=>'slug',
+    						'type'=>'VARCHAR(30)',
+    						'null'=> FALSE,
+    						'unique'=> FALSE,
+    						'max_length'=>30,
+    						'primary_key'=> FALSE,
+    						'auto'=> FALSE,
+    						'default'=> NULL,
+    						'signed'=> FALSE,
+    						'constraint_name'=>'',
+    						'db_column'=>'slug',
+    						'db_index'=> NULL,
+    						'container_model'=>'role',
+    					],
+    					'class'=>'powerorm\model\field\CharField',
+    				],
+    				'id'=>	[
+    					'field_options'=>	[
+    						'name'=>'id',
+    						'type'=>'INT',
+    						'null'=> FALSE,
+    						'unique'=> FALSE,
+    						'max_length'=> NULL,
+    						'primary_key'=> TRUE,
+    						'auto'=> TRUE,
+    						'default'=> NULL,
+    						'signed'=> FALSE,
+    						'constraint_name'=>'',
+    						'db_column'=>'id',
+    						'db_index'=> NULL,
+    						'container_model'=>'role',
+    					],
+    					'class'=>'powerorm\model\field\AutoField',
+    				],
+    			],
+    		];
+    	}
     
     }
+
 
 ## 3. Querying
 The PModel class also provides several methods that can be used to interact with the database tables represented by 
 each model.
 
-e.g. inside the controller
+e.g. inside any controller method
 
      public function index(){
         $this->load->model('user');
@@ -240,10 +269,11 @@ e.g. inside the controller
         $user1->save();
      }
 
+see more methods and examples here http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html
 ## 4. Form
-The PModel also provides a method that generates a form for a specific model.
+The PModel also provides a form_builder that helps you generate and customize form for a specific model.
 
-e.g. inside the controller
+e.g. inside any controller method
 
     public function index(){
         $this->load->model('user');
@@ -251,7 +281,7 @@ e.g. inside the controller
         // this will generate a general form for the model
          $form_builder = $this->user->form_builder(); // get the form builder
         
-        // this will generate a form loaded with the values of this model
+        // this will generate a form loaded with the values of this model e.g. when updating
         $form_builder = $this->user->get(1)->form_builder(); // get the form builder
         
         
@@ -265,6 +295,33 @@ e.g. inside the controller
         $this->load->view('user_view', $data);
     }
 
+To use the form on the view
+
+    $form->open();
+        foreach($form->fields as $field):
+            $field->errors();
+            $field->label();
+            $field->widget(array("class"=>"form-control"));
+        endforeach;
+    $form->close();</code></pre>
+
+Or accessing each field individually from the form itself; as shown below:
+
+        $form->open();
+            $form->label('username');
+            $form->widget('username', ["class"=>"form-control"]);
+            
+            $form->label('password');
+            $form->widget('password', ["class"=>"form-control"]);
+            
+            $form->label('age');
+            $form->widget('age', ["class"=>"form-control"]);
+            
+        $form->close();</code></pre>
+ 
+see more form builder methods and examples here http://eddmash.github.io/powerorm/docs/classes/powerorm.form.ModelForm.html
+ 
+
 # Find detailed information here
 
 http://eddmash.github.io/powerorm/docs/classes/Orm.html
@@ -272,6 +329,6 @@ http://eddmash.github.io/powerorm/docs/classes/Orm.html
 # Requirements on 
  - CodeIgniter 3.0+
  - php 5.4+
- - on MYsql 5.6.5 
+ - on MYsql 5.5+
  
  

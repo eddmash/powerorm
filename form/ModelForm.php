@@ -401,6 +401,7 @@ class Form{
             if(!array_key_exists($field_name,$post)):
                 continue;
             endif;
+
             $field_obj->set_value($post[$field_name]);
         endforeach;
 
@@ -511,7 +512,7 @@ class Form{
 
         if(!empty($this->_errors())):
 
-            return '<p class="alert alert-danger">'.implode("\n", $this->_errors()). '</p>';
+            return '<p class="alert alert-danger">'.implode("<br>", $this->_errors()). '</p>';
 
         endif;
     }

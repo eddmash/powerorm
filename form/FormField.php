@@ -222,6 +222,7 @@ class FormField{
         endif;
 
         $rules = [];
+        $rules[] = $this->_type_validation();
 
         if(!empty($this->max_length)):
             $rules[] = 'max_length['.$this->max_length.']';
@@ -231,9 +232,6 @@ class FormField{
             $rules[] = 'required';
         endif;
 
-        if($this->type=='email'):
-            $rules[] = 'valid_email';
-        endif;
 
         if(!empty($this->validations)):
             foreach ($this->validations as $rule) :
@@ -248,6 +246,24 @@ class FormField{
         endif;
 
         return $this->_ensure_rule_exists($rules);
+    }
+
+    /**
+     * @ignore
+     */
+    public function _type_validation(){
+        $rule = '';
+        
+        if($this->type == 'number'):
+            $rule = 'numeric';
+        endif;
+
+
+        if($this->type=='email'):
+            $rule = 'valid_email';
+        endif;
+        
+        return $rule;
     }
 
     /**
@@ -362,6 +378,7 @@ class FormField{
         endif;
 
         $attrs = array(
+            'type'=> $this->type,
             'name' => $this->get_widget_name(),
             'placeholder' => ucwords(str_replace('_', ' ', $this->name.' ...')),
             'id'  =>  $this->name,
@@ -518,7 +535,8 @@ class FormField{
      */
     public function _field_errors(){
         $errors = $this->_errors();
-        if(empty($errrors)):
+
+        if(empty($errors)):
             return '';
         endif;
 
