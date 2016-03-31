@@ -110,6 +110,7 @@ The Main purpose of this method is to create fields that the model will use to m
 The orm provides different field type that represent the different types of database columns 
 e.g. **CharField** represent **varchar** type,  .
 
+Learn more about fields here http://eddmash.github.io/powerorm/docs/namespaces/powerorm.model.field.html
 
 
 

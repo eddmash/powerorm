@@ -13,26 +13,151 @@ use powerorm\form;
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class Field{
+
+    /**
+     * @ignore
+     * @var null
+     */
     public $name=Null;
+
+    /**
+     * @ignore
+     * @var string
+     */
     public $type;
+
+    /**
+     * If True, powerorm will store empty values as NULL in the database. Default is False.
+     *
+     * @var bool
+     */
     public $null=FALSE;
+
+    /**
+     * If True, this field must be unique throughout the table.
+     *
+     * This is enforced at the database level and by model validation.
+     *
+     * If you try to save a model with a duplicate value in a unique field,
+     *
+     * This option is valid on all field types except ManyToManyField, OneToOneField, and FileField.
+     *
+     * Note that when unique is True, you don’t need to specify db_index, because unique implies the creation of an index.
+     *
+     * @var bool
+     */
     public $unique=FALSE;
-    public $max_length;
+
+    /**
+     * If True, this field is the primary key for the model.
+     *
+     * If you don’t specify primary_key=True for any field in your model, Poweroem will automatically add an AutoField
+     * to hold the primary key,
+     *
+     * so you don’t need to set primary_key=True on any of your fields unless you want to override the default
+     * primary-key behavior.
+     *
+     * primary_key=True implies null=False and unique=True. Only one primary key is allowed on an object.
+     *
+     * The primary key field is read-only. If you change the value of the primary key on an existing object and then
+     * save it, a new object will be created alongside the old one.
+     *
+     * @var bool
+     */
     public $primary_key=FALSE;
-    public $auto=FALSE;
+
+    /**
+     * The default value for the field.
+     * @var
+     */
     public $default;
     public $signed=FALSE;
     public $db_column=Null;
+
+    /**
+     * If True, this field will be indexed.
+     * @var null
+     */
     public $db_index=Null;
+
+    /**
+     * the model that this field belongs to.
+     * @ignore
+     * @var
+     */
     public $container_model;
 
     // form specifics
+
+    /**
+     * If True, the field is allowed to be blank on form. Default is False.
+     *
+     * Note that this is different than null. null is purely database-related,
+     *
+     * whereas form_blank is validation-related.
+     *
+     * If a field has form_blank=True, form validation will allow entry of an empty value.
+     *
+     * If a field has form_blank=False, the field will be required.
+     *
+     * @var bool
+     */
     public $form_blank=FALSE;
+
+    /**
+     * An array consisting of items to use as choices for this field.
+     *
+     * If this is given, the default form widget will be a select box with these choices instead of the
+     * standard text field.
+     *
+     * The first element in each array is the actual value to be set on the model, and the second element is the
+     * human-readable name.
+     *
+     * For example:
+     * $gender_choices = [
+     *      'm'=>'Male',
+     *      'f'=>'Female',
+     * ]
+     *
+     * $gender =  ORM::CharField(['max_length'=2, 'choices'=$gender_choices])
+     *
+     * @var
+     *
+     */
     public $choices;
+
+    /**
+     * Set the html form type to use for this form.
+     * @var
+     */
     public $form_widget;
+
+    /**
+     * Used for forms with choices, this set the default option to show
+     *
+     *
+     * @var
+     */
     public $empty_label;
+
+    /**
+     * Extra “help” text to be displayed with the form widget.
+     * It’s useful for documentation even if your field isn’t used on a form.
+     *
+     * Note that this value is not HTML-escaped in automatically-generated forms.
+     * This lets you include HTML in help_text if you so desire.
+     *
+     * For example:
+     *  <pre><code>help_text="Please use the following format: <em>YYYY-MM-DD</em>."</code></pre>
+     *
+     * @var
+     */
     public $help_text;
 
+    /**
+     * @ignore
+     * @param array $field_options
+     */
     public function __construct($field_options = []){
 
         // if some passes type remove it,
@@ -61,16 +186,24 @@ abstract class Field{
 
     /**
      * Calculates the actual column name in the database, especially useful for foreign keys
-     * @return null
+     * @return string
      */
     public function db_column_name(){
         return $this->name;
     }
 
+    /**
+     *
+     * @ignore
+     */
     public function __validate_name(){
 
     }
 
+    /**
+     * Returns all the necessary items needed for recreation of the field again.
+     * @return array
+     */
     public function skeleton(){
         return [
             'field_options'=>$this->options(),
@@ -78,6 +211,10 @@ abstract class Field{
         ];
     }
 
+    /**
+     * Returns all the options that are necessary to represent this field on the database.
+     * @return array
+     */
     public function options(){
         $prefix = '';
         if($this->unique):
@@ -99,9 +236,7 @@ abstract class Field{
         $opts['null'] = $this->null;
         $opts['default'] = $this->default;
         $opts['signed'] = $this->signed;
-        $opts['auto'] = $this->auto;
         $opts['primary_key'] = $this->primary_key;
-        $opts['max_length'] = $this->max_length;
         $opts['db_column'] = $this->db_column;
         $opts['db_index'] = $this->db_index;
         $opts['container_model'] = $this->container_model;
@@ -109,6 +244,11 @@ abstract class Field{
         return $opts;
     }
 
+    /**
+     * returns the constriain name especially in relationship fields.
+     * @param $prefix
+     * @return string
+     */
     public function constraint_name($prefix){
         if(empty($prefix)):
             return '';
@@ -117,11 +257,19 @@ abstract class Field{
         return sprintf('%1$s_%2$s_%3$s', $prefix, strtolower($this->name), mt_rand());
     }
 
+    /**
+     * Returns all the options necessary to represent this field on a HTML Form.
+     * @return array
+     */
     public function form_field(){
 
         return $this->_prepare_form_field();
     }
 
+    /**
+     * @ignore
+     * @return array
+     */
     public function _prepare_form_field(){
 
         $opts = [];
@@ -138,10 +286,18 @@ abstract class Field{
         return $opts;
     }
 
+    /**
+     * return the database column that this field represents.
+     * @return string
+     */
     public function db_type(){
         return '';
     }
 
+    /**
+     * returns the HTML Form type that this field represents.
+     * @return string
+     */
     public function form_type(){
 
         return 'text';
@@ -153,22 +309,37 @@ abstract class Field{
         endif;
     }
 
+    /**
+     * @ignore
+     * @return string
+     */
     public function __toString(){
         return ''.$this->name;
     }
 
+    /**
+     * @ignore
+     * @param $context
+     * @param $value
+     */
     public function clean($context, $value){
 
     }
 
     /**
-     * Should return a list of checks Message instances.
+     * Should return a list of \powerorm\checks\Message instances. used in migrations.
      * @return array
      */
     public function check(){
         return [];
     }
 
+    /**
+     * @ignore
+     * @param $checks
+     * @param $new_check
+     * @return array
+     */
     public function add_check($checks, $new_check){
         if(!empty($new_check)):
             $checks = array_merge($checks, $new_check);
@@ -176,6 +347,9 @@ abstract class Field{
         return $checks;
     }
 
+    /**
+     * @ignore
+     */
     public function validate(){
 
     }
@@ -195,6 +369,8 @@ abstract class Field{
  *          The max_length is enforced at the database level and in form validation.
  */
 class CharField extends Field{
+
+    public $max_length;
 
     public function __construct($options=[]){
 
@@ -234,6 +410,14 @@ class CharField extends Field{
         if(!empty($this->max_length) && $this->max_length < 0):
             return [\powerorm\checks\check_error($this, sprintf('%s requires `max_length` to be a positive integer', get_class($this)))];
         endif;
+    }
+
+    public function options(){
+        $opts = parent::options();
+
+        $opts['max_length'] = $this->max_length;
+
+        return $opts;
     }
 
 }
@@ -480,10 +664,19 @@ class IntegerField extends Field{
  */
 class AutoField extends IntegerField{
 
+    public $auto=FALSE;
+
     public function __construct($options=[]){
         parent::__construct($options);
         $this->auto = TRUE;
         $this->signed = FALSE;
+    }
+
+    public function options(){
+        $opts = parent::options();
+
+        $opts['auto'] = $this->auto;
+        return $opts;
     }
 }
 
