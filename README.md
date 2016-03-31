@@ -284,10 +284,11 @@ e.g. inside any controller method
         // this will generate a form loaded with the values of this model e.g. when updating
         $form_builder = $this->user->get(1)->form_builder(); // get the form builder
         
+        // build the form using only password and username
+        $form_builder->only(['password','username']);  
         
-        $form_builder->only(['password','username']);  // build the form using only password and username
-        
-        $form = $form_builder->form(); // get the form
+        // get the form
+        $form = $form_builder->form(); 
         
         $data['form'] = $form;
         
@@ -303,7 +304,7 @@ To use the form on the view
             $field->label();
             $field->widget(array("class"=>"form-control"));
         endforeach;
-    $form->close();</code></pre>
+    $form->close(); 
 
 Or accessing each field individually from the form itself; as shown below:
 
@@ -317,7 +318,7 @@ Or accessing each field individually from the form itself; as shown below:
             $form->label('age');
             $form->widget('age', ["class"=>"form-control"]);
             
-        $form->close();</code></pre>
+        $form->close(); 
  
 see more form builder methods and examples here http://eddmash.github.io/powerorm/docs/classes/powerorm.form.ModelForm.html
  
