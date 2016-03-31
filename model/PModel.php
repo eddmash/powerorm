@@ -249,11 +249,53 @@ abstract class PModel extends \CI_Model
     }
 
     /**
-     * @ignore
+     * Gets the first record in the table represented by this model.
+     *
+     * <h4>USAGE:</h4>
+     *
+     * $users = $this->user_model->first();
+     *
+     * echo $users->username;
+     *
+     * @param array $opts
+     * @return $this
+     */
+    public function first($opts =[]){
+        return $this->queryset($opts)->first();
+    }
+
+    /**
+     * Gets the last record in the table represented by this model.
+     *
+     * <h4>USAGE:</h4>
+     *
+     * $users = $this->user_model->last();
+     *
+     * echo $users->username;
+     *
+     * @param array $opts
+     * @return $this
+     */
+    public function last($opts =[]){
+        return $this->queryset($opts)->last();
+    }
+
+    /**
+     * This method clears all the records in the database table represented by the model.
+     *
+     * <h4>USAGE:</h4>
+     *
+     * Deleting all the records.
+     *
+     * <pre><code>$this->role->delete()</code></pre>
+     *
+     * <strong>NB</strong> also consider using the Queryset delete().
+     * {@link }
+     *
      * @param array $opts
      */
     public function delete($opts=[]){
-        $this->queryset($opts)->delete();
+        $this->queryset($opts)->clear();
     }
 
     /**

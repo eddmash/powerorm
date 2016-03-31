@@ -27,7 +27,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Class for doing database lookups, The look up is done Lazily i.e. Lazy Loading.
  *
  * This class provides several methods for interacting with the database with one
- * important thing to note is that some.
+ * important thing to note is that some methods return a Queryset object while other return the expected result object.
  *
  * @package powerorm\queries
  * @since   1.0.0
@@ -301,7 +301,7 @@ class Queryset implements \IteratorAggregate, \Countable
      *
      * @param array|int $values an array of field and the value to look for, or an integer-primary key.
      * @see filter() To fetch more than one item based on some conditions.
-     * @param $values
+     * @param array $values
      * @return array|bool|object
      * @throws MultipleObjectsReturned
      * @throws ObjectDoesNotExist
@@ -352,11 +352,14 @@ class Queryset implements \IteratorAggregate, \Countable
      *  <pre><code>
      *  $roles = $this->user_model->filter(array("role::name"=>"admin"));</code></pre>
      *
+     * <h4>Be More Specific</h4>
+     * You can be more specifics on your conditions by using the lookup options available to you.
+     * $this->user_model->filter('username__contains'=>'eri');
      *
-     * @param array $where the where condition e.g. array('username'=>'john', 'password'="ad+as')
+     * this will run the following sql `select * from user_table where username like %eri%`
+     *
+     * @param array $conditions the where condition e.g. array('username'=>'john', 'password'="ad+as')
      * @see get() To fetch only one item.
-     * @param string $foreign_key the name of the foreign key if filtering by related, defaults to adding
-     * `tablename_primarykey'
      * @return Queryset
      * @throws OrmExceptions
      */
@@ -395,7 +398,7 @@ class Queryset implements \IteratorAggregate, \Countable
      *
      * <pre><code>$this->role->exclude(['name'=>'ceo'])</code></pre>
      *
-     * @param $conditions
+     * @param array $conditions
      * @return $this
      * @throws ValueError
      */
@@ -477,7 +480,7 @@ class Queryset implements \IteratorAggregate, \Countable
      *
      * <pre><code>$this->countries->all()->group_by(['independence_year']);</code></pre>
      *
-     * @param $condition
+     * @param array $condition
      * @return $this
      * @throws ValueError
      */
@@ -612,6 +615,42 @@ class Queryset implements \IteratorAggregate, \Countable
         return $this->count();
     }
 
+
+    /**
+     * Gets the first record in the current Queryset.
+     *
+     * <h4>USAGE:</h4>
+     *
+     * $users = $this->user_model->filter(['username__contains'=>'d'])->first();
+     *
+     * echo $users->username;
+     * @return $this
+     */
+    public function first(){
+        $this->_output_type = 'first_row';
+        $this->_from($this->_active_model_object->get_table_name());
+        return $this;
+    }
+
+
+    /**
+     * Gets the last record in the current Queryset.
+     *
+     * <h4>USAGE:</h4>
+     *
+     * $user = $this->user_model->filter(['username__contains'=>'d'])->last();
+     *
+     * echo $user->username;
+     *
+     * @return $this
+     */
+    public function last(){
+        $this->_output_type = 'last_row';
+        $this->_from($this->_active_model_object->get_table_name());
+        return $this;
+    }
+
+
     /**
      *@ignore
      */
@@ -621,24 +660,45 @@ class Queryset implements \IteratorAggregate, \Countable
     }
 
     /**
-     *@ignore
+     * Deletes records in the Queryset.
+     *
+     * The following will through an exception
+     *
+     * <pre><code>$this->role->all()->delete()</code></pre>
+     *
+     * <h4>USAGE</h4>
+     *
+     * Deleting everything
+     *
+     * <pre><code>$this->role->all()->delete()</code></pre>
+     *
+     * Deleting all the records with the first name john
+     *
+     * <pre><code>$this->user_model->filter(['username__startswith'=>'john'])->delete()</code></pre>
+     *
+     * @return int the number of records deleted.
      */
     public function delete(){
 
+        // delete records in the current Queryset
+        if(!empty($this->_where_cache)):
+            $this->_prepare_builder();
+            $this->_qbuilder->delete($this->_active_model_object->get_table_name());
+        endif;
+
+        return $this->_qbuilder->affected_rows();
     }
 
     /**
-     *@ignore
+     * This method clears all the records in the database table represented by the model.
+     * <pre><code>$this->role->delete()</code></pre>
+     * @ignore
+     * @return mixed
      */
     public function clear(){
-    }
-
-    /**
-     *@ignore
-     */
-    public function _reset(){
-
         $this->_qbuilder->empty_table($this->_active_model_object->get_table_name());
+        return $this->_qbuilder->affected_rows();
+
     }
 
     //ToDo
@@ -810,16 +870,6 @@ class Queryset implements \IteratorAggregate, \Countable
 
             $this->_fields_to_eager_load = $eager_models;
         endif;
-        return $this;
-    }
-
-    public function first(){
-        $this->_output_type = 'first_row';
-        return $this;
-    }
-
-    public function last(){
-        $this->_output_type = 'last_row';
         return $this;
     }
 

@@ -7,6 +7,8 @@ use powerorm\form;
 
 /**
  * This class represents a column in the database table.
+ *
+ * This is the parent class all the fields and should not be instantiated
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -182,7 +184,15 @@ abstract class Field{
 }
 
 /**
- * Class CharField
+ * A string field, for small- to large-sized strings. i.e. it creates SQL varchar column .
+ *
+ * For large amounts of text, use TextField.
+ *
+ * The default form input type is 'text'.
+ *
+ * CharField has one required argument:
+ *   - max_length The maximum length (in characters) of the field.
+ *          The max_length is enforced at the database level and in form validation.
  */
 class CharField extends Field{
 
@@ -228,6 +238,14 @@ class CharField extends Field{
 
 }
 
+/**
+ * Inherits from CharField.
+ * Just like CharField but ensure the input provided is a valid email.
+ *
+ * - default max_length was increased from 75 to 254 in order to be compliant with RFC3696/5321.
+ *
+ * @package powerorm\model\field
+ */
 class EmailField extends CharField{
 
     public function __construct($options=[]){
@@ -241,6 +259,17 @@ class EmailField extends CharField{
     }
 }
 
+/**
+ * Inherits from CharField.
+ *
+ * A file upload field.
+ * - The primary_key and unique arguments are not supported on this field.
+ *
+ * FileField has one optional argument:
+ *   - upload_to this is the path relative to the application base_url where the files will be uploaded.
+ *
+ * @package powerorm\model\field
+ */
 class FileField extends CharField{
     protected $passed_pk;
     protected $passed_unique;
@@ -290,6 +319,11 @@ class FileField extends CharField{
     }
 }
 
+/**
+ * Inherits all attributes and methods from FileField, but also validates that the uploaded object is a valid image.
+ *
+ * @package powerorm\model\field
+ */
 class ImageField extends FileField{
 
     public function form_type(){
@@ -298,7 +332,7 @@ class ImageField extends FileField{
 }
 
 /**
- * Class TextField
+ * A large text field. The default form widget for this field is a 'Textarea'.
  */
 class TextField extends Field{
 
@@ -319,6 +353,31 @@ class TextField extends Field{
 
 }
 
+/**
+ * A fixed-precision decimal number. SQl column DECIMAL(M,D)
+ *
+ * Has two required arguments:
+ *
+ * - max_digits
+ *
+ *    The maximum number of digits allowed in the number. Note that this number must be greater than or equal to decimal_places.
+ *
+ * - decimal_places
+ *
+ *    The number of decimal places to store with the number.
+ *
+ * For example, to store numbers up to 999 with a resolution of 2 decimal places, you’d use:
+ *
+ * ORM::DecimalField(max_digits=5, decimal_places=2)
+ *
+ * And to store numbers up to approximately one billion with a resolution of 10 decimal places:
+ *
+ * ORM::DecimalField(max_digits=19, decimal_places=10)
+ *
+ * The default form widget for this field is a 'text'.
+ *
+ * @package powerorm\model\field
+ */
 class DecimalField extends Field{
     public $max_digits;
     public $decimal_places;
@@ -386,7 +445,11 @@ class DecimalField extends Field{
 }
 
 /**
- * Class IntegerField
+ * Creates and integer column of Values ranging from -2147483648 to 2147483647.
+ *
+ * The default form widget for this field is a 'number' with a fallback on 'text' on browsers that dont support html5.
+ *
+ * @package powerorm\model\field
  */
 class IntegerField extends Field{
 
@@ -409,7 +472,11 @@ class IntegerField extends Field{
 }
 
 /**
- * Class AutoField
+ * An IntegerField that automatically increments according to available IDs.
+ * You usually won’t need to use this directly;
+ * a primary key field will automatically be added to your model if you don’t specify otherwise.
+ *
+ * @package powerorm\model\field
  */
 class AutoField extends IntegerField{
 
@@ -420,6 +487,13 @@ class AutoField extends IntegerField{
     }
 }
 
+/**
+ * A true/false field.
+ *
+ * The default form widget for this field is a 'radio'.
+ *
+ * @package powerorm\model\field
+ */
 class BooleanField extends Field{
     public $default = FALSE;
     public function db_type(){
@@ -446,12 +520,20 @@ class DateTimeField extends Field{
     }
 }
 
+/**
+ * Class DateField
+ * @package powerorm\model\field
+ */
 class DateField extends DateTimeField{
     public function db_type(){
         return "DATE";
     }
 }
 
+/**
+ * Class TimeField
+ * @package powerorm\model\field
+ */
 class TimeField extends DateTimeField{
 
     public function db_type(){

@@ -269,7 +269,10 @@ e.g. inside any controller method
         $user1->save();
      }
 
-see more methods and examples here http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html
+See more methods and examples here http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html
+and 
+http://eddmash.github.io/powerorm/docs/classes/PModel.html
+
 ## 4. Form
 The PModel also provides a form_builder that helps you generate and customize form for a specific model.
 
@@ -298,27 +301,33 @@ e.g. inside any controller method
 
 To use the form on the view
 
-    $form->open();
+    echo $form->open();
         foreach($form->fields as $field):
-            $field->errors();
-            $field->label();
-            $field->widget(array("class"=>"form-control"));
+            echo $field->errors();
+            echo $field->label();
+            echo $field->widget(array("class"=>"form-control"));
         endforeach;
-    $form->close(); 
+        
+        echo "<input type='submit' value='save'>"; // you have to add this manually it is not generated
+    echo $form->close(); 
 
 Or accessing each field individually from the form itself; as shown below:
 
-        $form->open();
-            $form->label('username');
-            $form->widget('username', ["class"=>"form-control"]);
+        echo $form->open();
+            echo $form->label('username');
+            echo $form->widget('username', ["class"=>"form-control"]);
             
-            $form->label('password');
-            $form->widget('password', ["class"=>"form-control"]);
+            echo $form->label('password');
+            echo $form->widget('password', ["class"=>"form-control"]);
             
-            $form->label('age');
-            $form->widget('age', ["class"=>"form-control"]);
+            echo $form->label('age');
+            echo $form->widget('age', ["class"=>"form-control"]);
             
-        $form->close(); 
+            echo "<input type='submit' value='save'>"; // you have to add this manually it is not generated
+            
+        echo $form->close(); 
+        
+ 
  
 see more form builder methods and examples here http://eddmash.github.io/powerorm/docs/classes/powerorm.form.ModelForm.html
  

@@ -62,7 +62,65 @@ class RelatedField extends Field{
 }
 
 /**
- * Class ForeignKey
+ * todo
+ * - on_delete
+ *
+ *      When an object referenced by a ForeignKey is deleted,
+ *      Powerorm by default emulates the behavior of the SQL constraint ON DELETE CASCADE and also deletes the object
+ *      containing the ForeignKey.
+ *
+ *      This behavior can be overridden by specifying the on_delete argument.
+ *      For example, if you have a nullable ForeignKey and you want it to be set null when the referenced object is deleted:
+ *
+ *      user = ORM::ForeignKey(['model_name'=>'user_model', 'blank'=>True, 'null'=>True, 'on_delete'=>ORM::SET_NULL])
+ *
+ *      The possible values for on_delete are found in ORM:
+ *      -   CASCADE
+ *
+ *          Cascade deletes; the default.
+ *
+ *      -   PROTECT
+ *
+ *          Prevent deletion of the referenced object by raising ProtectedError.
+ *
+ *      -   SET_NULL
+ *
+ *          Set the ForeignKey null; this is only possible if null is True.
+ *
+ *      -   SET_DEFAULT
+ *
+ *          Set the ForeignKey to its default value; a default for the ForeignKey must be set.
+ */
+
+/**
+ * A Creates many-to-one relationship.
+ *
+ * Has one required argument:
+ *
+ * - model_name
+ *
+ *    The model to which current model is related to.
+ *
+ * To create a recursive relationship
+ *
+ * – an object that has a many-to-one relationship with itself – use ORM::ForeignKey('model_name').
+ *
+ * e.g. user_model that has self-refernce to itself
+ *
+ * ORM::ForeignKey('user_model')
+ *
+ * Option arguments:
+ *
+ * - db_index
+ *
+ *      You can choose if a database index is created on this field by setting db_index:
+ *
+ *          - FALSE - disable
+ *          - TRUE - create index.
+ *
+ *      You may want to avoid the overhead of an index if you are creating a foreign key for consistency
+ *      rather than joins.
+ *
  */
 class ForeignKey extends RelatedField{
     public $constraint_name;
@@ -198,11 +256,18 @@ class ManyToMany extends RelatedField{
 
 }
 
-
 abstract class InverseRelation extends RelatedField{
     public $inverse = TRUE;
 }
 
+/**
+ * Class HasMany
+ * @package powerorm\model\field
+ */
 class HasMany extends InverseRelation{}
 
+/**
+ * Class HasOne
+ * @package powerorm\model\field
+ */
 class HasOne extends InverseRelation{}

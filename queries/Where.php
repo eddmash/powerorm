@@ -41,7 +41,8 @@ class Where{
 
     public function validate_lookup($lookup){
         if(!empty($lookup) && !in_array($lookup, $this->lookup_options)):
-            throw new OrmExceptions(sprintf("`%s` is not a valid lookup parameter", $lookup));
+            throw new OrmExceptions(
+                sprintf("`%1\$s` is not a valid lookup parameter the options are %2\$s", $lookup, stringify($this->lookup_options)));
         endif;
     }
 
