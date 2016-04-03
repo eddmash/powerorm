@@ -12,7 +12,10 @@ use powerorm\exceptions\OrmExceptions;
 use powerorm\migrations\ProjectState;
 
 /**
- * Creates a Relationship column or table depending on the type of relationship
+ * Creates a Relationship column or table depending on the type of relationship.
+ *
+ * {@inheritdoc}
+ *
  * @package powerorm\model\field
  */
 class RelatedField extends Field{
@@ -79,11 +82,9 @@ class RelatedField extends Field{
      * Used to set the field on the model to use for display e.g for the model user_model.
      * you could set the form_display_field to username, this will result in form select box shown below
      *
-     * <pre><code>
-     *  <select>
-     *      <option value=1> math // <----- the username.
-     * </select>
-     * </code></pre>
+     * &lt;select &gt;
+     *      &lt; option value=1 &gt; math // <----- the username.
+     * &lt;/select &gt;
      * @var
      */
     public $form_display_field;
@@ -96,18 +97,16 @@ class RelatedField extends Field{
      *
      * By default the primary key is used.
      *
-     * <pre><code>
-     *  <select>
-     *      <option value=linus@linux.com> math // not the value of the option is set to an email.
-     * </select>
-     * </code></pre>
+     * <pre><code &gt;
+     *  &lt;select &gt;
+     *      &lt;option value=linus@linux.com &gt; math // not the value of the option is set to an email.
+     * &lt;/select &gt;
      * @var
      */
     public $form_value_field;
 
     /**
      * {@inheritdoc}
-     * @throws OrmExceptions
      */
     public function __construct($field_options = []){
 

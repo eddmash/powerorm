@@ -64,9 +64,6 @@ class ModelForm extends Form{
     private $extra_fields;
 
     /**
-     *
-     * @param array $initial this are the initial values of the form fields e.g
-     *
      * Assuming that we have a user model that has already been loaded and it only has two fields name and age;
      * <pre><code> $initial =[
      *  'name'=>'mat',
@@ -219,7 +216,6 @@ class ModelForm extends Form{
             foreach ($this->only as $field_name) :
                 if(isset($this->model_object->meta->fields[$field_name])):
                     $form_fields[$field_name] = $this->model_object->meta->fields[$field_name]->form_field();
-//                   $this->fields[$this->_stable_name($field_name)] = new Field($opts);
                 else:
                     throw new FormException(
                         sprintf('The field `%1$s` is not defined in the model `%2$s`, choices are : %3$s', $field_name,
@@ -238,7 +234,6 @@ class ModelForm extends Form{
                 endif;
 
                 $form_fields[$field_name] = $model_fields[$field_name]->form_field();
-//                $this->fields[$this->_stable_name($field_name)] = new Field($opts);
             endforeach;
         endif;
 
@@ -247,8 +242,6 @@ class ModelForm extends Form{
 
             foreach($this->model_object->meta->fields as $field_name=>$field_obj):
                 $form_fields[$field_name] = $field_obj->form_field();
-
-//                $this->fields[$this->_stable_name($field_name)] = new Field($field_value);
             endforeach;
 
         endif;

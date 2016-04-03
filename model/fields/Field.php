@@ -14,7 +14,8 @@ use powerorm\exceptions\OrmExceptions;
 /**
  * This class represents a column in the database table.
  *
- * This is the parent class all the fields and should not be instantiated
+ * This class should not be instantiated
+ *
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -171,7 +172,7 @@ abstract class Field{
     public $help_text;
 
     /**
-     * @ignore
+     * Takes in options to determine how to create the field.
      * @param array $field_options
      */
     public function __construct($field_options = []){
@@ -319,6 +320,11 @@ abstract class Field{
         return 'text';
     }
 
+    /**
+     * @ignore
+     * @param $key
+     * @param $value
+     */
     public function __set($key, $value){
         if($key==='value'):
             $this->{'value'} = $value;

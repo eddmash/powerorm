@@ -71,7 +71,7 @@ class Field{
 
     /**
      * The choices to be passed to fields like checkbox, radio and dropdown/select
-     * @var
+     * @var array
      */
     public $choices;
 
@@ -91,11 +91,9 @@ class Field{
      *  Used to set the field on the model to use for display e.g for the model user_model.
      * you could set the form_display_field to username, this will result in form select box shown below
      *
-     * <pre><code>
-     *  <select>
-     *      <option value=1> math // <----- the username.
-     * </select>
-     * </code></pre>
+     *  &lt;select&gt;
+     *      &lt;option value=1 &gt; math // <----- the username.
+     * &lt;/select &gt;
      * @var
      */
     protected $form_display_field;
@@ -122,12 +120,11 @@ class Field{
     /**
      * The first item displayed  on a select box e.g.
      *
-     * <pre><code>
-     *  <select>
-     *      <option value=''> ----------- // the empty label
-     *      <option value=1> math
-     * </select>
-     * </code></pre>
+     * &lt;select &gt;
+     *      &lt;option value='' &gt; ----------- // the empty label
+     *      &lt;option value=1 &gt; math
+     * &lt;/select&gt;
+     *
      * @var
      */
     public $empty_label;
@@ -140,17 +137,16 @@ class Field{
      *
      * By default the primary key is used.
      *
-     * <pre><code>
-     *  <select>
-     *      <option value=linus@linux.com> math // not the value of the option is set to an email.
-     * </select>
-     * </code></pre>
+     * &lt;select &gt;
+     *      &lt;option value=linus@linux.com &gt; math // not the value of the option is set to an email.
+     * &lt;/select &gt;
+     * -->
      * @var string
      */
     public $form_value_field = '';
 
     /**
-     * @ignore
+     * Takes options to determine the kind of fields created
      * @param array $field_options
      */
     public function __construct($field_options=[]){
@@ -160,6 +156,10 @@ class Field{
         endforeach;
     }
 
+    /**
+     * Returns the field options needed to recreate it.
+     * @return array
+     */
     public function get_skeleton(){
         $parts = get_object_vars($this);
         unset($parts['_errors']);
@@ -251,9 +251,7 @@ class Field{
      *
      * which will output:
      *
-     * <pre><code>
-     * <input type="text" name="name" value="" id="name" maxlength="30" style="width:50%" class="form-control"  />
-     * </code></pre>
+     * &lt;input type="text" name="name" value="" id="name" maxlength="30" style="width:50%" class="form-control"  /&gt;
      *
      * @param array $view_attrs  contains HTML attributes to be set on the rendered widget
      * @return null|string
@@ -478,6 +476,10 @@ class Field{
         return $widget;
     }
 
+    /**
+     * Returns help information only related to a particular field.
+     * @return string
+     */
     public function help_text(){
         return sprintf("<small class='help-block'> %s </small>", ucfirst($this->help_text));
 

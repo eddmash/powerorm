@@ -41,6 +41,8 @@ namespace powerorm\model\field;
  * }</code></pre>
  *
  *
+ * Should not be instantiated.use its subclasse HasMany and HasOne.
+ *
  * @package powerorm\model\field
  */
 abstract class InverseRelation extends RelatedField{
@@ -53,13 +55,15 @@ abstract class InverseRelation extends RelatedField{
 
 /**
  * This creates a reverse connection to a model that define one-to-many/ many-to-many relationships
- * by using ForeignKey or ManyToMAny Fields
+ * by using ForeignKey or ManyToMAny Fields.
+ *
  * @package powerorm\model\field
  */
 class HasMany extends InverseRelation{}
 
 /**
  * Creates a reverse connection to a model that defines a one-toone relationship using OneToOne field.
+ *
  * @package powerorm\model\field
  */
 class HasOne extends InverseRelation{}

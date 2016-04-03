@@ -6,6 +6,8 @@
  *
  */
 namespace powerorm\form;
+use powerorm\exceptions\ValueError;
+
 /**
  * A class for generating forms based on the models.
  *
@@ -116,6 +118,7 @@ class Form{
     /**
      *
      * Assuming out model has two field name and age;
+     *
      * <pre><code> $initial =[
      *  'name'=>'mat',
      *  'age'=>10
@@ -125,7 +128,6 @@ class Form{
      * </code></pre>
      *
      *
-     * @param PModel $context the model object to create a form from.
      * @param array $initial the data displayed on form fields when the form is first loaded.
      */
     public function __construct($initial=[]){
@@ -135,7 +137,9 @@ class Form{
 
     /**
      * Gets a single field instance in the form fields array and returns it
+     *
      * <h4>Usage</h4>
+     *
      * if a form has a fields username, you get the field object:
      *
      * <pre><code>$form->get_field('username);</code></pre>
@@ -190,8 +194,8 @@ class Form{
      * <pre><code>echo form->open('email/send', 'class="email" id="myform"');</code></pre>
      *
      * The above examples would create a form similar to this:
-     * <pre><code><form method="post" accept-charset="utf-8"
-     * action="http://example.com/index.php/email/send" class="email" id="myform"></code></pre>
+     * &lt; form method="post" accept-charset="utf-8"
+     * action="http://example.com/index.php/email/send" class="email" id="myform" &gt;
      *
      * @param string $action
      * @param array $attributes
@@ -223,7 +227,10 @@ class Form{
     /**
      * Create the form closing tags and displays any errors that have not been display explicitly.
      *
-     * pre><code>echo form_close($string);// Would produce:  </form> </code></pre>
+     * <pre><code>echo form_close($string);</code></pre>
+     *
+     *
+     * Would produce: &lt;/form> &gt;
      *
      * @param string $extra
      * @return string
@@ -309,7 +316,7 @@ class Form{
     }
 
     /**
-     * @internal
+     * @@ignore
      * @param $opts
      * @throws ValueError
      */
@@ -320,24 +327,8 @@ class Form{
         endif;
     }
 
-    public function fields($fields){
-        if(empty($fields)):
-            return FALSE;
-        endif;
-
-        foreach ($fields as $field_name=>$field_value) :
-            $field_value['name'] = $field_name;
-
-            // ensure required arguments are present
-            $this->_validate_field($field_value);
-
-            $this->fields[$this->_stable_name($field_name)] = new Field($field_value);
-        endforeach;
-    }
-
-
     /**
-     * REturns errors related to the form as a whole.
+     * Returns errors related to the form as a whole.
      * @return string
      */
     public function errors(){
@@ -427,7 +418,7 @@ class Form{
 
     /**
      * This is the help information that relates to the whole form and not a specific to a field on the form.
-     * {@see Field::help_text()}
+     * {@link http://eddmash.github.io/powerorm/docs/classes/powerorm.form.Field.html#method_help_text}
      * <pre><code>$form_builder->help_text(['Please ensure the email and phone number are valid we
      * will use them for activation of you're account']);
      * </code></pre>
