@@ -18,19 +18,19 @@ abstract class Field{
      * @ignore
      * @var null
      */
-    protected $name=Null;
+    public $name=Null;
 
     /**
      * @ignore
      * @var string
      */
-    protected $type;
+    public $type;
 
     /**
      * @ignore
      * @var
      */
-    protected $constraint_name;
+    public $constraint_name;
 
     /**
      * If True, powerorm will store empty values as NULL in the database. Default is False.
@@ -77,7 +77,11 @@ abstract class Field{
      * @var
      */
     public $default;
-    public $signed=FALSE;
+
+    /**
+     * @ignore
+     * @var null
+     */
     public $db_column=Null;
 
     /**
@@ -241,7 +245,6 @@ abstract class Field{
         $opts['unique'] = $this->unique;
         $opts['null'] = $this->null;
         $opts['default'] = $this->default;
-        $opts['signed'] = $this->signed;
         $opts['primary_key'] = $this->primary_key;
         $opts['db_column'] = $this->db_column;
         $opts['db_index'] = $this->db_index;
@@ -644,6 +647,13 @@ class DecimalField extends Field{
  */
 class IntegerField extends Field{
 
+    /**
+     * If this options is set to TRUE, it will create a signed integer 0 to 2147483647
+     * else it will create an unsigned integer 0 to -2147483647
+     * @var bool
+     */
+    public $signed=FALSE;
+
     public function __construct($options=[]){
         parent::__construct($options);
         if(!$this->signed || $this->signed == 'UNSIGNED'):
@@ -653,12 +663,28 @@ class IntegerField extends Field{
         endif;
     }
 
+    /**
+     * {@inheritdoc}
+     * @return string
+     */
     public function db_type(){
         return 'INT';
     }
 
+    /**
+     * {@inheritdoc}
+     * @return string
+     */
     public function form_type(){
         return 'number';
+    }
+
+    public function options(){
+
+        $opts = parent::options();
+
+        $opts['signed'] = $this->signed;
+        return $opts;
     }
 }
 
@@ -671,6 +697,10 @@ class IntegerField extends Field{
  */
 class AutoField extends IntegerField{
 
+    /**
+     * @ignore
+     * @var bool
+     */
     public $auto=FALSE;
 
     public function __construct($options=[]){
@@ -696,6 +726,7 @@ class AutoField extends IntegerField{
  */
 class BooleanField extends Field{
     public $default = FALSE;
+
     public function db_type(){
         return "BOOLEAN";
     }
@@ -715,8 +746,20 @@ class DateTimeField extends Field{
             throw new OrmExceptions(sprintf('%s expects either `on_creation` or `on_update` to be set and not both', $this->name));
         endif;
     }
+
+    /**
+     * @ignore
+     * @return string
+     */
     public function db_type(){
         return "DATETIME";
+    }
+    
+    public function options(){
+        $opts = parent::options();
+        $opts['on_update'] = $this->on_update;
+        $opts['on_creation'] = $this->on_creation;
+        return $opts;
     }
 }
 

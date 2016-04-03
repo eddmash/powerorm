@@ -13,8 +13,17 @@ use powerorm\migrations\ProjectState;
 
 class RelatedField extends Field{
 
+    /**
+     * @ignore
+     * @var RelationObject
+     */
     public $related_model;
     public $model;
+
+    /**
+     * @ignore
+     * @var bool
+     */
     public $inverse = TRUE;
 
     protected $on_update;
@@ -57,6 +66,17 @@ class RelatedField extends Field{
         $opts['form_value_field'] = $this->form_value_field;
         $opts['choices'] = $this->related_model->all();
 
+        return $opts;
+    }
+
+    public function options(){
+
+        $opts = parent::options();
+        $opts['inverse'] = $this->inverse;
+        $opts['model'] = $this->model;
+        $opts['on_delete'] = $this->on_delete;
+        $opts['on_update'] = $this->on_update;
+        $opts['related_model'] = $this->related_model;
         return $opts;
     }
 }
@@ -123,7 +143,6 @@ class RelatedField extends Field{
  *
  */
 class ForeignKey extends RelatedField{
-    public $constraint_name;
 
     public function __construct($field_options = []){
         parent::__construct($field_options);
@@ -137,6 +156,7 @@ class ForeignKey extends RelatedField{
 
         $opts = parent::options();
         $opts['constraint_name'] = $this->constraint_name;
+        $opts['M2O'] = $this->M2O;
         return $opts;
     }
 
@@ -198,7 +218,13 @@ class OneToOne extends ForeignKey{
     
     public function _unique_check(){
     }
-    
+
+    public function options(){
+
+        $opts = parent::options();
+        $opts['O2O'] = $this->O2O;
+        return $opts;
+    }
 
 }
 
@@ -207,6 +233,10 @@ class OneToOne extends ForeignKey{
  */
 class ManyToMany extends RelatedField{
 
+    /**
+     * The intermidiate model to use, to create the ManyToMany relationship.
+     * @var
+     */
     public $through;
 
     public function __construct($field_options = []){
@@ -251,6 +281,7 @@ class ManyToMany extends RelatedField{
     public function options(){
         $opts = parent::options();
         $opts['through'] = $this->through;
+        $opts['M2M'] = $this->M2M;
         return $opts;
     }
 

@@ -244,7 +244,6 @@ class AutoDetector{
         $add_fields =  array_diff(array_keys($now_trigger_fields), array_keys($past_trigger_fields));
         $drop_fields = array_diff(array_keys($past_trigger_fields), array_keys($now_trigger_fields));
 
-
         if(!empty($add_fields)):
             $this->operations_todo(
                 $new_state->model_name,
@@ -505,11 +504,14 @@ class AutoDetector{
 
             $modified_field_names = array_diff_assoc($current_options, $past_options);
 
-            foreach (['constraint_name'] as $f_name) :
-                if(array_key_exists($f_name, $modified_field_names)):
-                    unset($modified_field_names[$f_name]);
-                endif;
-            endforeach;
+
+            if(!empty($modified_field_names)):
+                foreach (['constraint_name'] as $f_name) :
+                    if(array_key_exists($f_name, $modified_field_names)):
+                        unset($modified_field_names[$f_name]);
+                    endif;
+                endforeach;
+            endif;
         endif;
 
         return $modified_field_names;
