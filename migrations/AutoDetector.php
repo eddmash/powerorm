@@ -13,6 +13,7 @@ use powerorm\migrations\operations\DropM2MField;
 use powerorm\migrations\operations\DropModel;
 use powerorm\migrations\operations\AddField;
 use powerorm\model\field\InverseRelation;
+use powerorm\model\field\RelatedField;
 use powerorm\model\ProxyModel;
 
 /**
@@ -373,30 +374,35 @@ class AutoDetector{
 
             foreach ($new_fields_names as $field_name) :
                 $field = $model_meta->fields[$this->stable_name($field_name)];
-                $field_depends_on = [];
+
 
                 if($field instanceof InverseRelation):
                     continue;
                 endif;
 
-                if(isset($field->related_model)):
-                    $field_depends_on = [ucwords($this->stable_name($field->related_model->meta->model_name)),
-                        ucwords($this->stable_name($model_name))];
-                endif;
-
-                if(property_exists($field, 'M2M') && $field->M2M):
-                    $this->_add_m2m_field($model_meta, $field, $field_depends_on);
-                else:
-                    $this->operations_todo($model_name,
-                        new AddField($model_name, $field, ['table_name'=>$model_meta->db_table]),
-                        $field_depends_on
-                    );
-                endif;
-
+                $this->_create_target_field($field, $model_name, $model_meta);
             endforeach;
         endforeach;
 
 
+    }
+
+    public function _create_target_field($field, $model_name, $model_obj){
+        $field_depends_on = [];
+
+        if(isset($field->related_model)):
+            $field_depends_on = [ucwords($this->stable_name($field->related_model->meta->model_name)),
+                ucwords($this->stable_name($model_name))];
+        endif;
+
+        if(property_exists($field, 'M2M') && $field->M2M):
+            $this->_add_m2m_field($model_obj, $field, $field_depends_on);
+        else:
+            $this->operations_todo($model_name,
+                new AddField($model_name, $field, ['table_name'=>$model_obj->db_table]),
+                $field_depends_on
+            );
+        endif;
     }
 
     /**
@@ -428,26 +434,38 @@ class AutoDetector{
             endif;
 
             foreach ($dropped_fields_names as $field_name) :
+
                 $field = $model_past_state->fields[$field_name];
 
-                $field_depends_on = [];
-                if(isset($field->related_model)):
-                    $field_depends_on = [ucwords($this->stable_name($field->related_model->meta->model_name)),
-                        ucwords($this->stable_name($model_name))];
-                endif;
-
-                if(property_exists($field, 'M2M') && $field->M2M):
-                    $this->_drop_m2m_field($model_obj, $field, $field_depends_on);
-                else:
-                    $this->operations_todo($model_name,
-                        new DropField($model_name, $field, ['table_name'=>$model_obj->db_table]),
-                        $field_depends_on
-                    );
-                endif;
+                $this->_drop_target_field($field, $model_name, $model_obj);
             endforeach;
         endforeach;
 
 
+    }
+
+    /**
+     * @ignore
+     * @param $field
+     * @param $model_name
+     * @param $model_obj
+     */
+    public function _drop_target_field($field, $model_name, $model_obj){
+
+        $field_depends_on = [];
+        if(isset($field->related_model)):
+            $field_depends_on = [ucwords($this->stable_name($field->related_model->meta->model_name)),
+                ucwords($this->stable_name($model_name))];
+        endif;
+
+        if(property_exists($field, 'M2M') && $field->M2M):
+            $this->_drop_m2m_field($model_obj, $field, $field_depends_on);
+        else:
+            $this->operations_todo($model_name,
+                new DropField($model_name, $field, ['table_name'=>$model_obj->db_table]),
+                $field_depends_on
+            );
+        endif;
     }
 
     /**
@@ -463,6 +481,7 @@ class AutoDetector{
             if(!isset($this->history_state->models[$model_name])):
                 continue;
             endif;
+
             $model_past_state = $this->history_state->models[$model_name];
 
             $past_fields = $model_past_state->fields;
@@ -475,6 +494,16 @@ class AutoDetector{
                 $modified_field_names = $this->_is_modified($field, $past_fields[$name]);
                 // if there are not modifications found, no need to go on.
                 if(empty($modified_field_names)):
+                    continue;
+                endif;
+
+
+                // if field is moving to / from a relationship field, we need to drop the old version
+                // and create the new version
+                if($field instanceof RelatedField || $past_fields[$name] instanceof RelatedField):
+                    $past_field_state = $past_fields[$name];
+                    $this->_drop_target_field($past_field_state, $model_name, $model_obj);
+                    $this->_create_target_field($field, $model_name, $model_obj);
                     continue;
                 endif;
 
