@@ -233,7 +233,7 @@ class Form{
      *
      *
      * Would produce:
-     * <pre><code> &lt;/form &gt;</pre>
+     * <pre><code> &lt;/form &gt; </code></pre>
      *
      * @param string $extra
      * @return string
