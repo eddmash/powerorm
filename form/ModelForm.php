@@ -115,8 +115,19 @@ class Form{
     public $initial;
 
     /**
-     * @ignore
-     * @param array $initial
+     *
+     * Assuming out model has two field name and age;
+     * <pre><code> $initial =[
+     *  'name'=>'mat',
+     *  'age'=>10
+     * ];
+     *
+     * new Form($initial);
+     * </code></pre>
+     *
+     *
+     * @param PModel $context the model object to create a form from.
+     * @param array $initial the data displayed on form fields when the form is first loaded.
      */
     public function __construct($initial=[]){
         $this->_ci =& get_instance();
@@ -153,8 +164,36 @@ class Form{
     }
 
     /**
-     * Creates the form opening tag.
-     * <h4>Usage</h4>
+     * Creates an opening form tag with a base URL built from your config preferences.
+     *
+     * It will optionally let you add form attributes and hidden input fields, and will always add the accept-charset
+     * attribute based on the charset value in your config file.
+     *
+     *<pre><code>assuming we are using the controller `user/signup` to server this form.
+     * echo $form->open(); // goes back to the controller method that served this form.
+     * <form method="post" accept-charset="utf-8" action="http://example.com/index.php/user/signup">
+     *
+     * echo form->open('email/send'); // goes to the base_url  plus the “email/send” URI segments
+     * <form method="post" accept-charset="utf-8" action="http://example.com/index.php/email/send">
+     * </code></pre>
+     *
+     * This method also detects if the form contains any upload fields a generate a multipart form if they are found.
+     * it is also responsible for displaying the form help_text.
+     *
+     * <h4>Adding Attributes</h4>
+     *
+     * Attributes can be added by passing an associative array to the second parameter, like this:
+     *
+     * <pre><code>$attributes = array('class' => 'email', 'id' => 'myform');
+     * echo form->open('email/send', $attributes);</code></pre>
+     *
+     * Alternatively, you can specify the second parameter as a string:
+     * <pre><code>echo form->open('email/send', 'class="email" id="myform"');</code></pre>
+     *
+     * The above examples would create a form similar to this:
+     * <pre><code><form method="post" accept-charset="utf-8"
+     * action="http://example.com/index.php/email/send" class="email" id="myform"></code></pre>
+     *
      * @param string $action
      * @param array $attributes
      * @param array $hidden
@@ -183,7 +222,10 @@ class Form{
     }
 
     /**
-     * Create the form closing tags and displays any errors that have not been dispaly explicitly
+     * Create the form closing tags and displays any errors that have not been display explicitly.
+     *
+     * pre><code>echo form_close($string);// Would produce:  </form> </code></pre>
+     *
      * @param string $extra
      * @return string
      */
@@ -608,11 +650,21 @@ class ModelForm extends Form{
      * @var
      */
     private $extra_fields;
-
     /**
-     * @ignore
-     * @param PModel $context
-     * @param array $initial
+     *
+     * @param array $initial this are the initial values of the form fields e.g
+     *
+     * Assuming that we have a user model that has already been loaded and it only has two fields name and age;
+     * <pre><code> $initial =[
+     *  'name'=>'mat',
+     *  'age'=>10
+     * ];
+     *
+     * new ModelForm($this->user, $initial);
+     * </code></pre>
+     *
+     * @param PModel $context the model object to create a form from.
+     * @param array $initial the data displayed on form fields when the form is first loaded.
      */
     public function __construct(PModel $context, $initial=[]){
         parent::__construct($initial);

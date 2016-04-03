@@ -18,13 +18,19 @@ abstract class Field{
      * @ignore
      * @var null
      */
-    public $name=Null;
+    protected $name=Null;
 
     /**
      * @ignore
      * @var string
      */
-    public $type;
+    protected $type;
+
+    /**
+     * @ignore
+     * @var
+     */
+    protected $constraint_name;
 
     /**
      * If True, powerorm will store empty values as NULL in the database. Default is False.
@@ -239,6 +245,7 @@ abstract class Field{
         $opts['primary_key'] = $this->primary_key;
         $opts['db_column'] = $this->db_column;
         $opts['db_index'] = $this->db_index;
+        $opts['constraint_name'] = $this->constraint_name;
         $opts['container_model'] = $this->container_model;
 
         return $opts;

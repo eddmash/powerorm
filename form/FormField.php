@@ -5,7 +5,10 @@ use powerorm\exceptions\FormException;
 use powerorm\queries\Queryset;
 
 /**
- * Class FormField
+ * This class rerpesents the HTML FORM FIELD.
+ *
+ * In this class the term `widget` is used to mean a HTML input element.
+ *
  * @package powerorm\form
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -22,7 +25,6 @@ class FormField{
      * @var string.
      */
     public $name;
-    public $unique;
 
     /**
      * The maxlength of the form field.
@@ -67,10 +69,10 @@ class FormField{
     public $choices;
 
     /**
-     * Any validations to be run on the field e.g matches[password]
-     * @var
+     * Any validations to be run on the field e.g ['matches[password]', 'required']
+     * @var array
      */
-    public $validations;
+    public $validations=[];
 
     /**
      * @internal
@@ -83,16 +85,51 @@ class FormField{
      * @var
      */
     protected $form_display_field;
-    public $form_value_field = '';
+
 
     /**
-     * The default value
+     * Help information to be displayed next to the  field.
+     * @var
+     */
+    public $help_text;
+
+    /**
+     * Any extra HTML Form  elements attributes to be passed to the form e.g. ['class'=>'form-control']
+     * @var array
+     */
+    public $attrs=[];
+
+    /**
+     * The path to upload a file to, relative to the base directory returned by base_url();
+     * @var
+     */
+    public $upload_to;
+
+    /**
+     * The first item displayed  on a select box e.g.
+     *
+     * <pre><code>
+     *  <select>
+     *      <option value=''> ----------- // the empty label
+     *      <option value=1> math
+     * </select>
+     * </code></pre>
      * @var
      */
     public $empty_label;
-    public $help_text;
-    public $attrs;
-    public $upload_to;
+
+    /**
+     * Used to set the field on the model to use for display e.g for the model user_model.
+     * you could set the form_value_field to username, this will result in form select box shown below
+     *
+     * <pre><code>
+     *  <select>
+     *      <option value=1> math // <----- the username.
+     * </select>
+     * </code></pre>
+     * @var string
+     */
+    public $form_value_field = '';
 
     /**
      * @ignore
@@ -111,6 +148,10 @@ class FormField{
         return $parts;
     }
 
+    /**
+     * Returns the errrors related to this field.
+     * @return string
+     */
     public function errors(){
         $this->_field_errors();
         if(!empty($this->_errors)):
@@ -121,6 +162,31 @@ class FormField{
         return '';
     }
 
+    /**
+     * Returns fields label.
+     *
+     * Lets you generate a <label>. Simple example:
+     *
+     * <pre><code>echo field->label('What is your Name', 'username');</code></pre>
+     * // Would produce:  <label for="username">What is your Name</label>
+     *
+     * Similar to other functions, you can submit an associative array in the third parameter if you prefer to set additional attributes.
+     *
+     * Example:
+     * <pre><code> $attributes = array(
+     *  'class' => 'mycustomclass',
+     *  'style' => 'color: #000;'
+     * );
+     *
+     * echo field->label('What is your Name', 'username', $attributes);</code></pre>
+     *
+     * // Would produce:  <label for="username" class="mycustomclass" style="color: #000;">What is your Name</label>
+     *
+     * @param	string $label	The text to appear onscreen
+     * @param	string	$id The id the label applies to
+     * @param	array	$view_attrs Additional attributes
+     * @return string
+     */
     public function label($label=Null, $id=Null, $view_attrs=[]){
 
         // if the field is not hidden field set label
@@ -146,6 +212,35 @@ class FormField{
         return form_label($this->get_label_name(), $label_id, $view_attrs);
     }
 
+    /**
+     * Returns the field widget.
+     *
+     * Example:
+     *
+     * if in the model the field is
+     *
+     * <pre><code>$this->name = ORM::CharField(['max_length'=>30]);</code></pre>
+     *
+     * the form widget output can be customized as follows:
+     *
+     * <pre><code> $attributes = array(
+     *  'class' => 'form-control',
+     *  'style' => 'color: #000;'
+     *  'style'         => 'width:50%'
+     * );
+     *
+     * echo field->widget($attributes);</code></pre>
+     *
+     * which will output:
+     *
+     * <pre><code>
+     * <input type="text" name="name" value="" id="name" maxlength="30" style="width:50%" class="form-control"  />
+     * </code></pre>
+     *
+     * @param array $view_attrs  contains HTML attributes to be set on the rendered widget
+     * @return null|string
+     * @throws FormException
+     */
     public function widget($view_attrs=[]){
         $field_attr = $this->_attrs($view_attrs);
         $widget = NULL;
@@ -213,6 +308,10 @@ class FormField{
         return $widget;
     }
 
+    /**
+     * ignore
+     * @return array|mixed
+     */
     public function validation_rules(){
 
         // since the validator works with post data,
@@ -562,6 +661,10 @@ class FormField{
         $this->value= $value;
     }
 
+    /**
+     * Returns the widget name
+     * @return string
+     */
     public function get_widget_name(){
         $name = $this->name;
         if(in_array($this->type, ['multiselect', 'checkbox'])):
@@ -570,6 +673,10 @@ class FormField{
         return $name;
     }
 
+    /**
+     * Returns the label name .
+     * @return mixed|string
+     */
     public function get_label_name(){
         // incase form label is not set
         if(empty($this->label_name)):
