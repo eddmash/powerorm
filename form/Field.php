@@ -1,4 +1,11 @@
 <?php
+/**
+ * The Form Field.
+ */
+
+/**
+ *
+ */
 namespace powerorm\form;
 
 use powerorm\exceptions\FormException;
@@ -13,7 +20,7 @@ use powerorm\queries\Queryset;
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class FormField{
+class Field{
     /**
      * The type of form field. this are any HTML FORM input type  textarea, text, checkbox, radio.
      * @var string .
@@ -81,7 +88,14 @@ class FormField{
     protected $_errors = [];
 
     /**
-     * Usually used for radiom checkbox and select/dropdown, this is the label to be used next to the values
+     *  Used to set the field on the model to use for display e.g for the model user_model.
+     * you could set the form_display_field to username, this will result in form select box shown below
+     *
+     * <pre><code>
+     *  <select>
+     *      <option value=1> math // <----- the username.
+     * </select>
+     * </code></pre>
      * @var
      */
     protected $form_display_field;
@@ -119,12 +133,16 @@ class FormField{
     public $empty_label;
 
     /**
-     * Used to set the field on the model to use for display e.g for the model user_model.
-     * you could set the form_value_field to username, this will result in form select box shown below
+     * Works on dropdown, select, radio, checkbox.
+     *
+     * Used to set the model field to use for the value of the form option fields e.g for the model user_model.
+     * you could set the form_value_field to email, this will result in form select box shown below
+     *
+     * By default the primary key is used.
      *
      * <pre><code>
      *  <select>
-     *      <option value=1> math // <----- the username.
+     *      <option value=linus@linux.com> math // not the value of the option is set to an email.
      * </select>
      * </code></pre>
      * @var string
@@ -149,7 +167,7 @@ class FormField{
     }
 
     /**
-     * Returns the errrors related to this field.
+     * Returns the errors related to this field.
      * @return string
      */
     public function errors(){

@@ -1,8 +1,14 @@
 <?php
+/**
+ * The Model Field
+ */
+
+/**
+ *
+ */
 namespace powerorm\model\field;
 
 use powerorm\exceptions\OrmExceptions;
-use powerorm\form;
 
 
 /**
@@ -380,8 +386,16 @@ abstract class Field{
  */
 class CharField extends Field{
 
+    /**
+     * The maximum length (in characters) of the field.
+     * @var
+     */
     public $max_length;
 
+    /**
+     * {@inheritdoc}
+     * @param array $options
+     */
     public function __construct($options=[]){
 
         parent::__construct($options);
@@ -391,10 +405,16 @@ class CharField extends Field{
         endif;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function db_type(){
         return 'VARCHAR';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function form_type(){
 
         $type = 'text';
@@ -406,12 +426,19 @@ class CharField extends Field{
         return $type;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function check(){
         $checks = parent::check();
         $checks = $this->add_check($checks, $this->_max_length_check());
         return $checks;
     }
 
+    /**
+     * @ignore
+     * @return array
+     */
     public function _max_length_check(){
         if(empty($this->max_length)):
             return [\powerorm\checks\check_error($this, sprintf('%s requires `max_length` to be set', get_class($this)))];
@@ -422,6 +449,9 @@ class CharField extends Field{
         endif;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function options(){
         $opts = parent::options();
 
@@ -442,12 +472,18 @@ class CharField extends Field{
  */
 class EmailField extends CharField{
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($options=[]){
         //  254 in order to be compliant with RFC3696/5321
         $options['max_length'] = 254;
         parent::__construct($options);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function form_type(){
         return 'email';
     }
@@ -465,10 +501,27 @@ class EmailField extends CharField{
  * @package powerorm\model\field
  */
 class FileField extends CharField{
+    /**
+     * @ignore
+     * @var bool
+     */
     protected $passed_pk;
+
+    /**
+     * @ignore
+     * @var bool
+     */
     protected $passed_unique;
+
+    /**
+     * The path relative to the application base_url where the files will be uploaded
+     * @var
+     */
     public $upload_to;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($options=[]){
         $options['max_length'] = 100;
         $this->passed_pk = (array_key_exists('primary_key', $options))? TRUE: FALSE;
@@ -476,10 +529,18 @@ class FileField extends CharField{
         parent::__construct($options);
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function form_type(){
         return 'file';
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function check(){
         $checks = parent::check();
 
@@ -489,6 +550,10 @@ class FileField extends CharField{
         return $checks;
     }
 
+    /**
+     * @ignore
+     * @return array
+     */
     public function _check_unique(){
         if($this->passed_unique):
             return [\powerorm\checks\check_error($this, sprintf("'unique' is not a valid argument for a %s.", get_class($this)))];
@@ -496,6 +561,10 @@ class FileField extends CharField{
         return [];
     }
 
+    /**
+     * @ignore
+     * @return array
+     */
     public function _check_primarykey(){
         if($this->passed_pk):
             return [\powerorm\checks\check_error($this,
@@ -504,6 +573,11 @@ class FileField extends CharField{
         return [];
     }
 
+
+
+    /**
+     * {@inheritdoc}
+     */
     public function form_field(){
 
         $opts = parent::form_field();
@@ -520,6 +594,10 @@ class FileField extends CharField{
  */
 class ImageField extends FileField{
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function form_type(){
         return 'image';
     }
@@ -530,6 +608,10 @@ class ImageField extends FileField{
  */
 class TextField extends Field{
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($field_options = []){
         parent::__construct($field_options);
 
@@ -537,10 +619,18 @@ class TextField extends Field{
         $this->db_index = FALSE;
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function db_type(){
         return 'TEXT';
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function form_type(){
         return 'textarea';
     }
@@ -573,21 +663,48 @@ class TextField extends Field{
  * @package powerorm\model\field
  */
 class DecimalField extends Field{
+    /**
+     * The maximum number of digits allowed in the number.
+     * Note that this number must be greater than or equal to decimal_places.
+     *
+     * @var
+     */
     public $max_digits;
+
+    /**
+     * The number of decimal places to store with the number.
+     * @var
+     */
     public $decimal_places;
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($field_options = []){
         parent::__construct($field_options);
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function db_type(){
         return sprintf('DECIMAL(%1$s, %2$s)', $this->max_digits, $this->decimal_places);
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function form_type(){
         return 'number';
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function check(){
         $checks = parent::check();
         $checks = $this->add_check($checks,  $this->_decimal_places_check());
@@ -596,6 +713,10 @@ class DecimalField extends Field{
         return $checks;
     }
 
+    /**
+     * @ignore
+     * @return array
+     */
     public function _decimal_places_check(){
         if(empty($this->decimal_places)):
             return [\powerorm\checks\check_error($this,
@@ -610,6 +731,10 @@ class DecimalField extends Field{
         return [];
     }
 
+    /**
+     * @ignore
+     * @return array
+     */
     public function _check_max_digits(){
         if(empty($this->max_digits)):
             return [\powerorm\checks\check_error($this,
@@ -630,6 +755,10 @@ class DecimalField extends Field{
         return [];
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function options(){
         $opts = parent::options();
         $opts['max_digits'] = $this->max_digits;
@@ -654,6 +783,10 @@ class IntegerField extends Field{
      */
     public $signed=FALSE;
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($options=[]){
         parent::__construct($options);
         if(!$this->signed || $this->signed == 'UNSIGNED'):
@@ -665,7 +798,6 @@ class IntegerField extends Field{
 
     /**
      * {@inheritdoc}
-     * @return string
      */
     public function db_type(){
         return 'INT';
@@ -673,12 +805,15 @@ class IntegerField extends Field{
 
     /**
      * {@inheritdoc}
-     * @return string
      */
     public function form_type(){
         return 'number';
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function options(){
 
         $opts = parent::options();
@@ -703,12 +838,20 @@ class AutoField extends IntegerField{
      */
     public $auto=FALSE;
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($options=[]){
         parent::__construct($options);
         $this->auto = TRUE;
         $this->signed = FALSE;
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function options(){
         $opts = parent::options();
 
@@ -725,21 +868,54 @@ class AutoField extends IntegerField{
  * @package powerorm\model\field
  */
 class BooleanField extends Field{
+
+    /**
+     * {@inheritdoc}
+     */
     public $default = FALSE;
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function db_type(){
         return "BOOLEAN";
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function form_type(){
         return 'radio';
     }
 }
 
+/**
+ * Create a DateTime column i.e. date and timestamp.
+ * @package powerorm\model\field
+ */
 class DateTimeField extends Field{
+    /**
+     * Automatically set the field to now when the object is first created. Useful for creation of timestamps.
+     * Note that the current date is always used;
+     * it’s not just a default value that you can override.
+     * @var bool
+     */
     public $on_creation=FALSE;
+    /**
+     * Automatically set the field to now every time the object is saved.
+     * Useful for “last-modified” timestamps. Note that the current date is always used;
+     * it’s not just a default value that you can override.
+     * @var bool
+     */
     public $on_update=FALSE;
 
+    /**
+     * {@inheritdoc}
+     * @param array $options
+     * @throws OrmExceptions
+     */
     public function __construct($options=[]){
         parent::__construct($options);
         if($this->on_creation && $this->on_update):
@@ -754,7 +930,10 @@ class DateTimeField extends Field{
     public function db_type(){
         return "DATETIME";
     }
-    
+
+    /**
+     * {@inheritdoc}
+     */
     public function options(){
         $opts = parent::options();
         $opts['on_update'] = $this->on_update;
@@ -764,21 +943,30 @@ class DateTimeField extends Field{
 }
 
 /**
- * Class DateField
+ * Creates a Date column i.e. just the date not timestamp.
  * @package powerorm\model\field
  */
 class DateField extends DateTimeField{
+
+    /**
+     * @ignore
+     * @return string
+     */
     public function db_type(){
         return "DATE";
     }
 }
 
 /**
- * Class TimeField
+ * Creates a Timestamp column i.e no date.
  * @package powerorm\model\field
  */
 class TimeField extends DateTimeField{
 
+    /**
+     * @ignore
+     * @return string
+     */
     public function db_type(){
         return 'TIME';
     }

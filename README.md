@@ -83,10 +83,11 @@ To Start using the orm, create models as you normally would in CodeIgniter and e
     
     class Role extends PModel{
     
-        public function fields(){
-            $this->name = ORM::CharField(['max_length'=>25]);
-            $this->created_on = ORM::DateTimeField(['on_creation'=>TRUE]);
-            $this->updated_on = ORM::DateTimeField(['on_update'=>TRUE]);
+        public function fields()
+        {
+            $this->name = ORM::CharField(['max_length'=>30]);
+            $this->users = ORM::HasMany(['model'=>'user']); // creates a reverse connection to user model
+            $this->slug = ORM::CharField(['max_length'=>30]);
         }
     }
     

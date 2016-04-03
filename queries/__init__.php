@@ -4,3 +4,5 @@ include_once("Where.php");
 
 // Queryset
 include_once("Queryset.php");
+
+include_once("tools.php");

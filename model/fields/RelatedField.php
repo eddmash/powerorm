@@ -1,16 +1,20 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: eddmash
- * Date: 3/19/16
- * Time: 4:38 AM
+ * The Relationship fields.
  */
 
+/**
+ *
+ */
 namespace powerorm\model\field;
 
 use powerorm\exceptions\OrmExceptions;
 use powerorm\migrations\ProjectState;
 
+/**
+ * Creates a Relationship column or table depending on the type of relationship
+ * @package powerorm\model\field
+ */
 class RelatedField extends Field{
 
     /**
@@ -18,6 +22,11 @@ class RelatedField extends Field{
      * @var RelationObject
      */
     public $related_model;
+
+    /**
+     * This is the model to create a relationship with.
+     * @var
+     */
     public $model;
 
     /**
@@ -26,17 +35,80 @@ class RelatedField extends Field{
      */
     public $inverse = TRUE;
 
+    /**
+     * @ignore
+     * @var
+     */
     protected $on_update;
+
+    /**
+     * When an object referenced by a ForeignKey is deleted, Powerorm by default emulates the behavior of the SQL
+     * constraint ON DELETE CASCADE and also deletes the object containing the ForeignKey.
+     * @var
+     */
     protected $on_delete;
 
+    /**
+     * @ignore
+     * @var bool
+     */
     public $M2M=FALSE;
+
+    /**
+     * @ignore
+     * @var bool
+     */
     public $M2O=FALSE;
+
+    /**
+     * @ignore
+     * @var bool
+     */
     public $O2O=FALSE;
 
+    /**
+     * The form field used for Foreignkey and ManyToMany field is dropdown.
+     * This options allows you to set what is displayed as the first item on the dropdown list,
+     * most its use if the relationship allows null, meaning its not mandatory a user selects and item from dropdwon
+     * they can just leave it blank
+     * @var string
+     */
     public $empty_label  = '---------';
+
+    /**
+     * Used to set the field on the model to use for display e.g for the model user_model.
+     * you could set the form_display_field to username, this will result in form select box shown below
+     *
+     * <pre><code>
+     *  <select>
+     *      <option value=1> math // <----- the username.
+     * </select>
+     * </code></pre>
+     * @var
+     */
     public $form_display_field;
+
+    /**
+     * Works on dropdown, select, radio, checkbox.
+     *
+     * Used to set the model field to use for the value of the form option fields e.g for the model user_model.
+     * you could set the form_value_field to email, this will result in form select box shown below
+     *
+     * By default the primary key is used.
+     *
+     * <pre><code>
+     *  <select>
+     *      <option value=linus@linux.com> math // not the value of the option is set to an email.
+     * </select>
+     * </code></pre>
+     * @var
+     */
     public $form_value_field;
 
+    /**
+     * {@inheritdoc}
+     * @throws OrmExceptions
+     */
     public function __construct($field_options = []){
 
         if(!array_key_exists('model', $field_options)):
@@ -56,6 +128,9 @@ class RelatedField extends Field{
         return $this->related_model->meta->primary_key;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function form_field(){
 
         $opts = $this->_prepare_form_field();
@@ -69,6 +144,10 @@ class RelatedField extends Field{
         return $opts;
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function options(){
 
         $opts = parent::options();
@@ -144,11 +223,19 @@ class RelatedField extends Field{
  */
 class ForeignKey extends RelatedField{
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($field_options = []){
         parent::__construct($field_options);
         $this->M2O = TRUE;
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function options(){
         $this->type = $this->related_pk()->type;
         $this->signed = $this->related_pk()->signed;
@@ -160,16 +247,28 @@ class ForeignKey extends RelatedField{
         return $opts;
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function db_column_name(){
         $related_model_pk = strtolower($this->related_model->meta->primary_key->db_column_name());
         return sprintf('%1$s_%2$s', strtolower($this->name), $related_model_pk);
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function constraint_name($prefix){
         $prefix = "fk";
         return parent::constraint_name($prefix);
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function form_field(){
 
         $opts = $this->_prepare_form_field();
@@ -182,21 +281,32 @@ class ForeignKey extends RelatedField{
 
         return $opts;
     }
-    
+
+
+    /**
+     * {@inheritdoc}
+     */
     public function check(){
         $checks = [];
         $checks[] = $this->_unique_check();
         $checks[] = $this->_delete_check();
         return $checks;
     }
-    
+
+    /**
+     * @ignore
+     * @return mixed
+     */
     public function _unique_check(){
         if($this->unique):
             return \powerorm\checks\check_error($this,
                 'Setting unique=True on a ForeignKey has the same effect as using a OneToOne. use OneToOne field');
         endif;
     }
-    
+
+    /**
+     * @ignore
+     */
     public function _delete_check(){
     
     }
@@ -208,6 +318,10 @@ class ForeignKey extends RelatedField{
  */
 class OneToOne extends ForeignKey{
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($field_options = []){
         parent::__construct($field_options);
         $this->M2O = FALSE;
@@ -215,10 +329,17 @@ class OneToOne extends ForeignKey{
         $this->unique = TRUE;
 
     }
-    
+
+    /**
+     * @ignore
+     */
     public function _unique_check(){
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function options(){
 
         $opts = parent::options();
@@ -239,6 +360,10 @@ class ManyToMany extends RelatedField{
      */
     public $through;
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($field_options = []){
         parent::__construct($field_options);
         $this->M2M = TRUE;
@@ -247,6 +372,10 @@ class ManyToMany extends RelatedField{
         endif;
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function check(){
         $checks = [];
         $checks[] = $this->_unique_check();
@@ -255,6 +384,10 @@ class ManyToMany extends RelatedField{
         return $checks;
     }
 
+    /**
+     * @ignore
+     * @return mixed
+     */
     public function _unique_check(){
         if($this->unique):
             return \powerorm\checks\check_error($this, sprintf('%s field cannot be unique', get_class($this)));
@@ -262,12 +395,20 @@ class ManyToMany extends RelatedField{
 
     }
 
+    /**
+     * @ignore
+     * @return mixed
+     */
     public function _ignored_options(){
         if($this->null):
             return \powerorm\checks\check_warning($this, sprintf('`null` has no effect on %s', get_class($this)));
         endif;
     }
 
+    /**
+     * @ignore
+     * @return mixed
+     */
     public function _check_relation_model(){
         $model_names = array_keys(ProjectState::app_model_objects());
 
@@ -278,6 +419,10 @@ class ManyToMany extends RelatedField{
         endif;
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function options(){
         $opts = parent::options();
         $opts['through'] = $this->through;
@@ -287,18 +432,3 @@ class ManyToMany extends RelatedField{
 
 }
 
-abstract class InverseRelation extends RelatedField{
-    public $inverse = TRUE;
-}
-
-/**
- * Class HasMany
- * @package powerorm\model\field
- */
-class HasMany extends InverseRelation{}
-
-/**
- * Class HasOne
- * @package powerorm\model\field
- */
-class HasOne extends InverseRelation{}
