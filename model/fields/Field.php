@@ -173,7 +173,7 @@ abstract class Field{
 
     /**
      * Takes in options to determine how to create the field.
-     * @param array $field_options
+     * @param array $field_options the options to use.
      */
     public function __construct($field_options = []){
 
@@ -262,8 +262,9 @@ abstract class Field{
     }
 
     /**
-     * returns the constriain name especially in relationship fields.
-     * @param $prefix
+     * returns the constraint name especially in relationship fields.
+     * @ignore
+     * @param string $prefix
      * @return string
      */
     public function constraint_name($prefix){
@@ -400,11 +401,10 @@ class CharField extends Field{
 
     /**
      * {@inheritdoc}
-     * @param array $options
      */
-    public function __construct($options=[]){
+    public function __construct($field_options=[]){
 
-        parent::__construct($options);
+        parent::__construct($field_options);
 
         if(!empty($this->max_length)):
             $this->type = strtoupper(sprintf('%1$s(%2$s)', $this->type, $this->max_length));
@@ -481,10 +481,10 @@ class EmailField extends CharField{
     /**
      * {@inheritdoc}
      */
-    public function __construct($options=[]){
+    public function __construct($field_options=[]){
         //  254 in order to be compliant with RFC3696/5321
         $options['max_length'] = 254;
-        parent::__construct($options);
+        parent::__construct($field_options);
     }
 
     /**
@@ -528,11 +528,11 @@ class FileField extends CharField{
     /**
      * {@inheritdoc}
      */
-    public function __construct($options=[]){
+    public function __construct($field_options=[]){
         $options['max_length'] = 100;
         $this->passed_pk = (array_key_exists('primary_key', $options))? TRUE: FALSE;
         $this->passed_unique = (array_key_exists('unique', $options))? TRUE: FALSE;
-        parent::__construct($options);
+        parent::__construct($field_options);
     }
 
 
@@ -793,8 +793,8 @@ class IntegerField extends Field{
     /**
      * {@inheritdoc}
      */
-    public function __construct($options=[]){
-        parent::__construct($options);
+    public function __construct($field_options=[]){
+        parent::__construct($field_options);
         if(!$this->signed || $this->signed == 'UNSIGNED'):
             $this->signed = "UNSIGNED";
         else:
@@ -848,8 +848,8 @@ class AutoField extends IntegerField{
     /**
      * {@inheritdoc}
      */
-    public function __construct($options=[]){
-        parent::__construct($options);
+    public function __construct($field_options=[]){
+        parent::__construct($field_options);
         $this->auto = TRUE;
         $this->signed = FALSE;
     }
@@ -922,8 +922,8 @@ class DateTimeField extends Field{
      * @param array $options
      * @throws OrmExceptions
      */
-    public function __construct($options=[]){
-        parent::__construct($options);
+    public function __construct($field_options=[]){
+        parent::__construct($field_options);
         if($this->on_creation && $this->on_update):
             throw new OrmExceptions(sprintf('%s expects either `on_creation` or `on_update` to be set and not both', $this->name));
         endif;

@@ -191,11 +191,13 @@ class Form{
      * echo form->open('email/send', $attributes);</code></pre>
      *
      * Alternatively, you can specify the second parameter as a string:
+     *
      * <pre><code>echo form->open('email/send', 'class="email" id="myform"');</code></pre>
      *
      * The above examples would create a form similar to this:
-     * &lt; form method="post" accept-charset="utf-8"
-     * action="http://example.com/index.php/email/send" class="email" id="myform" &gt;
+     *
+     * <pre><code>&lt; form method="post" accept-charset="utf-8"
+     * action="http://example.com/index.php/email/send" class="email" id="myform" &gt;</code></pre>
      *
      * @param string $action
      * @param array $attributes
@@ -230,7 +232,8 @@ class Form{
      * <pre><code>echo form_close($string);</code></pre>
      *
      *
-     * Would produce: &lt;/form> &gt;
+     * Would produce:
+     * <pre><code> &lt;/form &gt;< /code></pre>
      *
      * @param string $extra
      * @return string
@@ -316,7 +319,7 @@ class Form{
     }
 
     /**
-     * @@ignore
+     * @ignore
      * @param $opts
      * @throws ValueError
      */

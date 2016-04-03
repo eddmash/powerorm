@@ -91,9 +91,9 @@ class Field{
      *  Used to set the field on the model to use for display e.g for the model user_model.
      * you could set the form_display_field to username, this will result in form select box shown below
      *
-     *  &lt;select&gt;
+     *  <pre><code>&lt;select&gt;
      *      &lt;option value=1 &gt; math // <----- the username.
-     * &lt;/select &gt;
+     * &lt;/select &gt;</code></pre>
      * @var
      */
     protected $form_display_field;
@@ -119,11 +119,10 @@ class Field{
 
     /**
      * The first item displayed  on a select box e.g.
-     *
-     * &lt;select &gt;
+     * <pre><code>&lt;select &gt;
      *      &lt;option value='' &gt; ----------- // the empty label
      *      &lt;option value=1 &gt; math
-     * &lt;/select&gt;
+     * &lt;/select&gt;</code></pre>
      *
      * @var
      */
@@ -137,10 +136,10 @@ class Field{
      *
      * By default the primary key is used.
      *
-     * &lt;select &gt;
+     * <pre><code>&lt;select &gt;
      *      &lt;option value=linus@linux.com &gt; math // not the value of the option is set to an email.
-     * &lt;/select &gt;
-     * -->
+     * &lt;/select &gt;</code></pre>
+     *
      * @var string
      */
     public $form_value_field = '';
@@ -251,7 +250,8 @@ class Field{
      *
      * which will output:
      *
-     * &lt;input type="text" name="name" value="" id="name" maxlength="30" style="width:50%" class="form-control"  /&gt;
+     * <pre><code>&lt;input type="text" name="name" value="" id="name" maxlength="30"
+     * style="width:50%" class="form-control"  /&gt;</code></pre>
      *
      * @param array $view_attrs  contains HTML attributes to be set on the rendered widget
      * @return null|string

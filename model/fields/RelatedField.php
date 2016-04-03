@@ -82,9 +82,9 @@ class RelatedField extends Field{
      * Used to set the field on the model to use for display e.g for the model user_model.
      * you could set the form_display_field to username, this will result in form select box shown below
      *
-     * &lt;select &gt;
+     * <pre><code>&lt;select &gt;
      *      &lt; option value=1 &gt; math // <----- the username.
-     * &lt;/select &gt;
+     * &lt;/select &gt;</code></pre>
      * @var
      */
     public $form_display_field;
@@ -100,10 +100,11 @@ class RelatedField extends Field{
      * <pre><code &gt;
      *  &lt;select &gt;
      *      &lt;option value=linus@linux.com &gt; math // not the value of the option is set to an email.
-     * &lt;/select &gt;
+     * &lt;/select &gt;</code></pre>
      * @var
      */
     public $form_value_field;
+
 
     /**
      * {@inheritdoc}
@@ -123,6 +124,10 @@ class RelatedField extends Field{
 
     }
 
+    /**
+     * @ignore
+     * @return mixed
+     */
     public function related_pk(){
         return $this->related_model->meta->primary_key;
     }
