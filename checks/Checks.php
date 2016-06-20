@@ -1,82 +1,71 @@
 <?php
 namespace powerorm\checks;
-use powerorm\cli\ColorCLi;
-use powerorm\migrations\ProjectState;
+use powerorm\BaseOrm;
 
+/**
+ * Class Checks
+ * @package powerorm\checks
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class Checks{
+    public $registered_checks;
 
-    public static function run(){
-        Checks::model_checks();
+    public function __construct(){
+        $this->checks = [];
+    }
+
+    public function register($check){
+        assert(is_array($check), "checks methods must return a list");
+        $this->registered_checks = array_merge($this->registered_checks, $check);
     }
     
-    public static function model_checks(){
-        ColorCLi::info("Performing System Checks .....");
+    public function run_checks(){
+        $models = BaseOrm::instance()->get_registry()->get_models();
 
-        $err_check = [];
-        foreach (ProjectState::app_model_objects() as $name=>$model_obj) :
+        foreach ($models as $name=>$model_obj) :
             $checks = $model_obj->check();
 
             foreach ($checks as $check) :
-
-                if($check instanceof Error):
-                    $err_check[] = $check;
-                endif;
-
-                if($check instanceof Warning):
-                    $warning_check[] = $check;
-                endif;
+                $this->registered_checks[] = $check;
             endforeach;
 
         endforeach;
 
-        if(!empty($err_check)):
-            ColorCLi::info("System check found some anomalies : ");
 
-            Checks::_display($err_check, TRUE);
-        endif;
-
-        if(!empty($warning_check)):
-            ColorCLi::info("Take note of the following : ");
-
-            Checks::_display($warning_check);
-        endif;
-
-        if(empty($err_check) && empty($warning_check)):
-            ColorCLi::success("System checks passed");
-        endif;
-
+        return $this->get_checks();
+    }
+    
+    public function get_checks(){
+        return $this->registered_checks;
     }
 
-    public static function _display($checks, $exit=FALSE){
 
-        if(!empty($checks)):
-
-            foreach ($checks as $check) :
-                $check->message();
-            endforeach;
-
-            if($exit):
-                exit;
-            endif;
-
-        endif;
+//    some short hand
+    public static function critical($opts){
+        $message = $hint = $context = $id = '';
+        extract($opts);
+        return new Critical($message, $hint, $context, $id);
+    }
+    public static function error($opts){
+        $message = $hint = $context = $id = '';
+        extract($opts);
+        return new Error($message, $hint, $context, $id);
+    }
+    public static function warning($opts){
+        $message = $hint = $context = $id = '';
+        extract($opts);
+        return new Warning($message, $hint, $context, $id);
+    }
+    public static function debug($opts){
+        $message = $hint = $context = $id = '';
+        extract($opts);
+        return new Debug($message, $hint, $context, $id);
+    }
+    public static function info($opts){
+        $message = $hint = $context = $id = '';
+        extract($opts);
+        return new Info($message, $hint, $context, $id);
     }
 
-}
-
-// some shorthand functions
-function check_error($field_obj, $message){
-    return new Error($field_obj, $message);
-}
-
-function check_warning($field_obj, $message){
-    return new Warning($field_obj, $message);
-}
-
-function check_info($message){
-    return new Info($message);
-}
-
-function check_success($message){
-    return new Success($message);
 }
