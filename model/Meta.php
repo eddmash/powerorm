@@ -1,7 +1,10 @@
 <?php
 namespace powerorm\model;
+use powerorm\Contributor;
+use powerorm\model\field\AutoField;
 use powerorm\model\field\InverseRelation;
 use powerorm\model\field\RelatedField;
+use powerorm\Object;
 
 /**
  * Class Meta
@@ -9,8 +12,10 @@ use powerorm\model\field\RelatedField;
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Meta{
+class Meta extends Object implements Contributor{
     public $model_name;
+    public $has_auto_field=FALSE;
+    public $auto_field;
     public $db_table;
     public $primary_key;
     public $fields = [];
@@ -18,8 +23,18 @@ class Meta{
     public $local_fields = [];
     public $inverse_fields = [];
     public $trigger_fields = [];
+    public $managed;
+    // todo
+    public $unique_together = [];
 
-    public function load_field($field_obj){
+    /**
+     * Indicates if model was auto created by the orm e.g. intermediary model for many to many relationship.
+     * @var bool
+     */
+    public $auto_created = FALSE;
+ 
+
+    public function add_field($field_obj){
         $this->fields[$field_obj->name] = $field_obj;
         $this->set_pk($field_obj);
 
@@ -49,7 +64,21 @@ class Meta{
         endif;
     }
 
-    public function fields_names(){
+    public function get_fields_names(){
         return array_keys($this->fields);
+    }
+    
+    public function prepare(BaseModel $model){
+        if(empty($this->primary_key)):
+            $model->add_to_class('id', new AutoField());
+        endif;
+    }
+    
+    public function contribute_to_class($name, $obj){
+        $obj->{$name}=$this;
+    }
+ 
+    public function can_migrate(){
+        return $this->managed;
     }
 }

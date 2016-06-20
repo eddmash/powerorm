@@ -2,6 +2,21 @@
 namespace powerorm\exceptions;
 
 /**
+ * Class NotImplemented
+ * @package powerorm\exceptions
+ * @since 1.0.1
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class NotImplemented extends \ErrorException{}
+
+/**
+ * Class NotFound
+ * @package powerorm\exceptions
+ * @since 1.0.1
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class NotFound extends \ErrorException{}
+/**
  * Class OrmErrors
  * @package powerorm\exceptions
  * @since 1.0.0
@@ -33,7 +48,6 @@ class TypeError extends OrmErrors{}
  */
 class AmbiguityError extends \Exception{}
 
-
 /**
  * Class ValueError
  * @package powerorm\exceptions
@@ -57,6 +71,7 @@ class FormException extends \Exception{}
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class DuplicateField extends FormException{}
+
 /**
  * Class ObjectDoesNotExist
  * @package powerorm\exceptions
@@ -73,4 +88,34 @@ class ObjectDoesNotExist extends OrmExceptions{}
  */
 class MultipleObjectsReturned extends OrmExceptions{}
 
+/**
+ * Class ValidationError
+ * @package powerorm\exceptions
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class ValidationError extends OrmErrors{}
+
+/**
+ * Class CommandError
+ * @package powerorm\exceptions
+ * @since 1.0.1
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class CommandError extends OrmErrors{}
+
+/**
+ * Class NotSupported
+ * @package powerorm\exceptions
+ * @since 1.0.1
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class NotSupported extends OrmExceptions{}
+
+/**
+ * Class SystemCheckError
+ * @package powerorm\exceptions
+ * @since 1.0.1
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class SystemCheckError extends OrmErrors{}
