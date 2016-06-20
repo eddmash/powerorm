@@ -1,7 +1,9 @@
 <?php
 namespace powerorm\model\field;
+use powerorm\BaseOrm;
+
 /**
- * Act a buffer for Relation Fields, to help avoid issues with
+ * Act as a buffer for Relation Fields, to help avoid issues with relations and self referencing.
  *
  * @package powerorm\model
  * @since 1.0.0
@@ -9,48 +11,36 @@ namespace powerorm\model\field;
  */
 class RelationObject{
 
-    public $model_name;
-    public $model;
+    public $auto_created = TRUE;
+    public $field = NULL;
+    public $model = NULL;
+    public $field_name = NULL;
+    public $related_name = NULL;
 
-    public function __construct($model_name){
-        $this->model_name = $model_name;
+    public function __construct($opts=[]){
+
+        $this->model = $opts['model'];
+        $this->field = $opts['field'];
     }
 
-    public function _model_object(){
-        $_ci = & get_instance();
-        if(!isset($this->model)):
-            $_ci->load->model($this->model_name);
-            $this->model =  $_ci->{$this->model_name};
-        endif;
-    }
+    public function model()
+    {
+        if (array_key_exists($this->model, BaseOrm::instance()->get_registry()->get_models())) :
+            return BaseOrm::instance()->get_registry()->get_model($this->model);
 
-    public function __get($key){
-        $this->_model_object();
-        return $this->model->{$key};
-
-    }
-    public function __call($method, $args){
-        $this->_model_object();
-
-        if(empty($args)):
-            // invoke from the queryset
-            return call_user_func(array($this->model, $method));
         else:
-            // invoke from the queryset
-            if(is_array($args)):
-                return call_user_func_array(array($this->model, $method), $args);
-            else:
-                return call_user_func(array($this->model, $method), $args);
-            endif;
+                return NULL;
+
         endif;
+    }
+}
 
-    }
-    public function __set($key, $value){
-        $this->_model_object();
-        $this->model->{$key} = $value;
-    }
-
-    public function __toString(){
-        return sprintf("Related Model: %s", $this->model_name);
-    }
+class ManyToOneObject extends RelationObject{}
+class OneToOneObject extends RelationObject{}
+class ManyToManyObject extends RelationObject{
+    public $through = NULL;
+    public function __construct($opts=[]){
+        parent::__construct($opts);
+        $this->through = $opts['through'];
+    } 
 }

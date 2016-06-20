@@ -1,20 +1,17 @@
 <?php
 namespace powerorm\migrations;
 
-use powerorm\migrations\operations\DropTriggers;
-use powerorm\model\field\DateTimeField;
-use powerorm\exceptions\OrmExceptions;
-use powerorm\migrations\operations\AddM2MField;
-use powerorm\migrations\operations\AddModel;
-use powerorm\migrations\operations\AddTriggers;
-use powerorm\migrations\operations\AlterField;
-use powerorm\migrations\operations\DropField;
-use powerorm\migrations\operations\DropM2MField;
-use powerorm\migrations\operations\DropModel;
 use powerorm\migrations\operations\AddField;
+use powerorm\migrations\operations\AlterField;
+use powerorm\migrations\operations\CreateModel;
+use powerorm\migrations\operations\DropField;
+use powerorm\migrations\operations\DropModel;
+use powerorm\migrations\operations\RenameField;
+use powerorm\migrations\operations\RenameModel;
 use powerorm\model\field\InverseRelation;
-use powerorm\model\field\RelatedField;
-use powerorm\model\ProxyModel;
+use powerorm\model\field\ManyToMany;
+use powerorm\Object;
+use powerorm\NOT_PROVIDED;
 
 /**
  * Class AutoDetector
@@ -22,326 +19,304 @@ use powerorm\model\ProxyModel;
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class AutoDetector{
-    public $operations = [];
-    public $current_state;
-    public $proxies = [];
+class AutoDetector extends Object{
 
-    // use proxy objects to create migration this is to allow storing model state in file
-    // add reference after creating table
-    public function __construct($current_state, $history_state){
-        $this->history_state = $history_state;
-        $this->current_state = $this->_prepare($current_state);
+    protected $operations = [];
+    protected  $present_state;
+    protected  $previous_state;
+    protected $questioner;
+
+    const ACTION_CREATED = 'created';
+    const ACTION_DROPPED = 'dropped';
+    const ACTION_ALTER = 'alter';
+
+    const TYPE_MODEL = 'model';
+    const TYPE_FIELD = 'field';
+
+    public function __construct(ProjectState $previous_state, ProjectState $present_state, Questioner $questioner=NULL){
+
+        $this->present_state = $present_state;
+        $this->previous_state = $previous_state;
+        $this->questioner = (is_null($questioner))? Questioner::instance() : $questioner;
+
+    }
+
+    public function changes(Graph $graph){
+        $changes = $this->find_changes();
+
+        $changes = $this->prepare_for_graph($changes, $graph);
+
+        return $changes;
+    }
+    
+    public function prepare_for_graph($changes, Graph $graph, $migration_name=NULL){
+        $leaves = $graph->leaf_nodes();
+
+        $leaf = (empty($leaves)) ? "" : $leaves[0];
+
+
+        if(empty($changes)):
+            return [];
+        endif;
+
+        foreach ($changes as $migration) :
+
+            if(empty($leaf)):
+                $migration_no = 1; 
+            else:
+                $migration_no = $this->get_migration_number($leaf) + 1;
+
+            endif;
+
+            // set name for migration
+            if(empty($leaf)):
+                // this mean we don't have previous migrations
+                $migration_name= "0001_initial";
+            else:
+                // first set previous as dependency of this
+                $migration->requires = [$leaf];
+
+                $migration_no = str_pad($migration_no, 4, "0", STR_PAD_LEFT);
+                $migration_name = $this->suggest_name($migration->operations());
+                $migration_name =  sprintf('%1$s_%2$s', $migration_no, $migration_name);
+            endif;
+
+            $migration->name = $migration_name;
+            
+        endforeach;
+
+        return $changes;
+    }
+
+    public function suggest_name($operations){
+        if(count($operations) == 1):
+            return $operations[0]->describe();
+        else:
+            return sprintf("auto_%s", date("Ymd_hm"));
+        endif;
+    }
+
+    public function fields_definitions($fields){
+        $field_defs = [];
+
+        foreach ($fields as $name=>$field) :
+            $field_defs[] = [$name => $field->skeleton()];
+        endforeach;
+
+        return $field_defs;
+    }
+
+    public function get_migration_number($name){
+
+        $name =  explode("_", $name);
+
+        return (int)$name[0];
     }
 
     /**
-     * Prepares the state for use in migration.
-     * @internal
-     * @param $current_state
-     * @return mixed
-     */
-    public function _prepare($current_state){
-        $current_state->models = $this->_model_resolution_order($current_state->models);
-        return $current_state;
-    }
-
-    /**
-     * Resolves how the models will be migrated based on how they depend on each other.
-     * @param $models
+     * returns of changes detected in the application.
      * @return array
      */
-    public function _model_resolution_order($models){
-        $order_models = [];
+    public function find_changes(){
 
-        // loop as many times as the size of models passed in.
-        $i = 0;
-        while($i< count($models)):
+        $new_models = $this->present_state->models;
+        $old_models = $this->previous_state->models;
 
-            foreach ($models as $name=>$model) :
+        $this->new_models_names = array_keys($new_models);
+        $this->old_models_names = array_keys($old_models);
 
-                if(empty($model->relations_fields)):
-                    $order_models[$name]= $model;
+        $this->past_field_names = [];
+        $this->present_field_names = [];
+
+        // models that exist in both states
+        $this->common_model_names = array_intersect($this->new_models_names, $this->old_models_names);
+
+        // get fields we use this to check for renamed fields
+        // for each of the common models
+        foreach ($this->common_model_names as $common_model_name) :
+            $past_model_state = $this->previous_state->get_model($common_model_name);
+            $present_model_state = $this->present_state->get_model($common_model_name);
+
+            $this->past_field_names[$common_model_name] = array_keys($past_model_state->fields);
+            $this->present_field_names[$common_model_name]= array_keys($present_model_state->fields);
+        endforeach;
+
+        // model
+        $this->find_renamed_models();
+        $this->find_dropped_models();
+        $this->find_new_models();
+
+        // fields
+        $this->find_renamed_fields();
+        $this->find_drop_fields();
+        $this->find_added_fields();
+        $this->find_altered_fields();
+
+        // we need to sort the operation, this to ensure operations like DropModel which might depend a foreign keys
+        // being dropped first come after the fields are dropped
+
+        $changes = [];
+        if(!empty($this->operations)):
+            // then create a migration class for them.
+            $migration_name = $this->suggest_name($this->operations);
+
+            $migration  = new Migration($migration_name);
+            $migration->operations = $this->operations;
+
+            $changes[] = $migration;
+        endif;
+
+        return $changes;
+    }
+
+    public function find_renamed_models(){
+
+        $this->renamed_models = [];
+        $this->renamed_models_to = [];
+
+
+        // get new models
+        $new_models_names = array_diff($this->new_models_names, $this->old_models_names);
+
+        foreach ($new_models_names as $new_model) :
+            $n_model_state= $this->present_state->get_model($new_model);
+            $n_fields_def = $this->fields_definitions($n_model_state->fields);
+
+            // get dropped models
+            $dropped_models_names = array_diff($this->old_models_names, $this->new_models_names);
+            foreach ($dropped_models_names as $dropped_model) :
+                $o_model_state= $this->previous_state->get_model($dropped_model);
+                $o_fields_def = $this->fields_definitions($o_model_state->fields);
+
+                if($n_fields_def === $o_fields_def &&
+                    $this->questioner->ask_rename_model($dropped_model, $new_model)):
+
+                    $this->add_operation(
+                        new RenameModel([
+                            'old_name'=>$o_model_state->name,
+                            'new_name'=>$n_model_state->name
+                        ]),
+                        []
+                    );
+
+                    $this->renamed_models[$n_model_state->name] = $o_model_state->name;
+                    $this->renamed_models_to[$o_model_state->name] = $n_model_state->name;
+
+                    $position = array_search($dropped_model,$this->old_models_names);
+                    // remove old name
+                    array_splice($this->old_models_names, $position, 1);
+
+                    // set the new name
+                    array_push($this->old_models_names, $new_model);
                 endif;
 
-                $existing_models = array_merge(array_keys($order_models), $this->migrated_models());
+            endforeach;
 
-                $dependencies = [];
-                foreach ($model->relations_fields as $field) :
 
-                    $dependencies[] = $this->stable_name($field->related_model->meta->model_name);
+        endforeach;
 
-                    $missing =array_diff($dependencies, $existing_models);
+    }
 
-                    // if there is nothing missing or this is just an inverse relation just add.
-                    if(count($missing)==0 || $field instanceof InverseRelation):
-                        $order_models[$name]= $model;
-                    endif;
+    public function find_new_models(){
 
-                    // also self add those that have self refernces
-                    $dependencies[] = $name;
-                    if($this->_self_referencing($name, $dependencies)):
-                        $order_models[$name]= $model;
+        // get new models not in previous state
+        $new_models_names = array_diff($this->new_models_names, $this->old_models_names);
+
+        foreach ($new_models_names as $model_name) :
+            // get meta info about the model
+            $model_meta = $this->present_state->registry()->get_model($model_name)->meta;
+
+            if(!empty($model_meta->local_fields)):
+                $this->add_operation(
+                    new CreateModel(['model'=>$model_name, 'fields'=>$model_meta->local_fields]),
+                    [],
+                    TRUE
+                );
+            endif;
+
+            // if its not managed no point in going on
+            if(!$model_meta->managed):
+                continue;
+            endif;
+
+            // create operations for related fields
+            foreach ($model_meta->relations_fields as $field_name=>$field) :
+                // ignore inverse fields
+                if($field instanceof InverseRelation):
+                    continue;
+                endif;
+
+                $this->_add_field($field_name, $field, $model_name, FALSE);
+            endforeach;
+
+        endforeach;
+    }
+    
+    public function find_dropped_models(){
+
+        // get models in previous state not in present state
+        $dropped_models_names = array_diff($this->old_models_names, $this->new_models_names);
+
+        foreach ($dropped_models_names as $model_name) :
+            $model = $this->previous_state->registry()->get_model($model_name);
+
+            // if its not managed no point in going on
+//            if(!$model->meta->managed):
+//                continue;
+//            endif;
+
+            // remove the model
+            $this->add_operation(
+                new DropModel(['model'=>$model->meta->model_name]),
+                []
+            );
+        endforeach;
+
+    }
+
+    public function find_renamed_fields(){
+        $this->renamed_fields = [];
+
+        foreach ($this->common_model_names as $common_model_name) :
+            $past_fields = $this->past_field_names[$common_model_name];
+            $present_fields = $this->present_field_names[$common_model_name];
+
+            // get new fields
+            $new_fields_names = array_diff($present_fields, $past_fields);
+            // get dropped fields
+            $dropped_fields_names = array_diff($past_fields, $present_fields);
+            // compare the field definitions, if similar enquire if its a rename
+            foreach ($new_fields_names as $new_field_name) :
+                $field = $this->present_state->registry()->get_model($common_model_name)->meta->get_field($new_field_name);
+                $new_field = $this->present_state->get_model($common_model_name)->fields[$new_field_name];
+                $new_field_def = $new_field->skeleton();
+
+                foreach ($dropped_fields_names as $dropped_fields_name) :
+                    $dropped_field = $this->previous_state->get_model($common_model_name)->fields[$dropped_fields_name];
+                    $drop_field_def = $dropped_field->skeleton();
+
+                    if($drop_field_def === $new_field_def):
+                        if($this->questioner->ask_rename($common_model_name, $dropped_fields_name, $new_field_name, $field)):
+                            $this->add_operation(
+                                new RenameField([
+                                    'model'=>$common_model_name,
+                                    'old_name'=>$dropped_fields_name,
+                                    'new_name'=>$new_field_name,
+                                ]),
+                                []
+                            );
+
+                            // replace old name with the new name in the list of past fields
+                            array_splice($past_fields, array_search($dropped_fields_name, $past_fields), 1);
+                            array_push($past_fields, $new_field_name);
+                            $this->past_field_names[$common_model_name] = $past_fields;
+                            $this->renamed_fields[$common_model_name][$new_field_name]=$dropped_fields_name;
+                        endif;
                     endif;
                 endforeach;
 
             endforeach;
-            $i++;
-        endwhile;
-        return $order_models;
-    }
-
-    /**
-     * Returns all the operation that need to be migrated.
-     * @return array
-     */
-    public function get_operations(){
-        return $this->find_operations();
-    }
-
-    /**
-     * Gets all the models that have alredy been migrated
-     * @return array
-     */
-    public function migrated_models(){
-        return array_keys($this->history_state->models);
-    }
-
-    /**
-     * Creates a list operations that need to be done based on the current state of the project.
-     * @internal
-     * @param $model_name
-     * @param $operation
-     * @param $dependency
-     */
-    public function operations_todo($model_name, $operation, $dependency){
-        $this->operations[] = [
-            'model_name'=>$this->stable_name($model_name),
-            'operation'=> $operation,
-            'dependency'=>$dependency
-        ];
-    }
-
-    /**
-     * Gets all the operations that needs to be carried out.
-     * @internal
-     * @return array
-     * @throws OrmExceptions
-     */
-    public function find_operations(){
-        # Generate non-rename model operations
-        $this->find_deleted_models();
-        $this->find_created_models();
-        $this->find_added_fields();
-        $this->find_dropped_fields();
-        $this->find_altered_fields();
-        $this->setup_triggers();
-
-
-        // first resolve dependencies, to ensure that we don't add an operation that expects a model to
-        // already exist only to find it does not
-        $this->_operation_resolution_order();
-
-        // try to merge some of the operations, e.g AddModel and AddField can be merged if the act on same model
-        // and depend on model that already exists
-
-        return $this->_optimize();
-    }
-
-    public function setup_triggers(){
-
-        foreach ($this->current_state->models as $model_meta) :
-
-            if(isset($this->history_state->models[$this->stable_name($model_meta->model_name)])):
-                $past = $this->history_state->models[$this->stable_name($model_meta->model_name)];
-            else:
-                $past = [];
-            endif;
-
-            //find trigger fields
-            $this->_create_triggers($model_meta, $past);
         endforeach;
-
-
-    }
-
-    /**
-     * Detects any new models to be acted on.
-     * @intenal
-     */
-    public function find_created_models(){
-
-        if(!empty($this->history_state->models)):
-            $past_model_names = array_keys($this->history_state->models);
-        else:
-            $past_model_names = [];
-        endif;
-
-
-        $current_models = $this->_model_resolution_order($this->current_state->models);
-
-
-        $current_model_names = array_keys($current_models);
-
-        $added_models = array_values(array_diff($current_model_names, $past_model_names));
-
-        // go through the created models and create necessary operations
-        foreach ($added_models as $added_model) :
-
-            $model_state = $current_models[$added_model];
-
-
-            // create model operation
-            $this->operations_todo(
-                $added_model,
-                new AddModel($added_model, $model_state->local_fields, ['table_name'=>$model_state->db_table]),
-                []
-            );
-
-            // add relation operations
-            // we do this separately because need the model to be created before the relationships are created
-            // maybe optimize later
-            foreach ($model_state->relations_fields as $field) :
-                $field_depends_on = [ucwords($this->stable_name($field->related_model->meta->model_name)),
-                    ucwords($this->stable_name($added_model))];
-                if($field instanceof InverseRelation):
-                    continue;
-                endif;
-                if($field->M2M):
-                   $this->_add_m2m_field($model_state, $field, $field_depends_on);
-                else:
-                    $this->operations_todo($added_model,
-                        new AddField($added_model, $field, ['table_name'=>$model_state->db_table]),
-                        $field_depends_on
-                    );
-                endif;
-
-            endforeach;
-
-        endforeach;
-    }
-
-    public function _create_triggers($new_state, $past_state){
-        $now_trigger_fields=[];
-        $past_trigger_fields=[];
-
-        $now_fields = $new_state->fields;
-
-
-        foreach ($now_fields as $field) :
-            if($this->is_trigger_field($field)):
-                $now_trigger_fields[$field->name] = $field;
-            endif;
-        endforeach;
-
-        if(!empty($past_state)):
-            $past_fields = $past_state->fields;
-            foreach ($past_fields as $field) :
-                if($this->is_trigger_field($field)):
-                    $past_trigger_fields[$field->name] = $field;
-                endif;
-            endforeach;
-        endif;
-
-        $add_fields =  array_diff(array_keys($now_trigger_fields), array_keys($past_trigger_fields));
-        $drop_fields = array_diff(array_keys($past_trigger_fields), array_keys($now_trigger_fields));
-
-        if(!empty($add_fields)):
-            $this->operations_todo(
-                $new_state->model_name,
-                new AddTriggers($new_state->model_name, $now_trigger_fields, ['table_name'=>$new_state->db_table]),
-                [$new_state->model_name]
-            );
-            return;
-        endif;
-
-        if(!empty($drop_fields)):
-            if(!empty($now_trigger_fields)):
-                $this->operations_todo(
-                    $new_state->model_name,
-                    new AddTriggers($new_state->model_name, $now_trigger_fields, ['table_name'=>$new_state->db_table]),
-                    [$new_state->model_name]
-                );
-            else:
-                // gets here only if this was the last set of trigger fields on the model
-                $this->operations_todo(
-                    $this->_past_names($new_state->model_name),
-                    new DropTriggers($this->_past_names($past_state->model_name),
-                        $past_trigger_fields,
-                        ['table_name'=>$this->_past_names($past_state->db_table)]),
-                    [$this->_past_names($past_state->model_name)]
-                );
-            endif;
-            return;
-        endif;
-
-        if(!empty($now_trigger_fields) && !empty($past_trigger_fields)):
-            foreach ($now_trigger_fields as $field) :
-                if(isset($past_trigger_fields[$field->name])):
-                    $past = $past_trigger_fields[$field->name];
-                    if($this->_is_modified($field, $past)):
-                        $this->operations_todo(
-                            $new_state->model_name,
-                            new AddTriggers($new_state->model_name, $now_trigger_fields,
-                                ['table_name'=>$new_state->db_table]),
-                            [$new_state->model_name]
-                        );
-                    endif;
-                endif;
-
-            endforeach;
-            return;
-        endif;
-
-        if(!empty($now_trigger_fields) && empty($past_trigger_fields)):
-
-            $this->operations_todo(
-                $new_state->model_name,
-                new AddTriggers($new_state->model_name, $now_trigger_fields, ['table_name'=>$new_state->db_table]),
-                [$new_state->model_name]
-            );
-            return;
-        endif;
-
-    }
-
-    public function _past_names($name){
-
-        if(preg_match("/_fake_/", $name)):
-            return $this->stable_name(str_replace('_fake_\\', '', $name));
-        endif;
-        return $name;
-    }
-
-    /**
-     * detect Models that have been deleted.
-     * @internal
-     */
-    public function find_deleted_models(){
-
-        if(empty($this->history_state->models)):
-            return;
-        endif;
-
-        $current_models = $this->current_state->models;
-
-        $current_model_names = array_keys($current_models);
-        $past_model_names = array_keys($this->history_state->models);
-
-        $deleted_models = array_values(array_diff($past_model_names, $current_model_names));
-
-        foreach ($deleted_models as $deleted_model) :
-            $model_state = $this->history_state->models[$deleted_model];
-            $name = $model_state->db_table;
-            if(preg_match("/_fake_/", $name)):
-                $name = str_replace('_fake_\\', '', $name);
-            endif;
-            $this->operations_todo(
-                $deleted_model,
-                new DropModel($deleted_model, $model_state->local_fields, ['table_name'=>$name]),
-                []
-            );
-        endforeach;
-
 
     }
 
@@ -350,98 +325,178 @@ class AutoDetector{
      * @internal
      */
     public function find_added_fields(){
-        if(empty($this->history_state->models)):
-          return;
-        endif;
 
-        // search for each model in the migrations, if present get its fields
-        // note those that we added
-        foreach ($this->current_state->models as $model_name => $model_meta) :
-            if(!isset($this->history_state->models[$this->stable_name($model_name)])):
-                continue;
-            endif;
+        foreach ($this->common_model_names as $common_model_name) :
+            $past_fields = $this->past_field_names[$common_model_name];
+            $present_fields = $this->present_field_names[$common_model_name];
 
-            $model_past_state = $this->history_state->models[$this->stable_name($model_name)];
-
-            $current_fields = array_keys($model_meta->fields);
-            $past_fields = array_keys($model_past_state->fields);
-
-            $new_fields_names = array_values(array_diff($current_fields, $past_fields));
-
-            if(empty($new_fields_names)):
-                continue;
-            endif;
+            // get new fields
+            $new_fields_names = array_diff($present_fields, $past_fields);
 
             foreach ($new_fields_names as $field_name) :
-                $field = $model_meta->fields[$this->stable_name($field_name)];
+                $model_meta = $this->present_state->registry()->get_model($common_model_name)->meta;
 
+                $field = $model_meta->get_field($field_name);
 
                 if($field instanceof InverseRelation):
                     continue;
                 endif;
 
-                $this->_create_target_field($field, $model_name, $model_meta);
-            endforeach;
-        endforeach;
 
+                $this->_add_field($field_name, $field, $common_model_name, $model_meta);
+            endforeach;
+
+        endforeach;
 
     }
 
-    public function _create_target_field($field, $model_name, $model_obj){
-        $field_depends_on = [];
+    public function find_drop_fields(){
 
-        if(isset($field->related_model)):
-            $field_depends_on = [ucwords($this->stable_name($field->related_model->meta->model_name)),
-                ucwords($this->stable_name($model_name))];
-        endif;
+        foreach ($this->common_model_names as $common_model_name) :
+            $past_fields = $this->past_field_names[$common_model_name];
+            $present_fields = $this->present_field_names[$common_model_name];
 
-        if(property_exists($field, 'M2M') && $field->M2M):
-            $this->_add_m2m_field($model_obj, $field, $field_depends_on);
-        else:
-            $this->operations_todo($model_name,
-                new AddField($model_name, $field, ['table_name'=>$model_obj->db_table]),
-                $field_depends_on
-            );
-        endif;
+            // get dropped fields
+            $dropped_fields_names = array_diff($past_fields, $present_fields);
+
+            foreach ($dropped_fields_names as $field_name) :
+                $model_meta = $this->previous_state->registry()->get_model($common_model_name)->meta;
+
+                $field = $model_meta->get_field($field_name);
+
+                if($field instanceof InverseRelation):
+                    continue;
+                endif;
+
+                $this->_drop_field($field_name, $field, $common_model_name);
+            endforeach;
+        endforeach;
+
     }
 
     /**
-     * Detect dropped fields.
+     * Detects any field alterations.
      * @internal
      */
-    public function find_dropped_fields(){
+    public function find_altered_fields(){
+        foreach ($this->common_model_names as $common_model_name) :
+            $past_fields = $this->past_field_names[$common_model_name];
+            $present_fields = $this->present_field_names[$common_model_name];
 
-        if(empty($this->history_state->models)):
-          return;
-        endif;
+            $common_fields = array_intersect($present_fields, $past_fields);
 
-        // search for each model in the migrations, if present get its fields
-        // note those that we added
-        foreach ($this->current_state->models as $model_name => $model_obj) :
-            if(!isset($this->history_state->models[$model_name])):
-                continue;
-            endif;
-            $model_past_state = $this->history_state->models[$model_name];
+            foreach ($common_fields as $common_field_name) :
+                // since the common models are got from the old model names which has been adjusted for renamed models
+                // we need to get the initial model name before the rename, since that the name that will be present
+                // in the past state as stored by the migrations files
+                $past_model_name = $common_model_name;
+                if((array_key_exists($common_model_name, $this->renamed_models))):
+                    $past_model_name = $this->renamed_models[$common_model_name];
+                endif;
 
-            $current_fields = array_keys($model_obj->fields);
-            $past_fields = array_keys($model_past_state->fields);
+                // we also need to check for field renames
+                $past_field_name = $common_field_name;
+                if(array_key_exists($common_model_name, $this->renamed_fields)):
 
-            $dropped_fields_names = array_values(array_diff($past_fields, $current_fields));
+                    if(array_key_exists($common_field_name, $this->renamed_fields[$common_model_name])):
+                        $past_field_name = $this->renamed_fields[$common_model_name][$common_field_name];
+                    endif;
+                endif;
+
+                $old_field = $this->previous_state->models[$past_model_name]->fields[$past_field_name];
+
+                $new_field =  $this->present_state->models[$common_model_name]->fields[$common_field_name];
+
+                // look at this field in both state comparing them to seem if the differ i.e an alteration has occured
+
+                $new_field_def = $new_field->skeleton();
+                $old_field_def = $old_field->skeleton();
+
+                if($new_field_def !== $old_field_def):
+                    $both_m2m = ($old_field instanceof ManyToMany && $new_field instanceof ManyToMany);
+                    $neither_m2m = (!$old_field instanceof ManyToMany && !$new_field instanceof ManyToMany);
+                    $preserve_default = TRUE;;
+
+                    if(!$old_field->null &&
+                        $new_field->null &&
+                        !$new_field->has_default() &&
+                        !$new_field instanceof ManyToMany):
+
+                        $new_default = $this->questioner->ask_not_null_alteration($common_field_name, $common_model_name);
+
+                        if($new_default !== new NOT_PROVIDED):
+                            $new_field->default = $new_default;
+                            $preserve_default = FALSE;
+                        endif;
+                    endif;
+
+                    if(!$both_m2m || $neither_m2m):
+
+                        $this->add_operation(
+                            new AlterField([
+                                'model'=>$common_model_name,
+                                'field'=> $new_field,
+                                'name'=>$common_field_name,
+                                'preserve_default'=>$preserve_default
+                            ]),
+                            []
+                        );
+                    else:
+                        $this->_drop_field($common_field_name, $old_field, $common_field_name);
+                        $this->_add_field($common_field_name, $new_field, $common_field_name);
+                    endif;
 
 
-            if(empty($dropped_fields_names)):
-                continue;
-            endif;
-
-            foreach ($dropped_fields_names as $field_name) :
-
-                $field = $model_past_state->fields[$field_name];
-
-                $this->_drop_target_field($field, $model_name, $model_obj);
+                endif;
             endforeach;
         endforeach;
 
+    }
 
+    public function add_dependency($item_name, $action, $type){
+        return ['item_name'=>$this->lower_case($item_name), 'action'=> $action, 'type'=> $type];
+    }
+
+    /**
+     * @param $field_name
+     * @param $field
+     * @param $model_name
+     * @param bool|TRUE $alter if true this method is being used to create a field that alters an existing model table.
+     * otherwise its altering and existing model.
+     */
+    public function _add_field($field_name, $field, $model_name, $alter=TRUE){
+        $field_depends_on = [];
+
+        $preserve_default = TRUE;
+
+        if(isset($field->related_model)):
+            $field_depends_on = [
+                // depend on the related model
+                $this->add_dependency($this->lower_case($field->related_model->meta->model_name),
+                    self::ACTION_CREATED, self::TYPE_MODEL),
+
+                // depend on the model this field belongs to.
+                $this->add_dependency($this->lower_case($model_name), self::ACTION_CREATED, self::TYPE_MODEL)
+            ];
+        endif;
+
+        if($field->null===FALSE && $field->default instanceof NOT_PROVIDED && !$field instanceof ManyToMany && $alter):
+            $field->default = $this->questioner->ask_not_null_default($field->name, $model_name);
+
+            // we don't want this default set permanently its just temporary
+            $preserve_default = FALSE;
+        endif;
+
+
+        $this->add_operation(
+            new AddField([
+                'model'=>$model_name,
+                'name'=>$field_name,
+                'field'=>$field,
+                'preserve_default'=>$preserve_default
+            ]),
+            $field_depends_on
+        );
     }
 
     /**
@@ -450,433 +505,36 @@ class AutoDetector{
      * @param $model_name
      * @param $model_obj
      */
-    public function _drop_target_field($field, $model_name, $model_obj){
+    public function _drop_field($field_name, $field, $model_name){
 
         $field_depends_on = [];
         if(isset($field->related_model)):
-            $field_depends_on = [ucwords($this->stable_name($field->related_model->meta->model_name)),
-                ucwords($this->stable_name($model_name))];
+            $field_depends_on = [ucwords($this->lower_case($field->related_model->meta->model_name)),
+                ucwords($this->lower_case($model_name))];
         endif;
 
-        if(property_exists($field, 'M2M') && $field->M2M):
-            $this->_drop_m2m_field($model_obj, $field, $field_depends_on);
+        $this->add_operation(
+            new DropField([
+                'model'=>$model_name,
+                'name'=>$field_name,
+            ]),
+            $field_depends_on
+        );
+    }
+
+    /**
+     * @param $operation
+     * @param array $dependencies
+     * @param bool|FALSE $push_at_top some operations should come before others, use this determine which
+     */
+    public function add_operation($operation, $dependencies=[], $push_at_top=FALSE){
+        $operation->depends_on = $dependencies;
+
+        if($push_at_top):
+            array_unshift($this->operations, $operation);
         else:
-            $this->operations_todo($model_name,
-                new DropField($model_name, $field, ['table_name'=>$model_obj->db_table]),
-                $field_depends_on
-            );
+            array_push($this->operations, $operation);
         endif;
     }
 
-    /**
-     * Detects any field alterations.
-     * @internal
-     */
-    public function find_altered_fields(){
-        if(empty($this->history_state->models)):
-            return;
-        endif;
-
-        foreach ($this->current_state->models as $model_name => $model_obj) :
-            if(!isset($this->history_state->models[$model_name])):
-                continue;
-            endif;
-
-            $model_past_state = $this->history_state->models[$model_name];
-
-            $past_fields = $model_past_state->fields;
-
-            foreach ($model_obj->fields as $name=>$field) :
-                if(!isset($past_fields[$name])):
-                    continue;
-                endif;
-
-                $modified_field_names = $this->_is_modified($field, $past_fields[$name]);
-                // if there are not modifications found, no need to go on.
-                if(empty($modified_field_names)):
-                    continue;
-                endif;
-
-
-                // if field is moving to / from a relationship field, we need to drop the old version
-                // and create the new version
-                if($field instanceof RelatedField || $past_fields[$name] instanceof RelatedField):
-                    $past_field_state = $past_fields[$name];
-                    $this->_drop_target_field($past_field_state, $model_name, $model_obj);
-                    $this->_create_target_field($field, $model_name, $model_obj);
-                    continue;
-                endif;
-
-                if(!empty($modified_field_names)):
-                    $this->operations_todo(
-                        $model_name,
-                        new AlterField($model_name,
-                            [$name=>['present'=>$field, 'past'=>$past_fields[$name]]],
-                            ['table_name'=>$model_obj->db_table,]
-                        ),
-                        []
-                    );
-                endif;
-            endforeach;
-
-        endforeach;
-
-    }
-
-    public function _is_modified($field, $past_field){
-        $modified_field_names = [];
-        if(!$field instanceof InverseRelation):
-
-            $current_options = $field->options();
-            $past_options = $past_field->options();
-
-
-            $modified_field_names = array_diff_assoc($current_options, $past_options);
-
-
-            if(!empty($modified_field_names)):
-                foreach (['constraint_name'] as $f_name) :
-                    if(array_key_exists($f_name, $modified_field_names)):
-                        unset($modified_field_names[$f_name]);
-                    endif;
-                endforeach;
-            endif;
-        endif;
-
-        return $modified_field_names;
-    }
-
-    public function is_trigger_field($field_obj){
-        if($field_obj instanceof DateTimeField && ($field_obj->on_creation || $field_obj->on_update)):
-            return TRUE;
-        endif;
-        return FALSE;
-    }
-    
-    /**
-     * Find dependecies of an operation based on where its in the operations list.
-     * @internal
-     * @param $operation
-     * @param $history
-     * @return array
-     */
-    public function _dependency_check($operation, $history){
-        // get already existing models
-        $existing_models = $this->migrated_models();
-
-        if(!empty($history)):
-
-            // get names of models they act on, this means they create or act on a modes thats already created
-            foreach ($history as $e_op) :
-                $existing_models[] = $this->stable_name($e_op['operation']->model_name);
-            endforeach;
-        endif;
-
-        $dependencies = [];
-        foreach ($operation['dependency'] as $dep) :
-            $dependencies[] = $this->stable_name($dep);
-        endforeach;
-
-        // do the models that the operation depends on exist
-        return array_diff($dependencies, $existing_models);
-    }
-
-    /**
-     * Find out if model depends on itself i.e. self refencing.
-     * @internal
-     * @param $model
-     * @param $dependency
-     * @return bool
-     */
-    public function _self_referencing($model_name, $dependency){
-        $depends = [];
-        foreach ($dependency as $dep) :
-            $depends[] = $this->stable_name($dep);
-        endforeach;
-
-        return [$this->stable_name($model_name), $this->stable_name($model_name)] == $depends;
-    }
-
-    /**
-     * Reduce the number of operations, by merging operations that are mergable.
-     * @internal
-     * @param $operations
-     * @return array
-     */
-    public function _optimize(){
-
-        foreach ($this->operations as  $index=>&$main_operation) :
-
-            // get operations between start and position of operation including the operation
-            $history = array_slice($this->operations, 0, $index+1);
-            // look forward through all the other operations and see if the can be merged
-            // if merged remove them from the operations
-            // if none add it to the new array
-            foreach ($this->operations  as  $candidate_index=>$candidate_operation) :
-
-                if($candidate_index == $index):
-                    continue;
-                endif;
-
-                // check if the candidate depends on models that don't exist
-                $pending = $this->_dependency_check($candidate_operation, $history);
-
-                // if some dependencies are still pending just pass
-                if(!empty($pending)):
-                    continue;
-                endif;
-
-                // IF A MERGE HAS HAPPENED REMOVE THE CURRENT CANDINDATE FROM THE LIST OF OPERATIONS
-                $act =  $this->_merge($main_operation, $candidate_operation);
-
-                if($act):
-                    unset($this->operations[$candidate_index]);
-                endif;
-            endforeach;
-        endforeach;
-        return array_values($this->operations);
-    }
-
-    public function myecho($item){
-        echo "<pre>";
-        print_r($item);
-        echo "</pre>";
-    }
-
-    /**
-     * Orders the operations so that operations don't depend on models that dont exist.
-     * @internal
-     * @throws OrmExceptions
-     */
-    public function _operation_resolution_order(){
-        $ordered_ops = [];
-        $dependent_ops = [];
-        $proxy_ops = [];
-
-        // holds names of models that already exist/ are to be created
-        $created_models = $this->migrated_models();
-
-        // first those that depend on nothing
-        // those that depend on one model and is not self referencing
-        foreach ($this->operations as $op) :
-            $mod_name = $op['model_name'];
-            // no dependency mostly AddModel operation
-            if(empty($op['dependency'])):
-                $ordered_ops[] = $op;
-                $created_models[] = $op['model_name'];
-                continue;
-            endif;
-
-            // if this is not a proxy model.
-            $is_proxy_model = isset($op['operation']->options['proxy_model']) && $op['operation']->options['proxy_model'];
-
-            // with dependency come later
-            if($is_proxy_model):
-                $proxy_ops[] = $op;
-                continue;
-            endif;
-
-            // with dependency come later
-            if(!empty($op['dependency'])):
-                $dependent_ops[] = $op;
-            endif;
-        endforeach;
-
-        // those with dependency come next
-        foreach ($dependent_ops as $dep_op) :
-
-            if(in_array($dep_op['model_name'], $created_models)):
-                $ordered_ops[] = $dep_op;
-            else:
-                throw new OrmExceptions(
-                    sprintf('Trying `%1$s` that depends on model `%2$s` that does not seem to exist',
-                        get_class($dep_op['operation']), $dep_op['model_name']));
-            endif;
-        endforeach;
-
-        foreach ($proxy_ops as $dep_op) :
-
-            $deps =[];
-            foreach ($dep_op['dependency'] as $dep) :
-                $deps[] = $this->stable_name($dep);
-            endforeach;
-            $mission_dep = array_diff($deps, $created_models);
-
-            if(count($mission_dep)==0):
-                $ordered_ops[] = $dep_op;
-            else:
-                throw new OrmExceptions(
-                    sprintf('Trying `%1$s` that depends on model `%2$s` that does not seem to exist',
-                        get_class($dep_op['operation']), json_encode($mission_dep)));
-            endif;
-        endforeach;
-        $this->operations = $ordered_ops;
-
-    }
-
-    /**
-     * Creates an add operation of M2M fields.
-     * @internal
-     * @param $owner_meta
-     * @param $field
-     * @param $field_depends_on
-     */
-    public function _add_m2m_field($owner_meta, $field, $field_depends_on){
-
-        if(empty($field->through)):
-            $inverse_meta = $field->related_model->meta;
-            $proxy = new ProxyModel($owner_meta,$inverse_meta);
-            $name = $this->stable_name($owner_meta->model_name);
-
-            $this->operations_todo(
-                $name,
-                new AddM2MField($name, [$field->name=>$field], $proxy,
-                    ['table_name'=>$proxy->meta->db_table, 'proxy_model'=>$proxy->meta->proxy_model]),
-                $field_depends_on);
-        endif;
-    }
-
-    /**
-     * creates a drop operation for M2M fields
-     * @internal
-     * @param $owner_meta
-     * @param $field
-     * @param $field_depends_on
-     */
-    public function _drop_m2m_field($owner_meta, $field, $field_depends_on){
-
-        if(empty($field->through)):
-            $inverse_meta = $field->related_model->meta;
-            $proxy = new ProxyModel($owner_meta,$inverse_meta);
-            $name = $this->stable_name($owner_meta->model_name);
-
-            $this->operations_todo(
-                $name,
-                new DropM2MField($name, [$field->name=>$field], $proxy,
-                    ['table_name'=>$proxy->meta->db_table, 'proxy_model'=>$proxy->meta->proxy_model]),
-                $field_depends_on);
-        endif;
-
-    }
-
-    /**
-     * Does the actual optimization.
-     * @internal
-     * @param $operation
-     * @param $candidate_operation
-     * @return bool|mixed
-     */
-    public function _merge(&$operation, $candidate_operation){
-        // if they act on same model they can merge
-        if($this->stable_name($operation['model_name']) == $this->stable_name($candidate_operation['model_name'])):
-
-            if($operation['operation'] instanceof AddModel &&
-                $candidate_operation['operation'] instanceof AddField):
-                return $this->_merge_model_add_and_field_add($operation, $candidate_operation);
-            endif;
-
-            if($operation['operation'] instanceof AddField &&
-                $candidate_operation['operation'] instanceof AddField):
-                return $this->_merge_field_add($operation, $candidate_operation);
-            endif;
-
-            if($operation['operation'] instanceof DropField &&
-                $candidate_operation['operation'] instanceof DropField):
-                return $this->_merge_field_drop($operation, $candidate_operation);
-            endif;
-
-            if($operation['operation'] instanceof AlterField &&
-                $candidate_operation['operation'] instanceof AlterField):
-            return $this->_merge_field_alter($operation, $candidate_operation);
-        endif;
-
-        endif;
-
-        return FALSE;
-    }
-
-    /**
-     * Tries to merge operations, returns null on fail, or $candidate_operation merged with the $operation
-     * @internal
-     * @param $operation
-     * @param $candidate_operation
-     * @param $before_candidate_operations
-     * @return mixed
-     */
-    public function _merge_model_add_and_field_add(&$operation, $candidate_operation){
-        $model_name = $operation['model_name'];
-
-        // if self referencing just pass
-        if($this->_self_referencing($model_name, $candidate_operation['dependency'])):
-            return FALSE;
-        endif;
-
-        $fields = $candidate_operation['operation']->fields;
-
-        foreach ($fields as $field) :
-            $operation['operation']->fields[$field->name]= $field;
-        endforeach;
-
-        return TRUE;
-
-    }
-
-    /**
-     * @internal
-     * @param $operation
-     * @param $candidate_operation
-     * @return bool
-     */
-    public function _merge_field_add(&$operation, $candidate_operation){
-        $fields = $candidate_operation['operation']->fields;
-
-        foreach ($fields as $name=>$field) :
-            $operation['operation']->fields[$name]= $field;
-        endforeach;
-
-        return TRUE;
-    }
-
-    /**
-     * @internal
-     * @param $operation
-     * @param $candidate_operation
-     * @return bool
-     */
-    public function _merge_field_drop($operation, $candidate_operation){
-        $fields = $candidate_operation['operation']->fields;
-        foreach ($fields as $field) :
-            $operation['operation']->fields[$field->name]= $field;
-        endforeach;
-
-        return TRUE;
-    }
-
-    /**
-     * @internal
-     * @param $operation
-     * @param $candidate_operation
-     * @return bool
-     */
-    public function _merge_field_alter(&$operation, $candidate_operation){
-        $next = $candidate_operation['operation']->fields;
-        $present = $operation['operation']->fields;
-        $operation['operation']->fields = array_merge($present, $next);
-        return TRUE;
-    }
-
-    /**
-     * makes for consistent names to use across the class.
-     * @internal
-     * @param $name
-     * @return string
-     */
-    public function stable_name($name){
-        return strtolower($name);
-    }
 }
-
-// ToDo very serious validation on foreignkey constraint, based on cascade passed in.
-// tOdO set default if add foreignkey on a table with values
-// tOdO validate if fk is null and it is not set as accepting null
-//ToDo on migration check if any records exist, if any exist ask for a value for those

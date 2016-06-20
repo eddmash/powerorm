@@ -1,53 +1,95 @@
 <?php
+/**
+ * Created by http://eddmash.com.
+ * User: eddmash
+ * Date: 4/24/16
+ * Time: 9:46 AM
+ */
+
 namespace powerorm\migrations\operations;
 
-
-use powerorm\db\MysqlStatements;
+use powerorm\migrations\ProjectState;
+use powerorm\NOT_PROVIDED;
 
 /**
  * Class AddField
  * @package powerorm\migrations\operations
+ *
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class AddField extends Operation
 {
     public $model_name;
-    public $fields=[];
-    public $options;
+    public $field_name;
+    public $field;
+    public $preserve_default;
 
-    public function __construct($model_name, $field, $options){
-        $this->fields[$field->name] = $field;
-        $this->model_name = $model_name;
-        $this->options = $options;
+    public function __construct($opts = []){ 
+
+        parent::__construct($opts);
+        
+        $this->model_name = $opts['model'];
+        $this->field = $opts['field'];
+        $this->field_name = $opts['name'];
+
+        $this->preserve_default = (array_key_exists('preserve_default', $opts) && $opts['preserve_default']) ?  TRUE: FALSE;
+
     }
 
-    public function up()
+    public function update_database($connection, $current_state, $desired_state)
     {
-//        $triggers =  MysqlStatements::date_fields_triggers($this->db_table(), $this->fields);
-        return MysqlStatements::alter_table_add_field($this->db_table(), $this->fields);
+        $model = $desired_state->registry()->get_model($this->model_name);
+
+        $field = $model->meta->get_field($this->field_name);
+
+        $current_model = $current_state->registry()->get_model($this->model_name);
+
+        // if we are not preserving the default
+        if(!$this->preserve_default):
+            $field->default = $this->field->default;
+        endif;
+
+        if($this->allow_migrate_model($connection, $model)):
+            $connection->add_model_field($current_model, $field);
+        endif;
     }
 
-    public function down()
+    public function rollback_database($connection, $current_state, $desired_state)
     {
-        return MysqlStatements::drop_table_field($this->db_table(), $this->fields);
+//        var_dump($desired_state->models);
+        $current_model = $current_state->registry()->get_model($this->model_name);
+
+        if($this->allow_migrate_model($connection, $current_model)):
+            $connection->drop_model_field($current_model, $current_model->meta->get_field($this->field_name));
+        endif;
     }
 
-    public function message()
+    public function describe()
     {
-        return "add_fields";
+        return sprintf('%1$s_add_%2$s', $this->model_name, $this->field_name);
     }
 
-    public function state(){
-        $model = ['model_name'=>$this->model_name,'operation'=>'add_field'];
-        $model = array_merge($model, $this->options);
+    public function constructor_args()
+    {
+        $args = parent::constructor_args();
 
-        foreach ($this->fields as $field) :
-            $fields['fields'][$field->name] = $field->skeleton();
+        foreach ($args as &$arg) :
+
+            if(array_key_exists('preserve_default', $arg) && $arg['preserve_default']===TRUE):
+                unset($arg['preserve_default']);
+            endif;
         endforeach;
 
 
-        return array_merge($model, $fields);
+
+        return $args;
+    }
+
+    public function update_state(ProjectState $state)
+    {
+       $state->get_model($this->model_name)->fields[$this->field_name] = $this->field;
+
     }
 }
 
@@ -57,330 +99,216 @@ class AddField extends Operation
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class DropField extends Operation
-{
+class DropField extends Operation{
+
     public $model_name;
-    public $fields=[];
-    public $options;
+    private $field_name;
 
-    public function __construct($model_name, $field, $options){
-        $this->fields[$field->name] = $field;
-        $this->model_name = $model_name;
-        $this->options = $options;
+    public function __construct($opts = []){
+
+        parent::__construct($opts);
+        $this->model_name = $opts['model'];
+        $this->field_name = $opts['name'];
+
     }
 
-    public function up(){
-        return MysqlStatements::drop_table_field($this->db_table(), $this->fields);
-    }
-
-    public function down()
+    public function update_database($connection, $current_state, $desired_state)
     {
-        return MysqlStatements::alter_table_add_field($this->db_table(), $this->fields);
+        $current_model = $current_state->registry()->get_model($this->model_name);
+        if($this->allow_migrate_model($connection, $current_model)):
+            $connection->drop_model_field($current_model, $current_model->meta->get_field($this->field_name));
+        endif;
     }
 
-    public function message()
+    public function rollback_database($connection, $current_state, $desired_state)
     {
-        return "drop_fields";
+        $desired_model = $desired_state->registry()->get_model($this->model_name);
+
+        $current_model = $current_state->registry()->get_model($this->model_name);
+
+        if($this->allow_migrate_model($connection, $current_model)):
+            $connection->add_model_field($current_model, $desired_model->meta->get_field($this->field_name));
+        endif;
     }
 
+    public function describe()
+    {
+        return sprintf('%1$s_drop_%2$s', $this->model_name, $this->field_name);
+    }
 
-    public function state(){
-        $model = ['model_name'=>$this->model_name,'operation'=>'drop_field'];
-        $model = array_merge($model, $this->options);
+    public function update_state(ProjectState $state)
+    {
+        $new_model_fields = [];
+        $model_state = $state->get_model($this->model_name);
 
-        foreach ($this->fields as $field) :
-            $fields['fields'][$field->name] = $field->skeleton();
+        foreach ($model_state->fields as $field_name => $field_object) :
+            if($field_name !== $this->field_name):
+                continue;
+            endif;
+
+            $new_model_fields[$field_name] = $field_object;
         endforeach;
 
-
-        return array_merge($model, $fields);
+        $state->get_model($this->model_name)->fields = $new_model_fields;
     }
 }
 
 /**
  * Class AlterField
  * @package powerorm\migrations\operations
+ *
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class AlterField extends Operation{
-
     public $model_name;
-    public $fields=[];
-    public $options;
-    public $forward=[];
-    public $backward=[];
-    public $unique_alter = [];
-    public $index_alter = [];
+    private $field_name;
+    private $field;
+    public $preserve_default;
 
+    public function __construct($opts = []){
 
-    public function __construct($model_name, $fields, $options){
+        parent::__construct($opts);
 
-        $this->fields= $fields;
+        $this->model_name = $opts['model'];
+        $this->field = $opts['field'];
+        $this->field_name = $opts['name'];
+        $this->preserve_default = (array_key_exists('preserve_default', $opts) && $opts['preserve_default']) ?  TRUE: FALSE;
 
-        $this->model_name = $model_name;
-        $this->options = $options;
-    }
-
-    public function _setup(){
-        foreach ($this->fields as $field) :
-
-            $past = $field['past'];
-            $present = $field['present'];
-
-            $this->forward[$present->name] = $this->_prepare(array_diff_assoc($present->options(), $past->options()), $field);
-            $this->backward[$present->name] = $this->_prepare(array_diff_assoc($past->options(), $present->options()), $field);
-        endforeach;
-
-        foreach ($this->forward as $name => &$forward) :
-            if(array_key_exists('unique', $forward)):
-                $this->unique_alter[$name] = $forward['unique'];
-            endif;
-            if(array_key_exists('index', $forward)):
-                $this->index_alter[$name] = $forward['index'];
-            endif;
-        endforeach;
-
-        $this->_clean();
 
     }
 
-    public function _prepare($opts, $field, $forward=TRUE){
-
-        if(array_key_exists('null', $opts)):
-            $opts['null'] = ($opts['null'])? 'NULL':'NOT NULL';
-        endif;
-
-        if(!isset($opts['type'])):
-            $present = $field['present'];
-            $opts['type'] = $present->options()['type'];
-        endif;
-
-        return $opts;
-    }
-
-    public function _clean(){
-
-        foreach (['db_index', 'unique', 'constraint_name', 'on_update', 'on_creation'] as $key) :
-            foreach ($this->backward as $index=>&$backward) :
-                if(array_key_exists($key, $backward)):
-                    unset($backward[$key]);
-                endif;
-
-                if(empty($backward)):
-                    unset($this->backward[$index]);
-                endif;
-            endforeach;
-
-            foreach ($this->forward as $index=>&$forward) :
-                if(array_key_exists($key, $forward)):
-                    unset($forward[$key]);
-                endif;
-
-                if(empty($forward)):
-                    unset($this->forward[$index]);
-                endif;
-            endforeach;
-
-        endforeach;
-    }
-
-    public function add_constraints($fields){
-        $table = $this->db_table();
-        $field_sql = [];
-        // unique
-        if(MysqlStatements::unique_constraint($fields) != NULL):
-            foreach (MysqlStatements::unique_constraint($fields) as $index) :
-                $field_sql[] =  MysqlStatements::_string_add_column_constraint($table, $index);
-            endforeach;
-
-        endif;
-
-        // index
-        if(MysqlStatements::add_indexes($fields) != NULL):
-            foreach (MysqlStatements::add_indexes($fields) as $index) :
-                $field_sql[] =  MysqlStatements::_string_add_column_constraint($table, $index);
-            endforeach;
-
-        endif;
-
-        return $field_sql;
-    }
-
-    public function drop_constraints($fields){
-        $table = $this->db_table();
-        $field_sql = [];
-        // drop indexes
-        if(MysqlStatements::drop_indexes($fields) != NULL):
-            foreach (MysqlStatements::drop_indexes($fields) as $index) :
-                $field_sql[] = MysqlStatements::_string_drop_constraint($table, $index);
-            endforeach;
-        endif;
-        return $field_sql;
-    }
-
-    public function up()
+    public function update_database($connection, $current_state, $desired_state)
     {
-        $this->_setup();
+        $this->_alter_field($connection, $current_state, $desired_state);
+    }
 
-        $statement = [];
+    public function rollback_database($connection, $current_state, $desired_state)
+    {
+        $this->_alter_field($connection, $current_state, $desired_state);
+    }
 
+    public function _alter_field($connection, $current_state, $desired_state){
+        $desired_model = $desired_state->registry()->get_model($this->model_name);
+        $current_model = $current_state->registry()->get_model($this->model_name);
+        $current_field = $current_model->meta->get_field($this->field_name);
+        $desired_field = $desired_model->meta->get_field($this->field_name);
 
-        if(!empty($this->forward)):
-            array_push($statement, MysqlStatements::_string_modify_field($this->db_table(), $this->forward));
+        // if we are not preserving the default
+        if(!$this->preserve_default):
+            $desired_field->default = $this->field->default;
         endif;
 
-        foreach ($this->fields as $name=>$field_obj) :
-
-
-            if((isset($this->unique_alter[$name]) && $this->unique_alter[$name]===TRUE) ||
-                (isset($this->index_alter[$name]) && $this->index_alter[$name]===TRUE)):
-                $statement = array_merge($statement, $this->add_constraints([$this->fields[$name]['present']]));
-            endif;
-
-            if((isset($this->unique_alter[$name]) && $this->unique_alter[$name] ===FALSE) ||
-                (isset($this->index_alter[$name]) && $this->index_alter[$name] === FALSE)):
-                $statement = array_merge($statement,  $this->drop_constraints([$this->fields[$name]['past']]));
-            endif;
-
-        endforeach;
-
-        return $statement;
+        if($this->allow_migrate_model($connection, $desired_model)):
+            $connection->alter_model_field($current_model, $current_field, $desired_field);
+        endif;
     }
 
-    public function down(){
+    public function describe()
+    {
+        return sprintf('altered_%s', $this->field_name);
+    }
 
-        $this->_setup();
-
-        $statement = [];
-
-        if(!empty($this->backward)):
-            array_push($statement, MysqlStatements::_string_modify_field($this->db_table(), $this->backward));
+    public function update_state(ProjectState $state)
+    {
+        if(FALSE === $this->preserve_default):
+            $field = $this->field ;
+            $field->default = new NOT_PROVIDED;
+        else:
+            $field = $this->field;
         endif;
 
-        foreach ($this->fields as $name=>$field_obj) :
+        $state->models[$this->model_name]->fields[$this->field_name] = $field ;
+    }
 
+    public function constructor_args()
+    {
+        $args = parent::constructor_args();
 
-            if((isset($this->unique_alter[$name]) && $this->unique_alter[$name]===TRUE) ||
-                (isset($this->index_alter[$name]) && $this->index_alter[$name]===TRUE)):
-                $statement = array_merge($statement, $this->drop_constraints([$this->fields[$name]['present']]));
-            endif;
+        foreach ($args as &$arg) :
 
-            if((isset($this->unique_alter[$name]) && $this->unique_alter[$name] ===FALSE) ||
-                (isset($this->index_alter[$name]) && $this->index_alter[$name] === FALSE)):
-                $statement = array_merge($statement,  $this->add_constraints([$this->fields[$name]['past']]));
+            if(array_key_exists('preserve_default', $arg) && $arg['preserve_default']===TRUE):
+                unset($arg['preserve_default']);
             endif;
         endforeach;
 
 
-        return $statement;
-    }
 
-    public function message()
-    {
-        return 'modify_fields';
-    }
-
-    public function state(){
-        $model = ['model_name'=>$this->model_name,'operation'=>'modify_field'];
-        $model = array_merge($model, $this->options);
-
-        $fields_collection['fields'] =[];
-        foreach ($this->fields as $name=>$fields) :
-            $fields_collection['fields'][$this->fields[$name]['present']->name] =
-                $this->fields[$name]['present']->skeleton();
-        endforeach;
-
-
-        return array_merge($model, $fields_collection);
-    }
-
-}
-
-class AddM2MField extends Operation{
-    public $model_name;
-    public $fields;
-    public $options;
-    public $proxy;
-
-    public function __construct($name, $fields, $proxy, $options){
-        $this->model_name = $name;
-        $this->proxy = $proxy;
-        $this->fields = $fields;
-        $this->options = $options;
-    }
-
-    public function up(){
-
-        $table = MysqlStatements::_porm_create_table($this->db_table());
-        $fields = MysqlStatements::add_table_field($this->proxy->meta->fields);
-        return array_merge($fields, $table);
-
-    }
-
-    public function down()
-    {
-        return MysqlStatements::_porm_drop_table($this->db_table());
-    }
-
-    public function message()
-    {
-        return "add_m2m_field";
-    }
-
-    public function state(){
-        $model = ['model_name'=>$this->model_name,'operation'=>'add_m2m_field'];
-        $model = array_merge($model, $this->options);
-
-        $fields['fields'] = [];
-        foreach ($this->fields as $field_name=>$field_obj) :
-            $fields['fields'][$field_name] = $field_obj->skeleton();
-        endforeach ;
-
-        return array_merge($model, $fields);
+        return $args;
     }
 }
 
-class DropM2MField extends Operation{
+/**
+ * Class RenameField
+ * @package powerorm\migrations\operations
+ * @since 1.0.1
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class RenameField extends Operation{
+
     public $model_name;
-    public $fields;
-    public $options;
-    public $proxy;
+    public $old_namedb;
+    public $new_name;
 
-    public function __construct($name, $fields, $proxy, $options){
-        $this->model_name = $name;
-        $this->proxy = $proxy;
-        $this->fields = $fields;
-        $this->options = $options;
+    public function __construct($opts = []){
+
+        parent::__construct($opts);
+
+        $this->model_name = $opts['model'];
+        $this->old_name = $opts['old_name'];
+        $this->new_name = $opts['new_name'];
+
     }
-    public function up()
+
+    public function update_state(ProjectState $state)
     {
-        return MysqlStatements::_porm_drop_table($this->db_table());
+        $old_fields = $state->models[$this->model_name]->fields;
+
+        $new_fields = [];
+        foreach ($old_fields as $name => $field) :
+            if($this->lower_case($name) === $this->lower_case($this->old_name)):
+                $new_fields[$this->new_name] = $field;
+                continue;
+            endif;
+            $new_fields[$name] = $field;
+        endforeach;
+
+        $state->models[$this->model_name]->fields = $new_fields;
     }
 
-    public function down(){
-
-        $table = MysqlStatements::_porm_create_table($this->db_table());
-        $fields = MysqlStatements::add_table_field($this->proxy->meta->fields);
-        return array_merge($fields, $table);
-
-    }
-
-
-    public function message()
+    public function update_database($connection, $current_state, $desired_state)
     {
-        return "drop_m2m_field";
+        $desired_model = $desired_state->registry()->get_model($this->model_name);
+
+        if ($this->allow_migrate_model($connection, $desired_model)):
+            $current_model = $current_state->registry()->get_model($this->model_name);
+
+            $current_field = $current_model->meta->get_field($this->old_name);
+            $desired_field = $desired_model->meta->get_field($this->new_name);
+
+            $connection->alter_model_field($desired_model, $current_field, $desired_field);
+
+        endif;
     }
 
-    public function state(){
-        $model = ['model_name'=>$this->model_name,'operation'=>'drop_m2m_field'];
-        $model = array_merge($model, $this->options);
+    public function rollback_database($connection, $current_state, $desired_state)
+    {
+        $desired_model = $desired_state->registry()->get_model($this->model_name);
 
-        $fields['fields'] = [];
-        foreach ($this->fields as $field_name=>$field_obj) :
-            $fields['fields'][$field_name] = $field_obj->skeleton();
-        endforeach ;
+        if ($this->allow_migrate_model($connection, $desired_model)):
+            $current_model = $current_state->registry()->get_model($this->model_name);
 
-        return array_merge($model, $fields);
+            $connection->alter_model_field(
+                $desired_model,
+                $current_model->meta->get_field($this->new_name),
+                $desired_model->meta->get_field($this->old_name)
+            );
+
+        endif;
+    }
+
+    public function describe()
+    {
+        return sprintf('field_%s_rename', $this->old_name);
     }
 }

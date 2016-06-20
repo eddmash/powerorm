@@ -1,54 +1,64 @@
 <?php
+/**
+ * Created by http://eddmash.com.
+ * User: eddmash
+ * Date: 4/17/16
+ * Time: 10:30 AM
+ */
+
 namespace powerorm\migrations\operations;
 
 
-use powerorm\db\MysqlStatements;
+use powerorm\migrations\ModelState;
+use powerorm\migrations\ProjectState;
 
 /**
- * Class AddModel
+ * Class CreateModel
  * @package powerorm\migrations\operations
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class AddModel extends Operation{
+class CreateModel extends Operation
+{
     public $model_name;
     public $fields;
+    public $depends_on;
     public $options;
 
-    public function __construct($name, $fields, $options){
-        $this->model_name = $name;
-        $this->fields = $fields;
-        $this->options = $options;
+    public function __construct($opts=[]){
+
+        parent::__construct($opts);
+        $this->model_name = $opts['model'];
+        $this->fields = $opts['fields'];
     }
 
-    public function up(){
-
-        $table = MysqlStatements::_porm_create_table($this->db_table());
-        $fields = MysqlStatements::add_table_field($this->fields);
-        return array_merge($fields, $table);
-
-    }
-
-    public function down()
+    public function update_database($connection, $current_state, $desired_state)
     {
-        return MysqlStatements::_porm_drop_table($this->db_table());
+        $model = $desired_state->registry()->get_model($this->model_name);
+
+        if($this->allow_migrate_model($connection, $model)):
+
+            $connection->create_model($model);
+        endif;
     }
 
-    public function message()
+    public function rollback_database($connection, $current_state, $desired_state)
     {
-        return "create";
+        $model = $current_state->registry()->get_model($this->model_name);
+
+        if($this->allow_migrate_model($connection, $model)):
+            $connection->drop_model($model);
+        endif;
     }
 
-    public function state(){
-        $model = ['model_name'=>$this->model_name,'operation'=>'add_model'];
-        $model = array_merge($model, $this->options);
-
-        $fields['fields'] = [];
-        foreach ($this->fields as $field_name=>$field_obj) :
-            $fields['fields'][$field_name] = $field_obj->skeleton();
-        endforeach ;
-
-        return array_merge($model, $fields);
+    public function describe()
+    {
+        return sprintf("add_%s", $this->model_name);
+    }
+    
+    public function update_state(ProjectState $state){
+        $model_state = new ModelState($this->model_name, $this->fields);
+        $state->add_model($model_state);
     }
 
 }
@@ -59,44 +69,86 @@ class AddModel extends Operation{
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class DropModel extends Operation
-{
-    public $model_name;
-    public $fields;
-    public $options;
+class DropModel extends Operation{
 
-    public function __construct($name, $fields, $options){
-        $this->model_name = $name;
-        $this->fields = $fields;
-        $this->options = $options;
+    public function __construct($opts=[]){
+
+        parent::__construct($opts);
+        $this->model_name = $opts['model'];
     }
-    public function up()
+
+    public function update_database($connection, $current_state, $desired_state)
     {
-        return MysqlStatements::_porm_drop_table($this->db_table());
+        $model = $current_state->registry()->get_model($this->model_name);
+
+        if($this->allow_migrate_model($connection, $model)):
+            $connection->drop_model($model);
+        endif;
     }
 
-    public function down()
+    public function rollback_database($connection, $current_state, $desired_state)
     {
-        $table = MysqlStatements::_porm_create_table($this->db_table());
-        $fields = MysqlStatements::add_table_field($this->fields);
-        return array_merge($fields, $table);
+        $model = $desired_state->registry()->get_model($this->model_name);
+
+        if($this->allow_migrate_model($connection, $model)):
+            $connection->create_model($model);
+        endif;
     }
 
-    public function message()
+    public function describe()
     {
-        return 'drop_table';
-    }
-    
-    public function state(){
-        $model = ['model_name'=>$this->model_name,'operation'=>'drop_model'];
-        $model = array_merge($model, $this->options);
-
-        $fields['fields'] = [];
-        foreach ($this->fields as $field_name=>$field_obj) :
-            $fields['fields'][$field_name] = $field_obj->skeleton();
-        endforeach ;
-
-        return array_merge($model, $fields);
+        return sprintf("drop_%s", $this->model_name);
     }
 
+    public function update_state(ProjectState $state)
+    {
+        $state->remove_model($this->model_name);
+    }
+
+}
+
+/**
+ * Class RenameModel
+ * @package powerorm\migrations\operations
+ * @since 1.0.1
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class RenameModel extends Operation{
+
+    public function __construct($opts=[]){
+
+        parent::__construct($opts);
+        $this->old_name = $opts['old_name'];
+        $this->new_name = $opts['new_name'];
+    }
+
+    public function update_state(ProjectState $state)
+    {
+        // map new name to the model state before rename
+        $state->models[$this->new_name] = $state->models[$this->old_name];
+
+        // change name to new name
+        $state->models[$this->new_name]->name = $this->new_name;
+
+        // remove the model state before rename
+        $state->remove_model($this->old_name);
+
+    }
+
+    public function update_database($connection, $current_state, $desired_state)
+    {
+        // alter table name
+        // alter relation fields name
+        // alter m2m
+    }
+
+    public function rollback_database($connection, $current_state, $desired_state)
+    {
+        //repeat update with different names
+    }
+
+    public function describe()
+    {
+        return sprintf('rename_%1$s_to_%2$s', $this->old_name, $this->new_name);
+    }
 }

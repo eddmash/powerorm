@@ -8,7 +8,12 @@
  */
 namespace powerorm\model\field;
 
+use powerorm\checks\Checks;
+use powerorm\Contributor;
+use powerorm\DeConstruct;
 use powerorm\exceptions\OrmExceptions;
+use powerorm\NOT_PROVIDED;
+use powerorm\Object;
 
 
 /**
@@ -19,13 +24,51 @@ use powerorm\exceptions\OrmExceptions;
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-abstract class Field{
+abstract class Field extends Object implements DeConstruct, Contributor{
 
     /**
      * @ignore
      * @var null
      */
     public $name=Null;
+
+
+    /**
+     * The maximum length (in characters) of the field.
+     * @var
+     */
+    public $max_length;
+
+    /**
+     * @ignore
+     * @var bool
+     */
+    public $inverse = FALSE;
+
+    /**
+     * @ignore
+     * @var bool
+     */
+    public $M2M=FALSE;
+
+    /**
+     * @ignore
+     * @var bool
+     */
+    public $M2O=FALSE;
+
+    /**
+     * @ignore
+     * @var bool
+     */
+    public $O2O=FALSE;
+
+    /**
+     * A human-readable name for the field. If the verbose name isn’t given, Powerorm will automatically create it using
+     * the field’s attribute name, converting underscores to spaces.
+     * @var string
+     */
+    public $verbose_name = NULL;
 
     /**
      * @ignore
@@ -95,16 +138,19 @@ abstract class Field{
      * If True, this field will be indexed.
      * @var null
      */
-    public $db_index=Null;
+    public $db_index=FALSE;
+
+    public $relation = NULL;
+
+    public $is_relation = FALSE;
 
     /**
-     * the model that this field belongs to.
-     * @ignore
+     * Model that this field is attached to.
      * @var
      */
     public $container_model;
 
-    // form specifics
+    // =====================  form specifics
 
     /**
      * If True, the field is allowed to be blank on form. Default is False.
@@ -172,20 +218,31 @@ abstract class Field{
     public $help_text;
 
     /**
+     * @ignore
+     * @var
+     */
+    private $constructor_args;
+
+    /**
      * Takes in options to determine how to create the field.
      * @param array $field_options the options to use.
      */
     public function __construct($field_options = []){
-
         // if some passes type remove it,
         // we don't people breaking our perfect flow of things.
         if(isset($field_options['type'])):
             unset($field_options['type']);
         endif;
+        $this->default = new NOT_PROVIDED;
+
+        $this->constructor_args = $field_options;
 
         // replace the default options with the ones passed in.
         foreach ($field_options as $key=>$value) :
-            $this->{$key} = $value;
+            // only replace those that exist do not set new ones
+            if($this->has_property($key)):
+                $this->{$key} = $value;
+            endif;
         endforeach;
 
         // null status
@@ -196,8 +253,6 @@ abstract class Field{
         if(!in_array('form_blank', $field_options)):
             $this->form_blank = $this->null;
         endif;
-
-        $this->type = $this->db_type();
 
     }
 
@@ -223,42 +278,68 @@ abstract class Field{
      */
     public function skeleton(){
         return [
-            'field_options'=>$this->options(),
-            'class'=>get_class($this)
+            'constructor_args'=>$this->constructor_args(),
+            'path'=>get_class($this)
+        ];
+    }
+ 
+    public function db_params($connection)
+    {
+        return [
+            'type'=> $this->db_type()
         ];
     }
 
     /**
-     * Returns all the options that are necessary to represent this field on the database.
-     * @return array
+     * Returns all the parameters that were passed to the constructor on initialization
+     * @return mixed
      */
-    public function options(){
-        $prefix = '';
-        if($this->unique):
-            $prefix = 'uni';
+    public function constructor_args(){
+        $this->constructor_args = array_change_key_case($this->constructor_args, CASE_LOWER);
+
+        $defaults = [
+            "primary_key"=>False,
+            "max_length"=>NULL,
+            "unique"=>False,
+            "null"=>False,
+            "db_index"=>False,
+            "default"=>new NOT_PROVIDED,
+        ];
+//
+        foreach ($defaults as $name=>$default) :
+            $value = ($this->has_property($name)) ? $this->{$name} : $default;
+
+            if($name == 'default' && ! $value instanceof NOT_PROVIDED):
+                $this->constructor_args[$name] = $value;
+            elseif($value != $default && !array_key_exists(strtolower($name), $this->constructor_args)):
+
+                $this->constructor_args[$name] = $value;
+
+            endif;
+        endforeach;
+
+        return [$this->constructor_args];
+    }
+
+    /**
+     * inheritdoc
+     */
+    public function contribute_to_class($field_name, $model_obj){
+        $this->container_model = $model_obj;
+        $this->set_from_name($field_name);
+        $model_obj->{$field_name} = $this;
+
+        $model_obj->meta->add_field($this);
+
+    }
+
+    public function set_from_name($name){
+        $this->name = $name;
+        $this->db_column = $this->db_column_name();
+
+        if(empty($this->verbose_name)):
+            $this->verbose_name = ucwords(str_replace("_", " ", $name));
         endif;
-
-        if($this->db_index):
-            $prefix = 'idx';
-        endif;
-
-        if(empty($this->constraint_name)):
-            $this->constraint_name = $this->constraint_name($prefix);
-        endif;
-
-        $opts = [];
-        $opts['name'] = $this->name;
-        $opts['type'] = $this->type;
-        $opts['unique'] = $this->unique;
-        $opts['null'] = $this->null;
-        $opts['default'] = $this->default;
-        $opts['primary_key'] = $this->primary_key;
-        $opts['db_column'] = $this->db_column;
-        $opts['db_index'] = $this->db_index;
-        $opts['constraint_name'] = $this->constraint_name;
-        $opts['container_model'] = $this->container_model;
-
-        return $opts;
     }
 
     /**
@@ -309,7 +390,7 @@ abstract class Field{
      * @return string
      */
     public function db_type(){
-        return '';
+        return NULL;
     }
 
     /**
@@ -322,22 +403,22 @@ abstract class Field{
     }
 
     /**
-     * @ignore
-     * @param $key
-     * @param $value
+     * Tells us if the default value is set
      */
-    public function __set($key, $value){
-        if($key==='value'):
-            $this->{'value'} = $value;
-        endif;
+    public function has_default(){
+        return $this->default === (new NOT_PROVIDED());
     }
-
+    
+    public function get_default(){
+        return $this->default;
+    }
+ 
     /**
      * @ignore
      * @return string
      */
     public function __toString(){
-        return ''.$this->name;
+        return $this->container_model->get_class_name().'->'.$this->name;
     }
 
     /**
@@ -377,6 +458,12 @@ abstract class Field{
 
     }
 
+    public function deep_clone(){
+        $skel = $this->skeleton();
+        $constructor_args =array_pop($skel['constructor_args']);
+        $path =$skel['path'];
+        return new $path($constructor_args);
+    }
 
 }
 
@@ -394,21 +481,11 @@ abstract class Field{
 class CharField extends Field{
 
     /**
-     * The maximum length (in characters) of the field.
-     * @var
-     */
-    public $max_length;
-
-    /**
      * {@inheritdoc}
      */
     public function __construct($field_options=[]){
 
         parent::__construct($field_options);
-
-        if(!empty($this->max_length)):
-            $this->type = strtoupper(sprintf('%1$s(%2$s)', $this->type, $this->max_length));
-        endif;
     }
 
     /**
@@ -447,23 +524,27 @@ class CharField extends Field{
      */
     public function _max_length_check(){
         if(empty($this->max_length)):
-            return [\powerorm\checks\check_error($this, sprintf('%s requires `max_length` to be set', get_class($this)))];
+            return [
+                Checks::error([
+                    "message"=>"Charfield requires `max_length` to be set",
+                    "hint"=>NULL,
+                    "context"=>$this,
+                    "id"=>"fields.E120"
+                ])
+            ];
         endif;
 
         if(!empty($this->max_length) && $this->max_length < 0):
-            return [\powerorm\checks\check_error($this, sprintf('%s requires `max_length` to be a positive integer', get_class($this)))];
+            return [
+                Checks::error([
+                    "message"=>'Charfield requires `max_length` to be a positive integer',
+                    "hint"=>NULL,
+                    "context"=>$this,
+                    "id"=>"fields.E121"
+                ])
+            ];
         endif;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function options(){
-        $opts = parent::options();
-
-        $opts['max_length'] = $this->max_length;
-
-        return $opts;
+        return [];
     }
 
 }
@@ -483,7 +564,7 @@ class EmailField extends CharField{
      */
     public function __construct($field_options=[]){
         //  254 in order to be compliant with RFC3696/5321
-        $options['max_length'] = 254;
+        $field_options['max_length'] = 254;
         parent::__construct($field_options);
     }
 
@@ -529,9 +610,9 @@ class FileField extends CharField{
      * {@inheritdoc}
      */
     public function __construct($field_options=[]){
-        $options['max_length'] = 100;
-        $this->passed_pk = (array_key_exists('primary_key', $options))? TRUE: FALSE;
-        $this->passed_unique = (array_key_exists('unique', $options))? TRUE: FALSE;
+        $field_options['max_length'] = 100;
+        $this->passed_pk = (array_key_exists('primary_key', $field_options))? TRUE: FALSE;
+        $this->passed_unique = (array_key_exists('unique', $field_options))? TRUE: FALSE;
         parent::__construct($field_options);
     }
 
@@ -562,7 +643,14 @@ class FileField extends CharField{
      */
     public function _check_unique(){
         if($this->passed_unique):
-            return [\powerorm\checks\check_error($this, sprintf("'unique' is not a valid argument for a %s.", get_class($this)))];
+            return [
+                Checks::error([
+                    "message"=>sprintf("'unique' is not a valid argument for a %s.", get_class($this)),
+                    'hint'=>NULL,
+                    'context'=>$this,
+                    'id'=>'fields.E200'
+                ])
+            ];
         endif;
         return [];
     }
@@ -573,9 +661,17 @@ class FileField extends CharField{
      */
     public function _check_primarykey(){
         if($this->passed_pk):
-            return [\powerorm\checks\check_error($this,
-                sprintf("'primary_key' is not a valid argument for a %s.", get_class($this)))];
+
+            return [
+                Checks::error([
+                    "message"=>sprintf("'primary_key' is not a valid argument for a %s.", get_class($this)),
+                    'hint'=>NULL,
+                    'context'=>$this,
+                    'id'=>'fields.E201'
+                ])
+            ];
         endif;
+
         return [];
     }
 
@@ -696,7 +792,7 @@ class DecimalField extends Field{
      * {@inheritdoc}
      */
     public function db_type(){
-        return sprintf('DECIMAL(%1$s, %2$s)', $this->max_digits, $this->decimal_places);
+        return 'DECIMAL';
     }
 
 
@@ -725,13 +821,25 @@ class DecimalField extends Field{
      */
     public function _decimal_places_check(){
         if(empty($this->decimal_places)):
-            return [\powerorm\checks\check_error($this,
-                sprintf("%s expects 'decimal_place' attribute to be set", get_class($this)))];
+            return [
+                Checks::error([
+                    "message"=>sprintf("%s expects 'decimal_place' attribute to be set.", get_class($this)),
+                    'hint'=>NULL,
+                    'context'=>$this,
+                    'id'=>'fields.E130'
+                ])
+            ];
         endif;
 
         if(!is_numeric($this->decimal_places) || $this->decimal_places < 0):
-            return [\powerorm\checks\check_error($this,
-                sprintf("%s expects 'decimal_place' attribute to be a positive integer", get_class($this)))];
+            return [
+                Checks::error([
+                    "message"=>sprintf("%s expects 'decimal_place' attribute to be a positive integer.", get_class($this)),
+                    'hint'=>NULL,
+                    'context'=>$this,
+                    'id'=>'fields.E131'
+                ])
+            ];
         endif;
 
         return [];
@@ -743,33 +851,40 @@ class DecimalField extends Field{
      */
     public function _check_max_digits(){
         if(empty($this->max_digits)):
-            return [\powerorm\checks\check_error($this,
-                sprintf("%s expects 'max_digits' attribute to be set", get_class($this)))];
+            return [
+                Checks::error([
+                    "message"=>sprintf("%s expects 'max_digits' attribute to be set.", get_class($this)),
+                    'hint'=>NULL,
+                    'context'=>$this,
+                    'id'=>'fields.E132'
+                ])
+            ];
         endif;
 
         if(!is_numeric($this->max_digits) || $this->max_digits < 0):
-            return [\powerorm\checks\check_error($this,
-                sprintf("%s expects 'max_digits' attribute to be a positive integer", get_class($this)))];
+            return [
+                Checks::error([
+                    "message"=>sprintf("%s expects 'max_digits' attribute to be a positive integer", get_class($this)),
+                    'hint'=>NULL,
+                    'context'=>$this,
+                    'id'=>'fields.E133'
+                ])
+            ];
         endif;
         
         // ensure max_digits is greater than decimal_places
         if($this->max_digits < $this->decimal_places):
-            return [\powerorm\checks\check_error($this,
-                sprintf("%s expects 'max_digits' to be greate than 'decimal_places' ", get_class($this)))];
+            return [
+                Checks::error([
+                    "message"=>sprintf("%s expects 'max_digits' to be greater than 'decimal_places'", get_class($this)),
+                    'hint'=>NULL,
+                    'context'=>$this,
+                    'id'=>'fields.E134'
+                ])
+            ];
         endif;
 
         return [];
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function options(){
-        $opts = parent::options();
-        $opts['max_digits'] = $this->max_digits;
-        $opts['decimal_places'] = $this->decimal_places;
-        return $opts;
     }
 }
 
@@ -784,10 +899,11 @@ class IntegerField extends Field{
 
     /**
      * If this options is set to TRUE, it will create a signed integer 0 to 2147483647
-     * else it will create an unsigned integer 0 to -2147483647
+     * else it will create an unsigned integer 0 to -2147483647.
+     *
      * @var bool
      */
-    public $signed=FALSE;
+    public $signed=NULL;
 
 
     /**
@@ -795,11 +911,7 @@ class IntegerField extends Field{
      */
     public function __construct($field_options=[]){
         parent::__construct($field_options);
-        if(!$this->signed || $this->signed == 'UNSIGNED'):
-            $this->signed = "UNSIGNED";
-        else:
-            $this->signed = "SIGNED";
-        endif;
+
     }
 
     /**
@@ -814,18 +926,6 @@ class IntegerField extends Field{
      */
     public function form_type(){
         return 'number';
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function options(){
-
-        $opts = parent::options();
-
-        $opts['signed'] = $this->signed;
-        return $opts;
     }
 }
 
@@ -851,18 +951,21 @@ class AutoField extends IntegerField{
     public function __construct($field_options=[]){
         parent::__construct($field_options);
         $this->auto = TRUE;
-        $this->signed = FALSE;
+        $this->unique = TRUE;
+        $this->primary_key = TRUE;
     }
 
 
     /**
      * {@inheritdoc}
      */
-    public function options(){
-        $opts = parent::options();
+    public function contribute_to_class($property_name, $model){
+        assert($model->meta->has_auto_field!==TRUE,
+            sprintf("%s has more than one AutoField, this is not allowed", $model->meta->model_name));
+        parent::contribute_to_class($property_name, $model);
 
-        $opts['auto'] = $this->auto;
-        return $opts;
+        $model->meta->has_auto_field = TRUE;
+        $model->meta->auto_field = $this;
     }
 }
 
@@ -919,7 +1022,7 @@ class DateTimeField extends Field{
 
     /**
      * {@inheritdoc}
-     * @param array $options
+     * @param array $field_options
      * @throws OrmExceptions
      */
     public function __construct($field_options=[]){
@@ -935,16 +1038,6 @@ class DateTimeField extends Field{
      */
     public function db_type(){
         return "DATETIME";
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function options(){
-        $opts = parent::options();
-        $opts['on_update'] = $this->on_update;
-        $opts['on_creation'] = $this->on_creation;
-        return $opts;
     }
 }
 
