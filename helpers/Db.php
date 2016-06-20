@@ -1,5 +1,8 @@
 <?php
-namespace powerorm\queries;
+namespace powerorm\helpers;
+
+use powerorm\queries\Queryset;
+
 /**
  * @ignore
  * Borrowed from CI &DB(), disable creating a connection immediately, reason for this is because before a queryset is
@@ -7,8 +10,11 @@ namespace powerorm\queries;
  * @param string $params
  * @param null $query_builder_override
  * @return mixed
+ *
+ * @since 1.0.1
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-function get_query_builder($params = '', $query_builder_override = NULL)
+function create_queryset($model, $query=NULL, $params='', $query_builder_override=NULL)
 {
     // Load the DB config file if a DSN string wasn't passed
     if (is_string($params) && strpos($params, '://') === FALSE)
@@ -134,13 +140,14 @@ function get_query_builder($params = '', $query_builder_override = NULL)
             /**
              * CI_DB
              *
-             * @ignore
              * Acts as an alias for both CI_DB_driver and CI_DB_query_builder.
              *
              * @see	CI_DB_query_builder
              * @see	CI_DB_driver
              */
-            class CI_DB extends \CI_DB_query_builder { }
+//            class CI_DB extends \CI_DB_query_builder { }
+            eval('class CI_DB extends \CI_DB_query_builder{}');
+
         }
     }
     elseif ( ! class_exists('CI_DB', FALSE))
@@ -159,7 +166,6 @@ function get_query_builder($params = '', $query_builder_override = NULL)
 
     // Instantiate the DB adapter
     $driver = 'CI_DB_'.$params['dbdriver'].'_driver';
-
     $DB = new $driver($params);
 
     // Check for a subdriver
@@ -171,15 +177,16 @@ function get_query_builder($params = '', $query_builder_override = NULL)
         {
             require_once($driver_file);
             $driver = 'CI_DB_'.$DB->dbdriver.'_'.$DB->subdriver.'_driver';
+            $DB = new $driver($model, $query, $params);
         }
     }
 
 
-    if(!class_exists('powerorm\queries\P_QB', FALSE)):
-        eval(sprintf('namespace powerorm\queries; class P_QB extends \%s{}',$driver));
-    endif;
+//    if(!class_exists('powerorm\queries\BaseQueryset', FALSE)):
+//        $base_queryset = sprintf('namespace powerorm\queries; class BaseQueryset extends \%s {}', $driver);
+//        eval($base_queryset);
+//    endif;
 
-    // load QueryBuilder
-    require_once('QueryBuilder.php');
-    return new QueryBuilder($params);
+    require_once(APPPATH.'libraries/powerorm/queries/__init__.php');
+    return Queryset::instance($model, $DB);
 }
