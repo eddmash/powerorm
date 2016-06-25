@@ -5,7 +5,7 @@ namespace powerorm;
  * Orm Loader
  */
 use powerorm\db\Connection;
-use powerorm\form\Form;
+use powerorm\form\BaseForm; 
 use powerorm\registry\App;
 
 /**
@@ -328,7 +328,17 @@ class BaseOrm {
     }
 
     protected function _get_form_builder(){
-        return new Form();
+        require_once("form/__init__.php");
+        return new BaseForm();
+    }
+
+    public function fetch_form($form, $data=[], $initial=[], $kwargs=[]){
+        //todo loader match to that of codeigniter especially in naming
+        require_once("form/__init__.php");
+
+        require_once APPPATH.'forms/'.$form.'.php';
+
+        return new $form($data, $initial, $kwargs);
     }
 
     //********************************** ORM Registry*********************************
