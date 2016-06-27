@@ -10,6 +10,8 @@ namespace powerorm\migrations;
 use powerorm\DeConstruct;
 
 use powerorm\helpers\Tools;
+use powerorm\migrations\operations\Operation;
+use powerorm\model\field\Field;
 use powerorm\Object;
 
 
@@ -117,24 +119,38 @@ class Migration extends Object
     public function unapply($project_state, $connection){
         $ops = $this->operations();
 
-        $ops_to_run = [];
+        $items_to_run = [];
 
+        $state_after_op = $project_state->deep_clone();
         // we need to reverse the operations so that foreignkeys are removed before model is destroyed
         foreach ($ops as $op) :
-            array_unshift($ops_to_run, $op);
+
+            $state_before_op = $state_after_op->deep_clone();
+            $state_after_op = $state_after_op->deep_clone();
+
+            // update state
+            $op->update_state($state_after_op);
+
+            /**
+             * we insert them in the reverse order so the last operation is run first
+             */
+            array_unshift($items_to_run,
+                ['operation'=>$op, 'state_before_op'=>$state_before_op, 'state_after_op'=>$state_after_op]);
         endforeach;
 
-        foreach ($ops_to_run as $op) :
-            $state_before_op = $project_state->deep_clone();
 
-            $op->update_state($project_state);
+        foreach ($items_to_run as $item) :
 
-            // since we are un applying the past state is where we want to revert to
-            // and the updated state is the state we are moving from
-            // so in this case :
-            //          $project_state == old state
-            //          $state_before_op == new state
-            $op->rollback_database($connection, $project_state, $state_before_op);
+            $operation = $item['operation'];
+            $state_before_op = $item['state_before_op'];
+            $state_after_op = $item['state_after_op'];
+
+            /**
+             * Since we are un applying the past state is where we want to revert to
+             * and the updated state is the state we are moving from i.e
+             * we are moving from $state_after_op to $state_before_op
+             */
+            $operation->rollback_database($connection, $state_after_op, $state_before_op);
         endforeach;
 
 
@@ -371,6 +387,7 @@ class StringifyOperation{
         $string = join(PHP_EOL, $this->buffer);
 
         $string = trim($string, ',');
+
 
         return [sprintf("new %1\$s(%2\$s\t\t\t)", $class, PHP_EOL.$string.PHP_EOL), $import];
 

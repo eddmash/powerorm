@@ -60,4 +60,31 @@ abstract class Operation extends Object implements DeConstruct
 
         return $model->meta->can_migrate();
     }
+
+    public static function CreateModel($opts){
+        return new CreateModel($opts);
+    }
+
+    public static function RenameModel($opts){
+        return new RenameModel($opts);
+    }
+
+    public static function DropModel($opts){
+        return new DropModel($opts);
+    }
+
+    public static function AddField($opts){
+        return new AddField($opts);
+    }
+
+    public static function DropField($opts){
+        return new DropField($opts);
+    }
+    public static function AlterField($opts){
+        return new AlterField($opts);
+    }
+
+    public static function RenameField($opts){
+        return new RenameField($opts);
+    }
 }

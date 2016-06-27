@@ -57,7 +57,6 @@ class AddField extends Operation
 
     public function rollback_database($connection, $current_state, $desired_state)
     {
-//        var_dump($desired_state->models);
         $current_model = $current_state->registry()->get_model($this->model_name);
 
         if($this->allow_migrate_model($connection, $current_model)):

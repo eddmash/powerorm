@@ -237,11 +237,20 @@ class Executor extends Base
         endforeach;
 
         foreach ($full_plan as $f_plan) :
+
+            /**
+             * If there are no migrations to run, just break
+             */
+            if(empty($migrations_to_run)):
+                break;
+            endif;
+
             $migration = $f_plan['migration'];
 
             if(array_key_exists($migration->name, $migrations_to_run)):
                 //save state before update
                 $back_states_collection[$migration->name] = $state->deep_clone();
+
                 // remove it from the migrations to run
                 unset($migrations_to_run[$migration->name]);
             endif;
@@ -255,7 +264,6 @@ class Executor extends Base
         // rollback now
         foreach ($plan as $item) :
             $migration = $item['migration'];
-
             $this->unapply_migration($back_states_collection[$migration->name], $migration, $fake);
         endforeach;
     }

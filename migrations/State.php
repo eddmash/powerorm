@@ -153,7 +153,6 @@ class ModelState extends Object{
     }
     
     public function to_model(App $registry){
-        // dummy namespace for this models to avoid collusion with the actial models
 
         $model = $this->_define_load_class($this->name);
 
