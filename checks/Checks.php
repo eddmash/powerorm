@@ -13,6 +13,7 @@ class Checks{
 
     public function __construct(){
         $this->checks = [];
+        $this->registered_checks = [];
     }
 
     public function register($check){

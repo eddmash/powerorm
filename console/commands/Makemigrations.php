@@ -3,6 +3,7 @@ namespace powerorm\console\command;
 
 use powerorm\BaseOrm;
 use powerorm\helpers\FileHandler;
+use powerorm\helpers\Tools;
 use powerorm\migrations\AutoDetector;
 use powerorm\migrations\InteractiveQuestioner;
 use powerorm\migrations\Loader;
@@ -31,7 +32,7 @@ class Makemigrations extends Command
         if(!empty($issues)):
             $message = "The following migrations seem to indicate they are both the latest migration :".PHP_EOL;
             $message .= " %s ".PHP_EOL;
-            $this->error(sprintf($message, stringify($issues, NULL, NULL, NULL)));
+            $this->error(sprintf($message, Tools::stringify($issues, NULL, NULL, NULL)));
             exit;
         endif;
 

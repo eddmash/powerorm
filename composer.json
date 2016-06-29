@@ -1,6 +1,6 @@
 {
   "name": "eddmash/powerorm",
-  "type": "CodeIgniter-library",
+  "type": "codeigniter-library",
   "keywords": ["codeigniter", "orm", "form", "migrations"],
   "description": "A very simple but effective codeignter orm",
   "homepage": "https://github.com/eddmash/powerorm",
@@ -14,6 +14,7 @@
     }
   ],
   "require": {
-    "php": ">=5.4.0"
+    "php": ">=5.4.0",
+    "composer/installers": "~1.0"
   }
 }

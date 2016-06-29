@@ -2,6 +2,7 @@
 namespace powerorm\console;
 
 use powerorm\helpers\FileHandler;
+use powerorm\helpers\Tools;
 
 /**
  * Class Manager
@@ -20,6 +21,7 @@ class Manager extends Base{
     public $manager_name;
 
     public function __construct(){
+        // default command path
         $this->path = sprintf("%s/commands", dirname(__FILE__));
 
         $this->manager_name = $this->lower_case($this->get_class_name());
@@ -32,8 +34,7 @@ class Manager extends Base{
     public function execute(){
 
         // get console args
-        $arg_opts = $_SERVER['argv'];
-        $arg_count = $_SERVER['argc'];
+        $arg_opts = $_SERVER['argv']; 
 
         // remove the manager from the list
         $manager = array_shift($arg_opts);
@@ -53,6 +54,11 @@ class Manager extends Base{
         if(in_array($command_name, ['Version', '--version', '-v'])):
             $this->normal("PowerOrm Version : ".$this->ansiFormat(POWERORM_VERSION, Console::FG_CYAN).PHP_EOL);
             exit;
+        endif;
+        
+        if(in_array('--command-dir', $arg_opts)):
+            $pos = array_search('--command-dir', $arg_opts);
+            $this->path = $arg_opts[$pos+1];
         endif;
 
 
@@ -76,7 +82,7 @@ class Manager extends Base{
             $this->normal($help.PHP_EOL.PHP_EOL);
 
             $this->normal(sprintf('Usage : %1$s %2$s',
-                    $this->lower_case($message), stringify(array_keys($options), NULL, NULL, NULL, TRUE)).PHP_EOL.PHP_EOL);
+                    $this->lower_case($message), Tools::stringify(array_keys($options), NULL, NULL, NULL, TRUE)).PHP_EOL.PHP_EOL);
 
             $this->normal("optional arguments:".PHP_EOL.PHP_EOL);
 
@@ -142,13 +148,15 @@ class Manager extends Base{
         $file = $file_handler->get_file();
 
         if(empty($file)):
-            $this->error(sprintf("Unknown command: %s".PHP_EOL, $name));
+            $this->error(
+                sprintf('Unknown command: ` %1$s`. Does the file exists `%2$s\%1$s.php` ?'.PHP_EOL, $name, $this->path));
             $message = $this->ansiFormat(sprintf('php %s.php help', $this->manager_name), Console::FG_YELLOW);
             $this->normal(sprintf("Type %s for usage.".PHP_EOL, $message));
             exit;
         endif;
 
         require_once $file;
+
 
         // commands are in the commands namespace
         $name = 'powerorm\console\command\\'.$name;

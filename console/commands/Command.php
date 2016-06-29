@@ -23,7 +23,10 @@ class Command extends Base
     public $system_check = TRUE;
 
     public function get_options(){
-        return ['--help'=>'show this help message and exit'];
+        return [
+            '--help'=>'show this help message and exit',
+            '--command-dir'=>'the directory where command is defined'
+        ];
     }
 
     public function get_positional_options(){
@@ -148,10 +151,6 @@ class Command extends Base
     public function check(){
         $checks = (new Checks())->run_checks();
 
-        if(empty($checks)):
-            return;
-        endif;
-
         $debugs = [];
         $info = [];
         $warning = [];
@@ -183,8 +182,6 @@ class Command extends Base
                 $critical[] = $check;
             endif;
         endforeach;
-
-
 
         $this->normal("Perfoming system checks ...", TRUE);
 

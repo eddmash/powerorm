@@ -1,8 +1,16 @@
 <?php
 namespace powerorm\console;
-
 /**
  * Borrows heavily from the the yii\helpers\BaseConsole class,
+ *
+ * Part of the Yii framework.
+ *
+ * @package    Yii
+ * @version    2.0
+ * @author Carsten Brandt <mail@cebe.cc>
+ * @link http://www.yiiframework.com/
+ * @copyright Copyright (c) 2008 Yii Software LLC
+ * @license http://www.yiiframework.com/license/
  *
  * 
  * Class Console

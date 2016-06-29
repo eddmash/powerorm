@@ -9,7 +9,6 @@
 namespace powerorm\console\command;
 
 /**
- * Borrowed from fuelphp oil robot
  * @package powerorm\console\command
  * @since 1.0.1
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
