@@ -57,6 +57,14 @@ class AmbiguityError extends \Exception{}
 class ValueError extends OrmExceptions{}
 
 /**
+ * Class KeyError
+ * @package powerorm\exceptions
+ * @since 1.0.1
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class KeyError extends OrmExceptions{}
+
+/**
  * Class FormException
  * @package powerorm\exceptions
  * @since 1.0.0
@@ -94,7 +102,20 @@ class MultipleObjectsReturned extends OrmExceptions{}
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class ValidationError extends OrmErrors{}
+class ValidationError extends OrmErrors{
+
+    public function __construct($message, $code=''){
+        parent::__construct($message);
+
+        //todo handle if message is array
+        $this->message = $message;
+        $this->validation_code = $code;
+    }
+
+    public function get_message(){
+        return $this->message;
+    }
+}
 
 /**
  * Class CommandError

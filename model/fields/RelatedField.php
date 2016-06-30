@@ -163,6 +163,11 @@ class RelatedField extends Field{
         return [];
     }
 
+    public function contribute_to_class($name, $obj){
+        parent::contribute_to_class($name,$obj);
+        $obj->{$name} = new ForwardManyToOneDescriptor($this);
+    }
+
 }
 
 /**
@@ -254,7 +259,6 @@ class ForeignKey extends RelatedField{
         return sprintf('%s_id', $this->lower_case($this->name));
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -262,7 +266,6 @@ class ForeignKey extends RelatedField{
         $prefix = "fk";
         return parent::constraint_name($prefix);
     }
-
 
     /**
      * {@inheritdoc}
@@ -279,7 +282,6 @@ class ForeignKey extends RelatedField{
 
         return $opts;
     }
-
 
     /**
      * {@inheritdoc}
@@ -495,4 +497,6 @@ class ManyToMany extends RelatedField{
     }
 
 }
+
+class ForwardManyToOneDescriptor{}
 

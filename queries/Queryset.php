@@ -1,64 +1,38 @@
 <?php
-/**
- * ORM QuerySet implementation.
- */
-
-
-/**
- *
- */
 namespace powerorm\queries;
 
-use powerorm\exceptions\MultipleObjectsReturned;
-use powerorm\exceptions\ObjectDoesNotExist;
-use powerorm\exceptions\OrmExceptions;
-use powerorm\exceptions\ValueError;
-use powerorm\model\field\ForeignKey;
-use powerorm\model\field\HasMany;
-use powerorm\model\field\HasOne;
-use powerorm\model\field\InverseRelation;
-use powerorm\model\field\ManyToMany;
-use powerorm\model\ProxyModel;
-use powerorm\model\field\RelatedField;
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+use powerorm\BaseOrm;
+use powerorm\exceptions\MultipleObjectsReturned;
+use powerorm\exceptions\NotFound;
+use powerorm\exceptions\ObjectDoesNotExist;
+use powerorm\exceptions\ValueError;
+use powerorm\Object;
 
 /**
- * Class for doing database lookups, The look up is done Lazily i.e. Lazy Loading.
- *
- * This class provides several methods for interacting with the database with one
- * important thing to note is that some methods return a Queryset object while other return the expected result object.
- *
+ * Class Queryset
  * @package powerorm\queries
- * @since   1.0.0
+ * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Queryset implements \IteratorAggregate, \Countable
-{
+class Queryset extends Object implements \IteratorAggregate, \Countable, Query{
 
-    /**
-     * @var string Identifies if the Queryset returns more than one row.
-     * @internal
-     */
-    protected $_output_type = 'result';
+    const FETCH_MULTIPLE = 'result_array';
+    const FETCH_SINGLE = 'row_array';
+    const FETCH_FIRST = 'first_row';
+    const FETCH_LAST= 'last_row';
 
-    /**
-     * @internal
-     * @var object Holds the model instance the Queryset acts on.
-     */
-    protected $_active_model_object;
+    const OPERATION_FETCH = 1;
+    const OPERATION_INSERT = 2;
+    const OPERATION_UPDATE = 3;
+    const OPERATION_DELETE = 4;
+    const RELATIONS_LOOK_SEP = '->';
 
-    /**
-     * @var object Holds a copy of the database connection the current queryset will use
-     * @internal
-     */
-    protected $_qbuilder;
-
-    /**
-     * @var bool Indacates if a Queryset has been evaluated.
-     * @internal
-     */
-    protected $_evaluated = FALSE;
+    public $model;
+    public $model_class;
+    public $type;
+    public $fetch_type;
+    public $_evaluated = FALSE;
 
     /**
      * @var object Holds the Queryset Result when Queryset evaluates.
@@ -66,163 +40,85 @@ class Queryset implements \IteratorAggregate, \Countable
      */
     protected $_results_cache;
 
+    public $sql_cache = '';
 
     /**
-     * @var bool This is usually true if the methods are being chained in the current instance of the Queryset.
-     * @internal
-     */
-    protected $_table_set = FALSE;
-
-    /**
-     * Sets if the queryset requires to do an eager load
-     * @internal
-     * @var bool
-     */
-    protected $_eager_load = FALSE;
-
-    /**
-     * Values for fields to eager load
-     * @var array
-     * @internal
-     */
-    protected $_eager_fields_values = [];
-
-    /**
-     * The Queryset to use to get the eager fetched results
-     * @var Queryset
-     * @internal
-     */
-    protected $_eager_fetched_results;
-
-    /**
-     * Holds the fields to eager load
+     * Holds the where clauses, we do this because to create the where condition some db
+     * drivers require a connection which we open up only when evaluating
      * @internal
      * @var array
      */
-    protected $_fields_to_eager_load = array();
+    public $_filter_cache = [];
 
     /**
-     * Holds the where clauses
-     * @internal
+     * Keeps track of which tables have been added to the 'from' part of the query
      * @var array
      */
-    protected $_where_cache = [];
+    public $_from_cache=[];
 
-    /**
-     * Holds the database connection resource.this only happens if profiler is turned on.
-     * @var array
-     * @internal
-     */
-    protected $conn_id;
 
-    /**
-     *  ============================================OVERRIDEN MAGIC METHODS =========================
-     *  -----------------------------------------------------------------------------------------------
-     *  -----------------------------------------------------------------------------------------------
-     *  ---------------------------------------------------------------------------------------------
-     *  -----------------------------------------------------------------------------------------------
-     * -----------------------------------------------------------------------------------------------
-     *  -----------------------------------------------------------------------------------------------
-     *
-     */
-    /**
-     * @ignore
-     * @param \PModel $model the model the Queryset works on.
-     * @param object $database the database to use.
-     */
-    public function __construct($database, $model)
-    {
-        $this->_active_model_object = $model;
+    public function __construct($model, $query=NULL){
+        $this->model = $model;
+        $this->model_class = $model->full_class_name();
+        $this->_query_builder = $query;
 
-        $this->_get_query_builder();
+        // default action of queryset is fetching
+        $this->type = self::OPERATION_FETCH;
     }
 
-    /**
-     * Evaluate the Queryset when existence of a property in the Queryset Result is tested. using isset().
-     * @param $property
-     * @ignore
-     * @return bool
-     */
-    public function __isset($property)
-    {
+    public function __deconstruct(){
 
-        $result = $this->_eval_queryset();
-        if((!property_exists($result, $property))):
-            return property_exists($result, $property);
-        endif;
-
-        return (empty($this->_results_cache->{$property}))? FALSE:TRUE;
-
-    }
-
-    /**
-     * Evaluate the Queryset when a property is accessed from the Model Instance.
-     * @param $property
-     * @ignore
-     * @return mixed
-     */
-    public function __get($property)
-    {
-        $value = NULL;
-        // check if queryset is already evaluated
-        if (!$this->_evaluated):
-            $this->_eval_queryset();
-        endif;
-
-        return $this->_results_cache->{$property};
-    }
-
-    /**
-     * Evaluates Queryset when the Queryset Result is used like a string e.g. using Queryset Result in echo statement.
-     * @ignore
-     * @return string
-     */
-    public function __toString()
-    {
-
-        $this->_eval_queryset();
-        return sprintf('%s', $this->_results_cache);
-    }
-
-    /**
-     * Evaluates the Queryset when a method is being accessed in the Queryset Result.
-     * @param $method
-     * @param $args
-     * @ignore
-     * @return mixed
-     */
-    public function __call($method, $args){
-
-        if(!method_exists($this,$method)):
-            if(!$this->_evaluated):
-                // evaluate the queryset
-                $this->_eval_queryset();
-            endif;
-
-            // if a method is being accessed that does not exist in the queryset
-            // look for it in the resulting model if the query has been evaluated
-            if($this->_evaluated):
-                if(empty($args)):
-                    return call_user_func(array($this->_results_cache, $method));
-                else:
-                    if(is_array($args)):
-                        return call_user_func_array(array($this->_results_cache, $method), $args);
-                    else:
-                        return call_user_func(array($this->_results_cache, $method), $args);
-                    endif;
-                endif;
-            endif;
+        // close connection if its untill now open
+        if($this->_query_builder->conn_id):
+            $this->_query_builder->close();
         endif;
     }
 
-    /**
-     *
-     * @ignore
-     */
-    public function __clone()
-    {
-        // make a copy of the database
-        $this->_qbuilder = $this->_shallow_copy($this->_qbuilder);
+    public static function instance($model, $query){
+        return new static($model, $query);
+    }
+
+
+
+
+
+    // **************************************************************************************************
+
+    // ******************************************* FETCH DATA *******************************************
+
+    // **************************************************************************************************
+
+
+
+
+    public function one($conditions=[]){
+        $query = $this->_filter($conditions, self::FETCH_SINGLE);
+        $no_of_records = $this->size();
+
+        if ($no_of_records > 1):
+            throw new MultipleObjectsReturned(
+                sprintf('get() returned more than one %1$s -- it found %2$s!',
+                    $this->_model->meta->model_name, $no_of_records));
+        endif;
+
+        if ($no_of_records == 0):
+            throw new ObjectDoesNotExist(sprintf('`%s` matching query does not exist.!',
+                $this->model->meta->model_name));
+        endif;
+        return $query;
+    }
+
+    public function all(){
+        return $this->_filter();
+    }
+
+    public function filter($conditions=[]){
+        return $this->_filter($conditions);
+    }
+
+    public function _validate_conditions($method, $conditions){
+        assert(is_array($conditions), sprintf(" %s() expects conditions should be in array format", $method));
+        return $conditions;
     }
 
     /**
@@ -230,160 +126,27 @@ class Queryset implements \IteratorAggregate, \Countable
      * @ignore
      * @return mixed
      */
-    public function count()
+    public function size()
     {
         if($this->_evaluated):
-            return count($this->_results_cache);
+
+            $size = count($this->_results_cache);
+        else:
+            $this->_setup_filters();
+
+            $size = $this->_query_builder->count_all_results('', FALSE);
         endif;
 
-        $this->_prepare_builder();
-
-        $qb = $this->_shallow_copy($this->_qbuilder);
-
-        return $qb->get()->num_rows();
+        return $size;
     }
 
-    /**
-     * Evaluates the Queryset when Queryset Result is used in a foreach.
-     * @ignore
-     * @return ArrayIterator
-     */
-    public function getIterator()
-    {
-        $result = new \ArrayIterator($this->_eval_queryset());
-        return $result;
+    public function sql(){
+        return (empty($this->sql_cache)) ? $this->_sql() : $this->sql_cache;
     }
-
-    // ToDo serialization , to json too
-//    protected function __sleep(){
-//        $this->_eval_queryset();
-//        return array('_results_cache');
-//    }
-
-    /**
-     * ============================================ QUERY OPERATION METHODS =========================
-     *  -----------------------------------------------------------------------------------------------
-     *  -----------------------------------------------------------------------------------------------
-     *  ---------------------------------------------------------------------------------------------
-     *  -----------------------------------------------------------------------------------------------
-     * -----------------------------------------------------------------------------------------------
-     *  -----------------------------------------------------------------------------------------------
-     *
-     */
-
-    /**
-     * Fetches exactly one record from the database table by matching the given lookup parameters.
-     * This method Returns a Queryset for further refinement
-     * USAGE:.
-     *
-     *
-     * To fetch a single row in the database with the name john.
-     *
-     *
-     * <code>  $this->User_model->get(array('name'=>'john')) </code>
-     *
-     *
-     * To fetch a single row in the database with the `name=john` and `age=20`.
-     *
-     *
-     * <code>     $this->User_model->get(array('name'=>'john', 'age'=20))</code>
-     *
-     * To fetch a single row in the database with the primary key 1, where primary key column is `id`.
-     *
-     *
-     * <code>      $this->User_model->get(1)</code>
-     *
-     *
-     * if primary key is not `id` you can pass the primary key field
-     *
-     *
-     * <code>      $this->User_model->get(array('pk'=>1))</code>
-     *
-     * @param array|int $values an array of field and the value to look for, or an integer-primary key.
-     * @see filter() To fetch more than one item based on some conditions.
-     * @param array $values
-     * @return array|bool|object
-     * @throws MultipleObjectsReturned
-     * @throws ObjectDoesNotExist
-     * @throws ValueError
-     */
-    public function get($values)
-    {
-        $this->_get($values);
-
-        // we are cloning the queryset because, we want the main queryset to
-        // return what is actually expected instead of the number of rows
-        // ensure only one row contains the passed in id
-        $temp_queryset = $this->_shallow_copy($this);
-        $no_of_records = $temp_queryset->size();
-
-        if ($no_of_records > 1):
-            throw new MultipleObjectsReturned(
-                sprintf('get() returned more than one %1$s -- it found %2$s!',
-                    $this->_model_name($this->_active_model_object), $no_of_records));
-        endif;
-
-        if ($no_of_records == 0):
-            throw new ObjectDoesNotExist(sprintf('`%s` matching query does not exist.!',
-                $this->_model_name($this->_active_model_object)));
-        endif;
-
-
-        return $this->_eval_queryset();
+    
+    public function exists(){
+        return $this->size() > 0;
     }
-
-    /**
-     * Works like the get method but difference is it can return more than one item.and return a Queryset
-     *
-     * Implements the where part of a query and returns rows limited by the where clause.
-     *
-     * <h4>USAGE:</h4>
-     *
-     * <h4>Normal Filtering</h4>
-     * To fetch all rows in the database with the name `john`.
-     *      <pre><code>$this->User_model->filter(array('name'=>'john'))</code></pre>
-     *
-     * To fetch all rows in the database with the `name=john` and `age=20`.
-     *      <pre><code>$this->User_model->filter(array('name'=>'john', 'age'=20))</code></pre>
-     *
-     * <h4>Related Filter</h4>
-     *
-     * To fetch all rows based on there related data e.g fetch user model where role is `admin`.
-     *  <pre><code>
-     *  $roles = $this->user_model->filter(array("role::name"=>"admin"));</code></pre>
-     *
-     * <h4>Be More Specific</h4>
-     * You can be more specifics on your conditions by using the lookup options available to you.
-     * $this->user_model->filter('username__contains'=>'eri');
-     *
-     * this will run the following sql `select * from user_table where username like %eri%`
-     *
-     * @param array $conditions the where condition e.g. array('username'=>'john', 'password'="ad+as')
-     * @see get() To fetch only one item.
-     * @return Queryset
-     * @throws OrmExceptions
-     */
-    public function filter($conditions){
-        $this->_filter($conditions);
-        return $this;
-    }
-
-    /**
-     * Fetches all the records in the database table represented by the Model Instance.
-     * USAGE:
-     *
-     * To get All user in the database
-     * <pre><code>$this->User_model->all()</code></pre>
-     * @return $this
-     */
-    public function all()
-    {
-        $this->_select($this->_active_model_object);
-        $this->_from($this->_active_model_object->get_table_name());
-
-        return $this;
-    }
-
     /**
      * Returns a Queryset that does not include those provided in the criteria.
      *
@@ -404,15 +167,13 @@ class Queryset implements \IteratorAggregate, \Countable
      */
     public function exclude($conditions)
     {
-        $this->_validate_condition($conditions);
-
         $conds = [];
         foreach ($conditions as $key => $value) :
             $key = sprintf("%s__not", $key);
             $conds[$key] = $value;
         endforeach;
 
-        $this->filter($conds);
+        $this->_filter($conds);
 
         return $this;
     }
@@ -428,7 +189,7 @@ class Queryset implements \IteratorAggregate, \Countable
      * @return $this
      */
     public function distinct(){
-        $this->_qbuilder->distinct();
+        $this->_query_builder->distinct();
         return $this;
     }
 
@@ -452,8 +213,6 @@ class Queryset implements \IteratorAggregate, \Countable
     public function order_by($criteria = [])
     {
 
-        $this->_validate_condition($criteria);
-
         foreach ($criteria as $field => $direction) :
 
             $direction = strtoupper($direction);
@@ -463,7 +222,7 @@ class Queryset implements \IteratorAggregate, \Countable
                     sprintf('order_by() expects either ASC, DESC, RANDOM as ordering direction, but got %s', $direction));
             endif;
 
-            $this->_qbuilder->order_by($field, $direction);
+            $this->_query_builder->order_by($field, $direction);
         endforeach;
 
 
@@ -483,17 +242,21 @@ class Queryset implements \IteratorAggregate, \Countable
      * @param array $condition
      * @return $this
      * @throws ValueError
+     * @throws NotFound
      */
     public function group_by($condition){
-        if (!is_array($condition)) {
-            throw new ValueError(sprintf("Arguments should be in array form"));
-        }
+        $condition = $this->_validate_conditions(__METHOD__,$condition);
 
         // ToDo group by relationship
         $new_cond = [];
+        $not_found = [];
         foreach ($condition as $cond) :
-            if($this->_is_relation_field($cond,$this->_active_model_object)):
-                $field_obj = $this->_active_model_object->meta->relations_fields[$cond];
+            if(!$this->model->has_property($cond)):
+                $not_found[] = $cond;
+                continue;
+            endif;
+            if($this->model->meta->get_field($cond)->is_relation):
+                $field_obj = $this->model->meta->relations_fields[$cond];
 
                 $new_cond[] = $field_obj->db_column_name();
 
@@ -502,9 +265,14 @@ class Queryset implements \IteratorAggregate, \Countable
                 $new_cond[] = $cond;
             endif;
         endforeach;
+        
+        if(!empty($not_found)):
+            throw new NotFound(sprintf('The fields [ %1$s ] not found in the model %2$s'),
+                join(', ',$not_found), $this->model->meta->model_name);
+        endif;
 
 
-        $this->_qbuilder->group_by($new_cond);
+        $this->_query_builder->group_by($new_cond);
         return $this;
     }
 
@@ -534,85 +302,9 @@ class Queryset implements \IteratorAggregate, \Countable
             throw new ValueError('limit() Expects start to be a numeric value');
         endif;
 
-        $this->_qbuilder->limit($size, $start);
+        $this->_query_builder->limit($size, $start);
 
         return $this;
-    }
-
-    /**
-     * Shows the `sql` statement to be executed at certain point of the queryset chaining.
-     *
-     * USAGE:.
-     *
-     * To get all users with the role admin
-     *
-     * <pre><code>
-     * $user = $this->user_model->all()->dump_sql()
-     *      ->filter(array('related'=>array('model'=>'role', 'where'=>array('name'=>'admin')));
-     * foreach()->dump_sql() as $user){
-     *      ...
-     * }
-     * </code></pre>
-     *
-     * This will output the following at each point of the chain where dump_sql() is used.
-     *<pre><code>
-     * ******************* Running the sql statement *******************************
-     * SELECT *
-     * FROM `user`
-     * ************************************************************************
-     * **************** Running the sql statement *******************************
-     * SELECT `user`.*
-     * FROM `user`
-     * JOIN `user_role` ON `user`.`id`=`user_role`.`user_id`
-     * JOIN `role` ON `role`.`id`=`user_role`.`role_id`
-     * WHERE `role`.`name` = 'admin'
-     * *********************************************************************
-     * </code></pre>
-     * @ignore
-     * @return $this
-     */
-    public function dump_sql()
-    {
-        $this->_dump_sql();
-        return $this;
-    }
-
-    /**
-     * This evaluates the Queryset and returns the results of the evaluation.
-     *
-     * <strong>NB:</strong> use this method sparingly, using it defeats the purpose of the ORM, which is lazy loading.
-     *
-     * <h4>USAGE</h4>
-     *
-     * The following will result in an array of products as opposed to a Queryset
-     *
-     * <pre><code>$this->product_model->filter(array('category_model::id'=>5)))->value();</code></pre>
-     *
-     * @return mixed
-     */
-    public function value()
-    {
-        $this->_eval_queryset();
-        return $this->_results_cache;
-
-    }
-
-    /**
-     * Returns an integer representing the number of objects in the database matching the QuerySet.
-     *  USAGE:.
-     *
-     *
-     * To count all user in the database.
-     *
-     *
-     * <pre><code> $this->User_model->all()->size() </code></pre>
-     *
-     *
-     * @return mixed
-     */
-    public function size()
-    {
-        return $this->count();
     }
 
 
@@ -627,9 +319,13 @@ class Queryset implements \IteratorAggregate, \Countable
      * @return $this
      */
     public function first(){
-        $this->_output_type = 'first_row';
-        $this->_from($this->_active_model_object->get_table_name());
-        return $this;
+
+        if($this->is_chaining()):
+            $this->fetch_type = self::FETCH_FIRST;
+            return $this;
+        endif;
+
+        return $this->_filter([], self::FETCH_FIRST);
     }
 
 
@@ -645,1298 +341,323 @@ class Queryset implements \IteratorAggregate, \Countable
      * @return $this
      */
     public function last(){
-        $this->_output_type = 'last_row';
-        $this->_from($this->_active_model_object->get_table_name());
-        return $this;
-    }
-
-
-    /**
-     *@ignore
-     */
-    public function is_empty(){
-
-        return ($this->size() == 0) ? TRUE : FALSE ;
-    }
-
-    /**
-     * Deletes records in the Queryset.
-     *
-     * The following will through an exception
-     *
-     * <pre><code>$this->role->all()->delete()</code></pre>
-     *
-     * <h4>USAGE</h4>
-     *
-     * Deleting everything
-     *
-     * <pre><code>$this->role->all()->delete()</code></pre>
-     *
-     * Deleting all the records with the first name john
-     *
-     * <pre><code>$this->user_model->filter(['username__startswith'=>'john'])->delete()</code></pre>
-     *
-     * @return int the number of records deleted.
-     */
-    public function delete(){
-
-        // delete records in the current Queryset
-        if(!empty($this->_where_cache)):
-            $this->_prepare_builder();
-            $this->_qbuilder->delete($this->_active_model_object->get_table_name());
+ 
+        if($this->is_chaining()):
+            $this->fetch_type = self::FETCH_LAST;
+            return $this;
         endif;
-
-        return $this->_qbuilder->affected_rows();
+        return $this->_filter([], self::FETCH_LAST);
     }
 
-    /**
-     * This method clears all the records in the database table represented by the model.
-     * <pre><code>$this->role->delete()</code></pre>
-     * @ignore
-     * @return mixed
-     */
-    public function clear(){
-        $this->_qbuilder->empty_table($this->_active_model_object->get_table_name());
-        return $this->_qbuilder->affected_rows();
-
-    }
-
-    //ToDo
-
-    /**
-     *@ignore
-     */
-    public function raw($statement){
-    
-    }
-
-    // ToDo
-
-    /**
-     *@ignore
-     */
-    public function only($fields=[]){
-    }
-
-    /**
-     * ==================================  UTILITY METHODS =======================================
-     *  -----------------------------------------------------------------------------------------------
-     *  -----------------------------------------------------------------------------------------------
-     *  ---------------------------------------------------------------------------------------------
-     *  -----------------------------------------------------------------------------------------------
-     * -----------------------------------------------------------------------------------------------
-     *  -----------------------------------------------------------------------------------------------
-     *
-     */
-
-
-    /**
-     * Does the actual saving
-     * @ignore
-     * @return object
-     * @throws MultipleObjectsReturned
-     * @throws ObjectDoesNotExist
-     * @throws OrmExceptions
-     */
-    public function _save()
+    public function max($column)
     {
-        $pk = $this->_model_pk_field($this->_active_model_object);
-
-        // save related models
-        // got through the fields trying to find field with objects as value
-        foreach ($this->_active_model_object->meta->relations_fields as $field=>$field_obj) {
-            $field_value = $this->_active_model_object->{$field};
-
-            // assumes current model is the owning side being saved that is it has the foreign key
-            if (is_object($field_value) && $field_value instanceof Queryset):
-                // evaluate the Queryset
-                $field_value = $field_value->value();
-            endif;
-
-            if (is_object($field_value)):
-                $related_pk = $this->_model_pk_field($field_value);
-
-                // Ensure that a model instance without a PK hasn't been assigned to
-                // a ForeignKey or OneToOneField on this model. If the field is
-                // accepts null, allowing the save() would result in silent data loss of the unsaved model..
-                if (empty($field_value->{$related_pk})):
-                    throw new OrmExceptions(
-                        sprintf("Saving model failed, The value for `%s` field is an unsaved model", $field));
-                endif;
-
-                $this->_active_model_object->{$field} = $field_value->{$related_pk};
-            endif;
-
-            // on MYsql, for foreignkeys that allow empty values, The fields should be set to NULL
-            // otherwise the following error is raised
-            // #1452 - Cannot add or update a child row: a foreign key constraint fails.
-
-            if($field_obj instanceof ForeignKey && $field_obj->null):
-                if(is_string($field_value)):
-                    $field_value = trim($field_value);
-                endif;
-                if(empty($field_value)):
-                    $this->_active_model_object->{$field} = NULL;
-                endif;
-            endif;
-        }
-        $model_rep = $this->_to_array($this->_active_model_object);
-
-
-        // now open connection
-        $this->_qbuilder->initialize();
-
-        // determine if its an update or a new save
-        if (isset($this->_active_model_object->{$pk}) && !empty($this->_active_model_object->{$pk})):
-            $pk_value = $this->_active_model_object->{$pk};
-            $this->_qbuilder->where($pk, $pk_value);
-            $this->_qbuilder->update($this->_active_model_object->get_table_name(), $model_rep);
-        else:
-            $this->_qbuilder->insert($this->_active_model_object->get_table_name(), $model_rep);
-            $pk_value = $this->_qbuilder->insert_id();
-        endif;
-
-        // get saved model
-        return $this->get($pk_value);
+        // TODO: Implement max() method.
     }
 
-    /**
-     * @ignore
-     * @param $model
-     * @return array
-     */
-    public function _to_array($model){
-        $rep = [];
-
-        foreach ($model->meta->fields as $field) :
-            if($field instanceof ManyToMany || $field instanceof InverseRelation):
-                continue;
-            endif;
-            $rep[$field->db_column_name()] = $this->_active_model_object->{$field->name};
-        endforeach;
-
-        return $rep;
-
-    }
-
-    /**
-     * Save Many to Many relations
-     * @param $values -- the values to save can be id or models of related model(s)
-     * @ignore
-     * @return $this
-     */
-    public function _m2m_save($related_model_objects)
+    public function min($column)
     {
-        foreach ($related_model_objects as $related_model) :
-            $act_name = $this->_model_name($this->_active_model_object);
-            $rel_name = $this->_model_name($related_model);
-            $proxy = $this->_m2m_through_model($this->_active_model_object, $related_model);
-
-            $act_value = $this->_active_model_object->{$this->_model_pk_field($this->_active_model_object)};
-            $rel_value = $related_model->{$this->_model_pk_field($related_model)};
-
-            // we need to avoid having duplicate rows e.g. M2M between role and perm
-            // we avoid having more than one row having role=1 and perm=1
-            if(!$proxy->filter([$act_name=>$act_value, $rel_name=>$rel_value])->is_empty()):
-                continue;
-            endif;
-
-            $proxy->{$act_name} = $act_value;
-            $proxy->{$rel_name} = $rel_value;
-            $proxy->save();
-        endforeach;
-
-        return $this->_active_model_object;
+        // TODO: Implement min() method.
     }
 
-
-
-    /**
-     * @ignore
-     * @param $conditions
-     * @return $this
-     */
-    public function _eager_load($conditions)
+    public function delete()
     {
-        $this->_eager_load = TRUE;
-
-//        $this->_validate_condition($conditions);
-
-        if (is_array($conditions)):
-            $eager_models = [];
-            foreach ($conditions as $name) :
-                $eager_models [] = $this->_stable_name($name);
-            endforeach;
-
-            $this->_fields_to_eager_load = $eager_models;
-        endif;
-        return $this;
+        // TODO: Implement delete() method.
     }
 
-    /**
-     * @ignore
-     * @param $values
-     * @return $this
-     * @throws ValueError
-     */
-    protected function _get($values){
-        $conditions = [];
-        $this->_output_type = 'row';
-
-        //ensure a value was passed in
-        if (!isset($values)) {
-            throw new ValueError(
-                sprintf("Missing argument expected 'int or array' to be passed in to `get` method"));
-        }
-
-        // get id if value is not array
-        if (is_numeric($values)):
-            $pk = $this->_model_pk_field($this->_active_model_object);
-            $conditions[$pk] = $values;
-        endif;
-
-        // get id if value is not array
-        if (is_array($values)):
-            $conditions = $values;
-        endif;
-
-        $this->_filter($conditions);
-
-        return $this;
-    }
-
-    /**
-     * @ignore
-     * @param $conditions
-     * @return $this
-     * @throws OrmExceptions
-     * @throws ValueError
-     */
-    protected function _filter($conditions)
+    public function save()
     {
-
-        $this->_validate_condition($conditions);
-
-        // look if we have filter conditions that span relationships
-        $split_conditions = $this->_split_conditions($conditions);
-
-        // first handle the normal filter conditions
-        $table_name = $this->_active_model_object->get_table_name();
-
-        $this->_select($this->_active_model_object);
-        $this->_from($table_name);
-
-        if (!empty($split_conditions['normal_conditions'])):
-
-            $this->_where_clause($table_name,
-                $this->_prepare_where_conditions($split_conditions['normal_conditions']));
-        endif;
-
-        // lets handle there relationship filter
-        if (!empty($split_conditions['relation_conditions'])):
-
-            foreach ($split_conditions['relation_conditions'] as $model_name => $conditions) :
-                $model_object = $this->_load_model($model_name);
-
-                if($this->_is_m2o($this->_active_model_object, $model_object)):
-                    $this->_m2o_join($this->_active_model_object, $model_object, $conditions);
-                endif;
-
-                if($this->_is_m2m($this->_active_model_object, $model_object)):
-                    $proxy = $this->_m2m_through_model($this->_active_model_object, $model_object);
-                    $this->_m2m_join($proxy, $this->_active_model_object, $model_object, $conditions);
-                endif;
-            endforeach;
-
-        endif;
-
-        return $this;
+        // TODO: Implement save() method.
     }
 
-    /**
-     * Coverts the database result into the Class representing a database table
-     * @param $fetch_result results from a database fetch
-     * @param null $model_name Class to convert the database result into
-     * @internal
-     * @return array
-     */
-    protected function _cast_to_model($fetch_result, $target_model_obj = NULL)
-    {
 
-        if ($target_model_obj == NULL):
-            $target_model_obj = $this->_active_model_object;
-        endif;
+    // ----------------------------------------------- > relations
+    public function with($conditions){
 
-        $eagerly_results = NULL;
+        $this->_validate_conditions(__METHOD__, $conditions);
 
-        // in-case we don't go through the following condition, i.e casting of ther results to $targe model
-        // this normally
-        $result = $fetch_result;
+        $with = [];
 
-        // if result is array
-        if ($this->_output_type == 'result'):
+        foreach ($conditions as $condition) :
+            $nested_relation = explode(self::RELATIONS_LOOK_SEP, $condition);
+            $total = count($nested_relation)-1;
 
-            $result = [];
-            // get data from the table rows
-            foreach ($fetch_result as $row_obj) :
-                $new_row = $this->_result_mapping($row_obj, $target_model_obj);
-                $result[] = $new_row;
-            endforeach;
-            // check if we need to eagerly load any models
-            $result = $this->_eager_load_relations($result);
-        endif;
+            for ($i=$total; $i>=0; $i--) :
 
-        // in-cases only an object was returned e.g using $this->db->row()
-        if (in_array($this->_output_type, ['row', 'first_row', 'last_row'])):
-            $this->_eager_load = FALSE;
-            $result = $this->_result_mapping($fetch_result, $target_model_obj);
-        endif;
-
-
-        return $result;
-    }
-
-    /**
-     * Display the sql statement to be executed
-     * @internal
-     */
-    protected function _dump_sql()
-    {
-        echo '******************* Running the sql statement *******************************<br>';
-        echo $this->_qbuilder->get_compiled_select(NULL, FALSE);
-        echo '<br>************************************************************************<br>';
-    }
-
-    /**
-     * Converts a result object in the required class object
-     * @internal
-     * @param $result_object
-     * @param $target_class
-     * @return mixed
-     */
-    protected function _result_mapping($db_result_object, $target_model_obj)
-    {
-
-        $target_object = $this->_shallow_copy($target_model_obj);
-
-        foreach ($target_object->meta->fields as $field_name => $field_object):
-
-
-            if (property_exists($field_object, 'related_model') &&
-                ($field_object->M2M || $field_object instanceof InverseRelation)):
-
-                $act_pk = $this->_model_pk_field($this->_active_model_object);
-                $value = $db_result_object->{$act_pk};
-
-            else:
-                $column_name = $field_object->db_column_name();
-                // column value in the database
-                $value = $db_result_object->$column_name;
-            endif;
-
-            $this->_prepare_eager_values($field_name, $value);
-
-            $value = $this->_map_relations($field_object, $value);
-            // map it
-            $target_object->{$field_name} = $value;
+                $with = ['model'=>$nested_relation[$i], 'field'=>'', 'relations'=>$with];
+            endfor;
 
         endforeach;
 
-        return $target_object;
-    }
-
-    /**
-     * @param $field_name
-     * @param $value
-     *
-     * @ignore
-     */
-    public function _prepare_eager_values($field_name, $value){
-        // set this values here to avoid having to loop over the results again get them when eager loading
-        if ($this->_eager_load && in_array($field_name, $this->_fields_to_eager_load)):
-            $this->_eager_fields_values[$field_name][] = $value;
-        endif;
-    }
-
-    /**
-     * @param $model_object
-     * @return string
-     * @ignore
-     */
-    protected function _model_name($model_object)
-    {
-        return $this->_stable_name($model_object->meta->model_name);
-    }
-
-    /**
-     * @param $name
-     * @return string
-     * @ignore
-     */
-    protected function _stable_name($name)
-    {
-        return strtolower($name);
-    }
-
-    /**
-     * @param $model_obj
-     * @return mixed
-     * @ignore
-     */
-    protected function _model_pk_field($model_obj)
-    {
-        return $this->_model_pk($model_obj)->name;
-    }
-
-    /**
-     * @param $model_obj
-     * @return mixed
-     * @ignore
-     */
-    protected function _model_pk($model_obj)
-    {
-        return $model_obj->meta->primary_key;
-    }
-
-    /**
-     * @param $field_object
-     * @param $db_value
-     * @return mixed
-     * @ignore
-     */
-    protected function _map_relations($field_object, $db_value)
-    {
-        $value = $db_value;
-
-        if ($field_object instanceof RelatedField):
-
-            // owning side
-            // if this is a relationship and its is not eagerly loaded, return a Queryset for the relation
-            if (!$this->_eager_load && !empty($db_value)):
-                $rel_pk = $this->_model_pk_field($field_object->related_model);
-
-                $act_name = $this->_model_name($this->_active_model_object);
-                $act_pk = $this->_model_pk_field($this->_active_model_object);
-
-                if($field_object->M2M):
-                    return $field_object->related_model->filter(["$act_name::$act_pk"=>$db_value]);
-                endif;
-
-                if($field_object instanceof HasMany):
-                    return $field_object->related_model->filter(["$act_name::$act_pk"=>$db_value]);
-                endif;
-
-                if($field_object instanceof HasOne):
-
-                    return $field_object->related_model->filter(["$act_name::$act_pk"=>$db_value])->first();
-                endif;
-
-                if(!$field_object->M2M && $this->_is_owning($field_object->related_model)):
-                    return $field_object->related_model->filter([$rel_pk => $db_value])->first();
-                endif;
-            endif;
-        endif;
-
-        return $value;
+        $this->_with = $with;
 
     }
+    // ----------------------------------------------- > relations
+
+
+
+    // **************************************************************************************************
+
+    // *************************************** INTERNAL METHODS *****************************************
+
+    // **************************************************************************************************
+
+
 
     /**
-     * @ignore
-     * @param array $main_result
-     * @return array|null
-     */
-    protected function _eager_load_relations($main_result)
-    {
-        $result = $main_result;
-
-        if (empty($this->_fields_to_eager_load)):
-            return $result;
-        endif;
-
-        // ensure model requested for eager loading are actually related to the current model
-        $this->_related_check();
-        foreach ($this->_fields_to_eager_load as $field_name) :
-            if(!isset($this->_eager_fields_values[$field_name])):
-                continue;
-            endif;
-
-            // since one eager model can be used by the current results multiple times
-            // we just make sure we dont have repetitions of the the same eager model key
-            $field_values = array_unique($this->_eager_fields_values[$field_name]);
-
-            // fetch the eager models with the values above
-            $eager_model_object = $this->_active_model_object->meta->relations_fields[$field_name]->related_model;
-
-            // the pk for the eager model
-            $pk_field_name = $this->_model_pk_field($eager_model_object);
-
-            // this is queryset
-            $this->_eager_fetched_results = $eager_model_object->filter([$pk_field_name . "__in" => $field_values]);
-
-
-            $result = $this->_m2o_eager_loader($field_name, $main_result);
-        endforeach;
-
-
-        return $result;
-    }
-
-    /**
-     * @throws OrmExceptions
-     * @ignore
-     */
-    protected function _related_check()
-    {
-        $relation_fields = array_keys($this->_active_model_object->meta->relations_fields);
-        $not_relation_fields = array_diff($this->_fields_to_eager_load, $relation_fields);
-
-
-        if (count($not_relation_fields) > 0):
-            throw new OrmExceptions(sprintf(' %1$s` model has no relation to %2$s choices are :  %3$s ',
-                $this->_model_name($this->_active_model_object),
-                stringify($not_relation_fields),
-                stringify($relation_fields)));
-        endif;
-
-    }
-
-    /**
-     * @param $field_name
-     * @param $main_results
-     * @return mixed
-     * @ignore
-     */
-    protected function _m2o_eager_loader($field_name, $main_results)
-    {
-        if (empty($this->_eager_fields_values)):
-            return $main_results;
-        endif;
-
-        if (is_array($main_results)):
-            // update values in the main result
-            foreach ($main_results as $result) :
-                $field_value = $result->{$field_name};
-                $result->{$field_name} = $this->_locate_loaded_model($field_value);
-            endforeach;
-        endif;
-
-        if (is_object($main_results)):
-            $field_value = $main_results->{$field_name};
-            $main_results->{$field_name} = $this->_locate_loaded_model($field_value);
-        endif;
-
-        return $main_results;
-    }
-
-    /**
-     * Returns the results from the database already cast into apropriate model
-     * @internal
-     * @return array|bool|object
-     */
-    protected function _eval_queryset()
-    {
-        if (!$this->_evaluated):
-
-            // evaluate main object
-            $main_result = $this->_evaluate();
-            $this->_evaluated = TRUE;
-
-            $this->_results_cache = $this->_cast_to_model($main_result);
-        endif;
-
-        return $this->_results_cache;
-    }
-
-    /**
-     * Does the actual hit to the database either to fetch, edit, Add, delete
-     * @internal
-     * @return mixed
-     */
-    protected function _evaluate()
-    {
-        $this->_prepare_builder();
-
-        return $this->_db_results($this->_qbuilder->get());
-    }
-
-    /**
-     *
-     * @ignore
-     */
-    public function _prepare_builder(){
-
-        $this->_qbuilder->initialize();
-
-        if(!empty($this->_where_cache)):
-
-            // create the where conditions because they need a connection
-            foreach ($this->_where_cache as $table_name=>$conditions) :
-                $where = new Where($this->_qbuilder, $table_name);
-                $where->clause($conditions);
-            endforeach;
-
-        endif;
-    }
-
-    /**
-     * @param $query
-     * @return mixed
-     * @ignore
-     */
-    protected function _db_results($query)
-    {
-
-        if ($this->_output_type == 'row'):
-            return $query->row();
-        endif;
-
-        if ($this->_output_type == 'result'):
-            return $query->result();
-        endif;
-
-        if ($this->_output_type == 'num_rows'):
-            return $query->num_rows();
-        endif;
-
-        if ($this->_output_type == 'first_row'):
-            return $query->first_row();
-        endif;
-
-        if ($this->_output_type == 'last_row'):
-            return $query->last_row();
-        endif;
-    }
-
-    /**
-     * @param $field_value
-     * @return mixed
-     * @ignore
-     */
-    protected function _locate_loaded_model($field_value)
-    {
-
-        foreach ($this->_eager_fetched_results as $result) :
-            $pk_name = $this->_model_pk_field($result);
-            if ($result->{$pk_name} == $field_value):
-                return $result;
-            endif;
-        endforeach;
-
-        return $field_value;
-    }
-
-    /**
-     * @param $conditions
-     * @throws ValueError
-     * @ignore
-     */
-    protected function _validate_condition($conditions)
-    {
-
-        if (!is_array($conditions)) {
-            throw new ValueError(sprintf("Arguments should be in array form"));
-        }
-
-        foreach ($conditions as $key=>$value) :
-            if(empty($value)):
-                throw new ValueError(sprintf("Lookup condition on model `%2\$s`  has an empty value: %1\$s ",
-                    stringify($conditions), $this->_active_model_object->meta->model_name));
-            endif;
-        endforeach;
-
-
-        $this->_check_field_exist($conditions);
-
-    }
-
-    /**
-     * @param $model_obj
-     * @param $field
-     * @throws OrmExceptions
-     * @ignore
-     */
-    protected function _field_exists($model_obj, $field){
-        $where_concat_pattern = "/^~[.]*/";
-
-        // determine how to combine where statements
-        $has_or = preg_match($where_concat_pattern, $field);
-
-        // get the actual key
-        if($has_or):
-            $field = preg_split($where_concat_pattern, $field)[1];
-        endif;
-
-        if (!property_exists($this->_active_model_object, $field)):
-            throw new OrmExceptions(
-                sprintf('The field `%1$s does not exist on model  %2$s, the choices are : %3$s`',
-                    $field, $this->_model_name($model_obj), stringify(array_keys($model_obj->meta->fields))));
-        endif;
-    }
-
-    /**
-     * @param $conditions
-     * @throws OrmExceptions
-     * @ignore
-     */
-    protected function _check_field_exist($conditions)
-    {
-        $fields = array_keys($this->_active_model_object->meta->fields);
-
-        $split = $this->_split_conditions($conditions);
-
-        foreach ($split['normal_conditions'] as $key => $value) :
-            $key = $this->_field_from_condition($key);
-            $this->_field_exists($this->_active_model_object, $key);
-        endforeach;
-
-        // ensure that there is an actual relationship between this model and the current one
-//        foreach ($split['relation_conditions'] as $key => $value) :
-//            foreach ($this->_active_model_object->meta->relations_fields as $r_field) :
-//                if ($this->_model_name($this->$r_field->model_name) != $this->_stable_name($key)):
-//                    throw new OrmExceptions(
-//                        sprintf('The Model `%1$s does not have a relationship to the Model  %2$s', $key,
-//                            $this->_model_name($this->_active_model_object), implode(',', $fields)));
-//                endif;
-//            endforeach;
-//
-//        endforeach;
-
-
-    }
-
-    /**
-     * @param $conditions
-     * @return array
-     * @throws OrmExceptions
-     * @ignore
-     */
-    protected function _split_conditions($conditions)
-    {
-        $_relation_conditions = [];
-        $_normal_conditions = [];
-        foreach ($conditions as $key => $value) :
-            // look for relationship
-            if (preg_match("/::/", $key)):
-                $related_model_name = preg_split("/::/", $key)[0];
-                $related_model_search_key = preg_split("/::/", $key)[1];
-
-                $_relation_conditions[$related_model_name][$related_model_search_key] = $value;
-
-            else:
-
-                // look in the normal conditions and find it any of the fields is a relationship field
-                $key_test = $this->_field_from_condition($key);
-
-                // check field exists first
-                $this->_field_exists($this->_active_model_object, $key_test);
-
-                if($this->_is_relation_field($key_test,$this->_active_model_object)):
-                    $field_obj = $this->_active_model_object->meta->relations_fields[$key_test];
-
-                    $pk = $this->_model_pk_field($field_obj->related_model);
-                    $lookup = $this->_lookup_from_condition($key);
-
-                    if(!$this->_self_referncing($field_obj)):
-                        $new_lookup = $pk.'__'.$lookup;
-                        $_relation_conditions[$field_obj->model][$new_lookup] = $value;
-                    endif;
-
-                    $_normal_conditions[$key] = $value;
-                else:
-
-                    $_normal_conditions[$key] = $value;
-                endif;
-            endif;
-        endforeach;
-
-
-        return ['normal_conditions' => $_normal_conditions, 'relation_conditions' => $_relation_conditions];
-    }
-
-    /**
-     * @param $field_obj
-     * @return bool
-     * @ignore
-     */
-    public function _self_referncing($field_obj){
-        if($this->_stable_name($field_obj->model) == $this->_model_name($this->_active_model_object)):
-            return TRUE;
-        endif;
-    }
-
-    /**
-     * @param $model_object
-     * @ignore
-     */
-    protected function _select($model_object)
-    {
-        $t_name = $model_object->get_table_name();
-        $fields = [];
-
-
-        foreach ($model_object->meta->fields as $field) :
-            if (property_exists($field, 'M2M') && $field->M2M || $field instanceof InverseRelation):
-                continue;
-            endif;
-            $fields[] = $t_name.".".$field->db_column_name();
-        endforeach;
-
-
-        $fields = implode(',', $fields);
-
-        $this->_qbuilder->select($fields);
-    }
-
-    /**
-     * @param $table_name
-     * @ignore
-     */
-    protected function _from($table_name)
-    {
-        if (!$this->_is_chained()):
-            $this->_table_set = TRUE;
-            $this->_qbuilder->from($table_name);
-        endif;
-    }
-
-    /**
-     * @return bool
-     * @ignore
-     */
-    protected function _is_chained()
-    {
-        if ($this->_table_set):
-            return TRUE;
-        endif;
-        return FALSE;
-    }
-
-    /**
-     * Creates the different types of where clause based on looksup provided in the condition e.g ['name__exact'=>"john"]
-     * @internal
-     * @param string $model_name
-     * @param $conditions
-     */
-    protected function _where_clause($table_name, $conditions)
-    {
-        $this->_where_cache[$table_name]=$conditions;
-    }
-
-    /**
-     * @param $conditions
-     * @return array
-     * @ignore
-     */
-    protected function _prepare_where_conditions($conditions)
-    {
-        $ready_conditions = [];
-        foreach ($conditions as $key => $value) :
-
-            $field_name = $this->_field_from_condition($key);
-            $field_name = $this->_field_from_or($field_name);
-
-            $new_key = $this->_active_model_object->meta->fields[$field_name]->db_column_name();
-
-
-            if($this->_has_or($key)):
-                $new_key = '~'.$new_key;
-            endif;
-
-            $lookup =$this->_lookup_from_condition($key);
-            if(!empty($lookup)):
-                $key = $new_key.'__'.$this->_lookup_from_condition($key);
-            else:
-                $key = $new_key;
-            endif;
-
-            $ready_conditions[$key] = $value;
-        endforeach;
-
-        return $ready_conditions;
-    }
-
-    /**
-     * @param $model_name
-     * @return mixed
-     * @ignore
-     */
-    protected function _load_model($model_name)
-    {
-        $_ci =& get_instance();
-        $model_name = $this->_stable_name($model_name);
-        if (!isset($_ci->{$model_name})):
-            $_ci->load->model($model_name);
-        endif;
-        return $_ci->{$model_name};
-    }
-
-    /**
-     * @param $active_model
-     * @param $candidate_model
-     * @param $conditions
-     * @return $this
-     * @ignore
-     */
-    protected function _m2o_join($active_model, $candidate_model, $conditions)
-    {
-        $fk_info = $this->_find_fK_info($active_model, $candidate_model);
-
-
-        // from Owning side lookup
-        if ($this->_stable_name($fk_info['model_name']) == $this->_model_name($active_model)):
-
-            $joined_field_name = $this->_model_pk($active_model);
-            $joined_table_name = $candidate_model->get_table_name();
-            $main_table = $active_model->get_table_name();
-            $main_pk_name = $this->_stable_name($fk_info['field_name']);
-
-            $this->_join($main_table, $main_pk_name, $joined_table_name, $joined_field_name);
-            $this->_where_clause($joined_table_name, $conditions);
-        endif;
-
-        // from inverse side lookup
-        if ($this->_stable_name($fk_info['model_name']) == $this->_model_name($candidate_model)):
-
-            $main_pk_name = $this->_model_pk($active_model);
-            $main_table = $active_model->get_table_name();
-            $joined_table_name = $candidate_model->get_table_name();
-            $joined_field_name = $this->_stable_name($fk_info['field_name']);
-
-            $this->_join($main_table, $main_pk_name, $joined_table_name, $joined_field_name);
-            $this->_where_clause($joined_table_name, $conditions);
-        endif;
-
-        return $this;
-
-    }
-
-    /**
-     * @param $active_model
-     * @param $candidate_model
-     * @return array
-     * @ignore
-     */
-    protected function _find_fK_info($active_model, $candidate_model)
-    {
-
-        $active_model_name = $this->_model_name($active_model);
-        $candidate_model_name = $this->_model_name($candidate_model);
-
-        // first look for a relation field to the $candidate on the active model
-        foreach ($active_model->meta->relations_fields as $field) :
-            $related_model_name = $this->_model_name($field->related_model);
-            if (!$field->M2M && $related_model_name == $candidate_model_name && !$field instanceof InverseRelation):
-                return ['model_name' => $this->_model_name($active_model), 'field_name' => $field->db_column_name()];
-            endif;
-        endforeach;
-
-        // if nothing look for a relation field to the active model on $candidate
-        foreach ($candidate_model->meta->relations_fields as $field) :
-            $related_model_name = $this->_model_name($field->related_model);
-            if (!$field->M2M && $related_model_name == $active_model_name && !$field instanceof InverseRelation):
-                return ['model_name' => $this->_model_name($candidate_model), 'field_name' => $field->db_column_name()];
-            endif;
-        endforeach;
-
-    }
-
-    /**
-     * @param $main_table
-     * @param $main_pk_name
-     * @param $joined_table_name
-     * @param $joined_field_name
-     * @ignore
-     */
-    protected function _join($main_table, $main_pk_name, $joined_table_name, $joined_field_name)
-    {
-        $on = "$main_table.$main_pk_name=$joined_table_name.$joined_field_name";
-
-        $this->_qbuilder->join($joined_table_name, $on);
-    }
-
-    /**
-     * @param $active_model
-     * @param $candidate_model
-     * @return ProxyModel
-     * @throws OrmExceptions
-     * @ignore
-     */
-    protected function _m2m_through_model($active_model, $candidate_model)
-    {
-        $m2m_field_info = $this->_find_m2m_info($active_model, $candidate_model);
-
-        $m2m_field = $m2m_field_info['m2m_field'];
-        if (!empty($m2m_field->through)):
-            throw new OrmExceptions(
-                sprintf("Seems you have an intermidiary table `%s`, add() will not work in this case",
-                    $m2m_field->through)
-            );
-        endif;
-
-        if ($m2m_field_info['model_name'] == $this->_model_name($active_model)):
-            $owner_model = $active_model;
-            $inverse_model = $candidate_model;
-        else:
-            $owner_model = $candidate_model;
-            $inverse_model = $active_model;
-        endif;
-
-        return new ProxyModel($owner_model->meta, $inverse_model->meta);;
-
-    }
-
-    /**
-     * @param $active_model
-     * @param $candidate_model
-     * @return array
-     * @ignore
-     */
-    protected function _find_m2m_info($active_model, $candidate_model)
-    {
-
-        $active_model_name = $this->_model_name($active_model);
-        $candidate_model_name = $this->_model_name($candidate_model);
-
-        // first look for a relation field to the $candidate on the active model
-        foreach ($active_model->meta->relations_fields as $field) :
-            $related_model_name = $this->_model_name($field->related_model);
-            if ($field->M2M && $related_model_name == $candidate_model_name):
-                return ['model_name' => $this->_model_name($active_model), 'm2m_field' => $field];
-            endif;
-        endforeach;
-
-        // if nothing look for a relation field to the active model on $candidate
-        foreach ($candidate_model->meta->relations_fields as $field) :
-            $related_model_name = $this->_model_name($field->related_model);
-            if ($field->M2M && $related_model_name == $active_model_name):
-                return ['model_name' => $this->_model_name($candidate_model), 'm2m_field' => $field];
-            endif;
-        endforeach;
-
-    }
-
-    /**
-     * @param $through
-     * @param $owner_obj
-     * @param $inverse_obj
-     * @param $where_condition
-     * @return $this
-     * @throws OrmExceptions
-     * @ignore
-     */
-    protected function _m2m_join($through, $owner_obj, $inverse_obj, $where_condition)
-    {
-        $join_table_name = $through->get_table_name();
-
-        $current_table = $owner_obj->get_table_name();
-        $current_pk = $this->_model_pk_field($owner_obj);
-        $related_table = $inverse_obj->get_table_name();
-        $related_pk = $this->_model_pk_field($inverse_obj);
-
-        $owner_join_pt = '';
-        $inverse_join_pt = '';
-        foreach ($through->meta->relations_fields as $field) :
-
-            if ($this->_stable_name($field->model) == $this->_model_name($owner_obj)):
-                $owner_join_pt = $field->db_column_name();
-                continue;
-            endif;
-            if ($this->_stable_name($field->model) == $this->_model_name($inverse_obj)):
-                $inverse_join_pt = $field->db_column_name();
-                continue;
-            endif;
-        endforeach;
-
-        if (empty($owner_join_pt) || empty($inverse_join_pt)):
-            throw new OrmExceptions(
-                sprintf('The Model %1$s does not have a field that completes the M2M to %2$s',
-                    $this->_model_name($through)), $this->_model_name($inverse_obj));
-        endif;
-
-        // many to many
-        if (!empty($join_table_name)):
-
-            // join with the join table
-            $this->_qbuilder->join($join_table_name,
-                $current_table . "." . $current_pk . "=" . $join_table_name . "." . $owner_join_pt);
-
-            // join the related table
-            $this->_qbuilder->join($related_table,
-                $related_table . "." . $related_pk . "=" . $join_table_name . "." . $inverse_join_pt);
-
-            if (!empty($where_condition)):
-                $this->_where_clause($inverse_obj->get_table_name(), $where_condition);
-            endif;
-
-        endif;
-
-
-        return $this;
-    }
-
-    /**
-     * @param $related_obj
-     * @return bool
-     * @ignore
-     */
-    protected function _is_owning($related_obj)
-    {
-        // find owning side
-        foreach ($this->_active_model_object->meta->relations_fields as $field):
-            if ($this->_stable_name($field->model) == $this->_model_name($related_obj) &&
-                !$field instanceof InverseRelation):
-                return TRUE;
-            endif;
-        endforeach;
-
-        return FALSE;
-    }
-
-    /**
-     * Create a shallow copy of the object passed in, that is, if the object has any references,
+     * Create a deep copy of the object passed in, that is, if the object has any references,
      * both the copy and the original will work on the same references.
      *
      * @internal
      * @param $object
      * @return mixed
      */
-    protected function _shallow_copy($object)
+    protected function deep_clone()
     {
-        return clone $object;
+        $query = clone $this->_query_builder;
+        if($this->is_chaining()):
+            $query->reset_query();
+        endif;
+        return self::instance($this->model, $query);
     }
 
-    /**
-     * @param $field
-     * @return mixed
-     * @ignore
-     */
-    protected function _field_from_condition($field){
+    protected function is_chaining()
+    {
+        return false === empty($this->_from_cache);
+    }
 
-        $lookup_pattern = "/__/";
-        if(preg_match($lookup_pattern, $field)):
-            $options = preg_split($lookup_pattern, $field);
-            $field = $options[0];
+    protected function _filter($conditions=[], $fetch_type=self::FETCH_MULTIPLE){
+ 
+//        $query = $this->deep_clone();
+
+        assert(empty($this->_evaluated), "Its not possible to filter on a queryset that has already been evaluated");
+
+        $this->fetch_type = $fetch_type;
+
+        if(!in_array($this->model->meta->db_table, $this->_from_cache)):
+            $this->_from_cache[] =$this->model->meta->db_table;
+            $this->_query_builder->from($this->model->meta->db_table);
         endif;
 
-        return $field;
+        $this->_filter_cache = $this->_validate_conditions('filter', $conditions);
+
+        return $this;
     }
 
-    /**
-     * @param $field
-     * @return string
-     * @ignore
-     */
-    protected function _lookup_from_condition($field){
-
-        $lookup_pattern = "/__/";
-        if(preg_match($lookup_pattern, $field)):
-            $options = preg_split($lookup_pattern, $field);
-            return strtolower($options[1]);
-        endif;
+    protected function _create_filter(){
+        return new Filter($this->_query_builder, $this->model->meta->db_table);
     }
 
-    /**
-     * @param $key
-     * @return mixed
-     * @ignore
-     */
-    protected function _field_from_or($key){
-        // search for or condition
-        $where_concat_pattern = "/^~[.]*/";
+    public function _evaluate(){
 
-        // determine how to combine where statements
-        $has_or = preg_match($where_concat_pattern, $key);
+        if(empty($this->_results_cache)):
+            $this->_query_builder = $this->_profiler_ready($this->_query_builder);
+            $this->_query_builder->initialize();
 
+            $this->_setup_filters(FALSE);
 
-        // get the actual key
-        if($has_or):
-            $key = preg_split($where_concat_pattern, $key)[1];
-        endif;
+            $this->sql_cache = $this->sql();
 
-        return $key;
-    }
+            // NB:: THIS ARE NOT THE ACTUAL RESULTS FROM THE DATABASE
+            // this is an instance of \CI_DB_result
+            $results = $this->_query_builder->get();
 
-    /**
-     * @param $key
-     * @return int
-     * @ignore
-     */
-    protected function _has_or($key){
-        // search for or condition
-        $where_concat_pattern = "/^~[.]*/";
+            if($this->fetch_type == static::FETCH_FIRST || $this->fetch_type==static::FETCH_LAST):
 
-        // determine how to combine where statements
-        return preg_match($where_concat_pattern, $key);
-
-    }
-
-    /**
-     * @param $field
-     * @param $model_obj
-     * @return bool
-     * @ignore
-     */
-    protected function _is_relation_field($field, $model_obj){
-
-        foreach ($model_obj->meta->fields as $mod_field) :
-
-            if($this->_stable_name($mod_field->name) == $this->_stable_name($field) &&
-                $mod_field instanceof RelatedField):
-
-                return TRUE;
+                $results_data = call_user_func_array([$results, $this->fetch_type], ['array']);
+            else:
+                $results_data = call_user_func([$results, $this->fetch_type]);
             endif;
-        endforeach;
 
-        return FALSE;
-    }
+            $this->_evaluated = TRUE;
 
-    /**
-     * @param $active
-     * @param $related_obj
-     * @return bool
-     * @ignore
-     */
-    protected function _is_m2m($active, $related_obj){
-        if(!empty($this->_find_m2m_info($active, $related_obj))):
-            return TRUE;
+
+            $this->_results_cache = $this->_populate($results_data);
+
+            $this->_query_builder->close();
+
         endif;
+
+        return $this->_results_cache;
+
     }
 
-    /**
-     * @param $active
-     * @param $related_obj
-     * @return bool
-     * @ignore
-     */
-    protected function _is_m2o($active, $related_obj){
-        if(!empty($this->_find_fK_info($active, $related_obj))):
-            return TRUE;
-        endif;
-    }
+    protected function _populate($results_data)
+    {
+        $results = [];
 
-    /**
-     * @param string $params
-     * @ignore
-     */
-    protected function _get_query_builder($params=''){
-        $ci =& get_instance();
-        
-        if($ci->output->enable_profiler):
-            $name = $this->_model_name($this->_active_model_object);
-            $this->conn_id = $name.'_'.uniqid();
-            $qb = get_query_builder($params);
-            $ci->{$this->conn_id} = $qb;
-            $this->_qbuilder = $qb;
+        $primary_class = $this->model_class;
+
+        if($this->fetch_type == self::FETCH_MULTIPLE):
+            foreach ($results_data as $item) :
+                $results[] =  $this->_populate_model($primary_class, $item);
+            endforeach;
         else:
-            $this->_qbuilder = get_query_builder($params);
+            if(empty($results_data)):
+                return $results_data;
+            endif;
+
+            $results = $this->_populate_model($primary_class, $results_data);
+        endif;
+
+        return $results;
+    }
+
+    protected function _populate_model($primary_class, $results_data){
+
+        $results = $primary_class::from_db($this->_query_builder, $results_data);
+
+        return $results;
+    }
+
+    protected function _populate_relation($primary_model, $results){
+        
+    }
+
+    protected function _sql(){
+
+        $this->_setup_filters();
+
+        if($this->type==self::OPERATION_FETCH):
+            return $this->_query_builder->get_compiled_select('', FALSE);
+        endif;
+
+        if($this->type==self::OPERATION_INSERT):
+            return $this->_query_builder->get_compiled_insert('', FALSE);
         endif;
 
 
+        if($this->type==self::OPERATION_UPDATE):
+            return $this->_query_builder->get_compiled_update('', FALSE);
+        endif;
+
+        if($this->type==self::OPERATION_DELETE):
+            return $this->_query_builder->get_compiled_delete('', FALSE);
+        endif;
     }
+
+    protected function _setup_filters($create_connection =TRUE){
+        if(!empty($this->_filter_cache)):
+
+            if($create_connection):
+                $this->_query_builder->initialize();
+            endif;
+
+            $this->_create_filter()->clause($this->_filter_cache);
+
+            // reset the cache filter
+            $this->_filter_cache = [];
+
+            if($create_connection):
+                $this->_query_builder->close();
+            endif;
+
+        endif;
+
+    }
+
+    protected function _profiler_ready($query){
+        if(BaseOrm::ci_instance()->output->enable_profiler):
+
+            $conn_id = $this->model->meta->model_name.'_'.uniqid();
+
+            BaseOrm::ci_instance()->{$conn_id} = $query;
+            $query = BaseOrm::ci_instance()->{$conn_id};
+
+        endif;
+
+        return $query;
+    }
+
+    // **************************************************************************************************
+
+    // ************************************** MAGIC METHODS Overrides ***********************************
+
+    // **************************************************************************************************
+
+
+
+    /**
+     * Evaluate the Queryset when existence of a property in the Queryset Result is tested. using isset().
+     * @param $property
+     * @ignore
+     * @return bool
+     */
+    public function __isset($property)
+    {
+        $result = $this->_evaluate();
+        if((!property_exists($result, $property))):
+            return property_exists($result, $property);
+        endif;
+
+        return empty($this->_results_cache->{$property});
+    }
+
+    /**
+     * Evaluate the Queryset when a property is accessed from the Model Instance.
+     * @param $property
+     * @ignore
+     * @return mixed
+     */
+    public function __get($property)
+    {
+        // check if queryset is already evaluated
+        if (empty($this->_evaluated)):
+            $this->_evaluate();
+        endif;
+
+        return $this->_results_cache->{$property};
+    }
+
+    /**
+     * Evaluates Queryset when the Queryset Result is used like a string e.g. using Queryset Result in echo statement.
+     * @ignore
+     * @return string
+     */
+    public function __toString()
+    {
+        $this->_evaluate();
+        return $this->_results_cache;
+    }
+
+    /**
+     * Evaluates the Queryset when a method is being accessed in the Queryset Result.
+     * @param $method
+     * @param $args
+     * @ignore
+     * @return mixed
+     */
+
+
+    /**
+     * Evaluates the Queryset when Queryset Result is used in a foreach.
+     * @ignore
+     * @return ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->_evaluate());
+    }
+
+    /**
+     * Evaluates the Queryset when Queryset Result is used in a count() or size().
+     * @ignore
+     * @return mixed
+     */
+    public function count()
+    {
+        return $this->size();
+    }
+
+    /**
+     *
+     * @ignore
+     */
+    public function __clone()
+    {
+        // make a copy of the database
+        $this->model = $this->deep_clone($this->model);
+        $this->_query_builder = $this->_query_builder($this->deep_clone($this->_query_builder));
+    }
+
 }
-
-
-
-
 

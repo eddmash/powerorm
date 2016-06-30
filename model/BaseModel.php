@@ -56,17 +56,26 @@ abstract class BaseModel extends \CI_Model{
     /**
      * @ignore
      */
-    public function __construct()
+    public function __construct($data=[])
     {
+        assert(is_array($data), "Model expects and array of field/value");
+
         $this->dispatch_signal('powerorm.model.pre_init', $this);
 
         // invoke parent
         parent::__construct();
 
-        // initialize
-        $this->init();
+        $this->populate($data);
 
         $this->dispatch_signal('powerorm.model.post_init', $this);
+
+        $this->init();
+    }
+
+    public function populate($data){
+        foreach ($data as $field=>$value) :
+            $this->{$field} = $value;
+        endforeach;
     }
 
     public function init($registry='', $fields=[]){
@@ -237,7 +246,7 @@ abstract class BaseModel extends \CI_Model{
      */
     public function with($conditions, $opts=[]){
 
-        return $this->queryset($opts)->_eager_load($conditions);
+        return $this->queryset($opts)->with($conditions);
     }
 
     /**
@@ -512,7 +521,6 @@ abstract class BaseModel extends \CI_Model{
 
         endif;
 
-//        var_dump($checks);
         return $checks;
     }
 

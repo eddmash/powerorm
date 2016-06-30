@@ -26,7 +26,6 @@ class MysqlEditor extends \CI_DB_mysql_forge
 
     public function create_table($table, $if_not_exists = FALSE, array $attributes = array()){
 
-        var_dump($table);
         parent::create_table($table, $if_not_exists , ['ENGINE'=>'InnoDB']);
     }
 

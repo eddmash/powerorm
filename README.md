@@ -26,13 +26,18 @@ Load the library like any other Codeigniter library.
 
 `$autoload['libraries'] = array('session', 'powerorm/orm', 'powerauth/auth')`
 
+# Note
+
+The ORM does not replace codeigniters Active records, you can still them as if the orm was not in existence. 
+if you are using active records do not assume the database is loaded since the Orm loads the database only when need be. 
+
 # Dependecies
 This orm heavily relies on the core libraries provided with CodeIgniter without making any alterations on them.
 This means that any configuration made for the following libraries will affect how the ORM operates
 
 - The CodeIgniter Migration library
 
-- The CodeIgniter Database classes 
+- The CodeIgniter Database classes
 
 - The QueryBuilder Class.
 
@@ -342,5 +347,12 @@ http://eddmash.github.io/powerorm/docs/classes/Orm.html
  - CodeIgniter 3.0+
  - php 5.4+
  - on MYsql 5.5+
+ - on Postgresql 9+
+
+# Related CODEIGNITER Libraries.
+
+ - powerdispatch
+ 
+    An Event Dispatching mechanism for Codeigniter https://github.com/eddmash/powerdispatch
  
  

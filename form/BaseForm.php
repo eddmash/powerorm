@@ -361,6 +361,7 @@ class BaseForm extends Object
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function _html_output($opts = []){
+        //todo display errros
         $top_errors = $this->non_field_errors();
         $row = '';
         extract($opts);

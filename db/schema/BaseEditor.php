@@ -76,12 +76,12 @@ trait BaseEditor
         $this->add_column($model->meta->db_table, [$field->db_column_name()=>$sql_def]);
 
         // unique constraint
-        if($field->unique):
+        if($field->is_unique()):
             $this->add_unique_key($model, $field);
         endif;
 
         // index constraint
-        if($field->db_index and ! $field->unique):
+        if($field->db_index and ! $field->is_unique()):
             $this->add_index_key($model, $field);
         endif;
 
@@ -181,7 +181,7 @@ trait BaseEditor
         $unique_fields = [];
         foreach ($model->meta->fields as $name=>$field) :
 
-            if($field->unique):
+            if($field->is_unique()):
                 $unique_fields[] = $field;
             endif;
 
@@ -248,7 +248,7 @@ trait BaseEditor
 
         //  *********************** Drop uniqueness ***********************
 
-        if($previous_field->unique && !$present_field->unique):
+        if($previous_field->is_unique() && !$present_field->is_unique()):
             $this->drop_unique_key($model, $previous_field);
         endif;
         // todo drop index
@@ -321,7 +321,7 @@ trait BaseEditor
 
         // ******* CREATE CONSTRAINTS IF WE HAVE TO ***********************
         //  *********************** add Unique ***********************
-        if(!$previous_field->unique && $present_field->unique):
+        if(!$previous_field->is_unique() && $present_field->is_unique()):
             $this->add_unique_key($model, $present_field);
         endif;
         // todo add index

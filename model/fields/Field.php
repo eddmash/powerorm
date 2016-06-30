@@ -408,6 +408,10 @@ abstract class Field extends Object implements DeConstruct, Contributor{
     public function has_default(){
         return $this->default === (new NOT_PROVIDED());
     }
+
+    public function is_unique(){
+        return $this->unique || $this->primary_key;
+    }
     
     public function get_default(){
         return $this->default;
@@ -464,6 +468,17 @@ abstract class Field extends Object implements DeConstruct, Contributor{
         $path =$skel['path'];
         return new $path($constructor_args);
     }
+
+    /**
+     * Use to store this fields results, mostly used in relational fields
+     * @return string
+     * @since 1.0.1
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function get_cache_name(){
+        return sprintf("_%s_cache", $this->name);
+    }
+
 
 }
 

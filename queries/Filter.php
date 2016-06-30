@@ -1,15 +1,26 @@
 <?php
+/**
+ * Created by http://eddmash.com
+ * User: eddmash
+ * Date: 6/19/16
+ * Time: 1:17 AM
+ */
+
 namespace powerorm\queries;
+
+
 use powerorm\exceptions\OrmExceptions;
+use powerorm\helpers\Tools;
 
 /**
- * Creates the where clause.
+ * Class Filter
  * @package powerorm\queries
- * @since 1.0.0
+ *
+ * @since 1.0.1
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Where{
-
+class Filter
+{
     public $table_name;
     public $conditions;
     public $_database;
@@ -33,16 +44,17 @@ class Where{
         'not',
         'notin'];
 
-    public function __construct($qbuilder, $table_name=NULL){
+    public function __construct(&$qbuilder, $table_name=NULL){
         // pass by reference since we want this where to be associated with the other statements.
-        $this->_qbuilder =& $qbuilder;
+        $this->_qbuilder = $qbuilder;
         $this->table_name = $table_name;
     }
 
     public function validate_lookup($lookup){
         if(!empty($lookup) && !in_array($lookup, $this->lookup_options)):
             throw new OrmExceptions(
-                sprintf("`%1\$s` is not a valid lookup parameter the options are %2\$s", $lookup, stringify($this->lookup_options)));
+                sprintf("`%1\$s` is not a valid lookup parameter the options are %2\$s",
+                    $lookup, Tools::stringify($this->lookup_options)));
         endif;
     }
 

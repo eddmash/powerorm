@@ -8,7 +8,18 @@
 
 namespace powerorm\helpers;
 
-// borrowed from yii\helpers\BaseStringHelper
+/**
+ * some method borrowed from Yii\helpers\BaseStringHelper
+ * Part of the Yii framework.
+ *
+ * @package    Yii
+ * @version    2.0
+ * @author Qiang Xue <qiang.xue@gmail.com>
+ * @author Alex Makarov <sam@rmcreative.ru>
+ * @link http://www.yiiframework.com/
+ * @copyright Copyright (c) 2008 Yii Software LLC
+ * @license http://www.yiiframework.com/license/
+ */
 /**
  * Class Strings
  * @package powerorm\helpers

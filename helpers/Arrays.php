@@ -8,7 +8,17 @@
 
 namespace powerorm\helpers;
 
-// some method borrowed from Yii\helpers\BaseArrayHelper
+/**
+ * some method borrowed from Yii\helpers\BaseArrayHelper
+ * Part of the Yii framework.
+ *
+ * @package    Yii
+ * @version    2.0
+ * @author Qiang Xue <qiang.xue@gmail.com>
+ * @link http://www.yiiframework.com/
+ * @copyright Copyright (c) 2008 Yii Software LLC
+ * @license http://www.yiiframework.com/license/
+ */
 /**
  * Class Arrays
  * @package powerorm\helpers
