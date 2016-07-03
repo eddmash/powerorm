@@ -11,7 +11,7 @@ use powerorm\registry\App;
 /**
  * Class StateApps
  * @package powerorm\migrations
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class StateApps extends App{
@@ -40,7 +40,7 @@ class StateApps extends App{
  * This state can be passed around for use.
  *
  * @package powerorm\migrations
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class ProjectState extends Object{
@@ -112,7 +112,7 @@ class ProjectState extends Object{
  * This way we are able to make alterations to the model without affecting the actual models.
  *
  * @package powerorm\migrations
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class ModelState extends Object{

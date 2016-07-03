@@ -11,7 +11,7 @@ namespace powerorm\db\schema;
 /**
  * Class MysqliEditor
  * @package powerorm\db\schema
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class MysqliEditor extends \CI_DB_mysqli_forge

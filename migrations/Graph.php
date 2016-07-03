@@ -15,7 +15,7 @@ use powerorm\exceptions\NotFound;
  * and which migrations cannot exist if this one does not (children)
  *
  * @package powerorm\migrations
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Node{
@@ -81,7 +81,7 @@ class Node{
  * Creates a family tree for each migration with relation to the other migrations.
  * This will help us determine what needs to resolved before a migration is acted on.
  * @package powerorm\migrations
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Graph

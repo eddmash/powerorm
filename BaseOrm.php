@@ -17,7 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * PowerORM version
  * @ignore
  */
-define('POWERORM_VERSION', '1.0.1');
+define('POWERORM_VERSION', '1.1.0');
 
 /**
  * class that Loads the ORM LIBRARY and all the necessary classes.
@@ -241,7 +241,7 @@ define('POWERORM_VERSION', '1.0.1');
  *  To avoid this issues using this orm, use the {@see Queryset::with()} method.
  *
  * @package powerorm\model
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class BaseOrm {

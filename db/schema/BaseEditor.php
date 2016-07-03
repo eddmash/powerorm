@@ -14,7 +14,7 @@ use powerorm\exceptions\ValueError;
 /**
  * Class BaseEditor
  * @package powerorm\db\schema
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 trait BaseEditor

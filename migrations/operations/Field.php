@@ -240,7 +240,7 @@ class AlterField extends Operation{
 /**
  * Class RenameField
  * @package powerorm\migrations\operations
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class RenameField extends Operation{

@@ -9,7 +9,7 @@ use powerorm\traits\BaseObject;
 /**
  * Interface DeConstruct
  * @package powerorm
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 interface DeConstruct
@@ -52,7 +52,7 @@ interface DeConstruct
 /**
  * Interface Contributor
  * @package powerorm
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 interface Contributor{
@@ -79,7 +79,7 @@ class NOT_PROVIDED{}
 /**
  * Class Object
  * @package powerorm
- * @since 1.0.1
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Object
