@@ -23,7 +23,7 @@ class BaseForm extends Object
     public $initial = [];
     public $data = [];
     public $is_bound = FALSE;
-    public $fields = [];
+    protected $fields = [];
 
     public function __construct($data=[], $initial=[], $kwargs=[]){
         if(!empty($data)):
@@ -87,6 +87,10 @@ class BaseForm extends Object
         endif;
 
         throw new KeyError(sprintf('Field %1$s not found in %2$s', $field_name, $this->get_class_name()));
+    }
+
+    public function load_field($field){
+        $this->fields[$field->name]=$field;
     }
 
     /**
@@ -310,6 +314,7 @@ class BaseForm extends Object
         return $hidden_fields;
 
     }
+
     public function visible_fields(){
 
         $visible_fields = [];

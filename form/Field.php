@@ -175,7 +175,7 @@ class Field extends Object implements Contributor
 
     public function contribute_to_class($name, $object){
         $this->set_from_name($name);
-        $object->fields[$this->name] = $this;
+        $object->load_field($this);
         $this->form = $object;
     }
 

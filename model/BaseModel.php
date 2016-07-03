@@ -8,6 +8,7 @@ namespace powerorm\model;
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 use powerorm\BaseOrm;
+use powerorm\exceptions\OrmErrors;
 use powerorm\exceptions\OrmExceptions;
 use powerorm\exceptions\TypeError;
 use powerorm\form;
@@ -34,24 +35,26 @@ abstract class BaseModel extends \CI_Model{
     protected $table_name;
 
     /**
+     * Indicates if the orm should managed the table being represented by this model
+     * @var
+     */
+    protected $managed = TRUE;
+
+    /**
+     * @ignore
+     * @var
+     */
+    protected $proxy=FALSE;
+
+    protected $is_new=TRUE;
+
+    protected $fields =[];
+
+    /**
      * @ignore
      * @var array
      */
     public $meta;
-
-    /**
-     * Indicates if the orm should managed the table being represented by this model
-     * @var
-     */
-    public $managed = TRUE;
-
-    /**
-     * @ignore
-     * @var
-     */
-    public $proxy;
-
-    public $is_new;
 
     /**
      * @ignore
@@ -65,15 +68,17 @@ abstract class BaseModel extends \CI_Model{
         // invoke parent
         parent::__construct();
 
-        $this->populate($data);
-
         $this->dispatch_signal('powerorm.model.post_init', $this);
 
         $this->init();
+
+        // run this after init() to ensure the values are not reset by init().
+        $this->populate($data);
     }
 
     public function populate($data){
         foreach ($data as $field=>$value) :
+
             $this->{$field} = $value;
         endforeach;
     }
@@ -102,6 +107,12 @@ abstract class BaseModel extends \CI_Model{
             $registry->register_model($this);
         endif;
 
+    }
+
+    public static function instance($registry='', $fields=[]){
+        $obj = new static;
+        $obj->init($registry, $fields);
+        return $obj;
     }
 
 
@@ -389,7 +400,7 @@ abstract class BaseModel extends \CI_Model{
         $table_name = $this->table_name;
 
         if(!isset($table_name)):
-            $table_name = $this->lower_case($this->get_class_name());
+            $this->table_name =$table_name = $this->lower_case($this->get_class_name());
         endif;
 
         return $table_name;
@@ -629,6 +640,7 @@ abstract class BaseModel extends \CI_Model{
         endif;
 
         $fields = get_class_vars(get_class($this));
+
         foreach ($fields as $field_name => $value) :
 
             if (!isset($this->$field_name)):
@@ -640,8 +652,12 @@ abstract class BaseModel extends \CI_Model{
             $this->_add_fields($field_name, $field_obj);
 
         endforeach;
-    }
 
+        foreach ($this->fields as $name=>$field_obj) :
+            $this->_add_fields($name, $field_obj);
+        endforeach;
+
+    }
 
     protected function _add_fields($field_name, $field_obj){
         if($field_obj instanceof Field):
@@ -650,13 +666,14 @@ abstract class BaseModel extends \CI_Model{
         endif;
     }
 
+    public function load_field($field){
+        $this->fields[$field->name]=$field;
+    }
+
     public function add_to_class($name, $obj){
         if($obj->has_method('contribute_to_class')):
-
             $obj->contribute_to_class($name, $this);
-
         endif;
-
     }
 
     /**
@@ -695,6 +712,9 @@ abstract class BaseModel extends \CI_Model{
     }
 
 
+    public function has_property($name){
+        return property_exists($this, $name) || array_key_exists($name, $this->fields);
+    }
     // ========================================================================================================
 
     // ========================================== PHP MAGIC METHODS ===========================================
@@ -727,19 +747,24 @@ abstract class BaseModel extends \CI_Model{
         endif;
     }
 
-    /**
-     * @ignore
-     * Sets the fields and loads the meta
-     * @param $field_name
-     * @param $field_obj
-     */
-    public function __set($field_name, $field_obj)
-    {
+    public function __set($name, $value){
 
-        $this->setup_fields([$field_name=> $field_obj]);
-
+        if($value instanceof Field):
+            $this->fields[$name] = $value;
+        else:
+            $this->{$name} = $value;
+        endif;
     }
 
+    public function __get($name){
+
+        if(array_key_exists($name, $this->fields)):
+            return $this->fields[$name];
+        endif;
+
+        return parent::__get($name);
+
+    }
     /**
      * @ignore
      * @return string

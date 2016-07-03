@@ -154,14 +154,9 @@ class ModelState extends Object{
     
     public function to_model(App $registry){
 
-        $model = $this->_define_load_class($this->name);
+        $class_name = $this->_define_load_class($this->name);
 
-        // load model with fields
-        $fields = $this->fields;
-
-        $model->init($registry, $fields);
-
-        return $model;
+        return call_user_func_array(sprintf('%s::instance',$class_name), [$registry, $this->fields]);
     }
 
     public function _define_load_class($class_name){
@@ -177,14 +172,13 @@ class ModelState extends Object{
                  public function fields(){}
             }';
 
-        if(!class_exists('powerorm\migrations\_fake_\models\\'.$class_name, FALSE)):
+        $full_class_name = sprintf('\powerorm\migrations\_fake_\models\%s', $class_name);
+
+        if(!class_exists($full_class_name, FALSE)):
             eval(sprintf($class, $class_name));
         endif;
 
-
-        $class_name = '\powerorm\migrations\_fake_\models\\'.$class_name;
-
-        return new $class_name();
+        return $full_class_name;
     }
 
     public function deep_clone(){

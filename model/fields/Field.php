@@ -327,8 +327,7 @@ abstract class Field extends Object implements DeConstruct, Contributor{
     public function contribute_to_class($field_name, $model_obj){
         $this->container_model = $model_obj;
         $this->set_from_name($field_name);
-        $model_obj->{$field_name} = $this;
-
+        $model_obj->load_field($this);
         $model_obj->meta->add_field($this);
 
     }

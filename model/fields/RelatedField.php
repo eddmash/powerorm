@@ -165,7 +165,7 @@ class RelatedField extends Field{
 
     public function contribute_to_class($name, $obj){
         parent::contribute_to_class($name,$obj);
-        $obj->{$name} = new ForwardManyToOneDescriptor($this);
+        $obj->{$name} = ForwardManyToOneDescriptor::instance($this);
     }
 
 }
@@ -485,18 +485,39 @@ class ManyToMany extends RelatedField{
         endif;
 
         $class_name = "\\".$class_name;
-        $intermediary_obj = new $class_name();
-
-        $intermediary_obj->init(NULL, [
+        $fields = [
             $owner_model_name => new ForeignKey(['model'=>$owner_model_name]),
             $inverse_model_name => new ForeignKey(['model'=>$inverse_model_name])
-        ]);
+        ];
 
+        $intermediary_obj = call_user_func_array(sprintf('%s::instance',$class_name), [NULL, $fields]);
         $intermediary_obj->meta->auto_created = TRUE;
         return $intermediary_obj;
     }
 
 }
 
-class ForwardManyToOneDescriptor{}
+class ForwardManyToOneDescriptor{
+
+    public $field;
+
+    public function __construct($field){
+        $this->field = $field;
+    }
+
+    public static function instance($field){
+        return new static($field);
+    }
+
+    public function __get($name){
+
+        // check in the object
+    }
+    public function __set($name, $value){
+
+    }
+    public function __toString(){
+        return 'c';
+    }
+}
 
