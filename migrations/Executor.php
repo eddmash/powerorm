@@ -15,7 +15,7 @@ use powerorm\exceptions\AmbiguityError;
 /**
  * Class Executor
  * @package powerorm\migrations
- * @since 1.0.1
+ * @since 1.0.2
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Executor extends Base

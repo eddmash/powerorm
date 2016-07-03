@@ -110,7 +110,7 @@ class DropModel extends Operation{
 /**
  * Class RenameModel
  * @package powerorm\migrations\operations
- * @since 1.0.1
+ * @since 1.0.2
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class RenameModel extends Operation{

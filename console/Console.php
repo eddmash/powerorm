@@ -15,7 +15,7 @@ namespace powerorm\console;
  * 
  * Class Console
  * @package powerorm\console
- * @since 1.0.1
+ * @since 1.0.2
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Console

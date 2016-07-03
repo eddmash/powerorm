@@ -11,7 +11,7 @@ namespace powerorm\db;
 /**
  * Class Connection
  * @package powerorm\db
- * @since 1.0.1
+ * @since 1.0.2
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Connection

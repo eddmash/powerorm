@@ -15,7 +15,7 @@ use powerorm\traits\BaseFileReader;
 /**
  * This class is responsible for loading the state of the project based on the migration files present.
  * @package powerorm\migrations
- * @since 1.0.1
+ * @since 1.0.2
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Loader extends Object

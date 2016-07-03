@@ -20,7 +20,7 @@ use powerorm\traits\BaseObject;
  * The ORM Model that adds power to CI Model.
  *
  * @package powerorm\model
- * @since 1.0.1
+ * @since 1.0.2
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class BaseModel extends \CI_Model{

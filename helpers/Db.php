@@ -11,7 +11,7 @@ use powerorm\queries\Queryset;
  * @param null $query_builder_override
  * @return mixed
  *
- * @since 1.0.1
+ * @since 1.0.2
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 function create_queryset($model, $query=NULL, $params='', $query_builder_override=NULL)
