@@ -44,7 +44,6 @@ This means that any configuration made for the following libraries will affect h
 - The Form validation class.
 
 # Configuration 
- - Copy the **pmanger.php** file located in powerorm/bin/ to the same folder as `index.php`
  - Load the **powerorm** library. preferable on autoload. ```$autoload['libraries'] = array('powerorm/orm',);```
  
 
@@ -101,25 +100,46 @@ Learn more about fields here http://eddmash.github.io/powerorm/docs/namespaces/p
 
 
 ## 2. Migration
-To interact with the migration module, you do it through the command line.
+Create a migrations controller and add the following methods:
 
-The orm comes with commandline tool, to use it, you need to Copy the **pmanger.php** file located in powerorm/bin/ 
-to the same folder as `index.php` i.e. in the same directory as the application folder.
- 
-Having created the models like we have above, ON the command line/ terminal, run the following command, 
-get in the codeigniter installation folder, i.e. 
-the parent folder that house application folder, system folder, index.php, and now pmanager.php
+    class Migrations extends CI_Controller{
+            
+            /**
+            * Generate migration files.
+            */
+            public function makemigrations(){
+                ORM::makemigrations();
+            }
+        
+            /**
+             * Runs the latest migrations
+             */
+            public function migrate()
+            {
+                Orm::migrate();
+            }
+        
+            /**
+            * roll back to a previouse migration
+            */
+            public function rollback($version)
+            {
+                Orm::rollback($version);
+            }
+    }        
+        
+Once you have the models created, on the command line/ terminal, run the following command
 
-`php pmanager.php makemigrations`
+`php index.php migrations/makemigrations`
 
 This command detects any changes made to you models and creates the necessary migrations file.
 
 Once the files have been generated you can run the following command to actually executes the migrations fields to make 
 the database match the model state
 
-`php pmanager.php migrate`
+`php index.php migrations/migrate`
  
-Based on the models we created earlier, it will generate a migration file that looks as shown below:
+Looking at the roles model, it will generate a migration file that looks as shown below:
 
     // Migration for the model role
     
@@ -166,7 +186,18 @@ Based on the models we created earlier, it will generate a migration file that l
                                 'id'=> new AutoField(['primary_key'=> TRUE, 'unique'=> TRUE]),
                             ]
                         ]
-                    ), 
+                    ),
+        
+                    new CreateModel(
+                        [
+                            'model'=> 'permission',
+                            'fields'=>[ 
+                                'description'=> new CharField(['max_length'=> 40]),
+                                'code'=> new CharField(['max_length'=> 40]),
+                                'id'=> new AutoField(['primary_key'=> TRUE, 'unique'=> TRUE]),
+                            ]
+                        ]
+                    ),
         
                     new AddField(
                         [
