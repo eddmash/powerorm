@@ -13,7 +13,7 @@ use powerorm\traits\BaseFileReader;
  *
  * Class App
  * @package powerorm\registry
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class App extends Object

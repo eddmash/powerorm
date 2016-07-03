@@ -4,7 +4,7 @@ namespace powerorm\exceptions;
 /**
  * Class NotImplemented
  * @package powerorm\exceptions
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class NotImplemented extends \ErrorException{}
@@ -12,7 +12,7 @@ class NotImplemented extends \ErrorException{}
 /**
  * Class NotFound
  * @package powerorm\exceptions
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class NotFound extends \ErrorException{}
@@ -59,7 +59,7 @@ class ValueError extends OrmExceptions{}
 /**
  * Class KeyError
  * @package powerorm\exceptions
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class KeyError extends OrmExceptions{}
@@ -120,7 +120,7 @@ class ValidationError extends OrmErrors{
 /**
  * Class CommandError
  * @package powerorm\exceptions
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class CommandError extends OrmErrors{}
@@ -128,7 +128,7 @@ class CommandError extends OrmErrors{}
 /**
  * Class NotSupported
  * @package powerorm\exceptions
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class NotSupported extends OrmExceptions{}
@@ -136,7 +136,7 @@ class NotSupported extends OrmExceptions{}
 /**
  * Class SystemCheckError
  * @package powerorm\exceptions
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class SystemCheckError extends OrmErrors{}

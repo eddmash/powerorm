@@ -471,7 +471,7 @@ abstract class Field extends Object implements DeConstruct, Contributor{
     /**
      * Use to store this fields results, mostly used in relational fields
      * @return string
-     * @since 1.0.2
+     * @since 1.1.0
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_cache_name(){

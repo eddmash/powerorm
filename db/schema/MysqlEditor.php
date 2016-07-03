@@ -12,7 +12,7 @@ namespace powerorm\db\schema;
 /**
  * Class MysqlEditor
  * @package powerorm\db\schema
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class MysqlEditor extends \CI_DB_mysql_forge

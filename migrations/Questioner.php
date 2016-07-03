@@ -13,7 +13,7 @@ use powerorm\console\Base;
 /**
  * Class Questioner
  * @package powerorm\migrations
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Questioner extends Base {
@@ -52,7 +52,7 @@ class Questioner extends Base {
 /**
  * Class InteractiveQuestioner
  * @package powerorm\migrations
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class InteractiveQuestioner extends Questioner

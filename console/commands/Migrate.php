@@ -10,7 +10,7 @@ use powerorm\migrations\ProjectState;
 /**
  * Class Migrate
  * @package powerorm\console\command
- * @since 1.0.2
+ * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Migrate extends Command
