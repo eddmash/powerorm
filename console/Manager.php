@@ -149,7 +149,7 @@ class Manager extends Base{
 
         if(empty($file)):
             $this->error(
-                sprintf('Unknown command: ` %1$s`. Does the file exists `%2$s\%1$s.php` ?'.PHP_EOL, $name, $this->path));
+                sprintf('Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?'.PHP_EOL, $name, $this->path));
             $message = $this->ansiFormat(sprintf('php %s.php help', $this->manager_name), Console::FG_YELLOW);
             $this->normal(sprintf("Type %s for usage.".PHP_EOL, $message));
             exit;

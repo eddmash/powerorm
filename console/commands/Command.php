@@ -84,6 +84,12 @@ class Command extends Base
     }
     
     public function execute($arg_opts, $manager){
+
+        $marker = $this->ansiFormat("~~~>", Console::FG_YELLOW);
+        $version = $this->ansiFormat(POWERORM_VERSION, Console::FG_CYAN);
+        $this->normal(sprintf(PHP_EOL.'%2$s Using powerorm version : %1$s '.PHP_EOL, $version, $marker), TRUE);
+
+
         $this->manager_name = $manager;
 
         if(in_array('--help', $arg_opts)):

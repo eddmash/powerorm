@@ -536,21 +536,6 @@ abstract class BaseModel extends \CI_Model{
     }
 
     /**
-     * Creates a form builder used to customize the way the form that represents current model is created.
-     * @return form\ModelForm
-     */
-    public function form_builder()
-    {
-        // ToDo run checks when form is being created, please.
-//        if(!empty($this->check())):
-//            throw new ValidationError(checks_html_output($this->check()));
-//
-//        endif;
-
-        return new form\ModelForm($this, $this->_field_values());
-    }
-
-    /**
      * @return array
      * @ignore
      */

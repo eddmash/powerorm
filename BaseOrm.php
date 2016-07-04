@@ -5,7 +5,8 @@ namespace powerorm;
  * Orm Loader
  */
 use powerorm\db\Connection;
-use powerorm\form\BaseForm; 
+use powerorm\form\BaseForm;
+use powerorm\form\ModelForm;
 use powerorm\registry\App;
 
 /**
@@ -323,13 +324,17 @@ class BaseOrm {
      * are singletons i.e. using the same instance during the response of a request.
      * @return Form
      */
-    public function form_builder(){
-        return $this->_get_form_builder();
+    public function get_form($data=[], $initial=[]){
+        return $this->_get_form_builder($data, $initial);
     }
 
-    protected function _get_form_builder(){
+    public function get_model_form($model, $data=[], $initial=[]){
+        return $this->_get_form_builder($model, $data, $initial);
+    }
+
+    protected function _get_form_builder($model_form, $data=[], $initial=[]){
         require_once("form/__init__.php");
-        return new BaseForm();
+        return ($model_form) ? new ModelForm($model_form, $data, $initial) : new BaseForm($data, $initial);
     }
 
     public function fetch_form($form, $data=[], $initial=[], $kwargs=[]){

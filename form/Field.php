@@ -15,12 +15,40 @@ use powerorm\form\widgets\TextInput;
 use powerorm\form\widgets\UrlInput;
 use powerorm\Object;
 
+/**
+ * required -- Boolean that specifies whether the field is required.
+ *             True by default.
+ * widget -- A Widget class, or instance of a Widget class, that should
+ *           be used for this Field when displaying it. Each Field has a
+ *           default Widget that it'll use if you don't specify this. In
+ *           most cases, the default widget is TextInput.
+ * label -- A verbose name for this field, for use in displaying this
+ *          field in a form. By default, Django will use a "pretty"
+ *          version of the form field name, if the Field is part of a
+ *          Form.
+ * initial -- A value to use in this Field's initial display. This value
+ *            is *not* used as a fallback if data isn't given.
+ * help_text -- An optional string to use as "help text" for this Field.
+ * error_messages -- An optional dictionary to override the default
+ *                   messages that the field will raise.
+ * show_hidden_initial -- Boolean that specifies if it is needed to render a
+ *                        hidden widget with initial value after widget.
+ * validators -- List of additional validators to use
+ * localize -- Boolean that specifies if the field should be localized.
+ * disabled -- Boolean that specifies whether the field is disabled, that
+ *             is its widget is shown in the form but not editable.
+ * label_suffix -- Suffix to be added to the label. Overrides
+ *
+ * @package powerorm\form\fields
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class Field extends Object implements Contributor
 {
     public $form;
     public $name;
     public $widget;
-    public $required=True;
+    public $required=TRUE;
 
     public $label=NULL;
     /**
@@ -43,6 +71,7 @@ class Field extends Object implements Contributor
      * @var bool
      */
     public $disabled=False;
+
     public $label_suffix=NULL;
 
     public $default_validators=[];
@@ -62,7 +91,7 @@ class Field extends Object implements Contributor
 
         $this->widget->is_required = $this->required;
 
-        # Hook into self.widget_attrs() for any Field-specific HTML attributes.
+        // Hook into this->widget_attrs() for any Field-specific HTML attributes.
         $extra_attrs = $this->widget_attrs($this->widget);
 
         if($extra_attrs):
@@ -198,7 +227,7 @@ class Field extends Object implements Contributor
         $name = $this->name;
 
         $value = $this->initial;
- 
+
         if(!$this->form->is_bound):
             if(array_key_exists($this->name, $this->form->initial)):
                 $value = $this->form->initial[$name];
@@ -219,6 +248,10 @@ class Field extends Object implements Contributor
 
     public function is_hidden(){
         return $this->widget->is_hidden();
+    }
+
+    public function is_editable(){
+        return $this->editable;
     }
 
     public function __toString()

@@ -5,8 +5,6 @@ namespace powerorm\form;
 use powerorm\Contributor;
 use powerorm\exceptions\KeyError;
 use powerorm\exceptions\ValidationError;
-use powerorm\exceptions\ValueError;
-use powerorm\form\fields\Field;
 use powerorm\Object;
 
 
@@ -31,6 +29,14 @@ class BaseForm extends Object
         endif;
 
         $this->data = $data;
+
+        if(empty($data)):
+            $data = [];
+        endif;
+
+        if(empty($initial)):
+            $initial = [];
+        endif;
         $this->initial = array_change_key_case($initial, CASE_LOWER);
 
         // replace the default options with the ones passed in.
@@ -38,13 +44,15 @@ class BaseForm extends Object
             $this->{$key} = $value;
         endforeach;
 
+        $this->fields();
+
         $this->init();
+
+        $this->_load_components();
+
     }
 
     public function init(){
-        $this->fields();
-        $this->_load_components();
-
     }
 
     public function fields(){
@@ -52,7 +60,7 @@ class BaseForm extends Object
     }
 
     /**
-     * @internal
+     * @ignore
      */
     public function _load_components(){
         $this->ci_instance()->load->library('form_validation');
@@ -341,6 +349,10 @@ class BaseForm extends Object
 
     public function _is_multipart()
     {
+        if(empty($this->fields)):
+            return FALSE;
+        endif;
+
         foreach ($this->fields as $field) :
             if($field->widget->needs_multipart_form):
                 return TRUE;

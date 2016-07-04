@@ -15,6 +15,30 @@ use powerorm\exceptions\OrmExceptions;
 use powerorm\NOT_PROVIDED;
 use powerorm\Object;
 
+/**
+ * Interface FieldInterface
+ * @package powerorm\model\field
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+interface FieldInterface extends DeConstruct, Contributor{
+
+    /**
+     * return the database column that this field represents.
+     * @return string
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+     public function db_type();
+
+    /**
+     * Returns a powerorm.form.Field instance for this database Field.
+     * @return string
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function formfield($kwargs=[]);
+}
 
 /**
  * This class represents a column in the database table.
@@ -24,7 +48,7 @@ use powerorm\Object;
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-abstract class Field extends Object implements DeConstruct, Contributor{
+abstract class Field extends Object implements FieldInterface{
 
     /**
      * @ignore
@@ -49,7 +73,7 @@ abstract class Field extends Object implements DeConstruct, Contributor{
      * @ignore
      * @var bool
      */
-    public $M2M=FALSE;
+    public $M2M=FALSE; 
 
     /**
      * @ignore
@@ -393,12 +417,35 @@ abstract class Field extends Object implements DeConstruct, Contributor{
     }
 
     /**
-     * returns the HTML Form type that this field represents.
-     * @return string
+     * @inheritdoc
      */
-    public function form_type(){
+    public function formfield($kwargs=[]){
 
-        return 'text';
+        $kwargs = array_change_key_case($kwargs, CASE_LOWER);
+
+        $defaults = [
+            'required'=> ! $this->form_blank,
+            'label'=>$this->verbose_name,
+            'help_text'=>$this->help_text,
+        ];
+
+        if($this->has_default()):
+            $defaults['initial'] = $this->get_default();
+        endif;
+        
+        if($this->choices):
+            //todo
+        endif;
+
+
+        $field_class = '\powerorm\form\fields\CharField';
+        if(array_key_exists('field_class', $kwargs)):
+            $field_class = $kwargs['form_class'];
+            unset($kwargs['form_class']);
+        endif;
+
+        $defaults = array_merge($defaults, $kwargs);
+        return new $field_class($defaults);
     }
 
     /**
