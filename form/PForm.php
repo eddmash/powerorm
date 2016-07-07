@@ -1,15 +1,7 @@
 <?php
 use powerorm\form\BaseForm;
-use powerorm\form\fields\CharField;
-use powerorm\form\fields\EmailField;
-use powerorm\form\fields\TextField;
-use powerorm\form\fields\UrlField;
-use powerorm\form\widgets\EmailInput;
-use powerorm\form\widgets\HiddenInput;
-use powerorm\form\widgets\NumberInput;
-use powerorm\form\widgets\PasswordInput;
-use powerorm\form\widgets\TextInput;
-use powerorm\form\widgets\UrlInput;
+use powerorm\form\widgets as FormWidgets;
+use powerorm\form\fields as FormFields;
 
 /**
  * Class Form
@@ -22,17 +14,26 @@ class PForm extends BaseForm
 
     public static function CharField($attrs=[])
     {
-        return new CharField($attrs);
+        return new FormFields\CharField($attrs);
     }
 
     public static function EmailField($attrs=[])
     {
-        return new EmailField($attrs);
+        return new FormFields\EmailField($attrs);
     }
 
     public static function UrlField($attrs=[])
     {
-        return new UrlField($attrs);
+        return new FormFields\UrlField($attrs);
+    }
+
+    public static function BooleanField($attrs=[])
+    {
+        return new FormFields\BooleanField($attrs);
+    }
+
+    public static function ChoiceField($attrs=[]){
+        return new FormFields\ChoiceField($attrs);
     }
 
     // ******************************************************************************
@@ -44,31 +45,42 @@ class PForm extends BaseForm
 
 
     public static function TextInput($attrs=[]){
-        return new TextInput($attrs);
+        return new FormWidgets\TextInput($attrs);
     }
 
-
     public static function PasswordInput($attrs=[]){
-        return new PasswordInput($attrs);
+        return new FormWidgets\PasswordInput($attrs);
     }
 
     public static function EmailInput($attrs=[]){
-        return new EmailInput($attrs);
+        return new FormWidgets\EmailInput($attrs);
     }
 
     public static function UrlInput($attrs=[]){
-        return new UrlInput($attrs);
+        return new FormWidgets\UrlInput($attrs);
     }
 
     public static function HiddenInput($attrs=[]){
-        return new HiddenInput($attrs);
+        return new FormWidgets\HiddenInput($attrs);
     }
 
     public static function NumberInput($attrs=[]){
-        return new NumberInput($attrs);
+        return new FormWidgets\NumberInput($attrs);
     }
 
     public static function TextArea($attrs=[]){
-        return new TextArea($attrs);
+        return new FormWidgets\TextArea($attrs);
+    }
+
+    public static function CheckboxInput($attrs=[]){
+        return new FormWidgets\CheckboxInput($attrs);
+    }
+
+    public static function Select($attrs=[]){
+        return new FormWidgets\Select($attrs);
+    }
+
+    public static function SelectMultiple($attrs=[]){
+        return new FormWidgets\SelectMultiple($attrs);
     }
 }

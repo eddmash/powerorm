@@ -236,7 +236,7 @@ class Migration extends Object
 
             $import = [$skel['path']];
 
-            $class = array_pop(explode("\\", $skel['path']));
+            $class = $skel['name'];
 
 
             $constructor_args = $skel['constructor_args'];
@@ -297,13 +297,14 @@ class StringifyOperation{
         $skel = $this->operation->skeleton();
 
         $path = "";
+        $name = "";
         $constructor_args = [];
         //unpack the array to set the above variables with actual values.
         extract($skel);
 
         $import = [$path];
 
-        $class = array_pop(explode("\\", $path));
+        $class = $name;
 
         foreach ($constructor_args as $arg) :
 

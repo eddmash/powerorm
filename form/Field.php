@@ -10,7 +10,10 @@ namespace powerorm\form\fields;
 
 use powerorm\Contributor;
 use powerorm\exceptions\ValueError;
+use powerorm\form\widgets\CheckboxInput;
 use powerorm\form\widgets\EmailInput;
+use powerorm\form\widgets\NumberInput;
+use powerorm\form\widgets\Select;
 use powerorm\form\widgets\TextInput;
 use powerorm\form\widgets\UrlInput;
 use powerorm\Object;
@@ -78,7 +81,7 @@ class Field extends Object implements Contributor
 
     public function __construct($opts=[]){
 
-        $this->widget = (empty($this->widget)) ? new TextInput() :$this->widget ;
+        $this->widget = (empty($this->widget)) ? $this->get_widget() :$this->widget ;
 
         $this->validators = [];
 
@@ -101,6 +104,7 @@ class Field extends Object implements Contributor
         if(!is_array($this->validators)):
             throw new ValueError(' { validators } is expected to be an array of validation to apply on the field');
         endif;
+
         if($this->required):
             $this->validators[] = 'required';
         endif;
@@ -115,7 +119,9 @@ class Field extends Object implements Contributor
 
     /**
      * Given a Widget instance, returns an associative array of any HTML attributes
-     * that should be added to the Widget, based on this Field.
+     * that should be added to the Widget, based on this Field. this is a good place to ensure that the attributes field
+     * matches to there related html attributes e.g for form field we get mx_length but html expexts maxlength.
+     *
      * @param $widget
      * @return array
      * @since 1.0.0
@@ -123,6 +129,16 @@ class Field extends Object implements Contributor
      */
     public function widget_attrs($widget){
         return [];
+    }
+
+    /**
+     * Returns the Widget to use for this form field.
+     * @return static
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function get_widget(){
+        return TextInput::instance();
     }
 
     public function to_php($value){
@@ -161,14 +177,11 @@ class Field extends Object implements Contributor
     public function label($label=Null, $id=Null, $view_attrs=[]){
 
         // if the field is not hidden field set label
-        if($this->widget->input_type=='hidden') :
+        if($this->widget->is_hidden()) :
             return '';
         endif;
 
-        $label_id = $this->name;
-
-
-        $view_attrs = array_merge($view_attrs, $this->label_attrs);
+        $label_id = $this->get_auto_id();
 
         if(!empty($view_attrs)):
             if(isset($view_attrs['name'])):
@@ -190,11 +203,24 @@ class Field extends Object implements Contributor
      */
     public function get_label_name(){
         // incase form label is not set
-        if(empty($this->label_name)):
+        if(empty($this->label)):
             return str_replace('_',' ', ucwords(strtolower($this->name)));
         endif;
 
-        return $this->label_name;
+        return ucfirst($this->label);
+    }
+    
+    public function get_auto_id(){
+
+        if(is_string($this->form->auto_id) && strpos($this->form->auto_id, '%s')):
+            return sprintf($this->form->auto_id, $this->name);
+        endif;
+
+        if(is_bool($this->form->auto_id) && $this->form->auto_id):
+            return $this->name;
+        endif;
+
+        return '';
     }
 
     public function bound_value($data, $initial)
@@ -210,13 +236,23 @@ class Field extends Object implements Contributor
 
     public function set_from_name($name){
         $this->name = $name;
-        $this->label = $name;
+        $this->label = $this->get_label_name();
     }
 
-    public function as_widget($widget=NULL, $attrs=NULL, $only_initial=NULL)
+    public function as_widget($widget=NULL, $attrs=[], $only_initial=NULL)
     {
         if($widget==NULL):
             $widget = $this->widget;
+        endif;
+        
+        if($this->disabled):
+            $attrs['disabled'] = TRUE;
+        endif;
+        
+        if(!empty($this->get_auto_id()) &&
+            !array_key_exists('id', $attrs) &&
+            !array_key_exists('id', $this->widget->attrs)):
+            $attrs['id'] = $this->get_auto_id();
         endif;
 
         return (string)$widget->render($this->name, $this->value(), $attrs);
@@ -276,16 +312,23 @@ class CharField extends Field{
             $this->validators[] = sprintf('min_length[%s]', $this->min_length);
         endif;
     }
+
+    public function widget_attrs($widget){
+        $attrs = parent::widget_attrs($widget);
+        if($this->max_length):
+            $attrs['maxlength'] = $this->max_length;
+        endif;
+
+        return $attrs;
+    }
 }
 
 class EmailField extends CharField{
 
     public $default_validators = ['valid_email'];
 
-    public function __construct($opts=[]){
-        $this->widget = new EmailInput;
-
-        parent::__construct($opts);
+    public function get_widget(){
+        return EmailInput::instance();
     }
 }
 
@@ -293,9 +336,73 @@ class UrlField extends CharField{
 
     public $default_validators = ['valid_url'];
 
-    public function __construct($opts=[]){
-        $this->widget = new UrlInput;
+    public function get_widget(){
+        return UrlInput::instance();
+    }
+}
 
+class IntegerField extends Field{
+
+    public $min_value;
+    public $max_value;
+
+    public function __construct($opts=[]){
         parent::__construct($opts);
+
+        if($this->max_value):
+            $this->validators[] = sprintf('greater_than[%s]', $this->max_value);
+        endif;
+
+        if($this->min_value):
+            $this->validators[] = sprintf('less_than[%s]', $this->min_value);
+        endif;
+    }
+
+    public function get_widget(){
+        return NumberInput::instance();
+    }
+
+    public function widget_attrs($widget){
+        $attrs = parent::widget_attrs($widget);
+
+        if($this->max_value):
+            $attrs['max'] = $this->max_value;
+        endif;
+
+        if($this->min_value):
+            $attrs['min'] = $this->min_value;
+        endif;
+
+        return $attrs;
+    }
+}
+
+class BooleanField extends Field{
+    
+    public function get_widget(){
+        return CheckboxInput::instance();
+    }
+}
+
+class ChoiceField extends Field{
+
+    public function __construct($opts=[]){
+        parent::__construct($opts);
+        $this->widget->choices = array_key_exists('choices', $opts) ? $opts['choices'] : [];
+    }
+
+    public function get_widget(){
+        return Select::instance();
+    }
+}
+
+class TypedChoiceField extends ChoiceField{
+
+}
+
+class MultipleChoiceField extends ChoiceField{
+    
+    public function get_widget(){
+        return SelectMultiple::instance();
     }
 }

@@ -3,6 +3,7 @@
 namespace powerorm\migrations\operations;
 
 use powerorm\DeConstruct;
+use powerorm\helpers\Strings;
 use powerorm\migrations\ProjectState;
 use powerorm\Object;
 
@@ -50,8 +51,16 @@ abstract class Operation extends Object implements DeConstruct
     }
 
     public function skeleton(){
+        $path = '';
+
+        if(Strings::starts_with($this->full_class_name(), 'powerorm\migrations\operations')):
+            $path = 'powerorm\migrations\operations as operation';
+        endif;
+
         return [
-            'path'=>get_class($this),
+            'name'=>sprintf('operation\%s', $this->get_class_name()),
+            'path'=> $path,
+            'full_name'=> $this->full_class_name(),
             'constructor_args'=> $this->constructor_args(),
         ];
     }

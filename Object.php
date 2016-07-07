@@ -20,6 +20,7 @@ interface DeConstruct
      *
      * i.e.
      *
+     * - the class name
      * - the absolute path to the class as a string
      * - the constructor arguments as an array
      *
@@ -30,6 +31,8 @@ interface DeConstruct
      * var_dump($name->skeleton());
      *
      * [
+     *      'name'=> 'Charfield',
+     *      'full_name'=> 'powerorm\model\Charfield',// since the path and the name can contain alias, pass this also
      *      'path'=> 'powerorm\model\Charfield',
      *      'constructor_args'=> [
      *          'max_length'=> 20

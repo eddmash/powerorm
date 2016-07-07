@@ -65,7 +65,6 @@ class Makemigrations extends Command
         foreach ($migration_changes as $migration) :
             $content = $migration->as_string();
 
-            // get last file name and increment todo
             $file_name = $migration->file_name();
             $this->normal("  ".$file_name.".php", TRUE);
 

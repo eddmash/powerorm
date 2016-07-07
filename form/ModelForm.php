@@ -8,12 +8,38 @@
 
 namespace powerorm\form;
 
-function fields_from_model($model, $fields, $excludes, $widgets, $labels, $help_texts, $field_classes){
+function fields_from_model($model, $required_fields, $excludes, $widgets, $labels, $help_texts, $field_classes){
 
     $model_fields = $model->meta->fields;
 
     $fields =[];
     foreach ($model_fields as $name=>$obj) :
+        if(in_array($name, $excludes)):
+            continue;
+        endif;
+
+        if(!empty($required_fields) && !in_array($name, $required_fields)):
+            continue;
+        endif;
+        $kwargs = [];
+        if (!empty($widgets) && array_key_exists($name, $widgets)):
+            $kwargs['widget'] = $widgets[$name];
+
+        endif;
+
+        if(!empty($labels) && array_key_exists($name, $labels)):
+            $kwargs['label'] = $labels[$name];
+        endif;
+
+
+        if(!empty($help_texts) && array_key_exists($name, $help_texts)):
+            $kwargs['help_text'] = $help_texts[$name];
+        endif;
+
+        if(!empty($field_classes) && array_key_exists($name, $field_classes)):
+            $kwargs['form_class'] = $field_classes[$name];
+         endif; 
+
         $fields[$name] = $obj->formfield();
     endforeach;
 
@@ -34,8 +60,8 @@ class ModelForm extends BaseForm
         $this->model = $model;
         parent::__construct($data, $initial, $kwargs);
     }
-
-    public function init(){
+    
+    public function set_up(){
         $fields = fields_from_model($this->model, $this->fields, $this->excludes,
             $this->widgets, $this->labels, $this->help_texts, $this->field_classes
         );
@@ -86,4 +112,19 @@ class ModelForm extends BaseForm
         return $this;
     }
 
+
+    public function __toString(){
+        $this->set_up();
+        return parent::__toString();
+    }
+
+    public function __get($name){
+        $this->set_up();
+        parent::__get($name);
+    }
+
+    public function __set($name, $value){
+        $this->set_up();
+        parent::__set($name, $value);
+    }
 }

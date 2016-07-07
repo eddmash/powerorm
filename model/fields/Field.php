@@ -9,9 +9,11 @@
 namespace powerorm\model\field;
 
 use powerorm\checks\Checks;
+use powerorm\form\fields as form;
 use powerorm\Contributor;
 use powerorm\DeConstruct;
 use powerorm\exceptions\OrmExceptions;
+use powerorm\helpers\Strings;
 use powerorm\NOT_PROVIDED;
 use powerorm\Object;
 
@@ -49,6 +51,8 @@ interface FieldInterface extends DeConstruct, Contributor{
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class Field extends Object implements FieldInterface{
+
+    const BLANK_CHOICE_DASH = [""=> "---------"];
 
     /**
      * @ignore
@@ -220,14 +224,6 @@ abstract class Field extends Object implements FieldInterface{
     public $form_widget;
 
     /**
-     * Used for forms with choices, this set the default option to show
-     *
-     *
-     * @var
-     */
-    public $empty_label;
-
-    /**
      * Extra “help” text to be displayed with the form widget.
      * It’s useful for documentation even if your field isn’t used on a form.
      *
@@ -301,9 +297,18 @@ abstract class Field extends Object implements FieldInterface{
      * @return array
      */
     public function skeleton(){
+        $path = '';
+        
+        if(Strings::starts_with($this->full_class_name(), 'powerorm\model\field')):
+            $path = 'powerorm\model\field as modelfield';
+        endif;
+        
+        
         return [
             'constructor_args'=>$this->constructor_args(),
-            'path'=>get_class($this)
+            'path'=> $path,
+            'full_name'=> $this->full_class_name(),
+            'name'=> sprintf('modelfield\%s', $this->get_class_name())
         ];
     }
  
@@ -379,34 +384,6 @@ abstract class Field extends Object implements FieldInterface{
         return sprintf('%1$s_%2$s_%3$s', $prefix, strtolower($this->name), mt_rand());
     }
 
-    /**
-     * Returns all the options necessary to represent this field on a HTML Form.
-     * @return array
-     */
-    public function form_field(){
-
-        return $this->_prepare_form_field();
-    }
-
-    /**
-     * @ignore
-     * @return array
-     */
-    public function _prepare_form_field(){
-
-        $opts = [];
-        $opts['type'] = (!empty($this->form_widget))? $this->form_widget: $this->form_type();
-        $opts['name'] = $this->name;
-        $opts['unique'] = $this->unique;
-        $opts['max_length'] = $this->max_length;
-        $opts['default'] = $this->default;
-        $opts['blank'] = $this->form_blank;
-        $opts['empty_label'] = $this->empty_label;
-        $opts['choices'] = $this->choices;
-        $opts['help_text'] = $this->help_text;
-
-        return $opts;
-    }
 
     /**
      * return the database column that this field represents.
@@ -421,6 +398,8 @@ abstract class Field extends Object implements FieldInterface{
      */
     public function formfield($kwargs=[]){
 
+        $field_class = form\CharField::full_class_name();
+
         $kwargs = array_change_key_case($kwargs, CASE_LOWER);
 
         $defaults = [
@@ -432,19 +411,33 @@ abstract class Field extends Object implements FieldInterface{
         if($this->has_default()):
             $defaults['initial'] = $this->get_default();
         endif;
-        
+
+
         if($this->choices):
-            //todo
+            $include_blank = TRUE;
+
+            if($this->form_blank || empty($this->has_default()) || !in_array('initial', $kwargs)):
+                $include_blank = FALSE;
+            endif;
+
+            $defaults['choices'] = $this->get_choices(['include_blank'=>$include_blank]);
+
+            if(array_key_exists('form_choices_class', $kwargs)):
+                $field_class = $kwargs['form_choices_class'];
+            else:
+                $field_class = form\TypedChoiceField::full_class_name();
+            endif;
+
         endif;
 
 
-        $field_class = '\powerorm\form\fields\CharField';
         if(array_key_exists('field_class', $kwargs)):
-            $field_class = $kwargs['form_class'];
-            unset($kwargs['form_class']);
+            $field_class = $kwargs['field_class'];
+            unset($kwargs['field_class']);
         endif;
 
         $defaults = array_merge($defaults, $kwargs);
+
         return new $field_class($defaults);
     }
 
@@ -511,8 +504,8 @@ abstract class Field extends Object implements FieldInterface{
     public function deep_clone(){
         $skel = $this->skeleton();
         $constructor_args =array_pop($skel['constructor_args']);
-        $path =$skel['path'];
-        return new $path($constructor_args);
+        $class_name = $skel['full_name'];
+        return new $class_name($constructor_args);
     }
 
     /**
@@ -523,6 +516,27 @@ abstract class Field extends Object implements FieldInterface{
      */
     public function get_cache_name(){
         return sprintf("_%s_cache", $this->name);
+    }
+
+    /**
+     * Returns choices with a default blank choices included, for use as SelectField choices for this field.
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function get_choices($opts=[]){
+
+        $include_blank_dash = (array_key_exists('include_blank', $opts)) ? $opts['include_blank']==FALSE: TRUE;
+
+        $first_choice = [];
+        if($include_blank_dash):
+            $first_choice = self::BLANK_CHOICE_DASH;
+        endif;
+
+        if(!empty($this->choices)):
+            return array_merge($first_choice, $this->choices);
+        endif;
+
+        // load from relationships todo
     }
 
 
@@ -554,20 +568,6 @@ class CharField extends Field{
      */
     public function db_type(){
         return 'VARCHAR';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function form_type(){
-
-        $type = 'text';
-
-        if(!empty($this->choices)):
-            $type = 'dropdown';
-        endif;
-
-        return $type;
     }
 
     /**
@@ -608,6 +608,12 @@ class CharField extends Field{
         return [];
     }
 
+    public function formfield($kwargs=[]){
+        $defaults=['max_length'=>$this->max_length];
+        $defaults = array_merge($defaults, $kwargs);
+        return parent::formfield($defaults);
+    }
+
 }
 
 /**
@@ -629,11 +635,10 @@ class EmailField extends CharField{
         parent::__construct($field_options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function form_type(){
-        return 'email';
+    public function formfield($kwargs=[]){
+        $defaults=['widget'=> form\CharField::full_class_name()];
+        $defaults = array_merge($defaults, $kwargs);
+        return parent::formfield($defaults);
     }
 }
 
@@ -676,15 +681,6 @@ class FileField extends CharField{
         $this->passed_unique = (array_key_exists('unique', $field_options))? TRUE: FALSE;
         parent::__construct($field_options);
     }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function form_type(){
-        return 'file';
-    }
-
 
     /**
      * {@inheritdoc}
@@ -735,19 +731,6 @@ class FileField extends CharField{
 
         return [];
     }
-
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function form_field(){
-
-        $opts = parent::form_field();
-        $opts['upload_to'] = $this->upload_to;
-        return $opts;
-
-    }
 }
 
 /**
@@ -755,15 +738,7 @@ class FileField extends CharField{
  *
  * @package powerorm\model\field
  */
-class ImageField extends FileField{
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function form_type(){
-        return 'image';
-    }
+class ImageField extends FileField{ 
 }
 
 /**
@@ -788,14 +763,6 @@ class TextField extends Field{
      */
     public function db_type(){
         return 'TEXT';
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function form_type(){
-        return 'textarea';
     }
 
 }
@@ -855,15 +822,6 @@ class DecimalField extends Field{
     public function db_type(){
         return 'DECIMAL';
     }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function form_type(){
-        return 'number';
-    }
-
 
     /**
      * {@inheritdoc}
@@ -982,11 +940,11 @@ class IntegerField extends Field{
         return 'INT';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function form_type(){
-        return 'number';
+    public function formfield($kwargs=[]){
+        $defaults=['field_class'=> form\IntegerField::full_class_name()];
+        $defaults = array_merge($defaults, $kwargs);
+
+        return parent::formfield($defaults);
     }
 }
 
@@ -1052,13 +1010,24 @@ class BooleanField extends Field{
         return "BOOLEAN";
     }
 
+    public function formfield($kwargs=[]){
+        $include_blank = TRUE;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function form_type(){
-        return 'radio';
+        if(!empty($this->choices)):
+            if(empty($this->has_default()) || !in_array('initial', $kwargs)):
+                $include_blank = FALSE;
+            endif;
+
+            $defaults=['choices'=>$this->get_choices(['include_blank'=>$include_blank])];
+        else:
+            // create just one checkbox
+            $defaults = ['form_class'=> form\BooleanField::full_class_name()];
+        endif;
+
+        $defaults = array_merge($defaults, $kwargs);
+        return parent::formfield($defaults);
     }
+
 }
 
 /**

@@ -57,12 +57,12 @@ class Tools{
 
                 if(is_object($value)):
 
-                    if($value instanceof \powerorm\model\field\Field):
-                        $skel = $value->skeleton();
-                        $class = $skel['class'];
-                        $opts = $skel['field_options'];
-                        $string_state .= sprintf("%1\$s(%2\$s)", $class, self::stringify($opts));
-                    endif;
+//                    todo if($value instanceof \powerorm\model\field\Field):
+//                        $skel = $value->skeleton();
+//                        $class = $skel['class'];
+//                        $opts = $skel['field_options'];
+//                        $string_state .= sprintf("%1\$s(%2\$s)", $class, self::stringify($opts));
+//                    endif;
                 endif;
 
                 if(is_numeric($key) && !is_array($value) && !is_object($value)):

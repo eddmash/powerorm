@@ -18,6 +18,7 @@ class BaseForm extends Object
 {
     const NON_FIELD_ERRORS = '_all_';
 
+    public $auto_id = 'id_%s';
     public $initial = [];
     public $data = [];
     public $is_bound = FALSE;
@@ -37,6 +38,7 @@ class BaseForm extends Object
         if(empty($initial)):
             $initial = [];
         endif;
+
         $this->initial = array_change_key_case($initial, CASE_LOWER);
 
         // replace the default options with the ones passed in.
@@ -390,7 +392,7 @@ class BaseForm extends Object
             if($field->is_hidden()):
                 $hidden_output[] = (string)$field;
             else:
-                $output[] = sprintf($row, $field->label, $field, $field->help_text);
+                $output[] = sprintf($row, $field->label(), $field, $field->help_text);
             endif;
         endforeach;
 
