@@ -9,11 +9,19 @@ namespace powerorm\form\widgets;
 
 
 use powerorm\exceptions\NotImplemented;
+use powerorm\form\fields\ChoiceField;
 use powerorm\helpers\Tools;
 use powerorm\model\field\TextField;
 use powerorm\Object;
 
-class Widget extends Object
+/**
+ * base class for all widgets, should never initialized
+ * Class Widget
+ * @package powerorm\form\widgets
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+abstract class Widget extends Object
 {
 
     public $attrs;
@@ -23,6 +31,7 @@ class Widget extends Object
     public function __construct($attrs=[], $kwargs=[])
     {
         $this->attrs = $attrs;
+        $this->init();
     }
 
     public static function instance($attrs=[], $kwargs=[]){
@@ -81,7 +90,14 @@ class Widget extends Object
     }
 }
 
-class Input extends Widget{
+/**
+ * base class for all input widgets, should never initialized
+ * Class Input
+ * @package powerorm\form\widgets
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+abstract class Input extends Widget{
     public $input_type = NULL;
 
     public function render($name, $value, $attrs=[], $kwargs=[])
@@ -192,6 +208,8 @@ class TextArea extends Widget{
 }
 
 /**
+ * This creates a single checkbox on the fields, to create more than one use {@see MultipleCheckboxes}
+ *
  * Checkbox: <input type='checkbox' ...>
  *
  * Class CheckboxInput
@@ -241,6 +259,16 @@ class CheckboxInput extends Widget{
     }
 }
 
+
+
+// **************************************************************************************************
+
+// ******************************************* CHOICES *******************************************
+
+// **************************************************************************************************
+
+
+
 /**
  *
  * Select widget: <select><option ...>...</select>
@@ -263,7 +291,7 @@ class Select extends Widget{
 
     public function __construct($attrs=[], $kwargs=[]){
         parent::__construct($attrs);
-        
+
         if(array_key_exists('choices', $kwargs)):
             $this->choices = $kwargs['choices'];
         endif;
@@ -283,6 +311,7 @@ class Select extends Widget{
         $output[] = sprintf('<select %s >', $this->flat_attrs($final_attrs));
         // add select options
         $options[] = $this->render_options($selected_choices, [$value]);
+
         if(!empty($options)):
             $output = array_merge($output, $options);
         endif;
@@ -291,7 +320,7 @@ class Select extends Widget{
 
         return join(' ', $output);
     }
-    
+
     public function render_options($choices, $selected_choices){
         $selected = [];
         foreach ($selected_choices as $choice) :
@@ -309,13 +338,20 @@ class Select extends Widget{
         $output = [];
 
         foreach ($choices as $label=>$value) :
+
             if(is_array($value)):
+
                 $output[] = sprintf('<optgroup label="%s">', $label);
+
                 foreach ($value as $c_label=>$c_value) :
+
                     $output[] = $this->render_option($selected_choices, $c_value, $c_label);
+
                 endforeach;
+
                 $output[] = '</optgroup>';
             else:
+
                 $output[] = $this->render_option($selected_choices, $value, $label);
             endif;
 //
@@ -326,7 +362,7 @@ class Select extends Widget{
 
     public function render_option($selected_choices, $label, $value){
         $selected_html = '';
-        
+
         if(in_array($value, $selected_choices)):
             $selected_html = 'selected="selected"';
         endif;
@@ -360,9 +396,11 @@ class SelectMultiple extends Select{
         $output[] = sprintf('<select %s  multiple="multiple">', $this->flat_attrs($final_attrs));
         // add select options
         $options[] = $this->render_options($selected_choices, [$value]);
+
         if(!empty($options)):
             $output = array_merge($output, $options);
         endif;
+
         // close select
         $output[] = '</select>';
 
@@ -372,6 +410,110 @@ class SelectMultiple extends Select{
 }
 
 /**
+ * Base class of widgets like checkbox and radio which can be more than one.
+ * Class ChoiceInputFields
+ * @package powerorm\form\widgets
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+abstract class ChoiceInputFields extends Input{
+
+    public $input_type = '';
+    public $outer_html = '<ul %1$s> %2$s </ul>';
+    public $inner_html = '<li>%1$s %2$s </li>';
+
+    public function __construct($attrs=[], $kwargs=[]){
+        parent::__construct($attrs);
+
+        if(array_key_exists('choices', $kwargs)):
+            $this->choices = $kwargs['choices'];
+        endif;
+    }
+
+    public function render($name, $value, $attrs=[], $kwargs=[]){
+
+        $selected_choices = (array_key_exists('selected_choices', $kwargs)) ? $kwargs['selected_choices'] : [];
+
+        if(empty($value)):
+            // in case its null, false etc
+            $value = '';
+        endif;
+
+        $output = [];
+
+        // add select options
+        $options[] = $this->render_options($name, $selected_choices, [$value], $attrs);
+
+        if(!empty($options)):
+            $output = array_merge($output, $options);
+        endif;
+
+        return join(' ', $output);
+    }
+
+    public function render_options($field_name, $choices, $selected_choices, $attrs=[]){
+        $selected = [];
+
+        foreach ($selected_choices as $choice) :
+            $selected[] = (string)$choice;
+        endforeach;
+
+        /**
+         * 'choices'=>[
+         *      'gender'=> ['f'=>'Female', 'm'=>'Male' ],
+         *      'bmw'=>'mercedes benz'
+         * ]
+         */
+        $choices = array_merge($this->choices, $choices);
+
+        $output = [];
+
+        $count = 1;
+        foreach ($choices as $label=>$value) :
+
+            $attrs_ = $this->build_attrs($attrs,[
+                'name'=>$field_name.'[]',
+                'type'=>$this->input_type,
+            ]);
+
+            $attrs_['id'] = $attrs_['id'].'_'.$count;
+
+            if(is_array($value)):
+
+                $sub_widget = new static($attrs_, ['choices'=>$value]);
+
+                $output[] = sprintf($this->inner_html, $label, $sub_widget->render($field_name, ''));
+
+            else:
+                $sub_widget = '';
+
+                $output[] = sprintf($this->inner_html,
+                    $this->render_option($selected_choices, $value, $label, $attrs_), $sub_widget);
+            endif;
+
+            $count++;
+        endforeach;
+
+        return sprintf($this->outer_html, $this->flat_attrs($attrs),join(' ', $output));
+    }
+
+    public function render_option($selected_choices, $label, $value, $attrs=[]){
+
+        $checked_html = '';
+        $attrs['value'] = $value;
+
+        if(in_array($value, $selected_choices)):
+            $checked_html = 'checked="checked"';
+        endif;
+
+        $template = '<label for=""> <input %1$s %2$s/> %3$s </label>';
+
+        return sprintf($template, $this->flat_attrs($attrs), $checked_html, $label);
+    }
+}
+
+
+/**
  * Similar to Select, but rendered as a list of radio buttons within
  *
  * Class RadioSelect
@@ -379,8 +521,9 @@ class SelectMultiple extends Select{
  * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class RadioSelect extends Select{
-    //todo
+class RadioSelect extends ChoiceInputFields{
+    public $input_type = 'radio';
+
 }
 
 /**
@@ -391,6 +534,8 @@ class RadioSelect extends Select{
  * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class CheckboxSelectMultiple extends Select{
-    //todo
+class MultipleCheckboxes extends ChoiceInputFields{
+    public $input_type = 'checkbox';
+
 }
+

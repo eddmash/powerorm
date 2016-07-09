@@ -16,11 +16,14 @@ use powerorm\form\widgets\CheckboxInput;
 use powerorm\form\widgets\EmailInput;
 use powerorm\form\widgets\NumberInput;
 use powerorm\form\widgets\Select;
+use powerorm\form\widgets\SelectMultiple;
 use powerorm\form\widgets\TextInput;
 use powerorm\form\widgets\UrlInput;
 use powerorm\Object;
 
 /**
+ * Base class for all form fields, should nevers be initialized, use its subclasses.
+ *
  * required -- Boolean that specifies whether the field is required.
  *             True by default.
  * widget -- A Widget class, or instance of a Widget class, that should
@@ -48,7 +51,7 @@ use powerorm\Object;
  * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Field extends Object implements Contributor
+abstract class Field extends Object implements Contributor
 {
     public $form;
     public $name;
@@ -327,7 +330,7 @@ class Field extends Object implements Contributor
         $value = $this->initial;
 
         if(!$this->form->is_bound):
-            if(array_key_exists($this->name, $this->form->initial)):
+            if(array_key_exists($name, $this->form->initial)):
                 $value = $this->form->initial[$name];
             endif;
         else:
@@ -358,6 +361,23 @@ class Field extends Object implements Contributor
     }
 }
 
+/**
+ * Creates a :
+ *      Default widget: TextInput
+ *      Empty value: '' (an empty string)
+ *      Validates max_length or min_length, if they are provided. Otherwise, all inputs are valid.
+ *
+ * Has two optional arguments for validation:
+ *  - max_length
+ *  - min_length
+ *
+ *  If provided, these arguments ensure that the string is at most or at least the given length.
+ *
+ * Class CharField
+ * @package powerorm\form\fields
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class CharField extends Field{
 
     public $max_length;
@@ -385,6 +405,20 @@ class CharField extends Field{
     }
 }
 
+/**
+ * Creates an :
+ *      Default widget: EmailInput
+ *      Empty value: '' (an empty string)
+ *      Validates that the given value is a valid email address
+ *
+ * Has two optional arguments for validation, max_length and min_length.
+ * If provided, these arguments ensure that the string is at most or at least the given length.
+ *
+ * Class EmailField
+ * @package powerorm\form\fields
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class EmailField extends CharField{
 
     public $default_validators = ['valid_email'];
@@ -394,6 +428,24 @@ class EmailField extends CharField{
     }
 }
 
+/**
+ * Creates a:
+ *      Default widget: URLInput
+ *      Empty value: '' (an empty string)
+ *      Validates that the given value is a valid URL.
+ *
+ *
+ * Takes the following optional arguments:
+ *      - max_length
+ *      - min_length
+ *
+ * These are the same as CharField->max_length and CharField->min_length.
+ *
+ * Class UrlField
+ * @package powerorm\form\fields
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class UrlField extends CharField{
 
     public $default_validators = ['valid_url'];
@@ -403,6 +455,43 @@ class UrlField extends CharField{
     }
 }
 
+/**
+ * Creates a:
+ *      Default widget: TextInput
+ *      Empty value: '' (an empty string)
+ *      Validates that the given value contains only letters, numbers, underscores, and hyphens.
+ *
+ * This field is intended for use in representing a model SlugField in forms.
+ *
+ * Class SlugField
+ * @package powerorm\form\fields
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class SlugField extends CharField{
+
+    public $default_validators = ['regex_match[/^[-a-zA-Z0-9_]+\Z/]'];
+}
+
+/**
+ * Creates a:
+ *      Default widget: NumberInput.
+ *      Empty value: None
+ *
+ * Validates that the given value is an integer.
+ *
+ *
+ * Takes two optional arguments for validation:
+ *  - max_value
+ *  - min_value
+ *
+ * These control the range of values permitted in the field.
+ *
+ * Class IntegerField
+ * @package powerorm\form\fields
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class IntegerField extends Field{
 
     public $min_value;
@@ -439,6 +528,17 @@ class IntegerField extends Field{
     }
 }
 
+/**
+ * Creates a :
+ *       Default widget: CheckboxInput
+ *       Empty value: False
+ *       Validates that the value is True (e.g. the check box is checked) if the field has required=True.
+ *
+ * Class BooleanField
+ * @package powerorm\form\fields
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class BooleanField extends Field{
     
     public function get_widget(){
@@ -446,6 +546,30 @@ class BooleanField extends Field{
     }
 }
 
+/**
+ * Creates a :
+ *      Default widget: Select
+ *      Empty value: '' (an empty string)
+ * Takes one extra required argument:
+ *      choices
+ *          - Takes an associative array of value=>label e.g. ['f'=>'female'] or with grouping
+ *              $MEDIA_CHOICES = [
+ *                  'Audio'=>[
+ *                      'vinyl'=>'Vinyl',
+ *                      'cd'=> 'CD',
+ *                  ],
+ *                  'Video'=> [
+ *                      'vhs'=> 'VHS Tape',
+ *                      'dvd'=> 'DVD',
+ *                  ],
+ *                  'unknown'=> 'Unknown',
+ *              ];
+ *
+ * Class ChoiceField
+ * @package powerorm\form\fields
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class ChoiceField extends Field{
 
     public function __construct($opts=[]){

@@ -81,6 +81,14 @@ trait form{
     public static function SelectMultiple($attrs=[]){
         return new FormWidgets\SelectMultiple($attrs);
     }
+
+    public static function RadioSelect($attrs=[]){
+        return new FormWidgets\RadioSelect($attrs);
+    }
+
+    public static function MultipleCheckboxes($attrs=[]){
+        return new FormWidgets\MultipleCheckboxes($attrs);
+    }
 }
 
 /**
