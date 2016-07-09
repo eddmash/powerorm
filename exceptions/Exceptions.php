@@ -97,6 +97,16 @@ class ObjectDoesNotExist extends OrmExceptions{}
 class MultipleObjectsReturned extends OrmExceptions{}
 
 /**
+ * Class FormNotReadyException
+ * @package powerorm\exceptions
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class FormNotReadyException extends \Exception{
+
+}
+
+/**
  * Class ValidationError
  * @package powerorm\exceptions
  * @since 1.0.0

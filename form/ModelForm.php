@@ -9,8 +9,7 @@
 namespace powerorm\form;
 
 function fields_from_model($model, $required_fields, $excludes, $widgets, $labels, $help_texts, $field_classes){
-
-    $model_fields = $model->meta->fields;
+     $model_fields = $model->meta->fields;
 
     $fields =[];
     foreach ($model_fields as $name=>$obj) :
@@ -46,7 +45,8 @@ function fields_from_model($model, $required_fields, $excludes, $widgets, $label
 
     return $fields;
 }
-class ModelForm extends BaseForm
+
+class BaseModelForm extends BaseForm
 {
     public $model;
     protected $fields=[];
@@ -55,13 +55,8 @@ class ModelForm extends BaseForm
     protected $widgets=[];
     protected $help_texts=[];
     protected $field_classes=[];
-
-    public function __construct($model, $data=[], $initial=[], $kwargs=[]){
-        $this->model = $model;
-        parent::__construct($data, $initial, $kwargs);
-    }
     
-    public function set_up(){
+    public function setup(){
         $fields = fields_from_model($this->model, $this->fields, $this->excludes,
             $this->widgets, $this->labels, $this->help_texts, $this->field_classes
         );
@@ -71,14 +66,27 @@ class ModelForm extends BaseForm
             if(array_key_exists($name, $this->fields)):
                 continue;
             endif;
-            $this->_field_setup($name, $value);
+
+            $this->{$name}= $value;
         endforeach;
+
+        parent::setup();
+
+    }
+
+    public function custom(){
 
     }
 
     public function model($model=NULL){
+        
+        $this->model = (!empty($model))? $model : $this->model;
 
-        $this->model = ($model!==NULL)? $model : $this->model;
+        if(is_string($this->model)):
+            $this->ci_instance()->load->model($this->model);
+            $this->model = $this->ci_instance()->{$this->model};
+        endif;
+
         return $this;
     }
 
@@ -112,19 +120,4 @@ class ModelForm extends BaseForm
         return $this;
     }
 
-
-    public function __toString(){
-        $this->set_up();
-        return parent::__toString();
-    }
-
-    public function __get($name){
-        $this->set_up();
-        parent::__get($name);
-    }
-
-    public function __set($name, $value){
-        $this->set_up();
-        parent::__set($name, $value);
-    }
 }

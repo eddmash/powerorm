@@ -6,6 +6,7 @@ namespace powerorm;
  */
 use powerorm\db\Connection;
 use powerorm\form\BaseForm;
+use powerorm\form\BaseModelForm;
 use powerorm\form\ModelForm;
 use powerorm\registry\App;
 
@@ -324,26 +325,58 @@ class BaseOrm {
      * are singletons i.e. using the same instance during the response of a request.
      * @return Form
      */
-    public function get_form($data=[], $initial=[]){
-        return $this->_get_form_builder($data, $initial);
-    }
+    public function get_form($opts=[]){
 
-    public function get_model_form($model, $data=[], $initial=[]){
-        return $this->_get_form_builder($model, $data, $initial);
-    }
+        $data = (array_key_exists('data', $opts)) ? $opts['data'] : [];
+        $initial = (array_key_exists('initial', $opts)) ? $opts['initial'] : [];
+        $form = (array_key_exists('form', $opts)) ? $opts['form'] : [];
+        $model = (array_key_exists('model', $opts)) ? $opts['model'] : [];
 
-    protected function _get_form_builder($model_form, $data=[], $initial=[]){
+        $kwargs = $this->form_kwargs($opts);
+
+
+        assert((empty($form) || empty($model)), "Setting both { model } and { form } on the same get_form() method");
+
         require_once("form/__init__.php");
-        return ($model_form) ? new ModelForm($model_form, $data, $initial) : new BaseForm($data, $initial);
+
+        // just fetch the form
+        if(!empty($form)):
+            return $this->_fetch_form($form, $data, $initial, $kwargs);
+        endif;
+
+        // or create a ModelForm
+        if(!empty($model)):
+            return (new BaseModelForm($data, $initial, $kwargs))->model($model);
+        endif;
+
+        // else the create the default form
+        return new BaseForm($data, $initial, $kwargs);
+
     }
 
-    public function fetch_form($form, $data=[], $initial=[], $kwargs=[]){
+    public function form_kwargs($opts){
+        foreach (['data', 'initial', 'model', 'form'] as $opt) :
+            if(array_key_exists($opt, $opts)):
+                unset($opts[$opt]);
+            endif;
+        endforeach;
+
+        return $opts;
+    }
+
+    public function _fetch_form($form, $data=[], $initial=[], $kwargs=[]){
         //todo loader match to that of codeigniter especially in naming
-        require_once("form/__init__.php");
 
         require_once APPPATH.'forms/'.$form.'.php';
 
-        return new $form($data, $initial, $kwargs);
+        $form =  new $form($data, $initial, $kwargs);
+
+        // ensure the model is loaded
+        if($form instanceof BaseModelForm):
+            $form->model();
+        endif;
+
+        return $form;
     }
 
     //********************************** ORM Registry*********************************

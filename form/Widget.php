@@ -47,6 +47,13 @@ class Widget extends Object
 
     }
 
+    /**
+     * Prepare value for use on HTML widget
+     * @param $value
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function prepare_value($value){
         return $value;
     }

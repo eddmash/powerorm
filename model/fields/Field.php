@@ -34,6 +34,15 @@ interface FieldInterface extends DeConstruct, Contributor{
      public function db_type();
 
     /**
+     * Convert the value to a php value
+     * @param $value
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function to_php($value);
+
+    /**
      * Returns a powerorm.form.Field instance for this database Field.
      * @return string
      * @since 1.1.0
@@ -218,12 +227,6 @@ abstract class Field extends Object implements FieldInterface{
     public $choices;
 
     /**
-     * Set the html form type to use for this form.
-     * @var
-     */
-    public $form_widget;
-
-    /**
      * Extra “help” text to be displayed with the form widget.
      * It’s useful for documentation even if your field isn’t used on a form.
      *
@@ -253,6 +256,7 @@ abstract class Field extends Object implements FieldInterface{
         if(isset($field_options['type'])):
             unset($field_options['type']);
         endif;
+
         $this->default = new NOT_PROVIDED;
 
         $this->constructor_args = $field_options;
@@ -421,6 +425,7 @@ abstract class Field extends Object implements FieldInterface{
             endif;
 
             $defaults['choices'] = $this->get_choices(['include_blank'=>$include_blank]);
+            $defaults['coerce'] = [$this, 'to_php'];
 
             if(array_key_exists('form_choices_class', $kwargs)):
                 $field_class = $kwargs['form_choices_class'];
@@ -430,7 +435,6 @@ abstract class Field extends Object implements FieldInterface{
 
         endif;
 
-
         if(array_key_exists('field_class', $kwargs)):
             $field_class = $kwargs['field_class'];
             unset($kwargs['field_class']);
@@ -439,6 +443,10 @@ abstract class Field extends Object implements FieldInterface{
         $defaults = array_merge($defaults, $kwargs);
 
         return new $field_class($defaults);
+    }
+
+    public function to_php($value){
+        return $value;
     }
 
     /**

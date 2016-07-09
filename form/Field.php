@@ -9,6 +9,8 @@ namespace powerorm\form\fields;
 
 
 use powerorm\Contributor;
+use powerorm\exceptions\TypeError;
+use powerorm\exceptions\ValidationError;
 use powerorm\exceptions\ValueError;
 use powerorm\form\widgets\CheckboxInput;
 use powerorm\form\widgets\EmailInput;
@@ -79,11 +81,20 @@ class Field extends Object implements Contributor
 
     public $default_validators=[];
 
+    /**
+     * A list of some custom validators to run, this provides an easier way of implementing custom validations
+     * to your field.
+     *
+     * @var array
+     */
+    public $custom_validators = [];
+
     public function __construct($opts=[]){
 
         $this->widget = (empty($this->widget)) ? $this->get_widget() :$this->widget ;
 
         $this->validators = [];
+        $this->my_validators = [];
 
         // replace the default options with the ones passed in.
         foreach ($opts as $key=>$value) :
@@ -110,6 +121,8 @@ class Field extends Object implements Contributor
         endif;
 
         $this->validators = array_merge($this->default_validators, $this->validators);
+
+        $this->custom_validators = array_merge($this->custom_validators, $this->my_validators);
 
     }
 
@@ -231,7 +244,56 @@ class Field extends Object implements Contributor
     public function contribute_to_class($name, $object){
         $this->set_from_name($name);
         $object->load_field($this);
+
+        $object->field_validation_rules([
+            'field'=>$name,
+            'label'=>$this->get_label_name(),
+            'rules'=>$this->validators()
+        ]);
         $this->form = $object;
+    }
+    
+    public function clean($value){
+        $value = $this->to_php($value);
+        $this->validate($value);
+        $this->run_validators($value);
+        return $value;
+    }
+
+    /**
+     * Some validations that the CI_Validator does not take care off
+     * This method should raise a ValiationError Exception if the field fails validation
+     * @param $value
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function validate($value){
+
+    }
+
+    /**
+     * Runs custom validation not provided by CI_Validator
+     *
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function run_validators($value){
+
+        // collect all validation errors for this field
+        $errors = [];
+        foreach ($this->custom_validators as $validator) :
+            try{
+                call_user_func_array($validator, $value);
+
+            }catch (ValidationError $e){
+                $errors[] = $e;
+            }
+        endforeach;
+
+        if(!empty($errors)):
+            throw new ValidationError($errors);
+        endif;
+
     }
 
     public function set_from_name($name){
@@ -398,6 +460,28 @@ class ChoiceField extends Field{
 
 class TypedChoiceField extends ChoiceField{
 
+    public function clean($value){
+        $value = parent::clean($value);
+        return $this->_coerce($value);
+    }
+
+    public function _coerce($value){
+        if(empty($value)):
+            return $value;
+        endif;
+
+        try{
+            $value = call_user_func_array($this->coerce, [$value]);
+        }catch (ValueError $e){
+
+        }catch (ValidationError $v){
+
+        }catch (TypeError $t){
+
+        }
+
+        return $value;
+    }
 }
 
 class MultipleChoiceField extends ChoiceField{

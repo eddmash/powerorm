@@ -1,16 +1,11 @@
 <?php
 use powerorm\form\BaseForm;
+use powerorm\form\BaseModelForm;
 use powerorm\form\widgets as FormWidgets;
 use powerorm\form\fields as FormFields;
 
-/**
- * Class Form
- * @package powerorm\form
- * @since 1.0.0
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class PForm extends BaseForm
-{
+trait form{
+
 
     public static function CharField($attrs=[])
     {
@@ -35,6 +30,9 @@ class PForm extends BaseForm
     public static function ChoiceField($attrs=[]){
         return new FormFields\ChoiceField($attrs);
     }
+
+
+
 
     // ******************************************************************************
 
@@ -83,4 +81,19 @@ class PForm extends BaseForm
     public static function SelectMultiple($attrs=[]){
         return new FormWidgets\SelectMultiple($attrs);
     }
+}
+
+/**
+ * Class Form
+ * @package powerorm\form
+ * @since 1.0.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class PForm extends BaseForm
+{
+    use form;
+}
+
+class PModelForm extends BaseModelForm{
+    use form;
 }
