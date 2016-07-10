@@ -287,6 +287,8 @@ class CheckboxInput extends Widget{
  */
 class Select extends Widget{
     public $multiple_selected = FALSE;
+    public $open_select = '<select %s >';
+
     public $choices=[];
 
     public function __construct($attrs=[], $kwargs=[]){
@@ -298,19 +300,17 @@ class Select extends Widget{
     }
 
     public function render($name, $value, $attrs=[], $kwargs=[]){
-        $selected_choices = (array_key_exists('selected_choices', $kwargs)) ? $kwargs['selected_choices'] : [];
-
         if(empty($value)):
             // in case its null, false etc
-            $value = '';
+            $value = [];
         endif;
 
         $final_attrs = $this->build_attrs($attrs, ['name'=>$name]);
         $output = [];
         // open select
-        $output[] = sprintf('<select %s >', $this->flat_attrs($final_attrs));
+        $output[] = sprintf($this->open_select, $this->flat_attrs($final_attrs));
         // add select options
-        $options[] = $this->render_options($selected_choices, [$value]);
+        $options[] = $this->render_options($value);
 
         if(!empty($options)):
             $output = array_merge($output, $options);
@@ -321,11 +321,12 @@ class Select extends Widget{
         return join(' ', $output);
     }
 
-    public function render_options($choices, $selected_choices){
-        $selected = [];
-        foreach ($selected_choices as $choice) :
-            $selected[] = (string)$choice;
-        endforeach;
+    public function _prepare_selected($selected){
+        return (is_array($selected) && empty($selected))? $selected : [$selected];
+    }
+
+    public function render_options($selected_choices){
+        $selected_choices = $this->_prepare_selected($selected_choices);
 
         /**
          * 'choices'=>[
@@ -333,7 +334,7 @@ class Select extends Widget{
          *      'bmw'=>'mercedes benz'
          * ]
          */
-        $choices = array_merge($this->choices, $choices);
+        $choices = $this->choices;
 
         $output = [];
 
@@ -381,32 +382,15 @@ class Select extends Widget{
  */
 class SelectMultiple extends Select{
     public $multiple_selected = TRUE;
+    public $open_select = '<select %s  multiple="multiple">';
 
-    public function render($name, $value, $attrs=[], $kwargs=[]){
-        $selected_choices = (array_key_exists('selected_choices', $kwargs)) ? $kwargs['selected_choices'] : [];
-
-        if(empty($value)):
-            // in case its null, false etc
-            $value = '';
-        endif;
-
-        $final_attrs = $this->build_attrs($attrs, ['name'=>$name]);
-        $output = [];
-        // open select
-        $output[] = sprintf('<select %s  multiple="multiple">', $this->flat_attrs($final_attrs));
-        // add select options
-        $options[] = $this->render_options($selected_choices, [$value]);
-
-        if(!empty($options)):
-            $output = array_merge($output, $options);
-        endif;
-
-        // close select
-        $output[] = '</select>';
-
-        return join(' ', $output);
+    public function _prepare_selected($selected_choices){
+        $selected = [];
+        foreach ($selected_choices as $choice) :
+            $selected[] = (string)$choice;
+        endforeach;
+        return $selected;
     }
-
 }
 
 /**
@@ -417,7 +401,7 @@ class SelectMultiple extends Select{
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class ChoiceInputFields extends Input{
-
+    public $choices=[];
     public $input_type = '';
     public $outer_html = '<ul %1$s> %2$s </ul>';
     public $inner_html = '<li>%1$s %2$s </li>';
@@ -432,17 +416,15 @@ abstract class ChoiceInputFields extends Input{
 
     public function render($name, $value, $attrs=[], $kwargs=[]){
 
-        $selected_choices = (array_key_exists('selected_choices', $kwargs)) ? $kwargs['selected_choices'] : [];
-
         if(empty($value)):
             // in case its null, false etc
-            $value = '';
+            $value = [];
         endif;
 
         $output = [];
 
         // add select options
-        $options[] = $this->render_options($name, $selected_choices, [$value], $attrs);
+        $options[] = $this->render_options($name, $value, $attrs);
 
         if(!empty($options)):
             $output = array_merge($output, $options);
@@ -451,12 +433,7 @@ abstract class ChoiceInputFields extends Input{
         return join(' ', $output);
     }
 
-    public function render_options($field_name, $choices, $selected_choices, $attrs=[]){
-        $selected = [];
-
-        foreach ($selected_choices as $choice) :
-            $selected[] = (string)$choice;
-        endforeach;
+    public function render_options($field_name, $checked_choices, $attrs=[]){
 
         /**
          * 'choices'=>[
@@ -464,7 +441,7 @@ abstract class ChoiceInputFields extends Input{
          *      'bmw'=>'mercedes benz'
          * ]
          */
-        $choices = array_merge($this->choices, $choices);
+        $choices = $this->choices;
 
         $output = [];
 
@@ -472,7 +449,7 @@ abstract class ChoiceInputFields extends Input{
         foreach ($choices as $label=>$value) :
 
             $attrs_ = $this->build_attrs($attrs,[
-                'name'=>$field_name.'[]',
+                'name'=>$field_name,
                 'type'=>$this->input_type,
             ]);
 
@@ -482,13 +459,13 @@ abstract class ChoiceInputFields extends Input{
 
                 $sub_widget = new static($attrs_, ['choices'=>$value]);
 
-                $output[] = sprintf($this->inner_html, $label, $sub_widget->render($field_name, ''));
+                $output[] = sprintf($this->inner_html, $label, $sub_widget->render($field_name, $checked_choices));
 
             else:
                 $sub_widget = '';
 
                 $output[] = sprintf($this->inner_html,
-                    $this->render_option($selected_choices, $value, $label, $attrs_), $sub_widget);
+                    $this->render_option($checked_choices, $value, $label, $attrs_), $sub_widget);
             endif;
 
             $count++;
@@ -497,18 +474,24 @@ abstract class ChoiceInputFields extends Input{
         return sprintf($this->outer_html, $this->flat_attrs($attrs),join(' ', $output));
     }
 
-    public function render_option($selected_choices, $label, $value, $attrs=[]){
+    public function render_option($checked_choices, $label, $value, $attrs=[]){
 
         $checked_html = '';
         $attrs['value'] = $value;
 
-        if(in_array($value, $selected_choices)):
+        $checked = $this->_prepare_checked($checked_choices);
+
+        if(in_array($value, $checked)):
             $checked_html = 'checked="checked"';
         endif;
 
         $template = '<label for=""> <input %1$s %2$s/> %3$s </label>';
 
         return sprintf($template, $this->flat_attrs($attrs), $checked_html, $label);
+    }
+
+    public function _prepare_checked($checked_choices){
+        return $checked_choices;
     }
 }
 
@@ -524,6 +507,11 @@ abstract class ChoiceInputFields extends Input{
 class RadioSelect extends ChoiceInputFields{
     public $input_type = 'radio';
 
+
+    public function _prepare_checked($selected){
+        return (is_array($selected) && empty($selected))? $selected : [$selected];
+    }
+
 }
 
 /**
@@ -536,6 +524,14 @@ class RadioSelect extends ChoiceInputFields{
  */
 class MultipleCheckboxes extends ChoiceInputFields{
     public $input_type = 'checkbox';
+
+    public function _prepare_checked($selected_choices){
+        $selected = [];
+        foreach ($selected_choices as $choice) :
+            $selected[] = (string)$choice;
+        endforeach;
+        return $selected;
+    }
 
 }
 

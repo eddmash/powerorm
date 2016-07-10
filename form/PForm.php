@@ -30,6 +30,9 @@ trait form{
     public static function ChoiceField($attrs=[]){
         return new FormFields\ChoiceField($attrs);
     }
+    public static function MultipleChoiceField($attrs=[]){
+        return new FormFields\MultipleChoiceField($attrs);
+    }
 
 
 

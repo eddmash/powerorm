@@ -14,7 +14,9 @@ use powerorm\exceptions\ValidationError;
 use powerorm\exceptions\ValueError;
 use powerorm\form\widgets\CheckboxInput;
 use powerorm\form\widgets\EmailInput;
+use powerorm\form\widgets\MultipleCheckboxes;
 use powerorm\form\widgets\NumberInput;
+use powerorm\form\widgets\RadioSelect;
 use powerorm\form\widgets\Select;
 use powerorm\form\widgets\SelectMultiple;
 use powerorm\form\widgets\TextInput;
@@ -249,13 +251,24 @@ abstract class Field extends Object implements Contributor
         $object->load_field($this);
 
         $object->field_validation_rules([
-            'field'=>$name,
+            'field'=>$this->get_html_name(),
             'label'=>$this->get_label_name(),
             'rules'=>$this->validators()
         ]);
         $this->form = $object;
     }
-    
+
+    /**
+     * Returns the name to use in widgets, this is meant to help prepare names for fields like checkbox that take
+     * the name as an array
+     *
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function get_html_name(){
+        return $this->name;
+    }
     public function clean($value){
         $value = $this->to_php($value);
         $this->validate($value);
@@ -320,7 +333,7 @@ abstract class Field extends Object implements Contributor
             $attrs['id'] = $this->get_auto_id();
         endif;
 
-        return (string)$widget->render($this->name, $this->value(), $attrs);
+        return (string)$widget->render($this->get_html_name(), $this->value(), $attrs);
     }
 
     public function value()
@@ -572,9 +585,20 @@ class BooleanField extends Field{
  */
 class ChoiceField extends Field{
 
+    public $choices = [];
+
     public function __construct($opts=[]){
         parent::__construct($opts);
-        $this->widget->choices = array_key_exists('choices', $opts) ? $opts['choices'] : [];
+        $this->widget->choices =  $this->choices;
+    }
+
+    public function get_html_name(){
+        if($this->widget instanceof SelectMultiple || $this->widget instanceof MultipleCheckboxes):
+            return sprintf('%s[]', $this->name);
+
+        endif;
+        return parent::get_html_name();
+
     }
 
     public function get_widget(){
