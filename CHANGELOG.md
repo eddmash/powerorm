@@ -38,7 +38,7 @@
         
         - You can deal with forms in two ways :
             - Use the default form provided by the ORM
-                - this is achieved by colling the `$this->orm->form_builder()` 
+                - this is achieved by calling the `$this->orm->get_form()` 
                 which helps you build your form.
 
             - Define a form class in the forms folder.
@@ -58,10 +58,11 @@
         
         - registry = this->orm->get_registry()
         - orm version = this->orm->get_version()
-        - Orm Form = this->orm->form_builder() // this builds a form based on the 
-        orms core form class
-        - Orm Custom Form = this->orm->fetch_form() // this fetches a form that you 
-        have defined.
+        - Orm Form = this->orm->get_form() 
+                this builds a form based on the 
+                 - orms core form class by default
+                 - use a custom form you have defined if you pass the form as an argument or 
+                 - model to build a form based on a model that already exists.
         
     - Contributor, DeConstruct interface to provide a consistent way of 
     deconstructing  objects and contributing objects to other objects
