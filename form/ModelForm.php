@@ -9,8 +9,7 @@
 namespace powerorm\form;
 
 function fields_from_model($model, $required_fields, $excludes, $widgets, $labels, $help_texts, $field_classes){
-     $model_fields = $model->meta->fields;
-
+    $model_fields = $model->meta->fields;
     $fields =[];
     foreach ($model_fields as $name=>$obj) :
         if(in_array($name, $excludes)):

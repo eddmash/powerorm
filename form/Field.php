@@ -60,7 +60,8 @@ abstract class Field extends Object implements Contributor
     public $widget;
     public $required=TRUE;
 
-    public $label=NULL;
+    protected $label=NULL;
+
     /**
      * The initial value to used when displaying a form that is not bound with data, i.e.
      * before user types in and submits the form.
@@ -74,6 +75,10 @@ abstract class Field extends Object implements Contributor
      */
     public $initial=NULL;
 
+    /**
+     * Any help text that has been associated with the field.
+     * @var string
+     */
     public $help_text='';
 
     /**
@@ -187,32 +192,18 @@ abstract class Field extends Object implements Contributor
      *
      * // Would produce:  <label for="username" class="mycustomclass" style="color: #000;">What is your Name</label>
      *
-     * @param	string $label	The text to appear onscreen
-     * @param	string	$id The id the label applies to
-     * @param	array	$view_attrs Additional attributes
      * @return string
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function label($label=Null, $id=Null, $view_attrs=[]){
+    public function label_tag(){
 
         // if the field is not hidden field set label
         if($this->widget->is_hidden()) :
             return '';
         endif;
 
-        $label_id = $this->get_auto_id();
-
-        if(!empty($view_attrs)):
-            if(isset($view_attrs['name'])):
-                $this->label_name = $view_attrs['name'];
-                unset($view_attrs['name']);
-            endif;
-            if(isset($view_attrs['id'])):
-                $label_id = $view_attrs['id'];
-                unset($view_attrs['id']);
-            endif;
-        endif;
-
-        return form_label($this->get_label_name(), $label_id, $view_attrs);
+        return form_label($this->get_label_name(), $this->get_id_for_label(), []);
     }
 
     /**
@@ -241,6 +232,18 @@ abstract class Field extends Object implements Contributor
         return '';
     }
 
+    /**
+     * The html label ID that will be used for this field.
+     *
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function get_id_for_label(){
+        $id = (array_key_exists('id', $this->widget->attrs)) ? $this->widget->attrs['id'] : $this->get_auto_id();
+        return $this->widget->get_id_for_label($id);
+    }
+
     public function bound_value($data, $initial)
     {
         return $data;
@@ -259,6 +262,7 @@ abstract class Field extends Object implements Contributor
     }
 
     /**
+     * The name of the field that will be used in the input element’s name field i.e
      * Returns the name to use in widgets, this is meant to help prepare names for fields like checkbox that take
      * the name as an array
      *
@@ -269,6 +273,7 @@ abstract class Field extends Object implements Contributor
     public function get_html_name(){
         return $this->name;
     }
+
     public function clean($value){
         $value = $this->to_php($value);
         $this->validate($value);
@@ -336,6 +341,12 @@ abstract class Field extends Object implements Contributor
         return (string)$widget->render($this->get_html_name(), $this->value(), $attrs);
     }
 
+    /**
+     * The value of the field.
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function value()
     {
         $name = $this->name;
@@ -360,12 +371,14 @@ abstract class Field extends Object implements Contributor
         return $this->widget->value_from_data_collection($this->form->data, $this->name);
     }
 
+    /**
+     *  attribute is True if the form field is a hidden field and False otherwise
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function is_hidden(){
         return $this->widget->is_hidden();
-    }
-
-    public function is_editable(){
-        return $this->editable;
     }
 
     public function __toString()

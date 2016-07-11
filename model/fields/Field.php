@@ -453,7 +453,8 @@ abstract class Field extends Object implements FieldInterface{
      * Tells us if the default value is set
      */
     public function has_default(){
-        return $this->default === (new NOT_PROVIDED());
+
+        return !$this->default instanceof NOT_PROVIDED;
     }
 
     public function is_unique(){

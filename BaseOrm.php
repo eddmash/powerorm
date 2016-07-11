@@ -5,6 +5,7 @@ namespace powerorm;
  * Orm Loader
  */
 use powerorm\db\Connection;
+use powerorm\exceptions\FormException;
 use powerorm\form\BaseForm;
 use powerorm\form\BaseModelForm;
 use powerorm\form\ModelForm;
@@ -335,7 +336,9 @@ class BaseOrm {
         $kwargs = $this->form_kwargs($opts);
 
 
-        assert((empty($form) || empty($model)), "Setting both { model } and { form } on the same get_form() method");
+        if(!empty($form) && !empty($model)):
+            throw new FormException("Setting both { model } and { form } on the same get_form() method is not allowed");
+        endif;
 
         require_once("form/__init__.php");
 
@@ -355,13 +358,14 @@ class BaseOrm {
     }
 
     public function form_kwargs($opts){
-        foreach (['data', 'initial', 'model', 'form'] as $opt) :
-            if(array_key_exists($opt, $opts)):
-                unset($opts[$opt]);
-            endif;
-        endforeach;
 
-        return $opts;
+        $extra = array_key_exists('extra', $opts)? $opts['extra']:[];
+
+        if(!is_array($extra)):
+            throw new FormException(sprintf('get_form() expects { extra } to be an array'));
+        endif;
+
+        return $extra;
     }
 
     public function _fetch_form($form, $data=[], $initial=[], $kwargs=[]){

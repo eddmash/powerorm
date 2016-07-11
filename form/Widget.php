@@ -88,6 +88,19 @@ abstract class Widget extends Object
 
         return $str_attrs;
     }
+
+    /**Returns the HTML ID attribute of this Widget for use by a <label>,
+     * given the ID of the field. Returns None if no ID is available.
+     * This hook is necessary because some widgets have multiple HTML
+     * elements and, thus, multiple IDs. In that case, this method should
+     * return an ID value that corresponds to the first ID in the widget's
+     * tags.
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function get_id_for_label($id){
+        return $id;
+    }
 }
 
 /**
