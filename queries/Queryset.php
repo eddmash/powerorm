@@ -27,6 +27,10 @@ class Queryset extends Object implements \IteratorAggregate, \Countable, Query{
     const OPERATION_UPDATE = 3;
     const OPERATION_DELETE = 4;
     const RELATIONS_LOOK_SEP = '->';
+    /**
+     * The maximum number of items to display in a QuerySet->__toString()
+     */
+    const REPR_OUTPUT_SIZE = 20;
 
     public $model;
     public $model_class;
@@ -585,8 +589,11 @@ class Queryset extends Object implements \IteratorAggregate, \Countable, Query{
     public function __isset($property)
     {
         $result = $this->_evaluate();
-        if((!property_exists($result, $property))):
+
+        if(!empty($result)):
+
             return property_exists($result, $property);
+
         endif;
 
         return empty($this->_results_cache->{$property});
@@ -616,7 +623,9 @@ class Queryset extends Object implements \IteratorAggregate, \Countable, Query{
     public function __toString()
     {
         $this->_evaluate();
-        return $this->_results_cache;
+        $results_to_reps = array_slice($this->_results_cache, 0, self::REPR_OUTPUT_SIZE);
+        $string = implode(', ', $results_to_reps);
+        return sprintf('[%s]', $string);
     }
 
     /**

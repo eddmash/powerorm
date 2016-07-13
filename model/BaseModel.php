@@ -756,8 +756,7 @@ abstract class BaseModel extends \CI_Model{
      */
     public function __toString()
     {
-        $pk = $this->meta->primary_key->name;
-        return sprintf('< %1$s >', $this->get_class_name());
+        return sprintf('< %1$s: %1$s object> ', $this->get_class_name());
     }
 
 }
