@@ -7,6 +7,7 @@
  */
 
 namespace powerorm\migrations;
+
 use powerorm\DeConstruct;
 
 use powerorm\helpers\Tools;

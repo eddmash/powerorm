@@ -8,7 +8,7 @@
 
 namespace powerorm\queries;
 
-
+ 
 interface Query
 {
 

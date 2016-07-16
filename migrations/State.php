@@ -141,7 +141,7 @@ class ModelState extends Object{
             foreach ($model->meta->relations_fields as $name=>$field) :
 
                 // ignore the inverse fields
-                if($field instanceof InverseRelation):
+                if($field->is_inverse()):
                     continue;
                 endif;
 

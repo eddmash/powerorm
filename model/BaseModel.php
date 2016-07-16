@@ -12,12 +12,200 @@ use powerorm\exceptions\OrmErrors;
 use powerorm\exceptions\OrmExceptions;
 use powerorm\exceptions\TypeError;
 use powerorm\form;
+use powerorm\helpers\Db;
 use powerorm\model\field\Field;
 use powerorm\queries\Queryset;
 use powerorm\traits\BaseObject;
 
 /**
  * The ORM Model that adds power to CI Model.
+ *
+ * <h4>Model inheritance</h4>
+ *
+ * Model inheritance in Powerorm works almost identically to the way normal class inheritance works in PHP,
+ * That means the base class should subclass PModel.
+ *
+ * The only decision you have to make is whether you want the parent models to be models in their own right
+ * (with their own database tables), or
+ *
+ * if the parents are just holders of common information that will only be visible through the child models.
+ *
+ * There are three styles of inheritance that are possible in Powerorm:
+ *
+ *  - Often, you will just want to use the parent class to hold information that you don’t want to have to type out for
+ *    each child model. This class isn’t going to ever be used in isolation, so Abstract base classes are what you’re
+ *    after.
+ *
+ *  - If you’re subclassing an existing model (perhaps something from another application entirely) and want each model
+ *    to have its own database table, Multi-table inheritance is the way to go.
+ *
+ *  - Finally, if you only want to modify the PHP-level behavior of a model, without changing the models fields in any
+ *    way, you can use Proxy models.
+ *
+ *
+ * <h4>Abstract base classes</h4>
+ *
+ * <strong>Note</strong>Because codeigniter does not autoload classes you need to require the file with the abstract
+ * class in your model file.
+ *
+ * Abstract base classes are useful when you want to put some common information into a number of other models.
+ * You create an Abstract base class by simply creating a normal php abstract base class.
+ *
+ * This model will then not be used to create any database table.
+ *
+ * Instead, when it is used as a base class for other models, its fields will be added to those of the child class.
+ *
+ * Any fields defined in the Abstract that are again defined in the Child class will be over written by those in the
+ * child class.
+ *
+ * <code>abstract class CommonInfo extends PModel{
+ *      public function fields(){
+ *          name = PModel::CharField(['max_length'=>100]);
+ *          age = PModel::IntegerField();
+ *      }
+ * }
+ *
+ * class Student extends CommonInfo{
+ *      public function fields(){
+ *          home_group = PModel::CharField(['max_length'=>5]);
+ *      }
+ * }</code>
+ *
+ * The Student model will have three fields: name, age and home_group.
+ *
+ * The CommonInfo model cannot be used as a normal model, since it is an abstract base class.
+ * It does not generate a database table, and cannot be instantiated or saved directly.
+ *
+ * For many uses, this type of model inheritance will be exactly what you want.
+ *
+ * It provides a way to factor out common information at the php level, while still only creating one database table per
+ * child model at the database level.
+ *
+ *
+ * <H4><strong>NB:</strong><small> Attribute inheritance</small></h4>
+ * When inheriting, Some attributes will need to be overridden in child classes, since it doesn't make sense to set
+ * them in the base class.
+ *
+ * For example, setting <em>table_name</em> would mean that all the child classes
+ * (the ones that don’t specify <em>table_name</em> explictly) would use the same database table,
+ *
+ * which is almost certainly not what you want.
+ *
+ *
+ * <h4>Multi-table inheritance</h4>
+ *
+ * The second type of model inheritance supported by Powerorm is when each model in the hierarchy is a table all by
+ * itself.
+ *
+ *
+ * Each model corresponds to its own database table and can be queried and created individually.
+ *
+ * The inheritance relationship introduces links between the child model and each of its parents
+ * (via an automatically-created OneToOne). For example:
+ *
+ * <code>class Place extends PModel{
+ *      public function fields(){
+ *          name = PModel::CharField(['max_length'=>100]);
+ *          address = PModel::CharField(['max_length'=>80]);
+ *      }
+ * }
+ *
+ * class Restaurant extends Place{
+ *      public function fields(){
+ *          serves_hot_dogs =PModel::BooleanField(['default'=>False]);
+ *          serves_pizza =PModel::BooleanField(['default'=>False]);
+ *      }
+ * }</code>
+ *
+ *
+ * <strong>Note</strong>Because codeigniter does not autoload classes you need to load the base class first before
+ * the child. when using e.g. load the models defined above as show :
+ *
+ * <code>// load model
+ * $this->load->model('place');
+ * $this->load->model('restraurant');</code>
+ *
+ * All of the fields of Place will also be available in Restaurant, although the data will reside in a different
+ * database table. So these are both possible:
+ *
+ * <code>$this->place->filter([name="Bob's Cafe"]);
+ * $this->restaurant->filter([name="Bob's Cafe"]);</code>
+ *
+ * todo Check on this reverse lookup
+ * If you have a Place that is also a Restaurant, you can get from the Place object to the Restaurant object by using
+ * the lower-case version of the model name:
+ *
+ * <code>p = $this->place->get(['id'=12]);
+ * // If p is a Restaurant object, this will give the child class:
+ * p.restaurant</code>
+ *
+ * However, if p in the above example was not a Restaurant (it had been created directly as a Place object or was the
+ * parent of some other class), referring to p.restaurant would raise a exception.
+ *
+ *
+ *
+ * In reality the orm creates the base model table as expected in the database i.e with all the field the model
+ * specifies but for the child model it creates the a table with fields that have been specfied in the child model
+ * and create a one-to-one connection to the base models' table.
+ *
+ * <h4>Proxy models</h4>
+ *
+ * When using multi-table inheritance, a new database table is created for each subclass of a model.
+ *
+ * This is usually the desired behavior, since the subclass needs a place to store any additional data fields that
+ * are not present on the base class.
+ *
+ * Sometimes, however, you only want to change the php behavior of a model – perhaps to add a new method.
+ *
+ * This is what proxy model inheritance is for:
+ *
+ * creating a proxy for the original model. You can create, delete and update instances of the proxy model and all
+ * the data will be saved as if you were using the original (non-proxied) model.
+ *
+ * The difference is that you can change things like the default model ordering or the default manager in the proxy,
+ * without having to alter the original.
+ *
+ * Proxy models are declared like normal models. You tell Powerorm that it’s a proxy model by setting the <em>proxy</em>
+ * attribute of the class to True.
+ *
+ *<code>class Employee extends PModel{
+ *      public function fields(){
+ *          name = PModel::CharField(['max_length'=>100]);
+ *          age = PModel::InteferField();
+ *      }
+ * }
+ *
+ * class Auditor extends Employee{
+ *
+ *      public $proxy = TRUE;
+ *
+ *      // get how many times a specific accountant has audited a specific employee.
+ *      public function get_times_has_audited($employee){}
+ * }
+ *</code>
+ *
+ * <strong>Note</strong>Because codeigniter does not autoload classes you need to load the base class first before
+ * the child. when using e.g. load the models defined above as show :
+ *
+ * <code>// load model
+ * $this->load->model('employee');
+ * $this->load->model('auditor');</code>
+ *
+ * The Auditor class operates on the same database table as its parent Person class.
+ * In particular, any new instances of Employee will also be accessible through Auditor, and vice-versa:
+ * <code>p = $this->employee->create(['name='foobar']);
+ * $this->auditor->get(['name'='foobar']);</code>
+ *
+ * <h4><strong>NB:</strong>QuerySets still return the model that was requested</h4>
+ *
+ * There is no way to have Powerorm to return, say, a Auditor object whenever you query for Employee objects.
+ *
+ * A queryset for Employee objects will return those types of objects.
+ *
+ * The whole point of proxy objects is that code relying on the original Em[loyee will use those and your own code can
+ * use the extensions you included (that no other code is relying on anyway).
+ *
+ * It is not a way to replace the Employee (or any other) model everywhere with something of your own creation.
  *
  * @package powerorm\model
  * @since 1.1.0
@@ -28,7 +216,13 @@ abstract class BaseModel extends \CI_Model{
     use BaseObject;
 
     /**
-     * Holds the name that this model represents
+     * Holds the name of the database table that this model represents.
+     *
+     * To save you time, Powerorm automatically derives the name of the database table from the name of your model
+     * class. string off the namespace part e.g
+     *
+     * for a user model with a namespaced name of \myapp\models\user, the table name will be user
+     *
      * @var string
      * @ignore
      */
@@ -36,21 +230,78 @@ abstract class BaseModel extends \CI_Model{
 
     /**
      * Indicates if the orm should managed the table being represented by this model
+     *
+     * Defaults to True, meaning Powerorm  will create the appropriate database tables in migrate or as part of
+     * migrations and remove them as part of a flush command.
+     *
+     * That is, Powerorm manages the database tables’ lifecycles.
+     *
+     * If False, no database table creation or deletion operations will be performed for this model.
+     *
+     * This is useful if the model represents an existing table or a database view that has been created by some other
+     * means.
+     *
+     * This is the only difference when managed=False.
+     *
+     * All other aspects of model handling are exactly the same as normal. This includes:
+     *  - Adding an automatic primary key field to the model if you don’t declare it.
+     *   To avoid confusion for later code readers, it’s recommended to specify all the columns from the database table
+     *   you are modeling when using unmanaged models.
+     *
+     *  - If a model with managed=False contains a ManyToManyField that points to another unmanaged model,
+     *    then the intermediate table for the many-to-many join will also not be created.
+     *
+     *    However, the intermediary table between one managed and one unmanaged model will be created.
+     *
+     *    If you need to change this default behavior, create the intermediary table as an explicit model
+     *   (with managed set as needed) and use the ManyToManyField->through attribute to make the relation
+     *   use your custom model.
+
      * @var
      */
     protected $managed = TRUE;
 
     /**
-     * @ignore
+     * When using multi-table inheritance, a new database table is created for each subclass of a model.
+     *
+     * This is usually the desired behavior, since the subclass needs a place to store any additional data fields that
+     * are not present on the base class.
+     *
+     * Sometimes, however, you only want to change the php behavior of a model – perhaps to add a new method.
+     *
+     * This is what proxy model inheritance is for:
+     *
+     * creating a proxy for the original model. You can create, delete and update instances of the proxy model and all
+     * the data will be saved as if you were using the original (non-proxied) model.
+     *
+     * The difference is that you can change things like the default model ordering or the default manager in the proxy,
+     * without having to alter the original.
+     *
+     * Proxy models are declared like normal models. You tell Powerorm that it’s a proxy model by setting the proxy
+     * attribute of the class to True.
+     *
      * @var
      */
     protected $proxy=FALSE;
 
+    /**
+     * Indicates if this is a new model, in the sense that it has not been loaded with values from the database like
+     * you would when you want to update a database record.
+     *
+     * @ignore
+     * @var bool
+     */
     protected $is_new=TRUE;
 
+    /**
+     * A list of all Fields that the model has.
+     * @ignore
+     * @var array
+     */
     protected $fields =[];
 
     /**
+     * Meta information about the model.
      * @ignore
      * @var array
      */
@@ -90,13 +341,15 @@ abstract class BaseModel extends \CI_Model{
         $this->meta->model_name  = $this->lower_case($this->get_class_name());
         $this->meta->db_table  = $this->get_table_name();
         $this->meta->managed  = $this->is_managed();
+        $this->meta->proxy  = $this->is_proxy();
 
         // load the fields
-        $this->fields();
+        $this->_load_fields();
 
         // set them up
         $this->setup_fields($fields);
 
+        // ensure the model is ready for use.
         $this->meta->prepare($this);
 
         if(empty($registry)):
@@ -128,7 +381,7 @@ abstract class BaseModel extends \CI_Model{
     /**
      * @ignore
      */
-    public function get($conditions, $opts=[]){
+    public function one($conditions, $opts=[]){
         return $this->queryset($opts)->one($conditions);
     }
 
@@ -152,6 +405,20 @@ abstract class BaseModel extends \CI_Model{
      */
     public function exclude($conditions, $opts=[]){
         return $this->queryset($opts)->exclude($conditions);
+    }
+
+    /**
+     * @ignore
+     */
+    public function count($opts=[]){
+        return $this->queryset($opts)->size();
+    }
+
+    /**
+     * @ignore
+     */
+    public function exists($opts=[]){
+        return $this->queryset($opts)->exists();
     }
 
     /**
@@ -567,7 +834,10 @@ abstract class BaseModel extends \CI_Model{
     // ========================================================================================================
 
 
-
+    protected function _load_fields()
+    {
+        $this->call_method_upwards('fields');
+    }
 
 
     public static function from_db($connection, $fields_with_value){
@@ -584,7 +854,7 @@ abstract class BaseModel extends \CI_Model{
         $opts = (empty($opts)) ? '':$opts;
 
 
-        return \powerorm\helpers\create_queryset($this, NULL, $opts);
+        return Db::create_queryset($this, NULL, $opts);
     }
 
     /**
@@ -624,17 +894,25 @@ abstract class BaseModel extends \CI_Model{
             return;
         endif;
 
+        // in case the fields were not added dynamically, they already defined them as properties of the class.
         $fields = get_class_vars(get_class($this));
 
         foreach ($fields as $field_name => $value) :
 
-            if (!isset($this->$field_name)):
+            if (!isset($this->{$field_name})):
                 continue;
             endif;
 
-            $field_obj = $this->$field_name;
+            $field_obj = $this->{$field_name};
 
             $this->_add_fields($field_name, $field_obj);
+
+
+            // remove it as an attribute, since we store all the fields in the fields array,
+            // and use magic method __get() to access them
+            if($value instanceof Field):
+                unset($this->{$field_name});
+            endif;
 
         endforeach;
 
@@ -644,10 +922,23 @@ abstract class BaseModel extends \CI_Model{
 
     }
 
+//    protected function _load_field()
+//    {
+//
+//    }
+
+    /**
+     * Adds model fields.
+     * @param $field_name
+     * @param $field_obj
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     protected function _add_fields($field_name, $field_obj){
         if($field_obj instanceof Field):
 
             $this->add_to_class($field_name, $field_obj);
+
         endif;
     }
 
@@ -691,9 +982,23 @@ abstract class BaseModel extends \CI_Model{
 
         return $checks;
     }
-    
+
+    /**
+     * @return bool true if the orm manages this model.
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function is_managed(){
         return $this->managed;
+    }
+
+    /**
+     * @return bool true if the model is a proxy model.
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function is_proxy(){
+        return $this->proxy;
     }
 
 
@@ -730,6 +1035,9 @@ abstract class BaseModel extends \CI_Model{
                 return $this->meta->fields[$name]->choices[$value];
             endif;
         endif;
+
+        throw new \BadMethodCallException(
+            sprintf('Call to undefined method %1$s:%2$s() ', $this->get_class_name(), $method));
     }
 
     public function __set($name, $value){
@@ -757,6 +1065,19 @@ abstract class BaseModel extends \CI_Model{
     public function __toString()
     {
         return sprintf('< %1$s: %1$s object> ', $this->get_class_name());
+    }
+
+    public function __debugInfo()
+    {
+        $model = [];
+        foreach (get_object_vars($this) as $name=>$value) :
+            if($name==='fields'):
+                continue;
+            endif;
+            $model[$name] = $value;
+        endforeach;
+
+        return $model;
     }
 
 }

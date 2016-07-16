@@ -3,6 +3,13 @@ namespace powerorm\helpers;
 
 use powerorm\queries\Queryset;
 
+class Db{
+
+    public static function create_queryset($model, $query=NULL, $params='', $query_builder_override=NULL){
+        return create_queryset($model, $query, $params, $query_builder_override);
+    }
+}
+
 /**
  * @ignore
  * Borrowed from CI &DB(), disable creating a connection immediately, reason for this is because before a queryset is
@@ -114,10 +121,6 @@ function create_queryset($model, $query=NULL, $params='', $query_builder_overrid
     {
         show_error('You have not selected a database type to connect to.');
     }
- 
-    require_once(BASEPATH.'database/DB_driver.php');
-    require_once(BASEPATH.'database/DB_query_builder.php');
-    require_once(APPPATH.'libraries/powerorm/queries/__init__.php');
 
     if ( ! class_exists('CI_DB', FALSE))
     {

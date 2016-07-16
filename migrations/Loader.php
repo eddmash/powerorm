@@ -47,6 +47,8 @@ class Loader extends Object
 
         foreach ($this->get_migrations_classes() as $file_name=>$migration_name) :
 
+            require_once BaseOrm::get_migrations_path().$file_name.'.php';
+
             $migration_name  = sprintf('app\migrations\%s',$migration_name);
             $migration_name = $this->lower_case($migration_name);
             $migrations[$file_name] = new $migration_name($file_name);
@@ -77,7 +79,7 @@ class Loader extends Object
         $classes = [];
         foreach ($this->get_migrations_files() as $file) :
 
-            require_once $file;
+//            require_once $file;
 
             list($migration_name, $migration_class_name) = $this->migration_class_name($file);
             $classes[$migration_name] = $migration_class_name;

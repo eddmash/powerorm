@@ -89,4 +89,71 @@ trait BaseObject
             $this->signal->dispatch($signal_name, $object);
         endif;
     }
+
+    /**
+     * Returns the immediate parent of this object.
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function get_parent()
+    {
+
+    }
+
+    /**
+     * Retirns all he parents for this object static with the younest to the oldest
+     * The resolution order to follow when going up a inheritance hierarchy.
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function get_parents()
+    {
+        return class_parents($this);
+    }
+
+    /**
+     * Does not return anything, usually good for method that return void.
+     *
+     * This method invokes the specified method, going up,
+     * that is for each parent of the current class invoke the specified method if it exists.
+     * 
+     * @param $method
+     * @param $args
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function call_method_upwards($method, $args=NULL)
+    {
+        // start from oldest parent to the newest
+        $parents = array_reverse($this->get_parents());
+        foreach ($parents as $parent) :
+            $reflectionParent = new \ReflectionClass($parent);
+
+            if(!$reflectionParent->hasMethod($method)):
+                continue;
+            endif;
+
+            $reflectionMethod = $reflectionParent->getMethod($method);
+            if($reflectionMethod->isAbstract()):
+                continue;
+            endif;
+
+            $parent_method_call = sprintf('%1$s::%2$s',$parent, $method);
+            if(is_array($args)):
+                call_user_func_array([$this, $parent_method_call], $args);
+            else:
+
+                call_user_func([$this, $parent_method_call], $args);
+            endif;
+
+        endforeach;
+
+        // call the current now
+        if(is_array($args)):
+            call_user_func_array([$this, $method], $args);
+        else:
+
+            call_user_func([$this, $method], $args);
+        endif;
+    }
 }

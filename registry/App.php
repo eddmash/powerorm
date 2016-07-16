@@ -6,6 +6,7 @@ use powerorm\model\BaseModel;
 use powerorm\Object;
 use powerorm\traits\BaseFileReader;
 
+
 /**
  * This is the applications register.
  *
@@ -21,6 +22,12 @@ class App extends Object
     use BaseFileReader;
 
     public $all_models=[];
+
+    /**
+     * Models that extend the PModel, but extend the CI_Model
+     * @var array
+     */
+    protected $all_non_orm_models=[];
 
     /**
      * Returns a list of all model files
@@ -40,22 +47,46 @@ class App extends Object
         return $this->all_models;
     }
 
+    public function get_non_orm_models()
+    {
+        $this->_get_models();
+
+        return $this->all_non_orm_models;
+    }
+
     public function _get_models(){
         $model_classes = $this->get_model_classes();
 
         if($model_classes):
             foreach ($model_classes as $model_name) :
+                $reflect = new \ReflectionClass(ucfirst($model_name));
+
+                // if we cannot create an instance of a class just skip, e.g traits abstrat etc
+                if(! $reflect->isInstantiable()):
+                    continue;
+                endif;
+
                 $model = $this->_load_model($model_name);
                 if($model instanceof BaseModel):
                     $this->all_models[$this->lower_case($model_name)] =  $model;
                 endif;
+
+                if($model instanceof \CI_Model && ! $model instanceof BaseModel):
+                    $this->all_non_orm_models[$this->lower_case($model_name)] =  $model;
+                endif;
+
             endforeach;
         endif;
     }
 
     public function get_model($name){
         $name = $this->lower_case($name);
-        return (array_key_exists($name, $this->get_models())) ? $this->get_models()[$name] : NULL;
+        return $this->has_model($name) ? $this->get_models()[$name] : NULL;
+    }
+
+    public function has_model($name)
+    {
+        return array_key_exists($name, $this->get_models());
     }
 
     /**
@@ -63,14 +94,15 @@ class App extends Object
      * @param $model_name
      * @return mixed
      */
-    public function _load_model($model_name){ 
+    public function _load_model($model_name){
+
         $_ci =$this->ci_instance();
+
         if(!isset($_ci->{$model_name})):
             $_ci->load->model($model_name);
         endif;
 
-
-        return $_ci->{$model_name};
+        return isset($_ci->{$model_name})?$_ci->{$model_name}:'';
     }
 
     /**
@@ -87,6 +119,7 @@ class App extends Object
         endif;
 
         foreach ($this->get_model_files() as $file) :
+
             $models[]=$this->get_model_name($file);
         endforeach;
 

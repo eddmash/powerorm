@@ -4,6 +4,7 @@ namespace powerorm;
 /**
  * Orm Loader
  */
+use AutoLoader;
 use powerorm\db\Connection;
 use powerorm\exceptions\FormException;
 use powerorm\form\BaseForm;
@@ -247,6 +248,7 @@ define('POWERORM_VERSION', '1.1.0');
  * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
+
 class BaseOrm {
 
     public static $SET_NULL='set_null';
@@ -263,7 +265,8 @@ class BaseOrm {
      * @ignore
      */
     public function __construct($config=[]){
-        $this->setup();
+
+//        $this->setup();
         $this->init();
     }
 
@@ -283,33 +286,6 @@ class BaseOrm {
 
         //setup the registry
         $this->registry = new App();
-    }
-
-    /**
-     * setup the orm modules
-     * @internal
-     */
-    protected function setup(){
-
-        // load the CI model class
-        include_once BASEPATH."core/Model.php";
-        require_once(APPPATH."libraries/powerorm/exceptions/__init__.php");
-
-        require_once("traits/__init__.php");
-
-        // load some utility tools aka helpers
-        require_once("helpers/__init__.php");
-
-        require_once("Object.php");
-
-        require_once("registry/__init__.php");
-
-        // statements
-        require_once("db/__init__.php");
-
-        // model
-        require_once("model/__init__.php");
-
     }
 
     public static function load_class($qualified_name){
@@ -340,7 +316,6 @@ class BaseOrm {
             throw new FormException("Setting both { model } and { form } on the same get_form() method is not allowed");
         endif;
 
-        require_once("form/__init__.php");
 
         // just fetch the form
         if(!empty($form)):
@@ -371,7 +346,6 @@ class BaseOrm {
     public function _fetch_form($form, $data=[], $initial=[], $kwargs=[]){
         //todo loader match to that of codeigniter especially in naming
 
-        require_once APPPATH.'forms/'.$form.'.php';
 
         $form =  new $form($data, $initial, $kwargs);
 
@@ -437,7 +411,6 @@ class BaseOrm {
 
         $db = & $CI->db;
 
-        require_once(BASEPATH.'database/DB_forge.php');
         require_once(BASEPATH.'database/drivers/'.$db->dbdriver.'/'.$db->dbdriver.'_forge.php');
 
         $class = $db->dbdriver;

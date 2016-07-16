@@ -18,13 +18,13 @@ use powerorm\model\field\DateTimeField;
 use powerorm\model\field\DecimalField;
 use powerorm\model\field\EmailField;
 use powerorm\model\field\FileField;
-use powerorm\model\field\ForeignKey;
-use powerorm\model\field\HasMany;
-use powerorm\model\field\HasOne;
+use powerorm\model\field\HasManyField;
+use powerorm\model\field\HasOneField;
 use powerorm\model\field\ImageField;
 use powerorm\model\field\IntegerField;
-use powerorm\model\field\ManyToMany;
-use powerorm\model\field\OneToOne;
+use powerorm\model\field\ManyToManyField;
+use powerorm\model\field\ManyToOneField;
+use powerorm\model\field\OneToOneField;
 use powerorm\model\field\TextField;
 use powerorm\model\field\TimeField;
 
@@ -154,8 +154,8 @@ abstract class PModel extends BaseModel{
      * @param array $opts
      * @return ForeignKey
      */
-    public static function ForeignKey($opts=[]){
-        return new ForeignKey($opts);
+    public static function ManyToOneField($opts=[]){
+        return ManyToOneField::instance($opts);
     }
 
     /**
@@ -163,8 +163,8 @@ abstract class PModel extends BaseModel{
      * @param array $opts
      * @return OneToOne
      */
-    public static function OneToOne($opts=[]){
-        return new OneToOne($opts);
+    public static function OneToOneField($opts=[]){
+        return OneToOneField::instance($opts);
     }
 
     /**
@@ -172,8 +172,8 @@ abstract class PModel extends BaseModel{
      * @param array $opts
      * @return ManyToMany
      */
-    public static function ManyToMany($opts=[]){
-        return new ManyToMany($opts);
+    public static function ManyToManyField($opts=[]){
+        return ManyToManyField::instance($opts);
     }
 
     /**
@@ -181,8 +181,8 @@ abstract class PModel extends BaseModel{
      * @param array $opts
      * @return HasMany
      */
-    public static function HasMany($opts=[]){
-        return new HasMany($opts);
+    public static function HasManyField($opts=[]){
+        return HasManyField::instance($opts);
     }
 
     /**
@@ -190,7 +190,7 @@ abstract class PModel extends BaseModel{
      * @param array $opts
      * @return HasOne
      */
-    public static function HasOne($opts=[]){
-        return new HasOne($opts);
+    public static function HasOneField($opts=[]){
+        return HasOneField::instance($opts);
     }
 }

@@ -1,15 +1,14 @@
 <?php
 namespace powerorm\migrations;
 
-use powerorm\migrations\operations\AddField;
-use powerorm\migrations\operations\AlterField;
-use powerorm\migrations\operations\CreateModel;
-use powerorm\migrations\operations\DropField;
-use powerorm\migrations\operations\DropModel;
-use powerorm\migrations\operations\RenameField;
-use powerorm\migrations\operations\RenameModel;
-use powerorm\model\field\InverseRelation;
-use powerorm\model\field\ManyToMany;
+use powerorm\migrations\operations\field\AddField;
+use powerorm\migrations\operations\field\AlterField;
+use powerorm\migrations\operations\field\RenameField;
+use powerorm\migrations\operations\field\DropField;
+use powerorm\migrations\operations\model\CreateModel;
+use powerorm\migrations\operations\model\DropModel;
+use powerorm\migrations\operations\model\RenameModel;
+
 use powerorm\Object;
 use powerorm\NOT_PROVIDED;
 
@@ -242,7 +241,7 @@ class AutoDetector extends Object{
             // create operations for related fields
             foreach ($model_meta->relations_fields as $field_name=>$field) :
                 // ignore inverse fields
-                if($field instanceof InverseRelation):
+                if($field->is_inverse()):
                     continue;
                 endif;
 
@@ -338,7 +337,7 @@ class AutoDetector extends Object{
 
                 $field = $model_meta->get_field($field_name);
 
-                if($field instanceof InverseRelation):
+                if($field->is_inverse()):
                     continue;
                 endif;
 
@@ -364,7 +363,7 @@ class AutoDetector extends Object{
 
                 $field = $model_meta->get_field($field_name);
 
-                if($field instanceof InverseRelation):
+                if($field->is_inverse()):
                     continue;
                 endif;
 
@@ -413,14 +412,14 @@ class AutoDetector extends Object{
                 $old_field_def = $old_field->skeleton();
 
                 if($new_field_def !== $old_field_def):
-                    $both_m2m = ($old_field instanceof ManyToMany && $new_field instanceof ManyToMany);
-                    $neither_m2m = (!$old_field instanceof ManyToMany && !$new_field instanceof ManyToMany);
+                    $both_m2m = ($old_field->M2M && $new_field->M2M);
+                    $neither_m2m = (!$old_field->M2M && !$new_field->M2M);
                     $preserve_default = TRUE;;
 
                     if(!$old_field->null &&
                         $new_field->null &&
                         !$new_field->has_default() &&
-                        !$new_field instanceof ManyToMany):
+                        !$new_field->M2M):
 
                         $new_default = $this->questioner->ask_not_null_alteration($common_field_name, $common_model_name);
 
@@ -480,7 +479,7 @@ class AutoDetector extends Object{
             ];
         endif;
 
-        if($field->null===FALSE && $field->default instanceof NOT_PROVIDED && !$field instanceof ManyToMany && $alter):
+        if($field->null===FALSE && $field->default instanceof NOT_PROVIDED && !$field instanceof ManyToManyField && $alter):
             $field->default = $this->questioner->ask_not_null_default($field->name, $model_name);
 
             // we don't want this default set permanently its just temporary

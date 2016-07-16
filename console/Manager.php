@@ -22,7 +22,7 @@ class Manager extends Base{
 
     public function __construct(){
         // default command path
-        $this->path = sprintf("%s/commands", dirname(__FILE__));
+        $this->path = sprintf("%s/command", dirname(__FILE__));
 
         $this->manager_name = $this->lower_case($this->get_class_name());
     }
@@ -155,7 +155,7 @@ class Manager extends Base{
             exit;
         endif;
 
-        require_once $file;
+//        require_once $file;
 
 
         // commands are in the commands namespace

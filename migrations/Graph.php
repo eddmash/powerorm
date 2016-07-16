@@ -52,7 +52,7 @@ class Node{
         $ancestors = [];
 
         $ancestors[] = $this->name;
-        foreach ($this->parent as $parent) : 
+        foreach ($this->parent as $parent) :
             $ancestors=array_merge($parent->ancestors(), $ancestors);
         endforeach;
 

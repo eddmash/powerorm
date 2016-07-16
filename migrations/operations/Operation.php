@@ -4,6 +4,13 @@ namespace powerorm\migrations\operations;
 
 use powerorm\DeConstruct;
 use powerorm\helpers\Strings;
+use powerorm\migrations\operations\field\AddField;
+use powerorm\migrations\operations\field\AlterField;
+use powerorm\migrations\operations\field\DropField;
+use powerorm\migrations\operations\field\RenameField;
+use powerorm\migrations\operations\model\CreateModel;
+use powerorm\migrations\operations\model\DropModel;
+use powerorm\migrations\operations\model\RenameModel;
 use powerorm\migrations\ProjectState;
 use powerorm\Object;
 
@@ -52,13 +59,20 @@ abstract class Operation extends Object implements DeConstruct
 
     public function skeleton(){
         $path = '';
+        $alias = '';
 
-        if(Strings::starts_with($this->full_class_name(), 'powerorm\migrations\operations')):
-            $path = 'powerorm\migrations\operations as operation';
+        if(Strings::starts_with($this->full_class_name(), 'powerorm\migrations\operations\model')):
+            $alias = 'modeloperation';
+            $path = sprintf('powerorm\migrations\operations\model as %s', $alias);
+        endif;
+
+        if(Strings::starts_with($this->full_class_name(), 'powerorm\migrations\operations\field')):
+            $alias = 'fieldoperation';
+            $path = sprintf('powerorm\migrations\operations\field as %s', $alias);
         endif;
 
         return [
-            'name'=>sprintf('operation\%s', $this->get_class_name()),
+            'name'=>sprintf('%1$s\%2$s', $alias, $this->get_class_name()),
             'path'=> $path,
             'full_name'=> $this->full_class_name(),
             'constructor_args'=> $this->constructor_args(),
@@ -89,6 +103,7 @@ abstract class Operation extends Object implements DeConstruct
     public static function DropField($opts){
         return new DropField($opts);
     }
+
     public static function AlterField($opts){
         return new AlterField($opts);
     }
