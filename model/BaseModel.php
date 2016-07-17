@@ -8,6 +8,7 @@ namespace powerorm\model;
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 use powerorm\BaseOrm;
+use powerorm\db\Connection;
 use powerorm\exceptions\OrmErrors;
 use powerorm\exceptions\OrmExceptions;
 use powerorm\exceptions\TypeError;
@@ -16,6 +17,7 @@ use powerorm\helpers\Db;
 use powerorm\model\field\Field;
 use powerorm\queries\Queryset;
 use powerorm\traits\BaseObject;
+
 
 /**
  * The ORM Model that adds power to CI Model.
@@ -214,6 +216,12 @@ use powerorm\traits\BaseObject;
 abstract class BaseModel extends \CI_Model{
 
     use BaseObject;
+
+    const CASCADE='cascade';
+    const PROTECT='protect';
+    const SET_NULL='set_null';
+    const SET_DEFAULT='set_default';
+    const SET='set';
 
     /**
      * Holds the name of the database table that this model represents.
@@ -836,6 +844,13 @@ abstract class BaseModel extends \CI_Model{
 
     protected function _load_fields()
     {
+        
+        $reflect = new \ReflectionClass($this->get_parent());
+        if($reflect->isAbstract() && $this->proxy):
+            throw new TypeError(
+                sprintf('Proxy model { %s } cannot have all its base classes as abstract.', $this->get_class_name()));
+        endif;
+
         $this->call_method_upwards('fields');
     }
 
@@ -854,7 +869,7 @@ abstract class BaseModel extends \CI_Model{
         $opts = (empty($opts)) ? '':$opts;
 
 
-        return Db::create_queryset($this, NULL, $opts);
+        return Connection::get_queryset($this, NULL, $opts);
     }
 
     /**

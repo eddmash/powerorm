@@ -491,7 +491,7 @@ trait BaseEditor
 
     public function _create_fk_contraint($model, $field){
         $column_name = $field->db_column_name();
-        $relation_table = $this->db->protect_identifiers($field->relation->model()->meta->db_table, TRUE);
+        $relation_table = $this->db->protect_identifiers($field->relation->get_model()->meta->db_table, TRUE);
 
         $relation_table_column = $field->relation_field()->db_column_name();
         $constraint_name = $this->_constrain_name($model->meta->model_name, $field->name, 'fk');

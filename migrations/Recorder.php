@@ -18,19 +18,19 @@ use powerorm\console\Base;
  */
 class Recorder extends Base
 {
-    public $connection;
+    public $dbconnection;
     public $migration_table_name = "orm_migrations";
 
-    public function __construct($connection)
+    public function __construct($dbconnection)
     {
-        $this->connection = $connection;
+        $this->dbconnection = &$dbconnection;
 
     }
     
     public function get_applied()
     {
         $this->create_table();
-        $applied_migrations = $this->connection->get($this->migration_table_name)->result();
+        $applied_migrations = $this->dbconnection->get($this->migration_table_name)->result();
 
         $applied = [];
         foreach ($applied_migrations as $item) :
@@ -44,7 +44,7 @@ class Recorder extends Base
     {
         $this->create_table();
 
-        $this->connection->insert($this->migration_table_name, $data);
+        $this->dbconnection->insert($this->migration_table_name, $data);
 
     }
 
@@ -52,18 +52,19 @@ class Recorder extends Base
     {
         $this->create_table();
 
-        $this->connection->delete($this->migration_table_name, $data);
+        $this->dbconnection->delete($this->migration_table_name, $data);
     }
 
     public function flush()
     {
         $this->create_table();
-        $this->connection->empty_table($this->migration_table_name);
+        $this->dbconnection->empty_table($this->migration_table_name);
     }
 
     public function create_table()
     {
-        if($this->connection->table_exists($this->migration_table_name)):
+
+        if($this->dbconnection->table_exists($this->migration_table_name)):
            return;
         endif;
 
@@ -79,12 +80,13 @@ class Recorder extends Base
             )
         );
 
-        $this->connection->add_field($fields);
-        $this->connection->add_key('id', TRUE);
-        if (!$this->connection->create_table($this->migration_table_name, TRUE))
-        {
-            $this->error("Migration Table could not created, ensure you database is setup correctly");
-        }
+        $this->dbconnection->schema_editor->add_field($fields);
+        $this->dbconnection->schema_editor->add_key('id', TRUE);
+        $this->dbconnection->schema_editor->create_table($this->migration_table_name, TRUE);
+//        if (!)
+//        {
+//            $this->error("Migration Table could not created, ensure you database is setup correctly");
+//        }
 
 
     }

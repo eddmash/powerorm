@@ -97,7 +97,7 @@ trait BaseObject
      */
     public function get_parent()
     {
-
+        return get_parent_class($this);
     }
 
     /**

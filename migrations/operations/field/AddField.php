@@ -8,8 +8,10 @@
 
 namespace powerorm\migrations\operations\field;
 
+use powerorm\helpers\Bools;
 use powerorm\migrations\operations\Operation;
 use powerorm\migrations\ProjectState;
+use powerorm\NOT_PROVIDED;
 
 
 /**
@@ -47,12 +49,19 @@ class AddField extends Operation
         $current_model = $current_state->registry()->get_model($this->model_name);
 
         // if we are not preserving the default
-        if(!$this->preserve_default):
+        // give it the value temporary
+
+        if(Bools::false($this->preserve_default)):
             $field->default = $this->field->default;
         endif;
 
         if($this->allow_migrate_model($connection, $model)):
-            $connection->add_model_field($current_model, $field);
+            $connection->schema_editor->add_model_field($current_model, $field);
+        endif;
+
+        // reset it back
+        if(Bools::false($this->preserve_default)):
+            $field->default = NOT_PROVIDED::instance();
         endif;
     }
 
@@ -61,7 +70,7 @@ class AddField extends Operation
         $current_model = $current_state->registry()->get_model($this->model_name);
 
         if($this->allow_migrate_model($connection, $current_model)):
-            $connection->drop_model_field($current_model, $current_model->meta->get_field($this->field_name));
+            $connection->schema_editor->drop_model_field($current_model, $current_model->meta->get_field($this->field_name));
         endif;
     }
 

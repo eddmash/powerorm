@@ -77,7 +77,16 @@ interface Contributor{
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class NOT_PROVIDED{}
+class NOT_PROVIDED{
+    /**
+     * @return static
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function instance(){
+        return new static;
+    }
+}
 
 /**
  * Class Object

@@ -30,7 +30,7 @@ class DropModel extends Operation{
         $model = $current_state->registry()->get_model($this->model_name);
 
         if($this->allow_migrate_model($connection, $model)):
-            $connection->drop_model($model);
+            $connection->schema_editor->drop_model($model);
         endif;
     }
 
@@ -39,7 +39,7 @@ class DropModel extends Operation{
         $model = $desired_state->registry()->get_model($this->model_name);
 
         if($this->allow_migrate_model($connection, $model)):
-            $connection->create_model($model);
+            $connection->schema_editor->create_model($model);
         endif;
     }
 

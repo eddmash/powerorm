@@ -7,6 +7,7 @@
  */
 
 namespace powerorm\migrations\operations\field;
+use powerorm\helpers\Bools;
 use powerorm\migrations\operations\Operation;
 use powerorm\migrations\ProjectState;
 use powerorm\NOT_PROVIDED;
@@ -54,12 +55,18 @@ class AlterField extends Operation{
         $desired_field = $desired_model->meta->get_field($this->field_name);
 
         // if we are not preserving the default
-        if(!$this->preserve_default):
+        if(Bools::false($this->preserve_default)):
             $desired_field->default = $this->field->default;
         endif;
 
         if($this->allow_migrate_model($connection, $desired_model)):
-            $connection->alter_model_field($current_model, $current_field, $desired_field);
+            $connection->schema_editor->alter_model_field($current_model, $current_field, $desired_field);
+        endif;
+
+
+        // reset it back
+        if(Bools::false($this->preserve_default)):
+            $desired_field->default = NOT_PROVIDED::instance();
         endif;
     }
 

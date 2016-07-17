@@ -39,6 +39,10 @@ class RelationObject extends Object{
         endif;
     }
 
+    public function get_model(){
+        return $this->get_registry()->get_model($this->model);
+    }
+
     public function is_reverse_relation()
     {
         return $this->reverse;
@@ -82,7 +86,7 @@ abstract class ReverseRelationObject extends RelationObject{
 
     public function get_mapped_by()
     { 
-        return $this->model()->meta->get_field($this->mapped_by);
+        return $this->get_model()->meta->get_field($this->mapped_by);
     }
 
 }

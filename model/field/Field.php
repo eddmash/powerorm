@@ -257,7 +257,7 @@ abstract class Field extends Object implements FieldInterface{
             unset($field_options['type']);
         endif;
 
-        $this->default = new NOT_PROVIDED;
+        $this->default = NOT_PROVIDED::instance();
 
         $this->constructor_args = $field_options;
 

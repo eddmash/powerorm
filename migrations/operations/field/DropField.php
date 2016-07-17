@@ -34,7 +34,7 @@ class DropField extends Operation{
     {
         $current_model = $current_state->registry()->get_model($this->model_name);
         if($this->allow_migrate_model($connection, $current_model)):
-            $connection->drop_model_field($current_model, $current_model->meta->get_field($this->field_name));
+            $connection->schema_editor->drop_model_field($current_model, $current_model->meta->get_field($this->field_name));
         endif;
     }
 
@@ -45,7 +45,7 @@ class DropField extends Operation{
         $current_model = $current_state->registry()->get_model($this->model_name);
 
         if($this->allow_migrate_model($connection, $current_model)):
-            $connection->add_model_field($current_model, $desired_model->meta->get_field($this->field_name));
+            $connection->schema_editor->add_model_field($current_model, $desired_model->meta->get_field($this->field_name));
         endif;
     }
 

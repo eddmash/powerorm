@@ -548,6 +548,7 @@ class Queryset extends Object implements QuerysetAccess, Query{
 
         if(!in_array($this->model->meta->db_table, $this->_from_cache)):
             $this->_from_cache[] =$this->model->meta->db_table;
+
             $this->_query_builder->from($this->model->meta->db_table);
         endif;
 
@@ -708,12 +709,12 @@ class Queryset extends Object implements QuerysetAccess, Query{
     protected function _join_sql($model, $field){
         
         if($field->is_inverse()):
-            $owner_model = $field->relation->model();
+            $owner_model = $field->relation->get_model();
             $inverse_model = $model;
             $join_table = $owner_model->meta->db_table;
         else:
             $owner_model = $model;
-            $inverse_model = $field->relation->model();
+            $inverse_model = $field->relation->get_model();
             $join_table = $inverse_model->meta->db_table;
         endif;
 
@@ -815,7 +816,7 @@ class Queryset extends Object implements QuerysetAccess, Query{
                 continue;
             endif;
 
-            $field_model = $field->relation->model();
+            $field_model = $field->relation->get_model();
             $class_info =[
                 'model'=>$field_model,
                 'field'=>$field

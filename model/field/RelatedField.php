@@ -44,15 +44,40 @@ class RelatedField extends Field{
      */
     protected $model;
 
-    /**
-     * @ignore
-     * @var
-     */
-    protected $on_update;
+
 
     /**
      * When an object referenced by a ForeignKey is deleted, Powerorm by default emulates the behavior of the SQL
      * constraint ON DELETE CASCADE and also deletes the object containing the ForeignKey.
+     *
+     * - on_delete
+     *
+     *      When an object referenced by a ForeignKey is deleted,
+     *
+     *      Powerorm by default emulates the behavior of the SQL constraint ON DELETE CASCADE and also deletes the object
+     *      containing the ForeignKey.
+     *
+     *      This behavior can be overridden by specifying the on_delete argument.
+     *      For example, if you have a nullable ForeignKey and you want it to be set null when the referenced object is deleted:
+     *
+     *      user = ORM::ForeignKey(['model_name'=>'user_model', 'blank'=>True, 'null'=>True, 'on_delete'=>ORM::SET_NULL])
+     *
+     *      The possible values for on_delete are found in ORM:
+     *      -   CASCADE
+     *
+     *          Cascade deletes; the default.
+     *
+     *      -   PROTECT
+     *
+     *          Prevent deletion of the referenced object by raising ProtectedError.
+     *
+     *      -   SET_NULL
+     *
+     *          Set the ForeignKey null; this is only possible if null is True.
+     *
+     *      -   SET_DEFAULT
+     *
+     *          Set the ForeignKey to its default value; a default for the ForeignKey must be set.
      * @var
      */
     protected $on_delete;
@@ -118,7 +143,7 @@ class RelatedField extends Field{
      */
     public function relation_field(){
 
-        return $this->relation->model()->meta->primary_key;
+        return $this->relation->get_model()->meta->primary_key;
     }
 
     /**
@@ -150,14 +175,12 @@ class RelatedField extends Field{
      */
     public function _check_relation_model(){
 
-        $models = $this->get_registry()->get_models();
-        $model_names = array_keys($models);
-
-        if(!in_array($this->lower_case($this->relation->model), $model_names)):
+        $rel_model_name = $this->relation->get_model()->meta->model_name;
+        if(!$this->get_registry()->has_model($rel_model_name)):
+            $message = 'Field { %1$s } defines a relation with model { %2$s }, which does not exist or is abstract.';
             return [
                 Checks::error([
-                    "message"=>sprintf('%1$s field creates relationship to model `%2$s` that does not exist',
-                        $this->get_class_name(), ucfirst($this->relation->model)),
+                    "message"=>sprintf($message, $this->get_class_name(), ucfirst($rel_model_name)),
                     "hint"=>NULL,
                     "context"=>$this,
                     "id"=>"fields.E300"
@@ -170,34 +193,3 @@ class RelatedField extends Field{
 
 }
 
-/**
- * todo
- * - on_delete
- *
- *      When an object referenced by a ForeignKey is deleted,
- *
- *      Powerorm by default emulates the behavior of the SQL constraint ON DELETE CASCADE and also deletes the object
- *      containing the ForeignKey.
- *
- *      This behavior can be overridden by specifying the on_delete argument.
- *      For example, if you have a nullable ForeignKey and you want it to be set null when the referenced object is deleted:
- *
- *      user = ORM::ForeignKey(['model_name'=>'user_model', 'blank'=>True, 'null'=>True, 'on_delete'=>ORM::SET_NULL])
- *
- *      The possible values for on_delete are found in ORM:
- *      -   CASCADE
- *
- *          Cascade deletes; the default.
- *
- *      -   PROTECT
- *
- *          Prevent deletion of the referenced object by raising ProtectedError.
- *
- *      -   SET_NULL
- *
- *          Set the ForeignKey null; this is only possible if null is True.
- *
- *      -   SET_DEFAULT
- *
- *          Set the ForeignKey to its default value; a default for the ForeignKey must be set.
- */

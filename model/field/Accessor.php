@@ -86,7 +86,7 @@ class ForwardManyToOneAccessor extends Accessor{
         else:
             // create queryset, fetch the record and cache the results
 
-            $relations_model = $this->field->relation->model();
+            $relations_model = $this->field->relation->get_model();
             $pk_field = $relations_model->meta->primary_key->name;
 
             $pk_value = $this->model->{$this->field->db_column};

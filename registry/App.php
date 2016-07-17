@@ -2,6 +2,7 @@
 namespace powerorm\registry;
 
 use powerorm\BaseOrm;
+use powerorm\exceptions\LookupError;
 use powerorm\model\BaseModel;
 use powerorm\Object;
 use powerorm\traits\BaseFileReader;
@@ -81,7 +82,10 @@ class App extends Object
 
     public function get_model($name){
         $name = $this->lower_case($name);
-        return $this->has_model($name) ? $this->get_models()[$name] : NULL;
+        if(!$this->has_model($name)):
+            throw new LookupError(sprintf("The model %s."));
+        endif;
+        return $this->get_models()[$name];
     }
 
     public function has_model($name)

@@ -395,51 +395,7 @@ class BaseOrm {
 
     public static function dbconnection()
     {
-        static::create_connection();
-
-        $ci = self::ci_instance();
-
-        return new Connection($ci->db, $ci->dbforge);
-    }
-
-    public static function create_connection($db_configs = NULL){
-
-
-        $CI =self::ci_instance();
-
-        self::load_database($db_configs);
-
-        $db = & $CI->db;
-
-        require_once(BASEPATH.'database/drivers/'.$db->dbdriver.'/'.$db->dbdriver.'_forge.php');
-
-        $class = $db->dbdriver;
-        if ( ! empty($db->subdriver)):
-            $driver_path = sprintf(BASEPATH.'database/drivers/%s/subdrivers/%s_%s_forge.php', $db->dbdriver);
-            if (file_exists($driver_path)):
-                require_once($driver_path);
-                $class = $db->dbdriver.'_'.$db->subdriver;
-            endif;
-        endif;
-
-        $class = ucfirst($class);
-        $class = $class."Editor";
-
-        require_once(APPPATH.'libraries/powerorm/db/schema/'.$class.'.php');
-
-        $class = 'powerorm\db\schema\\'.$class;
-
-        $CI->dbforge = new $class($db);
-    }
-
-    public static function load_database($db_configs){
-
-        if(!empty($db_configs)):
-            self::ci_instance()->load->database($db_configs, FALSE, TRUE);
-        else:
-            self::ci_instance()->load->database('', FALSE, TRUE);;
-        endif;
-
+        return Connection::instance();
     }
 
     public static function &ci_instance(){
