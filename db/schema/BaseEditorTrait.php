@@ -10,6 +10,8 @@ namespace powerorm\db\schema;
 
 
 use powerorm\exceptions\ValueError;
+use powerorm\model\BaseModel;
+use powerorm\model\field\Field;
 
 /**
  * Class BaseEditor
@@ -17,7 +19,7 @@ use powerorm\exceptions\ValueError;
  * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-trait BaseEditor
+trait BaseEditorTrait
 {
 
     //   ************************** TEMPLATES to override ********************************
@@ -58,7 +60,7 @@ trait BaseEditor
 
     // ************************ Prepare for database alteration **************************
 
-    public function add_model_field($model, $field){
+    public function add_model_field(BaseModel $model, Field $field){
 
         // many to many
         if($field->M2M && $field->relation->through->meta->auto_created):
@@ -66,8 +68,9 @@ trait BaseEditor
             return;
         endif;
 
-        $sql_def = $this->field_as_sql($field);
+        $sql_def = $this->column_sql($field);
 
+        // It might not actually have a column behind it
         if(empty($sql_def)):
             return;
         endif;
@@ -91,7 +94,7 @@ trait BaseEditor
         endif;
     }
 
-    public function drop_model_field($model, $field){
+    public function drop_model_field(BaseModel $model, Field $field){
         // if we created a table for m2m
         if($field->M2M && $field->relation->through->meta->auto_created):
             $this->drop_model($field->relation->through);
@@ -125,7 +128,7 @@ trait BaseEditor
      * @return array|null
      * @throws ValueError
      */
-    public function alter_model_field($model, $previous_field, $present_field, $strict=False){
+    public function alter_model_field(BaseModel $model, Field $previous_field, Field $present_field, $strict=False){
         $previous_type = $previous_field->db_type();
         $present_type = $present_field->db_type();
 
@@ -175,17 +178,19 @@ trait BaseEditor
         $this->_alter_field($model, $previous_field, $present_field, $previous_type, $present_type,$strict);
     }
 
-    public function create_model($model){
+    public function create_model(BaseModel $model){
         // this assumes fields set_from_name has been invoked
         $fields = [];
         $unique_fields = [];
+
         foreach ($model->meta->fields as $name=>$field) :
 
             if($field->is_unique()):
                 $unique_fields[] = $field;
             endif;
 
-            $sql_def = $this->field_as_sql($field);
+            $sql_def = $this->column_sql($field);
+
             if(!empty($sql_def)):
                 $fields[$field->db_column_name()] = $sql_def;
             endif;
@@ -194,44 +199,46 @@ trait BaseEditor
         $this->add_field($fields);
 
         // create the primary key
-        $this->add_primary_key($model->meta->primary_key->db_column_name());
+        $this->add_primary_key($model);
 
         $this->create_table($model->meta->db_table,TRUE);
 
         // add unique constraint
+        // consider unique_together todo
         foreach ($unique_fields as $field) :
             $this->add_unique_key($model, $field);
         endforeach;
-
 
         // add fk constraint
         foreach ($model->meta->relations_fields as $name=>$relation_field) :
             if($relation_field->inverse || $relation_field->M2M):
                 continue;
             endif;
+
             $this->add_foreign_key_constraint($model, $relation_field);
         endforeach;
 
         // many to many
         foreach ($model->meta->relations_fields as $name=>$relation_field) :
-            if( $relation_field->M2M && $relation_field->relation->through->meta->auto_created):
+            if($relation_field->M2M && $relation_field->relation->through->meta->auto_created):
                 $this->create_model($relation_field->relation->through);
             endif;
         endforeach;
 
     }
     
-    public function drop_model($model){
+    public function drop_model(BaseModel $model){
 
         // first remove any automatically created models
         foreach ($model->meta->relations_fields as $name=>$field) :
-            //todo
+            if($field->M2M && $field->relation->through->auto_created):
+                $this->drop_table($field->relation->through);
+            endif;
         endforeach;
 
         $this->drop_table($model->meta->db_table);
 
     }
-
 
     public function _alter_field($model, $previous_field, $present_field, $previous_type, $present_type,$strict){
 
@@ -239,19 +246,38 @@ trait BaseEditor
 
         // drop fks if they exist to allow as to work we will recreate them later
         $dropped_fks = [];
-        if($previous_field->relation && $previous_field->db_constraint):
+        if($previous_field->is_relation && $previous_field->db_constraint):
             // take note of it
-            $dropped_fks[] = $this->_constrain_name($model->meta->model_name, $previous_field->name, 'fk');
+            $dropped_fks[] = $this->_constraint_name($model->meta->model_name, $previous_field->name, 'fk');
             // drop it
             $this->drop_foreign_key_constraint($model, $previous_field);
         endif;
 
         //  *********************** Drop uniqueness ***********************
 
-        if($previous_field->is_unique() && !$present_field->is_unique()):
+        if($previous_field->is_unique() &&
+            (!$present_field->is_unique() || (!$previous_field->primary_key && $present_field->primary_key))):
+
             $this->drop_unique_key($model, $previous_field);
         endif;
-        // todo drop index
+
+        //  *********************** Drop Reverse Relations if PK was altered ***********************
+        
+        if($previous_field->primary_key && $present_field->primary_key && $present_type!==$previous_type):
+            if():
+            
+            endif;
+        endif;
+        
+        //  *********************** Drop index ***********************
+
+        if($previous_field->db_index && !$present_field->db_index && !$previous_field->is_unique() &&
+            !(!$present_field->is_unique() && $previous_field->is_unique())):
+
+            $this->drop_unique_index($model, $previous_field);
+
+        endif;
+
         // was the column name renamed, this can happen when moving to/from a relational field. e.g ForeignKey
         // here we just rename the column only
         if($present_field->db_column_name() !== $previous_field->db_column_name()):
@@ -272,13 +298,7 @@ trait BaseEditor
         $column_name = $present_field->db_column_name();
 
         if($present_type !== $previous_type || $previous_field->max_length !== $present_field->max_length):
-//            $altered_attrs = [];
-//
-//            $altered_attrs[$column_name] = [
-//                'type'=> $present_type,
-//                'constraint'=> $present_field->max_length,
-//            ];
-//            $this->modify_column($model->meta->db_table, $altered_attrs);
+
             $this->alter_column_type($model, $present_field, $previous_field);
 
         endif;
@@ -326,6 +346,8 @@ trait BaseEditor
         endif;
         // todo add index
         // todo alter pk
+
+
         // Add FK
         //  - add foreign key, if current field is a relation constraint
         //  - and no fk constraints we dropped or previous field is not a relation field that is not a constraint
@@ -345,13 +367,14 @@ trait BaseEditor
     }
 
     public function _alter_many_to_many($model, $previous_field, $present_field, $strict){
+        //todo
         return [];
     }
 
     // ****************************** Alter actual database **********************************
 
 
-    public function field_as_sql($field){
+    public function column_sql(Field $field){
 
         $type = $field->db_type();
         if(empty($type)):
@@ -416,32 +439,39 @@ trait BaseEditor
         return $value;
     }
 
-    public function add_primary_key($name){
-        $this->add_key($name, TRUE);
+    public function add_primary_key(BaseModel $model){
+        $this->add_key($model->meta->primary_key->db_column_name(), TRUE);
     }
 
-    public function add_unique_key($model, $field){
+    public function add_unique_key(BaseModel $model, Field $field){
 
-        $constraint_name = $this->_constrain_name($model->meta->model_name, $field->name, 'uni');
+        $constraint_name = $this->_constraint_name($model->meta->model_name, $field->name, 'uni');
         $table = $this->db->protect_identifiers($model->meta->db_table, TRUE);
-        $this->db->query($this->add_unique_constraint($table, $constraint_name, $field->db_column_name()));
+        $this->db->query($this->_create_unique_constraint($table, $constraint_name, $field->db_column_name()));
     }
 
-    public function add_index_key($model, $field){
+    public function add_index_key(BaseModel $model, Field $field){
 
-        $constraint_name = $this->_constrain_name($model->meta->model_name, $field->name, 'idx');
+        $constraint_name = $this->_constraint_name($model->meta->model_name, $field->name, 'idx');
         $table = $this->db->protect_identifiers($model->meta->db_table, TRUE);
         $this->db->query($this->add_index_constraint($table, $constraint_name, $field->db_column_name()));
     }
 
-    public function drop_unique_key($model, $field){
+    public function drop_unique_key(BaseModel $model, Field $field){
         $table = $this->db->protect_identifiers($model->meta->db_table, TRUE);
-        $constraint_name = $this->_constrain_name($model->meta->model_name, $field->name, 'uni');
+        $constraint_name = $this->_constraint_name($model->meta->model_name, $field->name, 'uni');
 
         $this->db->query($this->drop_unique_constraint($table, $constraint_name));
     }
 
-    public function _constrain_name($model_name, $field_name, $type){
+    public function drop_unique_index(BaseModel $model, Field $field){
+        $table = $this->db->protect_identifiers($model->meta->db_table, TRUE);
+        $constraint_name = $this->_constraint_name($model->meta->model_name, $field->name, 'idx');
+
+        $this->db->query($this->drop_unique_constraint($table, $constraint_name));
+    }
+
+    public function _constraint_name($model_name, $field_name, $type){
         return sprintf('%1$s_%2$s_%3$s', $type, $model_name, $field_name);
     }
     
@@ -460,7 +490,7 @@ trait BaseEditor
 
     //    ************************** TEMPLATES END ********************************
 
-    public function add_unique_constraint($table, $constraint_name, $column_name){
+    public function _create_unique_constraint($table, $constraint_name, $column_name){
         return sprintf('ALTER TABLE %1$s ADD CONSTRAINT %2$s %3$s',
             $table,
             $constraint_name,
@@ -475,11 +505,13 @@ trait BaseEditor
         );
     }
 
-    public function drop_unique_constraint($table, $constraint_name){
+    public function drop_index_constraint($table, $constraint_name){
         return sprintf('ALTER TABLE %1$s DROP INDEX %2$s', $table, $constraint_name);
     }
+    public function drop_unique_constraint($table, $constraint_name){
+        return $this->drop_index_constraint($table, $constraint_name);
+    }
 
-    // interface implementations
     public function add_foreign_key_constraint($model, $field){
         $this->add_column($model->meta->db_table, [$this->_create_fk_contraint($model, $field)]);
     }
@@ -494,14 +526,14 @@ trait BaseEditor
         $relation_table = $this->db->protect_identifiers($field->relation->get_model()->meta->db_table, TRUE);
 
         $relation_table_column = $field->relation_field()->db_column_name();
-        $constraint_name = $this->_constrain_name($model->meta->model_name, $field->name, 'fk');
+        $constraint_name = $this->_constraint_name($model->meta->model_name, $field->name, 'fk');
 
         $constraint = $this->tpl_fk_constraint($constraint_name, $column_name, $relation_table, $relation_table_column);
         return $constraint;
     }
 
     public function _drop_fk_constraint($model, $field){
-        $constraint_name = $this->_constrain_name($model->meta->model_name, $field->name, 'fk');
+        $constraint_name = $this->_constraint_name($model->meta->model_name, $field->name, 'fk');
 
 
         $table = $this->db->protect_identifiers($model->meta->db_table, TRUE);

@@ -46,7 +46,7 @@ class RelatedField extends Field{
 
 
 
-    /**
+    /**todo
      * When an object referenced by a ForeignKey is deleted, Powerorm by default emulates the behavior of the SQL
      * constraint ON DELETE CASCADE and also deletes the object containing the ForeignKey.
      *
@@ -87,14 +87,6 @@ class RelatedField extends Field{
      */
     public $is_relation = TRUE;
 
-    /**
-     * The form field used for Foreignkey and ManyToMany field is dropdown.
-     * This options allows you to set what is displayed as the first item on the dropdown list,
-     * most its use if the relationship allows null, meaning its not mandatory a user selects and item from dropdwon
-     * they can just leave it blank
-     * @var string
-     */
-    public $empty_label  = '---------';
 
     /**
      * Used to set the field on the model to use for display e.g for the model user_model.
@@ -105,23 +97,7 @@ class RelatedField extends Field{
      * &lt;/select &gt;</code></pre>
      * @var
      */
-    public $form_display_field;
-
-    /**
-     * Works on dropdown, select, radio, checkbox.
-     *
-     * Used to set the model field to use for the value of the form option fields e.g for the model user_model.
-     * you could set the form_value_field to email, this will result in form select box shown below
-     *
-     * By default the primary key is used.
-     *
-     * <pre><code &gt;
-     *  &lt;select &gt;
-     *      &lt;option value=linus@linux.com &gt; math // not the value of the option is set to an email.
-     * &lt;/select &gt;</code></pre>
-     * @var
-     */
-    public $form_value_field;
+    public $form_display_field; 
 
     /**
      * {@inheritdoc}
@@ -144,22 +120,6 @@ class RelatedField extends Field{
     public function relation_field(){
 
         return $this->relation->get_model()->meta->primary_key;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function form_field(){
-
-        $opts = $this->_prepare_form_field();
-
-        // fetch all the records in the related model
-        $opts['type'] = 'multiselect';
-        $opts['form_display_field'] = $this->form_display_field;
-        $opts['form_value_field'] = $this->form_value_field;
-        $opts['choices'] = $this->related_model->all();
-
-        return $opts;
     }
 
     public function check(){

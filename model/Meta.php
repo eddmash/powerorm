@@ -44,6 +44,7 @@ class Meta extends Object implements Contributor{
         else:
             $this->local_fields[$field_obj->name] = $field_obj;
         endif;
+
         $this->load_inverse_field($field_obj);
     }
 
@@ -87,5 +88,32 @@ class Meta extends Object implements Contributor{
  
     public function can_migrate(){
         return $this->managed && !$this->proxy;
+    }
+
+    /**
+     * Get all fields that connect to this model inversely not directly i.e the field just point to this model but its
+     * not defined on the model e.g. by usingg hasmanyfield() or hasonefield().
+     *
+     * @return array
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function get_reverse_fields(){
+        $app_models = $this->orm_instance()->get_registry()->get_models();
+
+        $reverse = [];
+        foreach ($app_models as $name=>$app_model) :
+            foreach ($app_model->meta->relations_fields as $fname=>$field) :
+
+                if($field->is_relation &&
+                    !empty($field->relation->model) &&
+                    $field->relation->model === $this->model_name):
+                        $reverse[$field->name] = $field;
+                endif;
+            endforeach;
+
+        endforeach;
+
+        return $reverse;
     }
 }

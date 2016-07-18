@@ -14,10 +14,10 @@ namespace powerorm\db\schema;
  * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class MysqliEditor extends \CI_DB_mysqli_forge
+class MysqliEditor extends \CI_DB_mysqli_forge implements SchemaEditorInterface
 {
 
-    use BaseEditor;
+    use BaseEditorTrait;
 
     public function create_table($table, $if_not_exists = FALSE, array $attributes = array()){
 

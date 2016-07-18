@@ -7,6 +7,7 @@
  */
 
 namespace powerorm\model\field;
+use powerorm\checks\Checks;
 
 
 /**
@@ -72,22 +73,6 @@ class ManyToOneField extends RelatedField{
     public function constraint_name($prefix){
         $prefix = "fk";
         return parent::constraint_name($prefix);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function form_field(){
-
-        $opts = $this->_prepare_form_field();
-
-        // fetch all the records in the related model
-        $opts['type'] = 'dropdown';
-        $opts['form_display_field'] = $this->form_display_field;
-        $opts['form_value_field'] = $this->form_value_field;
-        $opts['choices'] = $this->related_model->all();
-
-        return $opts;
     }
 
     /**

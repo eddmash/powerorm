@@ -56,6 +56,7 @@ class App extends Object
     }
 
     public function _get_models(){
+
         $model_classes = $this->get_model_classes();
 
         if($model_classes):
@@ -83,7 +84,7 @@ class App extends Object
     public function get_model($name){
         $name = $this->lower_case($name);
         if(!$this->has_model($name)):
-            throw new LookupError(sprintf("The model %s."));
+            throw new LookupError(sprintf("The model { %s } Does not exist", $name));
         endif;
         return $this->get_models()[$name];
     }

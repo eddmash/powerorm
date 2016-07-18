@@ -114,12 +114,6 @@ abstract class Field extends Object implements FieldInterface{
     public $type;
 
     /**
-     * @ignore
-     * @var
-     */
-    public $constraint_name;
-
-    /**
      * If True, powerorm will store empty values as NULL in the database. Default is False.
      *
      * @var bool

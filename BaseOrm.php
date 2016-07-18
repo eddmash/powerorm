@@ -384,11 +384,10 @@ class BaseOrm {
     }
 
     /**
-     * This is just a shortcut method.
-     * get the current instance of the orm
+     * This is just a shortcut method. get the current instance of the orm
      * @return mixed
      */
-    public static function instance(){
+    public static function &instance(){
         $ci = self::ci_instance();
         return $ci->orm;
     }
