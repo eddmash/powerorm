@@ -26,12 +26,13 @@ use powerorm\Object;
 interface FieldInterface extends DeConstruct, Contributor{
 
     /**
-     * return the database column that this field represents.
+     * Returns the database column data type for the Field, taking into account the connection.
+     *
      * @return string
      * @since 1.1.0
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-     public function db_type();
+     public function db_type($connection);
 
     /**
      * Convert the value to a php value
@@ -49,6 +50,72 @@ interface FieldInterface extends DeConstruct, Contributor{
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function formfield($kwargs=[]);
+
+    /**
+     * Method called prior to prepare_value_for_db() to prepare the value before being saved
+     * (e.g. for DateField.auto_now).
+     *
+     * model_instance is the instance this field belongs to and add is whether the instance is being saved to the
+     * database for the first time.
+     *
+     * It should return the value of the appropriate attribute from model_instance for this field.
+     * The attribute name is in $this->name (this is set up by Field).
+     *
+     * @param $model
+     * @param bool $add is whether the instance is being saved to the database for the first time.
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function pre_save($model, $add);
+
+    /**
+     * value is the current value of the model’s attribute, and the method should return data in a format that has been
+     * prepared for use as a parameter in a query.ie. in the database
+     *
+     * @param $value
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function prepare_value($value);
+
+    /**
+     * Converts value to a backend-specific value.
+     * By default it returns value if prepared=True and prepare_value() if is False.
+     *
+     * @param $value
+     * @param $connection
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function prepare_value_for_db($value, $connection, $prepared=FALSE);
+
+    /**
+     * Same as the prepare_value_for_db(), but called when the field value must be saved to the database.
+     *
+     * By default returns prepare_value_for_db().
+     *
+     * @param $value
+     * @param $connection
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function prepare_value_before_save($value, $connection);
+
+    /**
+     * Converts a value as returned by the database to a PHP object. It is the reverse of prepare_value().
+     *
+     * This method is not used for most built-in fields as the database backend already returns the correct PHP type,
+     * or the backend itself does the conversion.
+     *
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function from_db_value();
 }
 
 /**
@@ -114,7 +181,7 @@ abstract class Field extends Object implements FieldInterface{
     public $type;
 
     /**
-     * If True, powerorm will store empty values as NULL in the database. Default is False.
+     * If True, powerorm will store empty values as NULL in the database. Default is False i.e NOT NULL
      *
      * @var bool
      */
@@ -316,7 +383,7 @@ abstract class Field extends Object implements FieldInterface{
     public function db_params($connection)
     {
         return [
-            'type'=> $this->db_type()
+            'type'=> $this->db_type($connection)
         ];
     }
 
@@ -390,7 +457,7 @@ abstract class Field extends Object implements FieldInterface{
      * return the database column that this field represents.
      * @return string
      */
-    public function db_type(){
+    public function db_type($connection){
         return NULL;
     }
 
@@ -548,6 +615,32 @@ abstract class Field extends Object implements FieldInterface{
 
         // load from relationships todo
     }
+
+    public function pre_save($model, $add)
+    {
+        // TODO: Implement pre_save() method.
+    }
+
+    public function prepare_value($value)
+    {
+        // TODO: Implement prepare_value() method.
+    }
+
+    public function prepare_value_for_db($value, $connection, $prepared = FALSE)
+    {
+        // TODO: Implement prepare_value_for_db() method.
+    }
+
+    public function from_db_value()
+    {
+        // TODO: Implement from_db_value() method.
+    }
+
+
+    public function prepare_value_before_save($value, $connection){
+        return $this->prepare_value_for_db($value, $connection);
+    }
+
 
     public function __debugInfo()
     {

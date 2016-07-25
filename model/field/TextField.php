@@ -8,8 +8,7 @@
 
 namespace powerorm\model\field;
 
-
-
+use powerorm\form\widgets\TextArea;
 
 
 /**
@@ -32,8 +31,14 @@ class TextField extends Field{
     /**
      * {@inheritdoc}
      */
-    public function db_type(){
+    public function db_type($connection){
         return 'TEXT';
+    }
+
+    public function formfield($kwargs=[]){
+
+        $kwargs['field_class'] = TextArea::full_class_name();
+        return parent::formfield($kwargs);
     }
 
 }

@@ -99,7 +99,7 @@ class ManyToManyField extends RelatedField{
         return [];
     }
 
-    public function db_type()
+    public function db_type($connection)
     {
         return NULL;
     }

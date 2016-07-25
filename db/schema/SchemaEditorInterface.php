@@ -28,8 +28,10 @@ interface SchemaEditorInterface
 
 
     // Constraints Manupilation
-    public function add_primary_key(BaseModel $model);
-    public function add_unique_key(BaseModel $model, Field $field);
-    public function drop_unique_key(BaseModel $model, Field $field);
-    public function add_index_key(BaseModel $model, Field $field);
+//    public function add_primary_key(BaseModel $model, Field $field);
+//    public function drop_primary_key(BaseModel $model, Field $field);
+//    public function add_unique_key(BaseModel $model, Field $field);
+//    public function drop_unique_key(BaseModel $model, Field $field);
+//    public function add_index_key(BaseModel $model, Field $field);
+//    public function drop_index_key(BaseModel $model, Field $field);
 }

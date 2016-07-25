@@ -9,6 +9,8 @@
 namespace powerorm\migrations;
  
 use powerorm\BaseOrm;
+use powerorm\exceptions\AmbiguityError;
+use powerorm\helpers\Strings;
 use powerorm\Object;
 use powerorm\traits\BaseFileReader;
 
@@ -158,6 +160,27 @@ class Loader extends Object
             return $latest;
         endif;
         return [];
+    }
+    
+    public function get_migration_by_prefix($name_prefix){
+
+        $results = [];
+
+        foreach ($this->app_migrations() as $name=>$migration) :
+
+            if(Strings::starts_with($name, $name_prefix)):
+                $results[] = $name;
+            endif;
+        endforeach;
+        
+        if(count($results) > 1):
+            throw new AmbiguityError(sprintf('There is more than one migration with the prefix %s', $name_prefix));
+        elseif(count($results) == 0):
+            throw new AmbiguityError(sprintf('There no migrations with the prefix %s', $name_prefix));
+        endif;
+
+        var_dump([$this->app_migrations()[$results[0]] ]);
+        return $results;
     }
 
 }

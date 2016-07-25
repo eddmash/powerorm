@@ -8,6 +8,7 @@
 
 namespace powerorm\model\field;
 
+use powerorm\form\widgets;
 
 /**
  * Inherits from CharField.
@@ -29,7 +30,7 @@ class EmailField extends CharField{
     }
 
     public function formfield($kwargs=[]){
-        $defaults=['widget'=> form\CharField::full_class_name()];
+        $defaults=['widget'=> widgets\EmailInput::full_class_name()];
         $defaults = array_merge($defaults, $kwargs);
         return parent::formfield($defaults);
     }

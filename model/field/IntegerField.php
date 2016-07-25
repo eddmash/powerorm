@@ -8,6 +8,8 @@
 
 namespace powerorm\model\field;
 
+use powerorm\form;
+
 
 /**
  * Creates and integer column of Values ranging from -2147483648 to 2147483647.
@@ -38,7 +40,7 @@ class IntegerField extends Field{
     /**
      * {@inheritdoc}
      */
-    public function db_type(){
+    public function db_type($connection){
         return 'INT';
     }
 

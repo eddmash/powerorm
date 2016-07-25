@@ -61,6 +61,10 @@ abstract class ChoiceInputFields extends Input{
          */
         $choices = $this->choices;
 
+        if(is_callable($choices)):
+            $choices = call_user_func($choices);
+        endif;
+
         $output = [];
 
         $count = 1;

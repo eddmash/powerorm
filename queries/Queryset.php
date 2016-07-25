@@ -155,7 +155,7 @@ class Queryset extends Object implements QuerysetAccess, Query{
 
     public function __deconstruct(){
 
-        // close connection if its untill now open
+        // close connection if its until now open
         if($this->_query_builder->conn_id):
             $this->_query_builder->close();
         endif;

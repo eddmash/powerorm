@@ -39,6 +39,8 @@ class Select extends Widget{
         if(array_key_exists('choices', $kwargs)):
             $this->choices = $kwargs['choices'];
         endif;
+        
+        
     }
 
     public function render($name, $value, $attrs=[], $kwargs=[]){
@@ -77,6 +79,10 @@ class Select extends Widget{
          * ]
          */
         $choices = $this->choices;
+        
+        if(is_callable($choices)):
+            $choices = call_user_func($choices);
+        endif;
 
         $output = [];
 

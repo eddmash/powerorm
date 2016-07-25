@@ -105,9 +105,9 @@ class Meta extends Object implements Contributor{
         foreach ($app_models as $name=>$app_model) :
             foreach ($app_model->meta->relations_fields as $fname=>$field) :
 
-                if($field->is_relation &&
-                    !empty($field->relation->model) &&
+                if($field->is_relation && !empty($field->relation->model) &&
                     $field->relation->model === $this->model_name):
+
                         $reverse[$field->name] = $field;
                 endif;
             endforeach;

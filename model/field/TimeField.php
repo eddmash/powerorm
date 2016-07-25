@@ -19,7 +19,7 @@ class TimeField extends DateTimeField{
      * @ignore
      * @return string
      */
-    public function db_type(){
+    public function db_type($connection){
         return 'TIME';
     }
 }

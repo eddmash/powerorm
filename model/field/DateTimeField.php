@@ -47,7 +47,7 @@ class DateTimeField extends Field{
      * @ignore
      * @return string
      */
-    public function db_type(){
+    public function db_type($connection){
         return "DATETIME";
     }
 }

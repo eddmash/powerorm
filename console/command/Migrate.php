@@ -41,12 +41,17 @@ class Migrate extends Command
             $fake = FALSE;
         endif;
 
-        $executor = new Executor(BaseOrm::dbconnection());
+        $connection = BaseOrm::dbconnection();
+        $executor = new Executor($connection);
 
         // target migrations to act on
-        if($name !== NULL):
-            //todo confirm the migration exists
-            $target = [$name];
+        if(!empty($name)):
+            if($name == 'zero'):
+                //todo confirm the migration exists
+                $target = [$name];
+            else:
+                $target = $executor->loader->get_migration_by_prefix($name);
+            endif;
         else:
             $target = $executor->loader->graph->leaf_nodes();
         endif;
@@ -76,6 +81,7 @@ class Migrate extends Command
         else:
             // migrate
             $executor->migrate($target, $plan, $fake);
+
         endif;
 
         $this->dispatch_signal("powerorm.migration.post_migrate", $this);

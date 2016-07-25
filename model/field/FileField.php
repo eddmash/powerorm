@@ -7,7 +7,7 @@
  */
 
 namespace powerorm\model\field;
-
+use powerorm\checks\Checks;
 
 
 /**

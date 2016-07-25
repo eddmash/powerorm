@@ -311,7 +311,7 @@ abstract class BaseModel extends \CI_Model{
     /**
      * Meta information about the model.
      * @ignore
-     * @var array
+     * @var Meta
      */
     public $meta;
 

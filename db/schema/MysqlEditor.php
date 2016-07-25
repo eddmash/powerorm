@@ -15,9 +15,8 @@ namespace powerorm\db\schema;
  * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class MysqlEditor extends \CI_DB_mysql_forge implements SchemaEditorInterface
+class MysqlEditor extends BaseEditor implements SchemaEditorInterface
 {
-    use BaseEditorTrait;
 
     public function tpl_drop_fk(){
         return 'ALTER TABLE %1$s DROP FOREIGN KEY %2$s';
@@ -27,9 +26,5 @@ class MysqlEditor extends \CI_DB_mysql_forge implements SchemaEditorInterface
     public function create_table($table, $if_not_exists = FALSE, array $attributes = array()){
 
         parent::create_table($table, $if_not_exists , ['ENGINE'=>'InnoDB']);
-    }
-
-    public function tpl_alter_column_type($column, $type){
-        return sprintf('MODIFY %1$s %2$s', $column, $type);
     }
 }

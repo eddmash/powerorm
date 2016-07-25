@@ -27,7 +27,7 @@ class BooleanField extends Field{
     /**
      * {@inheritdoc}
      */
-    public function db_type(){
+    public function db_type($connection){
         return "BOOLEAN";
     }
 

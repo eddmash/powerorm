@@ -111,9 +111,9 @@ class ManyToOneField extends RelatedField{
         return [];
     }
 
-    public function db_type()
+    public function db_type($connection)
     {
-        return $this->relation_field()->db_type();
+        return $this->relation_field()->db_type($connection);
     }
 
     public function contribute_to_class($name, $obj){

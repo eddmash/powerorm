@@ -52,6 +52,10 @@ trait InverseRelation{
     {
         return TRUE;
     }
+
+    public function db_type($connection){
+        return '';
+    }
 }
 
 

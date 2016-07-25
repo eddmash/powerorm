@@ -7,6 +7,7 @@
  */
 
 namespace powerorm\model\field;
+use powerorm\checks\Checks;
 
 
 /**
@@ -33,7 +34,7 @@ class CharField extends Field{
     /**
      * {@inheritdoc}
      */
-    public function db_type(){
+    public function db_type($connection){
         return 'VARCHAR';
     }
 

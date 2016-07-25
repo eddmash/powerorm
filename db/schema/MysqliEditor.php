@@ -14,25 +14,21 @@ namespace powerorm\db\schema;
  * @since 1.1.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class MysqliEditor extends \CI_DB_mysqli_forge implements SchemaEditorInterface
+class MysqliEditor extends BaseEditor implements SchemaEditorInterface
 {
-
-    use BaseEditorTrait;
+    public $sql_delete_fk = 'ALTER TABLE %1$s DROP FOREIGN KEY  %2$s';
+    public $sql_delete_unique = 'ALTER TABLE %1$s DROP INDEX %2$s';
+    public $sql_delete_index = 'DROP INDEX %2$s ON %1$s';
 
     public function create_table($table, $if_not_exists = FALSE, array $attributes = array()){
 
         parent::create_table($table, $if_not_exists , ['ENGINE'=>'InnoDB']);
     }
 
+    public function skip_default(Field $field){
+        $db_type = $field->db_type($this->get_connection());
+        $columns = ['tinyblob', 'blob', 'mediumblob', 'longblob', 'tinytext', 'text', 'mediumtext', 'longtext'];
 
-    public function tpl_drop_fk(){
-        return 'ALTER TABLE %1$s DROP FOREIGN KEY %2$s';
+        return (!$db_type && in_array(strtolower($db_type), $columns));
     }
-
-    public function tpl_alter_column_type($column, $type){
-        return sprintf('MODIFY %1$s %2$s', $column, $type);
-    }
-    
-
-
 }

@@ -73,9 +73,16 @@ class Connection
 
         $this->db = $db = &$CI->db;
         $class = $db->platform();
+        
+        if(!class_exists(POWERORM_BASEPATH.'db/schema/ForgeClass', TRUE)):
+
+            $tpl = sprintf('namespace powerorm\db\schema; class ForgeClass extends \%s{}', $this->forge_class($this->db));
+
+            eval($tpl);
+        endif;
 
         $class =sprintf("%sEditor", ucfirst($class));
-
+        
         require_once(POWERORM_BASEPATH.'db/schema/'.$class.'.php');
 
         $class = sprintf('powerorm\db\schema\%s', $class);
@@ -86,6 +93,21 @@ class Connection
 
     public static function get_queryset($model, $query=NULL, $configs=''){
         return create_queryset($model, $query, $configs);
+    }
+
+    public function forge_class($db){
+        if ( ! empty($db->subdriver))
+        {
+            $driver_path = BASEPATH.'database/drivers/'.$db->dbdriver.'/subdrivers/'.$db->dbdriver.'_'.$db->subdriver.'_forge.php';
+            if (file_exists($driver_path))
+            {
+                require_once($driver_path);
+                return 'CI_DB_'.$db->dbdriver.'_'.$db->subdriver.'_forge';
+            }
+        }
+
+        return 'CI_DB_'.$db->dbdriver.'_forge';
+
     }
 }
 

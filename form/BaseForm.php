@@ -15,7 +15,7 @@ use powerorm\Object;
  * @since 1.0.0
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class BaseForm extends Object
+class BaseForm extends Object implements \IteratorAggregate
 {
     const NON_FIELD_ERRORS = '_all_';
 
@@ -591,6 +591,11 @@ class BaseForm extends Object
         else:
             $this->{$name} = $value;
         endif;
+    }
+    
+    public function getIterator(){
+        $this->setup();
+        return new \ArrayIterator($this->fields);
     }
 
     /**
