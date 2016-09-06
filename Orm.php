@@ -1,15 +1,4 @@
 <?php
-define('POWERORM_BASEPATH', APPPATH . 'libraries/powerorm/src' . DIRECTORY_SEPARATOR);
-
-require_once POWERORM_BASEPATH . "autoloader/Autoloader.php";
-require POWERORM_BASEPATH . 'autoloader/BaseConfig.php';
-require_once POWERORM_BASEPATH . "autoloader/OrmConfig.php";
-
-// setup auto loader
-$loader = new \CodeIgniter\Autoloader\Autoloader();
-$loader->initialize(new \Config\OrmConfig());
-$loader->register();
-
 use eddmash\powerorm\app\Registry;
 use eddmash\powerorm\BaseOrm;
 use eddmash\powerorm\db\Connection;
