@@ -64,7 +64,7 @@
                  - use a custom form you have defined if you pass the form as an argument or 
                  - model to build a form based on a model that already exists.
         
-    - Contributor, DeConstruct interface to provide a consistent way of 
+    - Contributor, DeConstructable interface to provide a consistent way of 
     deconstructing  objects and contributing objects to other objects
 
 ### Improvements and Fixes
@@ -103,7 +103,7 @@
         
          - This removes the need for user to create a migration controller to be able 
          to use the orm just copy the 
-         `pmanger.php` file located at powerorm\bin\pmanger.php to the same directory
+         `pmanger.php` file located at eddmash\powerorm\bin\pmanger.php to the same directory
           as `index.php`
          
          - This also provides a consistent api for adding more commands within the orm

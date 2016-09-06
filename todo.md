@@ -6,6 +6,8 @@
     - relationships
     
 
-Later
+- Later
+
     - Form independent ?
     - optimize migrations
+    - work on cli options parser

@@ -1,4 +1,10 @@
-# powerorm 
+[![Build Status](https://travis-ci.org/eddmash/powerorm.svg?branch=master)](https://travis-ci.org/eddmash/powerorm)
+[![Latest Stable Version](https://poser.pugx.org/eddmash/powerorm/v/stable)](https://packagist.org/packages/eddmash/powerorm)
+[![Total Downloads](https://poser.pugx.org/eddmash/powerorm/downloads)](https://packagist.org/packages/eddmash/powerorm)
+[![Latest Unstable Version](https://poser.pugx.org/eddmash/powerorm/v/unstable)](https://packagist.org/packages/eddmash/powerorm)
+[![License](https://poser.pugx.org/eddmash/powerorm/license)](https://packagist.org/packages/eddmash/powerorm)
+
+# powerorm
 A light weight easy to use CodeIgniter ORM.
 
 # Introduction
@@ -41,4 +47,15 @@ Load the library like any other Codeigniter library.
  - Create forms automatically based on models.
  - All fields visible on the model, no need to look at the database table when you want to interact with the database.
  - Provides database interaction methods
- 
+
+ # Credits
+ I have used the following frameworks as a guiding hand, and in most cases i have replicated Django framework how has
+ approached a problem, and in some cases i have borrowed some source code :
+
+ In order of importance:
+ - Django framework
+ - FuelPHP framework
+ - Yii2 framework
+ - CakePHP framework
+ - Laravel framework
+ - Symfony2 framework
