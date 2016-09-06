@@ -61,9 +61,9 @@ class Connection
     public function load_database($db_configs)
     {
         if (!empty($db_configs)):
-            $this->ci_instance()->load->database($db_configs, false, true); else:
-            $this->ci_instance()->load->database('', false, true);
-        ;
+            $this->ci_instance()->load->database($db_configs, false, true);
+        else:
+            $this->ci_instance()->load->database('', false, true);;
         endif;
     }
 
@@ -86,7 +86,7 @@ class Connection
 
             $tpl = sprintf('namespace eddmash\powerorm\db\schema; class ForgeClass extends \%s{}', $this->forge_class($this->db));
 
-        eval($tpl);
+            eval($tpl);
         endif;
 
         $class = sprintf("%sEditor", ucfirst($class));

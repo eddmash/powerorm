@@ -28,7 +28,7 @@ class StateRegistry extends Registry
 
             foreach ($this->model_states as $name => $state) :
                 $state->to_model($this);
-        endforeach;
+            endforeach;
 
         endif;
 
@@ -183,10 +183,10 @@ class ModelState extends Object
                 // ignore the inverse fields
                 if ($field->is_inverse()):
                     continue;
-        endif;
+                endif;
 
-        $fields[$name] = $field;
-        endforeach;
+                $fields[$name] = $field;
+            endforeach;
         endif;
 
         return new ModelState($model->meta->model_name, $fields);

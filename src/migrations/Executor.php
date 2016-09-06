@@ -39,7 +39,8 @@ class Executor extends Base
     {
         $graph = $this->loader->graph;
         if ($fresh_start):
-            $applied_migrations = []; else:
+            $applied_migrations = [];
+        else:
             $applied_migrations = $this->loader->applied_migrations;
         endif;
 
@@ -49,43 +50,45 @@ class Executor extends Base
 
             if ($node_name == 'zero'):
                 $roots = $this->loader->graph->root_nodes();
-        foreach ($roots as $root) :
+                foreach ($roots as $root) :
                     $descedants = $this->loader->graph->after_lineage($root);
-        foreach ($descedants as $descedant) :
+                    foreach ($descedants as $descedant) :
                         if (in_array($descedant, $applied_migrations)):
                             $plan[] = ['migration' => $graph->nodes[$descedant], 'apply' => false];
-        unset($applied_migrations[$descedant]);
-        endif;
+                            unset($applied_migrations[$descedant]);
+                        endif;
 
-        endforeach;
+                    endforeach;
 
-        endforeach; elseif (in_array($node_name, $applied_migrations)):
+                endforeach;
+            elseif (in_array($node_name, $applied_migrations)):
                 // if its already applied, means we need to un apply i.e.
                 // we need to rollback the migrations up to the state represented by the current target migration
                 // so get its children and roll them back
                 $children = $graph->node_family_tree[$targets[0]]->children;
 
-        foreach ($children as $child) :
+                foreach ($children as $child) :
                     // get any migrations that depend on the current child
                     $after_lineage = $graph->after_lineage($child->name);
 
-        foreach ($after_lineage as $migration_name) :
+                    foreach ($after_lineage as $migration_name) :
                         if (in_array($migration_name, $applied_migrations)):
                             $plan[] = ['migration' => $graph->nodes[$migration_name], 'apply' => false];
                             // remove it from the list
                             unset($applied_migrations[$migration_name]);
-        endif;
-        endforeach;
+                        endif;
+                    endforeach;
 
-        endforeach; else:
+                endforeach;
+            else:
                 $before_lineage = $graph->before_lineage($node_name);
 
-        foreach ($before_lineage as $migration_name) :
+                foreach ($before_lineage as $migration_name) :
                     if (!in_array($migration_name, $applied_migrations)):
                         $plan[] = ['migration' => $graph->nodes[$migration_name], 'apply' => true];
-        endif;
-        endforeach;
-        endif;
+                    endif;
+                endforeach;
+            endif;
         endforeach;
 
         return $plan;
@@ -106,7 +109,7 @@ class Executor extends Base
         foreach ($applied_migrations_name as $item) :
             if (array_key_exists($item, $this->loader->graph->nodes)):
                 $applied_migrations[$item] = $this->loader->graph->nodes[$item];
-        endif;
+            endif;
         endforeach;
 
         $migrations_to_apply = [];
@@ -115,11 +118,12 @@ class Executor extends Base
         foreach ($plan as $item) :
             $migration = $item['migration'];
 
-        if ($item['apply']):
-                $migrations_to_apply[$migration->name] = $item; else:
+            if ($item['apply']):
+                $migrations_to_apply[$migration->name] = $item;
+            else:
 
                 $migrations_to_unapply[$migration->name] = $item;
-        endif;
+            endif;
         endforeach;
 
         // get the migration plan for the whole project
@@ -158,13 +162,14 @@ class Executor extends Base
 
         if (!$fake):
             $state = $migration->apply($state, $this->connection);
-        if ($state):
+            if ($state):
                 $this->recorder->record_applied(['name' => $migration->name]);
-        endif;
-        $this->success(" Success", true); else:
+            endif;
+            $this->success(" Success", true);
+        else:
             // record the migration into the database
             $this->recorder->record_applied(['name' => $migration->name]);
-        $this->success(" ... Faked", true);
+            $this->success(" ... Faked", true);
 
         endif;
         return $state;
@@ -182,13 +187,14 @@ class Executor extends Base
         $this->normal("Unapplying " . $migration);
         if (!$fake):
             $state = $migration->unapply($state, $this->connection);
-        if ($state):
+            if ($state):
                 $this->recorder->record_unapplied(['name' => $migration->name]);
-        endif;
-        $this->success(" ... Success", true); else:
+            endif;
+            $this->success(" ... Success", true);
+        else:
             // record the migration into the database
             $this->recorder->record_unapplied(['name' => $migration->name]);
-        $this->success(" ... Faked", true);
+            $this->success(" ... Faked", true);
 
         endif;
     }
@@ -209,14 +215,15 @@ class Executor extends Base
         foreach ($full_plan as $f_plan) :
             $migration = $f_plan['migration'];
 
-        if (array_key_exists($migration->name, $migrations_to_run)):
+            if (array_key_exists($migration->name, $migrations_to_run)):
                 $state = $this->apply_migration($state, $migration, $fake);
 
                 // remove it from the migrations to run
-                unset($migrations_to_run[$migration->name]); else:
+                unset($migrations_to_run[$migration->name]);
+            else:
                 // mutate state for consistency
                 $migration->update_state($state);
-        endif;
+            endif;
 
         endforeach;
     }
@@ -242,17 +249,17 @@ class Executor extends Base
              */
             if (empty($migrations_to_run)):
                 break;
-        endif;
+            endif;
 
-        $migration = $f_plan['migration'];
+            $migration = $f_plan['migration'];
 
-        if (array_key_exists($migration->name, $migrations_to_run)):
+            if (array_key_exists($migration->name, $migrations_to_run)):
                 //save state before update
                 $back_states_collection[$migration->name] = $state->deep_clone();
 
                 // remove it from the migrations to run
                 unset($migrations_to_run[$migration->name]);
-        endif;
+            endif;
 
             // update the state
             $migration->update_state($state);
@@ -263,7 +270,7 @@ class Executor extends Base
         // rollback now
         foreach ($plan as $item) :
             $migration = $item['migration'];
-        $this->unapply_migration($back_states_collection[$migration->name], $migration, $fake);
+            $this->unapply_migration($back_states_collection[$migration->name], $migration, $fake);
         endforeach;
     }
 }

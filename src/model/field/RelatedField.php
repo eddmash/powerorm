@@ -30,9 +30,10 @@ function lazy_related_operation($callback, $model, $related_models, $kwargs)
     $related_model_names = [];
     foreach ($related_models as $related_model) :
         if ($related_model instanceof BaseModel):
-            $related_model_names[] = $related_model->meta->model_name; else:
+            $related_model_names[] = $related_model->meta->model_name;
+        else:
             $related_model_names[] = $related_model;
-    endif;
+        endif;
     endforeach;
 
     $registry->lazy_model_ops($callback, $related_model_names, $kwargs);
@@ -185,11 +186,11 @@ class RelatedField extends Field
             $callback = function ($related_model, $kwargs) {
                 if (isset($kwargs['field'])):
                     $field = $kwargs['field'];
-                $field->relation->set_model($related_model);
+                    $field->relation->set_model($related_model);
                 endif;
             };
 
-        lazy_related_operation($callback, $this->container_model, [$this->relation->get_model()], ['field' => $this]);
+            lazy_related_operation($callback, $this->container_model, [$this->relation->get_model()], ['field' => $this]);
         endif;
     }
 

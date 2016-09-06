@@ -81,7 +81,7 @@ class Loader extends Object
         $classes = [];
         foreach ($this->get_migrations_files() as $file) :
             list($file_name, $migration_class_name) = $this->migration_class_name($file);
-        $classes[$file_name] = $migration_class_name;
+            $classes[$file_name] = $migration_class_name;
         endforeach;
 
         return $classes;
@@ -118,7 +118,7 @@ class Loader extends Object
         if (!empty($this->connection)):
             $recoder = new Recorder($this->connection);
 
-        $this->applied_migrations = $recoder->get_applied();
+            $this->applied_migrations = $recoder->get_applied();
         endif;
 
         $app_migrations = $this->app_migrations();
@@ -137,7 +137,7 @@ class Loader extends Object
 
                 $this->graph->add_dependency($name, $requires, $migration);
 
-        endforeach;
+            endforeach;
 
         endforeach;
     }
@@ -170,11 +170,12 @@ class Loader extends Object
 
             if (Strings::starts_with($name, $name_prefix)):
                 $results[] = $name;
-        endif;
+            endif;
         endforeach;
 
         if (count($results) > 1):
-            throw new AmbiguityError(sprintf('There is more than one migration with the prefix %s', $name_prefix)); elseif (count($results) == 0):
+            throw new AmbiguityError(sprintf('There is more than one migration with the prefix %s', $name_prefix));
+        elseif (count($results) == 0):
             throw new AmbiguityError(sprintf('There no migrations with the prefix %s', $name_prefix));
         endif;
 

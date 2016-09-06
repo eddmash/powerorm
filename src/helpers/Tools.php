@@ -13,8 +13,7 @@ class Tools
 {
     public static function invoke_callback($callback, $model, $kwargs = [])
     {
-        $callback($model, $kwargs);
-        ;
+        $callback($model, $kwargs);;
     }
 
     /**
@@ -37,8 +36,8 @@ class Tools
 
         if ($indent == false):
             $linebreak = '';
-        $indent_character = '';
-        $indent = 0;
+            $indent_character = '';
+            $indent = 0;
         endif;
 
         if (!empty($start)):
@@ -57,23 +56,24 @@ class Tools
 
             $string_state .= str_repeat($indent_character, $indent);
 
-        $next_indent = ($indent == false) ? $indent : $indent + 1;
+            $next_indent = ($indent == false) ? $indent : $indent + 1;
 
-        if (is_array($value)):
+            if (is_array($value)):
                 // HANDLE VALUE IF ARRAY
 
                 $string_state .= "[" . $linebreak;
 
-        if (!is_numeric($key)):
+                if (!is_numeric($key)):
                     $string_state .= "'$key'=>";
-        endif;
+                endif;
 
-        $string_state .= self::stringify($value, $next_indent, $close, $start, ++$level);
+                $string_state .= self::stringify($value, $next_indent, $close, $start, ++$level);
 
 
-        $string_state .= $linebreak;
-        $string_state .= ($indent != false) ? str_repeat($indent_character, $indent - 1) : '';
-        $string_state .= "]"; elseif (is_object($value)):
+                $string_state .= $linebreak;
+                $string_state .= ($indent != false) ? str_repeat($indent_character, $indent - 1) : '';
+                $string_state .= "]";
+            elseif (is_object($value)):
 
                 // HANDLE VALUE THAT ARE OBJECTS THAT IMPLEMENT DeConstructable interface
 
@@ -81,40 +81,45 @@ class Tools
                     $skel = $value->skeleton();
 
 
-        $class = $skel['full_name'];
+                    $class = $skel['full_name'];
 
-        $constructor_args = $skel['constructor_args'];
+                    $constructor_args = $skel['constructor_args'];
 
-        $string = self::stringify(reset($constructor_args), $next_indent, $close, $start, ++$level);
+                    $string = self::stringify(reset($constructor_args), $next_indent, $close, $start, ++$level);
 
-        $string_state .= sprintf("%1\$s(%2\$s)", $class, $string);
-        endif; else:
+                    $string_state .= sprintf("%1\$s(%2\$s)", $class, $string);
+                endif;
+            else:
 
                 // HANDLE VALUE IF ITS NOT OBJECT OR ARRAY
 
                 $string_state .= (!is_numeric($key)) ? "'$key'=>" : '';
 
-        if ($value === false):
-                    $string_state .= "FALSE"; elseif ($value === true):
-                    $string_state .= "TRUE"; elseif ($value === null):
-                    $string_state .= "NULL"; elseif (is_numeric($value)):
-                    $string_state .= "$value"; else:
+                if ($value === false):
+                    $string_state .= "FALSE";
+                elseif ($value === true):
+                    $string_state .= "TRUE";
+                elseif ($value === null):
+                    $string_state .= "NULL";
+                elseif (is_numeric($value)):
+                    $string_state .= "$value";
+                else:
                     $string_state .= "'$value'";
-        endif;
+                endif;
 
-        endif;
+            endif;
 
 
-        if ($counter != $totalCount && !$level == 0):
+            if ($counter != $totalCount && !$level == 0):
                 $string_state .= ', ' . $linebreak;
-        endif;
+            endif;
 
-        $counter++;
+            $counter++;
         endforeach;
 
         if (!empty($close)):
             $string_state .= $close;
-        $string_state .= $linebreak;
+            $string_state .= $linebreak;
         endif;
 
 

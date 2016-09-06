@@ -48,8 +48,7 @@ class Registry extends Object
     {
         if (!$this->ready):
             return new AppRegistryNotReady("Registry has not been loaded yet.");
-        endif;
-        ;
+        endif;;
     }
 
     /**
@@ -103,19 +102,19 @@ class Registry extends Object
                 // if we cannot create an instance of a class just skip, e.g traits abstrat etc
                 if (!$reflect->isInstantiable()):
                     continue;
-        endif;
+                endif;
 
-        $model = $this->_load_model($model_name);
+                $model = $this->_load_model($model_name);
 
-        if ($model instanceof BaseModel):
+                if ($model instanceof BaseModel):
                     $this->all_models[$this->standard_name($model_name)] = $model;
-        endif;
+                endif;
 
-        if ($model instanceof \CI_Model && !$model instanceof BaseModel):
+                if ($model instanceof \CI_Model && !$model instanceof BaseModel):
                     $this->all_non_orm_models[$this->standard_name($model_name)] = $model;
-        endif;
+                endif;
 
-        endforeach;
+            endforeach;
         endif;
     }
 
@@ -238,9 +237,9 @@ class Registry extends Object
         if (isset($this->_pending_ops[$model->meta->model_name])):
 
             $callbacks = $this->_pending_ops[$model->meta->model_name];
-        foreach ($callbacks as $callback) :
+            foreach ($callbacks as $callback) :
                 Tools::invoke_callback($callback, $model);
-        endforeach;
+            endforeach;
         endif;
     }
 }

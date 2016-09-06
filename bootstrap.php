@@ -7,4 +7,4 @@ $base_dir = dirname(dirname(dirname(dirname(__FILE__))));
 
 require_once "ci_instance.php";
 
-require $base_dir. '/vendor/autoload.php';
+require $base_dir . '/vendor/autoload.php';

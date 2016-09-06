@@ -75,20 +75,21 @@ abstract class ChoiceInputFields extends Input
                 'type' => $this->input_type,
             ]);
 
-        $attrs_['id'] = $attrs_['id'] . '_' . $count;
+            $attrs_['id'] = $attrs_['id'] . '_' . $count;
 
-        if (is_array($value)):
+            if (is_array($value)):
 
                 $sub_widget = new static($attrs_, ['choices' => $value]);
 
-        $output[] = sprintf($this->inner_html, $label, $sub_widget->render($field_name, $checked_choices)); else:
+                $output[] = sprintf($this->inner_html, $label, $sub_widget->render($field_name, $checked_choices));
+            else:
                 $sub_widget = '';
 
-        $output[] = sprintf($this->inner_html,
+                $output[] = sprintf($this->inner_html,
                     $this->render_option($checked_choices, $value, $label, $attrs_), $sub_widget);
-        endif;
+            endif;
 
-        $count++;
+            $count++;
         endforeach;
 
         return sprintf($this->outer_html, $this->flat_attrs($attrs), join(' ', $output));

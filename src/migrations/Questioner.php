@@ -115,21 +115,24 @@ class InteractiveQuestioner extends Questioner
         if ($choice == 1):
 
             $this->normal(PHP_EOL . " Please enter the default value now, as valid PHP", true);
-        $default_val = '';
+            $default_val = '';
 
-        while (true):
+            while (true):
                 $default = strtolower($this->input());
 
-        if (empty($default)):
-                    $this->normal(PHP_EOL . " Please enter some value, or 'exit' (with no quotes) to exit.", true); elseif ($default == 'exit'):
-                    exit; elseif ($default === false):
+                if (empty($default)):
+                    $this->normal(PHP_EOL . " Please enter some value, or 'exit' (with no quotes) to exit.", true);
+                elseif ($default == 'exit'):
+                    exit;
+                elseif ($default === false):
                     $this->error(PHP_EOL . " An error occured while trying to set default value", true);
-        exit; else:
+                    exit;
+                else:
                     $default_val = $default;
-        break;
-        endif;
-        endwhile;
-        return $default_val;
+                    break;
+                endif;
+            endwhile;
+            return $default_val;
         endif;
     }
 
@@ -139,8 +142,8 @@ class InteractiveQuestioner extends Questioner
 
         while (!in_array($input[0], ['y', 'n'])):
             $message = "Please answer with yes / no :";
-        $this->normal($message);
-        $input = strtolower(trim(fgets(STDIN)));
+            $this->normal($message);
+            $input = strtolower(trim(fgets(STDIN)));
         endwhile;
 
         $input = strtolower($input);

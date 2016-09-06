@@ -61,9 +61,9 @@ class DropField extends Operation
         foreach ($model_state->fields as $field_name => $field_object) :
             if ($field_name !== $this->field_name):
                 continue;
-        endif;
+            endif;
 
-        $new_model_fields[$field_name] = $field_object;
+            $new_model_fields[$field_name] = $field_object;
         endforeach;
 
         $state->get_model($this->model_name)->fields = $new_model_fields;

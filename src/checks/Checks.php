@@ -47,13 +47,13 @@ class Checks
 
             if (!$model_obj->has_method('check')):
                 continue;
-        endif;
+            endif;
 
-        $checks = $model_obj->check();
+            $checks = $model_obj->check();
 
-        foreach ($checks as $check) :
+            foreach ($checks as $check) :
                 $this->registered_checks[] = $check;
-        endforeach;
+            endforeach;
 
         endforeach;
     }

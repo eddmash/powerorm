@@ -53,13 +53,13 @@ abstract class BaseEditor extends ForgeClass
 
             if ($field->is_unique()):
                 $unique_fields[] = $field;
-        endif;
+            endif;
 
-        $sql_def = $this->column_sql($field);
+            $sql_def = $this->column_sql($field);
 
-        if (!empty($sql_def)):
+            if (!empty($sql_def)):
                 $fields[$field->db_column_name()] = $sql_def;
-        endif;
+            endif;
         endforeach;
 
         $this->_add_field_create($fields);
@@ -79,16 +79,16 @@ abstract class BaseEditor extends ForgeClass
         foreach ($model->meta->relations_fields as $name => $relation_field) :
             if ($relation_field->inverse || $relation_field->M2M || !$relation_field->db_constraint):
                 continue;
-        endif;
+            endif;
 
-        $this->add_fk_constraint($model, $relation_field);
+            $this->add_fk_constraint($model, $relation_field);
         endforeach;
 
         // many to many
         foreach ($model->meta->relations_fields as $name => $relation_field) :
             if ($relation_field->M2M && $relation_field->relation->through->meta->auto_created):
                 $this->create_model($relation_field->relation->through);
-        endif;
+            endif;
         endforeach;
     }
 
@@ -105,7 +105,7 @@ abstract class BaseEditor extends ForgeClass
         foreach ($model->meta->relations_fields as $name => $field) :
             if ($field->M2M && $field->relation->through->auto_created):
                 $this->_table_drop($field->relation->through);
-        endif;
+            endif;
         endforeach;
 
         $this->_table_drop($model);
@@ -124,7 +124,7 @@ abstract class BaseEditor extends ForgeClass
         // many to many
         if ($field->M2M && $field->relation->through->meta->auto_created):
             $this->create_model($field->relation->through);
-        return;
+            return;
         endif;
 
         $sql_def = $this->column_sql($field);
@@ -165,7 +165,7 @@ abstract class BaseEditor extends ForgeClass
         // if we created a table for m2m
         if ($field->M2M && $field->relation->through->meta->auto_created):
             $this->drop_model($field->relation->through);
-        return;
+            return;
         endif;
 
         if ($field->is_relation):
@@ -280,17 +280,17 @@ abstract class BaseEditor extends ForgeClass
         if ($previous_field->primary_key && $present_field->primary_key && $present_type !== $previous_type):
             $pointing_to_us = $model->meta->get_reverse_fields();
 
-        if (!empty($pointing_to_us)):
+            if (!empty($pointing_to_us)):
                 foreach ($pointing_to_us as $rels) :
 
                     if ($rels->M2M):
                         continue;
-        endif;
+                    endif;
 
                     // drop them for now.
                     $this->drop_constraint($this->sql_delete_fk, $rels->container_model, $rels, 'fk');
-        endforeach;
-        endif;
+                endforeach;
+            endif;
         endif;
 
 
@@ -315,14 +315,14 @@ abstract class BaseEditor extends ForgeClass
         if ($present_field->db_column_name() !== $previous_field->db_column_name()):
             $altered_attrs = [];
 
-        $altered_attrs [$previous_field->db_column_name()] = [
+            $altered_attrs [$previous_field->db_column_name()] = [
                 'name' => $present_field->db_column_name(),
                 'type' => $previous_type,
                 'constraint' => $previous_field->max_length,
                 'null' => $previous_field->null, // be explicit because of how forge modify_column works
             ];
 
-        $this->_modify_field($model, $altered_attrs);
+            $this->_modify_field($model, $altered_attrs);
 
         endif;
 
@@ -398,13 +398,13 @@ abstract class BaseEditor extends ForgeClass
         if (!empty($alter_actions) || !empty($null_actions)):
             if (!$four_way_default_alteration):
                 $alter_actions = array_merge($alter_actions, $null_actions);
-        endif;
+            endif;
 
-        foreach ($alter_actions as $alter_action) :
+            foreach ($alter_actions as $alter_action) :
                 $this->_modify_field($model, $alter_action);
-        endforeach;
+            endforeach;
 
-        if ($four_way_default_alteration):
+            if ($four_way_default_alteration):
 
                 // update other fields with the default
                 $statement = sprintf($this->sql_update_with_default,
@@ -412,13 +412,13 @@ abstract class BaseEditor extends ForgeClass
                     $this->_escape_identifiers($present_field->db_column_name()),
                     $new_default
                 );
-        $this->_query($statement);
+                $this->_query($statement);
 
                 // run the null actions
                 foreach ($null_actions as $null_action) :
                     $this->_modify_field($model, $null_action);
-        endforeach;
-        endif;
+                endforeach;
+            endif;
         endif;
 
 
@@ -448,7 +448,7 @@ abstract class BaseEditor extends ForgeClass
 
             $rel_field = $rel_to_update->relation_field();
 
-        $alter_statement = [
+            $alter_statement = [
                 $rel_to_update->db_column_name() => [
                     'type' => $rel_field->db_type($this->get_connection()),
                     'constraint' => $rel_field->max_length,
@@ -456,7 +456,7 @@ abstract class BaseEditor extends ForgeClass
                 ]
             ];
 
-        $this->_modify_field($rel_to_update->container_model, $alter_statement);
+            $this->_modify_field($rel_to_update->container_model, $alter_statement);
         endforeach;
 
         // did we become a relationship field or do we need to make it a db_constraint ?
@@ -471,17 +471,17 @@ abstract class BaseEditor extends ForgeClass
         // rebuild the fks we dropped in the beginning
         if ($present_field->primary_key && $previous_field->primary_key && $present_type !== $previous_type):
             $pointing_to_us = $model->meta->get_reverse_fields();
-        if (!empty($pointing_to_us)):
+            if (!empty($pointing_to_us)):
                 foreach ($pointing_to_us as $rels) :
                     if ($rels->M2M):
                         continue;
-        endif;
+                    endif;
 
                     // add them back.
                     $this->add_fk_constraint($rels->container_model, $rels);
-        endforeach;
+                endforeach;
 
-        endif;
+            endif;
         endif;
     }
 
@@ -526,7 +526,7 @@ abstract class BaseEditor extends ForgeClass
 
                 $sql['default'] = $this->prepare_default($field);
 
-        endif;
+            endif;
 
         endif;
 
@@ -578,7 +578,8 @@ abstract class BaseEditor extends ForgeClass
     public function effective_default(Field $field)
     {
         if ($field->has_default()):
-            $default = $field->get_default(); else:
+            $default = $field->get_default();
+        else:
             $default = NOT_PROVIDED::instance();
         endif;
 

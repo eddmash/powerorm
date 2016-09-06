@@ -34,9 +34,9 @@ class Makemigrations extends Command
 
         if (!empty($issues)):
             $message = "The following migrations seem to indicate they are both the latest migration :" . PHP_EOL;
-        $message .= " %s " . PHP_EOL;
-        $this->error(sprintf($message, Tools::stringify($issues)));
-        exit;
+            $message .= " %s " . PHP_EOL;
+            $this->error(sprintf($message, Tools::stringify($issues)));
+            exit;
         endif;
 
         $autodetector = new AutoDetector($loader->get_project_state(),
@@ -48,16 +48,16 @@ class Makemigrations extends Command
 
         if (empty($changes)):
             $this->normal("No changes were detected" . PHP_EOL);
-        exit;
+            exit;
         endif;
 
         if (in_array("--dry-run", $arg_opts)):
             $this->info("Migrations :" . PHP_EOL);
 
-        foreach ($changes as $migration) :
+            foreach ($changes as $migration) :
                 $this->normal("\t --" . $migration->name . PHP_EOL);
-        endforeach;
-        exit;
+            endforeach;
+            exit;
         endif;
 
         $this->_write_migrations($changes);
@@ -70,18 +70,18 @@ class Makemigrations extends Command
 
             $content = $migration->as_string();
 
-        $file_name = $migration->name;
-        $this->normal("  " . $file_name . ".php", true);
+            $file_name = $migration->name;
+            $this->normal("  " . $file_name . ".php", true);
 
-        foreach ($migration->operations as $op) :
+            foreach ($migration->operations as $op) :
                 $this->normal(sprintf("   - %s", ucwords($op->describe())), true);
-        endforeach;
+            endforeach;
 
 
             // write content to file.
             $handler = new FileHandler(BaseOrm::get_migrations_path(), $file_name);
 
-        $handler->write($content);
+            $handler->write($content);
         endforeach;
     }
 

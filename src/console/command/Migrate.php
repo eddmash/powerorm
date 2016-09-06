@@ -36,7 +36,8 @@ class Migrate extends Command
 
         if ($name === '--fake' || in_array('--fake', $arg_opts)):
             $fake = true;
-        $name = null; else:
+            $name = null;
+        else:
             $fake = false;
         endif;
 
@@ -49,9 +50,11 @@ class Migrate extends Command
         if (!empty($name)):
             if ($name == 'zero'):
                 //todo confirm the migration exists
-                $target = [$name]; else:
+                $target = [$name];
+            else:
                 $target = $executor->loader->get_migration_by_prefix($name);
-        endif; else:
+            endif;
+        else:
             $target = $executor->loader->graph->leaf_nodes();
         endif;
 
@@ -69,17 +72,18 @@ class Migrate extends Command
             //detect if a makemigrations is required
             $auto_detector = new AutoDetector($executor->loader->get_project_state(), ProjectState::from_apps($registry));
 
-        $changes = $auto_detector->changes($executor->loader->graph);
+            $changes = $auto_detector->changes($executor->loader->graph);
 
-        if (!empty($changes)):
+            if (!empty($changes)):
 
                 $this->warning("  Your models have changes that are not yet reflected " .
                     "in a migration, and so won't be applied.", true);
 
-        $this->warning("  Run 'manage.py makemigrations' to make new " .
+                $this->warning("  Run 'manage.py makemigrations' to make new " .
                     "migrations, and then re-run 'manage.py migrate' to apply them.", true);
 
-        endif; else:
+            endif;
+        else:
 
             // migrate
             $executor->migrate($target, $plan, $fake);

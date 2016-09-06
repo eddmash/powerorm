@@ -17,31 +17,31 @@ function fields_from_model($model, $required_fields, $excludes, $widgets, $label
     foreach ($model_fields as $name => $obj) :
         if (in_array($name, $excludes)):
             continue;
-    endif;
+        endif;
 
-    if (!empty($required_fields) && !in_array($name, $required_fields)):
+        if (!empty($required_fields) && !in_array($name, $required_fields)):
             continue;
-    endif;
-    $kwargs = [];
-    if (!empty($widgets) && array_key_exists($name, $widgets)):
+        endif;
+        $kwargs = [];
+        if (!empty($widgets) && array_key_exists($name, $widgets)):
             $kwargs['widget'] = $widgets[$name];
 
-    endif;
+        endif;
 
-    if (!empty($labels) && array_key_exists($name, $labels)):
+        if (!empty($labels) && array_key_exists($name, $labels)):
             $kwargs['label'] = $labels[$name];
-    endif;
+        endif;
 
 
-    if (!empty($help_texts) && array_key_exists($name, $help_texts)):
+        if (!empty($help_texts) && array_key_exists($name, $help_texts)):
             $kwargs['help_text'] = $help_texts[$name];
-    endif;
+        endif;
 
-    if (!empty($field_classes) && array_key_exists($name, $field_classes)):
+        if (!empty($field_classes) && array_key_exists($name, $field_classes)):
             $kwargs['form_class'] = $field_classes[$name];
-    endif;
+        endif;
 
-    $fields[$name] = $obj->formfield();
+        $fields[$name] = $obj->formfield();
     endforeach;
 
 
@@ -68,9 +68,9 @@ class BaseModelForm extends BaseForm
             // if field is already in the fields, that takes precedence over model field name
             if (array_key_exists($name, $this->fields)):
                 continue;
-        endif;
+            endif;
 
-        $this->{$name} = $value;
+            $this->{$name} = $value;
         endforeach;
 
         parent::setup();
@@ -86,7 +86,7 @@ class BaseModelForm extends BaseForm
 
         if (is_string($this->model)):
             Orm::ci_instance()->load->model($this->model);
-        $this->model = Orm::ci_instance()->{$this->model};
+            $this->model = Orm::ci_instance()->{$this->model};
         endif;
 
         return $this;

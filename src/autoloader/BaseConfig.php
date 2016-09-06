@@ -1,7 +1,7 @@
 <?php
 namespace CodeIgniter\Config;
 
-/**
+    /**
      * Borrowed from CodeIgniter 4.
      *
      * CodeIgniter

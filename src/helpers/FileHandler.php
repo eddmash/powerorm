@@ -43,9 +43,9 @@ class FileHandler extends Object
         $file_handle = fopen($file, "w");
         if ($file_handle):
             fprintf($file_handle, $content);
-        fclose($file_handle);
+            fclose($file_handle);
 
-        chmod($file, 0777);
+            chmod($file, 0777);
 
         endif;
     }
@@ -64,9 +64,9 @@ class FileHandler extends Object
 
         foreach ($files as $file) :
             $file_name = $file->getBaseName('.' . $ext);
-        if ($this->standard_name($file_name) == $name && $file->getExtension() == $ext):
+            if ($this->standard_name($file_name) == $name && $file->getExtension() == $ext):
                 return $file;
-        endif;
+            endif;
 
         endforeach;
 
@@ -107,14 +107,15 @@ class FileHandler extends Object
         foreach ($dirIterator as $file) :
             if ($file->isDot()):
                 continue;
-        endif;
+            endif;
 
-        if ($file->isDir() && $recurse):
+            if ($file->isDir() && $recurse):
                 foreach ($file as $inner_file) :
                     $file_list = $this->_add_file($file_list, $inner_file, $ext, $file_obj);
-        endforeach; else:
+                endforeach;
+            else:
                 $file_list = $this->_add_file($file_list, $file, $ext, $file_obj);
-        endif;
+            endif;
         endforeach;
 
         return $file_list;
@@ -125,17 +126,19 @@ class FileHandler extends Object
         if (!empty($ext)):
             if ($ext == $file->getExtension()):
                 if ($file_obj):
-                    $file_list[] = clone $file; else:
+                    $file_list[] = clone $file;
+                else:
                     $file_list[] = $file->getPathname();
-        endif;
-        endif;
+                endif;
+            endif;
 
-        return $file_list;
+            return $file_list;
         endif;
 
         // add everything
         if ($file_obj):
-            $file_list[] = clone $file; else:
+            $file_list[] = clone $file;
+        else:
             $file_list[] = $file->getPathname();
         endif;
 

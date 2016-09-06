@@ -92,16 +92,17 @@ class Select extends Widget
 
                 $output[] = sprintf('<optgroup label="%s">', $label);
 
-        foreach ($value as $c_label => $c_value) :
+                foreach ($value as $c_label => $c_value) :
 
                     $output[] = $this->render_option($selected_choices, $c_value, $c_label);
 
-        endforeach;
+                endforeach;
 
-        $output[] = '</optgroup>'; else:
+                $output[] = '</optgroup>';
+            else:
 
                 $output[] = $this->render_option($selected_choices, $value, $label);
-        endif;
+            endif;
 //
         endforeach;
 
