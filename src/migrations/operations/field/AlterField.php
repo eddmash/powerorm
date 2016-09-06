@@ -79,8 +79,7 @@ class AlterField extends Operation
     {
         if (false === $this->preserve_default):
             $field = $this->field;
-            $field->default = new NOT_PROVIDED;
-        else:
+        $field->default = new NOT_PROVIDED; else:
             $field = $this->field;
         endif;
 
@@ -95,7 +94,7 @@ class AlterField extends Operation
 
             if (array_key_exists('preserve_default', $arg) && $arg['preserve_default'] === true):
                 unset($arg['preserve_default']);
-            endif;
+        endif;
         endforeach;
 
 

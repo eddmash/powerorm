@@ -77,10 +77,9 @@ abstract class Widget extends Object
         $str_attrs = '';
         foreach ($attrs as $key => $attr) :
             if ($attrs === true || $attrs === false):
-                $str_attrs .= ' ' . $key;
-            else:
+                $str_attrs .= ' ' . $key; else:
                 $str_attrs .= sprintf(' %1$s = %2$s', $key, $attr);
-            endif;
+        endif;
         endforeach;
 
         return $str_attrs;

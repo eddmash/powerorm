@@ -207,8 +207,7 @@ class BaseForm extends Object implements \IteratorAggregate
 
         // create a multipart form or a normal form
         if ($this->_is_multipart()):
-            $form_open = form_open_multipart($action, $attributes, $hidden);
-        else:
+            $form_open = form_open_multipart($action, $attributes, $hidden); else:
             $form_open = form_open($action, $attributes, $hidden);
         endif;
 
@@ -435,7 +434,7 @@ class BaseForm extends Object implements \IteratorAggregate
         foreach ($this->fields as $name => $field) :
             if ($field->is_hidden()):
                 $hidden_fields[$name] = $field;
-            endif;
+        endif;
         endforeach;
 
         return $hidden_fields;
@@ -447,7 +446,7 @@ class BaseForm extends Object implements \IteratorAggregate
         foreach ($this->fields as $name => $field) :
             if (!$field->is_hidden()):
                 $visible_fields[$name] = $field;
-            endif;
+        endif;
         endforeach;
 
         return $visible_fields;
@@ -469,7 +468,7 @@ class BaseForm extends Object implements \IteratorAggregate
     {
         if (empty($this->validator)):
             Orm::ci_instance()->load->library('form_validation');
-            $this->validator = Orm::ci_instance()->form_validation;
+        $this->validator = Orm::ci_instance()->form_validation;
         endif;
 
         return $this->validator;
@@ -486,41 +485,39 @@ class BaseForm extends Object implements \IteratorAggregate
             // if field has failed validation, no need to go on
             if (array_key_exists($name, $this->_errors)):
                 continue;
-            endif;
+        endif;
 
-            if ($field->disabled):
-                $value = array_key_exists($name, $this->initial) ? $this->initial[$name] : $field->initial;
-            else:
+        if ($field->disabled):
+                $value = array_key_exists($name, $this->initial) ? $this->initial[$name] : $field->initial; else:
                 if (array_key_exists($name, $this->cleaned_data)):
 
-                    $value = $field->widget->value_from_data_collection($this->cleaned_data, $name);
-                else:
+                    $value = $field->widget->value_from_data_collection($this->cleaned_data, $name); else:
                     $value = $field->data();
-                endif;
-            endif;
+        endif;
+        endif;
 
-            try {
-                // run default field validations
+        try {
+            // run default field validations
                 $field->clean($value);
 
                 // just in case,  confirm the field has not field validation already
                 if (!array_key_exists($name, $this->_errors)):
                     $this->cleaned_data[$name] = $value;
-                endif;
+            endif;
 
                 // run custom validation by user
                 $field_clean_method = sprintf('clean_%s', $name);
-                if ($this->has_method($field_clean_method)):
+            if ($this->has_method($field_clean_method)):
                     $value = call_user_func([$this, $field_clean_method]);
-                    $this->cleaned_data[$name] = $value;
-                endif;
-            } catch (ValidationError $e) {
-                $this->add_error($name, $e);
+            $this->cleaned_data[$name] = $value;
+            endif;
+        } catch (ValidationError $e) {
+            $this->add_error($name, $e);
 
-                if (array_key_exists($name, $this->cleaned_data)):
+            if (array_key_exists($name, $this->cleaned_data)):
                     unset($this->cleaned_data[$name]);
-                endif;
-            }
+            endif;
+        }
 
         endforeach;
     }
@@ -553,7 +550,7 @@ class BaseForm extends Object implements \IteratorAggregate
         foreach ($this->fields as $field) :
             if ($field->widget->needs_multipart_form):
                 return true;
-            endif;
+        endif;
         endforeach;
     }
 
@@ -574,10 +571,9 @@ class BaseForm extends Object implements \IteratorAggregate
 
         foreach ($this->fields as $name => $field) :
             if ($field->is_hidden()):
-                $hidden_output[] = (string)$field;
-            else:
+                $hidden_output[] = (string)$field; else:
                 $output[] = sprintf($row, $field->label_tag(), $field, $field->help_text);
-            endif;
+        endif;
         endforeach;
 
         // add errors to the top
@@ -591,8 +587,7 @@ class BaseForm extends Object implements \IteratorAggregate
     protected function _field_setup($name, $value)
     {
         if ($value instanceof Contributor):
-            $value->contribute_to_class($name, $this);
-        else:
+            $value->contribute_to_class($name, $this); else:
             $this->{$name} = $value;
         endif;
     }

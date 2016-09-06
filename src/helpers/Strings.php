@@ -8,7 +8,7 @@
 
 namespace eddmash\powerorm\helpers;
 
-    /**
+/**
      * some method borrowed from Yii\helpers\BaseStringHelper
      * Part of the Yii framework.
      *

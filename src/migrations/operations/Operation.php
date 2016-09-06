@@ -59,12 +59,12 @@ abstract class Operation extends Object implements DeConstructable
 
         if (Strings::starts_with($this->full_class_name(), 'eddmash\powerorm\migrations\operations\model')):
             $alias = 'model_operations';
-            $path = sprintf('eddmash\powerorm\migrations\operations\model as %s', $alias);
+        $path = sprintf('eddmash\powerorm\migrations\operations\model as %s', $alias);
         endif;
 
         if (Strings::starts_with($this->full_class_name(), 'eddmash\powerorm\migrations\operations\field')):
             $alias = 'field_operations';
-            $path = sprintf('eddmash\powerorm\migrations\operations\field as %s', $alias);
+        $path = sprintf('eddmash\powerorm\migrations\operations\field as %s', $alias);
         endif;
 
         return [

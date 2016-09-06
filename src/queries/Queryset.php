@@ -246,7 +246,7 @@ class Queryset extends Object implements QuerysetAccess, Query
         $conds = [];
         foreach ($conditions as $key => $value) :
             $key = sprintf("%s__not", $key);
-            $conds[$key] = $value;
+        $conds[$key] = $value;
         endforeach;
 
         $this->_filter($conds);
@@ -293,12 +293,12 @@ class Queryset extends Object implements QuerysetAccess, Query
 
             $direction = strtoupper($direction);
 
-            if (!in_array($direction, ['ASC', 'DESC', 'RANDOM'])):
+        if (!in_array($direction, ['ASC', 'DESC', 'RANDOM'])):
                 throw new ValueError(
                     sprintf('order_by() expects either ASC, DESC, RANDOM as ordering direction, but got %s', $direction));
-            endif;
+        endif;
 
-            $this->_query_builder->order_by($field, $direction);
+        $this->_query_builder->order_by($field, $direction);
         endforeach;
 
 
@@ -329,16 +329,15 @@ class Queryset extends Object implements QuerysetAccess, Query
         foreach ($condition as $cond) :
             if (!$this->model->has_property($cond)):
                 $not_found[] = $cond;
-                continue;
-            endif;
-            if ($this->model->meta->get_field($cond)->is_relation):
+        continue;
+        endif;
+        if ($this->model->meta->get_field($cond)->is_relation):
                 $field_obj = $this->model->meta->relations_fields[$cond];
 
-                $new_cond[] = $field_obj->db_column_name();
-            else:
+        $new_cond[] = $field_obj->db_column_name(); else:
 
                 $new_cond[] = $cond;
-            endif;
+        endif;
         endforeach;
 
         if (!empty($not_found)):
@@ -397,7 +396,7 @@ class Queryset extends Object implements QuerysetAccess, Query
     {
         if ($this->is_chaining()):
             $this->fetch_type = self::FETCH_FIRST;
-            return $this;
+        return $this;
         endif;
 
         return $this->_filter([], self::FETCH_FIRST);
@@ -419,7 +418,7 @@ class Queryset extends Object implements QuerysetAccess, Query
     {
         if ($this->is_chaining()):
             $this->fetch_type = self::FETCH_LAST;
-            return $this;
+        return $this;
         endif;
         return $this->_filter([], self::FETCH_LAST);
     }
@@ -500,21 +499,21 @@ class Queryset extends Object implements QuerysetAccess, Query
         foreach ($conditions as $condition) :
             $inner_rel = [];
 
-            $condition_size = strlen($condition);
-            $sep_size = strlen(self::RELATIONS_LOOK_SEP);
+        $condition_size = strlen($condition);
+        $sep_size = strlen(self::RELATIONS_LOOK_SEP);
 
-            if ($occurs = strpos($condition, self::RELATIONS_LOOK_SEP)):
+        if ($occurs = strpos($condition, self::RELATIONS_LOOK_SEP)):
 
                 $relation = substr($condition, 0, $occurs);
 
 
-                $inner_rel = $this->_prepare_with([substr($condition, $occurs + $sep_size, $condition_size)]);
+        $inner_rel = $this->_prepare_with([substr($condition, $occurs + $sep_size, $condition_size)]);
 
-                $condition = $relation;
+        $condition = $relation;
 
-            endif;
+        endif;
 
-            $with[$condition] = $inner_rel;
+        $with[$condition] = $inner_rel;
 
         endforeach;
 
@@ -555,7 +554,7 @@ class Queryset extends Object implements QuerysetAccess, Query
         if (!in_array($this->model->meta->db_table, $this->_from_cache)):
             $this->_from_cache[] = $this->model->meta->db_table;
 
-            $this->_query_builder->from($this->model->meta->db_table);
+        $this->_query_builder->from($this->model->meta->db_table);
         endif;
 
         $this->_filter_cache = $this->_validate_conditions('filter', $conditions);
@@ -577,16 +576,15 @@ class Queryset extends Object implements QuerysetAccess, Query
     protected function _size()
     {
         if ($this->_evaluated):
-            $size = count($this->_results_cache);
-        else:
+            $size = count($this->_results_cache); else:
             $this->_setup_filters();
 
             // setup eager relations
             if ($this->eager_fetch):
                 $this->_eager_fetch();
-            endif;
+        endif;
 
-            $size = $this->_query_builder->count_all_results('', false);
+        $size = $this->_query_builder->count_all_results('', false);
         endif;
 
         return $size;
@@ -596,7 +594,7 @@ class Queryset extends Object implements QuerysetAccess, Query
     {
         if (empty($this->_results_cache)):
             $this->_query_builder = $this->_profiler_ready($this->_query_builder);
-            $this->_query_builder->initialize();
+        $this->_query_builder->initialize();
 
             // setup select statement
             $this->_setup_select();
@@ -607,22 +605,22 @@ class Queryset extends Object implements QuerysetAccess, Query
             // setup eager relations
             if ($this->eager_fetch):
                 $this->_eager_fetch();
-            endif;
+        endif;
 
-            $this->sql_cache = $this->sql();
+        $this->sql_cache = $this->sql();
 
-            $results = $this->_fetch_data();
+        $results = $this->_fetch_data();
 
-            $this->_evaluated = true;
+        $this->_evaluated = true;
 
-            $populated_results = $this->_populate($results);
+        $populated_results = $this->_populate($results);
 
-            if ($this->_defered_eager):
+        if ($this->_defered_eager):
                 $this->_resolve_defered_eager($populated_results, $this->_defered_eager_relation);
-            endif;
+        endif;
 
-            $this->_results_cache = $populated_results;
-            $this->_query_builder->close();
+        $this->_results_cache = $populated_results;
+        $this->_query_builder->close();
 
         endif;
 
@@ -678,16 +676,16 @@ class Queryset extends Object implements QuerysetAccess, Query
         foreach ($class_info['related_klass_infos'] as $related_klass_info) :
             $rel_field = $related_klass_info['field'];
 
-            $this->_join_cache[] = $rel_field->name;
+        $this->_join_cache[] = $rel_field->name;
 
-            if ($this->_should_defer_eager($rel_field)):
+        if ($this->_should_defer_eager($rel_field)):
                 $this->_defered_eager_relation[] = $rel_field;
-                $this->_defered_eager = true;
-            endif;
+        $this->_defered_eager = true;
+        endif;
 
-            if (!in_array($rel_field->name, $this->_join_cache)):
+        if (!in_array($rel_field->name, $this->_join_cache)):
                 $this->_join_sql($this->model, $rel_field);
-            endif;
+        endif;
         endforeach;
     }
 
@@ -714,12 +712,11 @@ class Queryset extends Object implements QuerysetAccess, Query
     {
         if ($field->is_inverse()):
             $owner_model = $field->relation->get_model();
-            $inverse_model = $model;
-            $join_table = $owner_model->meta->db_table;
-        else:
+        $inverse_model = $model;
+        $join_table = $owner_model->meta->db_table; else:
             $owner_model = $model;
-            $inverse_model = $field->relation->get_model();
-            $join_table = $inverse_model->meta->db_table;
+        $inverse_model = $field->relation->get_model();
+        $join_table = $inverse_model->meta->db_table;
         endif;
 
         $inverse_model_pk = $inverse_model->meta->primary_key;
@@ -756,7 +753,7 @@ class Queryset extends Object implements QuerysetAccess, Query
 
         foreach ($default_fields as $index => $name) :
             $select[] = $name;
-            $select_fields[] = $index;
+        $select_fields[] = $index;
         endforeach;
 
         $class_info = [
@@ -788,8 +785,8 @@ class Queryset extends Object implements QuerysetAccess, Query
         foreach ($model->meta->fields as $field) :
             if ($field->is_inverse()):
                 continue;
-            endif;
-            $columns[] = $this->_select_field($model, $field);
+        endif;
+        $columns[] = $this->_select_field($model, $field);
         endforeach;
 
 
@@ -819,35 +816,35 @@ class Queryset extends Object implements QuerysetAccess, Query
             // ensure the field was eager loaded
             if (!$this->_is_requested_relation($field, $requested_fields)):
                 continue;
-            endif;
+        endif;
 
-            $field_model = $field->relation->get_model();
-            $class_info = [
+        $field_model = $field->relation->get_model();
+        $class_info = [
                 'model' => $field_model,
                 'field' => $field
             ];
 
-            $rel_fields = $this->_get_default_fields($field_model);
+        $rel_fields = $this->_get_default_fields($field_model);
 
-            $select_fields = [];
+        $select_fields = [];
 
             //remember array start at zero
             $count_select = count($select) - 1;
-            foreach ($rel_fields as $index => $name) :
+        foreach ($rel_fields as $index => $name) :
                 $count_select++; // increment the count with each loop
                 $select[] = $name;
-                $select_fields[] = $count_select;
-            endforeach;
+        $select_fields[] = $count_select;
+        endforeach;
 
-            $class_info['select_fields'] = $select_fields;
+        $class_info['select_fields'] = $select_fields;
 
             // adjust requested fields to get any relation that go deeper that is follow user->role
 
             $next_relation = $requested_fields[$field->name];
-            $class_info['related_klass_infos'] = $this->_get_related_selection($select, $field_model, $next_relation);
+        $class_info['related_klass_infos'] = $this->_get_related_selection($select, $field_model, $next_relation);
 
 
-            $related_class_infos[] = $class_info;
+        $related_class_infos[] = $class_info;
         endforeach;
 
         return $related_class_infos;
@@ -884,8 +881,7 @@ class Queryset extends Object implements QuerysetAccess, Query
 
             foreach ($results_data as $item) :
                 $results[] = $this->_populate_model($primary_class, $item, $class_info, $select);
-            endforeach;
-        else:
+        endforeach; else:
             $results = $this->_populate_model($primary_class, $results_data, $class_info, $select);
         endif;
 
@@ -907,11 +903,11 @@ class Queryset extends Object implements QuerysetAccess, Query
     {
         foreach ($class_info['related_klass_infos'] as $related_klass_info) :
             $rel_model = $related_klass_info['model'];
-            $rel_field = $related_klass_info['field'];
+        $rel_field = $related_klass_info['field'];
 
 
-            $rel_obj = $this->_populate_model($rel_model->full_class_name(), $results, $related_klass_info, $select);
-            $primary_model->{$rel_field->get_cache_name()} = $rel_obj;
+        $rel_obj = $this->_populate_model($rel_model->full_class_name(), $results, $related_klass_info, $select);
+        $primary_model->{$rel_field->get_cache_name()} = $rel_obj;
         endforeach;
 
         return $primary_model;
@@ -928,11 +924,11 @@ class Queryset extends Object implements QuerysetAccess, Query
 
                 $field_name = $select[$fields_position];
 
-                $aliased_field_name = (strpos($field_name, ".")) ? str_replace('.', '_', $field_name) : $field_name;
-                $field_name = ($pos = strpos($field_name, ".")) ? substr($field_name, $pos + 1) : $field_name;
+        $aliased_field_name = (strpos($field_name, ".")) ? str_replace('.', '_', $field_name) : $field_name;
+        $field_name = ($pos = strpos($field_name, ".")) ? substr($field_name, $pos + 1) : $field_name;
 
-                $model_values[$field_name] = $data_item[$aliased_field_name];
-            endif;
+        $model_values[$field_name] = $data_item[$aliased_field_name];
+        endif;
         endforeach;
 
         return $model_values;
@@ -978,16 +974,16 @@ class Queryset extends Object implements QuerysetAccess, Query
 
             if ($create_connection):
                 $this->_query_builder->initialize();
-            endif;
+        endif;
 
-            $this->_create_filter()->clause($this->_filter_cache);
+        $this->_create_filter()->clause($this->_filter_cache);
 
             // reset the cache filter
             $this->_filter_cache = [];
 
-            if ($create_connection):
+        if ($create_connection):
                 $this->_query_builder->close();
-            endif;
+        endif;
 
         endif;
     }
@@ -998,8 +994,8 @@ class Queryset extends Object implements QuerysetAccess, Query
 
             $conn_id = $this->model->meta->model_name . '_' . uniqid();
 
-            Orm::ci_instance()->{$conn_id} = $query;
-            $query = Orm::ci_instance()->{$conn_id};
+        Orm::ci_instance()->{$conn_id} = $query;
+        $query = Orm::ci_instance()->{$conn_id};
 
         endif;
 
@@ -1047,7 +1043,7 @@ class Queryset extends Object implements QuerysetAccess, Query
 
         if (count($this->_results_cache) > self::REPR_OUTPUT_SIZE):
             $results_to_reps = array_slice($this->_results_cache, 0, self::REPR_OUTPUT_SIZE);
-            $results_to_reps[] = "...(remaining elements truncated)...";
+        $results_to_reps[] = "...(remaining elements truncated)...";
         endif;
 
         $string = implode(', ', $results_to_reps);

@@ -85,7 +85,7 @@ class AddField extends Operation
 
             if (array_key_exists('preserve_default', $arg) && $arg['preserve_default'] === true):
                 unset($arg['preserve_default']);
-            endif;
+        endif;
         endforeach;
 
 

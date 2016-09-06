@@ -41,10 +41,9 @@ class BooleanField extends Field
         if (!empty($this->choices)):
             if (empty($this->has_default()) || !in_array('initial', $kwargs)):
                 $include_blank = false;
-            endif;
+        endif;
 
-            $defaults = ['choices' => $this->get_choices(['include_blank' => $include_blank])];
-        else:
+        $defaults = ['choices' => $this->get_choices(['include_blank' => $include_blank])]; else:
             // create just one checkbox
             $defaults = ['form_class' => form_fields\BooleanField::full_class_name()];
         endif;

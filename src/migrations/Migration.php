@@ -53,9 +53,9 @@ class Migration extends Object
         foreach ($ops as $operation) :
             $op_string = StringifyOperation::formatted($operation);
 
-            array_push($operations, $op_string[0]);
+        array_push($operations, $op_string[0]);
 
-            $imports = array_merge($imports, $op_string[1]);
+        $imports = array_merge($imports, $op_string[1]);
         endforeach;
 
         $imports = array_unique($imports);
@@ -64,7 +64,7 @@ class Migration extends Object
 
         foreach ($imports as $import) :
             $import = sprintf("use %s;", $import);
-            $import_paths .= $import . PHP_EOL;
+        $import_paths .= $import . PHP_EOL;
         endforeach;
 
 
@@ -102,8 +102,8 @@ class Migration extends Object
             // get a copy of the state before it is updated by the operation
             $state_before_op = $project_state->deep_clone();
 
-            $op->update_state($project_state);
-            $op->update_database($connection, $state_before_op, $project_state);
+        $op->update_state($project_state);
+        $op->update_database($connection, $state_before_op, $project_state);
         endforeach;
 
         return $project_state;
@@ -127,7 +127,7 @@ class Migration extends Object
         foreach ($ops as $op) :
 
             $state_before_op = $state_after_op->deep_clone();
-            $state_after_op = $state_after_op->deep_clone();
+        $state_after_op = $state_after_op->deep_clone();
 
             // update state
             $op->update_state($state_after_op);
@@ -143,8 +143,8 @@ class Migration extends Object
         foreach ($items_to_run as $item) :
 
             $operation = $item['operation'];
-            $state_before_op = $item['state_before_op'];
-            $state_after_op = $item['state_after_op'];
+        $state_before_op = $item['state_before_op'];
+        $state_after_op = $item['state_after_op'];
 
             /**
              * Since we are un applying the past state is where we want to revert to
@@ -201,61 +201,60 @@ class Migration extends Object
 
         if (is_array($value)):
             $import = [];
-            $assoc = [];
+        $assoc = [];
 
-            foreach ($value as $key => $val) :
+        foreach ($value as $key => $val) :
                 if (!is_int($key)):
                     $key_arr = Migration::stringify($key);
-                    $val_arr = Migration::stringify($val);
+        $val_arr = Migration::stringify($val);
 
-                    array_push($assoc, sprintf('%1$s=> %2$s', $key_arr[0], $val_arr[0]));
+        array_push($assoc, sprintf('%1$s=> %2$s', $key_arr[0], $val_arr[0]));
 
-                    if (!empty($key_arr[1])):
+        if (!empty($key_arr[1])):
                         $import = array_merge($import, $key_arr[1]);
-                    endif;
+        endif;
 
-                    if (!empty($val_arr[1])):
+        if (!empty($val_arr[1])):
                         $import = array_merge($import, $val_arr[1]);
-                    endif;
-                else:
+        endif; else:
 
                     $val_arr = Migration::stringify($val);
-                    array_push($assoc, $val_arr[0]);
+        array_push($assoc, $val_arr[0]);
 
-                    if (!empty($val_arr[1])):
+        if (!empty($val_arr[1])):
                         $import = array_merge($import, $val_arr[1]);
-                    endif;
+        endif;
 
-                endif;
+        endif;
 
-            endforeach;
+        endforeach;
 
-            return [sprintf("[%s]", join(", ", $assoc)), $import];
+        return [sprintf("[%s]", join(", ", $assoc)), $import];
         endif;
 
         if (is_object($value) && $value instanceof DeConstructable):
             $skel = $value->skeleton();
 
-            $import = [$skel['path']];
+        $import = [$skel['path']];
 
-            $class = $skel['name'];
+        $class = $skel['name'];
 
 
-            $constructor_args = $skel['constructor_args'];
+        $constructor_args = $skel['constructor_args'];
 
-            $cons_args = [];
-            foreach ($constructor_args as $arg) :
+        $cons_args = [];
+        foreach ($constructor_args as $arg) :
 
                 $val_array = Migration::stringify($arg);
 
-                array_push($cons_args, $val_array[0]);
+        array_push($cons_args, $val_array[0]);
 
-                if (!empty($val_array[1])):
+        if (!empty($val_array[1])):
                     $import = array_merge($import, $val_array[1]);
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
-            return [sprintf('new %1$s(%2$s)', $class, join(",", $cons_args)), $import];
+        return [sprintf('new %1$s(%2$s)', $class, join(",", $cons_args)), $import];
         endif;
 
         if ($value === true):
@@ -318,77 +317,73 @@ class StringifyOperation
             if (is_array($arg)):
 
                 if (empty($arg)):
-                    $this->add_item("[],");
-                else:
+                    $this->add_item("[],"); else:
                     $this->add_item('[');
 
-                    foreach ($arg as $key => $val) :
+        foreach ($arg as $key => $val) :
                         if (!is_int($key)):
                             $key_arr = Migration::stringify($key);
 
-                            if (is_array($val)):
+        if (is_array($val)):
 
                                 $this->add_indent();
-                                $this->add_item(sprintf('%1$s=>[ ', $key_arr[0]));
+        $this->add_item(sprintf('%1$s=>[ ', $key_arr[0]));
 
-                                foreach ($val as $val_key => $in_val) :
+        foreach ($val as $val_key => $in_val) :
 
                                     $val_arr = Migration::stringify($in_val);
-                                    $import = array_merge($import, $val_arr[1]);
+        $import = array_merge($import, $val_arr[1]);
 
-                                    $this->add_indent();
-                                    $this->add_item(sprintf("'%1\$s'=> %2\$s,", $val_key, $val_arr[0]));
-                                    $this->reduce_indent();
+        $this->add_indent();
+        $this->add_item(sprintf("'%1\$s'=> %2\$s,", $val_key, $val_arr[0]));
+        $this->reduce_indent();
 
-                                endforeach;
+        endforeach;
 
-                                $this->add_item("]");
-                                $this->reduce_indent();
-                            else:
+        $this->add_item("]");
+        $this->reduce_indent(); else:
                                 $val_arr = Migration::stringify($val);
-                                $this->add_indent();
-                                $this->add_item(sprintf('%1$s=> %2$s,', $key_arr[0], $val_arr[0]));
-                                $this->reduce_indent();
-                            endif;
+        $this->add_indent();
+        $this->add_item(sprintf('%1$s=> %2$s,', $key_arr[0], $val_arr[0]));
+        $this->reduce_indent();
+        endif;
 
                             // imports
                             if (!empty($key_arr[1])):
                                 $import = array_merge($import, $key_arr[1]);
-                            endif;
+        endif;
 
-                            if (!empty($val_arr[1])):
+        if (!empty($val_arr[1])):
                                 $import = array_merge($import, $val_arr[1]);
-                            endif;
-                        else:
+        endif; else:
 
                             $val_arr = Migration::stringify($val);
 
-                            $this->add_indent();
-                            $this->add_item(sprintf("%s", $val_arr[0]));
-                            $this->reduce_indent();
+        $this->add_indent();
+        $this->add_item(sprintf("%s", $val_arr[0]));
+        $this->reduce_indent();
 
 
-                            if (!empty($val_arr[1])):
+        if (!empty($val_arr[1])):
                                 $import = array_merge($import, $val_arr[1]);
-                            endif;
+        endif;
 
-                        endif;
-                    endforeach;
+        endif;
+        endforeach;
 
-                    $this->add_item('],');
+        $this->add_item('],');
 
-                endif;
-            else:
+        endif; else:
 
                 $val_array = Migration::stringify($arg);
-                $this->add_item(sprintf(" %s,", $val_array[0]));
+        $this->add_item(sprintf(" %s,", $val_array[0]));
 
 
-            endif;
+        endif;
 
-            if (!empty($val_array[1])):
+        if (!empty($val_array[1])):
                 $import = array_merge($import, $val_array[1]);
-            endif;
+        endif;
         endforeach;
 
         $string = join(PHP_EOL, $this->buffer);

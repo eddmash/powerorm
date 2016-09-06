@@ -67,8 +67,7 @@ class Meta extends Object implements Contributor
         $this->set_pk($field_obj);
 
         if ($field_obj instanceof RelatedField):
-            $this->relations_fields[$field_obj->name] = $field_obj;
-        else:
+            $this->relations_fields[$field_obj->name] = $field_obj; else:
             $this->local_fields[$field_obj->name] = $field_obj;
         endif;
 
@@ -136,7 +135,7 @@ class Meta extends Object implements Contributor
         foreach (self::DEFAULT_NAMES as $default_name) :
             if (array_key_exists($default_name, $this->overrides)):
                 $this->{$default_name} = $this->overrides[$default_name];
-            endif;
+        endif;
         endforeach;
     }
 
@@ -172,8 +171,8 @@ class Meta extends Object implements Contributor
                 ):
 
                     $reverse[$field->name] = $field;
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
         endforeach;
 

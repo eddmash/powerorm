@@ -357,11 +357,10 @@ abstract class Field extends Object implements Contributor
         if (!$this->form->is_bound):
             if (array_key_exists($name, $this->form->initial)):
                 $value = $this->form->initial[$name];
-            endif;
-        else:
+        endif; else:
             $initial = (array_key_exists($name, $this->form->initial)) ? $this->form->initial[$name] : $this->initial;
 
-            $value = $this->bound_value($this->data(), $initial);
+        $value = $this->bound_value($this->data(), $initial);
         endif;
 
         return $this->prepare_value($value);

@@ -337,7 +337,7 @@ abstract class Field extends Object implements FieldInterface
             // only replace those that exist do not set new ones
             if ($this->has_property($key)):
                 $this->{$key} = $value;
-            endif;
+        endif;
         endforeach;
 
         // null status
@@ -421,13 +421,12 @@ abstract class Field extends Object implements FieldInterface
         foreach ($defaults as $name => $default) :
             $value = ($this->has_property($name)) ? $this->{$name} : $default;
 
-            if ($name == 'default' && !$value instanceof NOT_PROVIDED):
-                $this->constructor_args[$name] = $value;
-            elseif ($value != $default && !array_key_exists(strtolower($name), $this->constructor_args)):
+        if ($name == 'default' && !$value instanceof NOT_PROVIDED):
+                $this->constructor_args[$name] = $value; elseif ($value != $default && !array_key_exists(strtolower($name), $this->constructor_args)):
 
                 $this->constructor_args[$name] = $value;
 
-            endif;
+        endif;
         endforeach;
 
         return [$this->constructor_args];
@@ -502,24 +501,23 @@ abstract class Field extends Object implements FieldInterface
         if ($this->choices):
             $include_blank = true;
 
-            if ($this->form_blank || empty($this->has_default()) || !in_array('initial', $kwargs)):
+        if ($this->form_blank || empty($this->has_default()) || !in_array('initial', $kwargs)):
                 $include_blank = false;
-            endif;
+        endif;
 
-            $defaults['choices'] = $this->get_choices(['include_blank' => $include_blank]);
-            $defaults['coerce'] = [$this, 'to_php'];
+        $defaults['choices'] = $this->get_choices(['include_blank' => $include_blank]);
+        $defaults['coerce'] = [$this, 'to_php'];
 
-            if (array_key_exists('form_choices_class', $kwargs)):
-                $field_class = $kwargs['form_choices_class'];
-            else:
+        if (array_key_exists('form_choices_class', $kwargs)):
+                $field_class = $kwargs['form_choices_class']; else:
                 $field_class = form_fields\TypedChoiceField::full_class_name();
-            endif;
+        endif;
 
         endif;
 
         if (array_key_exists('field_class', $kwargs)):
             $field_class = $kwargs['field_class'];
-            unset($kwargs['field_class']);
+        unset($kwargs['field_class']);
         endif;
 
         $defaults = array_merge($defaults, $kwargs);
@@ -679,10 +677,10 @@ abstract class Field extends Object implements FieldInterface
 
                     $model[$name] = $value->get_class_name();
 
-                endif;
-                continue;
-            endif;
-            $model[$name] = $value;
+        endif;
+        continue;
+        endif;
+        $model[$name] = $value;
         endforeach;
 
         return $model;

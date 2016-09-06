@@ -40,9 +40,9 @@ class RenameField extends Operation
         foreach ($old_fields as $name => $field) :
             if ($this->standard_name($name) === $this->standard_name($this->old_name)):
                 $new_fields[$this->new_name] = $field;
-                continue;
-            endif;
-            $new_fields[$name] = $field;
+        continue;
+        endif;
+        $new_fields[$name] = $field;
         endforeach;
 
         $state->models[$this->model_name]->fields = $new_fields;
@@ -55,10 +55,10 @@ class RenameField extends Operation
         if ($this->allow_migrate_model($connection, $desired_model)):
             $current_model = $current_state->registry()->get_model($this->model_name);
 
-            $current_field = $current_model->meta->get_field($this->old_name);
-            $desired_field = $desired_model->meta->get_field($this->new_name);
+        $current_field = $current_model->meta->get_field($this->old_name);
+        $desired_field = $desired_model->meta->get_field($this->new_name);
 
-            $connection->schema_editor->alter_model_field($desired_model, $current_field, $desired_field);
+        $connection->schema_editor->alter_model_field($desired_model, $current_field, $desired_field);
 
         endif;
     }
@@ -70,7 +70,7 @@ class RenameField extends Operation
         if ($this->allow_migrate_model($connection, $desired_model)):
             $current_model = $current_state->registry()->get_model($this->model_name);
 
-            $connection->schema_editor->alter_model_field(
+        $connection->schema_editor->alter_model_field(
                 $desired_model,
                 $current_model->meta->get_field($this->new_name),
                 $desired_model->meta->get_field($this->old_name)

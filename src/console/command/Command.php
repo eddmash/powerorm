@@ -63,10 +63,9 @@ class Command extends Base
 
         if (!empty($help)):
             $this->normal($help, true);
-            $this->stdout(PHP_EOL);
+        $this->stdout(PHP_EOL);
 
-            $this->normal(Console::wrapText($usage, 8), true);
-        else:
+        $this->normal(Console::wrapText($usage, 8), true); else:
             $this->normal($usage, true);
         endif;
 
@@ -97,7 +96,7 @@ class Command extends Base
 
         if (in_array('--help', $arg_opts)):
             $this->usage();
-            exit;
+        exit;
         endif;
 
         if ($this->system_check):
@@ -117,9 +116,9 @@ class Command extends Base
         $default_help = '--help';
         foreach ($this->get_options() as $key => $value) :
             $len = strlen($key) + 2 + ($key === $default_help ? 10 : 0);
-            if ($maxlen < $len) :
+        if ($maxlen < $len) :
                 $maxlen = $len;
-            endif;
+        endif;
         endforeach;
 
 
@@ -130,13 +129,13 @@ class Command extends Base
             foreach ($this->get_positional_options() as $key => $value) :
 
                 $this->stdout(" " . $this->ansiFormat($key, Console::FG_YELLOW));
-                $len = strlen($key) + 2;
+        $len = strlen($key) + 2;
 
-                if ($value !== '') {
-                    $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
-                }
-                $this->stdout(PHP_EOL . PHP_EOL);
-            endforeach;
+        if ($value !== '') {
+            $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
+        }
+        $this->stdout(PHP_EOL . PHP_EOL);
+        endforeach;
         endif;
 
 
@@ -146,12 +145,12 @@ class Command extends Base
         foreach ($this->get_options() as $key => $value) :
 
             $this->stdout(" " . $this->ansiFormat($key, Console::FG_YELLOW));
-            $len = strlen($key) + 2;
+        $len = strlen($key) + 2;
 
-            if ($value !== '') {
-                $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
-            }
-            $this->stdout("\n");
+        if ($value !== '') {
+            $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
+        }
+        $this->stdout("\n");
         endforeach;
     }
 
@@ -168,27 +167,27 @@ class Command extends Base
         foreach ($checks as $check) :
             if ($check->level < CheckMessage::INFO):
                 $debugs[] = $check;
-            endif;
+        endif;
 
             // info
             if ($check->level >= CheckMessage::INFO && $check->level < CheckMessage::WARNING):
                 $info[] = $check;
-            endif;
+        endif;
 
             // warning
             if ($check->level >= CheckMessage::WARNING && $check->level < CheckMessage::ERROR):
                 $warning[] = $check;
-            endif;
+        endif;
 
             //error
             if ($check->level >= CheckMessage::ERROR && $check->level < CheckMessage::CRITICAL):
                 $errors[] = $check;
-            endif;
+        endif;
 
             //critical
             if ($check->level >= CheckMessage::CRITICAL):
                 $critical[] = $check;
-            endif;
+        endif;
         endforeach;
 
         $this->normal("Perfoming system checks ...", true);
@@ -199,7 +198,7 @@ class Command extends Base
         $errors = array_merge($critical, $errors);
         if (!empty($errors)):
             $this->error(join(PHP_EOL, $errors), true);
-            exit;
+        exit;
         endif;
 
         if (!empty($warning)):

@@ -84,9 +84,9 @@ class Filter
             // check which where clause to use
             if (preg_match($lookup_pattern, $key)):
                 $options = preg_split($lookup_pattern, $key);
-                $key = $options[0];
-                $lookup = strtolower($options[1]);
-            endif;
+        $key = $options[0];
+        $lookup = strtolower($options[1]);
+        endif;
 
             // determine how to combine where statements
             $use_or = preg_match($where_concat_pattern, $key);
@@ -94,25 +94,24 @@ class Filter
             // get the actual key
             if ($use_or):
                 $key = preg_split($where_concat_pattern, $key)[1];
-            endif;
+        endif;
 
             // validate lookups
             $this->validate_lookup($lookup);
 
-            $table_name = strtolower($table_name);
+        $table_name = strtolower($table_name);
 
             // append table name to key
             if (!empty($table_name)):
                 $key = $table_name . ".$key";
-            endif;
+        endif;
 
             // check if we need to use OR to combine
             if ($use_or):
-                $or_combine[] = ['lookup' => $lookup, 'key' => $key, 'value' => $value];
-            else:
+                $or_combine[] = ['lookup' => $lookup, 'key' => $key, 'value' => $value]; else:
                 // otherwise use and
                 $this->_and_where_concat($lookup, $key, $value);
-            endif;
+        endif;
 
         endforeach;
 
@@ -127,51 +126,51 @@ class Filter
         switch ($lookup):
             case 'eq':
                 $this->_qbuilder->where($key, $value);
-                break;
-            case 'in':
+        break;
+        case 'in':
                 $this->_qbuilder->where_in($key, $value);
-                break;
-            case 'gt':
+        break;
+        case 'gt':
                 $this->_qbuilder->where("$key >", $value);
-                break;
-            case 'lt':
+        break;
+        case 'lt':
                 $this->_qbuilder->where("$key <", $value);
-                break;
-            case 'gte':
+        break;
+        case 'gte':
                 $this->_qbuilder->where("$key >=", $value);
-                break;
-            case 'lte':
+        break;
+        case 'lte':
                 $this->_qbuilder->where("$key <=", $value);
-                break;
-            case 'contains':
+        break;
+        case 'contains':
                 $this->_qbuilder->like($key, $value, 'both');
-                break;
-            case 'startswith':
+        break;
+        case 'startswith':
                 $this->_qbuilder->like($key, $value, 'after');
-                break;
-            case 'endswith':
+        break;
+        case 'endswith':
                 $this->_qbuilder->like($key, $value, 'before');
-                break;
-            case 'between':
+        break;
+        case 'between':
                 if (!is_array($value) || (is_array($value) && count($value) != 2)) {
                     throw new OrmExceptions(
                         sprintf("filter() using between expected value to be an array, with two values only"));
                 }
-                $this->_qbuilder->where("$key BETWEEN $value[0] AND $value[1] ");
-                break;
-            case 'isnull':
+        $this->_qbuilder->where("$key BETWEEN $value[0] AND $value[1] ");
+        break;
+        case 'isnull':
                 //TODO NOTNULL
                 if ($value):
                     $value = null;
-                endif;
-                $this->_qbuilder->where($key, $value);
-                break;
-            case 'not':
+        endif;
+        $this->_qbuilder->where($key, $value);
+        break;
+        case 'not':
                 $this->_qbuilder->where("$key !=", $value);
-                break;
-            case 'notin':
+        break;
+        case 'notin':
                 $this->_qbuilder->where_not_in($key, $value);
-                break;
+        break;
         endswitch;
     }
 
@@ -180,47 +179,47 @@ class Filter
         switch ($lookup):
             case 'eq':
                 $this->_qbuilder->or_where($key, $value);
-                break;
-            case 'in':
+        break;
+        case 'in':
                 $this->_qbuilder->or_where_in($key, $value);
-                break;
-            case 'gt':
+        break;
+        case 'gt':
                 $this->_qbuilder->or_where("$key >", $value);
-                break;
-            case 'lt':
+        break;
+        case 'lt':
                 $this->_qbuilder->or_where("$key <", $value);
-                break;
-            case 'gte':
+        break;
+        case 'gte':
                 $this->_qbuilder->or_where("$key >=", $value);
-                break;
-            case 'lte':
+        break;
+        case 'lte':
                 $this->_qbuilder->or_where("$key <=", $value);
-                break;
-            case 'contains':
+        break;
+        case 'contains':
                 $this->_qbuilder->or_like($key, $value, 'both');
-                break;
-            case 'startswith':
+        break;
+        case 'startswith':
                 $this->_qbuilder->or_like($key, $value, 'after');
-                break;
-            case 'endswith':
+        break;
+        case 'endswith':
                 $this->_qbuilder->or_like($key, $value, 'before');
-                break;
-            case 'between':
+        break;
+        case 'between':
                 if (!is_array($value) || (is_array($value) && count($value) != 2)) {
                     throw new OrmExceptions(
                         sprintf("filter() usin between expected value to be an array, with two values only"));
                 }
-                $this->_qbuilder->or_where("$key BETWEEN $value[0] AND $value[1] ");
-                break;
-            case 'isnull':
+        $this->_qbuilder->or_where("$key BETWEEN $value[0] AND $value[1] ");
+        break;
+        case 'isnull':
                 $this->_qbuilder->or_where($key, $value);
-                break;
-            case 'not':
+        break;
+        case 'not':
                 $this->_qbuilder->or_where("$key !=", $value);
-                break;
-            case 'notin':
+        break;
+        case 'notin':
                 $this->_qbuilder->or_where_not_in($key, $value);
-                break;
+        break;
         endswitch;
     }
 

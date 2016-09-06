@@ -54,17 +54,17 @@ class Manager extends Base
 
         if (in_array($command_name, ['Help']) || empty($command_name)):
             $this->main_help_text($arg_opts);
-            exit;
+        exit;
         endif;
 
         if (in_array($command_name, ['Version', '--version', '-v'])):
             $this->normal("PowerOrm Version : " . $this->ansiFormat(POWERORM_VERSION, Console::FG_CYAN) . PHP_EOL);
-            exit;
+        exit;
         endif;
 
         if (in_array('--command-dir', $arg_opts)):
             $pos = array_search('--command-dir', $arg_opts);
-            $this->path = $arg_opts[$pos + 1];
+        $this->path = $arg_opts[$pos + 1];
         endif;
 
 
@@ -78,39 +78,39 @@ class Manager extends Base
         if (!empty($arg_opts)):
             $subcommand = array_shift($arg_opts);
 
-            $command = $this->fetch_command($subcommand);
+        $command = $this->fetch_command($subcommand);
 
-            $options = $command->get_options();
-            $help = $command->get_help();
+        $options = $command->get_options();
+        $help = $command->get_help();
 
-            $message = sprintf('php %1$s.php %2$s', $this->manager_name, $subcommand);
-            $this->normal($help . PHP_EOL . PHP_EOL);
+        $message = sprintf('php %1$s.php %2$s', $this->manager_name, $subcommand);
+        $this->normal($help . PHP_EOL . PHP_EOL);
 
-            $this->normal(sprintf('Usage : %1$s %2$s',
+        $this->normal(sprintf('Usage : %1$s %2$s',
                     $this->standard_name($message), Tools::stringify(array_keys($options), false)) . PHP_EOL . PHP_EOL);
 
-            $this->normal("optional arguments:" . PHP_EOL . PHP_EOL);
+        $this->normal("optional arguments:" . PHP_EOL . PHP_EOL);
 
-            $maxlen = 5;
-            foreach ($options as $key => $value) :
+        $maxlen = 5;
+        foreach ($options as $key => $value) :
                 $len = strlen($key) + 2 + ($key === $this->default_command ? 10 : 0);
-                if ($maxlen < $len) :
+        if ($maxlen < $len) :
                     $maxlen = $len;
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
-            foreach ($options as $key => $value) :
+        foreach ($options as $key => $value) :
 
                 $this->stdout(" " . $this->ansiFormat($key, Console::FG_YELLOW));
-                $len = strlen($key) + 2;
+        $len = strlen($key) + 2;
 
-                if ($value !== '') {
-                    $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
-                }
-                $this->stdout("\n");
-            endforeach;
+        if ($value !== '') {
+            $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
+        }
+        $this->stdout("\n");
+        endforeach;
 
-            exit;
+        exit;
         endif;
 
         $this->info($this->default_help . PHP_EOL . PHP_EOL);
@@ -127,12 +127,12 @@ class Manager extends Base
         foreach ($files as $file) :
             $file = basename($file, '.php');
 
-            $file = $this->standard_name($file);
+        $file = $this->standard_name($file);
             // ignore base class
             if ($file == 'command'):
                 continue;
-            endif;
-            $this->normal("\t " . $file . PHP_EOL);
+        endif;
+        $this->normal("\t " . $file . PHP_EOL);
         endforeach;
 
         foreach ($this->default_commands() as $name => $command) :
@@ -141,8 +141,8 @@ class Manager extends Base
             // ignore base class
             if ($file == 'command'):
                 continue;
-            endif;
-            $this->normal("\t " . $file . PHP_EOL);
+        endif;
+        $this->normal("\t " . $file . PHP_EOL);
         endforeach;
     }
 
@@ -163,9 +163,9 @@ class Manager extends Base
         if (empty($file)):
             $this->error(
                 sprintf('Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?' . PHP_EOL, $name, $this->path));
-            $message = $this->ansiFormat(sprintf('php %s.php help', $this->manager_name), Console::FG_YELLOW);
-            $this->normal(sprintf("Type %s for usage." . PHP_EOL, $message));
-            exit;
+        $message = $this->ansiFormat(sprintf('php %s.php help', $this->manager_name), Console::FG_YELLOW);
+        $this->normal(sprintf("Type %s for usage." . PHP_EOL, $message));
+        exit;
         endif;
 
         // commands are in the commands namespace

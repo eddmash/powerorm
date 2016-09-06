@@ -37,7 +37,6 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
 
     public function testHasMethod()
     {
-
         $obj = new Object();
         $this->assertTrue($obj->has_method('get_class_name'), 'Expected True, since the method exists');
     }
@@ -57,7 +56,6 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
      */
     public function testConversionToStandardName($originalName, $expectedName)
     {
-
         $obj = new Object();
         $returnedName = $obj->standard_name($originalName);
 
@@ -77,7 +75,4 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
             array('', ''),
         );
     }
-
-
-
 }
