@@ -1,4 +1,5 @@
 <?php
+
 // if we are not in testing environment load the bootstrap,
 // other the bootstrap is loaded by phpunit.
 if(ENVIRONMENT != 'testing'):

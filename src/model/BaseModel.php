@@ -1070,6 +1070,7 @@ abstract class BaseModel extends \CI_Model
     {
         return property_exists($this, $name) || array_key_exists($name, $this->fields);
     }
+
     // ========================================================================================================
 
     // ========================================== PHP MAGIC METHODS ===========================================

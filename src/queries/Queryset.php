@@ -480,6 +480,7 @@ class Queryset extends Object implements QuerysetAccess, Query
     }
 
     // ----------------------------------------------- > relations
+
     public function with($conditions)
     {
         $this->_validate_conditions(__METHOD__, $conditions);
@@ -488,6 +489,7 @@ class Queryset extends Object implements QuerysetAccess, Query
 
         return $this;
     }
+
     // ----------------------------------------------- > relations
 
     // **************************************************************************************************
