@@ -3,12 +3,11 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:09 PM
+ * Time: 4:09 PM.
  */
-
 namespace powerorm\model\field;
-use powerorm\checks\Checks;
 
+use powerorm\checks\Checks;
 
 /**
  * A Creates many-to-one relationship.
@@ -38,66 +37,73 @@ use powerorm\checks\Checks;
  *
  *      You may want to avoid the overhead of an index if you are creating a foreign key for consistency
  *      rather than joins.
- *
  */
-class ManyToOneField extends RelatedField{
+class ManyToOneField extends RelatedField
+{
+    /**
+     * {@inheritdoc}
+     */
+    public $db_constraint = true;
 
     /**
      * {@inheritdoc}
      */
-    public $db_constraint = TRUE;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct($field_options = []){
+    public function __construct($field_options = [])
+    {
         parent::__construct($field_options);
-        $this->M2O = TRUE;
+        $this->M2O = true;
 
         $this->relation = new ManyToOneObject([
-            'model'=>$field_options['model'],
-            'field'=>$this
+            'model' => $field_options['model'],
+            'field' => $this,
         ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function db_column_name(){
+    public function db_column_name()
+    {
         return sprintf('%s_id', $this->lower_case($this->name));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function constraint_name($prefix){
-        $prefix = "fk";
+    public function constraint_name($prefix)
+    {
+        $prefix = 'fk';
+
         return parent::constraint_name($prefix);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function check(){
+    public function check()
+    {
         $checks = parent::check();
         $checks = $this->add_check($checks, $this->_unique_check());
         $checks = $this->add_check($checks, $this->_delete_check());
+
         return $checks;
     }
 
     /**
      * @ignore
+     *
      * @return mixed
      */
-    public function _unique_check(){
-        if($this->unique):
+    public function _unique_check()
+    {
+        if ($this->unique):
             return [
                 Checks::warning([
-                    "message"=>"Setting unique=True on a ForeignKey has the same effect as using a OneToOne.",
-                    "hint"=>"use OneToOne field",
-                    "context"=>$this,
-                    "id"=>"fields.W300"
-                ])
+                    'message' => 'Setting unique=True on a ForeignKey has the same effect as using a OneToOne.',
+                    'hint'    => 'use OneToOne field',
+                    'context' => $this,
+                    'id'      => 'fields.W300',
+                ]),
             ];
         endif;
 
@@ -107,7 +113,8 @@ class ManyToOneField extends RelatedField{
     /**
      * @ignore
      */
-    public function _delete_check(){
+    public function _delete_check()
+    {
         return [];
     }
 
@@ -116,8 +123,9 @@ class ManyToOneField extends RelatedField{
         return $this->relation_field()->db_type();
     }
 
-    public function contribute_to_class($name, $obj){
-        parent::contribute_to_class($name,$obj);
+    public function contribute_to_class($name, $obj)
+    {
+        parent::contribute_to_class($name, $obj);
         $this->container_model->{$name} = ForwardManyToOneAccessor::instance($this->container_model, $this);
     }
 }

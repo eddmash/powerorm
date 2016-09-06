@@ -1,81 +1,82 @@
 <?php
+
 namespace powerorm\console;
+
 /**
- * Borrows heavily from the the yii\helpers\BaseConsole class,
+ * Borrows heavily from the the yii\helpers\BaseConsole class,.
  *
  * Part of the Yii framework.
  *
- * @package    Yii
  * @version    2.0
+ *
  * @author Carsten Brandt <mail@cebe.cc>
+ *
  * @link http://www.yiiframework.com/
+ *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
- *
- * 
  * Class Console
- * @package powerorm\console
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Console
 {
-
     // foreground color control codes
-    const FG_BLACK  = 30;
-    const FG_RED    = 31;
-    const FG_GREEN  = 32;
+    const FG_BLACK = 30;
+    const FG_RED = 31;
+    const FG_GREEN = 32;
     const FG_YELLOW = 33;
-    const FG_BLUE   = 34;
+    const FG_BLUE = 34;
     const FG_PURPLE = 35;
-    const FG_CYAN   = 36;
-    const FG_GREY   = 37;
+    const FG_CYAN = 36;
+    const FG_GREY = 37;
     // background color control codes
-    const BG_BLACK  = 40;
-    const BG_RED    = 41;
-    const BG_GREEN  = 42;
+    const BG_BLACK = 40;
+    const BG_RED = 41;
+    const BG_GREEN = 42;
     const BG_YELLOW = 43;
-    const BG_BLUE   = 44;
+    const BG_BLUE = 44;
     const BG_PURPLE = 45;
-    const BG_CYAN   = 46;
-    const BG_GREY   = 47;
+    const BG_CYAN = 46;
+    const BG_GREY = 47;
     // fonts style control codes
-    const RESET       = 0;
-    const NORMAL      = 0;
-    const BOLD        = 1;
-    const ITALIC      = 3;
-    const UNDERLINE   = 4;
-    const BLINK       = 5;
-    const NEGATIVE    = 7;
-    const CONCEALED   = 8;
+    const RESET = 0;
+    const NORMAL = 0;
+    const BOLD = 1;
+    const ITALIC = 3;
+    const UNDERLINE = 4;
+    const BLINK = 5;
+    const NEGATIVE = 7;
+    const CONCEALED = 8;
     const CROSSED_OUT = 9;
-    const FRAMED      = 51;
-    const ENCIRCLED   = 52;
-    const OVERLINED   = 53;
-
-
+    const FRAMED = 51;
+    const ENCIRCLED = 52;
+    const OVERLINED = 53;
 
     /**
-     * Will return a string formatted with the given ANSI style
+     * Will return a string formatted with the given ANSI style.
      *
      * @param string $string the string to be formatted
-     * @param array $format An array containing formatting values.
-     * You can pass any of the FG_*, BG_* and TEXT_* constants
-     * and also [[xtermFgColor]] and [[xtermBgColor]] to specify a format.
+     * @param array  $format An array containing formatting values.
+     *                       You can pass any of the FG_*, BG_* and TEXT_* constants
+     *                       and also [[xtermFgColor]] and [[xtermBgColor]] to specify a format.
+     *
      * @return string
      */
     public static function ansiFormat($string, $format = [])
     {
         $code = implode(';', $format);
 
-        return "\033[0m" . ($code !== '' ? "\033[" . $code . 'm' : '') . $string . "\033[0m";
+        return "\033[0m".($code !== '' ? "\033[".$code.'m' : '').$string."\033[0m";
     }
 
     /**
      * Prints a string to STDOUT.
      *
      * @param string $string the string to print
-     * @return integer|boolean Number of bytes printed or false on error
+     *
+     * @return int|bool Number of bytes printed or false on error
      */
     public static function stdout($string)
     {
@@ -86,7 +87,8 @@ class Console
      * Prints a string to STDERR.
      *
      * @param string $string the string to print
-     * @return integer|boolean Number of bytes printed or false on error
+     *
+     * @return int|bool Number of bytes printed or false on error
      */
     public static function stderr($string)
     {
@@ -98,6 +100,7 @@ class Console
      * prompt.
      *
      * @param string $prompt the prompt to display before waiting for input (optional)
+     *
      * @return string the user's input
      */
     public static function input($prompt = null)
@@ -109,11 +112,11 @@ class Console
         return static::stdin();
     }
 
-
     /**
      * Gets input from STDIN and returns a string right-trimmed for EOLs.
      *
-     * @param boolean $raw If set to true, returns the raw string without trimming
+     * @param bool $raw If set to true, returns the raw string without trimming
+     *
      * @return string the string read from stdin
      */
     public static function stdin($raw = false)
@@ -121,27 +124,28 @@ class Console
         return $raw ? fgets(\STDIN) : rtrim(fgets(\STDIN), PHP_EOL);
     }
 
-
     /**
      * Prints text to STDOUT appended with a carriage return (PHP_EOL).
      *
      * @param string $string the text to print
-     * @return integer|boolean number of bytes printed or false on error.
+     *
+     * @return int|bool number of bytes printed or false on error.
      */
     public static function output($string = null)
     {
-        return static::stdout($string . PHP_EOL);
+        return static::stdout($string.PHP_EOL);
     }
 
     /**
      * Prints text to STDERR appended with a carriage return (PHP_EOL).
      *
      * @param string $string the text to print
-     * @return integer|boolean number of bytes printed or false on error.
+     *
+     * @return int|bool number of bytes printed or false on error.
      */
     public static function error($string = null)
     {
-        return static::stderr($string . PHP_EOL);
+        return static::stderr($string.PHP_EOL);
     }
 
     /**
@@ -151,7 +155,8 @@ class Console
      * - not tty consoles
      *
      * @param mixed $stream
-     * @return boolean true if the stream supports ANSI colors, otherwise false.
+     *
+     * @return bool true if the stream supports ANSI colors, otherwise false.
      */
     public static function streamSupportsAnsiColors($stream)
     {
@@ -161,8 +166,9 @@ class Console
     }
 
     /**
-     * Returns true if the console is running on windows
-     * @return boolean
+     * Returns true if the console is running on windows.
+     *
+     * @return bool
      */
     public static function isRunningOnWindows()
     {
@@ -170,12 +176,13 @@ class Console
     }
 
     /**
-     * Usage: list($width, $height) = ConsoleHelper::getScreenSize();
+     * Usage: list($width, $height) = ConsoleHelper::getScreenSize();.
      *
-     * @param boolean $refresh whether to force checking and not re-use cached size value.
-     * This is useful to detect changing window size while the application is running but may
-     * not get up to date values on every terminal.
-     * @return array|boolean An array of ($width, $height) or false when it was not able to determine size.
+     * @param bool $refresh whether to force checking and not re-use cached size value.
+     *                      This is useful to detect changing window size while the application is running but may
+     *                      not get up to date values on every terminal.
+     *
+     * @return array|bool An array of ($width, $height) or false when it was not able to determine size.
      */
     public static function getScreenSize($refresh = false)
     {
@@ -212,7 +219,7 @@ class Console
     }
 
     /**
-     * Word wrap text with indentation to fit the screen size
+     * Word wrap text with indentation to fit the screen size.
      *
      * If screen size could not be detected, or the indentation is greater than the screen size, the text will not be wrapped.
      *
@@ -225,11 +232,13 @@ class Console
      *     amet.
      * ```
      *
-     * @param string $text the text to be wrapped
-     * @param integer $indent number of spaces to use for indentation.
-     * @param boolean $refresh whether to force refresh of screen size.
-     * This will be passed to [[getScreenSize()]].
+     * @param string $text    the text to be wrapped
+     * @param int    $indent  number of spaces to use for indentation.
+     * @param bool   $refresh whether to force refresh of screen size.
+     *                        This will be passed to [[getScreenSize()]].
+     *
      * @return string the wrapped text.
+     *
      * @since 2.0.4
      */
     public static function wrapText($text, $indent = 0, $refresh = false)
@@ -246,16 +255,17 @@ class Console
                 $first = false;
                 continue;
             }
-            $lines[$i] = $pad . $line;
+            $lines[$i] = $pad.$line;
         }
+
         return implode("\n", $lines);
     }
 
     /**
-     * Prompts the user for input and validates it
+     * Prompts the user for input and validates it.
      *
-     * @param string $text prompt string
-     * @param array $options the options to validate the input:
+     * @param string $text    prompt string
+     * @param array  $options the options to validate the input:
      *
      * - `required`: whether it is required or not
      * - `default`: default value if no input is inserted by the user
@@ -278,11 +288,11 @@ class Console
             ],
             $options
         );
-        $error   = null;
+        $error = null;
 
         top:
         $input = $options['default']
-            ? static::input("$text [" . $options['default'] . '] ')
+            ? static::input("$text [".$options['default'].'] ')
             : static::input("$text ");
 
         if ($input === '') {
@@ -309,13 +319,14 @@ class Console
      * Asks user to confirm by typing y or n.
      *
      * @param string $message to print out before waiting for user input
-     * @param boolean $default this value is returned if no selection is made.
-     * @return boolean whether user confirmed
+     * @param bool   $default this value is returned if no selection is made.
+     *
+     * @return bool whether user confirmed
      */
     public static function confirm($message, $default = false)
     {
         while (true) {
-            static::stdout($message . ' (yes|no) [' . ($default ? 'yes' : 'no') . ']:');
+            static::stdout($message.' (yes|no) ['.($default ? 'yes' : 'no').']:');
             $input = trim(static::stdin());
 
             if (empty($input)) {
@@ -336,15 +347,15 @@ class Console
      * Gives the user an option to choose from. Giving '?' as an input will show
      * a list of options to choose from and their explanations.
      *
-     * @param string $prompt the prompt message
-     * @param array $options Key-value array of options to choose from
+     * @param string $prompt  the prompt message
+     * @param array  $options Key-value array of options to choose from
      *
      * @return string An option character the user chose
      */
     public static function select($prompt, $options = [])
     {
         top:
-        static::stdout("$prompt [" . implode(',', array_keys($options)) . ',?]: ');
+        static::stdout("$prompt [".implode(',', array_keys($options)).',?]: ');
         $input = static::stdin();
         if ($input === '?') {
             foreach ($options as $key => $value) {
@@ -358,7 +369,4 @@ class Console
 
         return $input;
     }
-
-
-
 }

@@ -1,6 +1,6 @@
 <?php
-namespace powerorm\console\command;
 
+namespace powerorm\console\command;
 
 use powerorm\checks\CheckMessage;
 use powerorm\checks\Checks;
@@ -9,27 +9,31 @@ use powerorm\console\Console;
 use powerorm\exceptions\NotImplemented;
 
 /**
- * Class Command
- * @package powerorm\console\command
+ * Class Command.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Command extends Base
 {
     /**
      * If true the command will perfom check before it runs.
+     *
      * @var bool
      */
-    public $system_check = TRUE;
+    public $system_check = true;
 
-    public function get_options(){
+    public function get_options()
+    {
         return [
-            '--help'=>'show this help message and exit',
-            '--command-dir'=>'the directory where command is defined'
+            '--help'        => 'show this help message and exit',
+            '--command-dir' => 'the directory where command is defined',
         ];
     }
 
-    public function get_positional_options(){
+    public function get_positional_options()
+    {
         return [];
     }
 
@@ -38,6 +42,7 @@ class Command extends Base
      *
      * You may override this method to return customized help.
      * The default implementation returns help information retrieved from the PHPDoc comment.
+     *
      * @return string
      */
     public function get_help()
@@ -51,110 +56,109 @@ class Command extends Base
 
         $options_names = array_merge(array_keys($this->get_positional_options()), array_keys($this->get_options()));
 
-        $options = sprintf("[ %s ]", join(' || ', $options_names));
+        $options = sprintf('[ %s ]', implode(' || ', $options_names));
 
         $usage = sprintf('Usage : %1$s %2$s %3$s ', $this->manager_name, $command, $options);
 
         $help = $this->get_help();
         $this->stdout(PHP_EOL);
 
-        if(!empty($help)):
-            $this->normal($help, TRUE);
-            $this->stdout(PHP_EOL);
+        if (!empty($help)):
+            $this->normal($help, true);
+        $this->stdout(PHP_EOL);
 
-            $this->normal(Console::wrapText($usage, 8), TRUE);
-        else:
-            $this->normal($usage, TRUE);
+        $this->normal(Console::wrapText($usage, 8), true); else:
+            $this->normal($usage, true);
         endif;
 
         $this->stdout(PHP_EOL);
 
         $this->command_options();
-
     }
 
     public function get_command_name()
     {
-        $name = array_pop(explode("\\", $this->get_class_name()));
+        $name = array_pop(explode('\\', $this->get_class_name()));
+
         return $this->lower_case($name);
     }
-    
-    public function handle($arg_opts=[]){
-        return new NotImplemented("Subclasses of the class Command must implement the handle()");
-    }
-    
-    public function execute($arg_opts, $manager){
 
-        $marker = $this->ansiFormat("~~~>", Console::FG_YELLOW);
+    public function handle($arg_opts = [])
+    {
+        return new NotImplemented('Subclasses of the class Command must implement the handle()');
+    }
+
+    public function execute($arg_opts, $manager)
+    {
+        $marker = $this->ansiFormat('~~~>', Console::FG_YELLOW);
         $version = $this->ansiFormat(POWERORM_VERSION, Console::FG_CYAN);
-        $this->normal(sprintf(PHP_EOL.'%2$s Using powerorm version : %1$s '.PHP_EOL, $version, $marker), TRUE);
+        $this->normal(sprintf(PHP_EOL.'%2$s Using powerorm version : %1$s '.PHP_EOL, $version, $marker), true);
 
 
         $this->manager_name = $manager;
 
-        if(in_array('--help', $arg_opts)):
+        if (in_array('--help', $arg_opts)):
             $this->usage();
-            exit;
+        exit;
         endif;
 
-        if($this->system_check):
+        if ($this->system_check):
             $this->check();
         endif;
 
         $output = $this->handle($arg_opts);
 
-        if(!empty($output)):
+        if (!empty($output)):
             $this->normal($output.PHP_EOL);
         endif;
     }
 
     public function command_options()
     {
-
         $maxlen = 5;
         $default_help = '--help';
-        foreach ($this->get_options() as $key=>$value) :
+        foreach ($this->get_options() as $key => $value) :
             $len = strlen($key) + 2 + ($key === $default_help ? 10 : 0);
-            if ($maxlen < $len) :
+        if ($maxlen < $len) :
                 $maxlen = $len;
-            endif;
+        endif;
         endforeach;
 
 
-        $this->normal("Position Arguments:".PHP_EOL.PHP_EOL);
+        $this->normal('Position Arguments:'.PHP_EOL.PHP_EOL);
         $positional = $this->get_positional_options();
 
-        if(!empty($positional)):
-            foreach ($this->get_positional_options() as $key=>$value) :
+        if (!empty($positional)):
+            foreach ($this->get_positional_options() as $key => $value) :
 
-                $this->stdout(" " . $this->ansiFormat($key, Console::FG_YELLOW));
-                $len = strlen($key) + 2;
+                $this->stdout(' '.$this->ansiFormat($key, Console::FG_YELLOW));
+        $len = strlen($key) + 2;
 
-                if ($value !== '') {
-                    $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
-                }
-                $this->stdout(PHP_EOL.PHP_EOL);
-            endforeach;
+        if ($value !== '') {
+            $this->stdout(str_repeat(' ', $maxlen - $len + 2).Console::wrapText($value, $maxlen + 2));
+        }
+        $this->stdout(PHP_EOL.PHP_EOL);
+        endforeach;
         endif;
 
 
-        $this->normal("Optional Arguments:".PHP_EOL.PHP_EOL);
+        $this->normal('Optional Arguments:'.PHP_EOL.PHP_EOL);
 
 
-        foreach ($this->get_options() as $key=>$value) :
+        foreach ($this->get_options() as $key => $value) :
 
-            $this->stdout(" " . $this->ansiFormat($key, Console::FG_YELLOW));
-            $len = strlen($key) + 2;
+            $this->stdout(' '.$this->ansiFormat($key, Console::FG_YELLOW));
+        $len = strlen($key) + 2;
 
-            if ($value !== '') {
-                $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
-            }
-            $this->stdout("\n");
+        if ($value !== '') {
+            $this->stdout(str_repeat(' ', $maxlen - $len + 2).Console::wrapText($value, $maxlen + 2));
+        }
+        $this->stdout("\n");
         endforeach;
-
     }
-    
-    public function check(){
+
+    public function check()
+    {
         $checks = (new Checks())->run_checks();
 
         $debugs = [];
@@ -164,55 +168,52 @@ class Command extends Base
         $critical = [];
 
         foreach ($checks as $check) :
-            if($check->level < CheckMessage::INFO ):
+            if ($check->level < CheckMessage::INFO):
                 $debugs[] = $check;
-            endif;
+        endif;
 
             // info
-            if($check->level >= CheckMessage::INFO &&  $check->level < CheckMessage::WARNING):
+            if ($check->level >= CheckMessage::INFO &&  $check->level < CheckMessage::WARNING):
                 $info[] = $check;
-            endif;
+        endif;
 
             // warning
-            if($check->level >= CheckMessage::WARNING &&  $check->level < CheckMessage::ERROR):
+            if ($check->level >= CheckMessage::WARNING &&  $check->level < CheckMessage::ERROR):
                 $warning[] = $check;
-            endif;
+        endif;
 
             //error
-            if($check->level >= CheckMessage::ERROR &&  $check->level < CheckMessage::CRITICAL):
+            if ($check->level >= CheckMessage::ERROR &&  $check->level < CheckMessage::CRITICAL):
                 $errors[] = $check;
-            endif;
+        endif;
 
             //critical
-            if($check->level >= CheckMessage::CRITICAL):
+            if ($check->level >= CheckMessage::CRITICAL):
                 $critical[] = $check;
-            endif;
+        endif;
         endforeach;
 
-        $this->normal("Perfoming system checks ...", TRUE);
+        $this->normal('Perfoming system checks ...', true);
 
-        $issue = (count($checks)==1)?'issue':'issues';
-        $this->normal(sprintf('System check identified %1$s %2$s', count($checks), $issue), TRUE);
+        $issue = (count($checks) == 1) ? 'issue' : 'issues';
+        $this->normal(sprintf('System check identified %1$s %2$s', count($checks), $issue), true);
 
         $errors = array_merge($critical, $errors);
-        if(!empty($errors)):
-            $this->error(join(PHP_EOL, $errors), TRUE);
-            exit;
+        if (!empty($errors)):
+            $this->error(implode(PHP_EOL, $errors), true);
+        exit;
         endif;
 
-        if(!empty($warning)):
-            $this->warning(join(PHP_EOL, $warning), TRUE);
+        if (!empty($warning)):
+            $this->warning(implode(PHP_EOL, $warning), true);
         endif;
 
-        if(!empty($info)):
-            $this->info(join(PHP_EOL, $info), TRUE);
+        if (!empty($info)):
+            $this->info(implode(PHP_EOL, $info), true);
         endif;
 
-        if(!empty($debugs)):
-            $this->normal(join("  ".PHP_EOL, $debugs), TRUE);
+        if (!empty($debugs)):
+            $this->normal(implode('  '.PHP_EOL, $debugs), true);
         endif;
-
-
     }
-
 }

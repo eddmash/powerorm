@@ -1,28 +1,29 @@
 <?php
+
 namespace powerorm\console;
 
 use powerorm\Object;
 
 /**
- * Class Base
- * @package powerorm\console
+ * Class Base.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Base extends Object
 {
-
     const EXIT_CODE_NORMAL = 0;
     const EXIT_CODE_ERROR = 1;
 
     /**
-     * @var boolean whether to run the command interactively.
+     * @var bool whether to run the command interactively.
      */
     public $interactive = true;
 
     /**
-     * @var boolean whether to enable ANSI color in the output.
-     * If not set, ANSI color will only be enabled for terminals that support it.
+     * @var bool whether to enable ANSI color in the output.
+     *           If not set, ANSI color will only be enabled for terminals that support it.
      */
     public $color;
 
@@ -31,8 +32,8 @@ class Base extends Object
      */
     private $option_list = [];
 
-    public $help='';
-    public $summary='';
+    public $help = '';
+    public $summary = '';
 
     public function wrap_text($message, $indent, $refresh = false)
     {
@@ -46,7 +47,8 @@ class Base extends Object
      * and the terminal supports ANSI color.
      *
      * @param resource $stream the stream to check.
-     * @return boolean Whether to enable ANSI style in output.
+     *
+     * @return bool Whether to enable ANSI style in output.
      */
     public function isColorEnabled($stream = \STDOUT)
     {
@@ -54,7 +56,7 @@ class Base extends Object
     }
 
     /**
-     * Formats a string with ANSI codes
+     * Formats a string with ANSI codes.
      *
      * You may pass additional parameters using the constants defined in [[\powerorm\consoleConsole]].
      *
@@ -65,6 +67,7 @@ class Base extends Object
      * ```
      *
      * @param string $string the string to be formatted
+     *
      * @return string
      */
     public function ansiFormat($string)
@@ -74,11 +77,12 @@ class Base extends Object
             array_shift($args);
             $string = Console::ansiFormat($string, $args);
         }
+
         return $string;
     }
 
     /**
-     * Prints a string to STDOUT
+     * Prints a string to STDOUT.
      *
      * You may optionally format the string with ANSI codes by
      * passing additional parameters using the constants defined in [[\powerorm\consoleConsole]].
@@ -90,7 +94,8 @@ class Base extends Object
      * ```
      *
      * @param string $string the string to print
-     * @return integer|boolean Number of bytes printed or false on error
+     *
+     * @return int|bool Number of bytes printed or false on error
      */
     public function stdout($string)
     {
@@ -99,11 +104,12 @@ class Base extends Object
             array_shift($args);
             $string = Console::ansiFormat($string, $args);
         }
+
         return Console::stdout($string);
     }
 
     /**
-     * Prints a string to STDERR
+     * Prints a string to STDERR.
      *
      * You may optionally format the string with ANSI codes by
      * passing additional parameters using the constants defined in [[\powerorm\consoleConsole]].
@@ -115,7 +121,8 @@ class Base extends Object
      * ```
      *
      * @param string $string the string to print
-     * @return integer|boolean Number of bytes printed or false on error
+     *
+     * @return int|bool Number of bytes printed or false on error
      */
     public function stderr($string)
     {
@@ -128,49 +135,48 @@ class Base extends Object
         return fwrite(\STDERR, $string);
     }
 
-    public function normal($message, $newline=FALSE){
-        if($newline):
-            $message=$message.PHP_EOL;
+    public function normal($message, $newline = false)
+    {
+        if ($newline):
+            $message = $message.PHP_EOL;
         endif;
-        $this->stdout(" ".$message);
-
+        $this->stdout(' '.$message);
     }
 
-    public function success($message, $newline=FALSE){
-        if($newline):
-            $message=$message.PHP_EOL;
+    public function success($message, $newline = false)
+    {
+        if ($newline):
+            $message = $message.PHP_EOL;
         endif;
-        $this->stdout(" ".$message, Console::FG_GREEN);
-
+        $this->stdout(' '.$message, Console::FG_GREEN);
     }
 
-    public function info($message, $newline=FALSE){
-        if($newline):
-            $message=$message.PHP_EOL;
+    public function info($message, $newline = false)
+    {
+        if ($newline):
+            $message = $message.PHP_EOL;
         endif;
-        $this->stdout(" ".$message, Console::FG_BLUE);
+        $this->stdout(' '.$message, Console::FG_BLUE);
     }
 
-    public function error($message, $newline=FALSE){
-        if($newline):
-            $message=$message.PHP_EOL;
+    public function error($message, $newline = false)
+    {
+        if ($newline):
+            $message = $message.PHP_EOL;
         endif;
-        $this->stderr(" ".$message, Console::FG_RED);
-
-    }
-    
-    public function warning($message, $newline=FALSE){
-        if($newline):
-            $message=$message.PHP_EOL;
-        endif;
-        $this->stdout(" ".$message, Console::FG_PURPLE);
-
+        $this->stderr(' '.$message, Console::FG_RED);
     }
 
-    public function input($message=' ')
+    public function warning($message, $newline = false)
+    {
+        if ($newline):
+            $message = $message.PHP_EOL;
+        endif;
+        $this->stdout(' '.$message, Console::FG_PURPLE);
+    }
+
+    public function input($message = ' ')
     {
         return Console::input($message);
     }
-
-
 }

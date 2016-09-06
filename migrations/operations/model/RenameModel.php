@@ -3,24 +3,24 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 3:30 PM
+ * Time: 3:30 PM.
  */
-
 namespace powerorm\migrations\operations\model;
+
 use powerorm\migrations\operations\Operation;
 use powerorm\migrations\ProjectState;
 
-
 /**
- * Class RenameModel
- * @package powerorm\migrations\operations
+ * Class RenameModel.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class RenameModel extends Operation{
-
-    public function __construct($opts=[]){
-
+class RenameModel extends Operation
+{
+    public function __construct($opts = [])
+    {
         parent::__construct($opts);
         $this->old_name = $opts['old_name'];
         $this->new_name = $opts['new_name'];
@@ -36,7 +36,6 @@ class RenameModel extends Operation{
 
         // remove the model state before rename
         $state->remove_model($this->old_name);
-
     }
 
     public function update_database($connection, $current_state, $desired_state)

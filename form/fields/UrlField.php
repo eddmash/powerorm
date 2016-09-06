@@ -3,12 +3,11 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 2:07 PM
+ * Time: 2:07 PM.
  */
-
 namespace powerorm\form\fields;
-use powerorm\form\widgets\UrlInput;
 
+use powerorm\form\widgets\UrlInput;
 
 /**
  * Creates a:
@@ -24,15 +23,17 @@ use powerorm\form\widgets\UrlInput;
  * These are the same as CharField->max_length and CharField->min_length.
  *
  * Class UrlField
- * @package powerorm\form\fields
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class UrlField extends CharField{
-
+class UrlField extends CharField
+{
     public $default_validators = ['valid_url'];
 
-    public function get_widget(){
+    public function get_widget()
+    {
         return UrlInput::instance();
     }
 }

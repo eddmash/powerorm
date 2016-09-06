@@ -3,38 +3,37 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 2:14 PM
+ * Time: 2:14 PM.
  */
-
 namespace powerorm\form\widgets;
-
-
-
 
 /**
  * Base class of widgets like checkbox and radio which can be more than one.
- * Class ChoiceInputFields
- * @package powerorm\form\widgets
+ * Class ChoiceInputFields.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-abstract class ChoiceInputFields extends Input{
-    public $choices=[];
+abstract class ChoiceInputFields extends Input
+{
+    public $choices = [];
     public $input_type = '';
     public $outer_html = '<ul %1$s> %2$s </ul>';
     public $inner_html = '<li>%1$s %2$s </li>';
 
-    public function __construct($attrs=[], $kwargs=[]){
+    public function __construct($attrs = [], $kwargs = [])
+    {
         parent::__construct($attrs);
 
-        if(array_key_exists('choices', $kwargs)):
+        if (array_key_exists('choices', $kwargs)):
             $this->choices = $kwargs['choices'];
         endif;
     }
 
-    public function render($name, $value, $attrs=[], $kwargs=[]){
-
-        if(empty($value)):
+    public function render($name, $value, $attrs = [], $kwargs = [])
+    {
+        if (empty($value)):
             // in case its null, false etc
             $value = [];
         endif;
@@ -44,16 +43,17 @@ abstract class ChoiceInputFields extends Input{
         // add select options
         $options[] = $this->render_options($name, $value, $attrs);
 
-        if(!empty($options)):
+        if (!empty($options)):
             $output = array_merge($output, $options);
         endif;
 
-        return join(' ', $output);
+        return implode(' ', $output);
     }
 
-    public function render_options($field_name, $checked_choices, $attrs=[]){
+    public function render_options($field_name, $checked_choices, $attrs = [])
+    {
 
-        /**
+        /*
          * 'choices'=>[
          *      'gender'=> ['f'=>'Female', 'm'=>'Male' ],
          *      'bmw'=>'mercedes benz'
@@ -64,42 +64,40 @@ abstract class ChoiceInputFields extends Input{
         $output = [];
 
         $count = 1;
-        foreach ($choices as $label=>$value) :
+        foreach ($choices as $label => $value) :
 
-            $attrs_ = $this->build_attrs($attrs,[
-                'name'=>$field_name,
-                'type'=>$this->input_type,
+            $attrs_ = $this->build_attrs($attrs, [
+                'name' => $field_name,
+                'type' => $this->input_type,
             ]);
 
-            $attrs_['id'] = $attrs_['id'].'_'.$count;
+        $attrs_['id'] = $attrs_['id'].'_'.$count;
 
-            if(is_array($value)):
+        if (is_array($value)):
 
-                $sub_widget = new static($attrs_, ['choices'=>$value]);
+                $sub_widget = new static($attrs_, ['choices' => $value]);
 
-                $output[] = sprintf($this->inner_html, $label, $sub_widget->render($field_name, $checked_choices));
-
-            else:
+        $output[] = sprintf($this->inner_html, $label, $sub_widget->render($field_name, $checked_choices)); else:
                 $sub_widget = '';
 
-                $output[] = sprintf($this->inner_html,
+        $output[] = sprintf($this->inner_html,
                     $this->render_option($checked_choices, $value, $label, $attrs_), $sub_widget);
-            endif;
+        endif;
 
-            $count++;
+        $count++;
         endforeach;
 
-        return sprintf($this->outer_html, $this->flat_attrs($attrs),join(' ', $output));
+        return sprintf($this->outer_html, $this->flat_attrs($attrs), implode(' ', $output));
     }
 
-    public function render_option($checked_choices, $label, $value, $attrs=[]){
-
+    public function render_option($checked_choices, $label, $value, $attrs = [])
+    {
         $checked_html = '';
         $attrs['value'] = $value;
 
         $checked = $this->_prepare_checked($checked_choices);
 
-        if(in_array($value, $checked)):
+        if (in_array($value, $checked)):
             $checked_html = 'checked="checked"';
         endif;
 
@@ -108,7 +106,8 @@ abstract class ChoiceInputFields extends Input{
         return sprintf($template, $this->flat_attrs($attrs), $checked_html, $label);
     }
 
-    public function _prepare_checked($checked_choices){
+    public function _prepare_checked($checked_choices)
+    {
         return $checked_choices;
     }
 }
