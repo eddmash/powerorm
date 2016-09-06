@@ -16,6 +16,7 @@ namespace eddmash\powerorm\console;
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  * Class Console
+ *
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
