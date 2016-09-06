@@ -6,5 +6,5 @@
 $base_dir = dirname(dirname(dirname(dirname(__FILE__))));
 
 require $base_dir . '/vendor/autoload.php';
-require "ci_instance.php";
+//require "ci_instance.php";
 
