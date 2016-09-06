@@ -1,4 +1,10 @@
 <?php
+// if we are not in testing environment load the bootstrap,
+// other the bootstrap is loaded by phpunit.
+if(ENVIRONMENT!='testing'):
+    require_once 'bootstrap.php';
+endif;
+
 use eddmash\powerorm\app\Registry;
 use eddmash\powerorm\BaseOrm;
 use eddmash\powerorm\db\Connection;
