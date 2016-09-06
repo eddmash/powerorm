@@ -3,9 +3,8 @@
  * Created by http://eddmash.com.
  * User: eddmash
  * Date: 5/14/16
- * Time: 9:20 AM
+ * Time: 9:20 AM.
  */
-
 namespace eddmash\powerorm\migrations;
 
 use eddmash\powerorm\exceptions\NodeNotFoundError;
@@ -14,10 +13,10 @@ use eddmash\powerorm\exceptions\NotFound;
 /**
  * This class represents a migration and its family tree infomartion
  * i.e what migrations need to exist before this one can exist (parent)
- * and which migrations cannot exist if this one does not (children)
+ * and which migrations cannot exist if this one does not (children).
  *
- * @package eddmash\powerorm\migrations
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Node
@@ -50,7 +49,8 @@ class Node
     }
 
     /**
-     * Get ancestors from the first ancestor aka adam and eve to upto this node.that is oldest at index '0'
+     * Get ancestors from the first ancestor aka adam and eve to upto this node.that is oldest at index '0'.
+     *
      * @return array
      */
     public function ancestors()
@@ -67,7 +67,8 @@ class Node
 
     /**
      * Get all nodes the consider this node there first ancestor, stating with this one.
-     * This method puts the current node as first in array index 0, and the newest being in the other end
+     * This method puts the current node as first in array index 0, and the newest being in the other end.
+     *
      * @return array
      */
     public function descendants()
@@ -86,21 +87,23 @@ class Node
 /**
  * Creates a family tree for each migration with relation to the other migrations.
  * This will help us determine what needs to resolved before a migration is acted on.
- * @package eddmash\powerorm\migrations
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Graph
 {
-
     /**
-     * keeps track of Migrations already taken care of in the graph
+     * keeps track of Migrations already taken care of in the graph.
+     *
      * @var array
      */
     public $nodes;
 
     /**
      * contains a family tree for each node representing a migration.
+     *
      * @var
      */
     public $node_family_tree;
@@ -112,9 +115,11 @@ class Graph
     }
 
     /**
-     * @param string $migration_name
+     * @param string    $migration_name
      * @param Migration $migration_object
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function add_node($migration_name, $migration_object)
@@ -132,8 +137,11 @@ class Graph
      * @param $child
      * @param $parent
      * @param Migration $migration
+     *
      * @throws NodeNotFoundError
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function add_dependency($child, $parent, $migration)
@@ -154,7 +162,7 @@ class Graph
     }
 
     /**
-     * This is a list of all the migrations that are the latest, that is no other dependency depends on them
+     * This is a list of all the migrations that are the latest, that is no other dependency depends on them.
      */
     public function leaf_nodes()
     {
@@ -177,16 +185,19 @@ class Graph
 
     /**
      * Returns the lineage of the node, starting with the oldest (root node) upto the node.
-     * This method puts the current node as first in array index 0, and the older being in the other end
+     * This method puts the current node as first in array index 0, and the older being in the other end.
+     *
      * @param $node
+     *
      * @return mixed
+     *
      * @throws NotFound
      */
     public function before_lineage($node)
     {
         // todo check for cyclic
         if (!array_key_exists($node, $this->nodes)):
-            throw new NotFound(sprintf("Migration with the name %s does not exist", $node));
+            throw new NotFound(sprintf('Migration with the name %s does not exist', $node));
         endif;
 
         return $this->node_family_tree[$node]->ancestors();
@@ -194,22 +205,25 @@ class Graph
 
     /**
      * Get All nodes that depend on the existence of this node.
-     * This method puts the current node as first in array index 0, and the older being in the other end
+     * This method puts the current node as first in array index 0, and the older being in the other end.
+     *
      * @param $node
+     *
      * @return mixed
+     *
      * @throws NotFound
      */
     public function after_lineage($node)
     {
         if (!array_key_exists($node, $this->nodes)):
-            throw new NotFound(sprintf("Migration with the name %s does not exist", $node));
+            throw new NotFound(sprintf('Migration with the name %s does not exist', $node));
         endif;
 
         return $this->node_family_tree[$node]->descendants();
     }
 
     /**
-     * This is a list of all the migrations that were the first, i.e they don't depend on any other migrations
+     * This is a list of all the migrations that were the first, i.e they don't depend on any other migrations.
      */
     public function root_nodes()
     {
@@ -224,6 +238,7 @@ class Graph
             endif;
 
         endforeach;
+
         return $root;
     }
 
@@ -243,7 +258,6 @@ class Graph
         foreach ($leaves as $leaf) :
             // get lineage
             $lineage_members = $this->before_lineage($leaf);
-
 
             foreach ($lineage_members as $i => $l_member) :
 

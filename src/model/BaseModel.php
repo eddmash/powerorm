@@ -2,7 +2,7 @@
 
 namespace eddmash\powerorm\model;
 
-/**
+/*
  *
  */
 defined('BASEPATH') or exit('No direct script access allowed');
@@ -207,8 +207,8 @@ use Orm;
  *
  * It is not a way to replace the Employee (or any other) model everywhere with something of your own creation.
  *
- * @package eddmash\powerorm\model
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class BaseModel extends \CI_Model
@@ -235,7 +235,7 @@ abstract class BaseModel extends \CI_Model
     protected $table_name;
 
     /**
-     * Indicates if the orm should managed the table being represented by this model
+     * Indicates if the orm should managed the table being represented by this model.
      *
      * Defaults to True, meaning Powerorm  will create the appropriate database tables in migrate or as part of
      * migrations and remove them as part of a flush command.
@@ -262,6 +262,7 @@ abstract class BaseModel extends \CI_Model
      *    If you need to change this default behavior, create the intermediary table as an explicit model
      *   (with managed set as needed) and use the ManyToManyField->through attribute to make the relation
      *   use your custom model.
+     *
      * @var
      */
     protected $managed = true;
@@ -294,20 +295,25 @@ abstract class BaseModel extends \CI_Model
      * you would when you want to update a database record.
      *
      * @ignore
+     *
      * @var bool
      */
     protected $is_new = true;
 
     /**
      * A list of all Fields that the model has.
+     *
      * @ignore
+     *
      * @var array
      */
     protected $fields = [];
 
     /**
      * Meta information about the model.
+     *
      * @ignore
+     *
      * @var Meta
      */
     public $meta;
@@ -317,13 +323,12 @@ abstract class BaseModel extends \CI_Model
      */
     public function __construct($data = [])
     {
-        assert(is_array($data), "Model expects and array of field/value");
+        assert(is_array($data), 'Model expects and array of field/value');
 
         $this->dispatch_signal('powerorm.model.pre_init', $this);
 
         // invoke parent
         parent::__construct();
-
 
         $this->init();
 
@@ -335,8 +340,11 @@ abstract class BaseModel extends \CI_Model
 
     /**
      * Loads data to the model.
+     *
      * @param $data
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function populate($data)
@@ -348,9 +356,12 @@ abstract class BaseModel extends \CI_Model
 
     /**
      * @param Registry $registry
-     * @param array $fields
+     * @param array    $fields
+     *
      * @throws TypeError
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function init($registry = null, $fields = [])
@@ -370,7 +381,6 @@ abstract class BaseModel extends \CI_Model
         // ensure the model is ready for use.
         $meta->prepare($this);
 
-
         $registry->register_model($this);
 
 //        // have a reference to the registray associated to this model
@@ -379,19 +389,17 @@ abstract class BaseModel extends \CI_Model
 
     public static function instance($registry = '', $fields = [])
     {
-        $obj = new static;
+        $obj = new static();
         $obj->init($registry, $fields);
+
         return $obj;
     }
-
-
 
     // ========================================================================================================
 
     // ============================================= QUERY METHODS ============================================
 
     // ========================================================================================================
-
 
     /**
      * @ignore
@@ -442,7 +450,7 @@ abstract class BaseModel extends \CI_Model
     }
 
     /**
-     * Creates or Updates an object in the database,
+     * Creates or Updates an object in the database,.
      *
      * <h4>How it differentiates between update and create</h4>
      *
@@ -476,7 +484,9 @@ abstract class BaseModel extends \CI_Model
      * <pre><code> $role = $this->role->get(3);
      * $role->name = "chief executive officer";
      * $role = $cat->save();</code></pre>
+     *
      * @param array $opts
+     *
      * @return mixed
      */
     public function save($opts = [])
@@ -492,18 +502,17 @@ abstract class BaseModel extends \CI_Model
         // alert everyone of the save
         $this->dispatch_signal('powerorm.model.post_save', $this);
 
-
         $this->db->trans_complete();
 
         if ($this->db->trans_status() === false) {
-            show_error("sorry the operation was not successful");
+            show_error('sorry the operation was not successful');
         }
 
         return $save_model;
     }
 
     /**
-     * Eager loading, this will solve the N+1 ISSUE
+     * Eager loading, this will solve the N+1 ISSUE.
      *
      * <h4>USAGE:</h4>
      *
@@ -538,8 +547,9 @@ abstract class BaseModel extends \CI_Model
      *
      * </code></pre>
      *
-     * @param array $conditions the name/names of model fields.
+     * @param array $conditions the name/names of model fields
      * @param array $opts
+     *
      * @return Queryset
      */
     public function with($conditions, $opts = [])
@@ -557,6 +567,7 @@ abstract class BaseModel extends \CI_Model
      * echo $users->username;
      *
      * @param array $opts
+     *
      * @return $this
      */
     public function first($opts = [])
@@ -574,6 +585,7 @@ abstract class BaseModel extends \CI_Model
      * echo $users->username;
      *
      * @param array $opts
+     *
      * @return $this
      */
     public function last($opts = [])
@@ -591,7 +603,7 @@ abstract class BaseModel extends \CI_Model
      * <pre><code>$this->role->delete()</code></pre>
      *
      * <strong>NB</strong> also consider using the Queryset delete().
-     * {@link }
+     * {@link}
      *
      * @param array $opts
      */
@@ -601,7 +613,7 @@ abstract class BaseModel extends \CI_Model
     }
 
     /**
-     * Stores Many To Many relationship
+     * Stores Many To Many relationship.
      *
      * This methods expects and array, the array should contain object of related model or
      * a Queryset object of the related model
@@ -630,15 +642,16 @@ abstract class BaseModel extends \CI_Model
      * $user->add([$role]);
      * </code></pre>
      *
-     * @param array $related the objects of related models to associate with the current model.
+     * @param array  $related        the objects of related models to associate with the current model
      * @param string $using_db_group
+     *
      * @throws OrmExceptions
      * @throws TypeError
      */
     public function add($related = [], $using_db_group = '')
     {
         if (!is_array($related)) {
-            throw new OrmExceptions(sprintf("add() expects an array of models"));
+            throw new OrmExceptions(sprintf('add() expects an array of models'));
         }
 
         // if the array is empty exit
@@ -652,7 +665,7 @@ abstract class BaseModel extends \CI_Model
         foreach ($related as $item) :
 
             // if a Queryset was passed in
-            if (!$item instanceof BaseModel):
+            if (!$item instanceof self):
                 throw new OrmExceptions(
                     sprintf('add() expects an array of objects that extend the %1$s but got a %2$s',
                         'PModel', get_class($item)));
@@ -661,7 +674,7 @@ abstract class BaseModel extends \CI_Model
             // get the related model name to save
             if (!empty($related_model) && $related_model !== get_class($item)):
                 throw new TypeError(
-                    sprintf("Multiple types provided, add() expects only one type per call, see documentation"));
+                    sprintf('Multiple types provided, add() expects only one type per call, see documentation'));
             endif;
 
             $related_model = get_class($item);
@@ -672,17 +685,15 @@ abstract class BaseModel extends \CI_Model
         $this->queryset($using_db_group)->_m2m_save($related);
     }
 
-
-
     // ========================================================================================================
 
     // ================================================= OBJECT METHODS =======================================
 
     // ========================================================================================================
 
-
     /**
-     * The database table that this model represents
+     * The database table that this model represents.
+     *
      * @return string
      */
     public function get_table_name()
@@ -698,8 +709,10 @@ abstract class BaseModel extends \CI_Model
 
     /**
      * The database table that this model represents with the prefix appended if one
-     * was set on the database configuration
+     * was set on the database configuration.
+     *
      * @param null $name
+     *
      * @return string
      */
     public function full_table_name($name = null)
@@ -708,11 +721,13 @@ abstract class BaseModel extends \CI_Model
         if (null != $name) {
             $table_name = sprintf('%1$s%2$s', $this->db->dbprefix, $name);
         }
+
         return $table_name;
     }
 
     /**
      * Returns the database prefix to used on the table represent by current model.
+     *
      * @return mixed
      */
     public function table_prefix()
@@ -737,22 +752,25 @@ abstract class BaseModel extends \CI_Model
      *      $perms["can_assign_user_roles"]= "Can Assign User Roles";
      *      return $perms;
      * }</code></pre>
+     *
      * @return array
      */
     public static function permissions()
     {
         return array(
-            "can_add" => "Can Add",
-            "can_delete" => "Can Delete",
-            "can_update" => "Can Update",
-            "can_view" => "Can View",
-            "can_list" => "Can List",
+            'can_add' => 'Can Add',
+            'can_delete' => 'Can Delete',
+            'can_update' => 'Can Update',
+            'can_view' => 'Can View',
+            'can_list' => 'Can List',
         );
     }
 
     /**
-     * Creates a Queryset that is used to interaract with the database
+     * Creates a Queryset that is used to interaract with the database.
+     *
      * @param string $opts
+     *
      * @return Queryset
      */
     public function queryset($opts)
@@ -763,14 +781,16 @@ abstract class BaseModel extends \CI_Model
     /**
      * Sets the relative uri to an instance of the model e.g. user/1 .
      * <pre><code>public function get_uri($slug=FALSE){
-     *   $route = $this->id;
+     *   $route = $this->id;.
      *
      *   if($slug==TRUE){
      *      $route = $this->slug;
      *   }
      *   return 'user/'.$route;
      * }</code></pre>
+     *
      * @param bool $slug if set to true returns the url as a slug e.g. user/admin
+     *
      * @return string
      */
     public function get_uri($slug = false)
@@ -786,12 +806,11 @@ abstract class BaseModel extends \CI_Model
      *      $this->last_name = ORM::CharField(['max_length'=>30]);
      *      $this->password = ORM::CharField(['max_length'=>255]);
      *      $this->phone_number = ORM::CharField(['max_length'=>30]);
-     * }</code></pre>
+     * }</code></pre>.
      */
     abstract public function fields();
 
     /**
-     *
      * @ignore
      */
     public function clean()
@@ -800,7 +819,6 @@ abstract class BaseModel extends \CI_Model
     }
 
     /**
-     *
      * @ignore
      */
     public function full_clean()
@@ -835,12 +853,15 @@ abstract class BaseModel extends \CI_Model
         foreach ($this->meta->fields as $name => $field) :
             $values[$name] = $this->{$name};
         endforeach;
+
         return $values;
     }
 
     /**
      * Returns a Form that represents the current model.
+     *
      * @return $this
+     *
      * @throws OrmExceptions
      * @throws \eddmash\powerorm\exceptions\DuplicateField
      * @throws \eddmash\powerorm\exceptions\FormException
@@ -850,14 +871,11 @@ abstract class BaseModel extends \CI_Model
         return $this->form_builder()->form();
     }
 
-
-
     // ========================================================================================================
 
     // ============================================  UTILITY METHODS ==========================================
 
     // ========================================================================================================
-
 
     protected function _load_fields()
     {
@@ -870,28 +888,30 @@ abstract class BaseModel extends \CI_Model
         $this->call_method_upwards('fields');
     }
 
-
     public static function from_db($connection, $fields_with_value)
     {
         return new static($fields_with_value);
     }
 
     /**
-     * Create a queryset
+     * Create a queryset.
+     *
      * @internal
+     *
      * @return Queryset
      */
     public function _get_queryset($opts)
     {
         $opts = (empty($opts)) ? '' : $opts;
 
-
         return Connection::get_queryset($this, null, $opts);
     }
 
     /**
      * @param $opts
+     *
      * @return mixed
+     *
      * @internal
      */
     public function _get_db($opts)
@@ -904,15 +924,17 @@ abstract class BaseModel extends \CI_Model
         if (!empty($use_db_group)):
             $database = $this->load->database($use_db_group, true);
         else:
-            $database = $this->load->database('', true);;
+            $database = $this->load->database('', true);
         endif;
 
         return $database;
     }
 
     /**
-     * Adds fields to the model and add them to meta object of the model
+     * Adds fields to the model and add them to meta object of the model.
+     *
      * @internal
+     *
      * @param array $fields
      */
     public function setup_fields($fields)
@@ -942,7 +964,6 @@ abstract class BaseModel extends \CI_Model
 
             $this->_add_fields($field_name, $field_obj);
 
-
             // remove it as an attribute, since we store all the fields in the fields array,
             // and use magic method __get() to access them
             if ($value instanceof Field):
@@ -958,14 +979,17 @@ abstract class BaseModel extends \CI_Model
 
 //    protected function _load_field()
 //    {
-//
+
 //    }
 
     /**
      * Adds model fields.
+     *
      * @param $field_name
      * @param $field_obj
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _add_fields($field_name, $field_obj)
@@ -990,7 +1014,6 @@ abstract class BaseModel extends \CI_Model
     }
 
     /**
-     *
      * @ignore
      */
     public function clean_fields()
@@ -1020,8 +1043,10 @@ abstract class BaseModel extends \CI_Model
     }
 
     /**
-     * @return bool true if the orm manages this model.
+     * @return bool true if the orm manages this model
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function is_managed()
@@ -1030,8 +1055,10 @@ abstract class BaseModel extends \CI_Model
     }
 
     /**
-     * @return bool true if the model is a proxy model.
+     * @return bool true if the model is a proxy model
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function is_proxy()
@@ -1049,10 +1076,10 @@ abstract class BaseModel extends \CI_Model
 
     // ========================================================================================================
 
-
     /**
      * @param $method
      * @param $args
+     *
      * @return mixed
      *
      * @ignore
@@ -1063,12 +1090,12 @@ abstract class BaseModel extends \CI_Model
         if (preg_match('/get_(.*)_display/', $method)):
             $name = implode('', preg_split('/^(get_)||(_display)$/', $method));
 
-
             if (isset($this->meta->fields[$name]) && !empty($this->meta->fields[$name]->choices)):
                 $value = $this->{$name};
                 if (empty($value)):
                     return $value;
                 endif;
+
                 return $this->meta->fields[$name]->choices[$value];
             endif;
         endif;
@@ -1097,6 +1124,7 @@ abstract class BaseModel extends \CI_Model
 
     /**
      * @ignore
+     *
      * @return string
      */
     public function __toString()

@@ -3,19 +3,18 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 6/19/16
- * Time: 1:17 AM
+ * Time: 1:17 AM.
  */
-
 namespace eddmash\powerorm\queries;
 
 use eddmash\powerorm\exceptions\OrmExceptions;
 use eddmash\powerorm\helpers\Tools;
 
 /**
- * Class Filter
- * @package eddmash\powerorm\queries
+ * Class Filter.
  *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Filter
@@ -25,8 +24,10 @@ class Filter
     public $_database;
 
     /**
-     * Lookup options
+     * Lookup options.
+     *
      * @internal
+     *
      * @var array
      */
     protected $lookup_options = [
@@ -41,7 +42,7 @@ class Filter
         'endswith',
         'isnull',
         'not',
-        'notin'];
+        'notin', ];
 
     public function __construct(&$qbuilder, $table_name = null)
     {
@@ -54,32 +55,34 @@ class Filter
     {
         if (!empty($lookup) && !in_array($lookup, $this->lookup_options)):
             throw new OrmExceptions(
-                sprintf("`%1\$s` is not a valid lookup parameter the options are %2\$s",
+                sprintf('`%1$s` is not a valid lookup parameter the options are %2$s',
                     $lookup, Tools::stringify($this->lookup_options)));
         endif;
     }
 
     /**
      * Creates the different types of where clause based on looksup provided in the condition e.g ['name__exact'=>"john"]
-     * $this->user->filter(['~name'=>'mather', 'age'=>10])
+     * $this->user->filter(['~name'=>'mather', 'age'=>10]).
+     *
      * @internal
+     *
      * @param string $table_name
      * @param $conditions
+     *
      * @throws OrmExceptions
      */
-    public function _where($table_name = null, $conditions)
+    public function _where($table_name, $conditions)
     {
         // default lookup is equal
         $lookup = 'eq';
-        $lookup_pattern = "/__/";
-        $where_concat_pattern = "/^~[.]*/";
+        $lookup_pattern = '/__/';
+        $where_concat_pattern = '/^~[.]*/';
 
         // we add the or conditions afterwards to avoid them being mistaken for and conditions when they come first
         $or_combine = [];
 
         // create where clause from the conditions given
         foreach ($conditions as $key => $value) :
-
 
             // check which where clause to use
             if (preg_match($lookup_pattern, $key)):
@@ -103,7 +106,7 @@ class Filter
 
             // append table name to key
             if (!empty($table_name)):
-                $key = $table_name . ".$key";
+                $key = $table_name.".$key";
             endif;
 
             // check if we need to use OR to combine
@@ -155,7 +158,7 @@ class Filter
             case 'between':
                 if (!is_array($value) || (is_array($value) && count($value) != 2)) {
                     throw new OrmExceptions(
-                        sprintf("filter() using between expected value to be an array, with two values only"));
+                        sprintf('filter() using between expected value to be an array, with two values only'));
                 }
                 $this->_qbuilder->where("$key BETWEEN $value[0] AND $value[1] ");
                 break;
@@ -208,7 +211,7 @@ class Filter
             case 'between':
                 if (!is_array($value) || (is_array($value) && count($value) != 2)) {
                     throw new OrmExceptions(
-                        sprintf("filter() usin between expected value to be an array, with two values only"));
+                        sprintf('filter() usin between expected value to be an array, with two values only'));
                 }
                 $this->_qbuilder->or_where("$key BETWEEN $value[0] AND $value[1] ");
                 break;

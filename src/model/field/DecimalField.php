@@ -3,15 +3,14 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:06 PM
+ * Time: 4:06 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 use eddmash\powerorm\checks\Checks;
 
 /**
- * A fixed-precision decimal number. SQl column DECIMAL(M,D)
+ * A fixed-precision decimal number. SQl column DECIMAL(M,D).
  *
  * Has two required arguments:
  *
@@ -32,8 +31,6 @@ use eddmash\powerorm\checks\Checks;
  * ORM::DecimalField(max_digits=19, decimal_places=10)
  *
  * The default form widget for this field is a 'text'.
- *
- * @package eddmash\powerorm\model\field
  */
 class DecimalField extends Field
 {
@@ -47,10 +44,10 @@ class DecimalField extends Field
 
     /**
      * The number of decimal places to store with the number.
+     *
      * @var
      */
     public $decimal_places;
-
 
     /**
      * {@inheritdoc}
@@ -59,7 +56,6 @@ class DecimalField extends Field
     {
         parent::__construct($field_options);
     }
-
 
     /**
      * {@inheritdoc}
@@ -83,6 +79,7 @@ class DecimalField extends Field
 
     /**
      * @ignore
+     *
      * @return array
      */
     public function _decimal_places_check()
@@ -90,22 +87,22 @@ class DecimalField extends Field
         if (empty($this->decimal_places)):
             return [
                 Checks::error([
-                    "message" => sprintf("%s expects 'decimal_place' attribute to be set.", get_class($this)),
+                    'message' => sprintf("%s expects 'decimal_place' attribute to be set.", get_class($this)),
                     'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E130'
-                ])
+                    'id' => 'fields.E130',
+                ]),
             ];
         endif;
 
         if (!is_numeric($this->decimal_places) || $this->decimal_places < 0):
             return [
                 Checks::error([
-                    "message" => sprintf("%s expects 'decimal_place' attribute to be a positive integer.", get_class($this)),
+                    'message' => sprintf("%s expects 'decimal_place' attribute to be a positive integer.", get_class($this)),
                     'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E131'
-                ])
+                    'id' => 'fields.E131',
+                ]),
             ];
         endif;
 
@@ -114,6 +111,7 @@ class DecimalField extends Field
 
     /**
      * @ignore
+     *
      * @return array
      */
     public function _check_max_digits()
@@ -121,22 +119,22 @@ class DecimalField extends Field
         if (empty($this->max_digits)):
             return [
                 Checks::error([
-                    "message" => sprintf("%s expects 'max_digits' attribute to be set.", get_class($this)),
+                    'message' => sprintf("%s expects 'max_digits' attribute to be set.", get_class($this)),
                     'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E132'
-                ])
+                    'id' => 'fields.E132',
+                ]),
             ];
         endif;
 
         if (!is_numeric($this->max_digits) || $this->max_digits < 0):
             return [
                 Checks::error([
-                    "message" => sprintf("%s expects 'max_digits' attribute to be a positive integer", get_class($this)),
+                    'message' => sprintf("%s expects 'max_digits' attribute to be a positive integer", get_class($this)),
                     'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E133'
-                ])
+                    'id' => 'fields.E133',
+                ]),
             ];
         endif;
 
@@ -144,11 +142,11 @@ class DecimalField extends Field
         if ($this->max_digits < $this->decimal_places):
             return [
                 Checks::error([
-                    "message" => sprintf("%s expects 'max_digits' to be greater than 'decimal_places'", get_class($this)),
+                    'message' => sprintf("%s expects 'max_digits' to be greater than 'decimal_places'", get_class($this)),
                     'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E134'
-                ])
+                    'id' => 'fields.E134',
+                ]),
             ];
         endif;
 

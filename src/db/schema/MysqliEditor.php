@@ -3,17 +3,17 @@
  * Created by http://eddmash.com.
  * User: eddmash
  * Date: 5/28/16
- * Time: 8:59 AM
+ * Time: 8:59 AM.
  */
-
 namespace eddmash\powerorm\db\schema;
 
 use eddmash\powerorm\model\field\Field;
 
 /**
- * Class MysqliEditor
- * @package eddmash\powerorm\db\schema
+ * Class MysqliEditor.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class MysqliEditor extends BaseEditor implements SchemaEditorInterface
@@ -32,6 +32,6 @@ class MysqliEditor extends BaseEditor implements SchemaEditorInterface
         $db_type = $field->db_type($this->get_connection());
         $columns = ['tinyblob', 'blob', 'mediumblob', 'longblob', 'tinytext', 'text', 'mediumtext', 'longtext'];
 
-        return (!$db_type && in_array(strtolower($db_type), $columns));
+        return !$db_type && in_array(strtolower($db_type), $columns);
     }
 }

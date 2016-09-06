@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 2:08 PM
+ * Time: 2:08 PM.
  */
-
 namespace eddmash\powerorm\form\fields;
 
 use eddmash\powerorm\form\widgets\MultipleCheckboxes;
@@ -29,11 +28,12 @@ use eddmash\powerorm\form\widgets\SelectMultiple;
  *                      'dvd'=> 'DVD',
  *                  ],
  *                  'unknown'=> 'Unknown',
- *              ];
+ *              ];.
  *
  * Class ChoiceField
- * @package eddmash\powerorm\form\fields
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class ChoiceField extends Field
@@ -52,6 +52,7 @@ class ChoiceField extends Field
             return sprintf('%s[]', $this->name);
 
         endif;
+
         return parent::get_html_name();
     }
 

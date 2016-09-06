@@ -1,4 +1,5 @@
 <?php
+
 namespace eddmash\powerorm\model;
 
 use eddmash\powerorm\app\Registry;
@@ -10,9 +11,10 @@ use eddmash\powerorm\Object;
 use Orm;
 
 /**
- * Class Meta
- * @package eddmash\powerorm\model
+ * Class Meta.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Meta extends Object implements Contributor
@@ -35,6 +37,7 @@ class Meta extends Object implements Contributor
 
     /**
      * Holds the registry the model is attached to.
+     *
      * @var Registry
      */
     public $registry;
@@ -44,16 +47,17 @@ class Meta extends Object implements Contributor
 
     /**
      * This will hold items that will be overriden in the current meta instance.
+     *
      * @var array
      */
     private $overrides = [];
 
     /**
      * Indicates if model was auto created by the orm e.g. intermediary model for many to many relationship.
+     *
      * @var bool
      */
     public $auto_created = false;
-
 
     public function __construct($overrides = [])
     {
@@ -77,9 +81,10 @@ class Meta extends Object implements Contributor
 
     /**
      * @param Field $field_obj
-     * @since 1.1.0
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function load_inverse_field($field_obj)
     {
@@ -107,8 +112,11 @@ class Meta extends Object implements Contributor
 
     /**
      * Makes sure the model is ready for use.
+     *
      * @param BaseModel $model
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function prepare(BaseModel $model)
@@ -119,9 +127,11 @@ class Meta extends Object implements Contributor
     }
 
     /**
-     * @param string $name
+     * @param string    $name
      * @param BaseModel $obj
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function contribute_to_class($name, $obj)
@@ -148,6 +158,7 @@ class Meta extends Object implements Contributor
     private function _is_abstract($obj)
     {
         $reflection = new \ReflectionClass($obj);
+
         return $reflection->isAbstract();
     }
 
@@ -156,7 +167,9 @@ class Meta extends Object implements Contributor
      * not defined on the model e.g. by usingg hasmanyfield() or hasonefield().
      *
      * @return array
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_reverse_fields()

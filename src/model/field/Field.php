@@ -1,10 +1,6 @@
 <?php
 /**
- * The Model Field
- */
-
-/**
- *
+ * The Model Field.
  */
 namespace eddmash\powerorm\model\field;
 
@@ -18,36 +14,45 @@ use eddmash\powerorm\NOT_PROVIDED;
 use eddmash\powerorm\Object;
 
 /**
- * Interface FieldInterface
- * @package eddmash\powerorm\model\field
+ * Interface FieldInterface.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 interface FieldInterface extends DeConstructable, Contributor
 {
-
     /**
      * Returns the database column data type for the Field, taking into account the connection.
      *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function db_type($connection);
 
     /**
-     * Convert the value to a php value
+     * Convert the value to a php value.
+     *
      * @param $value
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function to_php($value);
 
     /**
      * Returns a powerorm.form.Field instance for this database Field.
+     *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function formfield($kwargs = []);
@@ -63,20 +68,26 @@ interface FieldInterface extends DeConstructable, Contributor
      * The attribute name is in $this->name (this is set up by Field).
      *
      * @param $model
-     * @param bool $add is whether the instance is being saved to the database for the first time.
+     * @param bool $add is whether the instance is being saved to the database for the first time
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function pre_save($model, $add);
 
     /**
      * value is the current value of the model’s attribute, and the method should return data in a format that has been
-     * prepared for use as a parameter in a query.ie. in the database
+     * prepared for use as a parameter in a query.ie. in the database.
      *
      * @param $value
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function prepare_value($value);
@@ -87,8 +98,11 @@ interface FieldInterface extends DeConstructable, Contributor
      *
      * @param $value
      * @param $connection
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function prepare_value_for_db($value, $connection, $prepared = false);
@@ -100,8 +114,11 @@ interface FieldInterface extends DeConstructable, Contributor
      *
      * @param $value
      * @param $connection
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function prepare_value_before_save($value, $connection);
@@ -113,7 +130,9 @@ interface FieldInterface extends DeConstructable, Contributor
      * or the backend itself does the conversion.
      *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function from_db_value();
@@ -125,45 +144,51 @@ interface FieldInterface extends DeConstructable, Contributor
  * This class should not be instantiated
  *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class Field extends Object implements FieldInterface
 {
-    const BLANK_CHOICE_DASH = ["" => "---------"];
+    const BLANK_CHOICE_DASH = ['' => '---------'];
 
     /**
      * @ignore
+     *
      * @var null
      */
     public $name = null;
 
-
     /**
      * The maximum length (in characters) of the field.
+     *
      * @var
      */
     public $max_length;
 
     /**
      * Indicate if this is an inverse relation field.
+     *
      * @var bool
      */
     public $inverse = false;
 
     /**
      * @ignore
+     *
      * @var bool
      */
     public $M2M = false;
 
     /**
      * @ignore
+     *
      * @var bool
      */
     public $M2O = false;
 
     /**
      * @ignore
+     *
      * @var bool
      */
     public $O2O = false;
@@ -171,18 +196,20 @@ abstract class Field extends Object implements FieldInterface
     /**
      * A human-readable name for the field. If the verbose name isn’t given, Powerorm will automatically create it using
      * the field’s attribute name, converting underscores to spaces.
+     *
      * @var string
      */
     public $verbose_name = null;
 
     /**
      * @ignore
+     *
      * @var string
      */
     public $type;
 
     /**
-     * If True, powerorm will store empty values as NULL in the database. Default is False i.e NOT NULL
+     * If True, powerorm will store empty values as NULL in the database. Default is False i.e NOT NULL.
      *
      * @var bool
      */
@@ -223,36 +250,42 @@ abstract class Field extends Object implements FieldInterface
 
     /**
      * The default value for the field.
+     *
      * @var
      */
     public $default;
 
     /**
      * @ignore
+     *
      * @var null
      */
     public $db_column = null;
 
     /**
      * If True, this field will be indexed.
+     *
      * @var null
      */
     public $db_index = false;
 
     /**
-     * if this is a relationship field, this hold the Relationship object that this field represents
+     * if this is a relationship field, this hold the Relationship object that this field represents.
+     *
      * @var RelationObject
      */
     public $relation = null;
 
     /**
      * Indicates if this field is  relationship field.
+     *
      * @var bool
      */
     public $is_relation = false;
 
     /**
      * Model that this field is attached to.
+     *
      * @var BaseModel
      */
     public $container_model;
@@ -292,7 +325,6 @@ abstract class Field extends Object implements FieldInterface
      * $gender =  ORM::CharField(['max_length'=2, 'choices'=$gender_choices])
      *
      * @var
-     *
      */
     public $choices;
 
@@ -312,13 +344,15 @@ abstract class Field extends Object implements FieldInterface
 
     /**
      * @ignore
+     *
      * @var
      */
     private $constructor_args;
 
     /**
      * Takes in options to determine how to create the field.
-     * @param array $field_options the options to use.
+     *
+     * @param array $field_options the options to use
      */
     public function __construct($field_options = [])
     {
@@ -356,7 +390,8 @@ abstract class Field extends Object implements FieldInterface
     }
 
     /**
-     * Calculates the actual column name in the database, especially useful for foreign keys
+     * Calculates the actual column name in the database, especially useful for foreign keys.
+     *
      * @return string
      */
     public function db_column_name()
@@ -365,7 +400,6 @@ abstract class Field extends Object implements FieldInterface
     }
 
     /**
-     *
      * @ignore
      */
     public function __validate_name()
@@ -374,6 +408,7 @@ abstract class Field extends Object implements FieldInterface
 
     /**
      * Returns all the necessary items needed for recreation of the field again.
+     *
      * @return array
      */
     public function skeleton()
@@ -385,24 +420,24 @@ abstract class Field extends Object implements FieldInterface
             $path = sprintf('eddmash\powerorm\model\field as %s', $alias);
         endif;
 
-
         return [
             'constructor_args' => $this->constructor_args(),
             'path' => $path,
             'full_name' => $this->full_class_name(),
-            'name' => sprintf('%1$s\%2$s', $alias, $this->get_class_name())
+            'name' => sprintf('%1$s\%2$s', $alias, $this->get_class_name()),
         ];
     }
 
     public function db_params($connection)
     {
         return [
-            'type' => $this->db_type($connection)
+            'type' => $this->db_type($connection),
         ];
     }
 
     /**
-     * Returns all the parameters that were passed to the constructor on initialization
+     * Returns all the parameters that were passed to the constructor on initialization.
+     *
      * @return mixed
      */
     public function constructor_args()
@@ -410,14 +445,14 @@ abstract class Field extends Object implements FieldInterface
         $this->constructor_args = array_change_key_case($this->constructor_args, CASE_LOWER);
 
         $defaults = [
-            "primary_key" => false,
-            "max_length" => null,
-            "unique" => false,
-            "null" => false,
-            "db_index" => false,
-            "default" => new NOT_PROVIDED,
+            'primary_key' => false,
+            'max_length' => null,
+            'unique' => false,
+            'null' => false,
+            'db_index' => false,
+            'default' => new NOT_PROVIDED(),
         ];
-//
+
         foreach ($defaults as $name => $default) :
             $value = ($this->has_property($name)) ? $this->{$name} : $default;
 
@@ -434,7 +469,7 @@ abstract class Field extends Object implements FieldInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function contribute_to_class($field_name, $model_obj)
     {
@@ -450,14 +485,17 @@ abstract class Field extends Object implements FieldInterface
         $this->db_column = $this->db_column_name();
 
         if (empty($this->verbose_name)):
-            $this->verbose_name = ucwords(str_replace("_", " ", $name));
+            $this->verbose_name = ucwords(str_replace('_', ' ', $name));
         endif;
     }
 
     /**
      * returns the constraint name especially in relationship fields.
+     *
      * @ignore
+     *
      * @param string $prefix
+     *
      * @return string
      */
     public function constraint_name($prefix)
@@ -469,9 +507,9 @@ abstract class Field extends Object implements FieldInterface
         return sprintf('%1$s_%2$s_%3$s', $prefix, strtolower($this->name), mt_rand());
     }
 
-
     /**
      * return the database column that this field represents.
+     *
      * @return string
      */
     public function db_type($connection)
@@ -480,7 +518,7 @@ abstract class Field extends Object implements FieldInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function formfield($kwargs = [])
     {
@@ -497,7 +535,6 @@ abstract class Field extends Object implements FieldInterface
         if ($this->has_default()):
             $defaults['initial'] = $this->get_default();
         endif;
-
 
         if ($this->choices):
             $include_blank = true;
@@ -533,7 +570,7 @@ abstract class Field extends Object implements FieldInterface
     }
 
     /**
-     * Tells us if the default value is set
+     * Tells us if the default value is set.
      */
     public function has_default()
     {
@@ -557,15 +594,17 @@ abstract class Field extends Object implements FieldInterface
 
     /**
      * @ignore
+     *
      * @return string
      */
     public function __toString()
     {
-        return $this->container_model->get_class_name() . '->' . $this->name;
+        return $this->container_model->get_class_name().'->'.$this->name;
     }
 
     /**
      * @ignore
+     *
      * @param $context
      * @param $value
      */
@@ -575,6 +614,7 @@ abstract class Field extends Object implements FieldInterface
 
     /**
      * Should return a list of \eddmash\powerorm\checks\Message instances. used in migrations.
+     *
      * @return array
      */
     public function check()
@@ -584,8 +624,10 @@ abstract class Field extends Object implements FieldInterface
 
     /**
      * @ignore
+     *
      * @param $checks
      * @param $new_check
+     *
      * @return array
      */
     public function add_check($checks, $new_check)
@@ -593,6 +635,7 @@ abstract class Field extends Object implements FieldInterface
         if (!empty($new_check)):
             $checks = array_merge($checks, $new_check);
         endif;
+
         return $checks;
     }
 
@@ -608,23 +651,29 @@ abstract class Field extends Object implements FieldInterface
         $skel = $this->skeleton();
         $constructor_args = array_pop($skel['constructor_args']);
         $class_name = $skel['full_name'];
+
         return new $class_name($constructor_args);
     }
 
     /**
-     * Use to store this fields results, mostly used in relational fields
+     * Use to store this fields results, mostly used in relational fields.
+     *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_cache_name()
     {
-        return sprintf("_%s_cache", $this->name);
+        return sprintf('_%s_cache', $this->name);
     }
 
     /**
      * Returns choices with a default blank choices included, for use as SelectField choices for this field.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_choices($opts = [])
@@ -663,12 +712,10 @@ abstract class Field extends Object implements FieldInterface
         // TODO: Implement from_db_value() method.
     }
 
-
     public function prepare_value_before_save($value, $connection)
     {
         return $this->prepare_value_for_db($value, $connection);
     }
-
 
     public function __debugInfo()
     {

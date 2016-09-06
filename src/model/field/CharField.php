@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:04 PM
+ * Time: 4:04 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 use eddmash\powerorm\checks\Checks;
@@ -23,7 +22,6 @@ use eddmash\powerorm\checks\Checks;
  */
 class CharField extends Field
 {
-
     /**
      * {@inheritdoc}
      */
@@ -47,11 +45,13 @@ class CharField extends Field
     {
         $checks = parent::check();
         $checks = $this->add_check($checks, $this->_max_length_check());
+
         return $checks;
     }
 
     /**
      * @ignore
+     *
      * @return array
      */
     public function _max_length_check()
@@ -59,24 +59,25 @@ class CharField extends Field
         if (empty($this->max_length)):
             return [
                 Checks::error([
-                    "message" => "Charfield requires `max_length` to be set",
-                    "hint" => null,
-                    "context" => $this,
-                    "id" => "fields.E120"
-                ])
+                    'message' => 'Charfield requires `max_length` to be set',
+                    'hint' => null,
+                    'context' => $this,
+                    'id' => 'fields.E120',
+                ]),
             ];
         endif;
 
         if (!empty($this->max_length) && $this->max_length < 0):
             return [
                 Checks::error([
-                    "message" => 'Charfield requires `max_length` to be a positive integer',
-                    "hint" => null,
-                    "context" => $this,
-                    "id" => "fields.E121"
-                ])
+                    'message' => 'Charfield requires `max_length` to be a positive integer',
+                    'hint' => null,
+                    'context' => $this,
+                    'id' => 'fields.E121',
+                ]),
             ];
         endif;
+
         return [];
     }
 
@@ -84,6 +85,7 @@ class CharField extends Field
     {
         $defaults = ['max_length' => $this->max_length];
         $defaults = array_merge($defaults, $kwargs);
+
         return parent::formfield($defaults);
     }
 }

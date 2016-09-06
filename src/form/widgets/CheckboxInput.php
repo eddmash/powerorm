@@ -3,19 +3,19 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 2:13 PM
+ * Time: 2:13 PM.
  */
-
 namespace eddmash\powerorm\form\widgets;
 
 /**
- * This creates a single checkbox on the fields, to create more than one use {@see MultipleCheckboxes}
+ * This creates a single checkbox on the fields, to create more than one use {@see MultipleCheckboxes}.
  *
  * Checkbox: <input type='checkbox' ...>
  *
  * Class CheckboxInput
- * @package eddmash\powerorm\form\widgets
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class CheckboxInput extends Widget
@@ -31,7 +31,7 @@ class CheckboxInput extends Widget
         endif;
 
         if (!empty($value)):
-            return (string)$value;
+            return (string) $value;
         endif;
 
         return sprintf('<input %s>', $this->flat_attrs($final_attrs));
@@ -55,8 +55,7 @@ class CheckboxInput extends Widget
             return $value;
         endif;
 
-
         // type cast otherwise
-        return (bool)$value;
+        return (bool) $value;
     }
 }

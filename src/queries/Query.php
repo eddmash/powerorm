@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 6/29/16
- * Time: 6:36 PM
+ * Time: 6:36 PM.
  */
-
 namespace eddmash\powerorm\queries;
 
 interface Query

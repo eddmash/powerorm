@@ -1,11 +1,12 @@
 <?php
+
 use eddmash\powerorm\Object;
 
 /**
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 9/5/16
- * Time: 11:34 PM
+ * Time: 11:34 PM.
  */
 class ObjectTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,7 +52,9 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
      * @param $expectedName
      * @param $returnedName
      * @dataProvider providerTestStandardizedName
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function testConversionToStandardName($originalName, $expectedName)

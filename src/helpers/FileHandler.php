@@ -1,12 +1,14 @@
 <?php
+
 namespace eddmash\powerorm\helpers;
 
 use eddmash\powerorm\Object;
 
 /**
  * Responsible for creating files. creates files with the extension "php".
- * @package eddmash\powerorm\migrations
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class FileHandler extends Object
@@ -16,8 +18,7 @@ class FileHandler extends Object
     public $file_name;
 
     /**
-     * @param string $folder the absolute path to the folder to be created/read from
-     *
+     * @param string $folder    the absolute path to the folder to be created/read from
      * @param string $file_name the specific file to handle in the folder specified
      */
     public function __construct($folder, $file_name = '')
@@ -38,9 +39,9 @@ class FileHandler extends Object
         endif;
 
         // absolute path to file
-        $file = $this->path . $this->file_name . ".php";
+        $file = $this->path.$this->file_name.'.php';
 
-        $file_handle = fopen($file, "w");
+        $file_handle = fopen($file, 'w');
         if ($file_handle):
             fprintf($file_handle, $content);
             fclose($file_handle);
@@ -63,7 +64,7 @@ class FileHandler extends Object
         $name = $this->standard_name($name);
 
         foreach ($files as $file) :
-            $file_name = $file->getBaseName('.' . $ext);
+            $file_name = $file->getBaseName('.'.$ext);
             if ($this->standard_name($file_name) == $name && $file->getExtension() == $ext):
                 return $file;
             endif;
@@ -75,8 +76,10 @@ class FileHandler extends Object
 
     /**
      * searches for files in a directory recursively.
-     * @param string $ext the extension of files to return defualt is "php"
-     * @param bool|TRUE $recurse if true checks inside directories within the directory default is true
+     *
+     * @param string    $ext     the extension of files to return defualt is "php"
+     * @param bool|true $recurse if true checks inside directories within the directory default is true
+     *
      * @return array
      */
     public function read_dir($ext = 'php', $recurse = true)
@@ -85,12 +88,16 @@ class FileHandler extends Object
     }
 
     /**
-     * Read contents inside a directory
-     * @param string $ext
-     * @param bool|TRUE $recurse
+     * Read contents inside a directory.
+     *
+     * @param string     $ext
+     * @param bool|true  $recurse
      * @param bool|false $file_obj if true returns a file object, if false returns a file pathname
+     *
      * @return array
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function _read_dir($ext = 'php', $recurse = true, $file_obj = false)
@@ -142,7 +149,6 @@ class FileHandler extends Object
             $file_list[] = $file->getPathname();
         endif;
 
-
         return $file_list;
     }
 
@@ -154,6 +160,6 @@ class FileHandler extends Object
 
     public function stable_dir($name)
     {
-        return (preg_match("/\/$/", $name)) ? $name : $name . "/";
+        return (preg_match("/\/$/", $name)) ? $name : $name.'/';
     }
 }

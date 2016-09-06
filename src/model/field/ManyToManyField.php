@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:10 PM
+ * Time: 4:10 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 use eddmash\powerorm\checks\Checks;
@@ -14,7 +13,7 @@ use eddmash\powerorm\model\field\relation\ManyToManyObject;
 use Orm;
 
 /**
- * Class ManyToMany
+ * Class ManyToMany.
  */
 class ManyToManyField extends RelatedField
 {
@@ -27,11 +26,10 @@ class ManyToManyField extends RelatedField
     {
         parent::__construct($field_options);
 
-
         $this->relation = new ManyToManyObject([
             'model' => $field_options['model'],
             'through' => array_key_exists('through', $field_options) ? $field_options['through'] : null,
-            'field' => $this
+            'field' => $this,
         ]);
     }
 
@@ -44,11 +42,13 @@ class ManyToManyField extends RelatedField
         $checks = parent::check();
         $checks = $this->add_check($checks, $this->_unique_check());
         $checks = $this->add_check($checks, $this->_ignored_options());
+
         return $checks;
     }
 
     /**
      * @ignore
+     *
      * @return mixed
      */
     public function _unique_check()
@@ -56,11 +56,11 @@ class ManyToManyField extends RelatedField
         if ($this->unique):
             return [
                 Checks::error([
-                    "message" => sprintf('%s field cannot be unique', $this->get_class_name()),
-                    "hint" => null,
-                    "context" => $this,
-                    "id" => "fields.E330"
-                ])
+                    'message' => sprintf('%s field cannot be unique', $this->get_class_name()),
+                    'hint' => null,
+                    'context' => $this,
+                    'id' => 'fields.E330',
+                ]),
             ];
         endif;
 
@@ -75,12 +75,12 @@ class ManyToManyField extends RelatedField
         if ($this->through !== null && !in_array($this->standard_name($this->through), $model_names)):
             return [
                 Checks::error([
-                    "message" => sprintf('Field specifies a many-to-many relation through model %s,
+                    'message' => sprintf('Field specifies a many-to-many relation through model %s,
                     which does not exist.', ucfirst($this->through)),
-                    "hint" => null,
-                    "context" => $this,
-                    "id" => "fields.E331"
-                ])
+                    'hint' => null,
+                    'context' => $this,
+                    'id' => 'fields.E331',
+                ]),
             ];
         endif;
 
@@ -89,6 +89,7 @@ class ManyToManyField extends RelatedField
 
     /**
      * @ignore
+     *
      * @return mixed
      */
     public function _ignored_options()
@@ -96,13 +97,14 @@ class ManyToManyField extends RelatedField
         if ($this->null):
             return [
                 Checks::warning([
-                    "message" => sprintf('`null` has no effect on %s', $this->get_class_name()),
-                    "hint" => null,
-                    "context" => $this,
-                    "id" => "fields.W340"
-                ])
+                    'message' => sprintf('`null` has no effect on %s', $this->get_class_name()),
+                    'hint' => null,
+                    'context' => $this,
+                    'id' => 'fields.W340',
+                ]),
             ];
         endif;
+
         return [];
     }
 
@@ -122,7 +124,6 @@ class ManyToManyField extends RelatedField
         if (is_string($this->relation->through)):
             $this->relation->through = $this->set_through_model($this->relation->through);
         endif;
-
 
         $this->container_model->{$field_name} = ForwardManyToManyAccessor::instance($this->container_model, $this);
     }
@@ -152,14 +153,15 @@ class ManyToManyField extends RelatedField
             eval($intermediary_class);
         endif;
 
-        $class_name = "\\" . $class_name;
+        $class_name = '\\'.$class_name;
         $fields = [
             $owner_model_name => new ManyToOneField(['model' => $owner_model_name]),
-            $inverse_model_name => new ManyToOneField(['model' => $inverse_model_name])
+            $inverse_model_name => new ManyToOneField(['model' => $inverse_model_name]),
         ];
 
         $intermediary_obj = call_user_func_array(sprintf('%s::instance', $class_name), [null, $fields]);
         $intermediary_obj->meta->auto_created = true;
+
         return $intermediary_obj;
     }
 }

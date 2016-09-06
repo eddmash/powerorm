@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/25/16
- * Time: 7:48 PM
+ * Time: 7:48 PM.
  */
-
 namespace eddmash\powerorm\console;
 
 use eddmash\powerorm\exceptions\ValueError;
@@ -52,7 +51,6 @@ class Parser
         }
     }
 
-
     /**
      * name or flags - Either a name or a list of option strings, e.g. foo or -f, --foo.
      * action - The basic type of action to be taken when this argument is encountered at the command line.
@@ -67,7 +65,9 @@ class Parser
      * dest - The name of the attribute to be added to the object returned by parse_args().
      *
      * @param array $opts
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
      * @throws ValueError

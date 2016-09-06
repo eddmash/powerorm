@@ -1,7 +1,8 @@
 <?php
+
 namespace CodeIgniter\Autoloader;
 
-/**
+/*
  * Borrowed from CodeIgniter 4.
  *
  * CodeIgniter
@@ -41,7 +42,7 @@ namespace CodeIgniter\Autoloader;
 use CodeIgniter\Config\BaseConfig;
 
 /**
- * CodeIgniter Autoloader
+ * CodeIgniter Autoloader.
  *
  * An autoloader that uses both PSR4 autoloading, and traditional classmaps.
  *
@@ -75,12 +76,9 @@ use CodeIgniter\Config\BaseConfig;
  *
  *      // register the autoloader
  *      $loader->register();
- *
- * @package CodeIgniter\Autoloader
  */
 class Autoloader
 {
-
     /**
      * Stores namespaces as key, and path as values.
      *
@@ -178,7 +176,6 @@ class Autoloader
             $this->prefixes[$namespace] = [$path];
         }
 
-
         return $this;
     }
 
@@ -203,10 +200,10 @@ class Autoloader
     /**
      * Loads the class file for a given class name.
      *
-     * @param string $class The fully qualified class name.
+     * @param string $class The fully qualified class name
      *
-     * @return mixed            The mapped file on success, or boolean false
-     *                          on failure.
+     * @return mixed The mapped file on success, or boolean false
+     *               on failure
      */
     public function loadClass($class)
     {
@@ -231,7 +228,7 @@ class Autoloader
      *
      * @param string $class The fully-qualified class name
      *
-     * @return mixed            The mapped file name on success, or boolean false on fail
+     * @return mixed The mapped file name on success, or boolean false on fail
      */
     protected function loadInNamespace($class)
     {
@@ -246,7 +243,7 @@ class Autoloader
 
             foreach ($directories as $directory) {
                 if (strpos($class, $namespace) === 0) {
-                    $filePath = $directory . str_replace('\\', '/', substr($class, strlen($namespace))) . '.php';
+                    $filePath = $directory.str_replace('\\', '/', substr($class, strlen($namespace))).'.php';
 
                     $filename = $this->requireFile($filePath);
 
@@ -268,9 +265,9 @@ class Autoloader
      * version of CodeIgniter, namely 'application/libraries', and
      * 'application/Models'.
      *
-     * @param $class    The class name. This typically should NOT have a namespace.
+     * @param $class    The class name. This typically should NOT have a namespace
      *
-     * @return mixed    The mapped file name on success, or boolean false on failure
+     * @return mixed The mapped file name on success, or boolean false on failure
      */
     protected function loadLegacy($class)
     {
@@ -281,16 +278,16 @@ class Autoloader
         }
 
         $paths = [
-            APPPATH . 'controllers/',
-            APPPATH . 'libraries/',
-            APPPATH . 'models/',
-            APPPATH . 'forms/',
+            APPPATH.'controllers/',
+            APPPATH.'libraries/',
+            APPPATH.'models/',
+            APPPATH.'forms/',
         ];
 
-        $class = str_replace('\\', '/', $class) . '.php';
+        $class = str_replace('\\', '/', $class).'.php';
 
         foreach ($paths as $path) {
-            if ($file = $this->requireFile($path . $class)) {
+            if ($file = $this->requireFile($path.$class)) {
                 return $file;
             }
         }
@@ -336,7 +333,7 @@ class Autoloader
      *
      * @param string $filename
      *
-     * @return string       The sanitized filename
+     * @return string The sanitized filename
      */
     public function sanitizeFilename($filename)
     {
@@ -354,5 +351,5 @@ class Autoloader
     }
 
     //--------------------------------------------------------------------
- 
+
 }

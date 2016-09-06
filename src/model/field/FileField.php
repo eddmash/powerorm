@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:05 PM
+ * Time: 4:05 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 use eddmash\powerorm\checks\Checks;
@@ -18,25 +17,26 @@ use eddmash\powerorm\checks\Checks;
  *
  * FileField has one optional argument:
  *   - upload_to this is the path relative to the application base_url where the files will be uploaded.
- *
- * @package eddmash\powerorm\model\field
  */
 class FileField extends CharField
 {
     /**
      * @ignore
+     *
      * @var bool
      */
     protected $passed_pk;
 
     /**
      * @ignore
+     *
      * @var bool
      */
     protected $passed_unique;
 
     /**
-     * The path relative to the application base_url where the files will be uploaded
+     * The path relative to the application base_url where the files will be uploaded.
+     *
      * @var
      */
     public $upload_to;
@@ -62,11 +62,13 @@ class FileField extends CharField
         $checks = $this->add_check($checks, $this->_check_primarykey());
 
         $checks = $this->add_check($checks, $this->_check_unique());
+
         return $checks;
     }
 
     /**
      * @ignore
+     *
      * @return array
      */
     public function _check_unique()
@@ -74,18 +76,20 @@ class FileField extends CharField
         if ($this->passed_unique):
             return [
                 Checks::error([
-                    "message" => sprintf("'unique' is not a valid argument for a %s.", get_class($this)),
+                    'message' => sprintf("'unique' is not a valid argument for a %s.", get_class($this)),
                     'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E200'
-                ])
+                    'id' => 'fields.E200',
+                ]),
             ];
         endif;
+
         return [];
     }
 
     /**
      * @ignore
+     *
      * @return array
      */
     public function _check_primarykey()
@@ -94,11 +98,11 @@ class FileField extends CharField
 
             return [
                 Checks::error([
-                    "message" => sprintf("'primary_key' is not a valid argument for a %s.", get_class($this)),
+                    'message' => sprintf("'primary_key' is not a valid argument for a %s.", get_class($this)),
                     'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E201'
-                ])
+                    'id' => 'fields.E201',
+                ]),
             ];
         endif;
 

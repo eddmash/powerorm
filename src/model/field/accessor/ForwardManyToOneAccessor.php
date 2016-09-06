@@ -3,17 +3,17 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 9/6/16
- * Time: 1:15 AM
+ * Time: 1:15 AM.
  */
-
 namespace eddmash\powerorm\model\field\accessor;
 
 /**
- * Accessing from the many side to the one side
+ * Accessing from the many side to the one side.
  *
  * Class ForwardManyToOneAccesor
- * @package eddmash\powerorm\model\field
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class ForwardManyToOneAccessor extends Accessor
@@ -29,7 +29,7 @@ class ForwardManyToOneAccessor extends Accessor
 
     public function __toString()
     {
-        return (string)$this->_fetch_related_record();
+        return (string) $this->_fetch_related_record();
     }
 
     public function _fetch_related_record($name = null)

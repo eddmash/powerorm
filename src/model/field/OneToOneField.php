@@ -3,18 +3,15 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:09 PM
+ * Time: 4:09 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 /**
- * Class OneToOne
+ * Class OneToOne.
  */
 class OneToOneField extends ManyToOneField
 {
-
-
     /**
      * {@inheritdoc}
      */

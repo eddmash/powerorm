@@ -1,4 +1,5 @@
 <?php
+
 namespace eddmash\powerorm\app;
 
 use eddmash\powerorm\BaseOrm;
@@ -16,8 +17,9 @@ use Orm;
  * That is it hold all the models and any other information about an application.
  *
  * Class Registry
- * @package eddmash\powerorm\app
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Registry extends Object
@@ -30,7 +32,7 @@ class Registry extends Object
 
     public function __construct()
     {
-        # Whether the registry is populated.
+        // Whether the registry is populated.
         $this->ready = false;
     }
 
@@ -47,28 +49,32 @@ class Registry extends Object
     public function is_app_ready()
     {
         if (!$this->ready):
-            return new AppRegistryNotReady("Registry has not been loaded yet.");
-        endif;;
+            return new AppRegistryNotReady('Registry has not been loaded yet.');
+        endif;
     }
 
     /**
-     * Models that extend the PModel, but extend the CI_Model
+     * Models that extend the PModel, but extend the CI_Model.
+     *
      * @var array
      */
     protected $all_non_orm_models = [];
 
     /**
-     * Returns a list of all model files
+     * Returns a list of all model files.
+     *
      * @return array
      */
     public function get_model_files()
     {
         $fileHandler = new FileHandler(BaseOrm::get_models_path());
+
         return $fileHandler->read_dir('php');
     }
 
     /**
      * Returns the list of all the models that extend the PModel in the current app.
+     *
      * @return array
      */
     public function get_models()
@@ -86,8 +92,10 @@ class Registry extends Object
     }
 
     /**
-     * Loads all the models in the current application
+     * Loads all the models in the current application.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function _get_models()
@@ -120,9 +128,13 @@ class Registry extends Object
 
     /**
      * @param $name
+     *
      * @return BaseModel
+     *
      * @throws LookupError
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_model($name)
@@ -132,7 +144,7 @@ class Registry extends Object
         $name = $this->standard_name($name);
 
         if (!$this->has_model($name)):
-            throw new LookupError(sprintf("The model { %s } Does not exist", $name));
+            throw new LookupError(sprintf('The model { %s } Does not exist', $name));
         endif;
 
         return $this->all_models[$name];
@@ -145,7 +157,9 @@ class Registry extends Object
 
     /**
      * Load the model instance.
+     *
      * @param $model_name
+     *
      * @return mixed
      */
     public function _load_model($model_name)
@@ -161,6 +175,7 @@ class Registry extends Object
 
     /**
      * Returns a list of all model names in lowercase or false if not models were found.
+     *
      * @return array
      */
     public function get_model_classes()
@@ -183,7 +198,9 @@ class Registry extends Object
 
     /**
      * Gets a model name from its model file name.
+     *
      * @param $file
+     *
      * @return string
      */
     public function get_model_name($file)
@@ -201,11 +218,13 @@ class Registry extends Object
     }
 
     /**
-     * @param callback $callback the callback to invoke when a model has been created
-     * @param array $model_names the model we are waiting for to be created, the model object is passed to
-     * the callback as the first argument.
-     * @param array $kwargs an associative array to be passed to the callback.
+     * @param callback $callback    the callback to invoke when a model has been created
+     * @param array    $model_names the model we are waiting for to be created, the model object is passed to
+     *                              the callback as the first argument
+     * @param array    $kwargs      an associative array to be passed to the callback
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function lazy_model_ops($callback, $model_names, $kwargs)
@@ -229,7 +248,9 @@ class Registry extends Object
 
     /**
      * @param BaseModel $model
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function resolve_pending_ops($model)

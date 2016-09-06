@@ -5,14 +5,14 @@ namespace eddmash\powerorm;
 // **************************** INTERFACES *************************
 
 /**
- * Interface DeConstructable
- * @package powerorm
+ * Interface DeConstructable.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 interface DeConstructable
 {
-
     /**
      * This should return all the information (as an array) required to recreate this object again.
      *
@@ -39,32 +39,36 @@ interface DeConstructable
      *
      *
      * </code></pre>
+     *
      * @return array
      */
     public function skeleton();
 
     /**
      * Should return an array of all the arguments that the constructor takes in.
+     *
      * @return array
      */
     public function constructor_args();
 }
 
 /**
- * Interface Contributor
- * @package powerorm
+ * Interface Contributor.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 interface Contributor
 {
-
     /**
-     * Add the current object to the passed in object
-     * @param string $propery_name the name map the current object to, in the class object passed in.
-     * @param Object $class_object the object to attach the current object to.
+     * Add the current object to the passed in object.
+     *
+     * @param string $propery_name the name map the current object to, in the class object passed in
+     * @param object $class_object the object to attach the current object to
      *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function contribute_to_class($propery_name, $class_object);
@@ -73,44 +77,46 @@ interface Contributor
 // **************************** CLASSES *************************
 
 /**
- * Class NOT_PROVIDED
- * @package powerorm
+ * Class NOT_PROVIDED.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class NOT_PROVIDED
 {
     /**
      * @return static
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public static function instance()
     {
-        return new static;
+        return new static();
     }
 }
 
-
 /**
- * Class BaseObject
- * @package eddmash\powerorm\traits
+ * Class BaseObject.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 trait BaseObject
 {
-
-
     /**
      * @ignore
+     *
      * @var bool
      */
     private $_signal = false;
 
     /**
      * Initializes the object.
-     * This method is invoked at the end of the constructor after the object is initialized ;
+     * This method is invoked at the end of the constructor after the object is initialized ;.
      */
     public function init()
     {
@@ -118,7 +124,8 @@ trait BaseObject
 
     /**
      * Returns the fully qualified name of this class.
-     * @return string the fully qualified name of this class.
+     *
+     * @return string the fully qualified name of this class
      */
     public static function full_class_name()
     {
@@ -134,6 +141,7 @@ trait BaseObject
                 $name = array_pop($name);
             endif;
         endif;
+
         return $name;
     }
 
@@ -142,8 +150,10 @@ trait BaseObject
      *
      * The default implementation is a call to php function `method_exists()`.
      * You may override this method when you implemented the php magic method `__call()`.
+     *
      * @param string $name the method name
-     * @return boolean whether the method is defined
+     *
+     * @return bool whether the method is defined
      */
     public function has_method($name)
     {
@@ -169,7 +179,9 @@ trait BaseObject
 
     /**
      * Returns the immediate parent of this object.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_parent()
@@ -180,7 +192,9 @@ trait BaseObject
     /**
      * Retirns all he parents for this object static with the younest to the oldest
      * The resolution order to follow when going up a inheritance hierarchy.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_parents()
@@ -196,7 +210,9 @@ trait BaseObject
      *
      * @param $method
      * @param $args
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function call_method_upwards($method, $args = null)
@@ -236,9 +252,10 @@ trait BaseObject
 }
 
 /**
- * Class Object
- * @package powerorm
+ * Class Object.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Object

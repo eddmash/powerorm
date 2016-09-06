@@ -3,18 +3,18 @@
  * Created by http://eddmash.com.
  * User: edd
  * Date: 5/26/16
- * Time: 1:03 PM
+ * Time: 1:03 PM.
  */
-
 namespace eddmash\powerorm\migrations;
 
 use eddmash\powerorm\console\Base;
 use eddmash\powerorm\db\Connection;
 
 /**
- * Class Recorder
- * @package eddmash\powerorm\migrations
+ * Class Recorder.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Recorder extends Base
@@ -24,7 +24,7 @@ class Recorder extends Base
      */
     public $dbconnection;
 
-    public $migration_table_name = "orm_migrations";
+    public $migration_table_name = 'orm_migrations';
 
     public function __construct($dbconnection)
     {
@@ -75,11 +75,11 @@ class Recorder extends Base
                 'type' => 'INT',
                 'constraint' => 5,
                 'unsigned' => true,
-                'auto_increment' => true
+                'auto_increment' => true,
             ),
             'name' => array(
                 'type' => 'TEXT',
-            )
+            ),
         );
 
         $this->dbconnection->schema_editor->add_field($fields);

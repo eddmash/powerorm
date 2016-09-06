@@ -2,9 +2,6 @@
 /**
  * Class responsible for representing the reverse direction of a relationship.
  */
-/**
- *
- */
 namespace eddmash\powerorm\model\field;
 
 /**
@@ -42,8 +39,6 @@ namespace eddmash\powerorm\model\field;
  *
  *
  * Should not be instantiated.use its subclasse HasMany and HasOne.
- *
- * @package eddmash\powerorm\model\field
  */
 trait InverseRelation
 {

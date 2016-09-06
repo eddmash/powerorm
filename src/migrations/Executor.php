@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: edd
  * Date: 5/26/16
- * Time: 3:07 PM
+ * Time: 3:07 PM.
  */
-
 namespace eddmash\powerorm\migrations;
 
 use eddmash\powerorm\console\Base;
@@ -15,8 +14,9 @@ use eddmash\powerorm\exceptions\AmbiguityError;
  * Runs migrations on the database.
  *
  * Class Executor
- * @package eddmash\powerorm\migrations
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Executor extends Base
@@ -32,7 +32,9 @@ class Executor extends Base
 
     /**
      * Given a migration, get a list of needed to for the current to be run .
+     *
      * @param $targets
+     *
      * @return array
      */
     public function migration_plan($targets, $fresh_start = false)
@@ -43,7 +45,6 @@ class Executor extends Base
         else:
             $applied_migrations = $this->loader->applied_migrations;
         endif;
-
 
         $plan = [];
         foreach ($targets as $node_name) :
@@ -134,8 +135,8 @@ class Executor extends Base
         $full_plan = $this->migration_plan($this->loader->graph->leaf_nodes(), true);
 
         if (!empty($migrations_to_unapply) && !empty($migrations_to_apply)):
-            throw new AmbiguityError("Migration plans with both forwards and backwards migrations are not supported. " .
-                "Please split your migration process into  separate plans of only forwards OR backwards migrations.");
+            throw new AmbiguityError('Migration plans with both forwards and backwards migrations are not supported. '.
+                'Please split your migration process into  separate plans of only forwards OR backwards migrations.');
         endif;
 
         if (!empty($migrations_to_apply)):
@@ -147,54 +148,59 @@ class Executor extends Base
         endif;
     }
 
-
     /**
      * @param ProjectState $state
-     * @param Migration $migration
+     * @param Migration    $migration
      * @param $fake
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function apply_migration($state, Migration $migration, $fake)
     {
-        $this->normal("Applying " . $migration . " ... ");
+        $this->normal('Applying '.$migration.' ... ');
 
         if (!$fake):
             $state = $migration->apply($state, $this->connection);
             if ($state):
                 $this->recorder->record_applied(['name' => $migration->name]);
             endif;
-            $this->success(" Success", true);
+            $this->success(' Success', true);
         else:
             // record the migration into the database
             $this->recorder->record_applied(['name' => $migration->name]);
-            $this->success(" ... Faked", true);
+            $this->success(' ... Faked', true);
 
         endif;
+
         return $state;
     }
 
     /**
      * @param ProjectState $state
-     * @param Migration $migration
+     * @param Migration    $migration
      * @param $fake
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function unapply_migration($state, $migration, $fake)
     {
-        $this->normal("Unapplying " . $migration);
+        $this->normal('Unapplying '.$migration);
         if (!$fake):
             $state = $migration->unapply($state, $this->connection);
             if ($state):
                 $this->recorder->record_unapplied(['name' => $migration->name]);
             endif;
-            $this->success(" ... Success", true);
+            $this->success(' ... Success', true);
         else:
             // record the migration into the database
             $this->recorder->record_unapplied(['name' => $migration->name]);
-            $this->success(" ... Faked", true);
+            $this->success(' ... Faked', true);
 
         endif;
     }
@@ -244,7 +250,7 @@ class Executor extends Base
 
         foreach ($full_plan as $f_plan) :
 
-            /**
+            /*
              * If there are no migrations to run, just break
              */
             if (empty($migrations_to_run)):
@@ -263,7 +269,6 @@ class Executor extends Base
 
             // update the state
             $migration->update_state($state);
-
 
         endforeach;
 

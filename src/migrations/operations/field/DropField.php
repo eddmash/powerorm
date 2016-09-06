@@ -3,18 +3,18 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 3:32 PM
+ * Time: 3:32 PM.
  */
-
 namespace eddmash\powerorm\migrations\operations\field;
 
 use eddmash\powerorm\migrations\operations\Operation;
 use eddmash\powerorm\migrations\ProjectState;
 
 /**
- * Class DropField
- * @package eddmash\powerorm\migrations\operations
+ * Class DropField.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class DropField extends Operation

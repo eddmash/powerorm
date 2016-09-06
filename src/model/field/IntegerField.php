@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:07 PM
+ * Time: 4:07 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 use eddmash\powerorm\form;
@@ -15,12 +14,9 @@ use eddmash\powerorm\form\fields as form_fields;
  * Creates and integer column of Values ranging from -2147483648 to 2147483647.
  *
  * The default form widget for this field is a 'number' with a fallback on 'text' on browsers that dont support html5.
- *
- * @package eddmash\powerorm\model\field
  */
 class IntegerField extends Field
 {
-
     /**
      * If this options is set to TRUE, it will create a signed integer 0 to 2147483647
      * else it will create an unsigned integer 0 to -2147483647.
@@ -28,7 +24,6 @@ class IntegerField extends Field
      * @var bool
      */
     public $signed = null;
-
 
     /**
      * {@inheritdoc}

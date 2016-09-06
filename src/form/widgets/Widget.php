@@ -2,9 +2,8 @@
 /**
  * Created by eddmash <http://eddmash.com>
  * Date: 6/23/16
- * Time: 3:55 PM
+ * Time: 3:55 PM.
  */
-
 namespace eddmash\powerorm\form\widgets;
 
 use eddmash\powerorm\exceptions\NotImplemented;
@@ -12,9 +11,10 @@ use eddmash\powerorm\Object;
 
 /**
  * base class for all widgets, should never initialized
- * Class Widget
- * @package eddmash\powerorm\form\widgets
+ * Class Widget.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class Widget extends Object
@@ -51,10 +51,14 @@ abstract class Widget extends Object
     }
 
     /**
-     * Prepare value for use on HTML widget
+     * Prepare value for use on HTML widget.
+     *
      * @param $value
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function prepare_value($value)
@@ -77,7 +81,7 @@ abstract class Widget extends Object
         $str_attrs = '';
         foreach ($attrs as $key => $attr) :
             if ($attrs === true || $attrs === false):
-                $str_attrs .= ' ' . $key;
+                $str_attrs .= ' '.$key;
             else:
                 $str_attrs .= sprintf(' %1$s = %2$s', $key, $attr);
             endif;

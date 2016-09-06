@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 2:08 PM
+ * Time: 2:08 PM.
  */
-
 namespace eddmash\powerorm\form\fields;
 
 use eddmash\powerorm\form\widgets\NumberInput;
@@ -13,7 +12,7 @@ use eddmash\powerorm\form\widgets\NumberInput;
 /**
  * Creates a:
  *      Default widget: NumberInput.
- *      Empty value: None
+ *      Empty value: None.
  *
  * Validates that the given value is an integer.
  *
@@ -25,8 +24,9 @@ use eddmash\powerorm\form\widgets\NumberInput;
  * These control the range of values permitted in the field.
  *
  * Class IntegerField
- * @package eddmash\powerorm\form\fields
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class IntegerField extends Field

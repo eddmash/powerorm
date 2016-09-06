@@ -1,4 +1,5 @@
 <?php
+
 namespace eddmash\powerorm\model\field\relation;
 
 use eddmash\powerorm\model\BaseModel;
@@ -8,15 +9,15 @@ use eddmash\powerorm\Object;
  * Act as a buffer for Relation Fields, to help avoid issues with relations and self referencing.
  * but most importantly it hold information about relationship.
  *
- * @package eddmash\powerorm\model
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class RelationObject extends Object
 {
-
     /**
-     * Indicate if this is a reverse relation
+     * Indicate if this is a reverse relation.
+     *
      * @var bool
      */
     public $reverse = false;
@@ -46,7 +47,9 @@ class RelationObject extends Object
 
     /**
      * @return Field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function target_field()
@@ -56,7 +59,9 @@ class RelationObject extends Object
 
     /**
      * @return BaseModel
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_model()
@@ -66,7 +71,9 @@ class RelationObject extends Object
 
     /**
      * @param BaseModel $model
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function set_model($model)

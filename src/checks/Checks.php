@@ -1,12 +1,14 @@
 <?php
+
 namespace eddmash\powerorm\checks;
 
 use Orm;
 
 /**
- * Class Checks
- * @package eddmash\powerorm\checks
+ * Class Checks.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Checks
@@ -21,7 +23,7 @@ class Checks
 
     public function register($check)
     {
-        assert(is_array($check), "checks methods must return a list");
+        assert(is_array($check), 'checks methods must return a list');
 
         $this->registered_checks = array_merge($this->registered_checks, $check);
     }
@@ -29,7 +31,6 @@ class Checks
     public function run_checks()
     {
         $this->model_checks();
-
 
         return $this->get_checks();
     }
@@ -58,12 +59,12 @@ class Checks
         endforeach;
     }
 
-
 //    some short hand
     public static function critical($opts)
     {
         $message = $hint = $context = $id = '';
         extract($opts);
+
         return new Critical($message, $hint, $context, $id);
     }
 
@@ -71,6 +72,7 @@ class Checks
     {
         $message = $hint = $context = $id = '';
         extract($opts);
+
         return new Error($message, $hint, $context, $id);
     }
 
@@ -78,6 +80,7 @@ class Checks
     {
         $message = $hint = $context = $id = '';
         extract($opts);
+
         return new Warning($message, $hint, $context, $id);
     }
 
@@ -85,6 +88,7 @@ class Checks
     {
         $message = $hint = $context = $id = '';
         extract($opts);
+
         return new Debug($message, $hint, $context, $id);
     }
 
@@ -92,6 +96,7 @@ class Checks
     {
         $message = $hint = $context = $id = '';
         extract($opts);
+
         return new Info($message, $hint, $context, $id);
     }
 }

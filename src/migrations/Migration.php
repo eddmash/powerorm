@@ -3,9 +3,8 @@
  * Created by http://eddmash.com.
  * User: edd
  * Date: 4/21/16
- * Time: 1:09 PM
+ * Time: 1:09 PM.
  */
-
 namespace eddmash\powerorm\migrations;
 
 use eddmash\powerorm\DeConstructable;
@@ -24,8 +23,8 @@ use eddmash\powerorm\Object;
  * Operations are the actions that need to be taken on the database to make it match what the
  * application models represent.
  *
- * @package eddmash\powerorm\migrations
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Migration extends Object
@@ -63,14 +62,13 @@ class Migration extends Object
         $import_paths = '';
 
         foreach ($imports as $import) :
-            $import = sprintf("use %s;", $import);
-            $import_paths .= $import . PHP_EOL;
+            $import = sprintf('use %s;', $import);
+            $import_paths .= $import.PHP_EOL;
         endforeach;
 
-
-        $content = '[' . PHP_EOL;
+        $content = '['.PHP_EOL;
         foreach ($operations as $op) :
-            $content .= sprintf("\t\t\t%s," . PHP_EOL . PHP_EOL, $op);
+            $content .= sprintf("\t\t\t%s,".PHP_EOL.PHP_EOL, $op);
         endforeach;
         $content .= "\t\t]";
 
@@ -90,8 +88,11 @@ class Migration extends Object
     /**
      * @param ProjectState $project_state
      * @param $connection
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function apply($project_state, $connection)
@@ -112,8 +113,11 @@ class Migration extends Object
     /**
      * @param ProjectState $project_state
      * @param $connection
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function unapply($project_state, $connection)
@@ -132,13 +136,12 @@ class Migration extends Object
             // update state
             $op->update_state($state_after_op);
 
-            /**
+            /*
              * we insert them in the reverse order so the last operation is run first
              */
             array_unshift($items_to_run,
                 ['operation' => $op, 'state_before_op' => $state_before_op, 'state_after_op' => $state_after_op]);
         endforeach;
-
 
         foreach ($items_to_run as $item) :
 
@@ -146,7 +149,7 @@ class Migration extends Object
             $state_before_op = $item['state_before_op'];
             $state_after_op = $item['state_after_op'];
 
-            /**
+            /*
              * Since we are un applying the past state is where we want to revert to
              * and the updated state is the state we are moving from i.e
              * we are moving from $state_after_op to $state_before_op
@@ -154,13 +157,14 @@ class Migration extends Object
             $operation->rollback_database($connection, $state_after_op, $state_before_op);
         endforeach;
 
-
         return $project_state;
     }
 
     /**
      * Migration use this method to contribute to the current state of the project.
+     *
      * @param ProjectState $state
+     *
      * @return mixed
      */
     public function update_state($state)
@@ -186,6 +190,7 @@ class Migration extends Object
 
     /**
      * Returns all the dependencies for this migration.
+     *
      * @return mixed
      */
     public function get_dependency()
@@ -205,8 +210,8 @@ class Migration extends Object
 
             foreach ($value as $key => $val) :
                 if (!is_int($key)):
-                    $key_arr = Migration::stringify($key);
-                    $val_arr = Migration::stringify($val);
+                    $key_arr = self::stringify($key);
+                    $val_arr = self::stringify($val);
 
                     array_push($assoc, sprintf('%1$s=> %2$s', $key_arr[0], $val_arr[0]));
 
@@ -219,7 +224,7 @@ class Migration extends Object
                     endif;
                 else:
 
-                    $val_arr = Migration::stringify($val);
+                    $val_arr = self::stringify($val);
                     array_push($assoc, $val_arr[0]);
 
                     if (!empty($val_arr[1])):
@@ -230,7 +235,7 @@ class Migration extends Object
 
             endforeach;
 
-            return [sprintf("[%s]", join(", ", $assoc)), $import];
+            return [sprintf('[%s]', implode(', ', $assoc)), $import];
         endif;
 
         if (is_object($value) && $value instanceof DeConstructable):
@@ -240,13 +245,12 @@ class Migration extends Object
 
             $class = $skel['name'];
 
-
             $constructor_args = $skel['constructor_args'];
 
             $cons_args = [];
             foreach ($constructor_args as $arg) :
 
-                $val_array = Migration::stringify($arg);
+                $val_array = self::stringify($arg);
 
                 array_push($cons_args, $val_array[0]);
 
@@ -255,7 +259,7 @@ class Migration extends Object
                 endif;
             endforeach;
 
-            return [sprintf('new %1$s(%2$s)', $class, join(",", $cons_args)), $import];
+            return [sprintf('new %1$s(%2$s)', $class, implode(',', $cons_args)), $import];
         endif;
 
         if ($value === true):
@@ -266,13 +270,12 @@ class Migration extends Object
             return ['FALSE', []];
         endif;
 
-
         return [$value, []];
     }
 
     public function __toString()
     {
-        return (string)$this->name;
+        return (string) $this->name;
     }
 }
 
@@ -285,7 +288,6 @@ class StringifyOperation
     private $buffer;
     private $indentation;
 
-
     public function __construct($operation, $indentation = 4)
     {
         $this->operation = $operation;
@@ -295,7 +297,8 @@ class StringifyOperation
 
     public static function formatted($operation, $indentation = 4)
     {
-        $op_string = new StringifyOperation($operation, $indentation);
+        $op_string = new self($operation, $indentation);
+
         return $op_string->stringify();
     }
 
@@ -303,8 +306,8 @@ class StringifyOperation
     {
         $skel = $this->operation->skeleton();
 
-        $path = "";
-        $name = "";
+        $path = '';
+        $name = '';
         $constructor_args = [];
         //unpack the array to set the above variables with actual values.
         extract($skel);
@@ -318,7 +321,7 @@ class StringifyOperation
             if (is_array($arg)):
 
                 if (empty($arg)):
-                    $this->add_item("[],");
+                    $this->add_item('[],');
                 else:
                     $this->add_item('[');
 
@@ -342,7 +345,7 @@ class StringifyOperation
 
                                 endforeach;
 
-                                $this->add_item("]");
+                                $this->add_item(']');
                                 $this->reduce_indent();
                             else:
                                 $val_arr = Migration::stringify($val);
@@ -364,9 +367,8 @@ class StringifyOperation
                             $val_arr = Migration::stringify($val);
 
                             $this->add_indent();
-                            $this->add_item(sprintf("%s", $val_arr[0]));
+                            $this->add_item(sprintf('%s', $val_arr[0]));
                             $this->reduce_indent();
-
 
                             if (!empty($val_arr[1])):
                                 $import = array_merge($import, $val_arr[1]);
@@ -381,8 +383,7 @@ class StringifyOperation
             else:
 
                 $val_array = Migration::stringify($arg);
-                $this->add_item(sprintf(" %s,", $val_array[0]));
-
+                $this->add_item(sprintf(' %s,', $val_array[0]));
 
             endif;
 
@@ -391,12 +392,11 @@ class StringifyOperation
             endif;
         endforeach;
 
-        $string = join(PHP_EOL, $this->buffer);
+        $string = implode(PHP_EOL, $this->buffer);
 
         $string = trim($string, ',');
 
-
-        return [sprintf("new %1\$s(%2\$s\t\t\t)", $class, PHP_EOL . $string . PHP_EOL), $import];
+        return [sprintf("new %1\$s(%2\$s\t\t\t)", $class, PHP_EOL.$string.PHP_EOL), $import];
     }
 
     public function op_string()
@@ -408,22 +408,23 @@ class StringifyOperation
     {
         $indentation = $this->indent($this->indentation);
 
-        $this->buffer[] = $indentation . $item;
+        $this->buffer[] = $indentation.$item;
     }
 
     public function add_indent()
     {
-        $this->indentation++;
+        ++$this->indentation;
     }
 
     public function reduce_indent()
     {
-        $this->indentation--;
+        --$this->indentation;
     }
 
     public function indent($by = 1)
     {
         $tab = "\t";
+
         return str_repeat($tab, $by);
     }
 }

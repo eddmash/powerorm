@@ -3,16 +3,16 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 2:14 PM
+ * Time: 2:14 PM.
  */
-
 namespace eddmash\powerorm\form\widgets;
 
 /**
  * Base class of widgets like checkbox and radio which can be more than one.
- * Class ChoiceInputFields
- * @package eddmash\powerorm\form\widgets
+ * Class ChoiceInputFields.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class ChoiceInputFields extends Input
@@ -47,13 +47,13 @@ abstract class ChoiceInputFields extends Input
             $output = array_merge($output, $options);
         endif;
 
-        return join(' ', $output);
+        return implode(' ', $output);
     }
 
     public function render_options($field_name, $checked_choices, $attrs = [])
     {
 
-        /**
+        /*
          * 'choices'=>[
          *      'gender'=> ['f'=>'Female', 'm'=>'Male' ],
          *      'bmw'=>'mercedes benz'
@@ -75,7 +75,7 @@ abstract class ChoiceInputFields extends Input
                 'type' => $this->input_type,
             ]);
 
-            $attrs_['id'] = $attrs_['id'] . '_' . $count;
+            $attrs_['id'] = $attrs_['id'].'_'.$count;
 
             if (is_array($value)):
 
@@ -89,10 +89,10 @@ abstract class ChoiceInputFields extends Input
                     $this->render_option($checked_choices, $value, $label, $attrs_), $sub_widget);
             endif;
 
-            $count++;
+            ++$count;
         endforeach;
 
-        return sprintf($this->outer_html, $this->flat_attrs($attrs), join(' ', $output));
+        return sprintf($this->outer_html, $this->flat_attrs($attrs), implode(' ', $output));
     }
 
     public function render_option($checked_choices, $label, $value, $attrs = [])

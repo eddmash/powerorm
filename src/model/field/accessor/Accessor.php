@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 2:56 AM
+ * Time: 2:56 AM.
  */
-
 namespace eddmash\powerorm\model\field\accessor;
 
 class Accessor implements \ArrayAccess, \IteratorAggregate

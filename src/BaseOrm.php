@@ -1,19 +1,20 @@
 <?php
+
 namespace eddmash\powerorm;
 
-/**
+/*
  * Orm Loader
  */
 use eddmash\powerorm\exceptions\FormException;
 use eddmash\powerorm\form\BaseForm;
 use eddmash\powerorm\form\BaseModelForm;
 
-/**
+/*
  *
  */
 defined('BASEPATH') or exit('No direct script access allowed');
 
-/**
+/*
  * PowerORM version
  * @ignore
  */
@@ -115,7 +116,7 @@ define('POWERORM_VERSION', '1.1.0');
  * - {@see Queryset::add() }
  *
  * Read more of this methods here
- * {@link http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html }
+ * {@link http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html}
  *
  * <h4><strong>Creating A Queryset</strong></h4>
  * Each model that extends the `PModel` class automatically gets assigned a Queryset object,
@@ -236,12 +237,12 @@ define('POWERORM_VERSION', '1.1.0');
  *
  * SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' IN (1,2,3,4,5)</code></pre>
  *
- * example borrowed from {@link http://www.sitepoint.com/silver-bullet-n1-problem/ }
+ * example borrowed from {@link http://www.sitepoint.com/silver-bullet-n1-problem/}
  *
  *  To avoid this issues using this orm, use the {@see Queryset::with()} method.
  *
- * @package eddmash\powerorm\model
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class BaseOrm extends Object
@@ -254,7 +255,6 @@ class BaseOrm extends Object
     public $migration_path;
 
     public $models_path;
-
 
     /**
      * @param array $config
@@ -271,26 +271,29 @@ class BaseOrm extends Object
 
     public static function get_models_path()
     {
-        return APPPATH . "models/";
+        return APPPATH.'models/';
     }
 
     public static function get_migrations_path()
     {
-        return APPPATH . "migrations/";
+        return APPPATH.'migrations/';
     }
 
-
     //********************************** ORM Form*********************************
-
 
     /**
      * Returns a form builder instance. you can use this to create forms that don't depend on models.
      * Take note this method creates a new instance of the form when invoked unlike how other classes in codeigniter
      * are singletons i.e. using the same instance during the response of a request.
+     *
      * @param array $opts
+     *
      * @return $this|BaseForm
+     *
      * @throws FormException
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_form($opts = [])
@@ -302,11 +305,9 @@ class BaseOrm extends Object
 
         $kwargs = $this->form_kwargs($opts);
 
-
         if (!empty($form) && !empty($model)):
-            throw new FormException("Setting both { model } and { form } on the same get_form() method is not allowed");
+            throw new FormException('Setting both { model } and { form } on the same get_form() method is not allowed');
         endif;
-
 
         // just fetch the form
         if (!empty($form)):
@@ -337,7 +338,6 @@ class BaseOrm extends Object
     {
         //todo loader match to that of codeigniter especially in naming
 
-
         $form = new $form($data, $initial, $kwargs);
 
         // ensure the model is loaded
@@ -350,9 +350,9 @@ class BaseOrm extends Object
 
     //********************************** ORM Registry*********************************
 
-
     /**
-     * Returns the numeric version of the orm
+     * Returns the numeric version of the orm.
+     *
      * @return string
      */
     public function get_version()
@@ -367,9 +367,8 @@ class BaseOrm extends Object
         return $this->get_version();
     }
 
-//
 //    //********************************** ORM Checks *********************************
 //    public static function register_check(){
-//
+
 //    }
 }

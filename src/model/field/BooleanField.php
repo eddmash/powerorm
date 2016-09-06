@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:07 PM
+ * Time: 4:07 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 use eddmash\powerorm\form\fields as form_fields;
@@ -14,24 +13,20 @@ use eddmash\powerorm\form\fields as form_fields;
  * A true/false field.
  *
  * The default form widget for this field is a 'radio'.
- *
- * @package eddmash\powerorm\model\field
  */
 class BooleanField extends Field
 {
-
     /**
      * {@inheritdoc}
      */
     public $default = false;
-
 
     /**
      * {@inheritdoc}
      */
     public function db_type($connection)
     {
-        return "BOOLEAN";
+        return 'BOOLEAN';
     }
 
     public function formfield($kwargs = [])
@@ -50,6 +45,7 @@ class BooleanField extends Field
         endif;
 
         $defaults = array_merge($defaults, $kwargs);
+
         return parent::formfield($defaults);
     }
 }

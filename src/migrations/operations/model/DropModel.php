@@ -3,18 +3,18 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 3:29 PM
+ * Time: 3:29 PM.
  */
-
 namespace eddmash\powerorm\migrations\operations\model;
 
 use eddmash\powerorm\migrations\operations\Operation;
 use eddmash\powerorm\migrations\ProjectState;
 
 /**
- * Class DropModel
- * @package eddmash\powerorm\migrations\operations
+ * Class DropModel.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class DropModel extends Operation
@@ -45,7 +45,7 @@ class DropModel extends Operation
 
     public function describe()
     {
-        return sprintf("drop_%s", $this->model_name);
+        return sprintf('drop_%s', $this->model_name);
     }
 
     public function update_state(ProjectState $state)

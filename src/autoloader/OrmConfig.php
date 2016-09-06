@@ -1,4 +1,6 @@
-<?php namespace Config;
+<?php
+
+namespace Config;
 
 use CodeIgniter\Config\BaseConfig;
 
@@ -29,7 +31,7 @@ class OrmConfig extends BaseConfig
     {
         parent::__construct();
 
-        /**
+        /*
          * -------------------------------------------------------------------
          * Namespaces
          * -------------------------------------------------------------------
@@ -51,11 +53,11 @@ class OrmConfig extends BaseConfig
          *   `];
          */
         $psr4 = [
-            'app\migrations' => APPPATH . 'migrations',
+            'app\migrations' => APPPATH.'migrations',
             'eddmash\powerorm' => realpath(POWERORM_BASEPATH),
         ];
 
-        /**
+        /*
          * -------------------------------------------------------------------
          * Class Map
          * -------------------------------------------------------------------
@@ -72,20 +74,20 @@ class OrmConfig extends BaseConfig
          *   ];
          */
         $classmap = [
-            'PModel' => POWERORM_BASEPATH . 'model/PModel.php',
-            'PModelForm' => POWERORM_BASEPATH . 'form/PForm.php',
-            'PForm' => POWERORM_BASEPATH . 'form/PForm.php',
+            'PModel' => POWERORM_BASEPATH.'model/PModel.php',
+            'PModelForm' => POWERORM_BASEPATH.'form/PForm.php',
+            'PForm' => POWERORM_BASEPATH.'form/PForm.php',
 
-            'eddmash\powerorm\migrations\ProjectState' => POWERORM_BASEPATH . 'migrations/State.php',
-            'eddmash\powerorm\migrations\ModelState' => POWERORM_BASEPATH . 'migrations/State.php',
-            'eddmash\powerorm\migrations\StateRegistry' => POWERORM_BASEPATH . 'migrations/State.php',
-            'eddmash\powerorm\migrations\Questioner' => POWERORM_BASEPATH . 'migrations/Questioner.php',
-            'eddmash\powerorm\migrations\InteractiveQuestioner' => POWERORM_BASEPATH . 'migrations/Questioner.php',
+            'eddmash\powerorm\migrations\ProjectState' => POWERORM_BASEPATH.'migrations/State.php',
+            'eddmash\powerorm\migrations\ModelState' => POWERORM_BASEPATH.'migrations/State.php',
+            'eddmash\powerorm\migrations\StateRegistry' => POWERORM_BASEPATH.'migrations/State.php',
+            'eddmash\powerorm\migrations\Questioner' => POWERORM_BASEPATH.'migrations/Questioner.php',
+            'eddmash\powerorm\migrations\InteractiveQuestioner' => POWERORM_BASEPATH.'migrations/Questioner.php',
 
-            'CI_Model' => BASEPATH . '/core/Model.php',
-            'CI_DB_forge' => BASEPATH . '/database/DB_forge.php',
-            'CI_DB_driver' => BASEPATH . '/database/DB_driver.php',
-            'CI_DB_query_builder' => BASEPATH . '/database/DB_query_builder.php',
+            'CI_Model' => BASEPATH.'/core/Model.php',
+            'CI_DB_forge' => BASEPATH.'/database/DB_forge.php',
+            'CI_DB_driver' => BASEPATH.'/database/DB_driver.php',
+            'CI_DB_query_builder' => BASEPATH.'/database/DB_query_builder.php',
         ];
 
         //--------------------------------------------------------------------

@@ -3,9 +3,8 @@
  * Created by http://eddmash.com.
  * User: eddmash
  * Date: 4/24/16
- * Time: 9:46 AM
+ * Time: 9:46 AM.
  */
-
 namespace eddmash\powerorm\migrations\operations\field;
 
 use eddmash\powerorm\helpers\Bools;
@@ -14,10 +13,10 @@ use eddmash\powerorm\migrations\ProjectState;
 use eddmash\powerorm\NOT_PROVIDED;
 
 /**
- * Class AddField
- * @package eddmash\powerorm\migrations\operations
+ * Class AddField.
  *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class AddField extends Operation
@@ -87,7 +86,6 @@ class AddField extends Operation
                 unset($arg['preserve_default']);
             endif;
         endforeach;
-
 
         return $args;
     }

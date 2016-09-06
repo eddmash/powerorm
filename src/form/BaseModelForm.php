@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/3/16
- * Time: 10:13 AM
+ * Time: 10:13 AM.
  */
-
 namespace eddmash\powerorm\form;
 
 use Orm;
@@ -32,7 +31,6 @@ function fields_from_model($model, $required_fields, $excludes, $widgets, $label
             $kwargs['label'] = $labels[$name];
         endif;
 
-
         if (!empty($help_texts) && array_key_exists($name, $help_texts)):
             $kwargs['help_text'] = $help_texts[$name];
         endif;
@@ -43,7 +41,6 @@ function fields_from_model($model, $required_fields, $excludes, $widgets, $label
 
         $fields[$name] = $obj->formfield();
     endforeach;
-
 
     return $fields;
 }
@@ -95,36 +92,42 @@ class BaseModelForm extends BaseForm
     public function only($fields = [])
     {
         $this->fields = array_merge($this->fields, $fields);
+
         return $this;
     }
 
     public function exclude($excludes = [])
     {
         $this->excludes = array_merge($this->excludes, $excludes);
+
         return $this;
     }
 
     public function labels($labels = [])
     {
         $this->labels = array_merge($this->labels, $labels);
+
         return $this;
     }
 
     public function widgets($widgets = [])
     {
         $this->widgets = array_merge($this->widgets, $widgets);
+
         return $this;
     }
 
     public function help_texts($help_texts = [])
     {
         $this->help_texts = array_merge($this->help_texts, $help_texts);
+
         return $this;
     }
 
     public function field_classes($field_classes = [])
     {
         $this->field_classes = array_merge($this->field_classes, $field_classes);
+
         return $this;
     }
 }

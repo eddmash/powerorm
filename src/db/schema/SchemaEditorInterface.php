@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/17/16
- * Time: 9:58 AM
+ * Time: 9:58 AM.
  */
-
 namespace eddmash\powerorm\db\schema;
 
 use eddmash\powerorm\model\BaseModel;
@@ -26,7 +25,6 @@ interface SchemaEditorInterface
     public function create_model(BaseModel $model);
 
     public function drop_model(BaseModel $model);
-
 
     // Constraints Manupilation
 //    public function add_primary_key(BaseModel $model, Field $field);

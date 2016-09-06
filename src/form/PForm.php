@@ -37,15 +37,11 @@ trait form
         return new FormFields\MultipleChoiceField($attrs);
     }
 
-
-
-
     // ******************************************************************************
 
     // ******************************* Widget ***************************************
 
     // ******************************************************************************
-
 
     public static function TextInput($attrs = [])
     {
@@ -109,9 +105,10 @@ trait form
 }
 
 /**
- * Class Form
- * @package eddmash\powerorm\form
+ * Class Form.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class PForm extends BaseForm

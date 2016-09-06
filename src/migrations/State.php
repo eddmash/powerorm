@@ -7,10 +7,10 @@ use eddmash\powerorm\model\BaseModel;
 use eddmash\powerorm\Object;
 
 /**
- * @inheritdoc
+ * {@inheritdoc}
  *
- * @package eddmash\powerorm\migrations
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class StateRegistry extends Registry
@@ -36,9 +36,12 @@ class StateRegistry extends Registry
     }
 
     /**
-     * remove the model from the registry
+     * remove the model from the registry.
+     *
      * @param string $model_name
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function unregister_model($model_name)
@@ -55,8 +58,8 @@ class StateRegistry extends Registry
  *
  * This state can be passed around for use.
  *
- * @package eddmash\powerorm\migrations
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class ProjectState extends Object
@@ -101,8 +104,11 @@ class ProjectState extends Object
 
     /**
      * @param Registry $registry
+     *
      * @return ProjectState
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public static function from_apps($registry)
@@ -113,11 +119,12 @@ class ProjectState extends Object
             $models[$name] = ModelState::from_model($model);
         endforeach;
 
-        return new ProjectState($models);
+        return new self($models);
     }
 
     /**
      * Create a new registry based on the present models in the state.
+     *
      * @return StateRegistry
      */
     public function registry()
@@ -140,6 +147,7 @@ class ProjectState extends Object
         foreach ($this->models as $name => $model) :
             $models[$name] = $model->deep_clone();
         endforeach;
+
         return new static($models);
     }
 }
@@ -148,8 +156,8 @@ class ProjectState extends Object
  * This represents a model in the application.
  * This way we are able to make alterations to the model without affecting the actual models.
  *
- * @package eddmash\powerorm\migrations
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class ModelState extends Object
@@ -165,8 +173,10 @@ class ModelState extends Object
 
     /**
      * Creates a model state for the model passed in.
+     *
      * @param BaseModel $model
-     * @param bool|TRUE $with_relations
+     * @param bool|true $with_relations
+     *
      * @return ModelState
      */
     public static function from_model(BaseModel $model, $with_relations = true)
@@ -189,14 +199,18 @@ class ModelState extends Object
             endforeach;
         endif;
 
-        return new ModelState($model->meta->model_name, $fields);
+        return new self($model->meta->model_name, $fields);
     }
 
     /**
      * Create a model from the current state.
+     *
      * @param Registry $registry
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function to_model(Registry $registry)
@@ -208,8 +222,11 @@ class ModelState extends Object
 
     /**
      * @param $class_name
+     *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function _define_load_class($class_name)

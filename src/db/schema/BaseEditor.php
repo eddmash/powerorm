@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/23/16
- * Time: 7:37 AM
+ * Time: 7:37 AM.
  */
-
 namespace eddmash\powerorm\db\schema;
 
 use eddmash\powerorm\exceptions\ValueError;
@@ -15,21 +14,18 @@ use eddmash\powerorm\NOT_PROVIDED;
 
 abstract class BaseEditor extends ForgeClass
 {
-    public $sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s";
+    public $sql_alter_column_type = 'ALTER COLUMN %(column)s TYPE %(type)s';
 
     public $sql_create_unique = 'ALTER TABLE %1$s ADD CONSTRAINT %2$s UNIQUE (%3$s)';
     public $sql_delete_unique = 'ALTER TABLE %1$s DROP CONSTRAINT %2$s';
 
-
     public $sql_create_fk = 'ALTER TABLE %1$s ADD CONSTRAINT %2$s  FOREIGN KEY (%3$s) REFERENCES %4$s(%5$s)';
     public $sql_delete_fk = 'ALTER TABLE %1$s DROP CONSTRAINT %2$s';
-
 
     public $sql_create_index = 'CREATE INDEX %1$s ON %2$s (%3$s)';
     public $sql_delete_index = 'DROP INDEX %s';
 
     public $sql_update_with_default = 'UPDATE %1$s SET %2$s = %3$s WHERE %2$s IS NULL';
-
 
     public function get_connection()
     {
@@ -38,8 +34,11 @@ abstract class BaseEditor extends ForgeClass
 
     /**
      * Represent the model in the database.
+     *
      * @param BaseModel $model
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function create_model(BaseModel $model)
@@ -94,8 +93,11 @@ abstract class BaseEditor extends ForgeClass
 
     /**
      * Drop the model representation in the database.
+     *
      * @param BaseModel $model
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function drop_model(BaseModel $model)
@@ -113,9 +115,12 @@ abstract class BaseEditor extends ForgeClass
 
     /**
      * Represent a model field in the database.
+     *
      * @param BaseModel $model
-     * @param Field $field
+     * @param Field     $field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function add_model_field(BaseModel $model, Field $field)
@@ -124,6 +129,7 @@ abstract class BaseEditor extends ForgeClass
         // many to many
         if ($field->M2M && $field->relation->through->meta->auto_created):
             $this->create_model($field->relation->through);
+
             return;
         endif;
 
@@ -155,9 +161,12 @@ abstract class BaseEditor extends ForgeClass
 
     /**
      * Remove the model field representation from the database.
+     *
      * @param BaseModel $model
-     * @param Field $field
+     * @param Field     $field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function drop_model_field(BaseModel $model, Field $field)
@@ -165,6 +174,7 @@ abstract class BaseEditor extends ForgeClass
         // if we created a table for m2m
         if ($field->M2M && $field->relation->through->meta->auto_created):
             $this->drop_model($field->relation->through);
+
             return;
         endif;
 
@@ -190,16 +200,17 @@ abstract class BaseEditor extends ForgeClass
      *
      * @param Field $previous_field
      * @param Field $present_field
-     * @return null
+     *
      * @throws ValueError
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function alter_model_field(BaseModel $model, Field $previous_field, Field $present_field)
     {
         $previous_type = $previous_field->db_type($this->get_connection());
         $present_type = $present_field->db_type($this->get_connection());
-
 
         // ensure they have a type if they are not relationship fields
         if ((is_null($present_type) && is_null($present_field->relation->through)) ||
@@ -237,14 +248,12 @@ abstract class BaseEditor extends ForgeClass
             return null;
         endif;
 
-
         // If we get here and we still don't have a field type and we cant do anything
         if (is_null($present_type) || is_null($previous_type)):
             throw new ValueError(
-                sprintf('Cannot alter field %1$s into %2$s - they are not compatible types (you cannot alter to or ' .
+                sprintf('Cannot alter field %1$s into %2$s - they are not compatible types (you cannot alter to or '.
                     'from M2M fields, or add or remove through= on M2M fields', $present_field, $previous_field));
         endif;
-
 
         $this->_alter_field($model, $previous_field, $present_field, $previous_type, $present_type);
     }
@@ -265,7 +274,6 @@ abstract class BaseEditor extends ForgeClass
         $adding_pk = (!$previous_field->primary_key && $present_field->primary_key);
         $adding_unique = (!$previous_field->unique && $present_field->unique);
         $drop_unique = ($previous_field->unique && !$present_field->unique);
-
 
         //  *********************** Drop uniqueness ***********************
 
@@ -293,7 +301,6 @@ abstract class BaseEditor extends ForgeClass
             endif;
         endif;
 
-
         //  *********************** Drop index ***********************
 
         //if we are not adding unique, and previous was not unique but in the past was indexed but presently we are not
@@ -308,7 +315,6 @@ abstract class BaseEditor extends ForgeClass
         endif;
 
         //  *********************** Column name change ***********************
-
 
         // was the column name renamed
         // here we just rename the column only
@@ -338,8 +344,8 @@ abstract class BaseEditor extends ForgeClass
                 $previous_field->db_column_name() => [
                     'type' => $present_type,
                     'constraint' => $present_field->max_length,
-                    'null' => $previous_field->null,// be explicit because of how forge modify_column works
-                ]
+                    'null' => $previous_field->null, // be explicit because of how forge modify_column works
+                ],
             ];
 
         endif;
@@ -356,8 +362,8 @@ abstract class BaseEditor extends ForgeClass
         if ($adds_default):
             $alter_actions[] = [
                 $previous_field->db_column_name() => [
-                    'default' => $this->prepare_default($present_field)
-                ]
+                    'default' => $this->prepare_default($present_field),
+                ],
             ];
         endif;
 
@@ -370,12 +376,11 @@ abstract class BaseEditor extends ForgeClass
                 $previous_field->db_column_name() => [
                     'type' => $present_type,
                     'constraint' => $present_field->max_length,
-                    'null' => $present_field->null
-                ]
+                    'null' => $present_field->null,
+                ],
             ];
 
         endif;
-
 
         // if we have a default and we are moving from null to not null
 
@@ -421,7 +426,6 @@ abstract class BaseEditor extends ForgeClass
             endif;
         endif;
 
-
         //did we add unique ?
         if ($adding_unique || ($previous_field->primary_key && !$present_field->primary_key && $present_field->unique)):
             $this->add_unique_constraint($model, $present_field);
@@ -452,8 +456,8 @@ abstract class BaseEditor extends ForgeClass
                 $rel_to_update->db_column_name() => [
                     'type' => $rel_field->db_type($this->get_connection()),
                     'constraint' => $rel_field->max_length,
-                    'null' => $rel_field->null,// be explicit because of how forge modify_column works
-                ]
+                    'null' => $rel_field->null, // be explicit because of how forge modify_column works
+                ],
             ];
 
             $this->_modify_field($rel_to_update->container_model, $alter_statement);
@@ -466,7 +470,6 @@ abstract class BaseEditor extends ForgeClass
         ):
             $this->add_fk_constraint($model, $present_field);
         endif;
-
 
         // rebuild the fks we dropped in the beginning
         if ($present_field->primary_key && $previous_field->primary_key && $present_type !== $previous_type):
@@ -485,11 +488,9 @@ abstract class BaseEditor extends ForgeClass
         endif;
     }
 
-
     // **************************************** ******* *************************************************
     // **************************************** HELPERS *************************************************
     // **************************************** ******* *************************************************
-
 
     public function column_sql(Field $field, $include_default = false)
     {
@@ -546,8 +547,11 @@ abstract class BaseEditor extends ForgeClass
      * Note we dont escape here.
      *
      * @param BaseModel $model
+     *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function get_model_table(BaseModel $model)
@@ -555,11 +559,11 @@ abstract class BaseEditor extends ForgeClass
         return sprintf('%1$s%2$s', $this->db->dbprefix, $model->meta->db_table);
     }
 
-
     /**
      * Some backends don't accept default values for certain columns types (i.e. MySQL longtext and longblob).
      *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function skip_default(Field $field)
@@ -568,11 +572,14 @@ abstract class BaseEditor extends ForgeClass
     }
 
     /**
-     * Returns a field's effective database default value
+     * Returns a field's effective database default value.
      *
      * @param Field $field
+     *
      * @return mixed|void
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function effective_default(Field $field)
@@ -595,18 +602,18 @@ abstract class BaseEditor extends ForgeClass
         return $value;
     }
 
-
-
     // **************************************** *************** *************************************************
     // **************************************** Standardization *************************************************
     // **************************************** *************** *************************************************
 
-
     /**
-     * Add a field to table using alter
+     * Add a field to table using alter.
+     *
      * @param BaseModel $model
-     * @param Field $field
+     * @param Field     $field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _add_field_alter(BaseModel $model, Field $field)
@@ -615,11 +622,13 @@ abstract class BaseEditor extends ForgeClass
         $this->add_column($model->meta->db_table, [$field->db_column_name() => $sql_def]);
     }
 
-
     /**
-     * Add table field on the table create statement
+     * Add table field on the table create statement.
+     *
      * @param $fields
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _add_field_create($fields)
@@ -628,10 +637,13 @@ abstract class BaseEditor extends ForgeClass
     }
 
     /**
-     * Sets up primary key for a table on create statement
+     * Sets up primary key for a table on create statement.
+     *
      * @param BaseModel $model
-     * @param Field $field
+     * @param Field     $field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _add_primary_key_create(BaseModel $model)
@@ -646,9 +658,12 @@ abstract class BaseEditor extends ForgeClass
 
     /**
      * Modifies the table represent by the model.
+     *
      * @param BaseModel $model
      * @param $sql
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _modify_field(BaseModel $model, $sql)
@@ -657,9 +672,12 @@ abstract class BaseEditor extends ForgeClass
     }
 
     /**
-     * Create the create table statement for a model table
+     * Create the create table statement for a model table.
+     *
      * @param BaseModel $model
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _table_create(BaseModel $model)
@@ -676,8 +694,11 @@ abstract class BaseEditor extends ForgeClass
      * Escapes columns and table names based on the current database.
      *
      * @param $item
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _escape_identifiers($item)
@@ -686,18 +707,20 @@ abstract class BaseEditor extends ForgeClass
     }
 
     /**
-     * Runs all raw sql statements. instead of passing through the db_forge
+     * Runs all raw sql statements. instead of passing through the db_forge.
      *
      * @param $sql
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _query($sql)
     {
         return $this->db->query($sql);
     }
-
 
     public function start_transaction($db)
     {
@@ -713,12 +736,14 @@ abstract class BaseEditor extends ForgeClass
     // ******************************************* CONSTRAINTS *************************************************
     // ******************************************* *********** *************************************************
 
-
     /**
      * Creates Unique constraint to a table.
+     *
      * @param BaseModel $model
-     * @param Field $field
+     * @param Field     $field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function add_unique_constraint(BaseModel $model, Field $field)
@@ -728,9 +753,12 @@ abstract class BaseEditor extends ForgeClass
 
     /**
      * Creates Index constraint to a table.
+     *
      * @param BaseModel $model
-     * @param Field $field
+     * @param Field     $field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function add_index_constraint(BaseModel $model, Field $field)
@@ -742,8 +770,10 @@ abstract class BaseEditor extends ForgeClass
      * Create Foreign key to table.
      *
      * @param BaseModel $model
-     * @param Field $field
+     * @param Field     $field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function add_fk_constraint(BaseModel $model, Field $field)
@@ -758,7 +788,9 @@ abstract class BaseEditor extends ForgeClass
      * @param BaseModel $model
      * @param Field $
      * @param $field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function drop_constraint($template, BaseModel $model, Field $field, $type)
@@ -772,10 +804,13 @@ abstract class BaseEditor extends ForgeClass
 
     /**
      * @param BaseModel $model
-     * @param Field $field
-     * @param string $type
+     * @param Field     $field
+     * @param string    $type
+     *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function create_constraint_name(BaseModel $model, Field $field, $type)
@@ -785,10 +820,14 @@ abstract class BaseEditor extends ForgeClass
 
     /**
      * Create sql statement for adding unique constraint.
+     *
      * @param BaseModel $model
-     * @param Field $field
+     * @param Field     $field
+     *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _unique_constraint_sql(BaseModel $model, Field $field)
@@ -798,16 +837,19 @@ abstract class BaseEditor extends ForgeClass
         $table = $this->_escape_identifiers($this->get_model_table($model));
         $column = $this->_escape_identifiers($field->db_column_name());
 
-
         return sprintf($this->sql_create_unique, $table, $constraint_name, $column);
     }
 
     /**
      * Create sql statement for adding index constraint.
+     *
      * @param BaseModel $model
-     * @param Field $field
+     * @param Field     $field
+     *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _index_constraint_sql(BaseModel $model, Field $field)
@@ -816,7 +858,6 @@ abstract class BaseEditor extends ForgeClass
 
         $table = $this->_escape_identifiers($this->get_model_table($model));
         $column = $this->_escape_identifiers($field->db_column_name());
-
 
         return sprintf($this->sql_create_index, $constraint_name, $table, $column);
     }
@@ -835,8 +876,6 @@ abstract class BaseEditor extends ForgeClass
 
         return sprintf($this->sql_create_fk, $table, $constraint_name, $column, $target_table, $target_column);
     }
-
-
 
     // **************************************** ***** *************************************************
     // **************************************** Magic *************************************************

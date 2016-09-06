@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:09 PM
+ * Time: 4:09 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 use eddmash\powerorm\checks\Checks;
@@ -40,11 +39,9 @@ use eddmash\powerorm\model\field\relation\ManyToOneObject;
  *
  *      You may want to avoid the overhead of an index if you are creating a foreign key for consistency
  *      rather than joins.
- *
  */
 class ManyToOneField extends RelatedField
 {
-
     /**
      * {@inheritdoc}
      */
@@ -60,7 +57,7 @@ class ManyToOneField extends RelatedField
 
         $this->relation = new ManyToOneObject([
             'model' => $field_options['model'],
-            'field' => $this
+            'field' => $this,
         ]);
     }
 
@@ -77,7 +74,8 @@ class ManyToOneField extends RelatedField
      */
     public function constraint_name($prefix)
     {
-        $prefix = "fk";
+        $prefix = 'fk';
+
         return parent::constraint_name($prefix);
     }
 
@@ -89,11 +87,13 @@ class ManyToOneField extends RelatedField
         $checks = parent::check();
         $checks = $this->add_check($checks, $this->_unique_check());
         $checks = $this->add_check($checks, $this->_delete_check());
+
         return $checks;
     }
 
     /**
      * @ignore
+     *
      * @return mixed
      */
     public function _unique_check()
@@ -101,11 +101,11 @@ class ManyToOneField extends RelatedField
         if ($this->unique):
             return [
                 Checks::warning([
-                    "message" => "Setting unique=True on a ForeignKey has the same effect as using a OneToOne.",
-                    "hint" => "use OneToOne field",
-                    "context" => $this,
-                    "id" => "fields.W300"
-                ])
+                    'message' => 'Setting unique=True on a ForeignKey has the same effect as using a OneToOne.',
+                    'hint' => 'use OneToOne field',
+                    'context' => $this,
+                    'id' => 'fields.W300',
+                ]),
             ];
         endif;
 
@@ -121,10 +121,14 @@ class ManyToOneField extends RelatedField
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @param $connection
+     *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function db_type($connection)
@@ -134,13 +138,13 @@ class ManyToOneField extends RelatedField
 
     /**
      * The field on the relation model that this field links to.
+     *
      * @return Field
      */
     public function related_field()
     {
         return $this->relation->get_model()->meta->primary_key;
     }
-
 
     public function contribute_to_class($name, $obj)
     {

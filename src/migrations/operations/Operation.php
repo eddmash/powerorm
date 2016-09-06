@@ -10,9 +10,10 @@ use eddmash\powerorm\model\BaseModel;
 use eddmash\powerorm\Object;
 
 /**
- * Class Operation
- * @package eddmash\powerorm\migrations\operations
+ * Class Operation.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class Operation extends Object implements DeConstructable
@@ -28,7 +29,6 @@ abstract class Operation extends Object implements DeConstructable
      * @param $connection
      * @param ProjectState $current_state the state of the project before the operation is applied
      * @param ProjectState $desired_state the state of the project after operation is applied
-     *
      */
     abstract public function update_database($connection, $current_state, $desired_state);
 
@@ -38,13 +38,16 @@ abstract class Operation extends Object implements DeConstructable
 
     /**
      * Updates the state based on what this operation needs done.
+     *
      * @param ProjectState $state
+     *
      * @return mixed
      */
     abstract public function update_state(ProjectState $state);
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @return array
      */
     public function constructor_args()
@@ -78,8 +81,11 @@ abstract class Operation extends Object implements DeConstructable
     /**
      * @param $connection
      * @param BaseModel $model
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function allow_migrate_model($connection, BaseModel $model)
@@ -89,7 +95,7 @@ abstract class Operation extends Object implements DeConstructable
 
     public function __toString()
     {
-        return PHP_EOL . Tools::stringify($this);
+        return PHP_EOL.Tools::stringify($this);
 //        return sprintf(' <%1$s(%2$s) >'.PHP_EOL,
 //            $this->get_class_name(),
 //            Tools::stringify($this->constructor_args()[0], FALSE));

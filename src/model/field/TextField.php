@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:06 PM
+ * Time: 4:06 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 use eddmash\powerorm\form\widgets\TextArea;
@@ -15,8 +14,6 @@ use eddmash\powerorm\form\widgets\TextArea;
  */
 class TextField extends Field
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -27,7 +24,6 @@ class TextField extends Field
         $this->unique = false;
         $this->db_index = false;
     }
-
 
     /**
      * {@inheritdoc}
@@ -40,6 +36,7 @@ class TextField extends Field
     public function formfield($kwargs = [])
     {
         $kwargs['field_class'] = TextArea::full_class_name();
+
         return parent::formfield($kwargs);
     }
 }

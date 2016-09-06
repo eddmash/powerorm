@@ -1,4 +1,5 @@
 <?php
+
 namespace eddmash\powerorm\queries;
 
 use eddmash\powerorm\exceptions\MultipleObjectsReturned;
@@ -13,9 +14,8 @@ interface QuerysetAccess extends \IteratorAggregate, \ArrayAccess, \Countable
 {
 }
 
-
 /**
- * <h4>When QuerySets are evaluated</h4>
+ * <h4>When QuerySets are evaluated</h4>.
  *
  * Internally, a QuerySet can be constructed, filtered, sliced, and generally passed around without actually hitting the
  * database.
@@ -76,8 +76,9 @@ interface QuerysetAccess extends \IteratorAggregate, \ArrayAccess, \Countable
  *      if you know in advance which section of the data you want
  *
  * Class Queryset
- * @package eddmash\powerorm\queries
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Queryset extends Object implements QuerysetAccess, Query
@@ -94,7 +95,7 @@ class Queryset extends Object implements QuerysetAccess, Query
     const RELATIONS_LOOK_SEP = '->';
 
     /**
-     * The maximum number of items to display in a QuerySet->__toString()
+     * The maximum number of items to display in a QuerySet->__toString().
      */
     const REPR_OUTPUT_SIZE = 20;
 
@@ -105,7 +106,8 @@ class Queryset extends Object implements QuerysetAccess, Query
     public $_evaluated = false;
 
     /**
-     * @var mixed Holds the Queryset Result when Queryset evaluates.
+     * @var mixed Holds the Queryset Result when Queryset evaluates
+     *
      * @internal
      */
     protected $_results_cache;
@@ -114,20 +116,24 @@ class Queryset extends Object implements QuerysetAccess, Query
 
     /**
      * Holds the where clauses, we do this because to create the where condition some db
-     * drivers require a connection which we open up only when evaluating
+     * drivers require a connection which we open up only when evaluating.
+     *
      * @internal
+     *
      * @var array
      */
     public $_filter_cache = [];
 
     /**
-     * Keeps track of which tables have been added to the 'from' part of the query
+     * Keeps track of which tables have been added to the 'from' part of the query.
+     *
      * @var array
      */
     public $_from_cache = [];
 
     /**
-     * INDICATE IF WE NEED TO EAGER LOAD
+     * INDICATE IF WE NEED TO EAGER LOAD.
+     *
      * @var bool
      */
     protected $eager_fetch = false;
@@ -137,10 +143,8 @@ class Queryset extends Object implements QuerysetAccess, Query
      * mostly for fields that create a many side.
      *
      * @var bool
-     *
      */
     protected $_defered_eager = false;
-
 
     public function __construct($model, $query = null)
     {
@@ -166,16 +170,11 @@ class Queryset extends Object implements QuerysetAccess, Query
         return new static($model, $query);
     }
 
-
-
-
-
     // **************************************************************************************************
 
     // ******************************************* FETCH DATA *******************************************
 
     // **************************************************************************************************
-
 
     public function one($conditions = [])
     {
@@ -194,6 +193,7 @@ class Queryset extends Object implements QuerysetAccess, Query
         endif;
 
         $this->_evaluate();
+
         return $this->_results_cache;
     }
 
@@ -209,7 +209,8 @@ class Queryset extends Object implements QuerysetAccess, Query
 
     public function _validate_conditions($method, $conditions)
     {
-        assert(is_array($conditions), sprintf(" %s() expects conditions should be in array format", $method));
+        assert(is_array($conditions), sprintf(' %s() expects conditions should be in array format', $method));
+
         return $conditions;
     }
 
@@ -238,14 +239,16 @@ class Queryset extends Object implements QuerysetAccess, Query
      * <pre><code>$this->role->exclude(['name'=>'ceo'])</code></pre>
      *
      * @param array $conditions
+     *
      * @return $this
+     *
      * @throws ValueError
      */
     public function exclude($conditions)
     {
         $conds = [];
         foreach ($conditions as $key => $value) :
-            $key = sprintf("%s__not", $key);
+            $key = sprintf('%s__not', $key);
             $conds[$key] = $value;
         endforeach;
 
@@ -262,16 +265,18 @@ class Queryset extends Object implements QuerysetAccess, Query
      * <h4>USAGE: </h4>
      *
      * <pre><code>$this->user_model->distinct()->filter(["name"=>"john"]);</code></pre>
+     *
      * @return $this
      */
     public function distinct()
     {
         $this->_query_builder->distinct();
+
         return $this;
     }
 
     /**
-     * Sorts the results of the Queryset in either:
+     * Sorts the results of the Queryset in either:.
      *
      * - ASC -- Ascending order
      * - DESC -- Descending order
@@ -284,7 +289,9 @@ class Queryset extends Object implements QuerysetAccess, Query
      * }</code></pre>
      *
      * @param array $criteria the criteria to use to order the objects;
+     *
      * @return $this
+     *
      * @throws ValueError
      */
     public function order_by($criteria = [])
@@ -301,7 +308,6 @@ class Queryset extends Object implements QuerysetAccess, Query
             $this->_query_builder->order_by($field, $direction);
         endforeach;
 
-
         return $this;
     }
 
@@ -315,7 +321,9 @@ class Queryset extends Object implements QuerysetAccess, Query
      * <pre><code>$this->countries->all()->group_by(['independence_year']);</code></pre>
      *
      * @param array $condition
+     *
      * @return $this
+     *
      * @throws ValueError
      * @throws NotFound
      */
@@ -343,16 +351,16 @@ class Queryset extends Object implements QuerysetAccess, Query
 
         if (!empty($not_found)):
             throw new NotFound(sprintf('The fields [ %1$s ] not found in the model %2$s'),
-                join(', ', $not_found), $this->model->meta->model_name);
+                implode(', ', $not_found), $this->model->meta->model_name);
         endif;
 
-
         $this->_query_builder->group_by($new_cond);
+
         return $this;
     }
 
     /**
-     * Limits the Queryset
+     * Limits the Queryset.
      *
      * <h4>USAGE</h4>
      *
@@ -362,9 +370,11 @@ class Queryset extends Object implements QuerysetAccess, Query
      * To get 10 permissions that come after the 5th permission
      * <pre><code>$this->permission_model->all()->limit(10, 5)</code></pre>
      *
-     * @param int $size the number of objects to return
+     * @param int $size  the number of objects to return
      * @param int $start where to begin reading from by default it starts at 0
+     *
      * @return $this
+     *
      * @throws ValueError
      */
     public function limit($size, $start = 0)
@@ -382,7 +392,6 @@ class Queryset extends Object implements QuerysetAccess, Query
         return $this;
     }
 
-
     /**
      * Gets the first record in the current Queryset.
      *
@@ -391,18 +400,19 @@ class Queryset extends Object implements QuerysetAccess, Query
      * $users = $this->user_model->filter(['username__contains'=>'d'])->first();
      *
      * echo $users->username;
+     *
      * @return $this
      */
     public function first()
     {
         if ($this->is_chaining()):
             $this->fetch_type = self::FETCH_FIRST;
+
             return $this;
         endif;
 
         return $this->_filter([], self::FETCH_FIRST);
     }
-
 
     /**
      * Gets the last record in the current Queryset.
@@ -419,8 +429,10 @@ class Queryset extends Object implements QuerysetAccess, Query
     {
         if ($this->is_chaining()):
             $this->fetch_type = self::FETCH_LAST;
+
             return $this;
         endif;
+
         return $this->_filter([], self::FETCH_LAST);
     }
 
@@ -434,7 +446,6 @@ class Queryset extends Object implements QuerysetAccess, Query
         // TODO: Implement min() method.
     }
 
-
     /**
      * Slice the queryset, just like you would slice and array using array_slice().
      *
@@ -442,8 +453,11 @@ class Queryset extends Object implements QuerysetAccess, Query
      *
      * @param int $start the where to begin spliting the queryset, the first element is at index 0, just like arrays
      * @param int $count how many items to be included in the slice, if empty it go to end of the queryset
+     *
      * @return \LimitIterator
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function slice($start, $count = null)
@@ -455,7 +469,6 @@ class Queryset extends Object implements QuerysetAccess, Query
         return new \LimitIterator($this->getIterator(), $start);
     }
 
-
     public function delete()
     {
         // TODO: Implement delete() method.
@@ -465,7 +478,6 @@ class Queryset extends Object implements QuerysetAccess, Query
     {
         // TODO: Implement save() method.
     }
-
 
     // ----------------------------------------------- > relations
     public function with($conditions)
@@ -478,7 +490,6 @@ class Queryset extends Object implements QuerysetAccess, Query
     }
     // ----------------------------------------------- > relations
 
-
     // **************************************************************************************************
 
     // *************************************** INTERNAL METHODS *****************************************
@@ -487,15 +498,18 @@ class Queryset extends Object implements QuerysetAccess, Query
 
     /**
      * Make the fields to prefetch ready for uses.
+     *
      * @param $conditions
+     *
      * @return array
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _prepare_with($conditions)
     {
         $with = [];
-
 
         foreach ($conditions as $condition) :
             $inner_rel = [];
@@ -506,7 +520,6 @@ class Queryset extends Object implements QuerysetAccess, Query
             if ($occurs = strpos($condition, self::RELATIONS_LOOK_SEP)):
 
                 $relation = substr($condition, 0, $occurs);
-
 
                 $inner_rel = $this->_prepare_with([substr($condition, $occurs + $sep_size, $condition_size)]);
 
@@ -521,6 +534,7 @@ class Queryset extends Object implements QuerysetAccess, Query
         if (!empty($with)):
             $this->eager_fetch = true;
         endif;
+
         return $with;
     }
 
@@ -529,7 +543,9 @@ class Queryset extends Object implements QuerysetAccess, Query
      * both the copy and the original will work on the same references.
      *
      * @internal
+     *
      * @param $object
+     *
      * @return mixed
      */
     protected function deep_clone()
@@ -538,6 +554,7 @@ class Queryset extends Object implements QuerysetAccess, Query
         if ($this->is_chaining()):
             $query->reset_query();
         endif;
+
         return self::instance($this->model, $query);
     }
 
@@ -548,7 +565,7 @@ class Queryset extends Object implements QuerysetAccess, Query
 
     protected function _filter($conditions = [], $fetch_type = self::FETCH_MULTIPLE)
     {
-        assert(empty($this->_evaluated), "Its not possible to filter on a queryset that has already been evaluated");
+        assert(empty($this->_evaluated), 'Its not possible to filter on a queryset that has already been evaluated');
 
         $this->fetch_type = $fetch_type;
 
@@ -568,10 +585,11 @@ class Queryset extends Object implements QuerysetAccess, Query
         return new Filter($this->_query_builder, $this->model->meta->db_table);
     }
 
-
     /**
      * Evaluates the Queryset when Queryset Result is used in a count() or sizeof().
+     *
      * @ignore
+     *
      * @return mixed
      */
     protected function _size()
@@ -633,7 +651,9 @@ class Queryset extends Object implements QuerysetAccess, Query
      * Does the actual Fetching of data from the database.
      *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _fetch_data()
@@ -661,7 +681,6 @@ class Queryset extends Object implements QuerysetAccess, Query
 
         $this->_query_builder->select($this->_compile($aliased_fields), false);
     }
-
 
     protected function _eager_fetch()
     {
@@ -705,9 +724,11 @@ class Queryset extends Object implements QuerysetAccess, Query
     /**
      * Creates a Join statement.
      *
-     * @param Object $model the model that contains the relationship field, that is the owning model
-     * @param Object $field the field that creates the relation from the model passed in to another
+     * @param object $model the model that contains the relationship field, that is the owning model
+     * @param object $field the field that creates the relation from the model passed in to another
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _join_sql($model, $field)
@@ -724,22 +745,21 @@ class Queryset extends Object implements QuerysetAccess, Query
 
         $inverse_model_pk = $inverse_model->meta->primary_key;
 
-
         // todo check for who owns the relationship
         $join_on = $this->_select_field($inverse_model, $inverse_model_pk);
-
 
         $main_on = $this->_select_field($owner_model, $field);
 
         $on = sprintf('%1$s = %2$s', $join_on, $main_on);
 
-
         $this->_query_builder->join($join_table, $on);
     }
 
     /**
-     * returns select field, class info
+     * returns select field, class info.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _get_select()
@@ -762,7 +782,7 @@ class Queryset extends Object implements QuerysetAccess, Query
         $class_info = [
             'model' => $model,
             'select_fields' => $select_fields,
-            'related_klass_infos' => []
+            'related_klass_infos' => [],
         ];
 
         if ($this->eager_fetch):
@@ -792,7 +812,6 @@ class Queryset extends Object implements QuerysetAccess, Query
             $columns[] = $this->_select_field($model, $field);
         endforeach;
 
-
         return $columns;
     }
 
@@ -815,7 +834,6 @@ class Queryset extends Object implements QuerysetAccess, Query
 
         foreach ($model->meta->fields as $name => $field) :
 
-
             // ensure the field was eager loaded
             if (!$this->_is_requested_relation($field, $requested_fields)):
                 continue;
@@ -824,7 +842,7 @@ class Queryset extends Object implements QuerysetAccess, Query
             $field_model = $field->relation->get_model();
             $class_info = [
                 'model' => $field_model,
-                'field' => $field
+                'field' => $field,
             ];
 
             $rel_fields = $this->_get_default_fields($field_model);
@@ -845,7 +863,6 @@ class Queryset extends Object implements QuerysetAccess, Query
 
             $next_relation = $requested_fields[$field->name];
             $class_info['related_klass_infos'] = $this->_get_related_selection($select, $field_model, $next_relation);
-
 
             $related_class_infos[] = $class_info;
         endforeach;
@@ -909,7 +926,6 @@ class Queryset extends Object implements QuerysetAccess, Query
             $rel_model = $related_klass_info['model'];
             $rel_field = $related_klass_info['field'];
 
-
             $rel_obj = $this->_populate_model($rel_model->full_class_name(), $results, $related_klass_info, $select);
             $primary_model->{$rel_field->get_cache_name()} = $rel_obj;
         endforeach;
@@ -928,8 +944,8 @@ class Queryset extends Object implements QuerysetAccess, Query
 
                 $field_name = $select[$fields_position];
 
-                $aliased_field_name = (strpos($field_name, ".")) ? str_replace('.', '_', $field_name) : $field_name;
-                $field_name = ($pos = strpos($field_name, ".")) ? substr($field_name, $pos + 1) : $field_name;
+                $aliased_field_name = (strpos($field_name, '.')) ? str_replace('.', '_', $field_name) : $field_name;
+                $field_name = ($pos = strpos($field_name, '.')) ? substr($field_name, $pos + 1) : $field_name;
 
                 $model_values[$field_name] = $data_item[$aliased_field_name];
             endif;
@@ -940,14 +956,14 @@ class Queryset extends Object implements QuerysetAccess, Query
 
     protected function print_r($model_values)
     {
-        echo "<pre>";
+        echo '<pre>';
         var_dump($model_values);
-        echo "</pre>";
+        echo '</pre>';
     }
 
     protected function _compile($list)
     {
-        return join(', ', $list);
+        return implode(', ', $list);
     }
 
     protected function _sql()
@@ -961,7 +977,6 @@ class Queryset extends Object implements QuerysetAccess, Query
         if ($this->type == self::OPERATION_INSERT):
             return $this->_query_builder->get_compiled_insert('', false);
         endif;
-
 
         if ($this->type == self::OPERATION_UPDATE):
             return $this->_query_builder->get_compiled_update('', false);
@@ -996,7 +1011,7 @@ class Queryset extends Object implements QuerysetAccess, Query
     {
         if (Orm::ci_instance()->output->enable_profiler):
 
-            $conn_id = $this->model->meta->model_name . '_' . uniqid();
+            $conn_id = $this->model->meta->model_name.'_'.uniqid();
 
             Orm::ci_instance()->{$conn_id} = $query;
             $query = Orm::ci_instance()->{$conn_id};
@@ -1017,11 +1032,12 @@ class Queryset extends Object implements QuerysetAccess, Query
 
     // **************************************************************************************************
 
-
     /**
      * Evaluate the Queryset when a property is accessed from the Model Instance.
+     *
      * @param $property
      * @ignore
+     *
      * @return mixed
      */
     public function __get($property)
@@ -1036,7 +1052,9 @@ class Queryset extends Object implements QuerysetAccess, Query
 
     /**
      * Evaluates Queryset when the Queryset Result is used like a string e.g. using Queryset Result in echo statement.
+     *
      * @ignore
+     *
      * @return string
      */
     public function __toString()
@@ -1047,25 +1065,29 @@ class Queryset extends Object implements QuerysetAccess, Query
 
         if (count($this->_results_cache) > self::REPR_OUTPUT_SIZE):
             $results_to_reps = array_slice($this->_results_cache, 0, self::REPR_OUTPUT_SIZE);
-            $results_to_reps[] = "...(remaining elements truncated)...";
+            $results_to_reps[] = '...(remaining elements truncated)...';
         endif;
 
         $string = implode(', ', $results_to_reps);
+
         return sprintf('[ %s]', $string);
     }
 
     /**
      * Evaluates the Queryset when a method is being accessed in the Queryset Result.
+     *
      * @param $method
      * @param $args
      * @ignore
+     *
      * @return mixed
      */
 
-
     /**
      * Evaluates the Queryset when Queryset Result is used in a foreach.
+     *
      * @ignore
+     *
      * @return \ArrayIterator
      */
     public function getIterator()
@@ -1078,7 +1100,9 @@ class Queryset extends Object implements QuerysetAccess, Query
 
     /**
      * Evaluates the Queryset when Queryset Result is used in a count() or size().
+     *
      * @ignore
+     *
      * @return mixed
      */
     public function count()
@@ -1087,7 +1111,6 @@ class Queryset extends Object implements QuerysetAccess, Query
     }
 
     /**
-     *
      * @ignore
      */
     public function __clone()
@@ -1098,12 +1121,15 @@ class Queryset extends Object implements QuerysetAccess, Query
         $this->_query_builder = clone $this->_query_builder;
     }
 
-
     /**
      * Check if the key passed in exists.
+     *
      * @param mixed $offset the offset to check on
-     * @return boolean
+     *
+     * @return bool
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function offsetExists($offset)
@@ -1114,24 +1140,33 @@ class Queryset extends Object implements QuerysetAccess, Query
     }
 
     /**
-     * retrieve the value for the given key
-     * @param integer $offset the offset to retrieve element.     *
+     * retrieve the value for the given key.
+     *
+     * @param int $offset the offset to retrieve element.     *
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @return mixed the element at the offset, null if no element is found at the offset
      */
     public function offsetGet($offset)
     {
         $exists = $this->offsetExists($offset);
+
         return isset($exists) ? $this->_results_cache[$offset] : null;
     }
 
     /**
      * Assign the value to the given key.
-     * @param integer $offset the offset to set element
-     * @param mixed $item the element value
+     *
+     * @param int   $offset the offset to set element
+     * @param mixed $item   the element value
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws NotSupported
      */
     public function offsetSet($offset, $item)
@@ -1141,9 +1176,13 @@ class Queryset extends Object implements QuerysetAccess, Query
 
     /**
      * The key to unset.
+     *
      * @param mixed $offset the offset to unset element
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws NotSupported
      */
     public function offsetUnset($offset)

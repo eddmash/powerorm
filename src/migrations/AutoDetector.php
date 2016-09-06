@@ -1,4 +1,5 @@
 <?php
+
 namespace eddmash\powerorm\migrations;
 
 use eddmash\powerorm\migrations\operations\field\AddField;
@@ -16,8 +17,9 @@ use eddmash\powerorm\Object;
  * This class detects any changes in the models and creates migration files to reflect this changes.
  *
  * Class AutoDetector
- * @package eddmash\powerorm\migrations
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class AutoDetector extends Object
@@ -35,9 +37,9 @@ class AutoDetector extends Object
     const TYPE_FIELD = 'field';
 
     /**
-     * @param ProjectState $old_state
-     * @param ProjectState $new_state
-     * @param Questioner|NULL $questioner
+     * @param ProjectState    $old_state
+     * @param ProjectState    $new_state
+     * @param Questioner|null $questioner
      */
     public function __construct(ProjectState $old_state, ProjectState $new_state, Questioner $questioner = null)
     {
@@ -48,9 +50,13 @@ class AutoDetector extends Object
 
     /**
      * Takes a migration graph and returns all the changes that have happend within the models.
+     *
      * @param Graph $graph
+     *
      * @return array
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function changes(Graph $graph)
@@ -63,19 +69,21 @@ class AutoDetector extends Object
     }
 
     /**
-     * @param array $changes
-     * @param Graph $graph
+     * @param array  $changes
+     * @param Graph  $graph
      * @param string $migration_name
+     *
      * @return array
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function prepare_for_graph(array $changes, Graph $graph, $migration_name = null)
     {
         $leaves = $graph->leaf_nodes();
 
-        $leaf = (empty($leaves)) ? "" : $leaves[0];
-
+        $leaf = (empty($leaves)) ? '' : $leaves[0];
 
         if (empty($changes)):
             return [];
@@ -99,7 +107,7 @@ class AutoDetector extends Object
                 // $migration->requires = [$leaf];
                 array_push($migration->requires, $leaf);
 
-                $migration_no = str_pad($migration_no, 4, "0", STR_PAD_LEFT);
+                $migration_no = str_pad($migration_no, 4, '0', STR_PAD_LEFT);
                 $migration_name = $this->suggest_name($migration->operations(), $migration_no);
 //                $migration_name =  sprintf('%1$s_%2$s', $migration_no, $migration_name);
             endif;
@@ -112,10 +120,14 @@ class AutoDetector extends Object
     }
 
     /**
-     * Trys to guess a name for the migration that is to be created
+     * Trys to guess a name for the migration that is to be created.
+     *
      * @param $operations
+     *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function suggest_name($operations = null, $id = null)
@@ -127,7 +139,7 @@ class AutoDetector extends Object
         if (count($operations) == 1):
             return sprintf('%s%s_%s', $prefix, $id, $operations[0]->describe());
         else:
-            return sprintf("%s%s_auto_%s", $prefix, $id, date("Ymd_hm"));
+            return sprintf('%s%s_auto_%s', $prefix, $id, date('Ymd_hm'));
         endif;
     }
 
@@ -144,13 +156,14 @@ class AutoDetector extends Object
 
     public function get_migration_number($name)
     {
-        $name = explode("_", $name);
+        $name = explode('_', $name);
 
-        return (int)str_replace('m', '', $name[0]);
+        return (int) str_replace('m', '', $name[0]);
     }
 
     /**
      * returns of changes detected in the application models.
+     *
      * @return array
      */
     public function find_changes()
@@ -172,7 +185,6 @@ class AutoDetector extends Object
 
         $this->past_field_names = [];
         $this->new_field_names = [];
-
 
         // ******** first we find out Who was a proxy model, who was a managed model and who was a regular model
         $old_models_states_keys = array_keys($old_models_states);
@@ -201,7 +213,6 @@ class AutoDetector extends Object
                 $this->new_models_names[] = $new_model_name;
             endif;
         endforeach;
-
 
         // ********** Next, we learn about the fields in the models
 
@@ -253,7 +264,6 @@ class AutoDetector extends Object
         $this->renamed_models = [];
         $this->renamed_models_to = [];
 
-
         // get new models
         $new_models_names = array_diff($this->new_models_names, $this->old_models_names);
 
@@ -274,7 +284,7 @@ class AutoDetector extends Object
                     $this->add_operation(
                         new RenameModel([
                             'old_name' => $o_model_state->name,
-                            'new_name' => $n_model_state->name
+                            'new_name' => $n_model_state->name,
                         ]),
                         []
                     );
@@ -291,7 +301,6 @@ class AutoDetector extends Object
                 endif;
 
             endforeach;
-
 
         endforeach;
     }
@@ -396,7 +405,8 @@ class AutoDetector extends Object
     }
 
     /**
-     * Detect new fields
+     * Detect new fields.
+     *
      * @internal
      */
     public function find_added_fields()
@@ -416,7 +426,6 @@ class AutoDetector extends Object
                 if ($field->is_inverse()):
                     continue;
                 endif;
-
 
                 $this->_add_field($field_name, $field, $common_model_name, $model_meta);
             endforeach;
@@ -449,6 +458,7 @@ class AutoDetector extends Object
 
     /**
      * Detects any field alterations.
+     *
      * @internal
      */
     public function find_altered_fields()
@@ -489,7 +499,7 @@ class AutoDetector extends Object
                 if ($new_field_def !== $old_field_def):
                     $both_m2m = ($old_field->M2M && $new_field->M2M);
                     $neither_m2m = (!$old_field->M2M && !$new_field->M2M);
-                    $preserve_default = true;;
+                    $preserve_default = true;
 
                     if (!$old_field->null &&
                         $new_field->null &&
@@ -499,7 +509,7 @@ class AutoDetector extends Object
 
                         $new_default = $this->questioner->ask_not_null_alteration($common_field_name, $common_model_name);
 
-                        if ($new_default !== new NOT_PROVIDED):
+                        if ($new_default !== new NOT_PROVIDED()):
                             $new_field->default = $new_default;
                             $preserve_default = false;
                         endif;
@@ -512,7 +522,7 @@ class AutoDetector extends Object
                                 'model' => $common_model_name,
                                 'field' => $new_field,
                                 'name' => $common_field_name,
-                                'preserve_default' => $preserve_default
+                                'preserve_default' => $preserve_default,
                             ]),
                             []
                         );
@@ -520,7 +530,6 @@ class AutoDetector extends Object
                         $this->_drop_field($common_field_name, $old_field, $common_field_name);
                         $this->_add_field($common_field_name, $new_field, $common_field_name);
                     endif;
-
 
                 endif;
             endforeach;
@@ -536,8 +545,8 @@ class AutoDetector extends Object
      * @param $field_name
      * @param $field
      * @param $model_name
-     * @param bool|TRUE $alter if true this method is being used to create a field that alters an existing model table.
-     * otherwise its altering and existing model.
+     * @param bool|true $alter if true this method is being used to create a field that alters an existing model table.
+     *                         otherwise its altering and existing model
      */
     public function _add_field($field_name, $field, $model_name, $alter = true)
     {
@@ -552,7 +561,7 @@ class AutoDetector extends Object
                     self::ACTION_CREATED, self::TYPE_MODEL),
 
                 // depend on the model this field belongs to.
-                $this->add_dependency($this->standard_name($model_name), self::ACTION_CREATED, self::TYPE_MODEL)
+                $this->add_dependency($this->standard_name($model_name), self::ACTION_CREATED, self::TYPE_MODEL),
             ];
         endif;
 
@@ -563,13 +572,12 @@ class AutoDetector extends Object
             $preserve_default = false;
         endif;
 
-
         $this->add_operation(
             new AddField([
                 'model' => $model_name,
                 'name' => $field_name,
                 'field' => $field,
-                'preserve_default' => $preserve_default
+                'preserve_default' => $preserve_default,
             ]),
             $field_depends_on
         );
@@ -577,6 +585,7 @@ class AutoDetector extends Object
 
     /**
      * @ignore
+     *
      * @param $field
      * @param $model_name
      * @param $model_obj
@@ -586,7 +595,7 @@ class AutoDetector extends Object
         $field_depends_on = [];
         if (isset($field->related_model)):
             $field_depends_on = [ucwords($this->standard_name($field->related_model->meta->model_name)),
-                ucwords($this->standard_name($model_name))];
+                ucwords($this->standard_name($model_name)), ];
         endif;
 
         $this->add_operation(
@@ -600,8 +609,8 @@ class AutoDetector extends Object
 
     /**
      * @param $operation
-     * @param array $dependencies
-     * @param bool|FALSE $push_at_top some operations should come before others, use this determine which
+     * @param array      $dependencies
+     * @param bool|false $push_at_top  some operations should come before others, use this determine which
      */
     public function add_operation($operation, $dependencies = [], $push_at_top = false)
     {

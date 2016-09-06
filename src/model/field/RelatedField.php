@@ -2,10 +2,6 @@
 /**
  * The Relationship fields.
  */
-
-/**
- *
- */
 namespace eddmash\powerorm\model\field;
 
 use eddmash\powerorm\exceptions\OrmExceptions;
@@ -13,11 +9,13 @@ use eddmash\powerorm\model\BaseModel;
 use Orm;
 
 /**
- * @param callback $callback
+ * @param callback  $callback
  * @param BaseModel $model
- * @param array $related_models
- * @param array $kwargs
+ * @param array     $related_models
+ * @param array     $kwargs
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 function lazy_related_operation($callback, $model, $related_models, $kwargs)
@@ -43,12 +41,9 @@ function lazy_related_operation($callback, $model, $related_models, $kwargs)
  * Creates a Relationship column or table depending on the type of relationship.
  *
  * {@inheritdoc}
- *
- * @package eddmash\powerorm\model\field
  */
 class RelatedField extends Field
 {
-
     /**
      * Controls whether or not a constraint should be created in the database for this foreign key.
      *
@@ -58,12 +53,14 @@ class RelatedField extends Field
      * - You’re sharing your database.
      *
      * If this is set to False, accessing a related object that doesn’t exist will raise its DoesNotExist exception.
+     *
      * @var
      */
     public $db_constraint = false;
 
     /**
      * This is the model to create a relationship with.
+     *
      * @var BaseModel
      */
     protected $model;
@@ -105,19 +102,20 @@ class RelatedField extends Field
     protected $on_delete;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @var bool
      */
     public $is_relation = true;
 
-
     /**
      * Used to set the field on the model to use for display e.g for the model user_model.
-     * you could set the form_display_field to username, this will result in form select box shown below
+     * you could set the form_display_field to username, this will result in form select box shown below.
      *
      * <pre><code>&lt;select &gt;
      *      &lt; option value=1 &gt; math // <----- the username.
      * &lt;/select &gt;</code></pre>
+     *
      * @var
      */
     public $form_display_field;
@@ -138,11 +136,13 @@ class RelatedField extends Field
     {
         $checks = parent::check();
         $checks = $this->add_check($checks, $this->_check_relation_model());
+
         return $checks;
     }
 
     /**
      * @ignore
+     *
      * @return mixed
      */
     public function _check_relation_model()
@@ -166,9 +166,11 @@ class RelatedField extends Field
     }
 
     /**
-     * @param string $name
+     * @param string    $name
      * @param BaseModel $obj
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function contribute_to_class($name, $obj)
@@ -176,7 +178,7 @@ class RelatedField extends Field
         parent::contribute_to_class($name, $obj);
         if (!$obj->meta->abstract):
 
-            /**
+            /*
              * callback to be invoked when a related model has been resolved.
              * @param BaseModel $related_model
              * @param array $kwargs
@@ -197,6 +199,7 @@ class RelatedField extends Field
     public function related_model()
     {
         Orm::get_registry()->is_app_ready();
+
         return $this->relation->get_model();
     }
 }

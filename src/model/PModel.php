@@ -1,11 +1,7 @@
 <?php
 
 /**
- * The Orm Model that adds power to the CI Model
- */
-
-/**
- *
+ * The Orm Model that adds power to the CI Model.
  */
 defined('BASEPATH') or exit('No direct script access allowed');
 
@@ -29,20 +25,21 @@ use eddmash\powerorm\model\field\TextField;
 use eddmash\powerorm\model\field\TimeField;
 
 /**
- * this makes the Orm Model available for use without namespaces
+ * this makes the Orm Model available for use without namespaces.
  *
- * @package eddmash\powerorm\model
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class PModel extends BaseModel
 {
-
     // ********************* Model Fields ************************************
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return AutoField
      */
     public static function AutoField($opts = [])
@@ -52,7 +49,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return CharField
      */
     public static function CharField($opts = [])
@@ -60,10 +59,11 @@ abstract class PModel extends BaseModel
         return CharField::instance($opts);
     }
 
-
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return FileField
      */
     public static function FileField($opts = [])
@@ -71,10 +71,11 @@ abstract class PModel extends BaseModel
         return FileField::instance($opts);
     }
 
-
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return ImageField
      */
     public static function ImageField($opts = [])
@@ -84,7 +85,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return BooleanField
      */
     public static function BooleanField($opts = [])
@@ -94,7 +97,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return EmailField
      */
     public static function EmailField($opts = [])
@@ -104,7 +109,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return TextField
      */
     public static function TextField($opts = [])
@@ -114,7 +121,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return DecimalField
      */
     public static function DecimalField($opts = [])
@@ -124,7 +133,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return IntegerField
      */
     public static function IntegerField($opts = [])
@@ -134,7 +145,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return DateTimeField
      */
     public static function DateTimeField($opts = [])
@@ -144,7 +157,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return DateField
      */
     public static function DateField($opts = [])
@@ -154,7 +169,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return TimeField
      */
     public static function TimeField($opts = [])
@@ -164,7 +181,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return ManyToOneField
      */
     public static function ManyToOneField($opts = [])
@@ -174,7 +193,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return OneToOneField
      */
     public static function OneToOneField($opts = [])
@@ -184,7 +205,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return ManyToManyField
      */
     public static function ManyToManyField($opts = [])
@@ -194,7 +217,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return HasManyField
      */
     public static function HasManyField($opts = [])
@@ -204,7 +229,9 @@ abstract class PModel extends BaseModel
 
     /**
      * @ignore
+     *
      * @param array $opts
+     *
      * @return HasOneField
      */
     public static function HasOneField($opts = [])

@@ -3,9 +3,8 @@
  * Created by http://eddmash.com.
  * User: eddmash
  * Date: 5/14/16
- * Time: 6:38 AM
+ * Time: 6:38 AM.
  */
-
 namespace eddmash\powerorm\migrations;
 
 use eddmash\powerorm\BaseOrm;
@@ -16,8 +15,9 @@ use eddmash\powerorm\Object;
 
 /**
  * This class is responsible for loading the state of the project based on the migration files present.
- * @package eddmash\powerorm\migrations
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Loader extends Object
@@ -45,6 +45,7 @@ class Loader extends Object
 
     /**
      * List of migration objects.
+     *
      * @return array
      */
     public function app_migrations()
@@ -63,17 +64,21 @@ class Loader extends Object
 
     /**
      * The migration class name.
+     *
      * @param $file
+     *
      * @return string
      */
     public function migration_class_name($file)
     {
-        $file_name = $class_name = trim(basename($file, ".php"));
+        $file_name = $class_name = trim(basename($file, '.php'));
+
         return [$file_name, $file_name];
     }
 
     /**
-     * the migrations classes
+     * the migrations classes.
+     *
      * @return array
      */
     public function get_migrations_classes()
@@ -89,16 +94,19 @@ class Loader extends Object
 
     /**
      * Get all the migration files, Absolute paths to each file.
+     *
      * @return array
      */
     public function get_migrations_files()
     {
         $fileHandler = new FileHandler($this->_migrations_path);
+
         return $fileHandler->read_dir('php');
     }
 
     /**
      * returns the latest migration number.
+     *
      * @return int
      */
     public function latest_migration_version()
@@ -106,12 +114,13 @@ class Loader extends Object
         $migration_files = $this->get_migrations_files();
         $last_version = array_pop($migration_files);
         $last_version = basename($last_version);
-        $last_version = preg_split("/_/", $last_version)[0];
-        return (int)$last_version;
+        $last_version = preg_split('/_/', $last_version)[0];
+
+        return (int) $last_version;
     }
 
     /**
-     * Load the migrations graph from the first to the latest migration
+     * Load the migrations graph from the first to the latest migration.
      */
     public function build_graph()
     {
@@ -151,7 +160,7 @@ class Loader extends Object
     }
 
     /**
-     * An application should only have one leaf node more than that means there is an issue somewhere
+     * An application should only have one leaf node more than that means there is an issue somewhere.
      */
     public function find_issues()
     {
@@ -159,6 +168,7 @@ class Loader extends Object
         if (count($latest) > 1):
             return $latest;
         endif;
+
         return [];
     }
 

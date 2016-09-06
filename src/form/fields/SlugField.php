@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 2:07 PM
+ * Time: 2:07 PM.
  */
-
 namespace eddmash\powerorm\form\fields;
 
 /**
@@ -17,8 +16,9 @@ namespace eddmash\powerorm\form\fields;
  * This field is intended for use in representing a model SlugField in forms.
  *
  * Class SlugField
- * @package eddmash\powerorm\form\fields
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class SlugField extends CharField

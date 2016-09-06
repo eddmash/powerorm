@@ -10,9 +10,10 @@ use eddmash\powerorm\Object;
 use Orm;
 
 /**
- * Class Form
- * @package eddmash\powerorm\form
+ * Class Form.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class BaseForm extends Object implements \IteratorAggregate
@@ -21,9 +22,10 @@ class BaseForm extends Object implements \IteratorAggregate
 
     /**
      * Indicates if the form is ready for use, if false, this indicates the form is in customization mode and cannot
-     * be used for things like validation.using it when not ready causes inconsistencies in how the form works
+     * be used for things like validation.using it when not ready causes inconsistencies in how the form works.
      *
      * Call done() to signal your done customizing the form
+     *
      * @var bool
      */
     protected $ready = false;
@@ -64,13 +66,12 @@ class BaseForm extends Object implements \IteratorAggregate
     public $cleaned_data = [];
 
     /**
-     * Takes three arguments
+     * Takes three arguments.
      *
-     * @param array $data the data to bind the form to and validate against, usually you will use data from the $_POST
-     * but can be an associative array that has any of the form fields names as keys
-     *
+     * @param array $data    the data to bind the form to and validate against, usually you will use data from the $_POST
+     *                       but can be an associative array that has any of the form fields names as keys
      * @param array $initial this is the are initial values for the form fields usually the first time the form is
-     * loaded i.e. unbound form, this should be an associative array where keys are the form fields names
+     *                       loaded i.e. unbound form, this should be an associative array where keys are the form fields names
      *
      * You may be thinking, why not just pass a dictionary of the initial values as data when displaying the form?
      * Well, if you do that, you’ll trigger validation, and the HTML output will include any validation errors.
@@ -81,10 +82,9 @@ class BaseForm extends Object implements \IteratorAggregate
      * Also note that initial values are not used as “fallback” data in validation if a particular field’s value is
      * not given. initial values are only intended for initial form display:
      *
-     * <strong>NOTE </strong> this are not default values.
-     *
+     * <strong>NOTE </strong> this are not default values
      * @param array $kwargs this accepts any other arguments that need to be passed to the form, usually
-     * this used to accept user defined arguments
+     *                      this used to accept user defined arguments
      */
     public function __construct($data = [], $initial = [], $kwargs = [])
     {
@@ -109,7 +109,6 @@ class BaseForm extends Object implements \IteratorAggregate
         Orm::ci_instance()->load->helper('url');
         Orm::ci_instance()->load->helper('form');
 
-
         $this->init();
     }
 
@@ -131,7 +130,6 @@ class BaseForm extends Object implements \IteratorAggregate
 
         $this->custom();
 
-
         if ($this->_is_multipart()):
             // load the upload library
             Orm::ci_instance()->load->library('upload');
@@ -140,16 +138,18 @@ class BaseForm extends Object implements \IteratorAggregate
 
     /**
      * Signals other parts of the form that its is ready for use.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function done()
     {
         $this->setup();
         $this->ready = true;
+
         return $this;
     }
-
 
     /**
      * Creates an opening form tag with a base URL built from your config preferences.
@@ -185,15 +185,15 @@ class BaseForm extends Object implements \IteratorAggregate
      * action="http://example.com/index.php/email/send" class="email" id="myform" &gt;</code></pre>
      *
      * @param string $action
-     * @param array $attributes
-     * @param array $hidden
-     * @return string
+     * @param array  $attributes
+     * @param array  $hidden
      *
+     * @return string
      */
     public function open($kwargs = [])
     {
         assert(is_array($kwargs),
-            "open() expects an associative array, options are { action, attributes, hidden, csrf }");
+            'open() expects an associative array, options are { action, attributes, hidden, csrf }');
 
         $action = '';
         $attributes = array();
@@ -219,7 +219,6 @@ class BaseForm extends Object implements \IteratorAggregate
         return $form_open;
     }
 
-
     /**
      * Create the form closing tags and displays any errors that have not been display explicitly.
      *
@@ -230,6 +229,7 @@ class BaseForm extends Object implements \IteratorAggregate
      * <pre><code> &lt;/form &gt; </code></pre>
      *
      * @param string $extra
+     *
      * @return string
      */
     public function close($extra = '')
@@ -239,8 +239,10 @@ class BaseForm extends Object implements \IteratorAggregate
 
     /**
      * Creates a form fieldset.
+     *
      * @param $legend_text
      * @param array $attrs
+     *
      * @return string
      */
     public function open_fieldset($legend_text, $attrs = array())
@@ -249,8 +251,10 @@ class BaseForm extends Object implements \IteratorAggregate
     }
 
     /**
-     * Closes a form fieldset
+     * Closes a form fieldset.
+     *
      * @param string $extra
+     *
      * @return string
      */
     public function close_fieldset($extra = '')
@@ -258,24 +262,29 @@ class BaseForm extends Object implements \IteratorAggregate
         return form_fieldset_close($extra);
     }
 
-
     /**
      * Returns true if the form is bound and its has not errors after validation has been run.
+     *
      * @return bool
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function is_valid()
     {
         $this->_is_ready(__METHOD__);
+
         return $this->is_bound && $this->_form_has_errors();
     }
 
-
     /**
-     * return a list of errors related to the form and its fields
+     * return a list of errors related to the form and its fields.
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function errors()
@@ -289,9 +298,13 @@ class BaseForm extends Object implements \IteratorAggregate
 
     /**
      * Raise error if form is not ready for use.
+     *
      * @param $method
+     *
      * @throws FormNotReadyException
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function _is_ready($method)
@@ -302,11 +315,13 @@ class BaseForm extends Object implements \IteratorAggregate
         endif;
     }
 
-
     /**
      * Returns true of form is ready for use or false if its still in customizaiton mode.
+     *
      * @return bool
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function is_ready()
@@ -314,11 +329,11 @@ class BaseForm extends Object implements \IteratorAggregate
         return $this->ready;
     }
 
-
     /**
-     * Clean the form and the fields i.e. do the validations for this form and its fields
-     * @return null
+     * Clean the form and the fields i.e. do the validations for this form and its fields.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function full_clean()
@@ -348,7 +363,7 @@ class BaseForm extends Object implements \IteratorAggregate
     }
 
     /**
-     * Gets a single field instance in the form fields array and returns it
+     * Gets a single field instance in the form fields array and returns it.
      *
      * <h4>Usage</h4>
      *
@@ -357,9 +372,13 @@ class BaseForm extends Object implements \IteratorAggregate
      * <pre><code>$form->get_field('username);</code></pre>
      *
      * @param $field_name
+     *
      * @return mixed
+     *
      * @throws KeyError
+     *
      * @since 1.0.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_field($field_name)
@@ -372,9 +391,12 @@ class BaseForm extends Object implements \IteratorAggregate
     }
 
     /**
-     * used to set up field on the form, usually used by a fields contribute method
+     * used to set up field on the form, usually used by a fields contribute method.
+     *
      * @param $field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function load_field($field)
@@ -383,8 +405,10 @@ class BaseForm extends Object implements \IteratorAggregate
     }
 
     /**
-     * Sets up so validation rules to be used by the CI_VALIDATION
+     * Sets up so validation rules to be used by the CI_VALIDATION.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function field_validation_rules($rules)
@@ -455,7 +479,9 @@ class BaseForm extends Object implements \IteratorAggregate
 
     /**
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function as_p()
@@ -474,7 +500,6 @@ class BaseForm extends Object implements \IteratorAggregate
 
         return $this->validator;
     }
-
 
     public function _clean_fields()
     {
@@ -559,7 +584,9 @@ class BaseForm extends Object implements \IteratorAggregate
 
     /**
      * @return string
+     *
      * @since 1.0.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     protected function _html_output($opts = [])
@@ -574,7 +601,7 @@ class BaseForm extends Object implements \IteratorAggregate
 
         foreach ($this->fields as $name => $field) :
             if ($field->is_hidden()):
-                $hidden_output[] = (string)$field;
+                $hidden_output[] = (string) $field;
             else:
                 $output[] = sprintf($row, $field->label_tag(), $field, $field->help_text);
             endif;
@@ -582,10 +609,10 @@ class BaseForm extends Object implements \IteratorAggregate
 
         // add errors to the top
 
-
         // add hidden inputs to end
         $output = array_merge($output, $hidden_output);
-        return join(' ', $output);
+
+        return implode(' ', $output);
     }
 
     protected function _field_setup($name, $value)
@@ -600,15 +627,21 @@ class BaseForm extends Object implements \IteratorAggregate
     public function getIterator()
     {
         $this->setup();
+
         return new \ArrayIterator($this->fields);
     }
 
     /**
      * @ignore
+     *
      * @param $field_name
+     *
      * @return mixed
+     *
      * @throws KeyError
+     *
      * @since 1.0.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function __get($field_name)

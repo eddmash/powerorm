@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 3:33 PM
+ * Time: 3:33 PM.
  */
-
 namespace eddmash\powerorm\migrations\operations\field;
 
 use eddmash\powerorm\helpers\Bools;
@@ -14,10 +13,10 @@ use eddmash\powerorm\migrations\ProjectState;
 use eddmash\powerorm\NOT_PROVIDED;
 
 /**
- * Class AlterField
- * @package eddmash\powerorm\migrations\operations
+ * Class AlterField.
  *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class AlterField extends Operation
@@ -63,7 +62,6 @@ class AlterField extends Operation
             $connection->schema_editor->alter_model_field($current_model, $current_field, $desired_field);
         endif;
 
-
         // reset it back
         if (Bools::false($this->preserve_default)):
             $desired_field->default = NOT_PROVIDED::instance();
@@ -79,7 +77,7 @@ class AlterField extends Operation
     {
         if (false === $this->preserve_default):
             $field = $this->field;
-            $field->default = new NOT_PROVIDED;
+            $field->default = new NOT_PROVIDED();
         else:
             $field = $this->field;
         endif;
@@ -97,7 +95,6 @@ class AlterField extends Operation
                 unset($arg['preserve_default']);
             endif;
         endforeach;
-
 
         return $args;
     }

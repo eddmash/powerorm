@@ -3,22 +3,22 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 9/6/16
- * Time: 1:19 AM
+ * Time: 1:19 AM.
  */
-
 namespace eddmash\powerorm\model\field\relation;
 
 abstract class ReverseRelationObject extends RelationObject
 {
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     *
      * @var bool
      */
     public $reverse = true;
 
     /**
      * Which field in relation model connects back to the current model.
+     *
      * @var null
      */
     public $mapped_by = null;

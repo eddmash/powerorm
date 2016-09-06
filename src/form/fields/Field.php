@@ -2,9 +2,8 @@
 /**
  * Created by eddmash <http://eddmash.com>
  * Date: 6/23/16
- * Time: 3:55 PM
+ * Time: 3:55 PM.
  */
-
 namespace eddmash\powerorm\form\fields;
 
 use eddmash\powerorm\Contributor;
@@ -39,8 +38,8 @@ use eddmash\powerorm\Object;
  *             is its widget is shown in the form but not editable.
  * label_suffix -- Suffix to be added to the label. Overrides
  *
- * @package eddmash\powerorm\form\fields
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class Field extends Object implements Contributor
@@ -61,18 +60,21 @@ abstract class Field extends Object implements Contributor
      *
      * Note initial values are not used as “fallback” data in validation if a particular field’s value is not given.
      * initial values are only intended for initial form display:
+     *
      * @var null
      */
     public $initial = null;
 
     /**
      * Any help text that has been associated with the field.
+     *
      * @var string
      */
     public $help_text = '';
 
     /**
      * Boolean that specifies whether the field is disabled, that is its widget is shown in the form but not editable.
+     *
      * @var bool
      */
     public $disabled = false;
@@ -136,8 +138,11 @@ abstract class Field extends Object implements Contributor
      * matches to there related html attributes e.g for form field we get mx_length but html expexts maxlength.
      *
      * @param $widget
+     *
      * @return array
+     *
      * @since 1.0.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function widget_attrs($widget)
@@ -147,8 +152,11 @@ abstract class Field extends Object implements Contributor
 
     /**
      * Returns the Widget to use for this form field.
+     *
      * @return static
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_widget()
@@ -187,7 +195,9 @@ abstract class Field extends Object implements Contributor
      * // Would produce:  <label for="username" class="mycustomclass" style="color: #000;">What is your Name</label>
      *
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function label_tag()
@@ -203,6 +213,7 @@ abstract class Field extends Object implements Contributor
 
     /**
      * Returns the label name .
+     *
      * @return mixed|string
      */
     public function get_label_name()
@@ -232,12 +243,15 @@ abstract class Field extends Object implements Contributor
      * The html label ID that will be used for this field.
      *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_id_for_label()
     {
         $id = (array_key_exists('id', $this->widget->attrs)) ? $this->widget->attrs['id'] : $this->get_auto_id();
+
         return $this->widget->get_id_for_label($id);
     }
 
@@ -254,7 +268,7 @@ abstract class Field extends Object implements Contributor
         $object->field_validation_rules([
             'field' => $this->get_html_name(),
             'label' => $this->get_label_name(),
-            'rules' => $this->validators()
+            'rules' => $this->validators(),
         ]);
         $this->form = $object;
     }
@@ -262,10 +276,12 @@ abstract class Field extends Object implements Contributor
     /**
      * The name of the field that will be used in the input element’s name field i.e
      * Returns the name to use in widgets, this is meant to help prepare names for fields like checkbox that take
-     * the name as an array
+     * the name as an array.
      *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function get_html_name()
@@ -278,14 +294,18 @@ abstract class Field extends Object implements Contributor
         $value = $this->to_php($value);
         $this->validate($value);
         $this->run_validators($value);
+
         return $value;
     }
 
     /**
      * Some validations that the CI_Validator does not take care off
-     * This method should raise a ValiationError Exception if the field fails validation
+     * This method should raise a ValiationError Exception if the field fails validation.
+     *
      * @param $value
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function validate($value)
@@ -293,9 +313,10 @@ abstract class Field extends Object implements Contributor
     }
 
     /**
-     * Runs custom validation not provided by CI_Validator
+     * Runs custom validation not provided by CI_Validator.
      *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function run_validators($value)
@@ -339,13 +360,16 @@ abstract class Field extends Object implements Contributor
             $attrs['id'] = $this->get_auto_id();
         endif;
 
-        return (string)$widget->render($this->get_html_name(), $this->value(), $attrs);
+        return (string) $widget->render($this->get_html_name(), $this->value(), $attrs);
     }
 
     /**
      * The value of the field.
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function value()
@@ -373,9 +397,12 @@ abstract class Field extends Object implements Contributor
     }
 
     /**
-     *  attribute is True if the form field is a hidden field and False otherwise
+     *  attribute is True if the form field is a hidden field and False otherwise.
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function is_hidden()

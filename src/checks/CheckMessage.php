@@ -1,17 +1,17 @@
 <?php
+
 namespace eddmash\powerorm\checks;
 
 use eddmash\powerorm\console\Base;
 
 /**
- * @package eddmash\powerorm\checks
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class CheckMessage extends Base
 {
-
-    # Levels
+    // Levels
     const DEBUG = 10;
     const INFO = 20;
     const WARNING = 30;
@@ -45,9 +45,10 @@ abstract class CheckMessage extends Base
 }
 
 /**
- * Class Error
- * @package eddmash\powerorm\checks
+ * Class Error.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Error extends CheckMessage
@@ -59,9 +60,10 @@ class Error extends CheckMessage
 }
 
 /**
- * Class Warning
- * @package eddmash\powerorm\checks
+ * Class Warning.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Warning extends CheckMessage
@@ -73,9 +75,10 @@ class Warning extends CheckMessage
 }
 
 /**
- * Class Info
- * @package eddmash\powerorm\checks
+ * Class Info.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Info extends CheckMessage
@@ -87,9 +90,10 @@ class Info extends CheckMessage
 }
 
 /**
- * Class Debug
- * @package eddmash\powerorm\checks
+ * Class Debug.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Debug extends CheckMessage
@@ -101,9 +105,10 @@ class Debug extends CheckMessage
 }
 
 /**
- * Class Critical
- * @package eddmash\powerorm\checks
+ * Class Critical.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Critical extends CheckMessage

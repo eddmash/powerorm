@@ -3,16 +3,13 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:10 PM
+ * Time: 4:10 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 /**
  * This creates a reverse connection to a model that define one-to-many/ many-to-many relationships
  * by using ForeignKey or ManyToMAny Fields.
- *
- * @package eddmash\powerorm\model\field
  */
 class HasManyField extends ManyToOneField
 {
@@ -23,7 +20,6 @@ class HasManyField extends ManyToOneField
         $this->M2O = false;
         parent::__construct($field_options);
     }
-
 
     public function contribute_to_class($name, $obj)
     {

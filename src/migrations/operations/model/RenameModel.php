@@ -3,18 +3,18 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 3:30 PM
+ * Time: 3:30 PM.
  */
-
 namespace eddmash\powerorm\migrations\operations\model;
 
 use eddmash\powerorm\migrations\operations\Operation;
 use eddmash\powerorm\migrations\ProjectState;
 
 /**
- * Class RenameModel
- * @package eddmash\powerorm\migrations\operations
+ * Class RenameModel.
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class RenameModel extends Operation

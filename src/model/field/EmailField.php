@@ -3,9 +3,8 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 4:05 PM
+ * Time: 4:05 PM.
  */
-
 namespace eddmash\powerorm\model\field;
 
 use eddmash\powerorm\form\widgets;
@@ -15,12 +14,9 @@ use eddmash\powerorm\form\widgets;
  * Just like CharField but ensure the input provided is a valid email.
  *
  * - default max_length was increased from 75 to 254 in order to be compliant with RFC3696/5321.
- *
- * @package eddmash\powerorm\model\field
  */
 class EmailField extends CharField
 {
-
     /**
      * {@inheritdoc}
      */
@@ -35,6 +31,7 @@ class EmailField extends CharField
     {
         $defaults = ['widget' => widgets\EmailInput::full_class_name()];
         $defaults = array_merge($defaults, $kwargs);
+
         return parent::formfield($defaults);
     }
 }
