@@ -8,11 +8,11 @@ use powerorm\exceptions\KeyError;
 use powerorm\exceptions\ValidationError;
 use powerorm\Object;
 
-
 /**
- * Class Form
- * @package powerorm\form
+ * Class Form.
+ *
  * @since 1.0.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class BaseForm extends Object
@@ -21,12 +21,13 @@ class BaseForm extends Object
 
     /**
      * Indicates if the form is ready for use, if false, this indicates the form is in customization mode and cannot
-     * be used for things like validation.using it when not ready causes inconsistencies in how the form works
+     * be used for things like validation.using it when not ready causes inconsistencies in how the form works.
      *
      * Call done() to signal your done customizing the form
+     *
      * @var bool
      */
-    protected $ready=FALSE;
+    protected $ready = false;
 
     /**
      * By default, the form rendering methods include:
@@ -58,19 +59,18 @@ class BaseForm extends Object
     public $auto_id = 'id_%s';
     public $initial = [];
     public $data = [];
-    public $is_bound = FALSE;
+    public $is_bound = false;
     protected $fields = [];
-    public $validation_rules=[];
+    public $validation_rules = [];
     public $cleaned_data = [];
 
     /**
-     * Takes three arguments
+     * Takes three arguments.
      *
-     * @param array $data the data to bind the form to and validate against, usually you will use data from the $_POST
-     * but can be an associative array that has any of the form fields names as keys
-     *
+     * @param array $data    the data to bind the form to and validate against, usually you will use data from the $_POST
+     *                       but can be an associative array that has any of the form fields names as keys
      * @param array $initial this is the are initial values for the form fields usually the first time the form is
-     * loaded i.e. unbound form, this should be an associative array where keys are the form fields names
+     *                       loaded i.e. unbound form, this should be an associative array where keys are the form fields names
      *
      * You may be thinking, why not just pass a dictionary of the initial values as data when displaying the form?
      * Well, if you do that, you’ll trigger validation, and the HTML output will include any validation errors.
@@ -82,30 +82,29 @@ class BaseForm extends Object
      * not given. initial values are only intended for initial form display:
      *
      * <strong>NOTE </strong> this are not default values.
-     *
      * @param array $kwargs this accepts any other arguments that need to be passed to the form, usually
-     * this used to accept user defined arguments
+     *                      this used to accept user defined arguments
      */
-    public function __construct($data=[], $initial=[], $kwargs=[]){
-
-        if(!empty($data)):
-            $this->is_bound = TRUE;
+    public function __construct($data = [], $initial = [], $kwargs = [])
+    {
+        if (!empty($data)):
+            $this->is_bound = true;
         endif;
 
         $this->data = $data;
 
-        if(empty($data)):
+        if (empty($data)):
             $data = [];
         endif;
 
-        if(empty($initial)):
+        if (empty($initial)):
             $initial = [];
         endif;
 
         $this->initial = array_change_key_case($initial, CASE_LOWER);
 
         // replace the default options with the ones passed in.
-        foreach ($kwargs as $key=>$value) :
+        foreach ($kwargs as $key => $value) :
             $this->{$key} = $value;
         endforeach;
 
@@ -118,26 +117,26 @@ class BaseForm extends Object
         $this->init();
     }
 
-    public function fields(){
-    
+    public function fields()
+    {
     }
 
-    public function widgets(){
-    
+    public function widgets()
+    {
     }
 
-    public function custom(){
-
+    public function custom()
+    {
     }
 
-    public function setup(){
-
+    public function setup()
+    {
         $this->fields();
 
         $this->custom();
 
 
-        if($this->_is_multipart()):
+        if ($this->_is_multipart()):
             // load the upload library
             $this->ci_instance()->load->library('upload');
         endif;
@@ -145,15 +144,18 @@ class BaseForm extends Object
 
     /**
      * Signals other parts of the form that its is ready for use.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function done(){
+    public function done()
+    {
         $this->setup();
-        $this->ready = TRUE;
+        $this->ready = true;
+
         return $this;
     }
-
 
     /**
      * Creates an opening form tag with a base URL built from your config preferences.
@@ -189,39 +191,38 @@ class BaseForm extends Object
      * action="http://example.com/index.php/email/send" class="email" id="myform" &gt;</code></pre>
      *
      * @param string $action
-     * @param array $attributes
-     * @param array $hidden
-     * @return string
+     * @param array  $attributes
+     * @param array  $hidden
      *
+     * @return string
      */
-    public function open($kwargs=[]){
+    public function open($kwargs = [])
+    {
         assert(is_array($kwargs),
-            "open() expects an associative array, options are { action, attributes, hidden, csrf }");
+            'open() expects an associative array, options are { action, attributes, hidden, csrf }');
 
         $action = '';
-        $attributes = array();
-        $hidden = array();
+        $attributes = [];
+        $hidden = [];
 
         extract($kwargs);
 
-        if(strlen($action)<=0):
+        if (strlen($action) <= 0):
             $action = current_url();
         endif;
 
         // create a multipart form or a normal form
-        if($this->_is_multipart()):
-            $form_open = form_open_multipart($action, $attributes, $hidden);
-        else:
+        if ($this->_is_multipart()):
+            $form_open = form_open_multipart($action, $attributes, $hidden); else:
             $form_open = form_open($action, $attributes, $hidden);
         endif;
 
-        if(isset($this->form_message)):
+        if (isset($this->form_message)):
             $form_open .= "<p class='help-block form-help-text'>$this->form_message</p>";
         endif;
 
         return $form_open;
     }
-
 
     /**
      * Create the form closing tags and displays any errors that have not been display explicitly.
@@ -233,54 +234,67 @@ class BaseForm extends Object
      * <pre><code> &lt;/form &gt; </code></pre>
      *
      * @param string $extra
+     *
      * @return string
      */
-    public function close($extra = ''){
-
+    public function close($extra = '')
+    {
         return form_close($extra);
     }
 
     /**
      * Creates a form fieldset.
+     *
      * @param $legend_text
      * @param array $attrs
+     *
      * @return string
      */
-    public function open_fieldset($legend_text, $attrs=array()){
+    public function open_fieldset($legend_text, $attrs = [])
+    {
         return form_fieldset($legend_text, $attrs);
     }
 
     /**
-     * Closes a form fieldset
+     * Closes a form fieldset.
+     *
      * @param string $extra
+     *
      * @return string
      */
-    public function close_fieldset($extra=''){
+    public function close_fieldset($extra = '')
+    {
         return form_fieldset_close($extra);
     }
 
-
     /**
      * Returns true if the form is bound and its has not errors after validation has been run.
+     *
      * @return bool
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function is_valid(){
+    public function is_valid()
+    {
         $this->_is_ready(__METHOD__);
+
         return $this->is_bound && $this->_form_has_errors();
     }
 
-
     /**
-     * return a list of errors related to the form and its fields
+     * return a list of errors related to the form and its fields.
+     *
      * @return mixed
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function errors(){
-
-        if(empty($this->_errors)):
+    public function errors()
+    {
+        if (empty($this->_errors)):
             $this->full_clean();
         endif;
 
@@ -289,43 +303,52 @@ class BaseForm extends Object
 
     /**
      * Raise error if form is not ready for use.
+     *
      * @param $method
+     *
      * @throws FormNotReadyException
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _is_ready($method){
-        if(!$this->ready):
+    public function _is_ready($method)
+    {
+        if (!$this->ready):
             throw new FormNotReadyException(
                 sprintf('Please ensure you have called done() method of the form before is { %s }', $method));
         endif;
     }
 
-
     /**
      * Returns true of form is ready for use or false if its still in customizaiton mode.
+     *
      * @return bool
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function is_ready(){
+    public function is_ready()
+    {
         return $this->ready;
     }
 
-
-
     /**
-     * Clean the form and the fields i.e. do the validations for this form and its fields
+     * Clean the form and the fields i.e. do the validations for this form and its fields.
+     *
      * @return null
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function full_clean(){
-
+    public function full_clean()
+    {
         $this->_errors = [];
 
-        if(!$this->is_bound):
-            return NULL;
+        if (!$this->is_bound):
+            return;
         endif;
 
         // this part is for using the CI_VALIDATION
@@ -336,17 +359,18 @@ class BaseForm extends Object
         $this->_clean_form();
     }
 
-    public function ci_validation(){
+    public function ci_validation()
+    {
         $this->validator()->set_rules($this->validation_rules);
         $this->validator()->set_data($this->data);
 
-        if($this->validator()->run() === FALSE):
+        if ($this->validator()->run() === false):
             $this->_errors = $this->validator()->error_array();
         endif;
     }
 
     /**
-     * Gets a single field instance in the form fields array and returns it
+     * Gets a single field instance in the form fields array and returns it.
      *
      * <h4>Usage</h4>
      *
@@ -355,51 +379,64 @@ class BaseForm extends Object
      * <pre><code>$form->get_field('username);</code></pre>
      *
      * @param $field_name
-     * @return mixed
+     *
      * @throws KeyError
+     *
+     * @return mixed
+     *
      * @since 1.0.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function get_field($field_name){
-
-        if((array_key_exists($this->lower_case($field_name), $this->fields))):
-            return $this->fields[$this->lower_case($field_name)] ;
+    public function get_field($field_name)
+    {
+        if ((array_key_exists($this->lower_case($field_name), $this->fields))):
+            return $this->fields[$this->lower_case($field_name)];
         endif;
 
         throw new KeyError(sprintf('Field %1$s not found in %2$s', $field_name, $this->get_class_name()));
     }
 
     /**
-     * used to set up field on the form, usually used by a fields contribute method
+     * used to set up field on the form, usually used by a fields contribute method.
+     *
      * @param $field
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function load_field($field){
-        $this->fields[$field->name]=$field;
+    public function load_field($field)
+    {
+        $this->fields[$field->name] = $field;
     }
 
     /**
-     * Sets up so validation rules to be used by the CI_VALIDATION
+     * Sets up so validation rules to be used by the CI_VALIDATION.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function field_validation_rules($rules){
+    public function field_validation_rules($rules)
+    {
         $this->validation_rules[] = $rules;
     }
 
-    public function clean(){
+    public function clean()
+    {
         return $this->cleaned_data;
     }
 
-    public function add_error($name, $error){
+    public function add_error($name, $error)
+    {
 
         // for consistency convert them to a validation error object
-        if(!$error instanceof ValidationError):
+        if (!$error instanceof ValidationError):
             $error = new ValidationError($error);
         endif;
 
-        if(!$name):
+        if (!$name):
             // todo store non field errors as arrays, current can only store one non field per form
             $name = self::NON_FIELD_ERRORS;
         endif;
@@ -414,152 +451,151 @@ class BaseForm extends Object
         $this->_field_setup($name, $field);
     }
 
-    public function non_field_errors(){
-        if(array_key_exists(self::NON_FIELD_ERRORS, $this->errors())):
+    public function non_field_errors()
+    {
+        if (array_key_exists(self::NON_FIELD_ERRORS, $this->errors())):
             return $this->errors()[self::NON_FIELD_ERRORS];
         endif;
 
         return [];
     }
 
-    public function hidden_fields(){
-
+    public function hidden_fields()
+    {
         $hidden_fields = [];
-        foreach ($this->fields as $name=>$field) :
-            if($field->is_hidden()):
+        foreach ($this->fields as $name => $field) :
+            if ($field->is_hidden()):
                 $hidden_fields[$name] = $field;
-            endif;
+        endif;
         endforeach;
 
         return $hidden_fields;
-
     }
 
-    public function visible_fields(){
-
+    public function visible_fields()
+    {
         $visible_fields = [];
-        foreach ($this->fields as $name=>$field) :
-            if(!$field->is_hidden()):
+        foreach ($this->fields as $name => $field) :
+            if (!$field->is_hidden()):
                 $visible_fields[$name] = $field;
-            endif;
+        endif;
         endforeach;
 
         return $visible_fields;
-
     }
 
     /**
      * @return string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function as_p(){
+    public function as_p()
+    {
         return $this->_html_output([
-            'row'=>'<p>%1$s <br> %2$s <br> %3$s</p>',
+            'row' => '<p>%1$s <br> %2$s <br> %3$s</p>',
         ]);
     }
 
-    public function validator(){
-
-        if(empty($this->validator)):
+    public function validator()
+    {
+        if (empty($this->validator)):
             $this->ci_instance()->load->library('form_validation');
-            $this->validator = $this->ci_instance()->form_validation;
+        $this->validator = $this->ci_instance()->form_validation;
         endif;
 
         return $this->validator;
     }
 
-
-
-
-
-    public function _clean_fields(){
+    public function _clean_fields()
+    {
         // who survived the CI_validator?
         $this->cleaned_data = array_diff_key($this->data, $this->_errors);
 
-        foreach ($this->fields as $name=>$field) :
+        foreach ($this->fields as $name => $field) :
 
             // if field has failed validation, no need to go on
-            if(array_key_exists($name, $this->_errors)):
+            if (array_key_exists($name, $this->_errors)):
                 continue;
-            endif;
+        endif;
 
-            if($field->disabled):
-                $value = array_key_exists($name, $this->initial) ? $this->initial[$name]: $field->initial;
-            else:
-                if(array_key_exists($name, $this->cleaned_data)):
+        if ($field->disabled):
+                $value = array_key_exists($name, $this->initial) ? $this->initial[$name] : $field->initial; else:
+                if (array_key_exists($name, $this->cleaned_data)):
 
-                    $value = $field->widget->value_from_data_collection($this->cleaned_data, $name);
-                else:
+                    $value = $field->widget->value_from_data_collection($this->cleaned_data, $name); else:
                     $value = $field->data();
-                endif;
-            endif;
+        endif;
+        endif;
 
-            try{
-                // run default field validations
+        try {
+            // run default field validations
                 $field->clean($value);
 
                 // just in case,  confirm the field has not field validation already
-                if(!array_key_exists($name, $this->_errors)):
+                if (!array_key_exists($name, $this->_errors)):
                     $this->cleaned_data[$name] = $value;
-                endif;
+            endif;
 
                 // run custom validation by user
                 $field_clean_method = sprintf('clean_%s', $name);
-                if($this->has_method($field_clean_method)):
+            if ($this->has_method($field_clean_method)):
                     $value = call_user_func([$this, $field_clean_method]);
-                    $this->cleaned_data[$name] = $value;
-                endif;
+            $this->cleaned_data[$name] = $value;
+            endif;
+        } catch (ValidationError $e) {
+            $this->add_error($name, $e);
 
-            }catch (ValidationError $e){
-
-                $this->add_error($name, $e);
-
-                if(array_key_exists($name, $this->cleaned_data)):
+            if (array_key_exists($name, $this->cleaned_data)):
                     unset($this->cleaned_data[$name]);
-                endif;
-            }
-
-        endforeach;
-
-    }
-    
-    public function _clean_form(){
-        try{
-            $clean_data = $this->clean();
-        }catch (ValidationError $e){
-            $clean_data = NULL;
-            $this->add_error(NULL, $e);
+            endif;
         }
 
-        if($clean_data):
+        endforeach;
+    }
+
+    public function _clean_form()
+    {
+        try {
+            $clean_data = $this->clean();
+        } catch (ValidationError $e) {
+            $clean_data = null;
+            $this->add_error(null, $e);
+        }
+
+        if ($clean_data):
             $this->cleaned_data = $clean_data;
         endif;
     }
 
-    public function _form_has_errors(){
+    public function _form_has_errors()
+    {
         return empty($this->errors());
     }
 
     protected function _is_multipart()
     {
-        if(empty($this->fields)):
-            return FALSE;
+        if (empty($this->fields)):
+            return false;
         endif;
 
         foreach ($this->fields as $field) :
-            if($field->widget->needs_multipart_form):
-                return TRUE;
-            endif;
+            if ($field->widget->needs_multipart_form):
+                return true;
+        endif;
         endforeach;
     }
 
     /**
      * @return string
+     *
      * @since 1.0.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    protected function _html_output($opts = []){
+    protected function _html_output($opts = [])
+    {
         //todo display errros
         $top_errors = $this->non_field_errors();
         $row = '';
@@ -568,12 +604,11 @@ class BaseForm extends Object
         $output = [];
         $hidden_output = [];
 
-        foreach ($this->fields as $name=>$field) :
-            if($field->is_hidden()):
-                $hidden_output[] = (string)$field;
-            else:
+        foreach ($this->fields as $name => $field) :
+            if ($field->is_hidden()):
+                $hidden_output[] = (string) $field; else:
                 $output[] = sprintf($row, $field->label_tag(), $field, $field->help_text);
-            endif;
+        endif;
         endforeach;
 
         // add errors to the top
@@ -581,38 +616,46 @@ class BaseForm extends Object
 
         // add hidden inputs to end
         $output = array_merge($output, $hidden_output);
-        return join(' ', $output);
+
+        return implode(' ', $output);
     }
 
     protected function _field_setup($name, $value)
     {
-        if($value instanceof Contributor):
-            $value->contribute_to_class($name, $this);
-        else:
+        if ($value instanceof Contributor):
+            $value->contribute_to_class($name, $this); else:
             $this->{$name} = $value;
         endif;
     }
 
     /**
      * @ignore
+     *
      * @param $field_name
-     * @return mixed
+     *
      * @throws KeyError
+     *
+     * @return mixed
+     *
      * @since 1.0.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function __get($field_name){
+    public function __get($field_name)
+    {
         $this->setup();
-        if(array_key_exists($field_name, $this->fields)):
+        if (array_key_exists($field_name, $this->fields)):
             return $this->get_field($field_name);
         endif;
     }
 
-    public function __set($name, $value){
+    public function __set($name, $value)
+    {
         $this->_field_setup($name, $value);
     }
 
-    public function __toString(){
+    public function __toString()
+    {
         $this->setup();
 
         return $this->as_p();

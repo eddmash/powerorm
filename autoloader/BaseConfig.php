@@ -1,4 +1,5 @@
 <?php
+
 namespace CodeIgniter\Config;
 
 /**
@@ -30,10 +31,10 @@ namespace CodeIgniter\Config;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @package	CodeIgniter
  * @author	CodeIgniter Dev Team
  * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
  * @license	http://opensource.org/licenses/MIT	MIT License
+ *
  * @link	http://codeigniter.com
  * @since	Version 3.0.0
  * @filesource
@@ -41,82 +42,83 @@ namespace CodeIgniter\Config;
 
 
 /**
- * AUTO-LOADER
+ * AUTO-LOADER.
  *
  * This file defines the namespaces and class maps so the Autoloader
  * can find the files as needed.
  */
 class BaseConfig
 {
-	/**
-	 * Array of namespaces for autoloading.
-	 * @var type
-	 */
-	public $psr4 = [];
+    /**
+     * Array of namespaces for autoloading.
+     *
+     * @var type
+     */
+    public $psr4 = [];
 
-	/**
-	 * Map of class names and locations
-	 * @var type
-	 */
-	public $classmap = [];
+    /**
+     * Map of class names and locations.
+     *
+     * @var type
+     */
+    public $classmap = [];
 
-	//--------------------------------------------------------------------
+    //--------------------------------------------------------------------
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct()
-	{
-		/**
-		 * -------------------------------------------------------------------
-		 * Namespaces
-		 * -------------------------------------------------------------------
-		 * This maps the locations of any namespaces in your application
-		 * to their location on the file system. These are used by the
-		 * Autoloader to locate files the first time they have been instantiated.
-		 *
-		 * The '/application' and '/system' directories are already mapped for
-		 * you. You may change the name of the 'App' namespace if you wish,
-		 * but this should be done prior to creating any namespaced classes,
-		 * else you will need to modify all of those classes for this to work.
-		 *
-		 * DO NOT change the name of the CodeIgniter namespace or your application
-		 * WILL break. *
-		 * Prototype:
-		 *
-		 *   $Config['psr4'] = [
-		 *       'CodeIgniter' => SYSPATH
-		 *   `];
-		 */
-		$this->psr4 = [
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        /*
+         * -------------------------------------------------------------------
+         * Namespaces
+         * -------------------------------------------------------------------
+         * This maps the locations of any namespaces in your application
+         * to their location on the file system. These are used by the
+         * Autoloader to locate files the first time they have been instantiated.
+         *
+         * The '/application' and '/system' directories are already mapped for
+         * you. You may change the name of the 'App' namespace if you wish,
+         * but this should be done prior to creating any namespaced classes,
+         * else you will need to modify all of those classes for this to work.
+         *
+         * DO NOT change the name of the CodeIgniter namespace or your application
+         * WILL break. *
+         * Prototype:
+         *
+         *   $Config['psr4'] = [
+         *       'CodeIgniter' => SYSPATH
+         *   `];
+         */
+        $this->psr4 = [
 //			'CodeIgniter' => realpath(BASEPATH)
-		];
+        ];
 
-		if (ENVIRONMENT == 'testing')
-		{
-//			$this->psr4['Tests\Support'] = BASEPATH.'../tests/_support/';
-		}
+        if (ENVIRONMENT == 'testing') {
+            //			$this->psr4['Tests\Support'] = BASEPATH.'../tests/_support/';
+        }
 
-		/**
-		 * -------------------------------------------------------------------
-		 * Class Map
-		 * -------------------------------------------------------------------
-		 * The class map provides a map of class names and their exact
-		 * location on the drive. Classes loaded in this manner will have
-		 * slightly faster performance because they will not have to be
-		 * searched for within one or more directories as they would if they
-		 * were being autoloaded through a namespace.
-		 *
-		 * Prototype:
-		 *
-		 *   $Config['classmap'] = [
-		 *       'MyClass'   => '/path/to/class/file.php'
-		 *   ];
-		 */
-		$this->classmap = [
+        /*
+         * -------------------------------------------------------------------
+         * Class Map
+         * -------------------------------------------------------------------
+         * The class map provides a map of class names and their exact
+         * location on the drive. Classes loaded in this manner will have
+         * slightly faster performance because they will not have to be
+         * searched for within one or more directories as they would if they
+         * were being autoloaded through a namespace.
+         *
+         * Prototype:
+         *
+         *   $Config['classmap'] = [
+         *       'MyClass'   => '/path/to/class/file.php'
+         *   ];
+         */
+        $this->classmap = [
 
-		];
-	}
+        ];
+    }
 
-	//--------------------------------------------------------------------
+    //--------------------------------------------------------------------
 }

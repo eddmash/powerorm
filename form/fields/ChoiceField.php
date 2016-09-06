@@ -3,14 +3,13 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 2:08 PM
+ * Time: 2:08 PM.
  */
-
 namespace powerorm\form\fields;
+
 use powerorm\form\widgets\MultipleCheckboxes;
 use powerorm\form\widgets\Select;
 use powerorm\form\widgets\SelectMultiple;
-
 
 /**
  * Creates a :
@@ -29,32 +28,36 @@ use powerorm\form\widgets\SelectMultiple;
  *                      'dvd'=> 'DVD',
  *                  ],
  *                  'unknown'=> 'Unknown',
- *              ];
+ *              ];.
  *
  * Class ChoiceField
- * @package powerorm\form\fields
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class ChoiceField extends Field{
-
+class ChoiceField extends Field
+{
     public $choices = [];
 
-    public function __construct($opts=[]){
+    public function __construct($opts = [])
+    {
         parent::__construct($opts);
-        $this->widget->choices =  $this->choices;
+        $this->widget->choices = $this->choices;
     }
 
-    public function get_html_name(){
-        if($this->widget instanceof SelectMultiple || $this->widget instanceof MultipleCheckboxes):
+    public function get_html_name()
+    {
+        if ($this->widget instanceof SelectMultiple || $this->widget instanceof MultipleCheckboxes):
             return sprintf('%s[]', $this->name);
 
         endif;
-        return parent::get_html_name();
 
+        return parent::get_html_name();
     }
 
-    public function get_widget(){
+    public function get_widget()
+    {
         return Select::instance();
     }
 }

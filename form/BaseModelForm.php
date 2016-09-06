@@ -3,42 +3,42 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/3/16
- * Time: 10:13 AM
+ * Time: 10:13 AM.
  */
-
 namespace powerorm\form;
 
-function fields_from_model($model, $required_fields, $excludes, $widgets, $labels, $help_texts, $field_classes){
+function fields_from_model($model, $required_fields, $excludes, $widgets, $labels, $help_texts, $field_classes)
+{
     $model_fields = $model->meta->fields;
-    $fields =[];
-    foreach ($model_fields as $name=>$obj) :
-        if(in_array($name, $excludes)):
+    $fields = [];
+    foreach ($model_fields as $name => $obj) :
+        if (in_array($name, $excludes)):
             continue;
-        endif;
+    endif;
 
-        if(!empty($required_fields) && !in_array($name, $required_fields)):
+    if (!empty($required_fields) && !in_array($name, $required_fields)):
             continue;
-        endif;
-        $kwargs = [];
-        if (!empty($widgets) && array_key_exists($name, $widgets)):
+    endif;
+    $kwargs = [];
+    if (!empty($widgets) && array_key_exists($name, $widgets)):
             $kwargs['widget'] = $widgets[$name];
 
-        endif;
+    endif;
 
-        if(!empty($labels) && array_key_exists($name, $labels)):
+    if (!empty($labels) && array_key_exists($name, $labels)):
             $kwargs['label'] = $labels[$name];
-        endif;
+    endif;
 
 
-        if(!empty($help_texts) && array_key_exists($name, $help_texts)):
+    if (!empty($help_texts) && array_key_exists($name, $help_texts)):
             $kwargs['help_text'] = $help_texts[$name];
-        endif;
+    endif;
 
-        if(!empty($field_classes) && array_key_exists($name, $field_classes)):
+    if (!empty($field_classes) && array_key_exists($name, $field_classes)):
             $kwargs['form_class'] = $field_classes[$name];
-         endif; 
+    endif;
 
-        $fields[$name] = $obj->formfield();
+    $fields[$name] = $obj->formfield();
     endforeach;
 
 
@@ -48,75 +48,86 @@ function fields_from_model($model, $required_fields, $excludes, $widgets, $label
 class BaseModelForm extends BaseForm
 {
     public $model;
-    protected $fields=[];
-    protected $excludes=[];
-    protected $labels=[];
-    protected $widgets=[];
-    protected $help_texts=[];
-    protected $field_classes=[];
-    
-    public function setup(){
+    protected $fields = [];
+    protected $excludes = [];
+    protected $labels = [];
+    protected $widgets = [];
+    protected $help_texts = [];
+    protected $field_classes = [];
+
+    public function setup()
+    {
         $fields = fields_from_model($this->model, $this->fields, $this->excludes,
             $this->widgets, $this->labels, $this->help_texts, $this->field_classes
         );
 
-        foreach ($fields as $name=>$value) :
+        foreach ($fields as $name => $value) :
             // if field is already in the fields, that takes precedence over model field name
-            if(array_key_exists($name, $this->fields)):
+            if (array_key_exists($name, $this->fields)):
                 continue;
-            endif;
+        endif;
 
-            $this->{$name}= $value;
+        $this->{$name} = $value;
         endforeach;
 
         parent::setup();
-
     }
 
-    public function custom(){
-
+    public function custom()
+    {
     }
 
-    public function model($model=NULL){
-        
-        $this->model = (!empty($model))? $model : $this->model;
+    public function model($model = null)
+    {
+        $this->model = (!empty($model)) ? $model : $this->model;
 
-        if(is_string($this->model)):
+        if (is_string($this->model)) :
             $this->ci_instance()->load->model($this->model);
-            $this->model = $this->ci_instance()->{$this->model};
+        $this->model = $this->ci_instance()->{$this->model};
         endif;
 
         return $this;
     }
 
-    public function only($fields=[]){
+    public function only($fields = [])
+    {
         $this->fields = array_merge($this->fields, $fields);
+
         return $this;
     }
-    
-    public function exclude($excludes=[]){
+
+    public function exclude($excludes = [])
+    {
         $this->excludes = array_merge($this->excludes, $excludes);
+
         return $this;
     }
-    
-    public function labels($labels=[]){
+
+    public function labels($labels = [])
+    {
         $this->labels = array_merge($this->labels, $labels);
+
         return $this;
     }
 
-    public function widgets($widgets=[]){
+    public function widgets($widgets = [])
+    {
         $this->widgets = array_merge($this->widgets, $widgets);
+
         return $this;
     }
 
-    public function help_texts($help_texts=[]){
+    public function help_texts($help_texts = [])
+    {
         $this->help_texts = array_merge($this->help_texts, $help_texts);
+
         return $this;
     }
 
-    public function field_classes($field_classes=[]){
+    public function field_classes($field_classes = [])
+    {
         $this->field_classes = array_merge($this->field_classes, $field_classes);
+
         return $this;
     }
-
 }

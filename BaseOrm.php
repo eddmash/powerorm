@@ -1,10 +1,10 @@
 <?php
+
 namespace powerorm;
 
-/**
+/*
  * Orm Loader
  */
-use AutoLoader;
 use powerorm\db\Connection;
 use powerorm\exceptions\FormException;
 use powerorm\form\BaseForm;
@@ -12,12 +12,12 @@ use powerorm\form\BaseModelForm;
 use powerorm\form\ModelForm;
 use powerorm\registry\App;
 
-/**
+/*
  *
  */
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-/**
+/*
  * PowerORM version
  * @ignore
  */
@@ -119,7 +119,7 @@ define('POWERORM_VERSION', '1.1.0');
  * - {@see Queryset::add() }
  *
  * Read more of this methods here
- * {@link http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html }
+ * {@link http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html}
  *
  * <h4><strong>Creating A Queryset</strong></h4>
  * Each model that extends the `PModel` class automatically gets assigned a Queryset object,
@@ -240,21 +240,20 @@ define('POWERORM_VERSION', '1.1.0');
  *
  * SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' IN (1,2,3,4,5)</code></pre>
  *
- * example borrowed from {@link http://www.sitepoint.com/silver-bullet-n1-problem/ }
+ * example borrowed from {@link http://www.sitepoint.com/silver-bullet-n1-problem/}
  *
  *  To avoid this issues using this orm, use the {@see Queryset::with()} method.
  *
- * @package powerorm\model
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-
-class BaseOrm {
-
-    public static $SET_NULL='set_null';
-    public static $CASCADE='cascade';
-    public static $PROTECT='protect';
-    public static $SET_DEFAULT='set_default';
+class BaseOrm
+{
+    public static $SET_NULL = 'set_null';
+    public static $CASCADE = 'cascade';
+    public static $PROTECT = 'protect';
+    public static $SET_DEFAULT = 'set_default';
 
     public $migration_path;
 
@@ -264,46 +263,51 @@ class BaseOrm {
      * @param array $config
      * @ignore
      */
-    public function __construct($config=[]){
+    public function __construct($config = [])
+    {
 
 //        $this->setup();
         $this->init();
     }
 
-    public static function get_models_path(){
-        return APPPATH."models/";
+    public static function get_models_path()
+    {
+        return APPPATH.'models/';
     }
 
-    public static function get_migrations_path(){
-        return APPPATH."migrations/";
+    public static function get_migrations_path()
+    {
+        return APPPATH.'migrations/';
     }
 
     /**
-     * initializes the orm and loads app some essential modules
+     * initializes the orm and loads app some essential modules.
+     *
      * @internal
      */
-    public function init(){
+    public function init()
+    {
 
         //setup the registry
         $this->registry = new App();
     }
 
-    public static function load_class($qualified_name){
+    public static function load_class($qualified_name)
+    {
         require_once $qualified_name;
     }
 
-
     //********************************** ORM Form*********************************
-
 
     /**
      * Returns a form builder instance. you can use this to create forms that don't depend on models.
      * Take note this method creates a new instance of the form when invoked unlike how other classes in codeigniter
      * are singletons i.e. using the same instance during the response of a request.
+     *
      * @return Form
      */
-    public function get_form($opts=[]){
-
+    public function get_form($opts = [])
+    {
         $data = (array_key_exists('data', $opts)) ? $opts['data'] : [];
         $initial = (array_key_exists('initial', $opts)) ? $opts['initial'] : [];
         $form = (array_key_exists('form', $opts)) ? $opts['form'] : [];
@@ -312,45 +316,45 @@ class BaseOrm {
         $kwargs = $this->form_kwargs($opts);
 
 
-        if(!empty($form) && !empty($model)):
-            throw new FormException("Setting both { model } and { form } on the same get_form() method is not allowed");
+        if (!empty($form) && !empty($model)):
+            throw new FormException('Setting both { model } and { form } on the same get_form() method is not allowed');
         endif;
 
 
         // just fetch the form
-        if(!empty($form)):
+        if (!empty($form)):
             return $this->_fetch_form($form, $data, $initial, $kwargs);
         endif;
 
         // or create a ModelForm
-        if(!empty($model)):
+        if (!empty($model)):
             return (new BaseModelForm($data, $initial, $kwargs))->model($model);
         endif;
 
         // else the create the default form
         return new BaseForm($data, $initial, $kwargs);
-
     }
 
-    public function form_kwargs($opts){
+    public function form_kwargs($opts)
+    {
+        $extra = array_key_exists('extra', $opts) ? $opts['extra'] : [];
 
-        $extra = array_key_exists('extra', $opts)? $opts['extra']:[];
-
-        if(!is_array($extra)):
+        if (!is_array($extra)):
             throw new FormException(sprintf('get_form() expects { extra } to be an array'));
         endif;
 
         return $extra;
     }
 
-    public function _fetch_form($form, $data=[], $initial=[], $kwargs=[]){
+    public function _fetch_form($form, $data = [], $initial = [], $kwargs = [])
+    {
         //todo loader match to that of codeigniter especially in naming
 
 
-        $form =  new $form($data, $initial, $kwargs);
+        $form = new $form($data, $initial, $kwargs);
 
         // ensure the model is loaded
-        if($form instanceof BaseModelForm):
+        if ($form instanceof BaseModelForm):
             $form->model();
         endif;
 
@@ -359,36 +363,44 @@ class BaseOrm {
 
     //********************************** ORM Registry*********************************
 
-
     /**
      * Returns the application registry.
+     *
      * @return mixed
      */
-    public function get_registry(){
+    public function get_registry()
+    {
         $this->init();
+
         return $this->registry;
     }
 
     /**
-     * Returns the numeric version of the orm
+     * Returns the numeric version of the orm.
+     *
      * @return string
      */
-    public function get_version(){
-        if(defined('POWERORM_VERSION')):
+    public function get_version()
+    {
+        if (defined('POWERORM_VERSION')):
             return POWERORM_VERSION;
         endif;
     }
 
-    public static function version(){
+    public static function version()
+    {
         return static::instance()->get_version();
     }
 
     /**
-     * This is just a shortcut method. get the current instance of the orm
+     * This is just a shortcut method. get the current instance of the orm.
+     *
      * @return mixed
      */
-    public static function &instance(){
+    public static function &instance()
+    {
         $ci = self::ci_instance();
+
         return $ci->orm;
     }
 
@@ -397,15 +409,13 @@ class BaseOrm {
         return Connection::instance();
     }
 
-    public static function &ci_instance(){
+    public static function &ci_instance()
+    {
         return get_instance();
     }
 
     //********************************** ORM Checks *********************************
-    public static function register_check(){
-
+    public static function register_check()
+    {
     }
 }
-
-
-

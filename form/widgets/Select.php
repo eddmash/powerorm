@@ -3,17 +3,12 @@
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 7/16/16
- * Time: 2:13 PM
+ * Time: 2:13 PM.
  */
-
 namespace powerorm\form\widgets;
 
-
-
-
 /**
- *
- * Select widget: <select><option ...>...</select>
+ * Select widget: <select><option ...>...</select>.
  *
  * Options:
  *
@@ -23,54 +18,60 @@ namespace powerorm\form\widgets;
  *      If it does, it will override anything you set here when the attribute is updated on the Field.
  *
  * Class Select
- * @package powerorm\form\widgets
+ *
  * @since 1.1.0
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Select extends Widget{
-    public $multiple_selected = FALSE;
+class Select extends Widget
+{
+    public $multiple_selected = false;
     public $open_select = '<select %s >';
 
-    public $choices=[];
+    public $choices = [];
 
-    public function __construct($attrs=[], $kwargs=[]){
+    public function __construct($attrs = [], $kwargs = [])
+    {
         parent::__construct($attrs);
 
-        if(array_key_exists('choices', $kwargs)):
+        if (array_key_exists('choices', $kwargs)):
             $this->choices = $kwargs['choices'];
         endif;
     }
 
-    public function render($name, $value, $attrs=[], $kwargs=[]){
-        if(empty($value)):
+    public function render($name, $value, $attrs = [], $kwargs = [])
+    {
+        if (empty($value)):
             // in case its null, false etc
             $value = [];
         endif;
 
-        $final_attrs = $this->build_attrs($attrs, ['name'=>$name]);
+        $final_attrs = $this->build_attrs($attrs, ['name' => $name]);
         $output = [];
         // open select
         $output[] = sprintf($this->open_select, $this->flat_attrs($final_attrs));
         // add select options
         $options[] = $this->render_options($value);
 
-        if(!empty($options)):
+        if (!empty($options)):
             $output = array_merge($output, $options);
         endif;
         // close select
         $output[] = '</select>';
 
-        return join(' ', $output);
+        return implode(' ', $output);
     }
 
-    public function _prepare_selected($selected){
-        return (is_array($selected) && empty($selected))? $selected : [$selected];
+    public function _prepare_selected($selected)
+    {
+        return (is_array($selected) && empty($selected)) ? $selected : [$selected];
     }
 
-    public function render_options($selected_choices){
+    public function render_options($selected_choices)
+    {
         $selected_choices = $this->_prepare_selected($selected_choices);
 
-        /**
+        /*
          * 'choices'=>[
          *      'gender'=> ['f'=>'Female', 'm'=>'Male' ],
          *      'bmw'=>'mercedes benz'
@@ -80,36 +81,36 @@ class Select extends Widget{
 
         $output = [];
 
-        foreach ($choices as $label=>$value) :
+        foreach ($choices as $label => $value) :
 
-            if(is_array($value)):
+            if (is_array($value)):
 
                 $output[] = sprintf('<optgroup label="%s">', $label);
 
-                foreach ($value as $c_label=>$c_value) :
+        foreach ($value as $c_label => $c_value) :
 
                     $output[] = $this->render_option($selected_choices, $c_value, $c_label);
 
-                endforeach;
+        endforeach;
 
-                $output[] = '</optgroup>';
-            else:
+        $output[] = '</optgroup>'; else:
 
                 $output[] = $this->render_option($selected_choices, $value, $label);
-            endif;
+        endif;
 //
         endforeach;
 
-        return join(' ', $output);
+        return implode(' ', $output);
     }
 
-    public function render_option($selected_choices, $label, $value){
+    public function render_option($selected_choices, $label, $value)
+    {
         $selected_html = '';
 
-        if(in_array($value, $selected_choices)):
+        if (in_array($value, $selected_choices)):
             $selected_html = 'selected="selected"';
         endif;
 
-        return sprintf('<option value="%1$s" %2$s >%3$s</option>',$value, $selected_html, $label);
+        return sprintf('<option value="%1$s" %2$s >%3$s</option>', $value, $selected_html, $label);
     }
 }
