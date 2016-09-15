@@ -7,10 +7,6 @@ use Eddmash\PowerOrm\Checks\Checks;
 use Eddmash\PowerOrm\Checks\ChecksRegistry;
 use Eddmash\PowerOrm\Console\Base;
 use Eddmash\PowerOrm\Console\Console;
-use Eddmash\PowerOrm\Console\Question\ChoiceQuestion;
-use Eddmash\PowerOrm\Console\Question\InteractiveAsker;
-use Eddmash\PowerOrm\Console\Question\NonInteractiveAsker;
-use Eddmash\PowerOrm\Console\Question\Question;
 use Eddmash\PowerOrm\exceptions\NotImplemented;
 
 /**
@@ -71,10 +67,9 @@ class BaseCommand extends Base
 
         if (!empty($help)):
             $this->normal($help, true);
-            $this->stdout(PHP_EOL);
+        $this->stdout(PHP_EOL);
 
-            $this->normal(Console::wrapText($usage, 8), true);
-        else:
+        $this->normal(Console::wrapText($usage, 8), true); else:
             $this->normal($usage, true);
         endif;
 
@@ -102,10 +97,10 @@ class BaseCommand extends Base
         $this->normal(sprintf($message, POWERORM_VERSION), true);
 
         $this->managerName = $manager;
-         
+
         if (in_array('--help', $argOpts)):
             $this->usage();
-            exit;
+        exit;
         endif;
 
         if ($this->systemCheck):
@@ -125,9 +120,9 @@ class BaseCommand extends Base
         $default_help = '--help';
         foreach ($this->getOptions() as $key => $value) :
             $len = strlen($key) + 2 + ($key === $default_help ? 10 : 0);
-            if ($maxlen < $len) :
+        if ($maxlen < $len) :
                 $maxlen = $len;
-            endif;
+        endif;
         endforeach;
 
         $this->normal('Position Arguments:'.PHP_EOL.PHP_EOL);
@@ -137,13 +132,13 @@ class BaseCommand extends Base
             foreach ($this->getPositionalOptions() as $key => $value) :
 
                 $this->stdout(' '.$this->ansiFormat($key, Console::FG_YELLOW));
-                $len = strlen($key) + 2;
+        $len = strlen($key) + 2;
 
-                if ($value !== '') {
-                    $this->stdout(str_repeat(' ', $maxlen - $len + 2).Console::wrapText($value, $maxlen + 2));
-                }
-                $this->stdout(PHP_EOL.PHP_EOL);
-            endforeach;
+        if ($value !== '') {
+            $this->stdout(str_repeat(' ', $maxlen - $len + 2).Console::wrapText($value, $maxlen + 2));
+        }
+        $this->stdout(PHP_EOL.PHP_EOL);
+        endforeach;
         endif;
 
         $this->normal('Optional Arguments:'.PHP_EOL.PHP_EOL);
@@ -151,12 +146,12 @@ class BaseCommand extends Base
         foreach ($this->getOptions() as $key => $value) :
 
             $this->stdout(' '.$this->ansiFormat($key, Console::FG_YELLOW));
-            $len = strlen($key) + 2;
+        $len = strlen($key) + 2;
 
-            if ($value !== '') {
-                $this->stdout(str_repeat(' ', $maxlen - $len + 2).Console::wrapText($value, $maxlen + 2));
-            }
-            $this->stdout("\n");
+        if ($value !== '') {
+            $this->stdout(str_repeat(' ', $maxlen - $len + 2).Console::wrapText($value, $maxlen + 2));
+        }
+        $this->stdout("\n");
         endforeach;
     }
 
@@ -173,27 +168,27 @@ class BaseCommand extends Base
         foreach ($checks as $check) :
             if ($check->level < CheckMessage::INFO):
                 $debugs[] = $check;
-            endif;
+        endif;
 
             // info
             if ($check->level >= CheckMessage::INFO && $check->level < CheckMessage::WARNING):
                 $info[] = $check;
-            endif;
+        endif;
 
             // warning
             if ($check->level >= CheckMessage::WARNING && $check->level < CheckMessage::ERROR):
                 $warning[] = $check;
-            endif;
+        endif;
 
             //error
             if ($check->level >= CheckMessage::ERROR && $check->level < CheckMessage::CRITICAL):
                 $errors[] = $check;
-            endif;
+        endif;
 
             //critical
             if ($check->level >= CheckMessage::CRITICAL):
                 $critical[] = $check;
-            endif;
+        endif;
         endforeach;
 
         $this->normal('Perfoming system checks ...', true);
@@ -204,7 +199,7 @@ class BaseCommand extends Base
         $errors = array_merge($critical, $errors);
         if (!empty($errors)):
             $this->error(implode(PHP_EOL, $errors), true);
-            exit;
+        exit;
         endif;
 
         if (!empty($warning)):

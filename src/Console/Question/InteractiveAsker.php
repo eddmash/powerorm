@@ -10,26 +10,25 @@
 
 namespace Eddmash\PowerOrm\Console\Question;
 
-
 /**
  * This Asker class interacts with the user getting reponses from them.
- * 
- * @inheritdoc
+ *
+ * {@inheritdoc}
  *
  *
  * Class InteractiveAsker
- * @package Eddmash\PowerOrm\Console\Question
+ *
  * @since 1.0.1
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class InteractiveAsker extends Asker
 {
-
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function ask($question)
-    { 
+    {
         if (!$question->getValidator()) :
             return $this->doAsk($question);
         endif;
@@ -37,14 +36,17 @@ class InteractiveAsker extends Asker
         $interviewer = function () use ($question) {
             return $this->doAsk($question);
         };
-        return $this->validateAttempts($interviewer, $question);
 
+        return $this->validateAttempts($interviewer, $question);
     }
 
     /**
      * @param Question $question
+     *
      * @return bool|string
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function doAsk($question)
@@ -55,10 +57,10 @@ class InteractiveAsker extends Asker
 
         if (false === $answer) :
             $answer = $this->input();
-            if (false === $answer) :
+        if (false === $answer) :
                 throw new \RuntimeException('Aborted');
-            endif;
-            $answer = trim($answer);
+        endif;
+        $answer = trim($answer);
         endif;
 
         $answer = strlen($answer) > 0 ? $answer : $question->getDefault();
@@ -73,9 +75,13 @@ class InteractiveAsker extends Asker
     /**
      * @param callable $interviewer
      * @param Question $question
+     *
      * @return mixed
+     *
      * @throws null
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function validateAttempts($interviewer, $question)
@@ -89,9 +95,9 @@ class InteractiveAsker extends Asker
 
             try {
                 return call_user_func($question->getValidator(), $interviewer());
-            } catch (\Exception $error) {}
+            } catch (\Exception $error) {
+            }
         }
         throw $error;
     }
-
 }

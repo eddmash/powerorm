@@ -2,11 +2,9 @@
 /**
  * Created by eddmash <http://eddmash.com>
  * Date: 9/14/16
- * Time: 4:45 PM
+ * Time: 4:45 PM.
  */
-
 namespace Eddmash\PowerOrm\Console\Question;
-
 
 class ChoiceQuestion extends Question
 {
@@ -30,7 +28,7 @@ class ChoiceQuestion extends Question
 
     public function getQuestion()
     {
-        return sprintf('%s : [ %s ]', $this->question, join(', ', $this->choices));
+        return sprintf('%s : [ %s ]', $this->question, implode(', ', $this->choices));
     }
 
     /**
@@ -55,6 +53,7 @@ class ChoiceQuestion extends Question
     {
         $this->multiselect = $multiselect;
         $this->setValidator($this->getDefaultValidator());
+
         return $this;
     }
     /**
@@ -85,6 +84,7 @@ class ChoiceQuestion extends Question
     public function setPrompt($prompt)
     {
         $this->prompt = $prompt;
+
         return $this;
     }
     /**
@@ -100,6 +100,7 @@ class ChoiceQuestion extends Question
     {
         $this->errorMessage = $errorMessage;
         $this->setValidator($this->getDefaultValidator());
+
         return $this;
     }
     /**
@@ -113,6 +114,7 @@ class ChoiceQuestion extends Question
         $errorMessage = $this->errorMessage;
         $multiselect = $this->multiselect;
         $isAssoc = $this->isAssoc($choices);
+
         return function ($selected) use ($choices, $errorMessage, $multiselect, $isAssoc) {
             // Collapse all spaces.
             $selectedChoices = str_replace(' ', '', $selected);
@@ -154,6 +156,7 @@ class ChoiceQuestion extends Question
             if ($multiselect) {
                 return $multiselectChoices;
             }
+
             return current($multiselectChoices);
         };
     }

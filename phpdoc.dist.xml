@@ -6,7 +6,7 @@
         <default-package-name>PowerOrm</default-package-name>
     </parser>
     <transformer>
-        <target>docs/v1_1_0</target>
+        <target>api/v1_1_0</target>
     </transformer>
     <files>
         <directory>./src</directory>

@@ -10,14 +10,11 @@
 
 namespace Eddmash\PowerOrm\Console\Question;
 
-
 use Eddmash\PowerOrm\Console\Base;
-use Eddmash\PowerOrm\Object;
-
 
 /**
- * The Asker class provides functions to ask the user for more information on the command line. 
- * 
+ * The Asker class provides functions to ask the user for more information on the command line.
+ *
  * Asking a smiple question like how old are you.
  * Usage:
  *
@@ -25,13 +22,12 @@ use Eddmash\PowerOrm\Object;
  * $asker = InteractiveAsker::createObject();
  * $asker->ask($q);</pre>
  *
- * @package Eddmash\PowerOrm\Console\Question
  * @since 1.0.1
+ *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 abstract class Asker extends Base
 {
-
     protected $question;
 
     public static function createObject()
@@ -39,13 +35,14 @@ abstract class Asker extends Base
         return new static();
     }
 
-    /**
-     * @param Question $question
-     * @return string
-     * @since 1.1.0
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-   public abstract function ask($question);
-
-
+   /**
+    * @param Question $question
+    *
+    * @return string
+    *
+    * @since 1.1.0
+    *
+    * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+    */
+   abstract public function ask($question);
 }

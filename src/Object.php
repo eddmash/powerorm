@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm;
 
-use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 
 /**
@@ -146,7 +145,7 @@ class Object
         $parents = [];
         while ($reflectionClass->getParentClass()):
             $reflectionClass = $reflectionClass->getParentClass();
-            $parents[$reflectionClass->getName()] = $reflectionClass;
+        $parents[$reflectionClass->getName()] = $reflectionClass;
         endwhile;
 
         return $parents;

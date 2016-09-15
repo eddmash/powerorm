@@ -10,7 +10,7 @@
 */
 
 namespace Eddmash\PowerOrm\Migration\State;
+
 class StateRegistry
 {
-
 }

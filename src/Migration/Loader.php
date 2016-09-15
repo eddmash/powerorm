@@ -10,29 +10,29 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
-
 class Loader
 {
-
     public $graph;
-    
-    public function __construct($connection = null, $loadGraph = true){
 
-        if($loadGraph):
+    public function __construct($connection = null, $loadGraph = true)
+    {
+        if ($loadGraph):
             $this->buildGraph();
         endif;
     }
-    
-    
-    public function detectConflicts(){
+
+    public function detectConflicts()
+    {
         return null;
     }
-    
-    public function getProjectState(){
+
+    public function getProjectState()
+    {
         return null;
     }
-    
-    public function buildGraph(){
+
+    public function buildGraph()
+    {
         return new Graph();
     }
 }

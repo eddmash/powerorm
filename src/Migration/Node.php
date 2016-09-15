@@ -10,8 +10,6 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
-
 class Node
 {
-
 }

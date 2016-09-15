@@ -10,13 +10,12 @@
 */
 
 namespace Eddmash\PowerOrm\Migration;
+
 use Eddmash\PowerOrm\Object;
 
 class AutoDetector extends Object
 {
     public function changes()
     {
-        
     }
 }
-

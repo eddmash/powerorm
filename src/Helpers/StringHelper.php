@@ -116,7 +116,8 @@ class StringHelper
         return preg_replace('/(?=[A-Z])/', $delim, $name);
     }
 
-    public static function isValidVariableName($name) {
+    public static function isValidVariableName($name)
+    {
         return preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/', $name);
     }
 }

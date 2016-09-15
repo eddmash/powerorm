@@ -1,0 +1,704 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+<meta charset="utf-8">
+<title>PowerOrm v1.1.0 API » \Eddmash\PowerOrm\Checks\CheckError</title>
+<meta name="author" content="Mike van Riel">
+<meta name="description" content="">
+<link href="../css/template.css" rel="stylesheet" media="all">
+<script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script><script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script><script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script><script src="../js/bootstrap.js" type="text/javascript"></script><script src="../js/template.js" type="text/javascript"></script><script src="../js/prettify/prettify.min.js" type="text/javascript"></script><link rel="shortcut icon" href="../img/favicon.ico">
+<link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+<div class="navbar-inner"><div class="container">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">PowerOrm v1.1.0 API</a><div class="nav-collapse"><ul class="nav">
+<li class="dropdown">
+<a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                                    API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a>Namespaces</a></li>
+<li><a href="../namespaces/Eddmash.html"><i class="icon-th"></i> Eddmash</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
+<li><a>Packages</a></li>
+<li><a href="../packages/Default.html"><i class="icon-folder-open"></i> Default</a></li>
+</ul>
+</li>
+<li class="dropdown" id="charts-menu">
+<a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                                    Charts <b class="caret"></b></a><ul class="dropdown-menu"><li><a href="../graph_class.html"><i class="icon-list-alt"></i> Class hierarchy diagram</a></li></ul>
+</li>
+<li class="dropdown" id="reports-menu">
+<a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                                    Reports <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
+                <span class="label label-info">414</span></a></li>
+<li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
+                <ul></ul></a></li>
+<li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
+                <span class="label label-info">0</span></a></li>
+</ul>
+</li>
+</ul></div>
+</div></div>
+<div class="go_to_top"><a href="#___" style="color: inherit">Back to top  <i class="icon-upload icon-white"></i></a></div>
+</div>
+<div id="___" class="container">
+<noscript><div class="alert alert-warning">
+                            Javascript is disabled; several features are only available
+                            if Javascript is enabled.
+                        </div></noscript>
+<div class="row">
+<div class="span4">
+<div xmlns:php="http://php.net/xsl" class="btn-toolbar">
+<div class="btn-group visibility" data-toggle="buttons-checkbox">
+<button class="btn public active" title="Show public elements">Public</button><button class="btn protected" title="Show protected elements">Protected</button><button class="btn private" title="Show private elements">Private</button><button class="btn inherited active" title="Show inherited elements">Inherited</button>
+</div>
+<div class="btn-group view pull-right" data-toggle="buttons-radio">
+<button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button><button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+</div>
+</div>
+<ul xmlns:php="http://php.net/xsl" class="side-nav nav nav-list">
+<li class="nav-header">
+<i title="Methods" class="icon-custom icon-method"></i> Methods
+                    <ul>
+<li class="method public "><a href="#method___construct" title="__construct() :: "><span class="description">__construct()
+        </span><pre>__construct()</pre></a></li>
+<li class="method public inherited"><a href="#method___construct" title="__construct() :: "><span class="description">__construct()
+        </span><pre>__construct()</pre></a></li>
+<li class="method public inherited"><a href="#method___toString" title="__toString() :: "><span class="description">__toString()
+        </span><pre>__toString()</pre></a></li>
+<li class="method public inherited"><a href="#method_ansiFormat" title="ansiFormat() :: Formats a string with ANSI codes."><span class="description">Formats a string with ANSI codes.</span><pre>ansiFormat()</pre></a></li>
+<li class="method public inherited"><a href="#method_createObject" title="createObject() :: "><span class="description">createObject()
+        </span><pre>createObject()</pre></a></li>
+<li class="method public inherited"><a href="#method_dispatchSignal" title="dispatchSignal() :: Dispatch signals if the Dispatch library is loaded."><span class="description">Dispatch signals if the Dispatch library is loaded.</span><pre>dispatchSignal()</pre></a></li>
+<li class="method public inherited"><a href="#method_error" title="error() :: "><span class="description">error()
+        </span><pre>error()</pre></a></li>
+<li class="method public inherited"><a href="#method_getFullClassName" title="getFullClassName() :: Returns the fully qualified name of this class."><span class="description">Returns the fully qualified name of this class.</span><pre>getFullClassName()</pre></a></li>
+<li class="method public inherited"><a href="#method_getParent" title="getParent() :: Returns the ReflectionClass of  the immediate parent of this object."><span class="description">Returns the ReflectionClass of  the immediate parent of this object.</span><pre>getParent()</pre></a></li>
+<li class="method public inherited"><a href="#method_getParents" title="getParents() :: Returns all the parents for this object static with the youngest to the oldest
+The resolution order to follow when going up a inheritance hierarchy."><span class="description">Returns all the parents for this object static with the youngest to the oldest
+The resolution order to follow when going up a inheritance hierarchy.</span><pre>getParents()</pre></a></li>
+<li class="method public inherited"><a href="#method_getShortClassName" title="getShortClassName() :: "><span class="description">getShortClassName()
+        </span><pre>getShortClassName()</pre></a></li>
+<li class="method public inherited"><a href="#method_hasMethod" title="hasMethod() :: Returns a value indicating whether a method is defined."><span class="description">Returns a value indicating whether a method is defined.</span><pre>hasMethod()</pre></a></li>
+<li class="method public inherited"><a href="#method_hasProperty" title="hasProperty() :: Checks if the provided propert exists in the current object."><span class="description">Checks if the provided propert exists in the current object.</span><pre>hasProperty()</pre></a></li>
+<li class="method public inherited"><a href="#method_info" title="info() :: "><span class="description">info()
+        </span><pre>info()</pre></a></li>
+<li class="method public inherited"><a href="#method_input" title="input() :: "><span class="description">input()
+        </span><pre>input()</pre></a></li>
+<li class="method public inherited"><a href="#method_isColorEnabled" title="isColorEnabled() :: Returns a value indicating whether ANSI color is enabled."><span class="description">Returns a value indicating whether ANSI color is enabled.</span><pre>isColorEnabled()</pre></a></li>
+<li class="method public inherited"><a href="#method_isSerious" title="isSerious() :: "><span class="description">isSerious()
+        </span><pre>isSerious()</pre></a></li>
+<li class="method public inherited"><a href="#method_normal" title="normal() :: "><span class="description">normal()
+        </span><pre>normal()</pre></a></li>
+<li class="method public inherited"><a href="#method_normalizeKey" title="normalizeKey() :: A normalizes key names to all lowercase."><span class="description">A normalizes key names to all lowercase.</span><pre>normalizeKey()</pre></a></li>
+<li class="method public inherited"><a href="#method_stderr" title="stderr() :: Prints a string to STDERR."><span class="description">Prints a string to STDERR.</span><pre>stderr()</pre></a></li>
+<li class="method public inherited"><a href="#method_stdout" title="stdout() :: Prints a string to STDOUT."><span class="description">Prints a string to STDOUT.</span><pre>stdout()</pre></a></li>
+<li class="method public inherited"><a href="#method_success" title="success() :: "><span class="description">success()
+        </span><pre>success()</pre></a></li>
+<li class="method public inherited"><a href="#method_warning" title="warning() :: "><span class="description">warning()
+        </span><pre>warning()</pre></a></li>
+<li class="method public inherited"><a href="#method_wrapText" title="wrapText() :: "><span class="description">wrapText()
+        </span><pre>wrapText()</pre></a></li>
+</ul>
+</li>
+<li class="nav-header">
+<i title="Properties" class="icon-custom icon-property"></i> Properties
+                    <ul>
+<li class="property public "><a href="#property_color" title="$color() :: "><span class="description">whether to enable ANSI color in the output.
+          If not set, ANSI color will only be enabled for terminals that support it</span><pre>$color</pre></a></li>
+<li class="property public "><a href="#property_context" title="$context() :: "><span class="description"></span><pre>$context</pre></a></li>
+<li class="property public "><a href="#property_help" title="$help() :: "><span class="description"></span><pre>$help</pre></a></li>
+<li class="property public "><a href="#property_hint" title="$hint() :: "><span class="description"></span><pre>$hint</pre></a></li>
+<li class="property public "><a href="#property_id" title="$id() :: "><span class="description"></span><pre>$id</pre></a></li>
+<li class="property public "><a href="#property_interactive" title="$interactive() :: "><span class="description">whether to run the command interactively</span><pre>$interactive</pre></a></li>
+<li class="property public "><a href="#property_level" title="$level() :: "><span class="description"></span><pre>$level</pre></a></li>
+<li class="property public "><a href="#property_message" title="$message() :: "><span class="description"></span><pre>$message</pre></a></li>
+<li class="property public "><a href="#property_summary" title="$summary() :: "><span class="description"></span><pre>$summary</pre></a></li>
+</ul>
+</li>
+<li class="nav-header private">» Private
+                    <ul>
+<li class="property private "><a href="#property__signal" title="$_signal() :: "><span class="description"></span><pre>$_signal</pre></a></li>
+<li class="property private "><a href="#property_option_list" title="$option_list() :: "><span class="description">the options passed during execution</span><pre>$option_list</pre></a></li>
+</ul>
+</li>
+<li class="nav-header">
+<i title="Constants" class="icon-custom icon-constant"></i> Constants
+                    <ul>
+<li class="constant  "><a href="#constant_CRITICAL" title="CRITICAL() :: "><span class="description">CRITICAL</span><pre>CRITICAL</pre></a></li>
+<li class="constant  "><a href="#constant_DEBUG" title="DEBUG() :: "><span class="description">DEBUG</span><pre>DEBUG</pre></a></li>
+<li class="constant  "><a href="#constant_ERROR" title="ERROR() :: "><span class="description">ERROR</span><pre>ERROR</pre></a></li>
+<li class="constant  "><a href="#constant_EXIT_CODE_ERROR" title="EXIT_CODE_ERROR() :: "><span class="description">EXIT_CODE_ERROR</span><pre>EXIT_CODE_ERROR</pre></a></li>
+<li class="constant  "><a href="#constant_EXIT_CODE_NORMAL" title="EXIT_CODE_NORMAL() :: "><span class="description">EXIT_CODE_NORMAL</span><pre>EXIT_CODE_NORMAL</pre></a></li>
+<li class="constant  "><a href="#constant_INFO" title="INFO() :: "><span class="description">INFO</span><pre>INFO</pre></a></li>
+<li class="constant  "><a href="#constant_WARNING" title="WARNING() :: "><span class="description">WARNING</span><pre>WARNING</pre></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="span8">
+<a xmlns:php="http://php.net/xsl" id="\Eddmash\PowerOrm\Checks\CheckError"></a><ul xmlns:php="http://php.net/xsl" class="breadcrumb">
+<li>
+<a href="../index.html"><i title="Classes" class="icon-custom icon-class"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Checks.html">Checks</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../classes/Eddmash.PowerOrm.Checks.CheckError.html">CheckError</a>
+</li>
+</ul>
+<div xmlns:php="http://php.net/xsl" class="element class">
+<p class="short_description">Class Error.</p>
+<div class="details">
+<div class="long_description"><p>Class Object.</p></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.0.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+<tr>
+<th>package</th>
+<td><a href="../packages/Default.html">Default</a></td>
+</tr>
+<tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Checks\CheckMessage</td>
+</tr>
+</table>
+<h3>
+<i title="Methods" class="icon-custom icon-method"></i> Methods</h3>
+<a id="method___construct"></a><div class="element clickable method public method___construct " data-toggle="collapse" data-target=".method___construct .collapse" title="public">
+<h2>__construct()
+        </h2>
+<pre>__construct($msg, $hint<code> = null</code>, $context<code> = null</code>, $id<code> = null</code>) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Checks\CheckMessage::__construct()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$msg</h4></div>
+<div class="subelement argument"><h4>$hint</h4></div>
+<div class="subelement argument"><h4>$context</h4></div>
+<div class="subelement argument"><h4>$id</h4></div>
+</div></div>
+</div>
+<a id="method___construct"></a><div class="element clickable method public method___construct inherited" data-toggle="collapse" data-target=".method___construct .collapse" title="public">
+<h2>__construct()
+        </h2>
+<pre>__construct($level, $msg, $hint<code> = null</code>, $context<code> = null</code>, $id<code> = null</code>) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$level</h4></div>
+<div class="subelement argument"><h4>$msg</h4></div>
+<div class="subelement argument"><h4>$hint</h4></div>
+<div class="subelement argument"><h4>$context</h4></div>
+<div class="subelement argument"><h4>$id</h4></div>
+</div></div>
+</div>
+<a id="method___toString"></a><div class="element clickable method public method___toString inherited" data-toggle="collapse" data-target=".method___toString .collapse" title="public">
+<h2>__toString()
+        </h2>
+<pre>__toString() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_ansiFormat"></a><div class="element clickable method public method_ansiFormat inherited" data-toggle="collapse" data-target=".method_ansiFormat .collapse" title="public">
+<h2>Formats a string with ANSI codes.</h2>
+<pre>ansiFormat(string $string) : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>You may pass additional parameters using the constants defined in [[\Eddmash\PowerOrm\ConsoleConsole]].</p>
+<p>Example:</p>
+<pre><code>echo $this-&gt;ansiFormat('This will be red and underlined.', Console::FG_RED, Console::UNDERLINE);</code></pre></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$string</h4>
+<code>string</code><p>the string to be formatted</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_createObject"></a><div class="element clickable method public method_createObject inherited" data-toggle="collapse" data-target=".method_createObject .collapse" title="public">
+<h2>createObject()
+        </h2>
+<pre>createObject($config) </pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$config</h4></div>
+</div></div>
+</div>
+<a id="method_dispatchSignal"></a><div class="element clickable method public method_dispatchSignal inherited" data-toggle="collapse" data-target=".method_dispatchSignal .collapse" title="public">
+<h2>Dispatch signals if the Dispatch library is loaded.</h2>
+<pre>dispatchSignal($signal_name, $object) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$signal_name</h4></div>
+<div class="subelement argument"><h4>$object</h4></div>
+</div></div>
+</div>
+<a id="method_error"></a><div class="element clickable method public method_error inherited" data-toggle="collapse" data-target=".method_error .collapse" title="public">
+<h2>error()
+        </h2>
+<pre>error($message, $newline<code> = false</code>) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$message</h4></div>
+<div class="subelement argument"><h4>$newline</h4></div>
+</div></div>
+</div>
+<a id="method_getFullClassName"></a><div class="element clickable method public method_getFullClassName inherited" data-toggle="collapse" data-target=".method_getFullClassName .collapse" title="public">
+<h2>Returns the fully qualified name of this class.</h2>
+<pre>getFullClassName() : string</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code>the fully qualified name of this class</div>
+</div></div>
+</div>
+<a id="method_getParent"></a><div class="element clickable method public method_getParent inherited" data-toggle="collapse" data-target=".method_getParent .collapse" title="public">
+<h2>Returns the ReflectionClass of  the immediate parent of this object.</h2>
+<pre>getParent() : \ReflectionClass</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>\ReflectionClass</code></div>
+</div></div>
+</div>
+<a id="method_getParents"></a><div class="element clickable method public method_getParents inherited" data-toggle="collapse" data-target=".method_getParents .collapse" title="public">
+<h2>Returns all the parents for this object static with the youngest to the oldest
+The resolution order to follow when going up a inheritance hierarchy.</h2>
+<pre>getParents() : array</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>this an array of ReflectionClass</div>
+</div></div>
+</div>
+<a id="method_getShortClassName"></a><div class="element clickable method public method_getShortClassName inherited" data-toggle="collapse" data-target=".method_getShortClassName .collapse" title="public">
+<h2>getShortClassName()
+        </h2>
+<pre>getShortClassName() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_hasMethod"></a><div class="element clickable method public method_hasMethod inherited" data-toggle="collapse" data-target=".method_hasMethod .collapse" title="public">
+<h2>Returns a value indicating whether a method is defined.</h2>
+<pre>hasMethod(string $name) : boolean</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>The default implementation is a call to php function <code>method_exists()</code>.</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$name</h4>
+<code>string</code><p>the method name</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>whether the method is defined</div>
+</div></div>
+</div>
+<a id="method_hasProperty"></a><div class="element clickable method public method_hasProperty inherited" data-toggle="collapse" data-target=".method_hasProperty .collapse" title="public">
+<h2>Checks if the provided propert exists in the current object.</h2>
+<pre>hasProperty($name) : boolean</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>boolean</code></div>
+</div></div>
+</div>
+<a id="method_info"></a><div class="element clickable method public method_info inherited" data-toggle="collapse" data-target=".method_info .collapse" title="public">
+<h2>info()
+        </h2>
+<pre>info($message, $newline<code> = false</code>) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$message</h4></div>
+<div class="subelement argument"><h4>$newline</h4></div>
+</div></div>
+</div>
+<a id="method_input"></a><div class="element clickable method public method_input inherited" data-toggle="collapse" data-target=".method_input .collapse" title="public">
+<h2>input()
+        </h2>
+<pre>input($message<code> = ' '</code>) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$message</h4></div>
+</div></div>
+</div>
+<a id="method_isColorEnabled"></a><div class="element clickable method public method_isColorEnabled inherited" data-toggle="collapse" data-target=".method_isColorEnabled .collapse" title="public">
+<h2>Returns a value indicating whether ANSI color is enabled.</h2>
+<pre>isColorEnabled(resource $stream<code> = \STDOUT</code>) : boolean</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>ANSI color is enabled only if [[color]] is set true or is not set
+and the terminal supports ANSI color.</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$stream</h4>
+<code>resource</code><p>the stream to check</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>Whether to enable ANSI style in output</div>
+</div></div>
+</div>
+<a id="method_isSerious"></a><div class="element clickable method public method_isSerious inherited" data-toggle="collapse" data-target=".method_isSerious .collapse" title="public">
+<h2>isSerious()
+        </h2>
+<pre>isSerious() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_normal"></a><div class="element clickable method public method_normal inherited" data-toggle="collapse" data-target=".method_normal .collapse" title="public">
+<h2>normal()
+        </h2>
+<pre>normal($message, $newline<code> = false</code>) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$message</h4></div>
+<div class="subelement argument"><h4>$newline</h4></div>
+</div></div>
+</div>
+<a id="method_normalizeKey"></a><div class="element clickable method public method_normalizeKey inherited" data-toggle="collapse" data-target=".method_normalizeKey .collapse" title="public">
+<h2>A normalizes key names to all lowercase.</h2>
+<pre>normalizeKey($name) : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_stderr"></a><div class="element clickable method public method_stderr inherited" data-toggle="collapse" data-target=".method_stderr .collapse" title="public">
+<h2>Prints a string to STDERR.</h2>
+<pre>stderr(string $string) : integer | boolean</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>You may optionally format the string with ANSI codes by
+passing additional parameters using the constants defined in [[\Eddmash\PowerOrm\ConsoleConsole]].</p>
+<p>Example:</p>
+<pre><code>$this-&gt;stderr('This will be red and underlined.', Console::FG_RED, Console::UNDERLINE);</code></pre></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$string</h4>
+<code>string</code><p>the string to print</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>integer</code><code>boolean</code>Number of bytes printed or false on error</div>
+</div></div>
+</div>
+<a id="method_stdout"></a><div class="element clickable method public method_stdout inherited" data-toggle="collapse" data-target=".method_stdout .collapse" title="public">
+<h2>Prints a string to STDOUT.</h2>
+<pre>stdout(string $string) : integer | boolean</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>You may optionally format the string with ANSI codes by
+passing additional parameters using the constants defined in [[\Eddmash\PowerOrm\ConsoleConsole]].</p>
+<p>Example:</p>
+<pre><code>$this-&gt;stdout('This will be red and underlined.', Console::FG_RED, Console::UNDERLINE);</code></pre></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$string</h4>
+<code>string</code><p>the string to print</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>integer</code><code>boolean</code>Number of bytes printed or false on error</div>
+</div></div>
+</div>
+<a id="method_success"></a><div class="element clickable method public method_success inherited" data-toggle="collapse" data-target=".method_success .collapse" title="public">
+<h2>success()
+        </h2>
+<pre>success($message, $newline<code> = false</code>) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$message</h4></div>
+<div class="subelement argument"><h4>$newline</h4></div>
+</div></div>
+</div>
+<a id="method_warning"></a><div class="element clickable method public method_warning inherited" data-toggle="collapse" data-target=".method_warning .collapse" title="public">
+<h2>warning()
+        </h2>
+<pre>warning($message, $newline<code> = false</code>) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$message</h4></div>
+<div class="subelement argument"><h4>$newline</h4></div>
+</div></div>
+</div>
+<a id="method_wrapText"></a><div class="element clickable method public method_wrapText inherited" data-toggle="collapse" data-target=".method_wrapText .collapse" title="public">
+<h2>wrapText()
+        </h2>
+<pre>wrapText($message, $indent, $refresh<code> = false</code>) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$message</h4></div>
+<div class="subelement argument"><h4>$indent</h4></div>
+<div class="subelement argument"><h4>$refresh</h4></div>
+</div></div>
+</div>
+<h3>
+<i title="Properties" class="icon-custom icon-property"></i> Properties</h3>
+<a id="property_color"> </a><div class="element clickable property public property_color" data-toggle="collapse" data-target=".property_color .collapse" title="public">
+<h2>whether to enable ANSI color in the output.
+          If not set, ANSI color will only be enabled for terminals that support it</h2>
+<pre>$color : boolean</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_context"> </a><div class="element clickable property public property_context" data-toggle="collapse" data-target=".property_context .collapse" title="public">
+<h2>$context</h2>
+<pre>$context </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_help"> </a><div class="element clickable property public property_help" data-toggle="collapse" data-target=".property_help .collapse" title="public">
+<h2>$help</h2>
+<pre>$help </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>''</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_hint"> </a><div class="element clickable property public property_hint" data-toggle="collapse" data-target=".property_hint .collapse" title="public">
+<h2>$hint</h2>
+<pre>$hint </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_id"> </a><div class="element clickable property public property_id" data-toggle="collapse" data-target=".property_id .collapse" title="public">
+<h2>$id</h2>
+<pre>$id </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_interactive"> </a><div class="element clickable property public property_interactive" data-toggle="collapse" data-target=".property_interactive .collapse" title="public">
+<h2>whether to run the command interactively</h2>
+<pre>$interactive : boolean</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>true</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_level"> </a><div class="element clickable property public property_level" data-toggle="collapse" data-target=".property_level .collapse" title="public">
+<h2>$level</h2>
+<pre>$level </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_message"> </a><div class="element clickable property public property_message" data-toggle="collapse" data-target=".property_message .collapse" title="public">
+<h2>$message</h2>
+<pre>$message </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_summary"> </a><div class="element clickable property public property_summary" data-toggle="collapse" data-target=".property_summary .collapse" title="public">
+<h2>$summary</h2>
+<pre>$summary </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>''</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property__signal"> </a><div class="element clickable property private property__signal" data-toggle="collapse" data-target=".property__signal .collapse" title="private">
+<h2>$_signal</h2>
+<pre>$_signal : boolean</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_option_list"> </a><div class="element clickable property private property_option_list" data-toggle="collapse" data-target=".property_option_list .collapse" title="private">
+<h2>the options passed during execution</h2>
+<pre>$option_list : array</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>array()</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<h3>
+<i title="Constants" class="icon-custom icon-constant"></i> Constants</h3>
+<a id="constant_CRITICAL"> </a><div class="element clickable constant  constant_CRITICAL" data-toggle="collapse" data-target=".constant_CRITICAL .collapse" title="">
+<h2>CRITICAL</h2>
+<pre>CRITICAL = 50 </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="constant_DEBUG"> </a><div class="element clickable constant  constant_DEBUG" data-toggle="collapse" data-target=".constant_DEBUG .collapse" title="">
+<h2>DEBUG</h2>
+<pre>DEBUG = 10 </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="constant_ERROR"> </a><div class="element clickable constant  constant_ERROR" data-toggle="collapse" data-target=".constant_ERROR .collapse" title="">
+<h2>ERROR</h2>
+<pre>ERROR = 40 </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="constant_EXIT_CODE_ERROR"> </a><div class="element clickable constant  constant_EXIT_CODE_ERROR" data-toggle="collapse" data-target=".constant_EXIT_CODE_ERROR .collapse" title="">
+<h2>EXIT_CODE_ERROR</h2>
+<pre>EXIT_CODE_ERROR = 1 </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="constant_EXIT_CODE_NORMAL"> </a><div class="element clickable constant  constant_EXIT_CODE_NORMAL" data-toggle="collapse" data-target=".constant_EXIT_CODE_NORMAL .collapse" title="">
+<h2>EXIT_CODE_NORMAL</h2>
+<pre>EXIT_CODE_NORMAL = 0 </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="constant_INFO"> </a><div class="element clickable constant  constant_INFO" data-toggle="collapse" data-target=".constant_INFO .collapse" title="">
+<h2>INFO</h2>
+<pre>INFO = 20 </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="constant_WARNING"> </a><div class="element clickable constant  constant_WARNING" data-toggle="collapse" data-target=".constant_WARNING .collapse" title="">
+<h2>WARNING</h2>
+<pre>WARNING = 30 </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="row"><footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
+            generated on 2016-09-15T21:36:59+03:00.<br></footer></div>
+</div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 composer.lock
 vendor
 .idea
-api
-docs
-!docs/index.html
+docs/build/*
+docs/cilexer
+api/raw

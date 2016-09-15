@@ -3,7 +3,7 @@
 <phpunit colors="true" bootstrap="bootstrap.php">
 
     <testsuites>
-        <testsuite name="Eddmash CodeIgniter Powerorm Test Suite">
+        <testsuite name="Eddmash Powerorm Test Suite">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>

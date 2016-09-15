@@ -18,45 +18,51 @@ use Eddmash\PowerOrm\Object;
 
 class ModelState extends Object
 {
-
     protected $name;
     protected $fields = [];
 
-    public function __construct($name, $fields, $options = []){
+    public function __construct($name, $fields, $options = [])
+    {
         $this->name = $this->normalizeKey($name);
         $this->fields = $fields;
     }
 
     /**
      * Takes a model returns a ModelState representing it.
-     * @param Model $model
+     *
+     * @param Model      $model
      * @param bool|false $excludeRels
+     *
      * @return static
+     *
      * @throws TypeError
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function fromModel($model, $excludeRels=false){
+    public static function fromModel($model, $excludeRels = false)
+    {
         $fields = [];
 
         foreach ($model->meta->localFields as $name => $field) :
             $name = Tools::normalizeKey($name);
-            try{
-                $fields[$name] = $field->deepClone();
-            }catch (\Exception $e){
-                throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->modelName));
-            }
+        try {
+            $fields[$name] = $field->deepClone();
+        } catch (\Exception $e) {
+            throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->modelName));
+        }
         endforeach;
-        
-        if($excludeRels!==false):
+
+        if ($excludeRels !== false):
             foreach ($model->meta->localManyToMany as $name => $field) :
                 $name = Tools::normalizeKey($name);
-                try{
-                    $fields[$name] = $field->deepClone();
-                }catch (\Exception $e){
-                    throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->modelName));
-                }
-            endforeach;
+        try {
+            $fields[$name] = $field->deepClone();
+        } catch (\Exception $e) {
+            throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->modelName));
+        }
+        endforeach;
         endif;
 
         return new static($model->meta->modelName, $fields);
@@ -93,7 +99,4 @@ class ModelState extends Object
     {
         $this->name = $name;
     }
-
-
-
 }

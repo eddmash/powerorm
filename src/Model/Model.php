@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\ContributorInterface;
-use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Exceptions\FieldError;
 use Eddmash\PowerOrm\Exceptions\TypeError;
 use Eddmash\PowerOrm\Object;
@@ -176,8 +175,7 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
 
         // proxy model setup
         if ($this->meta->proxy):
-            $this->proxySetup();
-        else:
+            $this->proxySetup(); else:
             $this->meta->concreteModel = $this;
 
             // setup for multiple inheritance
@@ -189,7 +187,6 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
 
         // register the model
         $registry->registerModel($this);
-
     }
 
     /**
@@ -203,8 +200,7 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
     public function addToClass($name, $value)
     {
         if ($value instanceof ContributorInterface):
-            $value->contributeToClass($name, $this);
-        else:
+            $value->contributeToClass($name, $this); else:
             $this->{$name} = $value;
         endif;
     }
@@ -214,7 +210,7 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
         if (empty($fields)):
             $fieldsList = $this->getFromHierarchy();
 
-            $fields = $fieldsList[$this->getFullClassName()];
+        $fields = $fieldsList[$this->getFullClassName()];
         endif;
 
         foreach ($fields as $name => $fieldObj) :
@@ -228,7 +224,6 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
 
     public function proxySetup()
     {
-
         $concreteParent = reset($this->getHierarchyMeta());
 
         if ($concreteParent == null):
@@ -243,7 +238,6 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
     public function prepareMultiInheritance()
     {
         //todo
-
     }
 
     public function prepare()
@@ -283,34 +277,32 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
         foreach ($parents as $reflectionParent) :
             $parent = $reflectionParent->getName();
 
-            if (!$reflectionParent->hasMethod($method)):
+        if (!$reflectionParent->hasMethod($method)):
                 continue;
-            endif;
+        endif;
 
-            $reflectionMethod = $reflectionParent->getMethod($method);
-            if ($reflectionMethod->isAbstract()):
+        $reflectionMethod = $reflectionParent->getMethod($method);
+        if ($reflectionMethod->isAbstract()):
                 continue;
-            endif;
+        endif;
 
             // check for at least once concrete parent nearest to the last child model.
             // since we are going downwards we keep updating the concrete varaible.
             if ($reflectionParent->isInstantiable()):
                 $concreteParent = $reflectionParent;
-            endif;
+        endif;
 
-            $parentMethodCall = sprintf('%1$s::%2$s', $parent, $method);
-            if ($args != null):
+        $parentMethodCall = sprintf('%1$s::%2$s', $parent, $method);
+        if ($args != null):
                 if (is_array($args)):
-                    $fields = call_user_func_array([$this, $parentMethodCall], $args);
-                else:
+                    $fields = call_user_func_array([$this, $parentMethodCall], $args); else:
 
                     $fields = call_user_func([$this, $parentMethodCall], $args);
-                endif;
-            else:
+        endif; else:
                 $fields = call_user_func([$this, $parentMethodCall]);
-            endif;
+        endif;
 
-            $modelFields[$parent] = $fields;
+        $modelFields[$parent] = $fields;
 
         endforeach;
 
@@ -336,8 +328,8 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
                 // does model have any fields ?
                 if (empty($mFields)):
                     $hierarchyFields[$modelName] = [];
-                    continue;
-                endif;
+        continue;
+        endif;
 
                 // if it has fields
                 foreach ($mFields as $fieldName => $fieldObj) :
@@ -346,25 +338,25 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
                     if (isset($hierarchyFields[$modelName][$fieldName])):
                         throw new FieldError(
                             sprintf('Field %s is declared more than once on the model %s', $fieldName, $modelName));
-                    endif;
+        endif;
 
                     // have we seen this field name in the models parent?
                     if (in_array($fieldName, array_keys($seenFields))):
                         // has the model been added to the field hierarchy?
                         if (!isset($hierarchyFields[$modelName])):
                             $hierarchyFields[$modelName] = [];
-                        endif;
-                        continue;
-                    endif;
+        endif;
+        continue;
+        endif;
 
                     // add it to the hierarchy
                     $hierarchyFields[$modelName][$fieldName] = $fieldObj;
 
                     // mark the field as seen
                     $seenFields[$fieldName] = $modelName;
-                endforeach;
+        endforeach;
 
-            endforeach;
+        endforeach;
 
         endif;
 
@@ -393,14 +385,14 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
                         'id' => 'models.E017',
                     ]),
                 ];
-            endif;
+        endif;
         endif;
 
         return $error;
     }
 
-    public function _checkFields() {
-
+    public function _checkFields()
+    {
         $errors = [];
         foreach ($this->meta->localFields as $fields) :
             $errors = array_merge($errors, $fields->checks());
@@ -564,9 +556,9 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
         foreach (get_object_vars($this) as $name => $value) :
             if (in_array($name, self::DEBUG_IGNORE)):
                 $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
-                continue;
-            endif;
-            $model[$name] = $value;
+        continue;
+        endif;
+        $model[$name] = $value;
         endforeach;
 
         return $model;

@@ -10,10 +10,8 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
-
 class Migration
 {
-
     protected $name;
     protected $operations;
     protected $description;
@@ -66,9 +64,7 @@ class Migration
         $this->description = $description;
     }
 
-
-
-    public function toString(){
-    
+    public function toString()
+    {
     }
 }

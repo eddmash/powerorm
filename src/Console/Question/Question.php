@@ -44,9 +44,6 @@ class Question extends Object
         $this->question = $question;
     }
 
-    /**
-     * @return null
-     */
     public function getDefault()
     {
         return $this->default;
@@ -86,6 +83,7 @@ class Question extends Object
     public function setValidator(callable $validator = null)
     {
         $this->validator = $validator;
+
         return $this;
     }
     /**
@@ -106,7 +104,7 @@ class Question extends Object
      *
      * @return Question The current instance
      *
-     * @throws \InvalidArgumentException In case the number of attempts is invalid.
+     * @throws \InvalidArgumentException In case the number of attempts is invalid
      */
     public function setMaxAttempts($attempts)
     {
@@ -114,6 +112,7 @@ class Question extends Object
             throw new InvalidArgumentException('Maximum number of attempts must be a positive value.');
         }
         $this->attempts = $attempts;
+
         return $this;
     }
     /**
@@ -140,7 +139,6 @@ class Question extends Object
         return $this->normalizer;
     }
 
-
     /**
      * Sets a normalizer for the response.
      *
@@ -153,6 +151,7 @@ class Question extends Object
     public function setNormalizer(callable $normalizer)
     {
         $this->normalizer = $normalizer;
+
         return $this;
     }
 

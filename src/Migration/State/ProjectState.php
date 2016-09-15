@@ -10,24 +10,25 @@
 */
 
 namespace Eddmash\PowerOrm\Migration\State;
+
 use Eddmash\PowerOrm\App\Registry;
 
 class ProjectState
 {
-
-
     /**
-     * Takes in an Registry and returns a ProjectState matching it
+     * Takes in an Registry and returns a ProjectState matching it.
      *
      * @param Registry $registry
-     * @return null
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function fromApps($registry){
+    public static function fromApps($registry)
+    {
         $modelStates = [];
-        foreach ($registry->getModels() as $modelName=>$modelObj) :
-            $modelStates[$modelName]= ModelState::fromModel($modelObj);
+        foreach ($registry->getModels() as $modelName => $modelObj) :
+            $modelStates[$modelName] = ModelState::fromModel($modelObj);
         endforeach;
 
         return new static($modelStates);

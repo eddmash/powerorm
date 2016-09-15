@@ -9,6 +9,8 @@
 * file that was distributed with this source code.
 */
 
+use Eddmash\PowerOrm\Helpers\StringHelper;
+
 class StringsTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -20,8 +22,9 @@ class StringsTest extends \PHPUnit_Framework_TestCase
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function testCamelToUnderscore($originalString, $expectedString) {
-        $returnedString = StringHelpercamelToUnderscore($originalString);
+    public function testCamelToUnderscore($originalString, $expectedString)
+    {
+        $returnedString = StringHelper::camelToUnderscore($originalString);
 
         $this->assertEquals(
             $expectedString,
@@ -30,7 +33,8 @@ class StringsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function providerCamelToUnderscore() {
+    public function providerCamelToUnderscore()
+    {
         return [
             ['userModel', 'user_Model'],
             ['studentsModel', 'students_Model'],

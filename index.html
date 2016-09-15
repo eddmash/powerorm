@@ -1,0 +1,211 @@
+
+		<p><a href="v1_0_1"><button class="btn btn-primary">Version 1.0.1</button></a>
+		<a href="v1_1_0"><button class="btn btn-primary">Version 1.1.0</button></a></p>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <h4><strong>Using the Orm</strong></h4>  
+<p>To start using the orm, load it like any other CODIGNTER library, preferably using autoload, this load the orm early enough allowing for better perfomance</p>
+<pre><code>$autoload['libraries'] = array(
+    'powerdispatch/signal',
+    'powerorm/orm', <------------------------------------ the orm
+    'powerauth/auth'
+    );</code></pre>
+        </div>
+ 
+
+<h4><strong>Extend The PModel</strong></h4>
+<p>The PModel is a ORM Model that adds power to CI Model.</p>
+<p>This class provides the CI MODEL with power by doing two important things :</p>
+<ul>
+    <li>
+        <p>Use model to determine how the database table it represent looks like</p>
+    </li>
+    <li>
+        <p>Assigns Model fields</p>
+        <p>Allows creating fields on the model, which represent columns in the database.</p>
+    </li>
+    <li>
+        <p>Provides easy interaction with the database.</p>
+        <p>This class provides a Queryset object for each class that extends it. The Queryset class Acts like a proxy
+            between
+            the database and the current model.</p>
+    </li>
+</ul>
+<p>USAGE:</p>
+<h4><strong>Extending</strong></h4>
+<p>Extend this class on model classes e.g.</p>
+<pre><code>User_model extends PModel{
+    protected $table_name= '';
+    ...
+    }</code></pre>
+<p>The <code>table_name</code> variable is optional, this tells the orm which database table this model represents. if
+    not set
+    Table name is taken as model name e.g. user_model above the table would be <code>user_model</code></p>
+<h4><strong>Interacting with the database</strong></h4>
+<p>Load model like any other codeigniter model</p>
+<pre><code>$this->load->model('user_model')</code></pre>
+<p>Extending the PModel, provides several methods that can be used to interact with the database, e.g. the get() method
+    more on this later.</p>
+<pre><code>$this->user_model->get(['name'=>'john'])</code></pre>
+<p>This will return object of the user_model.</p>
+<h4><strong>How it works</strong></h4>
+<ul>
+    <li>
+        <p>The first Queryset method invoked on the model creates that models Queryset.
+            Each of this methods below create a new Queryset instance.</p>
+<pre><code>$this->user_model->get(array('name'=>'john'));
+    $this->user_model->all());</code></pre>
+    </li>
+    <li>
+        <p>Several Queryset methods can be chained together to refine the query.</p>
+<pre><code>$this->user_model->all()->filter(array('username'=>'admin'));
+    **************************************************
+    SELECT `user`.*
+    FROM `user`
+    *************************************************
+    $this->user_model->all()->filter(array('username'=>'admin'));
+    ----------
+    SELECT `user`.*
+    FROM `user`
+    WHERE `user`.`username` = 'admin'</code></pre>
+    </li>
+    <li>Queryset is evaluated to get data from the database.</li>
+</ul>
+<p>The PModel has more methods read more here</p>
+<p><a href="http://eddmash.github.io/powerorm/docs/classes/PModel.html"><a
+        href="http://eddmash.github.io/powerorm/docs/classes/PModel.html">http://eddmash.github.io/powerorm/docs/classes/PModel.html</a></a>
+</p>
+<h4><strong>Queryset</strong></h4>
+<p>Class for doing database lookups, The look up is done Lazily i.e. Lazy Loading.</p>
+<p>This class provides several methods for interacting with the database with one
+    important thing to note is that some.</p>
+<p><strong><em>Most Methods return a Queryset object</em></strong> and not the database results.
+    This allows for further refinement of the Queryset.</p>
+<h4>Methods that don't return a Querset.</h4>
+<p>The following are the methods don't return a Queryset:</p>
+<ul>
+    <li>\Queryset::get()</li>
+    <li>\Queryset::size()</li>
+    <li>\Queryset::delete()</li>
+    <li>\Queryset::value()</li>
+    <li>\Queryset::save()</li>
+    <li>\Queryset::add()</li>
+</ul>
+<p>Read more of this methods here
+    <a href="http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html"><a
+            href="http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html">http://eddmash.github.io/powerorm/docs/classes/powerorm.queries.Queryset.html</a></a>
+</p>
+<h4><strong>Creating A Queryset</strong></h4>
+<p>Each model that extends the <code>PModel</code> class automatically gets assigned a Queryset object,
+    using this Queryset you are able perform database lookups.</p>
+<p>Assuming we have a model class User_model that represents all users in the user database table.</p>
+<p>We can interact with it as follows:</p>
+<p>To get one user with the <code>name=john</code></p>
+<pre><code>$this->User_model->get(array('name'=>'john'))</code></pre>
+<p>To get All user in the database</p>
+<pre><code>$this->User_model->all()</code></pre>
+<h4><strong>Refining the Queryset</strong> (Method Chaining)</h4>
+<p>e.g count all users</p>
+<pre><code> $this->user_model->all()->size(array('name'=>'john')) </code></pre>
+<p>get all users with the name <code>name=john</code></p>
+<pre><code> $this->user_model->all()->filter(array('name'=>'john'))
+
+    // which can also be handle as follows
+
+    $this->user_model->filter(array('name'=>'john'))
+</code></pre>
+<h4><strong>Getting Results</strong> (Lazily Loading and Evaluation)</h4>
+<p>To get results from the database, the Queryset object has to be evaluated, the reason for this is to hold
+    off from hitting the database until its absolutely necessary, that is when the results are actually needed.</p>
+<p>A Queryset Evaluation takes place in the following situations :.</p>
+<ul>
+    <li>
+        <p>When looping through the Queryset using foreach.</p>
+<pre><code> $admins = $this->role->all();
+    foreach($admins as $admin){
+    ...
+    } </code></pre>
+    </li>
+    <li>
+        <p>When using a Queryset like a string e.g. in an echo statement.</p>
+        <pre><code>echo $this->role->get(array('name'=>'admin'));</code></pre>
+    </li>
+    <li>
+        <p>When testing or existence of a property e.g. using isset().</p>
+<pre><code>$admin_role = $this->role->get(array('name'=>'admin'));
+    if(isset($admin_role->description)){
+    ...
+    }</code></pre>
+        .
+    </li>
+    <li>
+        <p>When the \Queryset::value() method of the Queryset is invoked.</p>
+        <pre><code>$admin_role = $this->role->all()->value(); </code></pre>
+        .
+
+        <h4>See methods for more explanations and usage examples</h4>
+
+        <h3>Some common issues when using ORMs to avoid</h3>
+    </li>
+    <li>
+        <h4><strong>N+1 Problem</strong></h4>
+    </li>
+</ul>
+<p>This problem occurs when the code needs to load the children of a parent-child relationship
+    (the “many” in the “one-to-many”).</p>
+<p>Most ORMs have lazy-loading enabled by default, so queries are issued for the parent record, and then one query for
+    EACH child record.</p>
+<p>As you can expect, doing N+1 queries instead of a single query will flood your database with queries,
+    which is something we can and should avoid.</p>
+<p>Consider a simple blog application which has many articles published by different authors. i.e many to one</p>
+<p>We want to list articles along with their title and author’s name.</p>
+<p>This could be achieved using the following</p>
+<pre><code>$articles = $this->article_model->all()
+
+    foreach($articles as $article){
+    $article->author->name;
+    }
+</code></pre>
+<p>Assuming we have 20 articles in the database, the above code will produce 20+1 queries to the database</p>
+<pre><code> // one to fetch all the articles
+
+    select * from articles;
+
+    // then based on the value of foreign_key to the author on each article, an author is
+    // fetched resultin in 20 more queries hence the N+1.
+
+    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?</code></pre>
+<p>To solve this problem use the \Queryset::with().</p>
+<p>The method tells the orm to eagerly load the article and authors in one go when the Queryset is being evaluated.
+    which will result in two sql queries as shown below:</p>
+<pre><code>$articles = $this->with(['author'])->article_model->all()
+
+    foreach($articles as $article){
+    $article->author->name;
+    }
+
+    // one to fetch all the articles
+
+    SELECT 'articles'.* FROM 'articles'
+
+    //one to fetch all authors
+
+    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' IN (1,2,3,4,5)</code></pre>
+<p>example borrowed from <a href="http://www.sitepoint.com/silver-bullet-n1-problem/"><a
+        href="http://www.sitepoint.com/silver-bullet-n1-problem/">http://www.sitepoint.com/silver-bullet-n1-problem/</a></a>
+</p>
+<p>To avoid this issues using this orm, use the \Queryset::with() method.</p>
+
+
+    </div>
+</div>
+</body>
+</html>

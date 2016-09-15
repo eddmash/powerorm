@@ -2,11 +2,9 @@
 /**
  * Created by eddmash <http://eddmash.com>
  * Date: 9/14/16
- * Time: 4:41 PM
+ * Time: 4:41 PM.
  */
-
 namespace Eddmash\PowerOrm\Console\Question;
-
 
 class ConfirmationQuestion extends Question
 {
@@ -33,6 +31,7 @@ class ConfirmationQuestion extends Question
     {
         $default = $this->getDefault();
         $regex = $this->trueAnswerRegex;
+
         return function ($answer) use ($default, $regex) {
             if (is_bool($answer)) {
                 return $answer;
@@ -41,6 +40,7 @@ class ConfirmationQuestion extends Question
             if (false === $default) {
                 return $answer && $answerIsTrue;
             }
+
             return !$answer || $answerIsTrue;
         };
     }

@@ -1,0 +1,774 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+<meta charset="utf-8">
+<title>PowerOrm v1.1.0 API » \Eddmash\PowerOrm\Model\Model</title>
+<meta name="author" content="Mike van Riel">
+<meta name="description" content="">
+<link href="../css/template.css" rel="stylesheet" media="all">
+<script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script><script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script><script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script><script src="../js/bootstrap.js" type="text/javascript"></script><script src="../js/template.js" type="text/javascript"></script><script src="../js/prettify/prettify.min.js" type="text/javascript"></script><link rel="shortcut icon" href="../img/favicon.ico">
+<link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+<div class="navbar-inner"><div class="container">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">PowerOrm v1.1.0 API</a><div class="nav-collapse"><ul class="nav">
+<li class="dropdown">
+<a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                                    API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a>Namespaces</a></li>
+<li><a href="../namespaces/Eddmash.html"><i class="icon-th"></i> Eddmash</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
+<li><a>Packages</a></li>
+<li><a href="../packages/Default.html"><i class="icon-folder-open"></i> Default</a></li>
+</ul>
+</li>
+<li class="dropdown" id="charts-menu">
+<a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                                    Charts <b class="caret"></b></a><ul class="dropdown-menu"><li><a href="../graph_class.html"><i class="icon-list-alt"></i> Class hierarchy diagram</a></li></ul>
+</li>
+<li class="dropdown" id="reports-menu">
+<a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                                    Reports <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
+                <span class="label label-info">414</span></a></li>
+<li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
+                <ul></ul></a></li>
+<li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
+                <span class="label label-info">0</span></a></li>
+</ul>
+</li>
+</ul></div>
+</div></div>
+<div class="go_to_top"><a href="#___" style="color: inherit">Back to top  <i class="icon-upload icon-white"></i></a></div>
+</div>
+<div id="___" class="container">
+<noscript><div class="alert alert-warning">
+                            Javascript is disabled; several features are only available
+                            if Javascript is enabled.
+                        </div></noscript>
+<div class="row">
+<div class="span4">
+<div xmlns:php="http://php.net/xsl" class="btn-toolbar">
+<div class="btn-group visibility" data-toggle="buttons-checkbox">
+<button class="btn public active" title="Show public elements">Public</button><button class="btn protected" title="Show protected elements">Protected</button><button class="btn private" title="Show private elements">Private</button><button class="btn inherited active" title="Show inherited elements">Inherited</button>
+</div>
+<div class="btn-group view pull-right" data-toggle="buttons-radio">
+<button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button><button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+</div>
+</div>
+<ul xmlns:php="http://php.net/xsl" class="side-nav nav nav-list">
+<li class="nav-header">
+<i title="Methods" class="icon-custom icon-method"></i> Methods
+                    <ul>
+<li class="method public "><a href="#method___construct" title="__construct() :: Model constructor."><span class="description">Model constructor.</span><pre>__construct()</pre></a></li>
+<li class="method public "><a href="#method___debugInfo" title="__debugInfo() :: "><span class="description">__debugInfo()
+        </span><pre>__debugInfo()</pre></a></li>
+<li class="method public "><a href="#method___get" title="__get() :: "><span class="description">__get()
+        </span><pre>__get()</pre></a></li>
+<li class="method public "><a href="#method___set" title="__set() :: "><span class="description">__set()
+        </span><pre>__set()</pre></a></li>
+<li class="method public "><a href="#method__checkFields" title="_checkFields() :: "><span class="description">_checkFields()
+        </span><pre>_checkFields()</pre></a></li>
+<li class="method public "><a href="#method__checkModels" title="_checkModels() :: "><span class="description">_checkModels()
+        </span><pre>_checkModels()</pre></a></li>
+<li class="method public "><a href="#method_addToClass" title="addToClass() :: "><span class="description">addToClass()
+        </span><pre>addToClass()</pre></a></li>
+<li class="method public "><a href="#method_checks" title="checks() :: "><span class="description">checks()
+        </span><pre>checks()</pre></a></li>
+<li class="method public "><a href="#method_constructorArgs" title="constructorArgs() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>constructorArgs()</pre></a></li>
+<li class="method public "><a href="#method_count" title="count() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>count()</pre></a></li>
+<li class="method public inherited"><a href="#method_dispatchSignal" title="dispatchSignal() :: Dispatch signals if the Dispatch library is loaded."><span class="description">Dispatch signals if the Dispatch library is loaded.</span><pre>dispatchSignal()</pre></a></li>
+<li class="method public "><a href="#method_getFromHierarchy" title="getFromHierarchy() :: "><span class="description">getFromHierarchy()
+        </span><pre>getFromHierarchy()</pre></a></li>
+<li class="method public inherited"><a href="#method_getFullClassName" title="getFullClassName() :: Returns the fully qualified name of this class."><span class="description">Returns the fully qualified name of this class.</span><pre>getFullClassName()</pre></a></li>
+<li class="method public "><a href="#method_getHierarchyMeta" title="getHierarchyMeta() :: Gets information about a model and all its parent."><span class="description">Gets information about a model and all its parent.</span><pre>getHierarchyMeta()</pre></a></li>
+<li class="method public "><a href="#method_getIterator" title="getIterator() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>getIterator()</pre></a></li>
+<li class="method public "><a href="#method_getMeta" title="getMeta() :: This method should return an array of all the configurations that need to made on the meta."><span class="description">This method should return an array of all the configurations that need to made on the meta.</span><pre>getMeta()</pre></a></li>
+<li class="method public inherited"><a href="#method_getParent" title="getParent() :: Returns the ReflectionClass of  the immediate parent of this object."><span class="description">Returns the ReflectionClass of  the immediate parent of this object.</span><pre>getParent()</pre></a></li>
+<li class="method public inherited"><a href="#method_getParents" title="getParents() :: Returns all the parents for this object static with the youngest to the oldest
+The resolution order to follow when going up a inheritance hierarchy."><span class="description">Returns all the parents for this object static with the youngest to the oldest
+The resolution order to follow when going up a inheritance hierarchy.</span><pre>getParents()</pre></a></li>
+<li class="method public "><a href="#method_getQueryset" title="getQueryset() :: Creates a Queryset that is used to interaract with the database."><span class="description">Creates a Queryset that is used to interaract with the database.</span><pre>getQueryset()</pre></a></li>
+<li class="method public inherited"><a href="#method_getShortClassName" title="getShortClassName() :: "><span class="description">getShortClassName()
+        </span><pre>getShortClassName()</pre></a></li>
+<li class="method public "><a href="#method_getTableName" title="getTableName() :: The database table that this model represents."><span class="description">The database table that this model represents.</span><pre>getTableName()</pre></a></li>
+<li class="method public inherited"><a href="#method_hasMethod" title="hasMethod() :: Returns a value indicating whether a method is defined."><span class="description">Returns a value indicating whether a method is defined.</span><pre>hasMethod()</pre></a></li>
+<li class="method public inherited"><a href="#method_hasProperty" title="hasProperty() :: Checks if the provided propert exists in the current object."><span class="description">Checks if the provided propert exists in the current object.</span><pre>hasProperty()</pre></a></li>
+<li class="method public "><a href="#method_init" title="init() :: "><span class="description">init()
+        </span><pre>init()</pre></a></li>
+<li class="method public inherited"><a href="#method_normalizeKey" title="normalizeKey() :: A normalizes key names to all lowercase."><span class="description">A normalizes key names to all lowercase.</span><pre>normalizeKey()</pre></a></li>
+<li class="method public "><a href="#method_offsetExists" title="offsetExists() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>offsetExists()</pre></a></li>
+<li class="method public "><a href="#method_offsetGet" title="offsetGet() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>offsetGet()</pre></a></li>
+<li class="method public "><a href="#method_offsetSet" title="offsetSet() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>offsetSet()</pre></a></li>
+<li class="method public "><a href="#method_offsetUnset" title="offsetUnset() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>offsetUnset()</pre></a></li>
+<li class="method public "><a href="#method_prepare" title="prepare() :: "><span class="description">prepare()
+        </span><pre>prepare()</pre></a></li>
+<li class="method public "><a href="#method_prepareMeta" title="prepareMeta() :: Should return an instance of the Meta class. which is used to hold meta information about the particular model."><span class="description">Should return an instance of the Meta class. which is used to hold meta information about the particular model.</span><pre>prepareMeta()</pre></a></li>
+<li class="method public "><a href="#method_prepareMultiInheritance" title="prepareMultiInheritance() :: "><span class="description">prepareMultiInheritance()
+        </span><pre>prepareMultiInheritance()</pre></a></li>
+<li class="method public "><a href="#method_proxySetup" title="proxySetup() :: "><span class="description">proxySetup()
+        </span><pre>proxySetup()</pre></a></li>
+<li class="method public "><a href="#method_serialize" title="serialize() :: "><span class="description">serialize()
+        </span><pre>serialize()</pre></a></li>
+<li class="method public "><a href="#method_setupFields" title="setupFields() :: "><span class="description">setupFields()
+        </span><pre>setupFields()</pre></a></li>
+<li class="method public "><a href="#method_skeleton" title="skeleton() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>skeleton()</pre></a></li>
+<li class="method public "><a href="#method_unboundFields" title="unboundFields() :: All the model fields are set on this model."><span class="description">All the model fields are set on this model.</span><pre>unboundFields()</pre></a></li>
+<li class="method public "><a href="#method_unserialize" title="unserialize() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>unserialize()</pre></a></li>
+</ul>
+</li>
+<li class="nav-header">
+<i title="Properties" class="icon-custom icon-property"></i> Properties
+                    <ul></ul>
+</li>
+<li class="nav-header protected">» Protected
+                    <ul>
+<li class="property protected "><a href="#property__fieldCache" title="$_fieldCache() :: Holds all the fields tha belong to this model."><span class="description"></span><pre>$_fieldCache</pre></a></li>
+<li class="property protected "><a href="#property_constructorArgs" title="$constructorArgs() :: Holds the arguments passed to the constructor."><span class="description"></span><pre>$constructorArgs</pre></a></li>
+<li class="property protected "><a href="#property_managed" title="$managed() :: Indicates if the orm should managed the table being represented by this model."><span class="description"></span><pre>$managed</pre></a></li>
+<li class="property protected "><a href="#property_proxy" title="$proxy() :: When using multi-table inheritance, a new database table is created for each subclass of a model."><span class="description"></span><pre>$proxy</pre></a></li>
+<li class="property protected "><a href="#property_verboseName" title="$verboseName() :: Human friendly name."><span class="description"></span><pre>$verboseName</pre></a></li>
+</ul>
+</li>
+<li class="nav-header private">» Private
+                    <ul><li class="property private "><a href="#property__signal" title="$_signal() :: "><span class="description"></span><pre>$_signal</pre></a></li></ul>
+</li>
+<li class="nav-header">
+<i title="Constants" class="icon-custom icon-constant"></i> Constants
+                    <ul><li class="constant  "><a href="#constant_DEBUG_IGNORE" title="DEBUG_IGNORE() :: "><span class="description">DEBUG_IGNORE</span><pre>DEBUG_IGNORE</pre></a></li></ul>
+</li>
+</ul>
+</div>
+<div class="span8">
+<a xmlns:php="http://php.net/xsl" id="\Eddmash\PowerOrm\Model\Model"></a><ul xmlns:php="http://php.net/xsl" class="breadcrumb">
+<li>
+<a href="../index.html"><i title="Classes" class="icon-custom icon-class"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Model.html">Model</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../classes/Eddmash.PowerOrm.Model.Model.html">Model</a>
+</li>
+</ul>
+<div xmlns:php="http://php.net/xsl" class="element class">
+<p class="short_description">Base class for all models in the ORM, this class cannot be instantiated on its own.</p>
+<div class="details">
+<div class="long_description"><p>Class Model.</p></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+<tr>
+<th>package</th>
+<td><a href="../packages/Default.html">Default</a></td>
+</tr>
+<tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Object</td>
+</tr>
+</table>
+<h3>
+<i title="Methods" class="icon-custom icon-method"></i> Methods</h3>
+<a id="method___construct"></a><div class="element clickable method public method___construct " data-toggle="collapse" data-target=".method___construct .collapse" title="public">
+<h2>Model constructor.</h2>
+<pre>__construct(array $kwargs<code> = array()</code>) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$kwargs</h4>
+<code>array</code><p>the kwargs is an associative array of configurations passed to the model,
+this configurations are all optional.</p>
+<p>The following are valid configurations:</p>
+<ul>
+<li>db - the database connection to use</li>
+<li>config - to</li>
+</ul></div>
+</div></div>
+</div>
+<a id="method___debugInfo"></a><div class="element clickable method public method___debugInfo " data-toggle="collapse" data-target=".method___debugInfo .collapse" title="public">
+<h2>__debugInfo()
+        </h2>
+<pre>__debugInfo() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method___get"></a><div class="element clickable method public method___get " data-toggle="collapse" data-target=".method___get .collapse" title="public">
+<h2>__get()
+        </h2>
+<pre>__get($name) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
+</div></div>
+</div>
+<a id="method___set"></a><div class="element clickable method public method___set " data-toggle="collapse" data-target=".method___set .collapse" title="public">
+<h2>__set()
+        </h2>
+<pre>__set($name, $value) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
+<div class="subelement argument"><h4>$value</h4></div>
+</div></div>
+</div>
+<a id="method__checkFields"></a><div class="element clickable method public method__checkFields " data-toggle="collapse" data-target=".method__checkFields .collapse" title="public">
+<h2>_checkFields()
+        </h2>
+<pre>_checkFields() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method__checkModels"></a><div class="element clickable method public method__checkModels " data-toggle="collapse" data-target=".method__checkModels .collapse" title="public">
+<h2>_checkModels()
+        </h2>
+<pre>_checkModels() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_addToClass"></a><div class="element clickable method public method_addToClass " data-toggle="collapse" data-target=".method_addToClass .collapse" title="public">
+<h2>addToClass()
+        </h2>
+<pre>addToClass(string $name, object|mixed $value) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$name</h4>
+<code>string</code>
+</div>
+<div class="subelement argument">
+<h4>$value</h4>
+<code>object</code><code>mixed</code>
+</div>
+</div></div>
+</div>
+<a id="method_checks"></a><div class="element clickable method public method_checks " data-toggle="collapse" data-target=".method_checks .collapse" title="public">
+<h2>checks()
+        </h2>
+<pre>checks() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_constructorArgs"></a><div class="element clickable method public method_constructorArgs " data-toggle="collapse" data-target=".method_constructorArgs .collapse" title="public">
+<h2>{@inheritdoc}</h2>
+<pre>constructorArgs() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_count"></a><div class="element clickable method public method_count " data-toggle="collapse" data-target=".method_count .collapse" title="public">
+<h2>{@inheritdoc}</h2>
+<pre>count() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_dispatchSignal"></a><div class="element clickable method public method_dispatchSignal inherited" data-toggle="collapse" data-target=".method_dispatchSignal .collapse" title="public">
+<h2>Dispatch signals if the Dispatch library is loaded.</h2>
+<pre>dispatchSignal($signal_name, $object) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$signal_name</h4></div>
+<div class="subelement argument"><h4>$object</h4></div>
+</div></div>
+</div>
+<a id="method_getFromHierarchy"></a><div class="element clickable method public method_getFromHierarchy " data-toggle="collapse" data-target=".method_getFromHierarchy .collapse" title="public">
+<h2>getFromHierarchy()
+        </h2>
+<pre>getFromHierarchy() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getFullClassName"></a><div class="element clickable method public method_getFullClassName inherited" data-toggle="collapse" data-target=".method_getFullClassName .collapse" title="public">
+<h2>Returns the fully qualified name of this class.</h2>
+<pre>getFullClassName() : string</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code>the fully qualified name of this class</div>
+</div></div>
+</div>
+<a id="method_getHierarchyMeta"></a><div class="element clickable method public method_getHierarchyMeta " data-toggle="collapse" data-target=".method_getHierarchyMeta .collapse" title="public">
+<h2>Gets information about a model and all its parent.</h2>
+<pre>getHierarchyMeta(string $method<code> = 'unboundFields'</code>, null $args<code> = null</code>, boolean|true $fromOldest<code> = true</code>) : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.</p></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$method</h4>
+<code>string</code><p>the method to invoke</p></div>
+<div class="subelement argument">
+<h4>$args</h4>
+<code>null</code><p>the arguments to pass to the method</p></div>
+<div class="subelement argument">
+<h4>$fromOldest</h4>
+<code>boolean</code><code>true</code><p>do we traverse from Object to the child model</p></div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exceptions\TypeError</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>array</code></div>
+</div></div>
+</div>
+<a id="method_getIterator"></a><div class="element clickable method public method_getIterator " data-toggle="collapse" data-target=".method_getIterator .collapse" title="public">
+<h2>{@inheritdoc}</h2>
+<pre>getIterator() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getMeta"></a><div class="element clickable method public method_getMeta " data-toggle="collapse" data-target=".method_getMeta .collapse" title="public">
+<h2>This method should return an array of all the configurations that need to made on the meta.</h2>
+<pre>getMeta() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Model\ModelInterface::getMeta()</td>
+</tr></table>
+</div></div>
+</div>
+<a id="method_getParent"></a><div class="element clickable method public method_getParent inherited" data-toggle="collapse" data-target=".method_getParent .collapse" title="public">
+<h2>Returns the ReflectionClass of  the immediate parent of this object.</h2>
+<pre>getParent() : \ReflectionClass</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>\ReflectionClass</code></div>
+</div></div>
+</div>
+<a id="method_getParents"></a><div class="element clickable method public method_getParents inherited" data-toggle="collapse" data-target=".method_getParents .collapse" title="public">
+<h2>Returns all the parents for this object static with the youngest to the oldest
+The resolution order to follow when going up a inheritance hierarchy.</h2>
+<pre>getParents() : array</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>this an array of ReflectionClass</div>
+</div></div>
+</div>
+<a id="method_getQueryset"></a><div class="element clickable method public method_getQueryset " data-toggle="collapse" data-target=".method_getQueryset .collapse" title="public">
+<h2>Creates a Queryset that is used to interaract with the database.</h2>
+<pre>getQueryset(string $opts) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Model\ModelInterface::getQueryset()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$opts</h4></div>
+</div></div>
+</div>
+<a id="method_getShortClassName"></a><div class="element clickable method public method_getShortClassName inherited" data-toggle="collapse" data-target=".method_getShortClassName .collapse" title="public">
+<h2>getShortClassName()
+        </h2>
+<pre>getShortClassName() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getTableName"></a><div class="element clickable method public method_getTableName " data-toggle="collapse" data-target=".method_getTableName .collapse" title="public">
+<h2>The database table that this model represents.</h2>
+<pre>getTableName() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Model\ModelInterface::getTableName()</td>
+</tr></table>
+</div></div>
+</div>
+<a id="method_hasMethod"></a><div class="element clickable method public method_hasMethod inherited" data-toggle="collapse" data-target=".method_hasMethod .collapse" title="public">
+<h2>Returns a value indicating whether a method is defined.</h2>
+<pre>hasMethod(string $name) : boolean</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>The default implementation is a call to php function <code>method_exists()</code>.</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$name</h4>
+<code>string</code><p>the method name</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>whether the method is defined</div>
+</div></div>
+</div>
+<a id="method_hasProperty"></a><div class="element clickable method public method_hasProperty inherited" data-toggle="collapse" data-target=".method_hasProperty .collapse" title="public">
+<h2>Checks if the provided propert exists in the current object.</h2>
+<pre>hasProperty($name) : boolean</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>boolean</code></div>
+</div></div>
+</div>
+<a id="method_init"></a><div class="element clickable method public method_init " data-toggle="collapse" data-target=".method_init .collapse" title="public">
+<h2>init()
+        </h2>
+<pre>init($registry<code> = null</code>, $fields<code> = array()</code>) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$registry</h4></div>
+<div class="subelement argument"><h4>$fields</h4></div>
+</div></div>
+</div>
+<a id="method_normalizeKey"></a><div class="element clickable method public method_normalizeKey inherited" data-toggle="collapse" data-target=".method_normalizeKey .collapse" title="public">
+<h2>A normalizes key names to all lowercase.</h2>
+<pre>normalizeKey($name) : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_offsetExists"></a><div class="element clickable method public method_offsetExists " data-toggle="collapse" data-target=".method_offsetExists .collapse" title="public">
+<h2>{@inheritdoc}</h2>
+<pre>offsetExists($offset) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$offset</h4></div>
+</div></div>
+</div>
+<a id="method_offsetGet"></a><div class="element clickable method public method_offsetGet " data-toggle="collapse" data-target=".method_offsetGet .collapse" title="public">
+<h2>{@inheritdoc}</h2>
+<pre>offsetGet($offset) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$offset</h4></div>
+</div></div>
+</div>
+<a id="method_offsetSet"></a><div class="element clickable method public method_offsetSet " data-toggle="collapse" data-target=".method_offsetSet .collapse" title="public">
+<h2>{@inheritdoc}</h2>
+<pre>offsetSet($offset, $value) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$offset</h4></div>
+<div class="subelement argument"><h4>$value</h4></div>
+</div></div>
+</div>
+<a id="method_offsetUnset"></a><div class="element clickable method public method_offsetUnset " data-toggle="collapse" data-target=".method_offsetUnset .collapse" title="public">
+<h2>{@inheritdoc}</h2>
+<pre>offsetUnset($offset) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$offset</h4></div>
+</div></div>
+</div>
+<a id="method_prepare"></a><div class="element clickable method public method_prepare " data-toggle="collapse" data-target=".method_prepare .collapse" title="public">
+<h2>prepare()
+        </h2>
+<pre>prepare() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_prepareMeta"></a><div class="element clickable method public method_prepareMeta " data-toggle="collapse" data-target=".method_prepareMeta .collapse" title="public">
+<h2>Should return an instance of the Meta class. which is used to hold meta information about the particular model.</h2>
+<pre>prepareMeta($config<code> = array()</code>) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>Override this method to provide a different Meta class or to customize.</p></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Model\ModelInterface::prepareMeta()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$config</h4></div>
+</div></div>
+</div>
+<a id="method_prepareMultiInheritance"></a><div class="element clickable method public method_prepareMultiInheritance " data-toggle="collapse" data-target=".method_prepareMultiInheritance .collapse" title="public">
+<h2>prepareMultiInheritance()
+        </h2>
+<pre>prepareMultiInheritance() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_proxySetup"></a><div class="element clickable method public method_proxySetup " data-toggle="collapse" data-target=".method_proxySetup .collapse" title="public">
+<h2>proxySetup()
+        </h2>
+<pre>proxySetup() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_serialize"></a><div class="element clickable method public method_serialize " data-toggle="collapse" data-target=".method_serialize .collapse" title="public">
+<h2>serialize()
+        </h2>
+<pre>serialize() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_setupFields"></a><div class="element clickable method public method_setupFields " data-toggle="collapse" data-target=".method_setupFields .collapse" title="public">
+<h2>setupFields()
+        </h2>
+<pre>setupFields($fields<code> = array()</code>) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$fields</h4></div>
+</div></div>
+</div>
+<a id="method_skeleton"></a><div class="element clickable method public method_skeleton " data-toggle="collapse" data-target=".method_skeleton .collapse" title="public">
+<h2>{@inheritdoc}</h2>
+<pre>skeleton() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_unboundFields"></a><div class="element clickable method public method_unboundFields " data-toggle="collapse" data-target=".method_unboundFields .collapse" title="public">
+<h2>All the model fields are set on this model.</h2>
+<pre>unboundFields() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><pre><code>public function fields(){
+     $this->username = ORM::CharField(['max_length'=>30]);
+     $this->first_name = ORM::CharField(['max_length'=>30]);
+     $this->last_name = ORM::CharField(['max_length'=>30]);
+     $this->password = ORM::CharField(['max_length'=>255]);
+     $this->phone_number = ORM::CharField(['max_length'=>30]);
+}</code></pre>.</div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Model\ModelInterface::unboundFields()</td>
+</tr></table>
+</div></div>
+</div>
+<a id="method_unserialize"></a><div class="element clickable method public method_unserialize " data-toggle="collapse" data-target=".method_unserialize .collapse" title="public">
+<h2>{@inheritdoc}</h2>
+<pre>unserialize($serialized) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$serialized</h4></div>
+</div></div>
+</div>
+<h3>
+<i title="Properties" class="icon-custom icon-property"></i> Properties</h3>
+<a id="property__fieldCache"> </a><div class="element clickable property protected property__fieldCache" data-toggle="collapse" data-target=".property__fieldCache .collapse" title="protected">
+<h2>Holds all the fields tha belong to this model.</h2>
+<pre>$_fieldCache : array</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_constructorArgs"> </a><div class="element clickable property protected property_constructorArgs" data-toggle="collapse" data-target=".property_constructorArgs .collapse" title="protected">
+<h2>Holds the arguments passed to the constructor.</h2>
+<pre>$constructorArgs : array</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_managed"> </a><div class="element clickable property protected property_managed" data-toggle="collapse" data-target=".property_managed .collapse" title="protected">
+<h2>Indicates if the orm should managed the table being represented by this model.</h2>
+<pre>$managed : </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>true</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"><p>Defaults to True, meaning Powerorm  will create the appropriate database tables in migrate or as part of
+migrations and remove them as part of a flush command.</p>
+<p>That is, Powerorm manages the database tables’ lifecycles.</p>
+<p>If False, no database table creation or deletion operations will be performed for this model.</p>
+<p>This is useful if the model represents an existing table or a database view that has been created by some other
+means.</p>
+<p>This is the only difference when managed=False.</p>
+<p>All other aspects of model handling are exactly the same as normal. This includes:</p>
+<ul>
+<li>
+<p>Adding an automatic primary key field to the model if you don’t declare it.
+To avoid confusion for later code readers, it’s recommended to specify all the columns from the database table
+you are modeling when using unmanaged models.</p>
+</li>
+<li>
+<p>If a model with managed=False contains a ManyToManyField that points to another unmanaged model,
+then the intermediate table for the many-to-many join will also not be created.</p>
+<p>However, the intermediary table between one managed and one unmanaged model will be created.</p>
+<p>If you need to change this default behavior, create the intermediary table as an explicit model
+(with managed set as needed) and use the ManyToManyField-&gt;through attribute to make the relation
+use your custom model.</p>
+</li>
+</ul></div></div></div>
+</div>
+<a id="property_proxy"> </a><div class="element clickable property protected property_proxy" data-toggle="collapse" data-target=".property_proxy .collapse" title="protected">
+<h2>When using multi-table inheritance, a new database table is created for each subclass of a model.</h2>
+<pre>$proxy : </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"><p>This is usually the desired behavior, since the subclass needs a place to store any additional data fields that
+are not present on the base class.</p>
+<p>Sometimes, however, you only want to change the php behavior of a model – perhaps to add a new method.</p>
+<p>This is what proxy model inheritance is for:</p>
+<p>creating a proxy for the original model. You can create, delete and update instances of the proxy model and all
+the data will be saved as if you were using the original (non-proxied) model.</p>
+<p>The difference is that you can change things like the default model ordering or the default manager in the proxy,
+without having to alter the original.</p>
+<p>Proxy models are declared like normal models. You tell Powerorm that it’s a proxy model by setting the proxy
+attribute of the class to True.</p></div></div></div>
+</div>
+<a id="property_verboseName"> </a><div class="element clickable property protected property_verboseName" data-toggle="collapse" data-target=".property_verboseName .collapse" title="protected">
+<h2>Human friendly name.</h2>
+<pre>$verboseName : string</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property__signal"> </a><div class="element clickable property private property__signal" data-toggle="collapse" data-target=".property__signal .collapse" title="private">
+<h2>$_signal</h2>
+<pre>$_signal : boolean</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<h3>
+<i title="Constants" class="icon-custom icon-constant"></i> Constants</h3>
+<a id="constant_DEBUG_IGNORE"> </a><div class="element clickable constant  constant_DEBUG_IGNORE" data-toggle="collapse" data-target=".constant_DEBUG_IGNORE .collapse" title="">
+<h2>DEBUG_IGNORE</h2>
+<pre>DEBUG_IGNORE = array('_fieldCache') </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="row"><footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
+            generated on 2016-09-15T21:37:00+03:00.<br></footer></div>
+</div>
+</body>
+</html>

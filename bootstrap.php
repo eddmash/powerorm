@@ -2,34 +2,42 @@
 /**
  * Bootstrap the application.
  */
-use Eddmash\PowerOrm\Config\OrmConfig;
 
-require 'vendor/autoload.php';
+
+use Eddmash\PowerOrm\Autoloader\Autoloader;
+use Eddmash\PowerOrm\Config\OrmConfig;
 
 define('POWERORM_VERSION', '1.1.0');
 
-if (!defined('BASEPATH')) {
+if (!defined('BASEPATH')) :
     define('ENVIRONMENT', 'testing');
     define('BASEPATH', __DIR__.DIRECTORY_SEPARATOR);
     define('APPPATH', BASEPATH);
     define('POWERORM_BASEPATH', BASEPATH);
     define('POWERORM_SRCPATH', BASEPATH.'src'.DIRECTORY_SEPARATOR);
-} else {
+else :
     define('POWERORM_BASEPATH', APPPATH.'libraries/powerorm'.DIRECTORY_SEPARATOR);
     define('POWERORM_SRCPATH', APPPATH.'libraries/powerorm/src'.DIRECTORY_SEPARATOR);
-}
+endif;
 
-require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';
-require POWERORM_SRCPATH.'Autoloader/BaseConfig.php';
-require_once POWERORM_SRCPATH.'Autoloader/OrmConfig.php';
+
+$autoloadFile = POWERORM_BASEPATH.'vendor/autoload.php';
+if(file_exists($autoloadFile)): 
+    require $autoloadFile;
+else:
+    require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';
+    require POWERORM_SRCPATH.'Autoloader/Config/BaseConfig.php';
+    require_once POWERORM_SRCPATH.'Autoloader/Config/OrmConfig.php';
+endif;
+
 
 // setup Autoloader
-$loader = new \CodeIgniter\Autoloader\Autoloader();
+$loader = new Autoloader();
 $loader->initialize(new OrmConfig());
 $loader->register();
 
 // create an instance of the ORM if we are in testing environment
 // otherwise the instance is created by the framework
 if (ENVIRONMENT == 'testing') {
-    require_once 'Orm.php'; 
+    require_once 'Orm.php';
 }
