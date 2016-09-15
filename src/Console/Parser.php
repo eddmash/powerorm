@@ -81,8 +81,9 @@ class Parser
         if (!empty($name) && count($name) == 1 && substr($name, 1, 1) == $this->prefix):
             if ($dest !== null):
                 throw new ValueError('dest supplied twice for a none optional argument');
-        endif;
-        $mandatory = $this->get_mandatory_arguments(); else:
+            endif;
+            $mandatory = $this->get_mandatory_arguments();
+        else:
             $optional = $this->get_optional_arguments();
         endif;
     }

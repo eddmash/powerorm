@@ -57,10 +57,10 @@ class InteractiveAsker extends Asker
 
         if (false === $answer) :
             $answer = $this->input();
-        if (false === $answer) :
+            if (false === $answer) :
                 throw new \RuntimeException('Aborted');
-        endif;
-        $answer = trim($answer);
+            endif;
+            $answer = trim($answer);
         endif;
 
         $answer = strlen($answer) > 0 ? $answer : $question->getDefault();

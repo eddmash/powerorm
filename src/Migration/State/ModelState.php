@@ -47,22 +47,23 @@ class ModelState extends Object
 
         foreach ($model->meta->localFields as $name => $field) :
             $name = Tools::normalizeKey($name);
-        try {
-            $fields[$name] = $field->deepClone();
-        } catch (\Exception $e) {
-            throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->modelName));
-        }
+            try {
+                $fields[$name] = $field->deepClone();
+            } catch (\Exception $e) {
+                throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->modelName));
+            }
         endforeach;
 
         if ($excludeRels !== false):
             foreach ($model->meta->localManyToMany as $name => $field) :
                 $name = Tools::normalizeKey($name);
-        try {
-            $fields[$name] = $field->deepClone();
-        } catch (\Exception $e) {
-            throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->modelName));
-        }
-        endforeach;
+                try {
+                    $fields[$name] = $field->deepClone();
+                } catch (\Exception $e) {
+                    throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name,
+                        $model->meta->modelName));
+                }
+            endforeach;
         endif;
 
         return new static($model->meta->modelName, $fields);

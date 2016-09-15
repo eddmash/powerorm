@@ -21,12 +21,11 @@ endif;
 $autoloadFile = POWERORM_BASEPATH.'vendor/autoload.php';
 if(file_exists($autoloadFile)):
     require $autoloadFile;
-else:
-    require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';
-    require POWERORM_SRCPATH.'Autoloader/Config/BaseConfig.php';
-    require_once POWERORM_SRCPATH.'Autoloader/Config/OrmConfig.php';
 endif;
 
+require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';
+require POWERORM_SRCPATH.'Autoloader/Config/BaseConfig.php';
+require_once POWERORM_SRCPATH.'Autoloader/Config/OrmConfig.php';
 // setup Autoloader
 $loader = new Autoloader();
 $loader->initialize(new OrmConfig());

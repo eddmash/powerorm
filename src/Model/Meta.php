@@ -164,7 +164,7 @@ class Meta extends Object implements MetaInterface
             if (array_key_exists($defaultName, $this->overrides)):
 
                 $this->{$defaultName} = $this->overrides[$defaultName];
-        endif;
+            endif;
         endforeach;
 
         $vName = $this->verboseName;
@@ -185,9 +185,10 @@ class Meta extends Object implements MetaInterface
     public function addField($field)
     {
         if ($field->isRelation && $field->manyToMany):
-            $this->localManyToMany[$field->name] = $field; else:
+            $this->localManyToMany[$field->name] = $field;
+        else:
             $this->localFields[$field->name] = $field;
-        $this->setupPrimaryKey($field);
+            $this->setupPrimaryKey($field);
         endif;
     }
 
@@ -222,8 +223,8 @@ class Meta extends Object implements MetaInterface
                 // todo $this->setupPrimaryKey($field);
             else:
                 $field = new AutoField(['verboseName' => 'ID', 'primaryKey' => true, 'autoCreated' => true]);
-        $model->addToClass('id', $field);
-        endif;
+                $model->addToClass('id', $field);
+            endif;
         endif;
     }
 
@@ -246,9 +247,9 @@ class Meta extends Object implements MetaInterface
         foreach (get_object_vars($this) as $name => $value) :
             if (in_array($name, self::DEBUG_IGNORE)):
                 $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
-        continue;
-        endif;
-        $meta[$name] = $value;
+                continue;
+            endif;
+            $meta[$name] = $value;
         endforeach;
 
         return $meta;

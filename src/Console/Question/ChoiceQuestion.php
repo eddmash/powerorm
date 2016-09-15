@@ -1,9 +1,14 @@
 <?php
-/**
- * Created by eddmash <http://eddmash.com>
- * Date: 9/14/16
- * Time: 4:45 PM.
- */
+
+/*
+* This file is part of the powerorm package.
+*
+* (c) Eddilbert Macharia <edd.cowan@gmail.com>
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
+
 namespace Eddmash\PowerOrm\Console\Question;
 
 class ChoiceQuestion extends Question
@@ -12,6 +17,7 @@ class ChoiceQuestion extends Question
     private $multiselect = false;
     private $prompt = ' > ';
     private $errorMessage = 'Value "%s" is invalid';
+
     /**
      * Constructor.
      *
@@ -40,6 +46,7 @@ class ChoiceQuestion extends Question
     {
         return $this->choices;
     }
+
     /**
      * Sets multiselect option.
      *
@@ -56,6 +63,7 @@ class ChoiceQuestion extends Question
 
         return $this;
     }
+
     /**
      * Returns whether the choices are multiselect.
      *
@@ -65,6 +73,7 @@ class ChoiceQuestion extends Question
     {
         return $this->multiselect;
     }
+
     /**
      * Gets the prompt for choices.
      *
@@ -74,6 +83,7 @@ class ChoiceQuestion extends Question
     {
         return $this->prompt;
     }
+
     /**
      * Sets the prompt for choices.
      *
@@ -87,6 +97,7 @@ class ChoiceQuestion extends Question
 
         return $this;
     }
+
     /**
      * Sets the error message for invalid values.
      *
@@ -103,6 +114,7 @@ class ChoiceQuestion extends Question
 
         return $this;
     }
+
     /**
      * Returns the default answer validator.
      *
@@ -136,7 +148,8 @@ class ChoiceQuestion extends Question
                     }
                 }
                 if (count($results) > 1) {
-                    throw new InvalidArgumentException(sprintf('The provided answer is ambiguous. Value should be one of %s.', implode(' or ', $results)));
+                    throw new InvalidArgumentException(sprintf('The provided answer is ambiguous. Value should be one of %s.',
+                        implode(' or ', $results)));
                 }
                 $result = array_search($value, $choices);
                 if (!$isAssoc) {

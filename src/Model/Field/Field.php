@@ -193,7 +193,8 @@ class Field extends Object implements FieldInterface
     {
         if (!StringHelper::isValidVariableName($fieldName)):
             throw new FieldError(
-                sprintf(' "%s" is not a valid field name on model "%s" .', $fieldName, $modelObject->getFullClassName()));
+                sprintf(' "%s" is not a valid field name on model "%s" .', $fieldName,
+                    $modelObject->getFullClassName()));
         endif;
 
         $this->setFromName($fieldName);
@@ -276,9 +277,9 @@ class Field extends Object implements FieldInterface
         if ($this->hasDefault()):
             if (is_callable($this->default)):
                 return call_user_func($this->default);
-        endif;
+            endif;
 
-        return $this->default;
+            return $this->default;
         endif;
 
         return '';
@@ -300,7 +301,7 @@ class Field extends Object implements FieldInterface
             $errors = [
                 CheckError::createObject([
                     'message' => sprintf(' "%s" is not a valid field name on model %s .',
-                                            $this->name, $this->scopeModel->getFullClassName()),
+                        $this->name, $this->scopeModel->getFullClassName()),
                     'hint' => null,
                     'context' => $this,
                     'id' => 'fields.E001',
@@ -420,9 +421,9 @@ class Field extends Object implements FieldInterface
         foreach (get_object_vars($this) as $name => $value) :
             if (in_array($name, self::DEBUG_IGNORE)):
                 $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
-        continue;
-        endif;
-        $field[$name] = $value;
+                continue;
+            endif;
+            $field[$name] = $value;
         endforeach;
 
         return $field;

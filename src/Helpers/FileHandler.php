@@ -53,9 +53,9 @@ class FileHandler extends Object
         $fileHandle = fopen($file, 'w');
         if ($fileHandle):
             fprintf($fileHandle, $content);
-        fclose($fileHandle);
+            fclose($fileHandle);
 
-        chmod($file, 0777);
+            chmod($file, 0777);
 
         endif;
     }
@@ -74,9 +74,9 @@ class FileHandler extends Object
 
         foreach ($files as $file) :
             $fileName = $file->getBaseName('.'.$ext);
-        if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext):
+            if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext):
                 return $file;
-        endif;
+            endif;
 
         endforeach;
 
@@ -123,14 +123,15 @@ class FileHandler extends Object
         foreach ($dirIterator as $file) :
             if ($file->isDot()):
                 continue;
-        endif;
+            endif;
 
-        if ($file->isDir() && $recurse):
+            if ($file->isDir() && $recurse):
                 foreach ($file as $innerFile) :
                     $_fileList = $this->_addFile($_fileList, $innerFile, $ext, $_fileObj);
-        endforeach; else:
+                endforeach;
+            else:
                 $_fileList = $this->_addFile($_fileList, $file, $ext, $_fileObj);
-        endif;
+            endif;
         endforeach;
 
         return $_fileList;
@@ -141,17 +142,19 @@ class FileHandler extends Object
         if (!empty($ext)):
             if ($ext == $file->getExtension()):
                 if ($_fileObj):
-                    $_fileList[] = clone $file; else:
+                    $_fileList[] = clone $file;
+                else:
                     $_fileList[] = $file->getPathname();
-        endif;
-        endif;
+                endif;
+            endif;
 
-        return $_fileList;
+            return $_fileList;
         endif;
 
         // add everything
         if ($_fileObj):
-            $_fileList[] = clone $file; else:
+            $_fileList[] = clone $file;
+        else:
             $_fileList[] = $file->getPathname();
         endif;
 

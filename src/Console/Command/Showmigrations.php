@@ -29,16 +29,17 @@ class Showmigrations extends BaseCommand
         foreach ($leaves as $leaf) :
             $list = $loader->graph->before_lineage($leaf);
 
-        foreach ($list as $item) :
+            foreach ($list as $item) :
                 $migrationName = array_pop(explode('\\', $item));
 
-        if (in_array($item, $loader->applied_migrations)):
-                    $indicator = $this->ansiFormat('(applied)', Console::FG_GREEN); else:
+                if (in_array($item, $loader->applied_migrations)):
+                    $indicator = $this->ansiFormat('(applied)', Console::FG_GREEN);
+                else:
                     $indicator = '(pending)';
-        endif;
+                endif;
 
-        $this->normal(sprintf('%1$s %2$s', $indicator, $migrationName), true);
-        endforeach;
+                $this->normal(sprintf('%1$s %2$s', $indicator, $migrationName), true);
+            endforeach;
         endforeach;
     }
 }

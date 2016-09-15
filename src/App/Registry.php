@@ -48,7 +48,7 @@ class Registry extends Object
     {
         if ($this->ready == false) :
             $this->getModels();
-        $this->ready = true;
+            $this->ready = true;
         endif;
 
         return;
@@ -110,13 +110,13 @@ class Registry extends Object
                 // if we cannot create an instance of a class just skip, e.g traits abstrat etc
                 if (!$reflect->isInstantiable()) :
                     continue;
-        endif;
+                endif;
 
-        if ($this->hasModel($this->normalizeKey($modelName))):
+                if ($this->hasModel($this->normalizeKey($modelName))):
                     continue;
-        endif;
-        new $modelName();
-        endforeach;
+                endif;
+                new $modelName();
+            endforeach;
         endif;
     }
 

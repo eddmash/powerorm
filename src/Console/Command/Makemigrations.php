@@ -36,9 +36,9 @@ class Makemigrations extends BaseCommand
 
         if (!empty($issues)):
             $message = 'The following migrations seem to indicate they are both the latest migration :'.PHP_EOL;
-        $message .= ' %s '.PHP_EOL;
-        $this->error(sprintf($message, Tools::stringify($issues)));
-        exit;
+            $message .= ' %s '.PHP_EOL;
+            $this->error(sprintf($message, Tools::stringify($issues)));
+            exit;
         endif;
 
         var_dump(ProjectState::fromApps($registry));
@@ -51,16 +51,16 @@ class Makemigrations extends BaseCommand
 
         if (empty($changes)):
             $this->normal('No changes were detected'.PHP_EOL);
-        exit;
+            exit;
         endif;
 
         if (in_array('--dry-run', $argOpts)):
             $this->info('Migrations :'.PHP_EOL);
 
-        foreach ($changes as $migration) :
+            foreach ($changes as $migration) :
                 $this->normal("\t --".$migration->name.PHP_EOL);
-        endforeach;
-        exit;
+            endforeach;
+            exit;
         endif;
 
         $this->_writeMigrations($changes);
@@ -73,17 +73,17 @@ class Makemigrations extends BaseCommand
 
             $content = $migration->asString();
 
-        $fileName = $migration->name;
-        $this->normal('  '.$fileName.'.php', true);
+            $fileName = $migration->name;
+            $this->normal('  '.$fileName.'.php', true);
 
-        foreach ($migration->operations as $op) :
+            foreach ($migration->operations as $op) :
                 $this->normal(sprintf('   - %s', ucwords($op->describe())), true);
-        endforeach;
+            endforeach;
 
             // write content to file.
             $handler = new FileHandler(BaseOrm::getMigrationsPath(), $fileName);
 
-        $handler->write($content);
+            $handler->write($content);
         endforeach;
     }
 

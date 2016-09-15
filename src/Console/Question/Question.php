@@ -86,6 +86,7 @@ class Question extends Object
 
         return $this;
     }
+
     /**
      * Gets the validator for the question.
      *
@@ -95,6 +96,7 @@ class Question extends Object
     {
         return $this->validator;
     }
+
     /**
      * Sets the maximum number of attempts.
      *
@@ -115,6 +117,7 @@ class Question extends Object
 
         return $this;
     }
+
     /**
      * Gets the maximum number of attempts.
      *
