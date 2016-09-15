@@ -1,3 +1,4 @@
+[![Documentation Status](https://readthedocs.org/projects/powerorm/badge/?version=gh-pages)](http://powerorm.readthedocs.io/en/gh-pages/?badge=gh-pages)
 [![StyleCI](https://styleci.io/repos/50822043/shield?style=flat)](https://styleci.io/repos/50822043)
 [![Build Status](https://travis-ci.org/eddmash/powerorm.svg?branch=master)](https://travis-ci.org/eddmash/powerorm)
 [![Latest Stable Version](https://poser.pugx.org/eddmash/powerorm/v/stable)](https://packagist.org/packages/eddmash/powerorm)
