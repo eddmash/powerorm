@@ -11,17 +11,5 @@ composer.lock
 #-------------------------
 .idea
 
-
-#-------------------------
-# User Guide Temp Files
-#-------------------------
-docs/build/*
-docs/cilexer/build/*
-docs/cilexer/dist/*
-docs/cilexer/pycilexer.egg-info/*
-
-
-#-------------------------
-# API Temp Files
-#-------------------------
-api/raw
+api
+docs
