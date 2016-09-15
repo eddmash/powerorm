@@ -1,8 +1,8 @@
 <?php
 
-namespace eddmash\powerorm\checks;
+namespace Eddmash\PowerOrm\Checks;
 
-use eddmash\powerorm\console\Base;
+use Eddmash\PowerOrm\Console\Base;
 
 /**
  * @since 1.0.0
@@ -33,7 +33,7 @@ abstract class CheckMessage extends Base
         $this->id = $id;
     }
 
-    public function is_serious()
+    public function isSerious()
     {
         return $this->level >= static::ERROR;
     }
@@ -42,79 +42,12 @@ abstract class CheckMessage extends Base
     {
         return sprintf('Issue %1$s : (%2$s) %3$s %4$s', $this->id, $this->context, $this->message, $this->hint);
     }
-}
 
-/**
- * Class Error.
- *
- * @since 1.0.0
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class Error extends CheckMessage
-{
-    public function __construct($msg, $hint = null, $context = null, $id = null)
+    public static function createObject($config)
     {
-        parent::__construct(CheckMessage::ERROR, $msg, $hint, $context, $id);
-    }
-}
+        $message = $hint = $context = $id = '';
+        extract($config);
 
-/**
- * Class Warning.
- *
- * @since 1.0.0
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class Warning extends CheckMessage
-{
-    public function __construct($msg, $hint = null, $context = null, $id = null)
-    {
-        parent::__construct(CheckMessage::WARNING, $msg, $hint, $context, $id);
-    }
-}
-
-/**
- * Class Info.
- *
- * @since 1.0.0
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class Info extends CheckMessage
-{
-    public function __construct($msg, $hint = null, $context = null, $id = null)
-    {
-        parent::__construct(CheckMessage::INFO, $msg, $hint, $context, $id);
-    }
-}
-
-/**
- * Class Debug.
- *
- * @since 1.0.0
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class Debug extends CheckMessage
-{
-    public function __construct($msg, $hint = null, $context = null, $id = null)
-    {
-        parent::__construct(CheckMessage::DEBUG, $msg, $hint, $context, $id);
-    }
-}
-
-/**
- * Class Critical.
- *
- * @since 1.0.0
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class Critical extends CheckMessage
-{
-    public function __construct($msg, $hint = null, $context = null, $id = null)
-    {
-        parent::__construct(CheckMessage::CRITICAL, $msg, $hint, $context, $id);
+        return new static($message, $hint, $context, $id);
     }
 }
