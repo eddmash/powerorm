@@ -2,8 +2,6 @@
 /**
  * Bootstrap the application.
  */
-
-
 use Eddmash\PowerOrm\Autoloader\Autoloader;
 use Eddmash\PowerOrm\Config\OrmConfig;
 
@@ -20,16 +18,14 @@ else :
     define('POWERORM_SRCPATH', APPPATH.'libraries/powerorm/src'.DIRECTORY_SEPARATOR);
 endif;
 
-
 $autoloadFile = POWERORM_BASEPATH.'vendor/autoload.php';
-if(file_exists($autoloadFile)): 
+if(file_exists($autoloadFile)):
     require $autoloadFile;
 else:
     require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';
     require POWERORM_SRCPATH.'Autoloader/Config/BaseConfig.php';
     require_once POWERORM_SRCPATH.'Autoloader/Config/OrmConfig.php';
 endif;
-
 
 // setup Autoloader
 $loader = new Autoloader();

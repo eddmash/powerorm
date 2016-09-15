@@ -1,7 +1,6 @@
 <?php
 
 namespace Eddmash\PowerOrm\Config;
- 
 
 /**
  * Borrowed from CodeIgniter 4.
