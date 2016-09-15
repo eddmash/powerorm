@@ -15,7 +15,9 @@ This model will then not be used to create any database table.
 Instead, when it is used as a base class for other models, its fields will be added to those of the child class.
 
 Any fields defined in the Abstract that are again defined in the Child class will be over written by those in the
-child class.::
+child class.:
+
+.. code-block:: php
 
 	abstract class CommonInfo extends PModel{
 	      public function fields(){
