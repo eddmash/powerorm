@@ -1,14 +1,12 @@
 <?php
 
-namespace eddmash\powerorm\model;
+namespace Eddmash\PowerOrm\Model;
 
-use eddmash\powerorm\app\Registry;
-use eddmash\powerorm\Contributor;
-use eddmash\powerorm\model\field\AutoField;
-use eddmash\powerorm\model\field\Field;
-use eddmash\powerorm\model\field\RelatedField;
-use eddmash\powerorm\Object;
-use Orm;
+use Eddmash\PowerOrm\app\Registry;
+use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Model\field\AutoField;
+use Eddmash\PowerOrm\Model\field\Field;
+use Eddmash\PowerOrm\Object;
 
 /**
  * Class Meta.
@@ -17,23 +15,89 @@ use Orm;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Meta extends Object implements Contributor
+class Meta extends Object implements MetaInterface
 {
-    const DEFAULT_NAMES = ['registry', 'verbose_name'];
+    const DEBUG_IGNORE = ['scopeModel', 'registry', 'localManyToMany', 'localFields', 'concreteModel', 'overrides'];
 
-    public $model_name;
-    public $has_auto_field = false;
-    public $auto_field;
-    public $db_table;
-    public $primary_key;
-    public $fields = [];
-    public $relations_fields = [];
-    public $local_fields = [];
-    public $inverse_fields = [];
-    public $trigger_fields = [];
+    const DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy'];
+
+    /**
+     * Th name of the model this meta holds information for.
+     *
+     * @var string
+     */
+    public $modelName;
+
+    public $verboseName;
+
     public $managed;
     public $proxy;
-    public $abstract;
+    /**
+     * Does this model have an autofield, will have if primary key was set automatically.
+     *
+     * @var bool
+     */
+    public $hasAutoField = false;
+
+    /**
+     * The AutoField.
+     *
+     * @var Field
+     */
+    public $autoField;
+
+    /**
+     * The name of the table the model represents.
+     *
+     * @var string
+     */
+    public $dbTable;
+
+    /**
+     * The primary key for the model.
+     *
+     * @var Field
+     */
+    public $primaryKey;
+
+    /**
+     * Holds the parents of the model, this is mostly for multi-inheritance.
+     *
+     * @var array
+     */
+    public $parents = [];
+
+    /**
+     * Holds many to many relationship that the model initiated.
+     *
+     * @var array
+     */
+    public $localManyToMany = [];
+
+    /**
+     * This holds fields that belong to the model, i.e when we create the table to represent the model,
+     * this field will be represented on that table.
+     *
+     * @var array
+     */
+    public $localFields = [];
+    public $inverseFields = [];
+
+    /**
+     * Holds the model that this meta represents, the reason for this is because we have proxy models which
+     * don't represent actual tables in the database.
+     *
+     * @var Model
+     */
+    public $scopeModel;
+
+    /**
+     * Applies to models that are not abstract, at the end of a proxy relationship, if model is not a proxy,
+     * the concreteModel is the model itself.
+     *
+     * @var Model
+     */
+    public $concreteModel;
 
     /**
      * Holds the registry the model is attached to.
@@ -43,7 +107,7 @@ class Meta extends Object implements Contributor
     public $registry;
 
     // todo
-    public $unique_together = [];
+    public $uniqueTogether = [];
 
     /**
      * This will hold items that will be overriden in the current meta instance.
@@ -57,139 +121,137 @@ class Meta extends Object implements Contributor
      *
      * @var bool
      */
-    public $auto_created = false;
+    public $autoCreated = false;
 
     public function __construct($overrides = [])
     {
         $this->overrides = $overrides;
-//        $this->registry = BaseOrm::instance()->get_registry();
-    }
-
-    public function add_field($field_obj)
-    {
-        $this->fields[$field_obj->name] = $field_obj;
-        $this->set_pk($field_obj);
-
-        if ($field_obj instanceof RelatedField):
-            $this->relations_fields[$field_obj->name] = $field_obj;
-        else:
-            $this->local_fields[$field_obj->name] = $field_obj;
-        endif;
-
-        $this->load_inverse_field($field_obj);
     }
 
     /**
-     * @param Field $field_obj
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
-    public function load_inverse_field($field_obj)
+    public function getFields()
     {
-        if ($field_obj->is_inverse()):
-            $this->inverse_fields[$field_obj->name] = $field_obj;
-        endif;
-    }
-
-    public function get_field($field_name)
-    {
-        return (array_key_exists($field_name, $this->fields)) ? $this->fields[$field_name] : null;
-    }
-
-    public function set_pk($field_obj)
-    {
-        if ($field_obj->primary_key):
-            $this->primary_key = $field_obj;
-        endif;
-    }
-
-    public function get_fields_names()
-    {
-        return array_keys($this->fields);
+        // TODO: Implement getFields() method.
     }
 
     /**
-     * Makes sure the model is ready for use.
-     *
-     * @param BaseModel $model
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
-    public function prepare(BaseModel $model)
+    public function getConcreteFields()
     {
-        if (empty($this->primary_key)):
-            $model->add_to_class('id', new AutoField());
-        endif;
+        // TODO: Implement getConcreteFields() method.
+    }
+
+    public function getRelatedObjects()
+    {
+        // TODO: Implement getRelatedObjects() method.
     }
 
     /**
-     * @param string    $name
-     * @param BaseModel $obj
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
-    public function contribute_to_class($name, $obj)
+    public function contributeToClass($propertyName, $classObject)
     {
-        $obj->{$name} = $this;
-        $this->model_name = $this->standard_name($obj->get_class_name());
-        $this->db_table = $obj->get_table_name();
-        $this->managed = $obj->is_managed();
-        $this->abstract = $this->_is_abstract($obj);
-        $this->proxy = $obj->is_proxy();
+        $classObject->{$propertyName} = $this;
+        $this->modelName = $this->normalizeKey($classObject->getShortClassName());
+        $this->scopeModel = $classObject;
 
-        foreach (self::DEFAULT_NAMES as $default_name) :
-            if (array_key_exists($default_name, $this->overrides)):
-                $this->{$default_name} = $this->overrides[$default_name];
+        // override with the configs now.
+        foreach (self::DEFAULT_NAMES as $defaultName) :
+
+            if (array_key_exists($defaultName, $this->overrides)):
+
+                $this->{$defaultName} = $this->overrides[$defaultName];
             endif;
         endforeach;
+
+        $vName = $this->verboseName;
+        $this->verboseName = (empty($vName)) ? ucwords(StringHelper::camelToSpace($this->modelName)) : $vName;
     }
 
-    public function can_migrate()
+    private function _getFields($opts)
     {
-        return $this->managed && !$this->proxy;
-    }
-
-    private function _is_abstract($obj)
-    {
-        $reflection = new \ReflectionClass($obj);
-
-        return $reflection->isAbstract();
+        $forward = $reverse = $include_parents = true;
+        $include_hidden = false;
+        $seen_models = null;
+        extract($opts);
     }
 
     /**
-     * Get all fields that connect to this model inversely not directly i.e the field just point to this model but its
-     * not defined on the model e.g. by usingg hasmanyfield() or hasonefield().
+     * {@inheritdoc}
+     */
+    public function addField($field)
+    {
+        if ($field->isRelation && $field->manyToMany):
+            $this->localManyToMany[$field->name] = $field;
+        else:
+            $this->localFields[$field->name] = $field;
+            $this->setupPrimaryKey($field);
+        endif;
+    }
+
+    /**
+     * Set the primary key field of the model.
      *
-     * @return array
+     * @param Field $field
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function get_reverse_fields()
+    public function setupPrimaryKey($field)
     {
-        $app_models = Orm::get_registry()->get_models();
+        if (!$this->primaryKey and $field->primaryKey):
+            $this->primaryKey = $field;
+        endif;
+    }
 
-        $reverse = [];
-        foreach ($app_models as $name => $app_model) :
-            foreach ($app_model->meta->relations_fields as $fname => $field) :
+    /**
+     * @param Model $model
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function prepare($model)
+    {
+        if (empty($this->primaryKey)):
+            if (empty($this->parents)):
 
-                if ($field->is_relation && !empty($field->relation->model) &&
-                    $field->relation->model === $this->model_name
-                ):
+                // todo $this->setupPrimaryKey($field);
+            else:
+                $field = new AutoField(['verboseName' => 'ID', 'primaryKey' => true, 'autoCreated' => true]);
+                $model->addToClass('id', $field);
+            endif;
+        endif;
+    }
 
-                    $reverse[$field->name] = $field;
-                endif;
-            endforeach;
+    /**
+     * @param Model $parent
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function setupProxy($parent)
+    {
+        $this->dbTable = $parent->meta->dbTable;
+        $this->primaryKey = $parent->meta->primaryKey;
+    }
 
+    public function __debugInfo()
+    {
+        $meta = [];
+        foreach (get_object_vars($this) as $name => $value) :
+            if (in_array($name, self::DEBUG_IGNORE)):
+                $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
+                continue;
+            endif;
+            $meta[$name] = $value;
         endforeach;
 
-        return $reverse;
+        return $meta;
     }
 }

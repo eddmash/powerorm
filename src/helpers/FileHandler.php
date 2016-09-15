@@ -1,8 +1,17 @@
 <?php
 
-namespace eddmash\powerorm\helpers;
+/*
+* This file is part of the powerorm package.
+*
+* (c) Eddilbert Macharia <edd.cowan@gmail.com>
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
-use eddmash\powerorm\Object;
+namespace Eddmash\PowerOrm\Helpers;
+
+use Eddmash\PowerOrm\Object;
 
 /**
  * Responsible for creating files. creates files with the extension "php".
@@ -15,16 +24,16 @@ class FileHandler extends Object
 {
     public $path;
     public $content;
-    public $file_name;
+    public $fileName;
 
     /**
-     * @param string $folder    the absolute path to the folder to be created/read from
-     * @param string $file_name the specific file to handle in the folder specified
+     * @param string $folder   the absolute path to the folder to be created/read from
+     * @param string $fileName the specific file to handle in the folder specified
      */
-    public function __construct($folder, $file_name = '')
+    public function __construct($folder, $fileName = '')
     {
         $this->path = $folder;
-        $this->file_name = $file_name;
+        $this->fileName = $fileName;
     }
 
     /**
@@ -39,33 +48,33 @@ class FileHandler extends Object
         endif;
 
         // absolute path to file
-        $file = $this->path.$this->file_name.'.php';
+        $file = $this->path.$this->fileName.'.php';
 
-        $file_handle = fopen($file, 'w');
-        if ($file_handle):
-            fprintf($file_handle, $content);
-            fclose($file_handle);
+        $fileHandle = fopen($file, 'w');
+        if ($fileHandle):
+            fprintf($fileHandle, $content);
+            fclose($fileHandle);
 
             chmod($file, 0777);
 
         endif;
     }
 
-    public function get_path_files($ext = 'php', $recurse = true)
+    public function getPathFiles($ext = 'php', $recurse = true)
     {
-        return $this->read_dir($ext, $recurse);
+        return $this->readDir($ext, $recurse);
     }
 
-    public function get_file($name = '', $ext = 'php')
+    public function getFile($name = '', $ext = 'php')
     {
-        $ext = $this->stable_ext($ext);
-        $files = $this->_read_dir($ext, true, true);
+        $ext = $this->_stableExt($ext);
+        $files = $this->_readDir($ext, true, true);
 
-        $name = $this->standard_name($name);
+        $name = $this->normalizeKey($name);
 
         foreach ($files as $file) :
-            $file_name = $file->getBaseName('.'.$ext);
-            if ($this->standard_name($file_name) == $name && $file->getExtension() == $ext):
+            $fileName = $file->getBaseName('.'.$ext);
+            if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext):
                 return $file;
             endif;
 
@@ -82,9 +91,9 @@ class FileHandler extends Object
      *
      * @return array
      */
-    public function read_dir($ext = 'php', $recurse = true)
+    public function readDir($ext = 'php', $recurse = true)
     {
-        return $this->_read_dir($ext, $recurse);
+        return $this->_readDir($ext, $recurse);
     }
 
     /**
@@ -92,7 +101,7 @@ class FileHandler extends Object
      *
      * @param string     $ext
      * @param bool|true  $recurse
-     * @param bool|false $file_obj if true returns a file object, if false returns a file pathname
+     * @param bool|false $_fileObj if true returns a file object, if false returns a file pathname
      *
      * @return array
      *
@@ -100,14 +109,14 @@ class FileHandler extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _read_dir($ext = 'php', $recurse = true, $file_obj = false)
+    public function _readDir($ext = 'php', $recurse = true, $_fileObj = false)
     {
-        $file_list = [];
+        $_fileList = [];
 
         // check if some put the extension beginning with the "."
-        $ext = $this->stable_ext($ext);
+        $ext = $this->_stableExt($ext);
 
-        $directory = $this->stable_dir($this->path);
+        $directory = $this->_stableDir($this->path);
 
         $dirIterator = new \DirectoryIterator($directory);
 
@@ -117,48 +126,48 @@ class FileHandler extends Object
             endif;
 
             if ($file->isDir() && $recurse):
-                foreach ($file as $inner_file) :
-                    $file_list = $this->_add_file($file_list, $inner_file, $ext, $file_obj);
+                foreach ($file as $innerFile) :
+                    $_fileList = $this->_addFile($_fileList, $innerFile, $ext, $_fileObj);
                 endforeach;
             else:
-                $file_list = $this->_add_file($file_list, $file, $ext, $file_obj);
+                $_fileList = $this->_addFile($_fileList, $file, $ext, $_fileObj);
             endif;
         endforeach;
 
-        return $file_list;
+        return $_fileList;
     }
 
-    public function _add_file(array $file_list, \SplFileInfo $file, $ext, $file_obj)
+    public function _addFile(array $_fileList, \SplFileInfo $file, $ext, $_fileObj)
     {
         if (!empty($ext)):
             if ($ext == $file->getExtension()):
-                if ($file_obj):
-                    $file_list[] = clone $file;
+                if ($_fileObj):
+                    $_fileList[] = clone $file;
                 else:
-                    $file_list[] = $file->getPathname();
+                    $_fileList[] = $file->getPathname();
                 endif;
             endif;
 
-            return $file_list;
+            return $_fileList;
         endif;
 
         // add everything
-        if ($file_obj):
-            $file_list[] = clone $file;
+        if ($_fileObj):
+            $_fileList[] = clone $file;
         else:
-            $file_list[] = $file->getPathname();
+            $_fileList[] = $file->getPathname();
         endif;
 
-        return $file_list;
+        return $_fileList;
     }
 
-    public function stable_ext($ext)
+    public function _stableExt($ext)
     {
         // does it start with a `.` trim it
         return (preg_match("/^\./", $ext)) ? ltrim($ext, '.') : $ext;
     }
 
-    public function stable_dir($name)
+    public function _stableDir($name)
     {
         return (preg_match("/\/$/", $name)) ? $name : $name.'/';
     }

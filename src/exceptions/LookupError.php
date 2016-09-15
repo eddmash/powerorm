@@ -5,7 +5,7 @@
  * Date: 7/16/16
  * Time: 9:45 PM.
  */
-namespace eddmash\powerorm\exceptions;
+namespace Eddmash\PowerOrm\Exceptions;
 
 /**
  * Class LookupError.

@@ -1,6 +1,6 @@
 <?php
 
-namespace eddmash\powerorm\exceptions;
+namespace Eddmash\PowerOrm\Exceptions;
 
 /**
  * Class DuplicateField.

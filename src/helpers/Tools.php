@@ -1,8 +1,8 @@
 <?php
 
-namespace eddmash\powerorm\helpers;
+namespace Eddmash\PowerOrm\Helpers;
 
-use eddmash\powerorm\DeConstructable;
+use Eddmash\PowerOrm\DeConstructableInterface;
 
 /**
  * Class Tools.
@@ -13,7 +13,11 @@ use eddmash\powerorm\DeConstructable;
  */
 class Tools
 {
-    public static function invoke_callback($callback, $model, $kwargs = [])
+    public static function normalizeKey($name){
+        return strtolower($name);
+    }
+
+    public static function invokeCallback($callback, $model, $kwargs = [])
     {
         $callback($model, $kwargs);
     }
@@ -36,96 +40,94 @@ class Tools
      */
     public static function stringify($data, $indent = 1, $close = '', $start = '', $level = 0)
     {
-        $indent_character = "\t";
+        $indentCharacter = "\t";
         $linebreak = PHP_EOL;
-        $string_state = '';
+        $stringState = '';
 
-        if ($indent == false):
+        if ($indent == false) {
             $linebreak = '';
-            $indent_character = '';
+            $indentCharacter = '';
             $indent = 0;
-        endif;
+        }
 
-        if (!empty($start)):
-            $string_state .= str_repeat($indent_character, $indent)."$start";
-        endif;
+        if (!empty($start)) {
+            $stringState .= str_repeat($indentCharacter, $indent)."$start";
+        }
 
         $totalCount = (is_array($data)) ? count($data) : 1;
         $counter = 1;
 
         // unify everything to an array, on the first round for consistencies.
-        if ($level == 0):
+        if ($level == 0) {
             $data = [$data];
-        endif;
+        }
 
-        foreach ($data as $key => $value) :
+        foreach ($data as $key => $value) {
+            $stringState .= str_repeat($indentCharacter, $indent);
 
-            $string_state .= str_repeat($indent_character, $indent);
+            $nextIndent = ($indent == false) ? $indent : $indent + 1;
 
-            $next_indent = ($indent == false) ? $indent : $indent + 1;
-
-            if (is_array($value)):
+            if (is_array($value)) {
                 // HANDLE VALUE IF ARRAY
 
-                $string_state .= '['.$linebreak;
+                $stringState .= '['.$linebreak;
 
-                if (!is_numeric($key)):
-                    $string_state .= "'$key'=>";
-                endif;
+                if (!is_numeric($key)) {
+                    $stringState .= "'$key'=>";
+                }
 
-                $string_state .= self::stringify($value, $next_indent, $close, $start, ++$level);
+                $stringState .= self::stringify($value, $nextIndent, $close, $start, ++$level);
 
-                $string_state .= $linebreak;
-                $string_state .= ($indent != false) ? str_repeat($indent_character, $indent - 1) : '';
-                $string_state .= ']';
-            elseif (is_object($value)):
+                $stringState .= $linebreak;
+                $stringState .= ($indent != false) ? str_repeat($indentCharacter, $indent - 1) : '';
+                $stringState .= ']';
+            } elseif (is_object($value)) {
 
-                // HANDLE VALUE THAT ARE OBJECTS THAT IMPLEMENT DeConstructable interface
+                // HANDLE VALUE THAT ARE OBJECTS THAT IMPLEMENT DeConstructableInterface interface
 
-                if ($value instanceof DeConstructable):
+                if ($value instanceof DeConstructableInterface) {
                     $skel = $value->skeleton();
 
-                    $class = $skel['full_name'];
+                    $class = $skel['fullName'];
 
-                    $constructor_args = $skel['constructor_args'];
+                    $constructorArgs = $skel['constructorArgs'];
 
-                    $string = self::stringify(reset($constructor_args), $next_indent, $close, $start, ++$level);
+                    $string = self::stringify(reset($constructorArgs), $nextIndent, $close, $start, ++$level);
 
-                    $string_state .= sprintf('%1$s(%2$s)', $class, $string);
-                endif;
-            else:
+                    $stringState .= sprintf('%1$s(%2$s)', $class, $string);
+                }
+            } else {
 
                 // HANDLE VALUE IF ITS NOT OBJECT OR ARRAY
 
-                $string_state .= (!is_numeric($key)) ? "'$key'=>" : '';
+                $stringState .= (!is_numeric($key)) ? "'$key'=>" : '';
 
-                if ($value === false):
-                    $string_state .= 'FALSE';
-                elseif ($value === true):
-                    $string_state .= 'TRUE';
-                elseif ($value === null):
-                    $string_state .= 'NULL';
-                elseif (is_numeric($value)):
-                    $string_state .= "$value";
-                else:
-                    $string_state .= "'$value'";
-                endif;
+                if ($value === false) {
+                    $stringState .= 'FALSE';
+                } elseif ($value === true) {
+                    $stringState .= 'TRUE';
+                } elseif ($value === null) {
+                    $stringState .= 'NULL';
+                } elseif (is_numeric($value)) {
+                    $stringState .= "$value";
+                } else {
+                    $stringState .= "'$value'";
+                }
+            }
 
-            endif;
-
-            if ($counter != $totalCount && !$level == 0):
-                $string_state .= ', '.$linebreak;
-            endif;
+            if ($counter != $totalCount && !$level == 0) {
+                $stringState .= ', '.$linebreak;
+            }
 
             ++$counter;
-        endforeach;
+        }
 
-        if (!empty($close)):
-            $string_state .= $close;
-            $string_state .= $linebreak;
-        endif;
+        if (!empty($close)) {
+            $stringState .= $close;
+            $stringState .= $linebreak;
+        }
 
-        return $string_state;
+        return $stringState;
     }
 
     /**
@@ -137,7 +139,7 @@ class Tools
      *
      * @return mixed
      */
-    public static function read_json($full_file_path, $ass_array = false)
+    public static function readJson($full_file_path, $ass_array = false)
     {
         $data = file_get_contents($full_file_path);
 
@@ -147,18 +149,18 @@ class Tools
     /** returns a list of countries and there codes
      * @return array
      */
-    public static function countries_list()
+    public static function countriesList()
     {
         $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/countries.json';
-        $countries = self::read_json($path, true);
+        $countries = self::readJson($path, true);
 
-        $list_countries = array();
+        $listCountries = array();
 
         foreach ($countries['Names'] as $code => $value) {
-            $list_countries[$code] = $value;
+            $listCountries[$code] = $value;
         }
 
-        return $list_countries;
+        return $listCountries;
     }
 
     /**
@@ -168,11 +170,11 @@ class Tools
      *
      * @return mixed
      */
-    public static function get_country($code)
+    public static function getCountry($code)
     {
-        $list_countries = self::countries_list();
+        $listCountries = self::countriesList();
 
-        return $list_countries[$code];
+        return $listCountries[$code];
     }
 
     /**
@@ -180,18 +182,18 @@ class Tools
      *
      * @return array
      */
-    public static function phone_codes_list()
+    public static function phoneCodesList()
     {
         $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/phone.json';
-        $phone_codes = self::read_json($path, true);
+        $phone_codes = self::readJson($path, true);
 
-        $list_codes = array();
+        $listCodes = array();
 
         foreach ($phone_codes as $code => $value) {
-            $list_codes[$code] = $value;
+            $listCodes[$code] = $value;
         }
 
-        return $list_codes;
+        return $listCodes;
     }
 
     /**
@@ -202,13 +204,13 @@ class Tools
      *
      * @return mixed
      */
-    public static function get_phone_code_country($code, $show_country_code = false)
+    public static function getPhoneCodeCountry($code, $show_country_code = false)
     {
-        $list_phone_codes = self::phone_codes_list();
-        $country = $list_phone_codes[$code];
+        $listPhoneCodes = self::phoneCodesList();
+        $country = $listPhoneCodes[$code];
 
         if ($show_country_code) {
-            $country = self::get_country($country);
+            $country = self::getCountry($country);
         }
 
         return $country;
@@ -219,18 +221,18 @@ class Tools
      *
      * @return array
      */
-    public static function currency_list()
+    public static function currencyList()
     {
         $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/currency.json';
-        $currency = self::read_json($path, true);
+        $currency = self::readJson($path, true);
 
-        $list_currency = array();
+        $listCurrency = array();
 
         foreach ($currency['Names'] as $code => $value) {
-            $list_currency[$code] = $value[1];
+            $listCurrency[$code] = $value[1];
         }
 
-        return $list_currency;
+        return $listCurrency;
     }
 
     /**
@@ -240,10 +242,10 @@ class Tools
      *
      * @return mixed
      */
-    public static function get_currency($code)
+    public static function getCurrency($code)
     {
-        $list_currency = self::currency_list();
+        $listCurrency = self::currencyList();
 
-        return $list_currency[$code];
+        return $listCurrency[$code];
     }
 }

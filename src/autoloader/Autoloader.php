@@ -84,14 +84,14 @@ class Autoloader
      *
      * @var array
      */
-    protected $prefixes = [];
+    public $prefixes = [];
 
     /**
      * Stores class name as key, and path as values.
      *
      * @var array
      */
-    protected $classmap = [];
+    public $classmap = [];
 
     //--------------------------------------------------------------------
 
@@ -351,5 +351,4 @@ class Autoloader
     }
 
     //--------------------------------------------------------------------
-
 }

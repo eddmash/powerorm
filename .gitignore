@@ -1,5 +1,6 @@
-# Created by .ignore support plugin (hsz.mobi)
-cs_fixer_tmp_*
 composer.lock
 vendor
-.php_cs
+.idea
+api
+docs
+!docs/index.html

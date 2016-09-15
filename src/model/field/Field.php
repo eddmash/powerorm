@@ -1,215 +1,31 @@
 <?php
-/**
- * The Model Field.
- */
-namespace eddmash\powerorm\model\field;
 
-use eddmash\powerorm\Contributor;
-use eddmash\powerorm\DeConstructable;
-use eddmash\powerorm\form\fields as form_fields;
-use eddmash\powerorm\helpers\Strings;
-use eddmash\powerorm\model\BaseModel;
-use eddmash\powerorm\model\field\relation\RelationObject;
-use eddmash\powerorm\NOT_PROVIDED;
-use eddmash\powerorm\Object;
+/*
+* This file is part of the powerorm package.
+*
+* (c) Eddilbert Macharia <edd.cowan@gmail.com>
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
-/**
- * Interface FieldInterface.
- *
- * @since 1.1.0
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-interface FieldInterface extends DeConstructable, Contributor
+namespace Eddmash\PowerOrm\Model\Field;
+
+use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Checks\CheckError;
+use Eddmash\PowerOrm\Exceptions\FieldError;
+use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Object;
+
+class Field extends Object implements FieldInterface
 {
-    /**
-     * Returns the database column data type for the Field, taking into account the connection.
-     *
-     * @return string
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function db_type($connection);
+    const DEBUG_IGNORE = ['scopeModel', 'relation'];
+
+    public $name;
 
     /**
-     * Convert the value to a php value.
-     *
-     * @param $value
-     *
-     * @return mixed
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function to_php($value);
-
-    /**
-     * Returns a powerorm.form.Field instance for this database Field.
-     *
-     * @return string
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function formfield($kwargs = []);
-
-    /**
-     * Method called prior to prepare_value_for_db() to prepare the value before being saved
-     * (e.g. for DateField.auto_now).
-     *
-     * model_instance is the instance this field belongs to and add is whether the instance is being saved to the
-     * database for the first time.
-     *
-     * It should return the value of the appropriate attribute from model_instance for this field.
-     * The attribute name is in $this->name (this is set up by Field).
-     *
-     * @param $model
-     * @param bool $add is whether the instance is being saved to the database for the first time
-     *
-     * @return mixed
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function pre_save($model, $add);
-
-    /**
-     * value is the current value of the model’s attribute, and the method should return data in a format that has been
-     * prepared for use as a parameter in a query.ie. in the database.
-     *
-     * @param $value
-     *
-     * @return mixed
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function prepare_value($value);
-
-    /**
-     * Converts value to a backend-specific value.
-     * By default it returns value if prepared=True and prepare_value() if is False.
-     *
-     * @param $value
-     * @param $connection
-     *
-     * @return mixed
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function prepare_value_for_db($value, $connection, $prepared = false);
-
-    /**
-     * Same as the prepare_value_for_db(), but called when the field value must be saved to the database.
-     *
-     * By default returns prepare_value_for_db().
-     *
-     * @param $value
-     * @param $connection
-     *
-     * @return mixed
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function prepare_value_before_save($value, $connection);
-
-    /**
-     * Converts a value as returned by the database to a PHP object. It is the reverse of prepare_value().
-     *
-     * This method is not used for most built-in fields as the database backend already returns the correct PHP type,
-     * or the backend itself does the conversion.
-     *
-     * @return mixed
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function from_db_value();
-}
-
-/**
- * This class represents a column in the database table.
- *
- * This class should not be instantiated
- *
- * @since 1.0.0
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-abstract class Field extends Object implements FieldInterface
-{
-    const BLANK_CHOICE_DASH = ['' => '---------'];
-
-    /**
-     * @ignore
-     *
-     * @var null
-     */
-    public $name = null;
-
-    /**
-     * The maximum length (in characters) of the field.
-     *
-     * @var
-     */
-    public $max_length;
-
-    /**
-     * Indicate if this is an inverse relation field.
-     *
-     * @var bool
-     */
-    public $inverse = false;
-
-    /**
-     * @ignore
-     *
-     * @var bool
-     */
-    public $M2M = false;
-
-    /**
-     * @ignore
-     *
-     * @var bool
-     */
-    public $M2O = false;
-
-    /**
-     * @ignore
-     *
-     * @var bool
-     */
-    public $O2O = false;
-
-    /**
-     * A human-readable name for the field. If the verbose name isn’t given, Powerorm will automatically create it using
-     * the field’s attribute name, converting underscores to spaces.
-     *
-     * @var string
-     */
-    public $verbose_name = null;
-
-    /**
-     * @ignore
-     *
-     * @var string
-     */
-    public $type;
-
-    /**
-     * If True, powerorm will store empty values as NULL in the database. Default is False i.e NOT NULL.
+     * If True, the orm will store empty values as NULL in the database. Default is False i.e NOT NULL.
      *
      * @var bool
      */
@@ -229,7 +45,6 @@ abstract class Field extends Object implements FieldInterface
      * @var bool
      */
     public $unique = false;
-
     /**
      * If True, this field is the primary key for the model.
      *
@@ -246,66 +61,51 @@ abstract class Field extends Object implements FieldInterface
      *
      * @var bool
      */
-    public $primary_key = false;
+    public $primaryKey = false;
 
     /**
-     * The default value for the field.
+     * The maximum length (in characters) of the field.
      *
-     * @var
+     * @var int
      */
-    public $default;
-
-    /**
-     * @ignore
-     *
-     * @var null
-     */
-    public $db_column = null;
+    public $maxLength;
 
     /**
      * If True, this field will be indexed.
      *
-     * @var null
+     * @var bool
      */
-    public $db_index = false;
+    public $dbIndex = false;
 
     /**
-     * if this is a relationship field, this hold the Relationship object that this field represents.
+     * The default value for the field.
      *
-     * @var RelationObject
+     * @var mixed
      */
-    public $relation = null;
+    public $default = NOT_PROVIDED;
 
     /**
-     * Indicates if this field is  relationship field.
+     * This is the attribute name on the scope model that is going to be bound to the model its going to be used to
+     * access this field from the model like normal class attributes.
+     *
+     * @var string
+     */
+    protected $attrName;
+
+    /**
+     * Human friendly name.
+     *
+     * @var string
+     */
+    public $verboseName;
+
+    /**
+     * indicates if this field automatically created by the orm. eg
+     * in most case the 'id' field of most models is automatically created.
      *
      * @var bool
      */
-    public $is_relation = false;
-
-    /**
-     * Model that this field is attached to.
-     *
-     * @var BaseModel
-     */
-    public $container_model;
-
-    // =====================  form specifics
-
-    /**
-     * If True, the field is allowed to be blank on form. Default is False.
-     *
-     * Note that this is different than null. null is purely database-related,
-     *
-     * whereas form_blank is validation-related.
-     *
-     * If a field has form_blank=True, form validation will allow entry of an empty value.
-     *
-     * If a field has form_blank=False, the field will be required.
-     *
-     * @var bool
-     */
-    public $form_blank = false;
+    public $autoCreated;
 
     /**
      * An array consisting of items to use as choices for this field.
@@ -322,7 +122,7 @@ abstract class Field extends Object implements FieldInterface
      *      'f'=>'Female',
      * ]
      *
-     * $gender =  ORM::CharField(['max_length'=2, 'choices'=$gender_choices])
+     * $gender =  PModel::CharField(['max_length'=2, 'choices'=$gender_choices])
      *
      * @var
      */
@@ -333,263 +133,272 @@ abstract class Field extends Object implements FieldInterface
      * It’s useful for documentation even if your field isn’t used on a form.
      *
      * Note that this value is not HTML-escaped in automatically-generated forms.
-     * This lets you include HTML in help_text if you so desire.
+     * This lets you include HTML in helpText if you so desire.
      *
      * For example:
-     *  <pre><code>help_text="Please use the following format: <em>YYYY-MM-DD</em>."</code></pre>
+     *  <pre><code>helpText="Please use the following format: <em>YYYY-MM-DD</em>."</code></pre>
      *
      * @var
      */
-    public $help_text;
+    public $helpText;
+    /**
+     * The name of the column that this field maps to on the database table represented by the scope model.
+     *
+     * @var string
+     */
+    public $dbColumn;
 
     /**
-     * @ignore
+     * if this is a relationship field, this hold the Relationship object that this field represents.
      *
-     * @var
+     * @var RelationObject
      */
-    private $constructor_args;
+    public $remoteField;
 
     /**
-     * Takes in options to determine how to create the field.
+     * Indicates if this field is  relationship field.
      *
-     * @param array $field_options the options to use
+     * @var bool
      */
-    public function __construct($field_options = [])
+    public $isRelation = false;
+
+    /**
+     * Indicates if this is a concrete field that can be represented by a column in the database table.
+     *
+     * @var bool
+     */
+    public $concrete;
+
+    /**
+     * The model to which this field belongs to.
+     *
+     * @var Model
+     */
+    public $scopeModel;
+
+    public function __construct($config = [])
     {
-        // if some passes type remove it,
-        // we don't people breaking our perfect flow of things.
-        if (isset($field_options['type'])):
-            unset($field_options['type']);
-        endif;
-
-        $this->default = NOT_PROVIDED::instance();
-
-        $this->constructor_args = $field_options;
-
-        // replace the default options with the ones passed in.
-        foreach ($field_options as $key => $value) :
-            // only replace those that exist do not set new ones
-            if ($this->has_property($key)):
-                $this->{$key} = $value;
-            endif;
-        endforeach;
-
-        // null status
-        if ($this->primary_key):
-            $this->null = false;
-        endif;
-
-        if (!in_array('form_blank', $field_options)):
-            $this->form_blank = $this->null;
-        endif;
+        BaseOrm::configure($this, $config);
     }
 
-    public static function instance($opts)
+    public static function createObject($config = [])
     {
-        return new static($opts);
+        return new static($config);
     }
 
     /**
-     * Calculates the actual column name in the database, especially useful for foreign keys.
+     * {@inheritdoc}
+     */
+    public function contributeToClass($fieldName, $modelObject)
+    {
+        if(!StringHelper::isValidVariableName($fieldName)):
+            throw new FieldError(
+                sprintf(' "%s" is not a valid field name on model "%s" .', $fieldName, $modelObject->getFullClassName()));
+        endif;
+
+        $this->setFromName($fieldName);
+        $this->scopeModel = $modelObject;
+        $modelObject->meta->addField($this);
+    }
+
+    /**
+     * set some values using the field name passed in. called in contributeToClass.
+     *
+     * @param $fieldName
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function setFromName($fieldName)
+    {
+        if (empty($this->name)):
+            $this->name = $fieldName;
+        endif;
+        $this->attrName = $this->getAttrName();
+        $this->dbColumn = $this->getColumnName();
+        $this->concrete = empty($this->dbColumn);
+
+        if (empty($this->verboseName)):
+            $this->verboseName = ucwords(str_replace('_', ' ', $this->name));
+        endif;
+    }
+
+    /**
+     * The name of the database column to use for this field.
      *
      * @return string
-     */
-    public function db_column_name()
-    {
-        return $this->standard_name($this->name);
-    }
-
-    /**
-     * @ignore
-     */
-    public function __validate_name()
-    {
-    }
-
-    /**
-     * Returns all the necessary items needed for recreation of the field again.
      *
-     * @return array
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getColumnName()
+    {
+        return (empty($this->dbColumn)) ? $this->getAttrName() : $this->dbColumn;
+    }
+
+    /**
+     * The attribute in the scope model the points to this field.
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getAttrName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Returns true if this field is primaru key or marked as unique.
+     *
+     * @return bool
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function isUnique()
+    {
+        return $this->unique || $this->primaryKey;
+    }
+
+    public function hasDefault()
+    {
+        return $this->default !== NOT_PROVIDED;
+    }
+
+    public function getDefault()
+    {
+        if ($this->hasDefault()):
+            if (is_callable($this->default)):
+                return call_user_func($this->default);
+            endif;
+
+            return $this->default;
+        endif;
+
+        return '';
+    }
+
+    public function checks() {
+        $errors = [];
+        $errors = array_merge($errors, $this->_checkFieldName());
+
+        return $errors;
+    }
+
+    public function _checkFieldName() {
+        $errors = [];
+
+        if(!StringHelper::isValidVariableName($this->name)):
+            $errors = [
+                CheckError::createObject([
+                    'message' => sprintf(' "%s" is not a valid field name on model %s .',
+                                            $this->name, $this->scopeModel->getFullClassName()),
+                    'hint' => null,
+                    'context' => $this,
+                    'id' => 'fields.E001',
+                ]),
+            ];
+        endif;
+
+        return $errors;
+    }
+    
+    public function deepClone(){
+        return 'clone';
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function skeleton()
     {
-        $path = '';
-        $alias = 'model_fields';
-
-        if (Strings::starts_with($this->full_class_name(), 'eddmash\powerorm\model\field')):
-            $path = sprintf('eddmash\powerorm\model\field as %s', $alias);
-        endif;
-
-        return [
-            'constructor_args' => $this->constructor_args(),
-            'path' => $path,
-            'full_name' => $this->full_class_name(),
-            'name' => sprintf('%1$s\%2$s', $alias, $this->get_class_name()),
-        ];
-    }
-
-    public function db_params($connection)
-    {
-        return [
-            'type' => $this->db_type($connection),
-        ];
-    }
-
-    /**
-     * Returns all the parameters that were passed to the constructor on initialization.
-     *
-     * @return mixed
-     */
-    public function constructor_args()
-    {
-        $this->constructor_args = array_change_key_case($this->constructor_args, CASE_LOWER);
-
-        $defaults = [
-            'primary_key' => false,
-            'max_length' => null,
-            'unique' => false,
-            'null' => false,
-            'db_index' => false,
-            'default' => new NOT_PROVIDED(),
-        ];
-
-        foreach ($defaults as $name => $default) :
-            $value = ($this->has_property($name)) ? $this->{$name} : $default;
-
-            if ($name == 'default' && !$value instanceof NOT_PROVIDED):
-                $this->constructor_args[$name] = $value;
-            elseif ($value != $default && !array_key_exists(strtolower($name), $this->constructor_args)):
-
-                $this->constructor_args[$name] = $value;
-
-            endif;
-        endforeach;
-
-        return [$this->constructor_args];
+        // TODO: Implement skeleton() method.
     }
 
     /**
      * {@inheritdoc}
      */
-    public function contribute_to_class($field_name, $model_obj)
+    public function constructorArgs()
     {
-        $this->container_model = $model_obj;
-        $this->set_from_name($field_name);
-        $model_obj->load_field($this);
-        $model_obj->meta->add_field($this);
-    }
-
-    public function set_from_name($name)
-    {
-        $this->name = $name;
-        $this->db_column = $this->db_column_name();
-
-        if (empty($this->verbose_name)):
-            $this->verbose_name = ucwords(str_replace('_', ' ', $name));
-        endif;
-    }
-
-    /**
-     * returns the constraint name especially in relationship fields.
-     *
-     * @ignore
-     *
-     * @param string $prefix
-     *
-     * @return string
-     */
-    public function constraint_name($prefix)
-    {
-        if (empty($prefix)):
-            return '';
-        endif;
-
-        return sprintf('%1$s_%2$s_%3$s', $prefix, strtolower($this->name), mt_rand());
-    }
-
-    /**
-     * return the database column that this field represents.
-     *
-     * @return string
-     */
-    public function db_type($connection)
-    {
-        return null;
+        // TODO: Implement constructorArgs() method.
     }
 
     /**
      * {@inheritdoc}
      */
-    public function formfield($kwargs = [])
+    public function dbType($connection)
     {
-        $field_class = form_fields\CharField::full_class_name();
-
-        $kwargs = array_change_key_case($kwargs, CASE_LOWER);
-
-        $defaults = [
-            'required' => !$this->form_blank,
-            'label' => $this->verbose_name,
-            'help_text' => $this->help_text,
-        ];
-
-        if ($this->has_default()):
-            $defaults['initial'] = $this->get_default();
-        endif;
-
-        if ($this->choices):
-            $include_blank = true;
-
-            if ($this->form_blank || empty($this->has_default()) || !in_array('initial', $kwargs)):
-                $include_blank = false;
-            endif;
-
-            $defaults['choices'] = $this->get_choices(['include_blank' => $include_blank]);
-            $defaults['coerce'] = [$this, 'to_php'];
-
-            if (array_key_exists('form_choices_class', $kwargs)):
-                $field_class = $kwargs['form_choices_class'];
-            else:
-                $field_class = form_fields\TypedChoiceField::full_class_name();
-            endif;
-
-        endif;
-
-        if (array_key_exists('field_class', $kwargs)):
-            $field_class = $kwargs['field_class'];
-            unset($kwargs['field_class']);
-        endif;
-
-        $defaults = array_merge($defaults, $kwargs);
-
-        return new $field_class($defaults);
+        return;
     }
 
-    public function to_php($value)
+    /**
+     * {@inheritdoc}
+     */
+    public function toPhp($value)
     {
         return $value;
     }
 
     /**
-     * Tells us if the default value is set.
+     * {@inheritdoc}
      */
-    public function has_default()
+    public function formField($kwargs = [])
     {
-        return !$this->default instanceof NOT_PROVIDED;
+        // TODO: Implement formField() method.
     }
 
-    public function is_unique()
+    /**
+     * {@inheritdoc}
+     */
+    public function preSave($model, $add)
     {
-        return $this->unique || $this->primary_key;
+        // TODO: Implement preSave() method.
     }
 
-    public function is_inverse()
+    /**
+     * {@inheritdoc}
+     */
+    public function prepareValue($value)
     {
-        return $this->inverse;
+        // TODO: Implement prepareValue() method.
     }
 
-    public function get_default()
+    /**
+     * {@inheritdoc}
+     */
+    public function prepareValueForDb($value, $connection, $prepared = false)
     {
-        return $this->default;
+        // TODO: Implement prepareValueForDb() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepareValueBeforeSave($value, $connection)
+    {
+        // TODO: Implement prepareValueBeforeSave() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fromDbValue()
+    {
+        // TODO: Implement fromDbValue() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function valueFromObject($obj)
+    {
+        return $obj->{$this->attrName};
     }
 
     /**
@@ -599,139 +408,20 @@ abstract class Field extends Object implements FieldInterface
      */
     public function __toString()
     {
-        return $this->container_model->get_class_name().'->'.$this->name;
-    }
-
-    /**
-     * @ignore
-     *
-     * @param $context
-     * @param $value
-     */
-    public function clean($context, $value)
-    {
-    }
-
-    /**
-     * Should return a list of \eddmash\powerorm\checks\Message instances. used in migrations.
-     *
-     * @return array
-     */
-    public function check()
-    {
-        return [];
-    }
-
-    /**
-     * @ignore
-     *
-     * @param $checks
-     * @param $new_check
-     *
-     * @return array
-     */
-    public function add_check($checks, $new_check)
-    {
-        if (!empty($new_check)):
-            $checks = array_merge($checks, $new_check);
-        endif;
-
-        return $checks;
-    }
-
-    /**
-     * @ignore
-     */
-    public function validate()
-    {
-    }
-
-    public function deep_clone()
-    {
-        $skel = $this->skeleton();
-        $constructor_args = array_pop($skel['constructor_args']);
-        $class_name = $skel['full_name'];
-
-        return new $class_name($constructor_args);
-    }
-
-    /**
-     * Use to store this fields results, mostly used in relational fields.
-     *
-     * @return string
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function get_cache_name()
-    {
-        return sprintf('_%s_cache', $this->name);
-    }
-
-    /**
-     * Returns choices with a default blank choices included, for use as SelectField choices for this field.
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function get_choices($opts = [])
-    {
-        $include_blank_dash = (array_key_exists('include_blank', $opts)) ? $opts['include_blank'] == false : true;
-
-        $first_choice = [];
-        if ($include_blank_dash):
-            $first_choice = self::BLANK_CHOICE_DASH;
-        endif;
-
-        if (!empty($this->choices)):
-            return array_merge($first_choice, $this->choices);
-        endif;
-
-        // load from relationships todo
-    }
-
-    public function pre_save($model, $add)
-    {
-        // TODO: Implement pre_save() method.
-    }
-
-    public function prepare_value($value)
-    {
-        // TODO: Implement prepare_value() method.
-    }
-
-    public function prepare_value_for_db($value, $connection, $prepared = false)
-    {
-        // TODO: Implement prepare_value_for_db() method.
-    }
-
-    public function from_db_value()
-    {
-        // TODO: Implement from_db_value() method.
-    }
-
-    public function prepare_value_before_save($value, $connection)
-    {
-        return $this->prepare_value_for_db($value, $connection);
+        return $this->scopeModel->getFullClassName().'->'.$this->name;
     }
 
     public function __debugInfo()
     {
-        $model = [];
+        $field = [];
         foreach (get_object_vars($this) as $name => $value) :
-            if (in_array($name, ['container_model', 'relation', 'constructor_args'])):
-                if (is_subclass_of($value, Object::full_class_name())):
-
-                    $model[$name] = $value->get_class_name();
-
-                endif;
+            if (in_array($name, self::DEBUG_IGNORE)):
+                $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
                 continue;
             endif;
-            $model[$name] = $value;
+            $field[$name] = $value;
         endforeach;
 
-        return $model;
+        return $field;
     }
 }

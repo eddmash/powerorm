@@ -1,6 +1,6 @@
 <?php
 
-use eddmash\powerorm\Object;
+use Eddmash\PowerOrm\Object;
 
 /**
  * Created by http://eddmash.com
@@ -12,14 +12,14 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
 {
     public function testFullClassName()
     {
-        $expectedName = 'eddmash\powerorm\Object';
+        $expectedName = 'Eddmash\PowerOrm\Object';
         $obj = new Object();
-        $returnedName = $obj->full_class_name();
+        $returnedName = $obj->getFullClassName();
 
         $this->assertEquals(
             $expectedName,
             $returnedName,
-            sprintf('full_class_name() returned %s but we expected %s', $returnedName, $expectedName)
+            sprintf('getFullClassName() returned %s but we expected %s', $returnedName, $expectedName)
         );
     }
 
@@ -27,49 +27,49 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
     {
         $expectedName = 'Object';
         $obj = new Object();
-        $returnedName = $obj->get_class_name();
+        $returnedName = $obj->getShortClassName();
 
         $this->assertEquals(
             $expectedName,
             $returnedName,
-            sprintf('get_class_name() returned %s but we expected %s', $returnedName, $expectedName)
+            sprintf('getShortClassName() returned %s but we expected %s', $returnedName, $expectedName)
         );
     }
 
     public function testHasMethod()
     {
         $obj = new Object();
-        $this->assertTrue($obj->has_method('get_class_name'), 'Expected True, since the method exists');
+        $this->assertTrue($obj->hasMethod('getFullClassName'), 'Expected True, since the method exists');
     }
 
     public function testHasProperty()
     {
         $obj = new Object();
-        $this->assertTrue($obj->has_property('_signal'), 'Expected return true, since the property exists');
+        $this->assertTrue($obj->hasProperty('_signal'), 'Expected return true, since the property exists');
     }
 
     /**
      * @param $expectedName
      * @param $returnedName
-     * @dataProvider providerTestStandardizedName
+     * @dataProvider providerTestNormalizeKey
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function testConversionToStandardName($originalName, $expectedName)
+    public function testConversionToNormalizeKey($originalName, $expectedName)
     {
         $obj = new Object();
-        $returnedName = $obj->standard_name($originalName);
+        $returnedName = $obj->normalizeKey($originalName);
 
         $this->assertEquals(
             $expectedName,
             $returnedName,
-            sprintf('standard_name() returned %s but we expected %s', $returnedName, $expectedName)
+            sprintf('normalizeKey() returned %s but we expected %s', $returnedName, $expectedName)
         );
     }
 
-    public function providerTestStandardizedName()
+    public function providerTestNormalizeKey()
     {
         return array(
             array('slUggified', 'sluggified'),

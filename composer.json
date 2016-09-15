@@ -5,6 +5,7 @@
     "codeigniter",
     "orm",
     "form",
+    "php",
     "migrations"
   ],
   "description": "A very simple but effective codeignter orm",
@@ -21,5 +22,21 @@
   "require": {
     "php": ">=5.4.0",
     "composer/installers": "~1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Eddmash\\PowerOrm\\": "src/"
+    }
+  },
+  "support": {
+    "issues": "https://github.com/eddmash/powerorm/issues"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.1.0-pre-alpha"
+    }
   }
 }

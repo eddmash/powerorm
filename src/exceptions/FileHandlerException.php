@@ -5,7 +5,7 @@
  * Date: 7/31/16
  * Time: 9:19 AM.
  */
-namespace eddmash\powerorm\exceptions;
+namespace Eddmash\PowerOrm\Exceptions;
 
 /**
  * Class FileHandlerException.

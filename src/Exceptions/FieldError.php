@@ -8,8 +8,8 @@
 * file that was distributed with this source code.
 */
 
-namespace Eddmash\PowerOrm\Model\Field;
+namespace Eddmash\PowerOrm\Exceptions;
 
-class CharField extends Field
+class FieldError extends \ErrorException
 {
 }
