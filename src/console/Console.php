@@ -1,6 +1,6 @@
 <?php
 
-namespace eddmash\powerorm\console;
+namespace Eddmash\PowerOrm\Console;
 
 /**
  * Borrows heavily from the the yii\helpers\BaseConsole class,.
@@ -201,7 +201,9 @@ class Console
         } else {
             // try stty if available
             $stty = [];
-            if (exec('stty -a 2>&1', $stty) && preg_match('/rows\s+(\d+);\s*columns\s+(\d+);/mi', implode(' ', $stty), $matches)) {
+            if (exec('stty -a 2>&1', $stty) && preg_match('/rows\s+(\d+);\s*columns\s+(\d+);/mi', implode(' ', $stty),
+                    $matches)
+            ) {
                 return $size = [$matches[2], $matches[1]];
             }
 

@@ -1,14 +1,14 @@
 <?php
 
-namespace eddmash\powerorm\console\command;
+namespace Eddmash\PowerOrm\Console\Command;
 
-use eddmash\powerorm\BaseOrm;
-use eddmash\powerorm\helpers\FileHandler;
-use eddmash\powerorm\helpers\Tools;
-use eddmash\powerorm\migrations\AutoDetector;
-use eddmash\powerorm\migrations\InteractiveQuestioner;
-use eddmash\powerorm\migrations\Loader;
-use eddmash\powerorm\migrations\ProjectState;
+use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Console\Question\InteractiveAsker;
+use Eddmash\PowerOrm\Helpers\FileHandler;
+use Eddmash\PowerOrm\Helpers\Tools;
+use Eddmash\PowerOrm\Migration\AutoDetector;
+use Eddmash\PowerOrm\Migration\Loader;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
 use Orm;
 
 /**
@@ -18,21 +18,21 @@ use Orm;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Makemigrations extends Command
+class Makemigrations extends BaseCommand
 {
     public $help = 'Updates database schema. Based on the migrations.';
 
-    public function handle($arg_opts = [])
+    public function handle($argOpts = [])
     {
-        if (in_array('--help', $arg_opts)):
+        if (in_array('--help', $argOpts)):
             $this->normal($this->help.PHP_EOL);
         endif;
 
-        $registry = Orm::get_registry();
+        $registry = Orm::getRegistry();
 
         $loader = new Loader();
 
-        $issues = $loader->find_issues();
+        $issues = $loader->detectConflicts();
 
         if (!empty($issues)):
             $message = 'The following migrations seem to indicate they are both the latest migration :'.PHP_EOL;
@@ -41,9 +41,10 @@ class Makemigrations extends Command
             exit;
         endif;
 
-        $autodetector = new AutoDetector($loader->get_project_state(),
-            ProjectState::from_apps($registry),
-            InteractiveQuestioner::instance()
+        var_dump(ProjectState::fromApps($registry));
+        $autodetector = new AutoDetector($loader->getProjectState(),
+            ProjectState::fromApps($registry),
+            InteractiveAsker::createObject()
         );
 
         $changes = $autodetector->changes($loader->graph);
@@ -53,7 +54,7 @@ class Makemigrations extends Command
             exit;
         endif;
 
-        if (in_array('--dry-run', $arg_opts)):
+        if (in_array('--dry-run', $argOpts)):
             $this->info('Migrations :'.PHP_EOL);
 
             foreach ($changes as $migration) :
@@ -62,33 +63,33 @@ class Makemigrations extends Command
             exit;
         endif;
 
-        $this->_write_migrations($changes);
+        $this->_writeMigrations($changes);
     }
 
-    public function _write_migrations($migration_changes)
+    public function _writeMigrations($migrationChanges)
     {
         $this->info('Creating Migrations :', true);
-        foreach ($migration_changes as $migration) :
+        foreach ($migrationChanges as $migration) :
 
-            $content = $migration->as_string();
+            $content = $migration->asString();
 
-            $file_name = $migration->name;
-            $this->normal('  '.$file_name.'.php', true);
+            $fileName = $migration->name;
+            $this->normal('  '.$fileName.'.php', true);
 
             foreach ($migration->operations as $op) :
                 $this->normal(sprintf('   - %s', ucwords($op->describe())), true);
             endforeach;
 
             // write content to file.
-            $handler = new FileHandler(BaseOrm::get_migrations_path(), $file_name);
+            $handler = new FileHandler(BaseOrm::getMigrationsPath(), $fileName);
 
             $handler->write($content);
         endforeach;
     }
 
-    public function get_options()
+    public function getOptions()
     {
-        $options = parent::get_options();
+        $options = parent::getOptions();
         $options['--dry-run'] = "Just show what migrations would be made; don't actually write them.";
 
         return $options;

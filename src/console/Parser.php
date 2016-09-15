@@ -5,9 +5,9 @@
  * Date: 7/25/16
  * Time: 7:48 PM.
  */
-namespace eddmash\powerorm\console;
+namespace Eddmash\PowerOrm\Console;
 
-use eddmash\powerorm\exceptions\ValueError;
+use Eddmash\PowerOrm\exceptions\ValueError;
 
 class Parser
 {

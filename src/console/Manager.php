@@ -1,10 +1,10 @@
 <?php
 
-namespace eddmash\powerorm\console;
+namespace Eddmash\PowerOrm\Console;
 
-use eddmash\powerorm\console\command\Command;
-use eddmash\powerorm\helpers\FileHandler;
-use eddmash\powerorm\helpers\Tools;
+use Eddmash\PowerOrm\Console\Command\Command;
+use Eddmash\PowerOrm\Helpers\FileHandler;
+use Eddmash\PowerOrm\Helpers\Tools;
 
 /**
  * Class Manager.
@@ -15,23 +15,23 @@ use eddmash\powerorm\helpers\Tools;
  */
 class Manager extends Base
 {
-    public $default_command = 'help';
+    public $defaultCommand = 'help';
 
-    public $default_help = 'Provides help information about console commands.';
+    public $defaultHelp = 'Provides help information about console commands.';
 
-    public $command_path;
+    public $commandPath;
 
-    public $manager_name;
+    public $managerName;
 
     public function __construct()
     {
         // default command path
-        $this->path = sprintf('%s/command', dirname(__FILE__));
+        $this->path = sprintf('%s/Command', dirname(__FILE__));
 
-        $this->manager_name = $this->standard_name($this->get_class_name());
+        $this->managerName = $this->normalizeKey($this->getShortClassName());
     }
 
-    public function default_commands()
+    public function defaultCommands()
     {
         return ['help' => '', 'version' => ''];
     }
@@ -40,61 +40,61 @@ class Manager extends Base
     {
 
         // get console args
-        $arg_opts = $_SERVER['argv'];
+        $argOpts = $_SERVER['argv'];
         $v = new Parser();
         $v->parse();
 
         // remove the manager from the list
-        $manager = array_shift($arg_opts);
+        $manager = array_shift($argOpts);
 
         // get command name and remove it from list
-        $command_name = array_shift($arg_opts);
+        $commandName = array_shift($argOpts);
 
-        $command_name = (!empty($command_name)) ? $command_name : $this->default_command;
+        $commandName = (!empty($commandName)) ? $commandName : $this->defaultCommand;
 
-        $command_name = ucfirst($command_name);
+        $commandName = ucfirst($commandName);
 
-        if (in_array($command_name, ['Help']) || empty($command_name)):
-            $this->main_help_text($arg_opts);
+        if (in_array($commandName, ['Help']) || empty($commandName)):
+            $this->mainHelpText($argOpts);
             exit;
         endif;
 
-        if (in_array($command_name, ['Version', '--version', '-v'])):
+        if (in_array($commandName, ['Version', '--version', '-v'])):
             $this->normal('PowerOrm Version : '.$this->ansiFormat(POWERORM_VERSION, Console::FG_CYAN).PHP_EOL);
             exit;
         endif;
 
-        if (in_array('--command-dir', $arg_opts)):
-            $pos = array_search('--command-dir', $arg_opts);
-            $this->path = $arg_opts[$pos + 1];
+        if (in_array('--command-dir', $argOpts)):
+            $pos = array_search('--command-dir', $argOpts);
+            $this->path = $argOpts[$pos + 1];
         endif;
 
-        $this->fetch_command($command_name)->execute($arg_opts, $manager);
+        $this->fetchCommand($commandName)->execute($argOpts, $manager);
     }
 
-    public function main_help_text($arg_opts = [])
+    public function mainHelpText($argOpts = [])
     {
         $this->stdout(PHP_EOL);
 
-        if (!empty($arg_opts)):
-            $subcommand = array_shift($arg_opts);
+        if (!empty($argOpts)):
+            $subcommand = array_shift($argOpts);
 
-            $command = $this->fetch_command($subcommand);
+            $command = $this->fetchCommand($subcommand);
 
-            $options = $command->get_options();
-            $help = $command->get_help();
+            $options = $command->getOptions();
+            $help = $command->getHelp();
 
-            $message = sprintf('php %1$s.php %2$s', $this->manager_name, $subcommand);
+            $message = sprintf('php %1$s.php %2$s', $this->managerName, $subcommand);
             $this->normal($help.PHP_EOL.PHP_EOL);
 
             $this->normal(sprintf('Usage : %1$s %2$s',
-                    $this->standard_name($message), Tools::stringify(array_keys($options), false)).PHP_EOL.PHP_EOL);
+                    $this->normalizeKey($message), Tools::stringify(array_keys($options), false)).PHP_EOL.PHP_EOL);
 
             $this->normal('optional arguments:'.PHP_EOL.PHP_EOL);
 
             $maxlen = 5;
             foreach ($options as $key => $value) :
-                $len = strlen($key) + 2 + ($key === $this->default_command ? 10 : 0);
+                $len = strlen($key) + 2 + ($key === $this->defaultCommand ? 10 : 0);
                 if ($maxlen < $len) :
                     $maxlen = $len;
                 endif;
@@ -114,21 +114,21 @@ class Manager extends Base
             exit;
         endif;
 
-        $this->info($this->default_help.PHP_EOL.PHP_EOL);
-        $in_message = $this->ansiFormat(sprintf('php %s.php help <subcommand>', $this->manager_name), Console::FG_YELLOW);
-        $this->normal(sprintf('Type %s for help on a specific subcommand.', $in_message).PHP_EOL.PHP_EOL);
+        $this->info($this->defaultHelp.PHP_EOL.PHP_EOL);
+        $inMessage = $this->ansiFormat(sprintf('php %s.php help <subcommand>', $this->managerName), Console::FG_YELLOW);
+        $this->normal(sprintf('Type %s for help on a specific subcommand.', $inMessage).PHP_EOL.PHP_EOL);
         $this->normal(sprintf('Available Commands : ').PHP_EOL);
 
         $path = sprintf('%s/commands', dirname(__FILE__));
 
         $fileHandler = new FileHandler($path);
 
-        $files = $fileHandler->read_dir();
+        $files = $fileHandler->readDir();
 
         foreach ($files as $file) :
             $file = basename($file, '.php');
 
-            $file = $this->standard_name($file);
+            $file = $this->normalizeKey($file);
             // ignore base class
             if ($file == 'command'):
                 continue;
@@ -136,9 +136,9 @@ class Manager extends Base
             $this->normal("\t ".$file.PHP_EOL);
         endforeach;
 
-        foreach ($this->default_commands() as $name => $command) :
+        foreach ($this->defaultCommands() as $name => $command) :
 
-            $file = $this->standard_name($name);
+            $file = $this->normalizeKey($name);
             // ignore base class
             if ($file == 'command'):
                 continue;
@@ -156,24 +156,25 @@ class Manager extends Base
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function fetch_command($name)
+    public function fetchCommand($name)
     {
         $name = ucfirst($name);
 
         $file_handler = new FileHandler($this->path);
 
-        $file = $file_handler->get_file($name);
+        $file = $file_handler->getFile($name);
 
         if (empty($file)):
             $this->error(
-                sprintf('Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?'.PHP_EOL, $name, $this->path));
-            $message = $this->ansiFormat(sprintf('php %s.php help', $this->manager_name), Console::FG_YELLOW);
+                sprintf('Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?'.PHP_EOL, $name,
+                    $this->path));
+            $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
             $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
             exit;
         endif;
 
         // commands are in the commands namespace
-        $name = 'eddmash\powerorm\console\command\\'.$name;
+        $name = 'Eddmash\PowerOrm\Console\Command\\'.$name;
 
         return new $name();
     }
@@ -181,5 +182,6 @@ class Manager extends Base
     public static function run()
     {
         (new static())->execute();
+
     }
 }

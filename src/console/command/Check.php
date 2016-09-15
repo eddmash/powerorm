@@ -5,14 +5,14 @@
  * Date: 6/2/16
  * Time: 10:20 PM.
  */
-namespace eddmash\powerorm\console\command;
+namespace Eddmash\PowerOrm\Console\Command;
 
 /**
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Check extends Command
+class Check extends BaseCommand
 {
     /**
      * {@inheritdoc}

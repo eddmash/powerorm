@@ -1,10 +1,10 @@
 <?php
 
-namespace eddmash\powerorm\console\command;
+namespace Eddmash\PowerOrm\Console\Command;
 
-use eddmash\powerorm\BaseOrm;
-use eddmash\powerorm\console\Console;
-use eddmash\powerorm\migrations\Loader;
+use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Console\Console;
+use Eddmash\PowerOrm\Migrations\Loader;
 
 /**
  * Class Showmigrations.
@@ -13,24 +13,24 @@ use eddmash\powerorm\migrations\Loader;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Showmigrations extends Command
+class Showmigrations extends BaseCommand
 {
     public $help = 'Provides help information about console commands.';
 
-    public function handle($arg_opts = [])
+    public function handle($argOpts = [])
     {
-        $connection = BaseOrm::dbconnection();
+        $connection = BaseOrm::getDbConnection();
 
         // get migrations list
         $loader = new Loader($connection, true);
 
-        $leaves = $loader->graph->leaf_nodes();
+        $leaves = $loader->graph->leafNodes();
 
         foreach ($leaves as $leaf) :
             $list = $loader->graph->before_lineage($leaf);
 
             foreach ($list as $item) :
-                $migration_name = array_pop(explode('\\', $item));
+                $migrationName = array_pop(explode('\\', $item));
 
                 if (in_array($item, $loader->applied_migrations)):
                     $indicator = $this->ansiFormat('(applied)', Console::FG_GREEN);
@@ -38,7 +38,7 @@ class Showmigrations extends Command
                     $indicator = '(pending)';
                 endif;
 
-                $this->normal(sprintf('%1$s %2$s', $indicator, $migration_name), true);
+                $this->normal(sprintf('%1$s %2$s', $indicator, $migrationName), true);
             endforeach;
         endforeach;
     }

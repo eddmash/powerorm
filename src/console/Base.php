@@ -1,8 +1,8 @@
 <?php
 
-namespace eddmash\powerorm\console;
+namespace Eddmash\PowerOrm\Console;
 
-use eddmash\powerorm\Object;
+use Eddmash\PowerOrm\Object;
 
 /**
  * Class Base.
@@ -35,7 +35,7 @@ class Base extends Object
     public $help = '';
     public $summary = '';
 
-    public function wrap_text($message, $indent, $refresh = false)
+    public function wrapText($message, $indent, $refresh = false)
     {
         return Console::wrapText($message, $indent, $refresh);
     }
@@ -58,7 +58,7 @@ class Base extends Object
     /**
      * Formats a string with ANSI codes.
      *
-     * You may pass additional parameters using the constants defined in [[\eddmash\powerorm\consoleConsole]].
+     * You may pass additional parameters using the constants defined in [[\Eddmash\PowerOrm\ConsoleConsole]].
      *
      * Example:
      *
@@ -85,7 +85,7 @@ class Base extends Object
      * Prints a string to STDOUT.
      *
      * You may optionally format the string with ANSI codes by
-     * passing additional parameters using the constants defined in [[\eddmash\powerorm\consoleConsole]].
+     * passing additional parameters using the constants defined in [[\Eddmash\PowerOrm\ConsoleConsole]].
      *
      * Example:
      *
@@ -112,7 +112,7 @@ class Base extends Object
      * Prints a string to STDERR.
      *
      * You may optionally format the string with ANSI codes by
-     * passing additional parameters using the constants defined in [[\eddmash\powerorm\consoleConsole]].
+     * passing additional parameters using the constants defined in [[\Eddmash\PowerOrm\ConsoleConsole]].
      *
      * Example:
      *

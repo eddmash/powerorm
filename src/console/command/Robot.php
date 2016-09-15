@@ -5,7 +5,7 @@
  * Date: 6/2/16
  * Time: 10:20 PM.
  */
-namespace eddmash\powerorm\console\command;
+namespace Eddmash\PowerOrm\Console\Command;
 
 /**
  * Borrowed from fuelphp oil robot.
@@ -14,7 +14,7 @@ namespace eddmash\powerorm\console\command;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Robot extends Command
+class Robot extends BaseCommand
 {
     /**
      * {@inheritdoc}
