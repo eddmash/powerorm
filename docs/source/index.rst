@@ -15,19 +15,19 @@ Overview
 **************
 
 .. toctree::
-	:includehidden:
-        :titlesonly:
+   :titlesonly:
 
-        intro/index
+   intro/index
+
 
 **************
 Model
 **************
 
 .. toctree::
-        :titlesonly:
+    :titlesonly:
 
-        model/index
+    model/index
 
 
 **************
@@ -35,19 +35,17 @@ Migration
 **************
 
 .. toctree::
-	:includehidden:
-        :titlesonly:
+    :titlesonly:
 
-        migration/index
+    migration/index
 
 **************
 Form
 **************
 
 .. toctree::
-	:includehidden:
-        :titlesonly:
+    :titlesonly:
 
-       form/index
+    form/index
 
  

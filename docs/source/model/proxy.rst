@@ -21,7 +21,7 @@ This is what proxy model inheritance is for:
 Proxy models are declared like normal models. You tell Powerorm that it’s a proxy model by setting
 the `proxy` attribute of the class to True.
 
-.. code-block:: ruby
+.. code-block:: php
 
 	 class Employee extends PModel{
 	      public function fields(){
