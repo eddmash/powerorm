@@ -8,7 +8,9 @@ Each model corresponds to its own database table and can be queried and created 
 
 The inheritance relationship introduces links between the child model and each of its parents (via an automatically-created OneToOne).
 
-For example::
+For example:
+
+.. code-block:: php
 
 	class Place extends PModel{
 	      public function fields(){
@@ -28,13 +30,17 @@ For example::
 	Because codeigniter does not autoload classes you need to load the base class first before
 	the child. when using e.g. load the models defined above as show :
 
-Loading models ::
+Loading models :
+
+.. code-block:: php
 
  	$this->load->model('place');
  	$this->load->model('restraurant');
 
 All of the fields of Place will also be available in Restaurant, although the data will reside in a
-different database table. So these are both possible::
+different database table. So these are both possible:
+
+.. code-block:: php
 
 	$this->place->filter([name="Bob's Cafe"]);
  	$this->restaurant->filter([name="Bob's Cafe"]);
@@ -42,7 +48,9 @@ different database table. So these are both possible::
 .. warning:: todo Check on this reverse lookup
 
 If you have a Place that is also a Restaurant, you can get from the Place object to the Restaurant
-object by using the lower-case version of the model name::
+object by using the lower-case version of the model name:
+
+.. code-block:: php
 
 	$p = $this->place->get(['id'=12]);
  	// If p is a Restaurant object, this will give the child class:

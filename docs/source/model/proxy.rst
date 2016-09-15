@@ -42,14 +42,16 @@ the `proxy` attribute of the class to True.
 	Because codeigniter does not autoload classes you need to load the base class first before
 	the child. when using e.g. load the models defined above as show.
 
-::
+.. code-block:: php
 
 	 // load model
 	 $this->load->model('employee');
 	 $this->load->model('auditor');
 
 The Auditor class operates on the same database table as its parent Person class.
-In particular, any new instances of Employee will also be accessible through Auditor, and vice-versa::
+In particular, any new instances of Employee will also be accessible through Auditor, and vice-versa:
+
+.. code-block:: php
 
 	 $p = $this->employee->create(['name='foobar']);
 	 $this->auditor->get(['name'='foobar']);
