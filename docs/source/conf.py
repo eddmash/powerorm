@@ -133,7 +133,7 @@ html_theme = 'eddmash_theme'
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
-html_theme_path = ["_themes"]
+html_theme_path = ["./_themes"]
 
 # Set up PHP syntax highlights
 from sphinx.highlighting import lexers
