@@ -132,7 +132,7 @@ html_theme = 'sphinx_rtd_theme'
 # html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ["./_themes"]
+html_theme_path = []
 
 # Set up PHP syntax highlights
 from sphinx.highlighting import lexers
