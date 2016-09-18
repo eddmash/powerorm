@@ -176,8 +176,11 @@ class Field extends Object implements FieldInterface
      */
     public $scopeModel;
 
+    private $constructorArgs;
+
     public function __construct($config = [])
     {
+        $this->constructorArgs = $config;
         BaseOrm::configure($this, $config);
     }
 
@@ -188,6 +191,12 @@ class Field extends Object implements FieldInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param string $fieldName
+     * @param Model $modelObject
+     * @throws FieldError
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function contributeToClass($fieldName, $modelObject)
     {
@@ -320,9 +329,22 @@ class Field extends Object implements FieldInterface
     /**
      * {@inheritdoc}
      */
-    public function skeleton()
+    public function deconstruct()
     {
-        // TODO: Implement skeleton() method.
+        $path = '';
+        $alias = 'modelField';
+
+        if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Model\Field')):
+            $path = sprintf('Eddmash\PowerOrm\Model\Field as %s', $alias);
+        endif;
+
+
+        return [
+            'constructor_args' => $this->constructorArgs(),
+            'path' => $path,
+            'full_name' => $this->getFullClassName(),
+            'name' => sprintf('%s\%s', $alias, $this->getShortClassName())
+        ];
     }
 
     /**

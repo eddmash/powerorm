@@ -210,7 +210,7 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
     public function setupFields($fields = [])
     {
         if (empty($fields)):
-            $fieldsList = $this->getFromHierarchy();
+            $fieldsList = $this->getFieldsFromHierarchy();
 
             $fields = $fieldsList[$this->getFullClassName()];
         endif;
@@ -318,7 +318,7 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
         return [$concreteParent, $modelFields];
     }
 
-    public function getFromHierarchy()
+    public function getFieldsFromHierarchy()
     {
 
         // get hierarchy meta information
@@ -456,9 +456,9 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
     /**
      * {@inheritdoc}
      */
-    public function skeleton()
+    public function deconstruct()
     {
-        // TODO: Implement skeleton() method.
+        // TODO: Implement deconstruct() method.
     }
 
     /**

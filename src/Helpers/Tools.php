@@ -87,7 +87,7 @@ class Tools
                 // HANDLE VALUE THAT ARE OBJECTS THAT IMPLEMENT DeConstructableInterface interface
 
                 if ($value instanceof DeConstructableInterface) {
-                    $skel = $value->skeleton();
+                    $skel = $value->deconstruct();
 
                     $class = $skel['fullName'];
 

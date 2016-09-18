@@ -13,19 +13,19 @@ namespace Eddmash\PowerOrm;
 interface DeConstructableInterface
 {
     /**
-     * This should return all the information (as an array) required to recreate this object again.
+     * This should return all the information (as an array) required to recreate an object again.
      *
      * i.e.
      *
      * - the class name
-     * - the absolute path to the class as a string
+     * - the absolute path to the class as a string,This should be the most portable version, so less specific may be better.
      * - the constructor arguments as an array
      *
      * e.g.
      *
      *  <pre><code> $name = Orm::Charfield(['max_length'=>20]);
      *
-     * var_dump($name->skeleton());
+     * var_dump($name->deconstruct());
      *
      * [
      *      'name'=> 'Charfield',
@@ -41,7 +41,7 @@ interface DeConstructableInterface
      *
      * @return array
      */
-    public function skeleton();
+    public function deconstruct();
 
     /**
      * Should return an array of all the arguments that the constructor takes in.
