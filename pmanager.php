@@ -1,8 +1,21 @@
 <?php
+// only set if this has not been set incase we are developing outside codeigniter environment
+use Eddmash\PowerOrm\BaseOrm;
 
-$base_dir = dirname(__FILE__);
-require_once $base_dir.'/application/libraries/powerorm/ci_instance.php';
+if(!defined('ENVIRONMENT')):
+    define('ENVIRONMENT', 'POWERORM_DEV');
+endif;
 
-use eddmash\powerorm\console\Manager;
+// bootstrap the orm.
+require_once 'bootstrap.php';
 
-Manager::run();
+// if we are not on 'POWERORM_DEV' environment load the ci_instance
+// since we are using the codeigniter.
+// else create and instance of the orm.
+if(ENVIRONMENT == 'POWERORM_DEV'):
+    BaseOrm::consoleRun();
+    BaseOrm::getDbConnection();
+else:
+    $base_dir = dirname(__FILE__);
+    require_once $base_dir.'/application/libraries/powerorm/ci_instance.php';
+endif;

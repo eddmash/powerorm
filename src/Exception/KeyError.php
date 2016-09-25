@@ -1,14 +1,14 @@
 <?php
 
-namespace Eddmash\PowerOrm\Exceptions;
+namespace Eddmash\PowerOrm\Exception;
 
 /**
- * Class SystemCheckError.
+ * Class KeyError.
  *
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class SystemCheckError extends OrmErrors
+class KeyError extends OrmException
 {
 }

@@ -104,11 +104,11 @@ class Tools
                 $stringState .= (!is_numeric($key)) ? "'$key'=>" : '';
 
                 if ($value === false) {
-                    $stringState .= 'FALSE';
+                    $stringState .= 'false';
                 } elseif ($value === true) {
-                    $stringState .= 'TRUE';
+                    $stringState .= 'true';
                 } elseif ($value === null) {
-                    $stringState .= 'NULL';
+                    $stringState .= 'null';
                 } elseif (is_numeric($value)) {
                     $stringState .= "$value";
                 } else {
@@ -116,7 +116,7 @@ class Tools
                 }
             }
 
-            if ($counter != $totalCount && !$level == 0) {
+            if ($counter != $totalCount && $level > 1) {
                 $stringState .= ', '.$linebreak;
             }
 

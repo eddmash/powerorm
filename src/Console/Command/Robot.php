@@ -19,7 +19,7 @@ class Robot extends BaseCommand
     /**
      * {@inheritdoc}
      */
-    public $system_check = false;
+    public $systemCheck = false;
 
     public $help = 'A little fun is good for the soul';
 
@@ -35,8 +35,8 @@ class Robot extends BaseCommand
             /___/ | | |   | | | \___\
             |  |  | | |---| | |  |  |
             |__|  \_| |_#_| |_/  |__|
-            //\\  <\ _//^\\_ />  //\\
-            \||/  |\//// \\\\/|  \||/
+            //\\\  <\ _//^\\\_ />  //\\\
+            \||/  |\\\//   \\\//|  \||/
                   |   |   |   |
                   |---|   |---|
                   |---|   |---|

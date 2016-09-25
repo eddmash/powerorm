@@ -4,7 +4,7 @@
  * Date: 8/29/16
  * Time: 4:11 PM.
  */
-namespace Eddmash\PowerOrm\Exceptions;
+namespace Eddmash\PowerOrm\Exception;
 
 class AppRegistryNotReady extends \Exception
 {

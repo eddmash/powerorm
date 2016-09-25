@@ -4,7 +4,7 @@ namespace Eddmash\PowerOrm\Console\Command;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Console\Console;
-use Eddmash\PowerOrm\Migrations\Loader;
+use Eddmash\PowerOrm\Migration\Loader;
 
 /**
  * Class Showmigrations.
@@ -24,7 +24,7 @@ class Showmigrations extends BaseCommand
         // get migrations list
         $loader = new Loader($connection, true);
 
-        $leaves = $loader->graph->leafNodes();
+        $leaves = $loader->graph->getLeafNodes();
 
         foreach ($leaves as $leaf) :
             $list = $loader->graph->before_lineage($leaf);

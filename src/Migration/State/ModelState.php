@@ -11,20 +11,41 @@
 
 namespace Eddmash\PowerOrm\Migration\State;
 
-use Eddmash\PowerOrm\Exceptions\TypeError;
+use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Helpers\Tools;
+use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Object;
 
+/**
+ * Represents a PowerOrm Model.
+ *
+ * We don't use the actual Model class as it's not designed to have its options changed -instead, we mutate this one
+ * and then render it into a Model as required.
+ *
+ * Note that while you are allowed to mutate .fields, you are not allowed to mutate the Field instances inside there
+ * themselves - you must instead assign new ones, as these are not detached during a clone.
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class ModelState extends Object
 {
-    protected $name;
-    protected $fields = [];
+    public $name;
+    public $fields = [];
+    public $meta;
+    public $extends;
 
-    public function __construct($name, $fields, $options = [])
+    private $fakeNamespace = 'Eddmash\PowerOrm\__Fake__\Model';
+
+    public function __construct($name, $fields, $kwargs = [])
     {
         $this->name = $this->normalizeKey($name);
         $this->fields = $fields;
+        BaseOrm::configure($this, $kwargs);
     }
 
     /**
@@ -45,6 +66,7 @@ class ModelState extends Object
     {
         $fields = [];
 
+        /** @var $field Field */
         foreach ($model->meta->localFields as $name => $field) :
             $name = Tools::normalizeKey($name);
             try {
@@ -66,38 +88,92 @@ class ModelState extends Object
             endforeach;
         endif;
 
-        return new static($model->meta->modelName, $fields);
+        $overrides = $model->meta->getOverrides();
+        $meta = [];
+        $ignore = ['registry'];
+        foreach ($overrides as $name => $value) :
+            if(in_array($name, $ignore)):
+                continue;
+            endif;
+            $meta[$name] = $value;
+        endforeach;
+
+        $kwargs = [
+            'meta' => $meta,
+            'extends' => $model->getParent()->getName(),
+        ];
+
+        return new static($model->meta->modelName, $fields, $kwargs);
     }
 
     /**
-     * @return array
+     * Converts the current modelState into a model.
+     *
+     * @param Registry $registry
+     *
+     * @return Model
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getFields()
-    {
-        return $this->fields;
+    public function toModel($registry) {
+
+        $metaData = $this->meta;
+        $extends = $this->extends;
+
+        $model = $this->_defineLoadClass($this->name, $extends);
+        $model->init($this->fields, ['meta' => $metaData, 'registry' => $registry]);
+
+        return $model;
     }
 
+    public static function createObject($name, $field, $kwargs) {
+        return new static($name, $field, $kwargs);
+    }
     /**
-     * @param array $fields
+     * @param string $className
+     * @param string $extends
+     *
+     * @return Model
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function setFields($fields)
-    {
-        $this->fields = $fields;
+    private function _defineLoadClass($className, $extends = '') {
+        $className = ucfirst($className);
+        // we create a new namespace and define new classes because,
+        // we might be dealing with a model that has been dropped
+        // Meaning if we try to load the model using the normal way,
+        // we will get and error of model does not exist
+        $class = 'namespace %1$s;
+
+            class %2$s extends \%3$s{
+
+                 public function unboundFields(){}
+            }';
+
+        if(empty($extends)):
+            $extends = 'Eddmash\PowerOrm\Model\Model';
+        endif;
+
+        $class = sprintf($class, $this->fakeNamespace, $className, $extends);
+
+        $className = sprintf('%s\%s', $this->fakeNamespace, $className);
+
+        if(!class_exists($className, false)):
+            eval($class);
+        endif;
+
+        return new $className();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getName()
-    {
-        return $this->name;
+    public function deepClone() {
+        return static::createObject($this->name, $this->fields, $this->kwargs);
     }
 
-    /**
-     * @param mixed $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
+    public function __toString() {
+        return sprintf("<ModelState: '%s'>", $this->name);
     }
 }

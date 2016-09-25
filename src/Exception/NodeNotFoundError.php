@@ -1,14 +1,14 @@
 <?php
 
-namespace Eddmash\PowerOrm\Exceptions;
+namespace Eddmash\PowerOrm\Exception;
 
 /**
- * Class CommandError.
+ * Class NodeNotFoundError.
  *
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class CommandError extends OrmErrors
+class NodeNotFoundError extends \ErrorException
 {
 }

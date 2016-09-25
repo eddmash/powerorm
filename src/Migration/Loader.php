@@ -10,29 +10,131 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
-class Loader
+use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Helpers\FileHandler;
+use Eddmash\PowerOrm\Object;
+
+class Loader extends Object
 {
+    /**
+     * @var Graph
+     */
     public $graph;
+    private $connection;
 
     public function __construct($connection = null, $loadGraph = true)
     {
+        $this->connection = $connection;
         if ($loadGraph):
             $this->buildGraph();
         endif;
     }
 
-    public function detectConflicts()
-    {
-        return null;
-    }
-
     public function getProjectState()
     {
-        return null;
+        return $this->graph->getState();
     }
 
     public function buildGraph()
     {
-        return new Graph();
+        if(!empty($this->connection)):
+            $recoder = new Recorder($this->connection);
+
+            $this->appliedMigrations = $recoder->getApplied();
+        endif;
+
+        $migrations = $this->getMigrations();
+
+        $this->graph = new Graph();
+
+        // first add all the migrations into the graph
+        foreach ($migrations as $name => $migration) :
+
+            $this->graph->addNode($name, $migration);
+        endforeach;
+
+        // the for each migration set its dependencies
+        /** @var $migration Migration */
+        foreach ($migrations as $name => $migration) :
+            foreach ($migration->getDependency() as $requires) :
+
+                $this->graph->addDependency($name, $requires, $migration);
+
+            endforeach;
+
+        endforeach;
+    }
+
+    public function getMigrationByPrefix($name) {
+        return $name;
+    }
+
+    public function createProjectState() {
+        return [];
+    }
+
+    public static function createObject() {
+        return new static();
+    }
+
+    /**
+     * List of migration objects.
+     *
+     * @return array
+     */
+    public function getMigrations() {
+        $migrations = [];
+
+        /** @var $migrationName Migration */
+        foreach ($this->getMigrationsClasses() as $migrationName) :
+            $fileName = $migrationName;
+            $migrationName = sprintf('app\migrations\%s', $migrationName);
+            $migrations[$fileName] = $migrationName::createObject($fileName);
+        endforeach;
+
+        return $migrations;
+    }
+
+    public function getMigrationsClasses() {
+        $migrationFiles = $this->getMigrationsFiles();
+
+        $classes = [];
+        foreach ($migrationFiles as $migrationFile) :
+            $classes[] = trim(basename($migrationFile, '.php'));
+        endforeach;
+
+        return $classes;
+    }
+
+    public function getMigrationsFiles() {
+        $fileHandler = FileHandler::createObject(['path' => BaseOrm::getMigrationsPath()]);
+
+        return $fileHandler->getPathFiles();
+    }
+
+    /**
+     * returns the latest migration number.
+     *
+     * @return int
+     */
+    public function getLatestMigrationVersion() {
+        $migration_files = $this->getMigrationsFiles();
+        $last_version = array_pop($migration_files);
+        $last_version = basename($last_version);
+        $last_version = preg_split('/_/', $last_version)[0];
+
+        return (int) $last_version;
+    }
+
+    /**
+     * An application should only have one leaf node more than that means there is an issue somewhere.
+     */
+    public function detectConflicts() {
+        $latest = $this->graph->getLeafNodes();
+        if(count($latest) > 1):
+            return $latest;
+        endif;
+
+        return [];
     }
 }

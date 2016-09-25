@@ -13,12 +13,13 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
-use Eddmash\PowerOrm\Exceptions\FieldError;
+use Eddmash\PowerOrm\DeconstructableObject;
+use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Object;
 
-class Field extends Object implements FieldInterface
+class Field extends DeconstructableObject implements FieldInterface
 {
     const DEBUG_IGNORE = ['scopeModel', 'relation'];
 
@@ -180,22 +181,19 @@ class Field extends Object implements FieldInterface
 
     public function __construct($config = [])
     {
-        $this->constructorArgs = $config;
         BaseOrm::configure($this, $config);
-    }
-
-    public static function createObject($config = [])
-    {
-        return new static($config);
     }
 
     /**
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model $modelObject
+     * @param Model  $modelObject
+     *
      * @throws FieldError
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function contributeToClass($fieldName, $modelObject)
@@ -323,7 +321,12 @@ class Field extends Object implements FieldInterface
 
     public function deepClone()
     {
-        return 'clone';
+        $skel = $this->deconstruct();
+        $constructorArgs = $skel['constructorArgs'];
+        $className = $skel['fullName'];
+
+        /* @var $className Field */
+        return $className::createObject($constructorArgs);
     }
 
     /**
@@ -338,21 +341,12 @@ class Field extends Object implements FieldInterface
             $path = sprintf('Eddmash\PowerOrm\Model\Field as %s', $alias);
         endif;
 
-
         return [
-            'constructor_args' => $this->constructorArgs(),
+            'constructorArgs' => $this->getConstructorArgs(),
             'path' => $path,
-            'full_name' => $this->getFullClassName(),
-            'name' => sprintf('%s\%s', $alias, $this->getShortClassName())
+            'fullName' => $this->getFullClassName(),
+            'name' => sprintf('%s\%s', $alias, $this->getShortClassName()),
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function constructorArgs()
-    {
-        // TODO: Implement constructorArgs() method.
     }
 
     /**

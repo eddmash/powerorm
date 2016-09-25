@@ -23,17 +23,6 @@ use Eddmash\PowerOrm\DeConstructableInterface;
 interface ModelInterface extends DeConstructableInterface
 {
     /**
-     * The database table that this model represents.
-     *
-     * @return string
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function getTableName();
-
-    /**
      * Creates a Queryset that is used to interaract with the database.
      *
      * @param string $opts
@@ -82,11 +71,20 @@ interface ModelInterface extends DeConstructableInterface
     /**
      * This method should return an array of all the configurations that need to made on the meta.
      *
+     * <pre>public function getMetaSettings(){
+     *   return [
+     *      'proxy' => $this->proxy,
+     *      'managed' => $this->managed,
+     *      'verboseName' => $this->verboseName,
+     *  ];
+     * }
+     * </pre>
+     *
      * @return array
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getMeta();
+    public function getMetaSettings();
 }

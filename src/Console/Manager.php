@@ -2,6 +2,7 @@
 
 namespace Eddmash\PowerOrm\Console;
 
+use Eddmash\PowerOrm\Console\Command\BaseCommand;
 use Eddmash\PowerOrm\Console\Command\Command;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Helpers\Tools;
@@ -41,8 +42,6 @@ class Manager extends Base
 
         // get console args
         $argOpts = $_SERVER['argv'];
-        $v = new Parser();
-        $v->parse();
 
         // remove the manager from the list
         $manager = array_shift($argOpts);
@@ -119,7 +118,7 @@ class Manager extends Base
         $this->normal(sprintf('Type %s for help on a specific subcommand.', $inMessage).PHP_EOL.PHP_EOL);
         $this->normal(sprintf('Available Commands : ').PHP_EOL);
 
-        $path = sprintf('%s/commands', dirname(__FILE__));
+        $path = sprintf($this->path, dirname(__FILE__));
 
         $fileHandler = new FileHandler($path);
 
@@ -150,7 +149,7 @@ class Manager extends Base
     /**
      * @param $name
      *
-     * @return Command
+     * @return BaseCommand
      *
      * @since 1.1.0
      *

@@ -3,6 +3,7 @@
 namespace Eddmash\PowerOrm\Model;
 
 use Eddmash\PowerOrm\app\Registry;
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\field\AutoField;
 use Eddmash\PowerOrm\Model\field\Field;
@@ -17,9 +18,9 @@ use Eddmash\PowerOrm\Object;
  */
 class Meta extends Object implements MetaInterface
 {
-    const DEBUG_IGNORE = ['scopeModel', 'registry', 'localManyToMany', 'localFields', 'concreteModel', 'overrides'];
+    public static $DEBUG_IGNORE = ['scopeModel', 'registry', 'localManyToMany', 'localFields', 'concreteModel', 'overrides'];
 
-    const DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy'];
+    public static $DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy'];
 
     /**
      * Th name of the model this meta holds information for.
@@ -30,8 +31,9 @@ class Meta extends Object implements MetaInterface
 
     public $verboseName;
 
-    public $managed;
-    public $proxy;
+    public $managed = true;
+
+    public $proxy = false;
     /**
      * Does this model have an autofield, will have if primary key was set automatically.
      *
@@ -126,6 +128,14 @@ class Meta extends Object implements MetaInterface
     public function __construct($overrides = [])
     {
         $this->overrides = $overrides;
+
+        if($this->registry == null):
+            $this->registry = BaseOrm::getRegistry();
+        endif;
+    }
+
+    public static function createObject($params = []) {
+        return new static($params);
     }
 
     /**
@@ -159,13 +169,17 @@ class Meta extends Object implements MetaInterface
         $this->scopeModel = $classObject;
 
         // override with the configs now.
-        foreach (self::DEFAULT_NAMES as $defaultName) :
+        foreach (static::$DEFAULT_NAMES as $defaultName) :
 
             if (array_key_exists($defaultName, $this->overrides)):
 
                 $this->{$defaultName} = $this->overrides[$defaultName];
             endif;
         endforeach;
+
+        if($this->dbTable == null):
+            $this->dbTable = $this->_getTableName();
+        endif;
 
         $vName = $this->verboseName;
         $this->verboseName = (empty($vName)) ? ucwords(StringHelper::camelToSpace($this->modelName)) : $vName;
@@ -241,11 +255,21 @@ class Meta extends Object implements MetaInterface
         $this->primaryKey = $parent->meta->primaryKey;
     }
 
+    /**
+     * Returns all the options to override on the meta object.
+     *
+     * @return array
+     */
+    public function getOverrides()
+    {
+        return $this->overrides;
+    }
+
     public function __debugInfo()
     {
         $meta = [];
         foreach (get_object_vars($this) as $name => $value) :
-            if (in_array($name, self::DEBUG_IGNORE)):
+            if (in_array($name, static::$DEBUG_IGNORE)):
                 $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
                 continue;
             endif;
@@ -253,5 +277,9 @@ class Meta extends Object implements MetaInterface
         endforeach;
 
         return $meta;
+    }
+
+    private function _getTableName() {
+        return $this->modelName;
     }
 }

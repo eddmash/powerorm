@@ -1,6 +1,6 @@
 <?php
 
-namespace Eddmash\PowerOrm\Exceptions;
+namespace Eddmash\PowerOrm\Exception;
 
 /**
  * Class RelatedObjectDoesNotExist.
@@ -9,6 +9,6 @@ namespace Eddmash\PowerOrm\Exceptions;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class RelatedObjectDoesNotExist extends OrmExceptions
+class RelatedObjectDoesNotExist extends OrmException
 {
 }

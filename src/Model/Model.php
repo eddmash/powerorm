@@ -10,11 +10,12 @@
 
 namespace Eddmash\PowerOrm\Model;
 
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\ContributorInterface;
-use Eddmash\PowerOrm\Exceptions\FieldError;
-use Eddmash\PowerOrm\Exceptions\TypeError;
+use Eddmash\PowerOrm\DeconstructableObject;
+use Eddmash\PowerOrm\Exception\FieldError;
+use Eddmash\PowerOrm\Exception\TypeError;
+use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Object;
 
 /**
@@ -25,7 +26,7 @@ use Eddmash\PowerOrm\Object;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-abstract class Model extends Object implements ModelInterface, \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
+abstract class Model extends DeconstructableObject implements ModelInterface, \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
 {
     const DEBUG_IGNORE = ['_fieldCache'];
 
@@ -154,20 +155,21 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
         $this->init();
     }
 
-    public function init($registry = null, $fields = [])
+    public function init($fields = [], $kwargs = [])
     {
-        // ---- set meta
-        if (null === $registry):
-            // add model to the registry
-            $registry = BaseOrm::getRegistry();
+        // get meta settings for this model
+        $metaSettings = $this->getMetaSettings();
+
+        if(!empty($kwargs)):
+            if(array_key_exists('meta', $kwargs)):
+                $metaSettings = $kwargs['meta'];
+            endif;
+            if(array_key_exists('registry', $kwargs)):
+                $metaSettings['registry'] = $kwargs['registry'];
+            endif;
         endif;
 
-        // create meta for this model
-        $configs = $this->getMeta();
-        $configs['registry'] = $registry;
-        $configs['dbTable'] = $this->getTableName();
-
-        $meta = new Meta($configs);
+        $meta = Meta::createObject($metaSettings);
 
         $this->addToClass('meta', $meta);
 
@@ -187,7 +189,7 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
         $this->prepare();
 
         // register the model
-        $registry->registerModel($this);
+        $meta->registry->registerModel($this);
     }
 
     /**
@@ -276,6 +278,10 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
         $modelFields = [];
 
         $concreteParent = null;
+
+        /*
+         * @var \ReflectionClass
+         */
         foreach ($parents as $reflectionParent) :
             $parent = $reflectionParent->getName();
 
@@ -398,6 +404,9 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
     public function _checkFields()
     {
         $errors = [];
+        /*
+         * @var Field
+         */
         foreach ($this->meta->localFields as $fields) :
             $errors = array_merge($errors, $fields->checks());
         endforeach;
@@ -411,18 +420,6 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
     public function unboundFields()
     {
         return [];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableName()
-    {
-        if (empty($this->tableName)):
-            $this->tableName = $this->normalizeKey($this->getShortClassName());
-        endif;
-
-        return $this->tableName;
     }
 
     /**
@@ -444,13 +441,9 @@ abstract class Model extends Object implements ModelInterface, \ArrayAccess, \It
     /**
      * {@inheritdoc}
      */
-    public function getMeta()
+    public function getMetaSettings()
     {
-        return [
-            'proxy' => $this->proxy,
-            'managed' => $this->managed,
-            'verboseName' => $this->verboseName,
-        ];
+        return [];
     }
 
     /**

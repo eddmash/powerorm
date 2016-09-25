@@ -10,6 +10,80 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+/**
+ * This class represents a migration and its family tree infomartion
+ * i.e what migrations need to exist before this one can exist (parent)
+ * and which migrations cannot exist if this one does not (children).
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class Node
 {
+    public $name;
+    public $children;
+    public $parent;
+
+    public function __construct($name)
+    {
+        $this->name = $name;
+        $this->children = [];
+        $this->parent = [];
+    }
+
+    /**
+     * @param Node $parent
+     */
+    public function addParent($parent)
+    {
+        $this->parent[] = $parent;
+    }
+
+    /**
+     * @param Node $child
+     */
+    public function addChild($child)
+    {
+        $this->children[] = $child;
+    }
+
+    /**
+     * Get ancestors from the first ancestor aka adam and eve to upto this node.that is oldest at index '0'.
+     *
+     * @return array
+     */
+    public function getAncestors()
+    {
+        $ancestors = [];
+
+        $ancestors[] = $this->name;
+
+        /** @var $parent Node */
+        foreach ($this->parent as $parent) :
+            $ancestors = array_merge($parent->getAncestors(), $ancestors);
+        endforeach;
+
+        return $ancestors;
+    }
+
+    /**
+     * Get all nodes the consider this node there first ancestor, stating with this one.
+     * This method puts the current node as first in array index 0, and the newest being in the other end.
+     *
+     * @return array
+     */
+    public function getDescendants()
+    {
+        $descendants = [];
+
+        $descendants[] = $this->name;
+
+        /** @var $child Node */
+        foreach ($this->children as $child) :
+            $descendants = array_merge($child->getDescendants(), $descendants);
+        endforeach;
+
+        return $descendants;
+    }
 }

@@ -48,5 +48,5 @@ interface DeConstructableInterface
      *
      * @return array
      */
-    public function constructorArgs();
+    public function getConstructorArgs();
 }

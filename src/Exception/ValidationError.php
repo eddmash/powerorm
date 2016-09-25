@@ -1,6 +1,6 @@
 <?php
 
-namespace Eddmash\PowerOrm\Exceptions;
+namespace Eddmash\PowerOrm\Exception;
 
 /**
  * Class ValidationError.
@@ -9,7 +9,7 @@ namespace Eddmash\PowerOrm\Exceptions;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class ValidationError extends OrmErrors
+class ValidationError extends OrmError
 {
     public function __construct($message, $code = '')
     {

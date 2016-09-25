@@ -12,13 +12,37 @@
 namespace Eddmash\PowerOrm\Migration\State;
 
 use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\DeconstructableObject;
+use Eddmash\PowerOrm\Helpers\Tools;
 
-class ProjectState
+class ProjectState extends DeconstructableObject
 {
+    public $modelStates;
+    private static $registry;
+
+    public function __construct($modelStates = []) {
+        $this->modelStates = $modelStates;
+    }
+
+    /**
+     * @param $models
+     *
+     * @return ProjectState
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function createObject($models = []) {
+        return new static($models);
+    }
+
     /**
      * Takes in an Registry and returns a ProjectState matching it.
      *
      * @param Registry $registry
+     *
+     * @return ProjectState
      *
      * @since 1.1.0
      *
@@ -28,9 +52,53 @@ class ProjectState
     {
         $modelStates = [];
         foreach ($registry->getModels() as $modelName => $modelObj) :
-            $modelStates[$modelName] = ModelState::fromModel($modelObj);
+            $modelStates[Tools::normalizeKey($modelName)] = ModelState::fromModel($modelObj);
         endforeach;
 
-        return new static($modelStates);
+        return static::createObject($modelStates);
     }
+
+    /**
+     * @param ModelState $model
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function addModelState($model) {
+        $this->modelStates[$model->name] = $model;
+    }
+
+    public function removeModelState($modelName) {
+        unset($this->modelStates[$modelName]);
+    }
+
+    /**
+     * @return StateRegistry
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getRegistry() {
+
+        return StateRegistry::createObject($this->modelStates);
+    }
+
+    /**
+     * @return array
+     */
+    public function getModelStates()
+    {
+        return $this->modelStates;
+    }
+
+    public function deepClone() {
+        return static::createObject();
+    }
+
+    public function deconstruct() {
+
+    }
+
 }

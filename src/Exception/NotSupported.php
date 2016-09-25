@@ -1,14 +1,14 @@
 <?php
 
-namespace Eddmash\PowerOrm\Exceptions;
+namespace Eddmash\PowerOrm\Exception;
 
 /**
- * Class NotImplemented.
+ * Class NotSupported.
  *
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class NotImplemented extends \ErrorException
+class NotSupported extends OrmException
 {
 }

@@ -8,8 +8,10 @@ use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Migration\AutoDetector;
 use Eddmash\PowerOrm\Migration\Loader;
+use Eddmash\PowerOrm\Migration\Migration;
+use Eddmash\PowerOrm\Migration\MigrationFile;
+use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
-use Orm;
 
 /**
  * Class Makemigrations.
@@ -28,7 +30,7 @@ class Makemigrations extends BaseCommand
             $this->normal($this->help.PHP_EOL);
         endif;
 
-        $registry = Orm::getRegistry();
+        $registry = BaseOrm::getRegistry();
 
         $loader = new Loader();
 
@@ -41,13 +43,13 @@ class Makemigrations extends BaseCommand
             exit;
         endif;
 
-        var_dump(ProjectState::fromApps($registry));
-        $autodetector = new AutoDetector($loader->getProjectState(),
+        $autodetector = new AutoDetector(
+            $loader->getProjectState(),
             ProjectState::fromApps($registry),
             InteractiveAsker::createObject()
         );
 
-        $changes = $autodetector->changes($loader->graph);
+        $changes = $autodetector->getChanges($loader->graph);
 
         if (empty($changes)):
             $this->normal('No changes were detected'.PHP_EOL);
@@ -57,8 +59,9 @@ class Makemigrations extends BaseCommand
         if (in_array('--dry-run', $argOpts)):
             $this->info('Migrations :'.PHP_EOL);
 
+            /** @var $migration Migration */
             foreach ($changes as $migration) :
-                $this->normal("\t --".$migration->name.PHP_EOL);
+                $this->normal('  -- '.$migration->getName().PHP_EOL);
             endforeach;
             exit;
         endif;
@@ -69,21 +72,25 @@ class Makemigrations extends BaseCommand
     public function _writeMigrations($migrationChanges)
     {
         $this->info('Creating Migrations :', true);
+
+        /** @var $migration Migration */
+        /* @var $op Operation */
         foreach ($migrationChanges as $migration) :
 
-            $content = $migration->asString();
+            $migrationFile = MigrationFile::createObject($migration);
 
-            $fileName = $migration->name;
-            $this->normal('  '.$fileName.'.php', true);
+            $fileName = $migrationFile->getFileName();
+            $this->normal('  '.$fileName, true);
 
-            foreach ($migration->operations as $op) :
-                $this->normal(sprintf('   - %s', ucwords($op->describe())), true);
+            $operations = $migration->getOperations();
+            foreach ($operations as $op) :
+                $this->normal(sprintf('     - %s', ucwords($op->getDescription())), true);
             endforeach;
 
             // write content to file.
             $handler = new FileHandler(BaseOrm::getMigrationsPath(), $fileName);
 
-            $handler->write($content);
+            $handler->write($migrationFile->getContent());
         endforeach;
     }
 

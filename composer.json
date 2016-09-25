@@ -21,7 +21,8 @@
   ],
   "require": {
     "php": ">=5.4.0",
-    "composer/installers": "~1.0"
+    "composer/installers": "~1.0",
+    "doctrine/dbal": ">=2.5-dev,<2.6-dev"
   },
   "require-dev": {
     "phpunit/phpunit": "*"

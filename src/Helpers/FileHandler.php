@@ -36,6 +36,12 @@ class FileHandler extends Object
         $this->fileName = $fileName;
     }
 
+    public static function createObject($param = []) {
+        $fileName = (empty($param['fileName'])) ? '' : $param['fileName'];
+
+        return new static($param['path'], $fileName);
+    }
+
     /**
      * @param string $content the content to write
      */
@@ -48,7 +54,7 @@ class FileHandler extends Object
         endif;
 
         // absolute path to file
-        $file = $this->path.$this->fileName.'.php';
+        $file = $this->path.$this->fileName;
 
         $fileHandle = fopen($file, 'w');
         if ($fileHandle):
@@ -117,6 +123,10 @@ class FileHandler extends Object
         $ext = $this->_stableExt($ext);
 
         $directory = $this->_stableDir($this->path);
+
+        if(!file_exists($directory)):
+            return [];
+        endif;
 
         $dirIterator = new \DirectoryIterator($directory);
 

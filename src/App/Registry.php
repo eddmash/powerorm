@@ -12,8 +12,8 @@
 namespace Eddmash\PowerOrm\App;
 
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Exceptions\AppRegistryNotReady;
-use Eddmash\PowerOrm\Exceptions\LookupError;
+use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
+use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Model;
@@ -44,10 +44,14 @@ class Registry extends Object
         $this->ready = false;
     }
 
+    public static function createObject($config = []) {
+        return new static();
+    }
+
     public function populate()
     {
         if ($this->ready == false) :
-            $this->getModels();
+            $this->_populateRegistry();
             $this->ready = true;
         endif;
 
@@ -87,7 +91,7 @@ class Registry extends Object
      */
     public function getModels()
     {
-        $this->_getModels();
+        $this->_populateRegistry();
 
         return $this->allModels;
     }
@@ -99,8 +103,12 @@ class Registry extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _getModels()
+    protected function _populateRegistry()
     {
+        if($this->ready):
+            return;
+        endif;
+
         $modelClasses = $this->getModelClasses();
 
         if (!empty($modelClasses)) :

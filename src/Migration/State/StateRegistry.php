@@ -11,6 +11,35 @@
 
 namespace Eddmash\PowerOrm\Migration\State;
 
-class StateRegistry
+use Eddmash\PowerOrm\App\Registry;
+
+class StateRegistry extends Registry
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($modelStates) {
+        parent::__construct();
+        $this->_populate($modelStates);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function createObject($modelStates) {
+        return new static($modelStates);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function _populate($modelStates)
+    {
+        /** @var $modelState ModelState */
+        foreach ($modelStates as $name => $modelState) :
+            $modelState->toModel($this);
+        endforeach;
+
+    }
+
 }

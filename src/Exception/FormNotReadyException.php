@@ -1,6 +1,6 @@
 <?php
 
-namespace Eddmash\PowerOrm\Exceptions;
+namespace Eddmash\PowerOrm\Exception;
 
 /**
  * Class FormNotReadyException.

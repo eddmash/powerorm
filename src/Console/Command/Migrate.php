@@ -2,10 +2,10 @@
 
 namespace Eddmash\PowerOrm\Console\Command;
 
-use Eddmash\PowerOrm\Migrations\AutoDetector;
-use Eddmash\PowerOrm\Migrations\Executor;
-use Eddmash\PowerOrm\Migrations\ProjectState;
-use Orm;
+use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Migration\AutoDetector;
+use Eddmash\PowerOrm\Migration\Executor;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 /**
  * Class Migrate.
@@ -45,8 +45,8 @@ class Migrate extends BaseCommand
             $fake = false;
         endif;
 
-        $connection = Orm::getDbConnection();
-        $registry = Orm::getRegistry();
+        $connection = BaseOrm::getDbConnection();
+        $registry = BaseOrm::getRegistry();
 
         $executor = new Executor($connection);
 
@@ -59,11 +59,11 @@ class Migrate extends BaseCommand
                 $target = $executor->loader->getMigrationByPrefix($name);
             endif;
         else:
-            $target = $executor->loader->graph->leafNodes();
+            $target = $executor->loader->graph->getLeafNodes();
         endif;
 
         // get migration plan
-        $plan = $executor->migrationPlan($target);
+        $plan = $executor->getMigrationPlan($target);
 
         $this->dispatchSignal('powerorm.migration.pre_migrate', $this);
 
@@ -76,7 +76,7 @@ class Migrate extends BaseCommand
             $auto_detector = new AutoDetector($executor->loader->createProjectState(),
                 ProjectState::fromApps($registry));
 
-            $changes = $auto_detector->changes($executor->loader->graph);
+            $changes = $auto_detector->getChanges($executor->loader->graph);
 
             if (!empty($changes)):
 

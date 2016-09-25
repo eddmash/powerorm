@@ -11,12 +11,17 @@
 
 namespace Eddmash\PowerOrm;
 
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\Console\Manager;
 
 define('NOT_PROVIDED', 'NOT_PROVIDED');
 
 class BaseOrm extends Object
 {
+    private static $instance;
     public static $SET_NULL = 'set_null';
     public static $CASCADE = 'cascade';
     public static $PROTECT = 'protect';
@@ -32,15 +37,20 @@ class BaseOrm extends Object
     public $modelsPath;
 
     /**
+     * @var Connection
+     */
+    private static $connection;
+
+    /**
      * @param array $config
      * @ignore
      */
     public function __construct($config = [])
     {
-        static::configure($this, $config);
+        self::configure($this, $config);
 
         // setup the registry
-        $this->registryCache = new Registry();
+        $this->registryCache = Registry::createObject();
     }
 
     public static function getModelsPath()
@@ -100,10 +110,29 @@ class BaseOrm extends Object
      */
     public static function &getInstance()
     {
-        $ci = &self::getCiObject();
+        $instance = null;
+        if(ENVIRONMENT == 'POWERORM_DEV'):
+            $instance = static::_standAloneEnvironment();
+        else:
+            $instance = static::_ciEnvironment();
+        endif;
+
+        return $instance;
+    }
+
+    public static function _ciEnvironment() {
+        $ci = static::getCiObject();
         $orm = &$ci->orm;
 
         return $orm;
+    }
+
+    public static function _standAloneEnvironment() {
+        if(static::$instance == null):
+            static::$instance = self::createObject();
+        endif;
+
+        return self::$instance;
     }
 
     /**
@@ -120,7 +149,27 @@ class BaseOrm extends Object
 
     public static function getDbConnection()
     {
-        //        return Connection::instance();
+
+        if(static::$connection == null):
+            $config = new Configuration();
+
+            $connectionParams = array(
+                'dbname' => 'tester',
+                'user' => 'root',
+                'password' => 'root1.',
+                'host' => 'localhost',
+                'driver' => 'pdo_mysql',
+            );
+
+            static::$connection = DriverManager::getConnection($connectionParams, $config);
+        endif;
+
+        $stmt = static::$connection->query('SELECT * FROM ts_user');
+        while ($row = $stmt->fetch()) {
+            echo $row['last_name'].PHP_EOL;
+        }
+
+        return static::$connection;
     }
 
     /**
@@ -138,5 +187,15 @@ class BaseOrm extends Object
         endforeach;
 
         return $object;
+    }
+
+    public static function createObject($config = []) {
+
+        return new static($config);
+    }
+
+    public static function consoleRun($config = []) {
+        static::createObject($config);
+        Manager::run();
     }
 }

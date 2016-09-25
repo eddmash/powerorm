@@ -10,11 +10,27 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+use Eddmash\PowerOrm\Migration\Operation\Operation;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
+
 class Migration
 {
     protected $name;
     protected $operations;
     protected $description;
+    protected $dependency = [];
+
+    public function __construct($name)
+    {
+        $this->name = $name;
+
+        $this->operations = $this->getOperations();
+        $this->requires = $this->getDependency();
+    }
+
+    public static function createObject($param) {
+        return new static($param);
+    }
 
     /**
      * @return mixed
@@ -64,7 +80,62 @@ class Migration
         $this->description = $description;
     }
 
-    public function toString()
+    /**
+     * @return mixed
+     */
+    public function getDependency()
     {
+        return $this->dependency;
+    }
+
+    /**
+     * @param mixed $dependency
+     */
+    public function setDependency($dependency)
+    {
+        $this->dependency[] = $dependency;
+    }
+
+    public function apply() {
+
+    }
+
+    public function unApply() {
+
+    }
+
+    /**
+     * Takes a ProjectState and returns a new one with the migration's operations applied to it.
+     *
+     * Preserves the original object state by default and will return a mutated state from a copy.
+     *
+     * @param ProjectState $state
+     * @param bool|true    $preserveState
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function updateState($state, $preserveState = true) {
+        $newState = $state;
+//        if($preserveState):
+//            $newState = $state->deepClone();
+//        endif;
+
+        /** @var $operation Operation */
+        foreach ($this->operations as $operation) :
+
+            $operation->updateState($state);
+
+        endforeach;
+
+        return $state;
+    }
+
+    public function __toString()
+    {
+        return sprintf('<Migration %s>', $this->name);
     }
 }

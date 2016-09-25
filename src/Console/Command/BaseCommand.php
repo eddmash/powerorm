@@ -24,7 +24,16 @@ class BaseCommand extends Base
      * @var bool
      */
     public $systemCheck = true;
-    public $headerMessage = 'Powerorm %s by Eddilbert Macharia (www.eddmash.com).';
+
+    public $headerMessage = '
+    **************************************************************************
+        *    ___   ___           ___  ___  ___  ___                      *
+        *   /___/ /  / \  /\  / /__  /__/ /  / /__/ /\  /\               *
+        *  /     /__/   \/  \/ /__  /  \ /__/ /  \ /  \/  \(%s)       *
+        *       by Eddilbert Macharia (www.eddmash.com)                  *
+    **************************************************************************
+
+    ';
 
     public function getOptions()
     {
@@ -93,8 +102,10 @@ class BaseCommand extends Base
 
     public function execute($argOpts, $manager)
     {
-        $message = $this->ansiFormat($this->headerMessage.PHP_EOL, Console::BG_BLACK);
+//        $consoleLabel = $this->ansiFormat($this->consoleLabel.PHP_EOL, Console::FG_GREEN);
+        $message = $this->ansiFormat($this->headerMessage.PHP_EOL, Console::FG_GREEN);
 
+//        $this->normal(sprintf($consoleLabel, POWERORM_VERSION));
         $this->normal(sprintf($message, POWERORM_VERSION), true);
 
         $this->managerName = $manager;

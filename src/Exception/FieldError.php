@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Eddmash\PowerOrm\Exceptions;
+namespace Eddmash\PowerOrm\Exception;
 
 class FieldError extends \ErrorException
 {

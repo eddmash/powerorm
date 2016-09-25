@@ -1,14 +1,14 @@
 <?php
 
-namespace Eddmash\PowerOrm\Exceptions;
+namespace Eddmash\PowerOrm\Exception;
 
 /**
- * Class OrmExceptions.
+ * Class OrmError.
  *
  * @since 1.0.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class OrmExceptions extends \Exception
+class OrmError extends \ErrorException
 {
 }

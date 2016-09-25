@@ -2,13 +2,16 @@
 /**
  * Bootstrap the application.
  */
+use Doctrine\Common\ClassLoader;
 use Eddmash\PowerOrm\Autoloader\Autoloader;
 use Eddmash\PowerOrm\Config\OrmConfig;
 
 define('POWERORM_VERSION', '1.1.0');
 
 if (!defined('BASEPATH')) :
-    define('ENVIRONMENT', 'testing');
+    if(!defined('ENVIRONMENT')):
+        define('ENVIRONMENT', 'testing');
+    endif;
     define('BASEPATH', __DIR__.DIRECTORY_SEPARATOR);
     define('APPPATH', BASEPATH);
     define('POWERORM_BASEPATH', BASEPATH);
@@ -26,13 +29,13 @@ endif;
 require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';
 require POWERORM_SRCPATH.'Autoloader/Config/BaseConfig.php';
 require_once POWERORM_SRCPATH.'Autoloader/Config/OrmConfig.php';
+require 'vendor/doctrine/common/lib/Doctrine/Common/ClassLoader.php';
+
 // setup Autoloader
 $loader = new Autoloader();
 $loader->initialize(new OrmConfig());
 $loader->register();
 
-// create an instance of the ORM if we are in testing environment
-// otherwise the instance is created by the framework
-if (ENVIRONMENT == 'testing') {
-    require_once 'Orm.php';
-}
+// load doctrine DBAL
+$classLoader = new ClassLoader('Doctrine', 'vendor/doctrine');
+$classLoader->register();
