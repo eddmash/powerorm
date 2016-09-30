@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm\Migration;
 use Eddmash\PowerOrm\Console\Question\Asker;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\RemoveField;
+use Eddmash\PowerOrm\Migration\Operation\Model\AlterModelMeta;
 use Eddmash\PowerOrm\Migration\Operation\Model\CreateModel;
 use Eddmash\PowerOrm\Migration\Operation\Model\DeleteModel;
 use Eddmash\PowerOrm\Migration\Operation\Model\RenameModel;
@@ -90,6 +91,12 @@ class AutoDetector extends Object
      * @var array
      */
     private $newUnmanagedKeys;
+    
+    private $keptProxyKeys;
+    private $keptUnmanagedKeys;
+    private $keptModelKeys;
+    private $oldFieldKeys;
+    private $newFieldKeys;
 
     /**
      * Holds any renamed models.
@@ -183,6 +190,30 @@ class AutoDetector extends Object
         endforeach;
 
         $this->generateRenamedModels();
+
+        // find anything that was kept
+        $this->keptModelKeys = array_diff($this->oldModelKeys, $this->newModelKeys);
+        $this->keptProxyKeys = array_diff($this->oldProxyKeys, $this->newProxyKeys);
+        $this->keptUnmanagedKeys = array_diff($this->oldUnmanagedKeys, $this->newUnmanagedKeys);
+        
+        // get fields from both the new and the old models
+        /**@var $oldState ModelState*/
+        /**@var $newState ModelState*/
+        foreach ($this->keptModelKeys as $modelName) :
+            $oldModelName = $this->getOldModelName($modelName);
+            $oldState = $this->fromState->modelStates[$oldModelName];
+            $newState = $this->toState->modelStates[$modelName];
+
+            foreach ($newState->fields as $newName=>$newField) :
+                $this->oldFieldKeys[$modelName][$newName] = $newField;
+            endforeach;
+
+            foreach ($oldState->fields as $oldName=>$oldField) :
+                $this->newFieldKeys[$modelName][$oldName] = $oldField;
+            endforeach;
+
+        endforeach;
+        
         $this->generateDeleteModel();
         $this->generateCreatedModel();
         $this->generateDeletedProxies();
@@ -517,7 +548,42 @@ class AutoDetector extends Object
      */
     public function generateAlteredMeta()
     {
+        //get unmanaged converted to managed
+        $managed = array_intersect($this->oldUnmanagedKeys, $this->newModelKeys);
+        //get managed converted to unmanaged
+        $unmanaged = array_intersect($this->oldModelKeys, $this->oldUnmanagedKeys);
 
+        $modelsToCheck = array_merge($this->keptProxyKeys, $this->keptUnmanagedKeys, $managed, $unmanaged);
+
+        $modelsToCheck = array_unique($modelsToCheck);
+        /**@var $oldState ModelState*/
+        /**@var $newState ModelState*/
+        foreach ($modelsToCheck as $modelName) :
+            $oldModelName = $this->getOldModelName($modelName);
+            $oldState = $this->fromState->modelStates[$oldModelName];
+            $newState = $this->toState->modelStates[$modelName];
+
+            $oldMeta = [];
+            foreach ($oldState->meta as $name=>$opt) :
+                if(AlterModelMeta::isAlterableOption($name)):
+                    $oldMeta[$name] = $opt;
+                endif;
+            endforeach;
+
+            $newMeta = [];
+            foreach ($newState->meta as $name=>$opt) :
+                if(AlterModelMeta::isAlterableOption($name)):
+                    $newMeta[$name] = $opt;
+                endif;
+            endforeach;
+        
+            if($oldMeta !== $newMeta):
+                $this->addOperation(AlterModelMeta::createObject([
+                    'name'=> $modelName,
+                    'meta'=> $newMeta,
+                ]));
+            endif;
+        endforeach;
     }
     
     /**
@@ -680,6 +746,11 @@ class AutoDetector extends Object
         $name = explode('_', $name);
 
         return (int) str_replace($this->migrationNamePrefix, '', $name[0]);
+    }
+
+    private function getOldModelName($modelName)
+    {
+        return (in_array($modelName, $this->renamedModels))? $this->renamedModels[$modelName]: $modelName;
     }
 
 }

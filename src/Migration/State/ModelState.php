@@ -35,7 +35,7 @@ class ModelState extends Object
 {
     public $name;
     public $fields = [];
-    public $meta;
+    public $meta=[];
     public $extends;
 
     private $fakeNamespace = 'Eddmash\PowerOrm\__Fake__\Model';
