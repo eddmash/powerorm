@@ -4,6 +4,7 @@ namespace Eddmash\PowerOrm\Model;
 
 use Eddmash\PowerOrm\app\Registry;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\field\AutoField;
 use Eddmash\PowerOrm\Model\field\Field;
@@ -16,7 +17,7 @@ use Eddmash\PowerOrm\Object;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Meta extends Object implements MetaInterface
+class Meta extends DeconstructableObject implements MetaInterface
 {
     public static $DEBUG_IGNORE = ['scopeModel', 'registry', 'localManyToMany', 'localFields', 'concreteModel', 'overrides'];
 
@@ -125,6 +126,13 @@ class Meta extends Object implements MetaInterface
      */
     public $autoCreated = false;
 
+    /**
+     * This attribute will only be set if the scopeModel contains a parent model
+     * that is not abstact/PModel/Eddmash\PowerOrm\Model
+     * @var
+     */
+    private $parentLink;
+
     public function __construct($overrides = [])
     {
         $this->overrides = $overrides;
@@ -154,7 +162,10 @@ class Meta extends Object implements MetaInterface
         // TODO: Implement getConcreteFields() method.
     }
 
-    public function getRelatedObjects()
+    /**
+     * {@inheritdoc}
+     */
+    public function getReverseRelatedObjects()
     {
         // TODO: Implement getRelatedObjects() method.
     }
@@ -165,7 +176,7 @@ class Meta extends Object implements MetaInterface
     public function contributeToClass($propertyName, $classObject)
     {
         $classObject->{$propertyName} = $this;
-        $this->modelName = $this->normalizeKey($classObject->getShortClassName());
+        $this->modelName = $classObject->getShortClassName();
         $this->scopeModel = $classObject;
 
         // override with the configs now.
@@ -185,12 +196,21 @@ class Meta extends Object implements MetaInterface
         $this->verboseName = (empty($vName)) ? ucwords(StringHelper::camelToSpace($this->modelName)) : $vName;
     }
 
-    private function _getFields($opts)
+    private function _getFields($forward = true, $reverse = true, $include_parents = true)
     {
-        $forward = $reverse = $include_parents = true;
-        $include_hidden = false;
+        $fields = [];
         $seen_models = null;
-        extract($opts);
+
+//        if($reverse):
+//
+//        endif;
+
+        if($forward):
+            $fields = array_merge($fields, array_merge($this->localFields, $this->localManyToMany));
+        endif;
+
+        return $fields;
+
     }
 
     /**
@@ -263,6 +283,10 @@ class Meta extends Object implements MetaInterface
     public function getOverrides()
     {
         return $this->overrides;
+    }
+    
+    public function deconstruct(){
+    
     }
 
     public function __debugInfo()

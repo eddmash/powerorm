@@ -9,13 +9,9 @@
 * file that was distributed with this source code.
 */
 
-namespace Eddmash\PowerOrm\Migration\Operation\Field;
+namespace Eddmash\PowerOrm\Model\Field\Related;
 
-use Eddmash\PowerOrm\Migration\Operation\Operation;
-
-class RemoveField extends Operation
+class OneToOneField extends BaseRelated
 {
-    public function updateState() {
 
-    }
 }

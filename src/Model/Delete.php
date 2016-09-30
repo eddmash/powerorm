@@ -9,13 +9,15 @@
 * file that was distributed with this source code.
 */
 
-namespace Eddmash\PowerOrm\Migration\Operation\Field;
+namespace Eddmash\PowerOrm\Model;
 
-use Eddmash\PowerOrm\Migration\Operation\Operation;
 
-class RemoveField extends Operation
+class Delete
 {
-    public function updateState() {
 
-    }
+    const CASCADE = 'cascade';
+    const PROTECT = 'protect';
+    const DONOTHING = 'donothing';
+    const SETNULL = 'setnull';
+    const SETDEFAULT = 'setdefault';
 }

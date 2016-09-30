@@ -11,13 +11,33 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
-
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 
+/**
+ *  Drops a model's table.
+ * @since 1.1.0
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class DeleteModel extends Operation
 {
 
-    public function updateState(){
-    
+    public $name;
+
+    /**
+     * @inheritDoc
+     */
+    public function updateState($state)
+    {
+        $state->removeModelState($this->name);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDescription()
+    {
+        return sprintf("Delete model %s", $this->name);
+    }
+
+
 }

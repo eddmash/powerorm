@@ -336,9 +336,14 @@ class Field extends DeconstructableObject implements FieldInterface
     {
         $path = '';
         $alias = 'modelField';
+        $relAlias = 'relModelField';
 
         if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Model\Field')):
             $path = sprintf('Eddmash\PowerOrm\Model\Field as %s', $alias);
+        endif;
+        if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Model\Field\Related')):
+            $alias = $relAlias;
+            $path = sprintf('Eddmash\PowerOrm\Model\Field\Related as %s', $relAlias);
         endif;
 
         return [

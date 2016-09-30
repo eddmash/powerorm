@@ -37,7 +37,17 @@ interface MetaInterface extends ContributorInterface
      */
     public function getConcreteFields();
 
-    public function getRelatedObjects();
+    /**
+     *  Returns all related objects pointing to the current model. The related objects can come from a one-to-one,
+     * one-to-many, or many-to-many field relation type.
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getReverseRelatedObjects();
 
     /**
      * Adds a field into the meta object.

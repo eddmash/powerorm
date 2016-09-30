@@ -80,17 +80,4 @@ abstract class Operation extends DeconstructableObject implements OperationInter
             'constructorArgs' => $this->getConstructorArgs(),
         ];
     }
-
-    /**
-     * Migration use this method to contribute to the current state of the project.
-     *
-     * @param ProjectState $state
-     *
-     * @return mixed
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    abstract public function updateState($state);
 }

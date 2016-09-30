@@ -10,12 +10,16 @@
 
 namespace Eddmash\PowerOrm\Model;
 
+use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\ArrayObjectInterface;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\ContributorInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
+use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Field\Related\OneToOneField;
 use Eddmash\PowerOrm\Object;
 
 /**
@@ -26,7 +30,7 @@ use Eddmash\PowerOrm\Object;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-abstract class Model extends DeconstructableObject implements ModelInterface, \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
+abstract class Model extends DeconstructableObject implements ModelInterface, ArrayObjectInterface
 {
     const DEBUG_IGNORE = ['_fieldCache'];
 
@@ -173,16 +177,23 @@ abstract class Model extends DeconstructableObject implements ModelInterface, \A
 
         $this->addToClass('meta', $meta);
 
-        $this->setupFields($fields);
+        list($concreteParentName, $immediateParent, $fieldsList) = $this->_getHierarchyMeta();
+
+        $this->setupFields($fields, $fieldsList);
 
         // proxy model setup
         if ($this->meta->proxy):
-            $this->proxySetup();
+            try{
+                $concreteParent = $meta->registry->getModel($concreteParentName);
+            }catch (LookupError $e){
+                $concreteParent = $concreteParentName::createObject();
+            }
+            $this->proxySetup($concreteParent);
         else:
             $this->meta->concreteModel = $this;
 
             // setup for multiple inheritance
-            $this->prepareMultiInheritance();
+            $this->prepareMultiInheritance($immediateParent);
         endif;
 
         // ensure the model is ready for use.
@@ -190,6 +201,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, \A
 
         // register the model
         $meta->registry->registerModel($this);
+
     }
 
     /**
@@ -209,12 +221,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, \A
         endif;
     }
 
-    public function setupFields($fields = [])
+    public function setupFields($fields = [], $hierarchyFields)
     {
         if (empty($fields)):
-            $fieldsList = $this->getFieldsFromHierarchy();
 
-            $fields = $fieldsList[$this->getFullClassName()];
+            $fields = $hierarchyFields[$this->getFullClassName()];
+
         endif;
 
         foreach ($fields as $name => $fieldObj) :
@@ -226,22 +238,42 @@ abstract class Model extends DeconstructableObject implements ModelInterface, \A
         endforeach;
     }
 
-    public function proxySetup()
+    /**
+     * @param Model $concreteParent
+     * @throws FieldError
+     * @throws TypeError
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function proxySetup($concreteParent)
     {
-        $concreteParent = reset($this->getHierarchyMeta());
-
-        if ($concreteParent == null):
-            throw new TypeError(sprintf("Proxy model '%s' has no non-abstract".
-                ' model base class.', $this->getShortClassName()));
-        endif;
 
         $this->meta->setupProxy($concreteParent);
         $this->meta->concreteModel = $concreteParent->meta->concreteModel;
     }
 
-    public function prepareMultiInheritance()
+    public function prepareMultiInheritance($parentModelName)
     {
-        //todo
+        $ignoreModels = [\PModel::getFullClassName(), Model::getFullClassName()];
+        if(!in_array($parentModelName, $ignoreModels)):
+
+            $attrName = sprintf('%s_ptr', $this->normalizeKey($parentModelName));
+
+            if($this->_fieldCache==null || !array_key_exists($attrName, $this->_fieldCache)):
+                $field = OneToOneField::createObject([
+                    'to'=> $parentModelName,
+                    'onDelete'=> Delete::CASCADE,
+                    'name'=> $attrName,
+                    'autoCreate'=>true,
+                    'parentLink'=>true,
+                ]);
+
+                $this->addToClass($attrName, $field);
+            endif;
+
+        endif;
+
+
     }
 
     public function prepare()
@@ -249,8 +281,17 @@ abstract class Model extends DeconstructableObject implements ModelInterface, \A
         $this->meta->prepare($this);
     }
 
+    private function _getFields($fieldsList) {
+
+        return $fieldsList[$this->getFullClassName()];
+    }
+
     /**
      * Gets information about a model and all its parent.
+     *
+     * Some fact to check for :
+     *  - proxy model should have at least one concrete model.
+     *  - proxy model should not extend an abstract class that contains fields.
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
@@ -261,13 +302,15 @@ abstract class Model extends DeconstructableObject implements ModelInterface, \A
      * @return array
      *
      * @throws TypeError
+     * @throws FieldError
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getHierarchyMeta($method = 'unboundFields', $args = null, $fromOldest = true)
+    private function _getHierarchyMeta($method = 'unboundFields', $args = null, $fromOldest = true)
     {
+        $isProxy = $this->meta->proxy;
         // start from oldest parent e.g Object to the last child model
         $parents = $this->getParents();
         $parents = array_merge([$this->getFullClassName() => new \ReflectionObject($this)], $parents);
@@ -279,27 +322,39 @@ abstract class Model extends DeconstructableObject implements ModelInterface, \A
 
         $concreteParent = null;
 
-        /*
-         * @var \ReflectionClass
-         */
-        foreach ($parents as $reflectionParent) :
+        $previousParent = null;
+        $previousAbstractParent = null;
+
+        /** @var $reflectionParent \ReflectionClass */
+        /* @var $concreteParent \ReflectionClass */
+        foreach ($parents as $index => $reflectionParent) :
+            $fields = [];
             $parent = $reflectionParent->getName();
+            $isOnCurrentModel = ($this->getFullClassName() === $parent);
 
             if (!$reflectionParent->hasMethod($method)):
                 continue;
             endif;
 
             $reflectionMethod = $reflectionParent->getMethod($method);
+
             if ($reflectionMethod->isAbstract()):
                 continue;
             endif;
 
+
+            // concrete is a class that can be instantiated.
             // check for at least once concrete parent nearest to the last child model.
-            // since we are going downwards we keep updating the concrete varaible.
-            if ($reflectionParent->isInstantiable()):
+            // since we are going downwards we keep updating the concrete variable.
+            if (!($isOnCurrentModel && $isProxy) && $reflectionParent->isInstantiable()):
+
                 $concreteParent = $reflectionParent;
             endif;
 
+            // ************ get the fields
+            // we need to call the parent version of the method for each class to get its fields
+            // this is how we bypass the overriding functionality of php, otherwise if we don't do this the $method will
+            // always provide the fields defined in the last child class.
             $parentMethodCall = sprintf('%1$s::%2$s', $parent, $method);
             if ($args != null):
                 if (is_array($args)):
@@ -312,65 +367,66 @@ abstract class Model extends DeconstructableObject implements ModelInterface, \A
                 $fields = call_user_func([$this, $parentMethodCall]);
             endif;
 
+            // =========================== Some Validations ========================
+
+            /**
+             * confirm fields don't exist on an  of the parents
+             * ensure its not an abstract class,
+             * i choose to through an exception of overriding for consistence sake. that is on the $method no overriding
+             * takes place.
+             *
+             */
+            if($previousParent != null && $previousParent != $previousAbstractParent):
+                $fieldKeys = array_keys($fields);
+                $parentKeys = array_keys($modelFields[$previousParent]);
+                $commonFields = array_intersect($parentKeys, $fieldKeys);
+
+                if(!empty($commonFields)):
+                    throw new FieldError(
+                        sprintf('Local field [ %s ] in class "%s" clashes with field of similar name from base class "%s" ',
+                            implode(', ', $commonFields), $parent, $previousParent));
+
+                endif;
+            endif;
+
+            // get fields of previous model if it was an abstract model and add them to child model.
+            if($previousAbstractParent != null):
+                $parentFields = $modelFields[$previousAbstractParent];
+                $fields = array_merge($parentFields, $fields);
+
+            endif;
+
+            // is the parent and abstract model and is the current model a proxy model
+            // if so the parent should not have any fields.
+            if(($isOnCurrentModel && $isProxy) && $previousParent === $previousAbstractParent):
+                $parentFields = $modelFields[$previousAbstractParent];
+                if(!empty($parentFields)):
+                    throw new TypeError(sprintf('Abstract base class containing model fields not '.
+                            "permitted for proxy model '%s'.", $parent));
+                endif;
+            endif;
+
+            if($reflectionParent->isAbstract()):
+                $previousAbstractParent = $parent;
+            else:
+                $previousAbstractParent = null;
+            endif;
+
+            if(!$isOnCurrentModel):
+                $previousParent = $parent;
+            endif;
+
             $modelFields[$parent] = $fields;
 
         endforeach;
 
-        if ($concreteParent == null):
+        if ($isProxy && $concreteParent == null):
             throw new TypeError(sprintf("Proxy model '%s' has no non-abstract".
-                ' model base class.', $this->getShortClassName()));
+                " model base class.", $this->getShortClassName()));
         endif;
 
-        return [$concreteParent, $modelFields];
-    }
 
-    public function getFieldsFromHierarchy()
-    {
-
-        // get hierarchy meta information
-        $mashedHierarchyFields = end($this->getHierarchyMeta());
-
-        $hierarchyFields = [];
-        $seenFields = [];
-
-        if (empty($fields)):
-            foreach ($mashedHierarchyFields as $modelName => $mFields) :
-                // does model have any fields ?
-                if (empty($mFields)):
-                    $hierarchyFields[$modelName] = [];
-                    continue;
-                endif;
-
-                // if it has fields
-                foreach ($mFields as $fieldName => $fieldObj) :
-
-                    // does model declare same more than one field with similar name.
-                    if (isset($hierarchyFields[$modelName][$fieldName])):
-                        throw new FieldError(
-                            sprintf('Field %s is declared more than once on the model %s', $fieldName, $modelName));
-                    endif;
-
-                    // have we seen this field name in the models parent?
-                    if (in_array($fieldName, array_keys($seenFields))):
-                        // has the model been added to the field hierarchy?
-                        if (!isset($hierarchyFields[$modelName])):
-                            $hierarchyFields[$modelName] = [];
-                        endif;
-                        continue;
-                    endif;
-
-                    // add it to the hierarchy
-                    $hierarchyFields[$modelName][$fieldName] = $fieldObj;
-
-                    // mark the field as seen
-                    $seenFields[$fieldName] = $modelName;
-                endforeach;
-
-            endforeach;
-
-        endif;
-
-        return $hierarchyFields;
+        return [($concreteParent == null)?:$concreteParent->getName(), $previousParent, $modelFields];
     }
 
     public function checks()
@@ -514,6 +570,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, \A
         return count($this->_fieldCache);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function serialize()
     {
         return serialize($this->_fieldCache);

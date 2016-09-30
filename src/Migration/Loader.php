@@ -56,9 +56,9 @@ class Loader extends Object
         // the for each migration set its dependencies
         /** @var $migration Migration */
         foreach ($migrations as $name => $migration) :
-            foreach ($migration->getDependency() as $requires) :
+            foreach ($migration->getDependency() as $parent) :
 
-                $this->graph->addDependency($name, $requires, $migration);
+                $this->graph->addDependency($name, $parent, $migration);
 
             endforeach;
 
@@ -67,10 +67,6 @@ class Loader extends Object
 
     public function getMigrationByPrefix($name) {
         return $name;
-    }
-
-    public function createProjectState() {
-        return [];
     }
 
     public static function createObject() {
@@ -128,6 +124,10 @@ class Loader extends Object
 
     /**
      * An application should only have one leaf node more than that means there is an issue somewhere.
+     *
+     * @return array
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function detectConflicts() {
         $latest = $this->graph->getLeafNodes();

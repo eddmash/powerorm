@@ -12,9 +12,12 @@
 namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\Console\Question\Asker;
+use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
+use Eddmash\PowerOrm\Migration\Operation\Field\RemoveField;
 use Eddmash\PowerOrm\Migration\Operation\Model\CreateModel;
 use Eddmash\PowerOrm\Migration\Operation\Model\DeleteModel;
+use Eddmash\PowerOrm\Migration\Operation\Model\RenameModel;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ModelState;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
@@ -82,6 +85,18 @@ class AutoDetector extends Object
      */
     private $newUnmanagedKeys;
 
+    /**
+     * Holds any renamed models.
+     * @var array
+     */
+    private $renamedModels;
+
+    /**
+     * Holds any renamed models
+     * @var
+     */
+    private $renamedModelsRel;
+
     const ACTION_CREATED = true;
     const ACTION_NOT_CREATED = false;
 
@@ -134,7 +149,7 @@ class AutoDetector extends Object
         $oldModelNames = array_keys($this->fromState->getModelStates());
 
         foreach ($oldModelNames as $oldModelName) :
-            $oldModel = $this->newRegistry->getModel($oldModelName);
+            $oldModel = $this->oldRegistry->getModel($oldModelName);
             if(!$oldModel->meta->managed):
                 $this->oldUnmanagedKeys[] = $oldModelName;
             elseif($oldModel->meta->proxy):
@@ -153,62 +168,22 @@ class AutoDetector extends Object
             if(false === $newModel->meta->managed):
                 $this->newUnmanagedKeys[] = $newModelName;
             elseif($newModel->meta->proxy):
+
                 $this->newProxyKeys[] = $newModelName;
+
             else:
                 $this->newModelKeys[] = $newModelName;
             endif;
         endforeach;
 
-        //todo $this->generateRenamedModel();
-        //todo $this->generateDeleteModel();
+        $this->generateRenamedModels();
+        $this->generateDeleteModel();
         $this->generateCreatedModel();
+        $this->generateDeletedProxies();
+        $this->generateCreatedProxies();
+        $this->generateAlteredMeta();
 
         return (empty($this->generatedOperations)) ? [] : [$this->createMigration()];
-    }
-
-    /**
-     * @param array $changes
-     * @param Graph     $graph
-     * @param string    $migrationName
-     *
-     * @return mixed
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function _arrangeForGraph($changes, $graph, $migrationName = null)
-    {
-        $leaves = $graph->getLeafNodes();
-        $leaf = (empty($leaves)) ? '' : $leaves[0];
-
-        if (empty($leaf)):
-            $migrationNo = 1;
-        else:
-            $migrationNo = $this->getMigrationNumber($leaf) + 1;
-
-        endif;
-
-        /**@var $migration Migration*/
-        foreach ($changes as $index=>&$migration) :
-            // set name for migration
-            if (empty($leaf)):
-                // this mean we don't have previous migrations
-                $migrationName = $this->suggestName();
-            else:
-                // first set previous as dependency of this
-                // $migration->requires = [$leaf];
-                $migration->setDependency($leaf);
-
-                $migrationNo = str_pad($migrationNo, 4, '0', STR_PAD_LEFT);
-                $migrationName = $this->suggestName($migration->getOperations(), $migrationNo);
-            endif;
-
-            $migration->setName($migrationName);
-        endforeach;
-
-
-        return $changes;
     }
 
     /**
@@ -223,12 +198,15 @@ class AutoDetector extends Object
         // get old model keys
         $oldModelKeys = array_merge($this->oldModelKeys, $this->oldUnmanagedKeys);
         $addedModels = array_diff($this->newModelKeys, $oldModelKeys);
+        $addedUnmanageModels = array_diff($this->newUnmanagedKeys, $oldModelKeys);
+
+        $allAddedModels = array_merge($addedModels, $addedUnmanageModels);
 
         /* @var $modelState ModelState */
         /* @var $primaryKeyRel Model */
         /* @var $relationField Field */
 
-        foreach ($addedModels as $addedModelName) :
+        foreach ($allAddedModels as $addedModelName) :
 
             $modelState = $this->toState->modelStates[$addedModelName];
             $meta = $this->newRegistry->getModel($addedModelName)->meta;
@@ -256,14 +234,18 @@ class AutoDetector extends Object
 
             endforeach;
 
-            /** @var $localM2MField Field */
-            foreach ($localM2MFields as $localM2MField) :
-
-                if($localField->remoteField != null && $localField->remoteField->model != null):
-                    $relatedFields[$localM2MField->name] = $localM2MField;
-                endif;
-
-            endforeach;
+            /** @var $localM2MField Field todo uncomment*/
+//            foreach ($localM2MFields as $localM2MField) :
+//                if($localField->remoteField->model != null):
+//                    $relatedFields[$localM2MField->name] = $localM2MField;
+//                endif;
+//
+//                // if field has a through model and it was not auto created, add it as a related field
+//                if($localField->remoteField->hasProperty('through') && !$localField->remoteField->through->meta->autoCreated):
+//                    $relatedFields[$localM2MField->name] = $localM2MField;
+//                endif;
+//
+//            endforeach;
 
             // we need to keep track of which operation need to run before us
 
@@ -317,7 +299,9 @@ class AutoDetector extends Object
                 ];
 
                 // if the through model was not automatically created, depend on it also
-                if($relationField->hasProperty('through') && !$relationField->remoteField->through->meta->autoCreated):
+                if($relationField->remoteField->hasProperty('through') &&
+                    !$relationField->remoteField->through->meta->autoCreated):
+
                     $opDep[] = [
                         'target' => $relationField->remoteField->through->meta->modelName,
                         'model' => true,
@@ -338,6 +322,229 @@ class AutoDetector extends Object
 
         endforeach;
 
+    }
+
+    /**
+     * Find all deleted models (managed and unmanaged) and make delete operations for them as well as separate
+     * operations to delete any foreign key or M2M relationships.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function generateDeleteModel() {
+
+        $newModelKeys = array_merge($this->newModelKeys, $this->newUnmanagedKeys);
+        $deletedModels = array_diff($this->oldModelKeys, $newModelKeys);
+        $deletedUnmanagedModels = array_diff($this->oldUnmanagedKeys, $newModelKeys);
+        $allDeletedModels = array_merge($deletedModels, $deletedUnmanagedModels);
+
+        /* @var $modelState ModelState */
+        foreach ($allDeletedModels as $deletedModel) :
+
+            $modelState = $this->fromState->modelStates[$deletedModel];
+            $meta = $this->fromState->getRegistry()->getModel($deletedModel)->meta;
+
+            // at this point if we the model is un manged just stop , since we just need to have it recorded in our
+            // migrations, we don't need to create the relationship fields also, its not our problem anymore
+            if(!$meta->managed):
+                continue;
+            endif;
+
+            $localFields = $meta->localFields;
+            $localM2MFields = $meta->localFields;
+
+            $relatedFields = [];
+
+            // get all the relationship fields that we initiated since they will need to be created in there own
+            // operations aside from  the one that creates the model remember the model needs to exist first before
+            // enforcing the relationships.
+
+            /** @var $localField Field */
+            foreach ($localFields as $localField) :
+                if($localField->remoteField != null && $localField->remoteField->model != null):
+                    $relatedFields[$localField->name] = $localField;
+                endif;
+
+            endforeach;
+
+            /** @var $localM2MField Field */
+            foreach ($localM2MFields as $localM2MField) :
+
+                if($localField->remoteField != null && $localField->remoteField->model != null):
+                    $relatedFields[$localM2MField->name] = $localM2MField;
+                endif;
+
+            endforeach;
+
+            // take care of relationships
+            foreach ($relatedFields as $fieldName => $relationField) :
+                //remove the operation
+                $this->addOperation(
+                    RemoveField::createObject([
+                        'modelName' => $deletedModel,
+                        'name' => $fieldName,
+                    ])
+                );
+            endforeach;
+
+            $opDep = [];
+
+            // we also need to drop all relationship fields that point from us, initiated by other models.
+            $relatedObjects = $meta->getReverseRelatedObjects();
+//            foreach ($relatedObjects as $relatedObject) :
+//
+//            endforeach;
+
+            // finally remove the model
+            $this->addOperation(DeleteModel::createObject(['name' => $modelState->name]), $opDep);
+
+        endforeach;
+
+    }
+
+    /**
+     * Finds any renamed models, and generates the operations for them, and removes the old entry from the model lists.
+     * Must be run before other model-level generation.
+     *
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function generateRenamedModels()
+    {
+        $addedModels = array_diff($this->newModelKeys, $this->oldModelKeys);
+
+        /**@var $modelState ModelState*/
+        foreach ($addedModels as $addedModel) :
+            $modelState = $this->toState->modelStates[$addedModel];
+            $modelDefinitionList = $this->getFieldsDefinitions($modelState->fields);
+
+            $removedModels = array_diff($this->oldModelKeys, $this->newModelKeys);
+            foreach ($removedModels as $removedModel) :
+
+                    $remModelState = $this->fromState->modelStates[$removedModel];
+                    $remModelDefinitionList = $this->getFieldsDefinitions($remModelState->fields);
+
+                    if($remModelDefinitionList == $modelDefinitionList):
+                        //todo add asker
+                        $this->addOperation(RenameModel::createObject([
+                            'oldName'=> $removedModel,
+                            'newName'=> $addedModel,
+                        ]));
+
+                        $this->renamedModels[$addedModel] = $removedModel;
+                    endif;
+            endforeach;
+        endforeach;
+    }
+
+    /**
+     * Makes CreateModel statements for proxy models.
+     *
+     * We use the same statements as that way there's less code duplication, but of course for proxy models we can skip
+     * all that pointless field stuff and just chuck out an operation.
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function generateCreatedProxies(){
+        $addedProxies = array_diff($this->newProxyKeys, $this->oldProxyKeys);
+
+        /**@var $modelState ModelState*/
+        foreach ($addedProxies as $addedProxy) :
+            $modelState = $this->toState->modelStates[$addedProxy];
+            assert($modelState->meta['proxy']);
+
+            $opDep = [['target' => $addedProxy, 'model' => true,  'create' => false]];
+
+            // create operation
+            $this->addOperation(
+                CreateModel::createObject([
+                    'name' => $modelState->name,
+                    'fields' => [],
+                    'meta' => $modelState->meta,
+                    'extends' => $modelState->extends,
+                ]),
+                $opDep
+            );
+        endforeach;
+
+    }
+
+    /**
+     *  Makes DeleteModel statements for proxy models.
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function generateDeletedProxies(){
+        $droppedProxies = array_diff($this->oldProxyKeys, $this->newProxyKeys);
+
+        foreach ($droppedProxies as $droppedProxy) :
+            $modelState = $this->fromState->modelStates[$droppedProxy];
+
+            // create operation
+            $this->addOperation(
+                DeleteModel::createObject([
+                    'name' => $modelState->name,
+                ])
+            );
+        endforeach;
+
+
+    }
+
+    /**
+     * Works out if any non-schema-affecting options have changed and makes an operation to represent them in state
+     * changes.
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function generateAlteredMeta()
+    {
+
+    }
+    
+    /**
+     * @param array  $changes
+     * @param Graph  $graph
+     * @param string $migrationName
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function _arrangeForGraph($changes, $graph, $migrationName = null)
+    {
+        $leaves = $graph->getLeafNodes();
+        $leaf = (empty($leaves)) ? '' : $leaves[0];
+
+        if (empty($leaf)):
+            $migrationNo = 1;
+        else:
+            $migrationNo = $this->getMigrationNumber($leaf) + 1;
+
+        endif;
+
+        /** @var $migration Migration */
+        foreach ($changes as $index => &$migration) :
+            // set name for migration
+            if (empty($leaf)):
+                // this mean we don't have previous migrations
+                $migrationName = $this->suggestName();
+            else:
+                // first set previous as dependency of this
+                // $migration->requires = [$leaf];
+                $migration->setDependency($leaf);
+
+                $migrationNo = str_pad($migrationNo, 4, '0', STR_PAD_LEFT);
+                $migrationName = $this->suggestName($migration->getOperations(), $migrationNo);
+            endif;
+
+            $migration->setName($migrationName);
+        endforeach;
+
+        return $changes;
     }
 
     /**
@@ -368,6 +575,51 @@ class AutoDetector extends Object
         return $migration;
     }
 
+    /**
+     * Return a definition of the fields that ignores field names and what related fields actually relate to.
+     *
+     * Used for detecting renames (as, of course, the related fields change during renames)
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function getFieldsDefinitions($fields)
+    {
+        $fieldDefs = [];
+
+        /**@var $field Field*/
+        foreach ($fields as $name=>$field) :
+            $def = $this->deepDeconstruct($field);
+
+            if($field->remoteField!==null && $field->remoteField->to !==null):
+                unset($def['constructorArgs']['to']);
+            endif;
+
+            //var_dump($def);
+            $fieldDefs[] = $def;
+        endforeach;
+        return $fieldDefs;
+    }
+
+    /**
+     * @param $value
+     * @return mixed
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function deepDeconstruct($value)
+    {
+        if(!$value instanceof Object || ($value instanceof Object && !$value->hasMethod('deconstruct'))):
+            return $value;
+        endif;
+
+        $deconstructed = $value->deconstruct();
+
+        return [
+            'constructorArgs'=>$this->deepDeconstruct($deconstructed['constructorArgs']),
+            'fullName'=>$this->deepDeconstruct($deconstructed['fullName'])
+        ];
+    }
+
     private function checkDependency($operation, $dependency)
     {
         return true;
@@ -391,16 +643,16 @@ class AutoDetector extends Object
             return sprintf('%s0001_Initial', $prefix);
         endif;
         if (count($operations) == 1):
-            /**@var $op Operation*/
+            /** @var $op Operation */
             $op = $operations[0];
             if($op instanceof CreateModel):
                 return sprintf('%s%s_%s', $prefix, $id, ucwords($op->name));
             elseif($op instanceof DeleteModel):
-                return sprintf('%s%s_delete_%s', $prefix, $id, ucwords($op->name));
+                return sprintf('%s%s_Delete_%s', $prefix, $id, ucwords($op->name));
             elseif($op instanceof AddField):
                 return sprintf('%s%s_%s_%s', $prefix, $id, ucwords($op->modelName), ucwords($op->name));
             elseif($op instanceof RemoveField):
-                return sprintf('%s%s_remove_%s_%s', $prefix, $id, ucwords($op->modelName), ucwords($op->name));
+                return sprintf('%s%s_Remove_%s_%s', $prefix, $id, ucwords($op->modelName), ucwords($op->name));
             endif;
 
         else:

@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Migration\State;
 
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\DeconstructableObject;
-use Eddmash\PowerOrm\Helpers\Tools;
 
 class ProjectState extends DeconstructableObject
 {
@@ -52,7 +51,7 @@ class ProjectState extends DeconstructableObject
     {
         $modelStates = [];
         foreach ($registry->getModels() as $modelName => $modelObj) :
-            $modelStates[Tools::normalizeKey($modelName)] = ModelState::fromModel($modelObj);
+            $modelStates[$modelName] = ModelState::fromModel($modelObj);
         endforeach;
 
         return static::createObject($modelStates);

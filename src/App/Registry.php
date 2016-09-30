@@ -143,8 +143,6 @@ class Registry extends Object
     {
         $this->isAppReady();
 
-        $name = $this->normalizeKey($name);
-
         if (!$this->hasModel($name)) {
             throw new LookupError(sprintf('The model { %s } Does not exist', $name));
         }

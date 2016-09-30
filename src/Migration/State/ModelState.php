@@ -14,7 +14,6 @@ namespace Eddmash\PowerOrm\Migration\State;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\TypeError;
-use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Object;
@@ -43,7 +42,7 @@ class ModelState extends Object
 
     public function __construct($name, $fields, $kwargs = [])
     {
-        $this->name = $this->normalizeKey($name);
+        $this->name = $name;
         $this->fields = $fields;
         BaseOrm::configure($this, $kwargs);
     }
@@ -68,7 +67,6 @@ class ModelState extends Object
 
         /** @var $field Field */
         foreach ($model->meta->localFields as $name => $field) :
-            $name = Tools::normalizeKey($name);
             try {
                 $fields[$name] = $field->deepClone();
             } catch (\Exception $e) {
@@ -78,7 +76,6 @@ class ModelState extends Object
 
         if ($excludeRels !== false):
             foreach ($model->meta->localManyToMany as $name => $field) :
-                $name = Tools::normalizeKey($name);
                 try {
                     $fields[$name] = $field->deepClone();
                 } catch (\Exception $e) {
@@ -151,7 +148,7 @@ class ModelState extends Object
 
             class %2$s extends \%3$s{
 
-                 public function unboundFields(){}
+                 public function unboundFields(){return [];}
             }';
 
         if(empty($extends)):

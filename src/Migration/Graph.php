@@ -91,8 +91,8 @@ class Graph
 
         // add to the family tree of both the child and parent
 
-        $this->getNodeFamilyTree($child)->addChild($this->nodeFamilyTree[$parent]);
-        $this->getNodeFamilyTree($child)->addChild($this->nodeFamilyTree[$child]);
+        $this->getNodeFamilyTree($child)->addParent($this->nodeFamilyTree[$parent]);
+        $this->getNodeFamilyTree($parent)->addChild($this->nodeFamilyTree[$child]);
     }
 
     /**
@@ -201,6 +201,7 @@ class Graph
         // we use this lineage to apply migrations in database
         $lineage = [];
         foreach ($leaves as $leaf) :
+
             // get lineage
             $lineage_members = $this->getBeforeLineage($leaf);
 
@@ -217,6 +218,7 @@ class Graph
         // use the lineage to get the project state based on the migrations.
         /* @var $migration Migration */
         foreach ($lineage as $member) :
+
             $migration = $this->nodes[$member];
 
             $state = $migration->updateState($state);

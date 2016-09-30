@@ -164,11 +164,6 @@ class BaseOrm extends Object
             static::$connection = DriverManager::getConnection($connectionParams, $config);
         endif;
 
-        $stmt = static::$connection->query('SELECT * FROM ts_user');
-        while ($row = $stmt->fetch()) {
-            echo $row['last_name'].PHP_EOL;
-        }
-
         return static::$connection;
     }
 

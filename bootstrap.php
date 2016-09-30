@@ -37,5 +37,6 @@ $loader->initialize(new OrmConfig());
 $loader->register();
 
 // load doctrine DBAL
+
 $classLoader = new ClassLoader('Doctrine', 'vendor/doctrine');
 $classLoader->register();
