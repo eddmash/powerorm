@@ -29,7 +29,6 @@ endif;
 require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';
 require POWERORM_SRCPATH.'Autoloader/Config/BaseConfig.php';
 require_once POWERORM_SRCPATH.'Autoloader/Config/OrmConfig.php';
-require 'vendor/doctrine/common/lib/Doctrine/Common/ClassLoader.php';
 
 // setup Autoloader
 $loader = new Autoloader();
@@ -37,6 +36,8 @@ $loader->initialize(new OrmConfig());
 $loader->register();
 
 // load doctrine DBAL
-
-$classLoader = new ClassLoader('Doctrine', 'vendor/doctrine');
-$classLoader->register();
+if(file_exists('vendor/doctrine')):
+    require 'vendor/doctrine/common/lib/Doctrine/Common/ClassLoader.php';
+    $classLoader = new ClassLoader('Doctrine', 'vendor/doctrine');
+    $classLoader->register();
+endif;

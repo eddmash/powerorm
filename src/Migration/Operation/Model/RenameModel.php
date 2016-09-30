@@ -9,16 +9,34 @@ namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
 
 use Eddmash\PowerOrm\Migration\Operation\Operation;
-use Eddmash\PowerOrm\Migration\State\ProjectState;
+
 
 class RenameModel extends Operation
 {
+    public $oldName;
+    public $newName;
     /**
      * @inheritDoc
      */
     public function updateState($state)
     {
-        // TODO: Implement updateState() method.
+        // model state
+        $modelState = $state->modelStates[$this->oldName];
+        // change name of model to the new name
+        $modelState->name = $this->newName;
+
+        // map the model to the new name
+        $state->modelStates[$this->newName] = $modelState;
+        // remove the mapping that uses the old name.
+        $state->removeModelState($this->oldName);
+
+        //todo take care of relatinships
+
+    }
+
+    public function getDescription()
+    {
+        return sprintf("Rename model %s to %s", $this->oldName, $this->newName);
     }
 
 }

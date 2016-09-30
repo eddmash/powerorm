@@ -12,7 +12,6 @@
 namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\Console\Question\Asker;
-use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\RemoveField;
 use Eddmash\PowerOrm\Migration\Operation\Model\CreateModel;
@@ -42,7 +41,14 @@ class AutoDetector extends Object
 {
     private $fromState;
     private $toState;
-    private $questioner;
+    /**
+     * @var Asker
+     */
+    private $asker;
+
+    /**
+     * @var string
+     */
     private $migrationNamePrefix = 'm';
 
     /**
@@ -111,7 +117,7 @@ class AutoDetector extends Object
     public function __construct($fromState, $toState, $asker) {
         $this->fromState = $fromState;
         $this->toState = $toState;
-        $this->questioner = empty($asker) ? new Asker() : $asker;
+        $this->asker = empty($asker) ? new Asker() : $asker;
     }
 
     /**
@@ -426,13 +432,24 @@ class AutoDetector extends Object
                     $remModelDefinitionList = $this->getFieldsDefinitions($remModelState->fields);
 
                     if($remModelDefinitionList == $modelDefinitionList):
-                        //todo add asker
-                        $this->addOperation(RenameModel::createObject([
-                            'oldName'=> $removedModel,
-                            'newName'=> $addedModel,
-                        ]));
+                        
+                        if($this->asker->ask(MigrationQuestion::hasModelRenamed($removedModel, $addedModel))):
 
-                        $this->renamedModels[$addedModel] = $removedModel;
+                            $this->addOperation(RenameModel::createObject([
+                                'oldName'=> $removedModel,
+                                'newName'=> $addedModel,
+                            ]));
+
+                            $this->renamedModels[$addedModel] = $removedModel;
+
+                            // remove the old name and update with the new name.
+                            $pos = array_search($removedModel, $this->oldModelKeys);
+
+                            array_splice($this->oldModelKeys, $pos, 1, [$addedModel]);
+
+                            // you can stop here.
+                            break;
+                        endif;
                     endif;
             endforeach;
         endforeach;
@@ -654,10 +671,8 @@ class AutoDetector extends Object
             elseif($op instanceof RemoveField):
                 return sprintf('%s%s_Remove_%s_%s', $prefix, $id, ucwords($op->modelName), ucwords($op->name));
             endif;
-
-        else:
-            return sprintf('%s%s_Auto_%s', $prefix, $id, date('Ymd_hm'));
         endif;
+        return sprintf('%s%s_Auto_%s', $prefix, $id, date('Ymd_hm'));
     }
 
     public function getMigrationNumber($name)
