@@ -129,7 +129,8 @@ class AutoDetector extends Object
      * @param ProjectState $toState
      * @param Asker        $asker
      */
-    public function __construct($fromState, $toState, $asker) {
+    public function __construct($fromState, $toState, $asker)
+    {
         $this->fromState = $fromState;
         $this->toState = $toState;
         $this->asker = empty($asker) ? new Asker() : $asker;
@@ -171,9 +172,9 @@ class AutoDetector extends Object
 
         foreach ($oldModelNames as $oldModelName) :
             $oldModel = $this->oldRegistry->getModel($oldModelName);
-            if(!$oldModel->meta->managed):
+            if (!$oldModel->meta->managed):
                 $this->oldUnmanagedKeys[] = $oldModelName;
-            elseif($oldModel->meta->proxy):
+            elseif ($oldModel->meta->proxy):
                 $this->oldProxyKeys[] = $oldModelName;
             else:
                 $this->oldModelKeys[] = $oldModelName;
@@ -186,9 +187,9 @@ class AutoDetector extends Object
         foreach ($newModelNames as $newModelName) :
             $newModel = $this->newRegistry->getModel($newModelName);
 
-            if(false === $newModel->meta->managed):
+            if (false === $newModel->meta->managed):
                 $this->newUnmanagedKeys[] = $newModelName;
-            elseif($newModel->meta->proxy):
+            elseif ($newModel->meta->proxy):
 
                 $this->newProxyKeys[] = $newModelName;
 
@@ -332,7 +333,7 @@ class AutoDetector extends Object
         foreach ($fields as $name => $field) :
             $def = $this->deepDeconstruct($field);
 
-            if($field->remoteField !== null && $field->remoteField->model !== null):
+            if ($field->remoteField !== null && $field->remoteField->model !== null):
                 unset($def['constructorArgs']['to']);
             endif;
 
@@ -354,7 +355,7 @@ class AutoDetector extends Object
      */
     public function deepDeconstruct($value)
     {
-        if(!$value instanceof Object || ($value instanceof Object && !$value->hasMethod('deconstruct'))):
+        if (!$value instanceof Object || ($value instanceof Object && !$value->hasMethod('deconstruct'))):
             return $value;
         endif;
 
@@ -391,13 +392,13 @@ class AutoDetector extends Object
         if (count($operations) == 1):
             /** @var $op Operation */
             $op = $operations[0];
-            if($op instanceof CreateModel):
+            if ($op instanceof CreateModel):
                 return sprintf('%s%s_%s', $prefix, $id, ucwords($op->name));
-            elseif($op instanceof DeleteModel):
+            elseif ($op instanceof DeleteModel):
                 return sprintf('%s%s_Delete_%s', $prefix, $id, ucwords($op->name));
-            elseif($op instanceof AddField):
+            elseif ($op instanceof AddField):
                 return sprintf('%s%s_%s_%s', $prefix, $id, ucwords($op->modelName), ucwords($op->name));
-            elseif($op instanceof RemoveField):
+            elseif ($op instanceof RemoveField):
                 return sprintf('%s%s_Remove_%s_%s', $prefix, $id, ucwords($op->modelName), ucwords($op->name));
             endif;
         endif;
@@ -427,7 +428,8 @@ class AutoDetector extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function generateCreatedModel() {
+    public function generateCreatedModel()
+    {
         // get old model keys
         $oldModelKeys = array_merge($this->oldModelKeys, $this->oldUnmanagedKeys);
         $addedModels = array_diff($this->newModelKeys, $oldModelKeys);
@@ -454,11 +456,11 @@ class AutoDetector extends Object
 
             /** @var $localField Field */
             foreach ($localFields as $localField) :
-                if($localField->remoteField != null && $localField->remoteField->model != null):
+                if ($localField->remoteField != null && $localField->remoteField->model != null):
 
-                    if($localField->primaryKey):
+                    if ($localField->primaryKey):
                         $primaryKeyRel = $localField->remoteField->model;
-                    elseif(!$localField->remoteField->parentLink):
+                    elseif (!$localField->remoteField->parentLink):
                         $relatedFields[$localField->name] = $localField;
                     endif;
 
@@ -470,13 +472,14 @@ class AutoDetector extends Object
             /** @var $localM2MField RelatedField */
             foreach ($localM2MFields as $localM2MField) :
 
-                if($localM2MField->remoteField->model != null):
+                if ($localM2MField->remoteField->model != null):
                     $relatedFields[$localM2MField->name] = $localM2MField;
                 endif;
 
                 // if field has a through model and it was not auto created, add it as a related field
-                if($localM2MField->remoteField->hasProperty('through') &&
-                    !$localM2MField->remoteField->through->meta->autoCreated):
+                if ($localM2MField->remoteField->hasProperty('through') &&
+                    !$localM2MField->remoteField->through->meta->autoCreated
+                ):
 
                     $relatedFields[$localM2MField->name] = $localM2MField;
                 endif;
@@ -486,10 +489,10 @@ class AutoDetector extends Object
             // we need to keep track of which operation need to run before us
 
             // first, check for operations that drops a proxy version of us has been dropped
-            $opDep = [['target' => $addedModelName, 'model' => true,  'create' => false]];
+            $opDep = [['target' => $addedModelName, 'model' => true, 'create' => false]];
 
             // depend on related model being created if primary key is a relationship field
-            if($primaryKeyRel !== null):
+            if ($primaryKeyRel !== null):
                 $opDep[] = ['target' => $primaryKeyRel->meta->modelName, 'model' => true, 'create' => true];
             endif;
 
@@ -498,7 +501,7 @@ class AutoDetector extends Object
             $unboundFields = $modelState->fields;
             $uFields = [];
             foreach ($unboundFields as $uname => $ufield) :
-                if(in_array($uname, $boundRelationFieldKeys)):
+                if (in_array($uname, $boundRelationFieldKeys)):
                     continue;
                 endif;
                 $uFields[$uname] = $ufield;
@@ -518,14 +521,14 @@ class AutoDetector extends Object
 
             // at this point if we the model is un manged just stop , since we just need to have it recorded in our
             // migrations, we don't need to create the relationship fields also, its not our problem anymore
-            if(!$meta->managed):
+            if (!$meta->managed):
                 continue;
             endif;
 
             // take care of relationships
             foreach ($relatedFields as $fieldName => $relationField) :
                 // we need the current model to be in existence
-                $opDep[] = ['target' => $addedModelName, 'model' => true,  'create' => true];
+                $opDep[] = ['target' => $addedModelName, 'model' => true, 'create' => true];
 
                 // depend on the related model also
                 $opDep[] = [
@@ -535,8 +538,9 @@ class AutoDetector extends Object
                 ];
 
                 // if the through model was not automatically created, depend on it also
-                if($relationField->remoteField->hasProperty('through') &&
-                    !$relationField->remoteField->through->meta->autoCreated):
+                if ($relationField->remoteField->hasProperty('through') &&
+                    !$relationField->remoteField->through->meta->autoCreated
+                ):
 
                     $opDep[] = [
                         'target' => $relationField->remoteField->through->meta->modelName,
@@ -568,7 +572,8 @@ class AutoDetector extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function generateDeleteModel() {
+    public function generateDeleteModel()
+    {
 
         $newModelKeys = array_merge($this->newModelKeys, $this->newUnmanagedKeys);
         $deletedModels = array_diff($this->oldModelKeys, $newModelKeys);
@@ -583,7 +588,7 @@ class AutoDetector extends Object
 
             // at this point if we the model is un manged just stop , since we just need to have it recorded in our
             // migrations, we don't need to create the relationship fields also, its not our problem anymore
-            if(!$meta->managed):
+            if (!$meta->managed):
                 continue;
             endif;
 
@@ -598,7 +603,7 @@ class AutoDetector extends Object
 
             /** @var $localField Field */
             foreach ($localFields as $localField) :
-                if($localField->remoteField != null && $localField->remoteField->model != null):
+                if ($localField->remoteField != null && $localField->remoteField->model != null):
                     $relatedFields[$localField->name] = $localField;
                 endif;
 
@@ -607,7 +612,7 @@ class AutoDetector extends Object
             /** @var $localM2MField Field */
             foreach ($localM2MFields as $localM2MField) :
 
-                if($localField->remoteField != null && $localField->remoteField->model != null):
+                if ($localField->remoteField != null && $localField->remoteField->model != null):
                     $relatedFields[$localM2MField->name] = $localM2MField;
                 endif;
 
@@ -633,9 +638,9 @@ class AutoDetector extends Object
             foreach ($reverseRelatedFields as $reverseRelatedField) :
                 $modelName = $reverseRelatedField->remoteField->getRelatedModel()->meta->modelName;
                 $fieldName = $reverseRelatedField->remoteField->field->name;
-                $opDep[] = ['target' => $fieldName, 'model' => $modelName,  'create' => false];
-                if(!$reverseRelatedField->remoteField->isManyToMany()):
-                    $opDep[] = ['target' => $fieldName, 'model' => $modelName,  'create' => 'alter'];
+                $opDep[] = ['target' => $fieldName, 'model' => $modelName, 'create' => false];
+                if (!$reverseRelatedField->remoteField->isManyToMany()):
+                    $opDep[] = ['target' => $fieldName, 'model' => $modelName, 'create' => 'alter'];
                 endif;
             endforeach;
 
@@ -669,9 +674,9 @@ class AutoDetector extends Object
                 $remModelState = $this->fromState->modelStates[$removedModel];
                 $remModelDefinitionList = $this->getFieldsDefinitions($remModelState->fields);
 
-                if($remModelDefinitionList == $modelDefinitionList):
+                if ($remModelDefinitionList == $modelDefinitionList):
 
-                    if($this->asker->ask(MigrationQuestion::hasModelRenamed($removedModel, $addedModel))):
+                    if ($this->asker->ask(MigrationQuestion::hasModelRenamed($removedModel, $addedModel))):
 
                         $this->addOperation(RenameModel::createObject([
                             'oldName' => $removedModel,
@@ -703,7 +708,8 @@ class AutoDetector extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function generateCreatedProxies() {
+    public function generateCreatedProxies()
+    {
         $addedProxies = array_diff($this->newProxyKeys, $this->oldProxyKeys);
 
         /* @var $modelState ModelState */
@@ -711,7 +717,7 @@ class AutoDetector extends Object
             $modelState = $this->toState->modelStates[$addedProxy];
             assert($modelState->meta['proxy']);
 
-            $opDep = [['target' => $addedProxy, 'model' => true,  'create' => false]];
+            $opDep = [['target' => $addedProxy, 'model' => true, 'create' => false]];
 
             // create operation
             $this->addOperation(
@@ -734,7 +740,8 @@ class AutoDetector extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function generateDeletedProxies() {
+    public function generateDeletedProxies()
+    {
         $droppedProxies = array_diff($this->oldProxyKeys, $this->newProxyKeys);
 
         foreach ($droppedProxies as $droppedProxy) :
@@ -777,19 +784,19 @@ class AutoDetector extends Object
 
             $oldMeta = [];
             foreach ($oldState->meta as $name => $opt) :
-                if(AlterModelMeta::isAlterableOption($name)):
+                if (AlterModelMeta::isAlterableOption($name)):
                     $oldMeta[$name] = $opt;
                 endif;
             endforeach;
 
             $newMeta = [];
             foreach ($newState->meta as $name => $opt) :
-                if(AlterModelMeta::isAlterableOption($name)):
+                if (AlterModelMeta::isAlterableOption($name)):
                     $newMeta[$name] = $opt;
                 endif;
             endforeach;
 
-            if($oldMeta !== $newMeta):
+            if ($oldMeta !== $newMeta):
                 $this->addOperation(AlterModelMeta::createObject([
                     'name' => $modelName,
                     'meta' => $newMeta,
@@ -828,12 +835,14 @@ class AutoDetector extends Object
                 foreach ($removedFields as $remField) :
                     $oldFieldDef = $this->deepDeconstruct($oldModelState->getFieldByName($remField));
 
-                    if($field->remoteField !== null && $field->remoteField->model !== null):
+                    if ($field->remoteField !== null && $field->remoteField->model !== null):
                         unset($oldFieldDef['constructorArgs']['to']);
                     endif;
 
-                    if($fieldDef === $oldFieldDef):
-                        if($this->asker->ask(MigrationQuestion::hasFieldRenamed($modelName, $remField, $addedField, $field))):
+                    if ($fieldDef === $oldFieldDef):
+                        if ($this->asker->ask(MigrationQuestion::hasFieldRenamed($modelName, $remField, $addedField,
+                            $field))
+                        ):
                             $this->addOperation(
                                 RenameField::createObject([
                                     'modelName' => $modelName,
@@ -863,7 +872,8 @@ class AutoDetector extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function generateAddedFields() {
+    public function generateAddedFields()
+    {
         foreach ($this->keptModelKeys as $modelName) :
 
             $oldFieldKeys = $this->oldFieldKeys[$modelName];
@@ -885,7 +895,8 @@ class AutoDetector extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function generateRemovedFields() {
+    public function generateRemovedFields()
+    {
         foreach ($this->keptModelKeys as $modelName) :
 
             $oldFieldKeys = $this->oldFieldKeys[$modelName];
@@ -906,7 +917,8 @@ class AutoDetector extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function generateAlteredFields() {
+    public function generateAlteredFields()
+    {
         /* @var $oldField Field */
         /* @var $newField Field */
         foreach ($this->keptModelKeys as $modelName) :
@@ -925,20 +937,21 @@ class AutoDetector extends Object
                 $oldDec = $this->deepDeconstruct($oldField);
                 $newDec = $this->deepDeconstruct($newField);
 
-                if($oldDec !== $newDec):
+                if ($oldDec !== $newDec):
                     $bothM2M = ($newField instanceof ManyToManyField && $oldField instanceof ManyToManyField);
                     $neitherM2M = (!$newField instanceof ManyToManyField && !$oldField instanceof ManyToManyField);
 
                     // Either both fields are m2m or neither is
-                    if($bothM2M || $neitherM2M):
+                    if ($bothM2M || $neitherM2M):
                         $preserveDefault = true;
 
-                        if($oldField->null && !$newField->null &&
-                            !$newField->hasDefault() && !$newField instanceof ManyToManyField):
+                        if ($oldField->null && !$newField->null &&
+                            !$newField->hasDefault() && !$newField instanceof ManyToManyField
+                        ):
                             $field = $newField->deepClone();
                             $default = MigrationQuestion::askNotNullAlteration($this->asker, $modelName, $keptField);
 
-                            if($default !== NOT_PROVIDED):
+                            if ($default !== NOT_PROVIDED):
                                 $field->default = $default;
                                 $preserveDefault = false;
                             endif;
@@ -965,7 +978,8 @@ class AutoDetector extends Object
         endforeach;
     }
 
-    public function generateAlteredDbTable() {
+    public function generateAlteredDbTable()
+    {
         $modelToCheck = array_merge($this->keptModelKeys, $this->keptProxyKeys, $this->keptUnmanagedKeys);
         /* @var $oldModelState ModelState */
         /* @var $newModelState ModelState */
@@ -976,34 +990,37 @@ class AutoDetector extends Object
             $oldDbTableName = (!isset($oldModelState->meta['dbTable'])) ?: $oldModelState->meta['dbTable'];
             $newDbTableName = (!isset($oldModelState->meta['dbTable'])) ?: $newModelState->meta['dbTable'];
 
-            if($oldDbTableName !== $newDbTableName) :
+            if ($oldDbTableName !== $newDbTableName) :
                 $this->addOperation(
                     AlterModelTable::createObject([
                         'name' => $modelName,
-                        'table' => $newDbTableName,                    ])
+                        'table' => $newDbTableName,
+                    ])
                 );
             endif;
         endforeach;
 
     }
-    public function _generateAddedFields($modelName, $fieldName) {
+
+    public function _generateAddedFields($modelName, $fieldName)
+    {
         /** @var $field Field */
         $field = $this->newRegistry->getModel($modelName)->meta->getField($fieldName);
         $opDep = [];
 
         $preserveDefault = true;
 
-        if($field->remoteField !== null && $field->remoteField->model):
+        if ($field->remoteField !== null && $field->remoteField->model):
             // depend on related model being created
             $opDep[] = ['target' => $field->remoteField->model->meta->modelName, 'model' => true, 'create' => true];
             // if it has through also depend on through model being created
-            if($field->hasProperty('through') && $field->remoteField->through->meta->autoCreated):
+            if ($field->hasProperty('through') && $field->remoteField->through->meta->autoCreated):
                 $opDep[] = ['target' => $field->through->model->meta->modelName, 'model' => true, 'create' => true];
             endif;
 
         endif;
 
-        if(!$field->null && !$field->hasDefault() && !$field instanceof ManyToManyField):
+        if (!$field->null && !$field->hasDefault() && !$field instanceof ManyToManyField):
             $def = MigrationQuestion::askNotNullAddition($this->asker, $modelName, $fieldName);
 
             $field = $field->deepClone();
@@ -1022,7 +1039,8 @@ class AutoDetector extends Object
         );
     }
 
-    public function _generateRemovedFields($modelName, $fieldName) {
+    public function _generateRemovedFields($modelName, $fieldName)
+    {
         $this->addOperation(
             RemoveField::createObject([
                 'modelName' => $modelName,
