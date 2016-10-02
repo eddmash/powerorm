@@ -27,15 +27,18 @@ class Executor
      */
     public $loader;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->loader = Loader::createObject();
     }
 
-    public function getMigrationPlan($target) {
+    public function getMigrationPlan($target)
+    {
         return [];
     }
 
-    public function migrate($target, $plan, $fake) {
+    public function migrate($target, $plan, $fake)
+    {
 
     }
 }

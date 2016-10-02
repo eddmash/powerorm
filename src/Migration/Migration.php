@@ -28,7 +28,8 @@ class Migration
         $this->requires = $this->getDependency();
     }
 
-    public static function createObject($param) {
+    public static function createObject($param)
+    {
         return new static($param);
     }
 
@@ -96,11 +97,13 @@ class Migration
         $this->dependency[] = $dependency;
     }
 
-    public function apply() {
+    public function apply()
+    {
 
     }
 
-    public function unApply() {
+    public function unApply()
+    {
 
     }
 
@@ -118,7 +121,8 @@ class Migration
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function updateState($state, $preserveState = true) {
+    public function updateState($state, $preserveState = true)
+    {
         $newState = $state;
 //        if($preserveState):
 //            $newState = $state->deepClone();

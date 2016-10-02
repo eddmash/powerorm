@@ -37,7 +37,7 @@ class Loader extends Object
 
     public function buildGraph()
     {
-        if(!empty($this->connection)):
+        if (!empty($this->connection)):
             $recoder = new Recorder($this->connection);
 
             $this->appliedMigrations = $recoder->getApplied();
@@ -65,11 +65,13 @@ class Loader extends Object
         endforeach;
     }
 
-    public function getMigrationByPrefix($name) {
+    public function getMigrationByPrefix($name)
+    {
         return $name;
     }
 
-    public static function createObject() {
+    public static function createObject()
+    {
         return new static();
     }
 
@@ -78,7 +80,8 @@ class Loader extends Object
      *
      * @return array
      */
-    public function getMigrations() {
+    public function getMigrations()
+    {
         $migrations = [];
 
         /** @var $migrationName Migration */
@@ -91,7 +94,8 @@ class Loader extends Object
         return $migrations;
     }
 
-    public function getMigrationsClasses() {
+    public function getMigrationsClasses()
+    {
         $migrationFiles = $this->getMigrationsFiles();
 
         $classes = [];
@@ -102,7 +106,8 @@ class Loader extends Object
         return $classes;
     }
 
-    public function getMigrationsFiles() {
+    public function getMigrationsFiles()
+    {
         $fileHandler = FileHandler::createObject(['path' => BaseOrm::getMigrationsPath()]);
 
         return $fileHandler->getPathFiles();
@@ -113,7 +118,8 @@ class Loader extends Object
      *
      * @return int
      */
-    public function getLatestMigrationVersion() {
+    public function getLatestMigrationVersion()
+    {
         $migration_files = $this->getMigrationsFiles();
         $last_version = array_pop($migration_files);
         $last_version = basename($last_version);
@@ -131,9 +137,10 @@ class Loader extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function detectConflicts() {
+    public function detectConflicts()
+    {
         $latest = $this->graph->getLeafNodes();
-        if(count($latest) > 1):
+        if (count($latest) > 1):
             return $latest;
         endif;
 

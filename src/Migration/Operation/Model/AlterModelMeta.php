@@ -32,7 +32,7 @@ class AlterModelMeta extends Operation
         $meta = array_replace($meta, $this->meta);
 
         foreach (self::$alterableOptions as $alterableOption) :
-            if(!array_key_exists($alterableOption, $this->meta) && array_key_exists($alterableOption, $meta)):
+            if (!array_key_exists($alterableOption, $this->meta) && array_key_exists($alterableOption, $meta)):
                 unset($meta[$alterableOption]);
             endif;
         endforeach;

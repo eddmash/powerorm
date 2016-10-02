@@ -49,7 +49,7 @@ class AlterField extends Operation
      */
     public function updateState($state)
     {
-        if(false == $this->preserveDefault):
+        if (false == $this->preserveDefault):
             $field = $this->field->deepClone();
             $field->default = NOT_PROVIDED;
         else:
@@ -59,7 +59,7 @@ class AlterField extends Operation
         $fields = $state->modelStates[$this->modelName]->fields;
         $newFields = [];
         foreach ($fields as $name => $ofield) :
-            if($name == $this->name):
+            if ($name == $this->name):
                 $newFields[$name] = $field;
             else:
                 $newFields[$name] = $ofield;

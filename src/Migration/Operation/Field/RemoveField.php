@@ -34,7 +34,7 @@ class RemoveField extends Operation
 
         $fieldsNew = [];
         foreach ($fields as $name => $field) :
-            if($name !== $this->name):
+            if ($name !== $this->name):
                 $fieldsNew[$name] = $field;
             endif;
         endforeach;

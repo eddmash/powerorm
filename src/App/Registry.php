@@ -43,7 +43,8 @@ class Registry extends Object
         $this->ready = false;
     }
 
-    public static function createObject($config = []) {
+    public static function createObject($config = [])
+    {
         return new static();
     }
 
@@ -104,7 +105,7 @@ class Registry extends Object
      */
     protected function _populateRegistry()
     {
-        if($this->ready):
+        if ($this->ready):
             return;
         endif;
 

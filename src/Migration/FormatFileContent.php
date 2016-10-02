@@ -37,12 +37,14 @@ class FormatFileContent
      */
     private $indentation;
 
-    public function __construct($indentation = 0) {
+    public function __construct($indentation = 0)
+    {
         $this->indentation = $indentation;
 
     }
 
-    public static function createObject($indentation = 0) {
+    public static function createObject($indentation = 0)
+    {
         return new static($indentation);
     }
 
@@ -113,7 +115,8 @@ class FormatFileContent
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function __toString() {
+    public function __toString()
+    {
         return implode("\n", $this->buffer);
     }
 

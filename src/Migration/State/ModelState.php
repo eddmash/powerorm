@@ -90,7 +90,7 @@ class ModelState extends Object
         $meta = [];
         $ignore = ['registry'];
         foreach ($overrides as $name => $value) :
-            if(in_array($name, $ignore)):
+            if (in_array($name, $ignore)):
                 continue;
             endif;
             $meta[$name] = $value;
@@ -115,7 +115,8 @@ class ModelState extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function toModel($registry) {
+    public function toModel($registry)
+    {
 
         $metaData = $this->meta;
         $extends = $this->extends;
@@ -126,12 +127,14 @@ class ModelState extends Object
         return $model;
     }
 
-    public static function createObject($name, $field, $kwargs) {
+    public static function createObject($name, $field, $kwargs)
+    {
         return new static($name, $field, $kwargs);
     }
 
-    public function getFieldByName($name) {
-        if(array_key_exists($name, $this->fields)):
+    public function getFieldByName($name)
+    {
+        if (array_key_exists($name, $this->fields)):
             return $this->fields[$name];
         endif;
         throw new ValueError(sprintf('No field called [ %s ] on model [ %s ]', $name, $this->name));
@@ -147,7 +150,8 @@ class ModelState extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function _defineLoadClass($className, $extends = '') {
+    private function _defineLoadClass($className, $extends = '')
+    {
         $className = ucfirst($className);
         // we create a new namespace and define new classes because,
         // we might be dealing with a model that has been dropped
@@ -160,7 +164,7 @@ class ModelState extends Object
                  public function unboundFields(){return [];}
             }';
 
-        if(empty($extends)):
+        if (empty($extends)):
             $extends = 'Eddmash\PowerOrm\Model\Model';
         endif;
 
@@ -168,18 +172,20 @@ class ModelState extends Object
 
         $className = sprintf('%s\%s', $this->fakeNamespace, $className);
 
-        if(!class_exists($className, false)):
+        if (!class_exists($className, false)):
             eval($class);
         endif;
 
         return new $className();
     }
 
-    public function deepClone() {
+    public function deepClone()
+    {
         return static::createObject($this->name, $this->fields, $this->kwargs);
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return sprintf("<ModelState: '%s'>", $this->name);
     }
 }

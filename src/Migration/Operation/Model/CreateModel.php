@@ -26,19 +26,21 @@ class CreateModel extends Operation
     public $meta;
     public $extends;
 
-    public function getDescription() {
+    public function getDescription()
+    {
         return sprintf('Create %smodel %s',
             (isset($this->meta['proxy']) && $this->meta['proxy']) ? 'proxy ' : '', $this->name);
     }
 
-    public function getConstructorArgs() {
+    public function getConstructorArgs()
+    {
         $constructorArgs = parent::getConstructorArgs();
-        if(isset($constructorArgs['meta']) && empty($constructorArgs['meta'])):
+        if (isset($constructorArgs['meta']) && empty($constructorArgs['meta'])):
             unset($constructorArgs['meta']);
         endif;
-        if(isset($constructorArgs['extends']) && !empty($constructorArgs['extends'])):
+        if (isset($constructorArgs['extends']) && !empty($constructorArgs['extends'])):
 
-            if(in_array($constructorArgs['extends'], [Model::getFullClassName(), \PModel::getFullClassName()])):
+            if (in_array($constructorArgs['extends'], [Model::getFullClassName(), \PModel::getFullClassName()])):
                 unset($constructorArgs['extends']);
 
             endif;

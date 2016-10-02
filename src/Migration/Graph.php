@@ -44,9 +44,11 @@ class Graph
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getNodeFamilyTree($node) {
+    public function getNodeFamilyTree($node)
+    {
         return $this->nodeFamilyTree[$node];
     }
+
     /**
      * @param $migrationName
      * @param $migrationObject
@@ -82,11 +84,13 @@ class Graph
         // both parent and child need to be already in the graph
         if (!array_key_exists($child, $this->nodes)):
             throw new NodeNotFoundError(
-                sprintf('Migration %s dependencies reference nonexistent child node %s', $migration->getName(), $child));
+                sprintf('Migration %s dependencies reference nonexistent child node %s', $migration->getName(),
+                    $child));
         endif;
         if (!array_key_exists($parent, $this->nodes)):
             throw new NodeNotFoundError(
-                sprintf('Migration %s dependencies reference nonexistent parent node %s', $migration->getName(), $parent));
+                sprintf('Migration %s dependencies reference nonexistent parent node %s', $migration->getName(),
+                    $parent));
         endif;
 
         // add to the family tree of both the child and parent

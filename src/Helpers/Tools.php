@@ -259,7 +259,8 @@ class Tools
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function lazyRelatedOperation($callback, $model, $relModel, $kwargs = []) {
+    public static function lazyRelatedOperation($callback, $model, $relModel, $kwargs = [])
+    {
         $relModel = (is_array($relModel)) ? $relModel : [$relModel];
 
         return $model->meta->registry->lazyModelOps($callback, $relModel, $kwargs);

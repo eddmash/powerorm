@@ -18,7 +18,8 @@ use Eddmash\PowerOrm\Model\Model;
 
 class RelatedField extends Field
 {
-    public function getRelatedModel() {
+    public function getRelatedModel()
+    {
         BaseOrm::getRegistry()->isAppReady();
 
         return $this->remoteField->getRelatedModel();
@@ -51,13 +52,13 @@ class RelatedField extends Field
         $kwargs = parent::getConstructorArgs();
         $kwargs['onDelete'] = $this->remoteField->onDelete;
 
-        if(is_string($this->remoteField->model)):
+        if (is_string($this->remoteField->model)):
             $kwargs['to'] = $this->remoteField->model;
         else:
             $kwargs['to'] = $this->remoteField->model->getFullClassName();
         endif;
 
-        if($this->remoteField->parentLink):
+        if ($this->remoteField->parentLink):
 
             $kwargs['parentLink'] = $this->remoteField->parentLink;
         endif;

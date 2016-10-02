@@ -26,7 +26,8 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      */
     private $_dependency;
 
-    public function __construct($params) {
+    public function __construct($params)
+    {
         BaseOrm::configure($this, $params);
     }
 
@@ -58,7 +59,8 @@ abstract class Operation extends DeconstructableObject implements OperationInter
         return '';
     }
 
-    public function deconstruct() {
+    public function deconstruct()
+    {
         $path = '';
         $alias = '';
 

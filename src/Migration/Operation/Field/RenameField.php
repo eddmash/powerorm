@@ -27,7 +27,7 @@ class RenameField extends Operation
         $fields = $state->modelStates[$this->modelName]->fields;
         $fieldsNew = [];
         foreach ($fields as $name => $field) :
-            if($name == $this->oldName):
+            if ($name == $this->oldName):
                 $fieldsNew[$this->newName] = $field;
             else:
                 $fieldsNew[$name] = $field;
@@ -40,7 +40,8 @@ class RenameField extends Operation
     /**
      * {@inheritdoc}
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return sprintf('Rename field %s on %s to %s', $this->oldName, $this->modelName, $this->newName);
     }
 

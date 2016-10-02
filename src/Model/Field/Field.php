@@ -190,7 +190,7 @@ class Field extends DeconstructableObject implements FieldInterface
     {
         BaseOrm::configure($this, $config, ['rel' => 'remoteField']);
 
-        if($this->remoteField !== null):
+        if ($this->remoteField !== null):
             $this->isRelation = true;
         endif;
     }
@@ -388,7 +388,7 @@ class Field extends DeconstructableObject implements FieldInterface
         foreach ($defaults as $name => $default) :
             $value = ($this->hasProperty($name)) ? $this->{$name} : $default;
 
-            if($value != $default):
+            if ($value != $default):
 
                 $constArgs[$name] = $value;
 

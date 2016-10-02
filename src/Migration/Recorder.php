@@ -58,7 +58,7 @@ class Recorder
 
     public function createTable()
     {
-        if($this->connection->tableExists($this->migration_table_name)):
+        if ($this->connection->tableExists($this->migration_table_name)):
             return;
         endif;
 
@@ -76,8 +76,7 @@ class Recorder
 
         $this->connection->add_field($fields);
         $this->connection->add_key('id', true);
-        if (!$this->connection->create_table($this->migration_table_name, true))
-        {
+        if (!$this->connection->create_table($this->migration_table_name, true)) {
             $this->error('Migration Table could not created, ensure you database is setup correctly');
         }
 

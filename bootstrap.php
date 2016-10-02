@@ -9,7 +9,7 @@ use Eddmash\PowerOrm\Config\OrmConfig;
 define('POWERORM_VERSION', '1.1.0');
 
 if (!defined('BASEPATH')) :
-    if(!defined('ENVIRONMENT')):
+    if (!defined('ENVIRONMENT')):
         define('ENVIRONMENT', 'testing');
     endif;
     define('BASEPATH', __DIR__.DIRECTORY_SEPARATOR);
@@ -22,7 +22,7 @@ else :
 endif;
 
 $autoloadFile = POWERORM_BASEPATH.'vendor/autoload.php';
-if(file_exists($autoloadFile)):
+if (file_exists($autoloadFile)):
     require $autoloadFile;
 endif;
 
@@ -36,7 +36,7 @@ $loader->initialize(new OrmConfig());
 $loader->register();
 
 // load doctrine DBAL
-if(file_exists('vendor/doctrine')):
+if (file_exists('vendor/doctrine')):
     require 'vendor/doctrine/common/lib/Doctrine/Common/ClassLoader.php';
     $classLoader = new ClassLoader('Doctrine', 'vendor/doctrine');
     $classLoader->register();

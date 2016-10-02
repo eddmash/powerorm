@@ -111,7 +111,7 @@ class BaseOrm extends Object
     public static function &getInstance()
     {
         $instance = null;
-        if(ENVIRONMENT == 'POWERORM_DEV'):
+        if (ENVIRONMENT == 'POWERORM_DEV'):
             $instance = static::_standAloneEnvironment();
         else:
             $instance = static::_ciEnvironment();
@@ -120,15 +120,17 @@ class BaseOrm extends Object
         return $instance;
     }
 
-    public static function _ciEnvironment() {
+    public static function _ciEnvironment()
+    {
         $ci = static::getCiObject();
         $orm = &$ci->orm;
 
         return $orm;
     }
 
-    public static function _standAloneEnvironment() {
-        if(static::$instance == null):
+    public static function _standAloneEnvironment()
+    {
+        if (static::$instance == null):
             static::$instance = self::createObject();
         endif;
 
@@ -150,7 +152,7 @@ class BaseOrm extends Object
     public static function getDbConnection()
     {
 
-        if(static::$connection == null):
+        if (static::$connection == null):
             $config = new Configuration();
 
             $connectionParams = array(
@@ -180,11 +182,11 @@ class BaseOrm extends Object
     public static function configure($object, $properties, $map = [])
     {
         foreach ($properties as $name => $value) :
-            if(array_key_exists($name, $map)):
+            if (array_key_exists($name, $map)):
                 $name = $map[$name];
             endif;
 
-            if(property_exists($object, $name)):
+            if (property_exists($object, $name)):
                 $object->$name = $value;
             endif;
 
@@ -193,12 +195,14 @@ class BaseOrm extends Object
         return $object;
     }
 
-    public static function createObject($config = []) {
+    public static function createObject($config = [])
+    {
 
         return new static($config);
     }
 
-    public static function consoleRun($config = []) {
+    public static function consoleRun($config = [])
+    {
         static::createObject($config);
         Manager::run();
     }

@@ -162,11 +162,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         // get meta settings for this model
         $metaSettings = $this->getMetaSettings();
 
-        if(!empty($kwargs)):
-            if(array_key_exists('meta', $kwargs)):
+        if (!empty($kwargs)):
+            if (array_key_exists('meta', $kwargs)):
                 $metaSettings = $kwargs['meta'];
             endif;
-            if(array_key_exists('registry', $kwargs)):
+            if (array_key_exists('registry', $kwargs)):
                 $metaSettings['registry'] = $kwargs['registry'];
             endif;
         endif;
@@ -181,9 +181,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         // proxy model setup
         if ($this->meta->proxy):
-            try{
+            try {
                 $concreteParent = $meta->registry->getModel($concreteParentName);
-            }catch (LookupError $e){
+            } catch (LookupError $e) {
                 $concreteParent = $concreteParentName::createObject();
             }
             $this->proxySetup($concreteParent);
@@ -255,10 +255,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function prepareMultiInheritance($parentModelName)
     {
         $ignoreModels = [\PModel::getFullClassName(), self::getFullClassName()];
-        if(!in_array($parentModelName, $ignoreModels)):
+        if (!in_array($parentModelName, $ignoreModels)):
             $attrName = sprintf('%s_ptr', $this->normalizeKey($parentModelName));
 
-            if($this->_fieldCache == null || !array_key_exists($attrName, $this->_fieldCache)):
+            if ($this->_fieldCache == null || !array_key_exists($attrName, $this->_fieldCache)):
 
                 $field = OneToOneField::createObject([
                     'to' => $parentModelName,
@@ -369,12 +369,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
              * takes place.
              *
              */
-            if($immediateParent != null && $immediateParent != $previousAbstractParent):
+            if ($immediateParent != null && $immediateParent != $previousAbstractParent):
                 $fieldKeys = array_keys($fields);
                 $parentKeys = array_keys($modelFields[$immediateParent]);
                 $commonFields = array_intersect($parentKeys, $fieldKeys);
 
-                if(!empty($commonFields)):
+                if (!empty($commonFields)):
                     throw new FieldError(
                         sprintf('Local field [ %s ] in class "%s" clashes with field of similar name from base class "%s" ',
                             implode(', ', $commonFields), $parentName, $immediateParent));
@@ -383,7 +383,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             endif;
 
             // get fields of immediate parent fields if it was an abstract model add them to child model.
-            if($previousAbstractParent != null):
+            if ($previousAbstractParent != null):
                 $parentFields = $modelFields[$previousAbstractParent];
                 $fields = array_merge($parentFields, $fields);
 
@@ -391,21 +391,21 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             // is the parent an abstract model and is the current model a proxy model
             // if so the parent should not have any fields.
-            if(($isOnCurrentModel && $isProxy) && $immediateParent === $previousAbstractParent):
+            if (($isOnCurrentModel && $isProxy) && $immediateParent === $previousAbstractParent):
                 $parentFields = $modelFields[$previousAbstractParent];
-                if(!empty($parentFields)):
+                if (!empty($parentFields)):
                     throw new TypeError(sprintf('Abstract base class containing model fields not '.
-                            "permitted for proxy model '%s'.", $parentName));
+                        "permitted for proxy model '%s'.", $parentName));
                 endif;
             endif;
 
-            if($reflectionParent->isAbstract()):
+            if ($reflectionParent->isAbstract()):
                 $previousAbstractParent = $parentName;
             else:
                 $previousAbstractParent = null;
             endif;
 
-            if(!$isOnCurrentModel):
+            if (!$isOnCurrentModel):
                 $immediateParent = ($parentName == $previousAbstractParent) ? 'Eddmash\PowerOrm\Model\Model' : $parentName;
             endif;
 

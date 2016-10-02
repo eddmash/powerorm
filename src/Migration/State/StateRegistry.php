@@ -18,7 +18,8 @@ class StateRegistry extends Registry
     /**
      * {@inheritdoc}
      */
-    public function __construct($modelStates) {
+    public function __construct($modelStates)
+    {
         parent::__construct();
         $this->_populate($modelStates);
     }
@@ -26,7 +27,8 @@ class StateRegistry extends Registry
     /**
      * {@inheritdoc}
      */
-    public static function createObject($modelStates) {
+    public static function createObject($modelStates)
+    {
         return new static($modelStates);
     }
 

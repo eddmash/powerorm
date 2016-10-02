@@ -12,6 +12,7 @@ class RenameModel extends Operation
 {
     public $oldName;
     public $newName;
+
     /**
      * {@inheritdoc}
      */

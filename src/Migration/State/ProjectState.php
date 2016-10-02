@@ -19,7 +19,8 @@ class ProjectState extends DeconstructableObject
     public $modelStates;
     private static $registry;
 
-    public function __construct($modelStates = []) {
+    public function __construct($modelStates = [])
+    {
         $this->modelStates = $modelStates;
     }
 
@@ -32,7 +33,8 @@ class ProjectState extends DeconstructableObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function createObject($models = []) {
+    public static function createObject($models = [])
+    {
         return new static($models);
     }
 
@@ -64,11 +66,13 @@ class ProjectState extends DeconstructableObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function addModelState($model) {
+    public function addModelState($model)
+    {
         $this->modelStates[$model->name] = $model;
     }
 
-    public function removeModelState($modelName) {
+    public function removeModelState($modelName)
+    {
         unset($this->modelStates[$modelName]);
     }
 
@@ -79,7 +83,8 @@ class ProjectState extends DeconstructableObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getRegistry() {
+    public function getRegistry()
+    {
 
         return StateRegistry::createObject($this->modelStates);
     }
@@ -92,11 +97,13 @@ class ProjectState extends DeconstructableObject
         return $this->modelStates;
     }
 
-    public function deepClone() {
+    public function deepClone()
+    {
         return static::createObject();
     }
 
-    public function deconstruct() {
+    public function deconstruct()
+    {
 
     }
 

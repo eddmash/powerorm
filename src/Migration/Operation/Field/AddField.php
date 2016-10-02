@@ -55,7 +55,7 @@ class AddField extends Operation
      */
     public function updateState($state)
     {
-        if(!$this->preserveDefault):
+        if (!$this->preserveDefault):
             $field = $this->field->deepClone();
             $field->default = NOT_PROVIDED;
         else:
@@ -71,7 +71,7 @@ class AddField extends Operation
     public function getConstructorArgs()
     {
         $constArgs = parent::getConstructorArgs();
-        if(false === $this->preserveDefault):
+        if (false === $this->preserveDefault):
             unset($constArgs['preserveDefault']);
         endif;
 

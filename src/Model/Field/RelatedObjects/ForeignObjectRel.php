@@ -11,11 +11,11 @@
 
 namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
-use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Object;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Object;
 
 class ForeignObjectRel extends Object
 {
@@ -38,20 +38,24 @@ class ForeignObjectRel extends Object
     public $parentLink;
     public $onDelete;
 
-    public function __construct($kwargs = []) {
+    public function __construct($kwargs = [])
+    {
         BaseOrm::configure($this, $kwargs, ['to' => 'model']);
     }
 
-    public static function createObject($kwargs = []) {
+    public static function createObject($kwargs = [])
+    {
         return new static($kwargs);
     }
 
-    public function getRemoteField() {
+    public function getRemoteField()
+    {
         return $this->field;
     }
 
-    public function getRelatedModel() {
-        if($this->field->scopeModel == null):
+    public function getRelatedModel()
+    {
+        if ($this->field->scopeModel == null):
             throw new OrmException(
                 "This method can't be accessed before field contributeToClass has been called.");
         endif;
@@ -59,18 +63,23 @@ class ForeignObjectRel extends Object
         return $this->field->scopeModel;
     }
 
-    public function isManyToMany() {
+    public function isManyToMany()
+    {
         return $this->field->manyToMany;
     }
-    public function isOneToMany() {
+
+    public function isOneToMany()
+    {
         return $this->field->oneToMany;
     }
 
-    public function isManyToOne() {
+    public function isManyToOne()
+    {
         return $this->field->manyToOne;
     }
 
-    public function isOneToOne() {
+    public function isOneToOne()
+    {
         return $this->field->oneToOne;
     }
 }

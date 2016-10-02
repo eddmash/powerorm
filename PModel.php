@@ -5,7 +5,6 @@
  */
 defined('BASEPATH') or exit('No direct script access allowed');
 
-use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\BooleanField;
 use Eddmash\PowerOrm\Model\Field\CharField;
@@ -23,6 +22,7 @@ use Eddmash\PowerOrm\Model\Field\ManyToOneField;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Field\TextField;
 use Eddmash\PowerOrm\Model\Field\TimeField;
+use Eddmash\PowerOrm\Model\Model;
 
 /**
  * this makes the Orm Model available for use without namespaces.
