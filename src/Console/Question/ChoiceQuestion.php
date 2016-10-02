@@ -34,7 +34,13 @@ class ChoiceQuestion extends Question
 
     public function getQuestion()
     {
-        return sprintf('%s : [ %s ]', $this->question, implode(', ', $this->choices));
+        $question = '%s :'.PHP_EOL;
+        foreach ($this->choices as $index => $choice) :
+
+            $question .= sprintf("\t%s. %s".PHP_EOL, $index + 1, $choice);
+        endforeach;
+
+        return sprintf($question, $this->question);
     }
 
     /**

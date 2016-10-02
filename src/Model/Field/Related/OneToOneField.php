@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Field\Related;
 
-class OneToOneField extends BaseRelated
+class OneToOneField extends ForeignKey
 {
-
 }

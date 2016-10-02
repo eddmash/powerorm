@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm\Migration\State;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\TypeError;
+use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Object;
@@ -35,7 +36,7 @@ class ModelState extends Object
 {
     public $name;
     public $fields = [];
-    public $meta=[];
+    public $meta = [];
     public $extends;
 
     private $fakeNamespace = 'Eddmash\PowerOrm\__Fake__\Model';
@@ -128,6 +129,14 @@ class ModelState extends Object
     public static function createObject($name, $field, $kwargs) {
         return new static($name, $field, $kwargs);
     }
+
+    public function getFieldByName($name) {
+        if(array_key_exists($name, $this->fields)):
+            return $this->fields[$name];
+        endif;
+        throw new ValueError(sprintf('No field called [ %s ] on model [ %s ]', $name, $this->name));
+    }
+
     /**
      * @param string $className
      * @param string $extends

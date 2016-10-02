@@ -16,6 +16,7 @@ use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Object;
 
@@ -106,7 +107,7 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * @var bool
      */
-    public $autoCreated;
+    public $autoCreated = false;
 
     /**
      * An array consisting of items to use as choices for this field.
@@ -127,7 +128,7 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * @var
      */
-    public $choices;
+    public $choices = [];
 
     /**
      * Extra “help” text to be displayed with the form widget.
@@ -141,18 +142,19 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * @var
      */
-    public $helpText;
+    public $helpText = '';
+
     /**
      * The name of the column that this field maps to on the database table represented by the scope model.
      *
      * @var string
      */
-    public $dbColumn;
+    protected $dbColumn;
 
     /**
      * if this is a relationship field, this hold the Relationship object that this field represents.
      *
-     * @var RelationObject
+     * @var ForeignObjectRel
      */
     public $remoteField;
 
@@ -177,11 +179,20 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public $scopeModel;
 
+    public $oneToMany = false;
+    public $oneToOne = false;
+    public $manyToMany = false;
+    public $manyToOne = false;
+
     private $constructorArgs;
 
     public function __construct($config = [])
     {
-        BaseOrm::configure($this, $config);
+        BaseOrm::configure($this, $config, ['rel' => 'remoteField']);
+
+        if($this->remoteField !== null):
+            $this->isRelation = true;
+        endif;
     }
 
     /**
@@ -224,8 +235,7 @@ class Field extends DeconstructableObject implements FieldInterface
             $this->name = $fieldName;
         endif;
         $this->attrName = $this->getAttrName();
-        $this->dbColumn = $this->getColumnName();
-        $this->concrete = empty($this->dbColumn);
+        $this->concrete = empty($this->getColumnName());
 
         if (empty($this->verboseName)):
             $this->verboseName = ucwords(str_replace('_', ' ', $this->name));
@@ -352,6 +362,40 @@ class Field extends DeconstructableObject implements FieldInterface
             'fullName' => $this->getFullClassName(),
             'name' => sprintf('%s\%s', $alias, $this->getShortClassName()),
         ];
+
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConstructorArgs()
+    {
+        $constArgs = [];
+
+        $defaults = [
+            'primaryKey' => false,
+            'maxLength' => null,
+            'unique' => false,
+            'null' => false,
+            'dbIndex' => false,
+            'default' => NOT_PROVIDED,
+            'dbColumn' => null,
+            'autoCreated' => false,
+            'helpText' => '',
+            'choices' => [],
+        ];
+
+        foreach ($defaults as $name => $default) :
+            $value = ($this->hasProperty($name)) ? $this->{$name} : $default;
+
+            if($value != $default):
+
+                $constArgs[$name] = $value;
+
+            endif;
+        endforeach;
+
+        return $constArgs;
     }
 
     /**

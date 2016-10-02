@@ -2,21 +2,18 @@
 /**
  * Created by eddmash <http://eddmash.com>
  * Date: 9/29/16
- * Time: 2:09 PM
+ * Time: 2:09 PM.
  */
-
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
-
 use Eddmash\PowerOrm\Migration\Operation\Operation;
-
 
 class RenameModel extends Operation
 {
     public $oldName;
     public $newName;
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function updateState($state)
     {
@@ -36,7 +33,7 @@ class RenameModel extends Operation
 
     public function getDescription()
     {
-        return sprintf("Rename model %s to %s", $this->oldName, $this->newName);
+        return sprintf('Rename model %s to %s', $this->oldName, $this->newName);
     }
 
 }

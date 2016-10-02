@@ -9,15 +9,15 @@
 * file that was distributed with this source code.
 */
 
-namespace Eddmash\PowerOrm;
+namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
 /**
- * Interface that allows objects to work as arrays.
+ * Used by ForeignObject to store information about the relation.
  *
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-interface ArrayObjectInterface extends \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
+class ManyToOneRel extends ForeignObjectRel
 {
 }

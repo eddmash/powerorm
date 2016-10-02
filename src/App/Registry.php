@@ -15,7 +15,6 @@ use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Helpers\FileHandler;
-use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Object;
 
@@ -32,11 +31,11 @@ use Eddmash\PowerOrm\Object;
  */
 class Registry extends Object
 {
-    public $allModels = [];
+    private $allModels = [];
     private $_pendingOps = [];
 
     protected $modelsReady;
-    protected $ready;
+    public $ready;
 
     public function __construct()
     {
@@ -212,7 +211,7 @@ class Registry extends Object
     {
 
         // get the first
-        $modelName = $this->normalizeKey($modelNames[0]);
+        $modelName = $modelNames[0];
 
         // recurse the others
         if (isset($modelNames[1]) && !empty(array_slice($modelNames, 1))) {
@@ -221,9 +220,10 @@ class Registry extends Object
 
         try {
             $model = $this->getModel($modelName);
-            Tools::invokeCallback($callback, $model, $kwargs);
+            $kwargs['related'] = $model;
+            $callback($kwargs);
         } catch (LookupError $err) {
-            $this->_pendingOps[$modelName][] = $callback;
+            $this->_pendingOps[$modelName][] = [$callback, $kwargs];
         }
     }
 
@@ -237,9 +237,11 @@ class Registry extends Object
     public function resolvePendingOps($model)
     {
         if (isset($this->_pendingOps[$model->meta->modelName])) {
-            $callbacks = $this->_pendingOps[$model->meta->modelName];
-            foreach ($callbacks as $callback) {
-                Tools::invokeCallback($callback, $model);
+            $todoActions = $this->_pendingOps[$model->meta->modelName];
+            foreach ($todoActions as $todoAction) {
+                list($callback, $kwargs) = $todoAction;
+                $kwargs['related'] = $model;
+                $callback($kwargs);
             }
         }
     }

@@ -3,6 +3,7 @@
 namespace Eddmash\PowerOrm\Helpers;
 
 use Eddmash\PowerOrm\DeConstructableInterface;
+use Eddmash\PowerOrm\Model\Model;
 
 /**
  * Class Tools.
@@ -16,11 +17,6 @@ class Tools
     public static function normalizeKey($name)
     {
         return strtolower($name);
-    }
-
-    public static function invokeCallback($callback, $model, $kwargs = [])
-    {
-        $callback($model, $kwargs);
     }
 
     /**
@@ -248,5 +244,24 @@ class Tools
         $listCurrency = self::currencyList();
 
         return $listCurrency[$code];
+    }
+
+    /**
+     * Schedule `callback` to be called once `model` and all `related_models` have been imported and registered with
+     * the app registry.
+     *
+     * @param callback $callback will be called with the newly-loaded model classes as its any optional keyword arguments
+     * @param Model    $model
+     * @param $relModel
+     * @param array $kwargs
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function lazyRelatedOperation($callback, $model, $relModel, $kwargs = []) {
+        $relModel = (is_array($relModel)) ? $relModel : [$relModel];
+
+        return $model->meta->registry->lazyModelOps($callback, $relModel, $kwargs);
     }
 }

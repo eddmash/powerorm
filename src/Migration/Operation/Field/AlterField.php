@@ -14,14 +14,7 @@ namespace Eddmash\PowerOrm\Migration\Operation\Field;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Model\Field\Field;
 
-/**
- * Adds a field to a model.
- *
- * @since 1.1.0
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class AddField extends Operation
+class AlterField extends Operation
 {
     /**
      * @var string
@@ -32,10 +25,6 @@ class AddField extends Operation
      * @var string
      */
     public $modelName;
-    /**
-     * @var Field
-     */
-    public $field;
 
     /**
      * @var bool
@@ -43,11 +32,16 @@ class AddField extends Operation
     public $preserveDefault;
 
     /**
+     * @var Field
+     */
+    public $field;
+
+    /**
      * {@inheritdoc}
      */
     public function getDescription()
     {
-        return sprintf('Add field %s to %s', $this->name, $this->modelName);
+        return sprintf('Alter field %s on %s', $this->name, $this->modelName);
     }
 
     /**
@@ -55,27 +49,23 @@ class AddField extends Operation
      */
     public function updateState($state)
     {
-        if(!$this->preserveDefault):
+        if(false == $this->preserveDefault):
             $field = $this->field->deepClone();
             $field->default = NOT_PROVIDED;
         else:
             $field = $this->field;
         endif;
 
-        $state->modelStates[$this->modelName]->fields[$this->name] = $field;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getConstructorArgs()
-    {
-        $constArgs = parent::getConstructorArgs();
-        if(false === $this->preserveDefault):
-            unset($constArgs['preserveDefault']);
-        endif;
-
-        return $constArgs;
+        $fields = $state->modelStates[$this->modelName]->fields;
+        $newFields = [];
+        foreach ($fields as $name => $ofield) :
+            if($name == $this->name):
+                $newFields[$name] = $field;
+            else:
+                $newFields[$name] = $ofield;
+            endif;
+        endforeach;
+        $state->modelStates[$this->modelName]->fields = $newFields;
     }
 
 }

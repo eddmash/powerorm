@@ -51,12 +51,12 @@ class InteractiveAsker extends Asker
      */
     public function doAsk($question)
     {
-        $this->normal($question->getQuestion(), true);
+        $this->normal($question->getQuestion());
 
         $answer = false;
 
         if (false === $answer) :
-            $answer = $this->input();
+            $answer = $this->input(' ');
             if (false === $answer) :
                 throw new \RuntimeException('Aborted');
             endif;

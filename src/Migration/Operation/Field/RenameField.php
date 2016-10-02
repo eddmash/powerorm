@@ -13,17 +13,11 @@ namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 
-class RemoveField extends Operation
+class RenameField extends Operation
 {
-    /**
-     * @var string
-     */
-    public $name;
-
-    /**
-     * @var string
-     */
     public $modelName;
+    public $newName;
+    public $oldName;
 
     /**
      * {@inheritdoc}
@@ -31,22 +25,23 @@ class RemoveField extends Operation
     public function updateState($state)
     {
         $fields = $state->modelStates[$this->modelName]->fields;
-
         $fieldsNew = [];
         foreach ($fields as $name => $field) :
-            if($name !== $this->name):
+            if($name == $this->oldName):
+                $fieldsNew[$this->newName] = $field;
+            else:
                 $fieldsNew[$name] = $field;
             endif;
         endforeach;
         $state->modelStates[$this->modelName]->fields = $fieldsNew;
+
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDescription()
-    {
-        return sprintf('Remove field %s from %s', $this->name, $this->modelName);
+    public function getDescription() {
+        return sprintf('Rename field %s on %s to %s', $this->oldName, $this->modelName, $this->newName);
     }
 
 }

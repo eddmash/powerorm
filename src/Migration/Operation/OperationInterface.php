@@ -29,7 +29,6 @@ interface OperationInterface
      */
     public function updateState($state);
 
-
 //    public function databaseForwards();
 //    public function databaseBackwards();
 }

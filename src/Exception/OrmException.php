@@ -9,6 +9,6 @@ namespace Eddmash\PowerOrm\Exception;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class OrmExceptions extends \Exception
+class OrmException extends \Exception
 {
 }

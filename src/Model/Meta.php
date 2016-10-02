@@ -5,9 +5,11 @@ namespace Eddmash\PowerOrm\Model;
 use Eddmash\PowerOrm\app\Registry;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeconstructableObject;
+use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\field\AutoField;
 use Eddmash\PowerOrm\Model\field\Field;
+use Eddmash\PowerOrm\Model\Field\Related\RelatedField;
 use Eddmash\PowerOrm\Object;
 
 /**
@@ -19,7 +21,8 @@ use Eddmash\PowerOrm\Object;
  */
 class Meta extends DeconstructableObject implements MetaInterface
 {
-    public static $DEBUG_IGNORE = ['scopeModel', 'registry', 'localManyToMany', 'localFields', 'concreteModel', 'overrides'];
+    public static $DEBUG_IGNORE = ['scopeModel', 'registry', 'localManyToMany',
+        'localFields', 'concreteModel', 'overrides', ];
 
     public static $DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy'];
 
@@ -128,10 +131,18 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     /**
      * This attribute will only be set if the scopeModel contains a parent model
-     * that is not abstact/PModel/Eddmash\PowerOrm\Model
+     * that is not abstact/PModel/Eddmash\PowerOrm\Model.
+     *
      * @var
      */
     private $parentLink;
+
+    /**
+     * Holds all the fields that point to the scope model coming from other models.
+     *
+     * @var array
+     */
+    public $_reverseRelationTreeCache = [];
 
     public function __construct($overrides = [])
     {
@@ -149,9 +160,43 @@ class Meta extends DeconstructableObject implements MetaInterface
     /**
      * {@inheritdoc}
      */
-    public function getFields()
+    public function getFields($includeParents = true)
     {
-        // TODO: Implement getFields() method.
+       return $this->_getFields(['includeParents' => $includeParents]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getField($name)
+    {
+        // first look in the forward fields only
+        $fields = $this->_getForwardOnlyField();
+        if(array_key_exists($name, $fields)):
+            return $fields[$name];
+        endif;
+
+        // next look at the reverse fields
+        if(!$this->registry->ready):
+            throw new FieldDoesNotExist(
+                sprintf("%s has no field named %s. The App registry isn't ready yet, so if this is an autoCreated ".
+                    "related field, it won't  be available yet.", $this->modelName, $name));
+        endif;
+        $reverseFields = $this->_getReverseOnlyField();
+        if(array_key_exists($name, $reverseFields)):
+            return $reverseFields[$name];
+        endif;
+
+        // if we get here we didn't get the field.
+        throw new FieldDoesNotExist(sprintf('%s has no field named %s', $this->modelName, $name));
+    }
+
+    public function _getForwardOnlyField() {
+        return $this->_getFields(['reverse' => false]);
+    }
+
+    public function _getReverseOnlyField() {
+        return $this->_getFields(['forward' => false]);
     }
 
     /**
@@ -167,7 +212,35 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getReverseRelatedObjects()
     {
-        // TODO: Implement getRelatedObjects() method.
+        if(empty($this->_reverseRelationTreeCache)):
+            $allRelations = [];
+            /* @var $model Model */
+            /* @var $field RelatedField */
+            $allModels = $this->registry->getModels();
+
+            // collect all relation fields for this each model
+            foreach ($allModels as $name => $model) :
+                // just get the forward fields
+                $fields = $model->meta->_getFields(['includeParents' => false, 'reverse' => false]);
+
+                foreach ($fields as $field) :
+
+                    if($field->isRelation && $field->getRelatedModel() !== null):
+                        $allRelations[$field->remoteField->model->meta->modelName][$field->name] = $field;
+                    endif;
+                endforeach;
+
+            endforeach;
+
+            // set cache relation to models
+            foreach ($allModels as $name => $model) :
+                // get fields for each model
+                $fields = (isset($allRelations[$name])) ? $allRelations[$name] : [];
+                $model->meta->_reverseRelationTreeCache = $fields;
+            endforeach;
+        endif;
+
+        return $this->_reverseRelationTreeCache;
     }
 
     /**
@@ -196,14 +269,17 @@ class Meta extends DeconstructableObject implements MetaInterface
         $this->verboseName = (empty($vName)) ? ucwords(StringHelper::camelToSpace($this->modelName)) : $vName;
     }
 
-    private function _getFields($forward = true, $reverse = true, $include_parents = true)
+    public function _getFields($kwargs = [])
     {
+        $forward = $reverse = $includeParents = true;
+        extract($kwargs);
+
         $fields = [];
         $seen_models = null;
 
-//        if($reverse):
-//
-//        endif;
+        if($reverse):
+            $fields = array_merge($fields, $this->getReverseRelatedObjects());
+        endif;
 
         if($forward):
             $fields = array_merge($fields, array_merge($this->localFields, $this->localManyToMany));
@@ -284,9 +360,17 @@ class Meta extends DeconstructableObject implements MetaInterface
     {
         return $this->overrides;
     }
-    
-    public function deconstruct(){
-    
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deconstruct()
+    {
+        // TODO: Implement deconstruct() method.
+    }
+
+    private function _getTableName() {
+        return $this->modelName;
     }
 
     public function __debugInfo()
@@ -301,9 +385,5 @@ class Meta extends DeconstructableObject implements MetaInterface
         endforeach;
 
         return $meta;
-    }
-
-    private function _getTableName() {
-        return $this->modelName;
     }
 }

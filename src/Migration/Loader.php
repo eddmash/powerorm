@@ -126,7 +126,9 @@ class Loader extends Object
      * An application should only have one leaf node more than that means there is an issue somewhere.
      *
      * @return array
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function detectConflicts() {

@@ -14,30 +14,38 @@ namespace Eddmash\PowerOrm\Migration\Operation\Model;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 
 /**
- *  Drops a model's table.
+ * Renames a model's table.
  *
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class DeleteModel extends Operation
+class AlterModelTable extends Operation
 {
+    /**
+     * @var string
+     */
     public $name;
 
     /**
-     * {@inheritdoc}
+     * @var string
      */
-    public function updateState($state)
-    {
-        $state->removeModelState($this->name);
-    }
+    public $table;
 
     /**
      * {@inheritdoc}
      */
     public function getDescription()
     {
-        return sprintf('Delete model %s', $this->name);
+        return sprintf('Rename table for %s to %s', $this->name, $this->table);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function updateState($state)
+    {
+        $state->modelStates[$this->name]->meta['dbTable'] = $this->table;
     }
 
 }

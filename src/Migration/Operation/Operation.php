@@ -14,7 +14,6 @@ namespace Eddmash\PowerOrm\Migration\Operation;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Helpers\StringHelper;
-use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 abstract class Operation extends DeconstructableObject implements OperationInterface
 {

@@ -2,11 +2,9 @@
 /**
  * Created by eddmash <http://eddmash.com>
  * Date: 9/29/16
- * Time: 2:08 PM
+ * Time: 2:08 PM.
  */
-
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
-
 
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ModelState;
@@ -24,11 +22,11 @@ class AlterModelMeta extends Operation
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function updateState($state)
     {
-        /**@var $modelState ModelState*/
+        /** @var $modelState ModelState */
         $modelState = $state->modelStates[$this->name];
         $meta = $modelState->meta;
         $meta = array_replace($meta, $this->meta);
@@ -43,7 +41,7 @@ class AlterModelMeta extends Operation
 
     public function getDescription()
     {
-        return sprintf("Changed Meta options on %s", $this->name);
+        return sprintf('Changed Meta options on %s', $this->name);
     }
 
 }

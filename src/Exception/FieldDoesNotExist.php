@@ -9,12 +9,8 @@
 * file that was distributed with this source code.
 */
 
-namespace Eddmash\PowerOrm\Model\Field\Related;
+namespace Eddmash\PowerOrm\Exception;
 
-
-use Eddmash\PowerOrm\Model\Field\Field;
-
-class BaseRelated extends Field
+class FieldDoesNotExist extends \Exception
 {
-
 }

@@ -9,13 +9,8 @@
 * file that was distributed with this source code.
 */
 
-namespace Eddmash\PowerOrm\Model;
+namespace Eddmash\PowerOrm\Exception;
 
-class Delete
+class AttributeError extends \Exception
 {
-    const CASCADE = 'cascade';
-    const PROTECT = 'protect';
-    const DONOTHING = 'donothing';
-    const SETNULL = 'setnull';
-    const SETDEFAULT = 'setdefault';
 }

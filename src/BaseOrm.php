@@ -17,7 +17,7 @@ use Doctrine\DBAL\DriverManager;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\Console\Manager;
 
-define('NOT_PROVIDED', 'NOT_PROVIDED');
+define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
 
 class BaseOrm extends Object
 {
@@ -172,13 +172,22 @@ class BaseOrm extends Object
      *
      * @param object $object     the object to be configured
      * @param array  $properties the property initial values given in terms of name-value pairs
+     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
+     *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
      */
-    public static function configure($object, $properties)
+    public static function configure($object, $properties, $map = [])
     {
         foreach ($properties as $name => $value) :
-            $object->$name = $value;
+            if(array_key_exists($name, $map)):
+                $name = $map[$name];
+            endif;
+
+            if(property_exists($object, $name)):
+                $object->$name = $value;
+            endif;
+
         endforeach;
 
         return $object;

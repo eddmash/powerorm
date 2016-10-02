@@ -53,10 +53,9 @@ Load the library like any other Codeigniter library.
  - Provides database interaction methods
 
  # Credits
- I have used the following frameworks as a guiding hand, and in most cases i have replicated Django framework how has
+ I have used the following frameworks as a guiding hand, and in most cases i have replicated how Django framework has
  approached a problem, and in some cases i have borrowed some source code :
-
- In order of importance:
+ 
  - Django framework
  - FuelPHP framework
  - Yii2 framework
