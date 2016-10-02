@@ -193,7 +193,9 @@ class Meta extends DeconstructableObject implements MetaInterface
     {
         // first look in the forward fields only
         $fields = $this->_getForwardOnlyField();
+
         if (ArrayHelper::hasKey($fields, $name)):
+
             return $fields[$name];
         endif;
 
@@ -204,7 +206,9 @@ class Meta extends DeconstructableObject implements MetaInterface
                     "related field, it won't  be available yet.", $this->modelName, $name));
         endif;
         $reverseFields = $this->_getReverseOnlyField();
+
         if (ArrayHelper::hasKey($reverseFields, $name)):
+
             return $reverseFields[$name];
         endif;
 
@@ -249,7 +253,9 @@ class Meta extends DeconstructableObject implements MetaInterface
                 foreach ($fields as $field) :
 
                     if ($field->isRelation && $field->getRelatedModel() !== null):
+
                         $allRelations[$field->relation->toModel->meta->modelName][$field->name] = $field;
+
                     endif;
                 endforeach;
 
@@ -417,6 +423,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     private function _getTableName()
     {
         return sprintf('%s%s', BaseOrm::getDbPrefix(), str_replace('\\', '_', $this->normalizeKey($this->modelName)));
+
     }
 
     public function __debugInfo()

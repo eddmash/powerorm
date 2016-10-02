@@ -139,6 +139,7 @@ class Migration
             });
         endforeach;
 
+
         return $state;
     }
 

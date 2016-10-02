@@ -268,6 +268,7 @@ class Tools
         foreach ($relModels as $relM) :
             if (is_string($relM)):
 
+
                 $relatedModels[] = $relM;
 
             elseif ($relM instanceof Model):

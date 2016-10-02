@@ -207,6 +207,7 @@ class Field extends DeconstructableObject implements FieldInterface
         BaseOrm::configure($this, $config, ['rel' => 'relation']);
 
         if ($this->relation !== null):
+
             $this->isRelation = true;
         endif;
     }

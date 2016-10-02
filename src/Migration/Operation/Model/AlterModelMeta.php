@@ -32,7 +32,11 @@ class AlterModelMeta extends Operation
         $meta = array_replace($meta, $this->meta);
 
         foreach (self::$alterableOptions as $alterableOption) :
+<<<<<<< HEAD
             if (!ArrayHelper::hasKey($this->meta, $alterableOption) && ArrayHelper::hasKey($meta, $alterableOption)):
+=======
+            if (!array_key_exists($alterableOption, $this->meta) && array_key_exists($alterableOption, $meta)):
+>>>>>>> format for symfony2 cs
                 unset($meta[$alterableOption]);
             endif;
         endforeach;

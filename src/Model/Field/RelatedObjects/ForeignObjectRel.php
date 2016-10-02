@@ -49,6 +49,7 @@ class ForeignObjectRel extends Object
     public function __construct($kwargs = [])
     {
         BaseOrm::configure($this, $kwargs, ['to' => 'toModel']);
+
     }
 
     public static function createObject($kwargs = [])
@@ -89,5 +90,6 @@ class ForeignObjectRel extends Object
     public function __toString()
     {
         return (string) sprintf('<Rel %s>', $this->toModel->meta->modelName);
+
     }
 }

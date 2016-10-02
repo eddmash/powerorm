@@ -36,6 +36,7 @@ $autoLoadFile = HOMEPATH.DIRECTORY_SEPARATOR.'vendor/autoload.php';
 
 if (file_exists($autoLoadFile)):
     require $autoLoadFile;
+
 endif;
 
 require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';

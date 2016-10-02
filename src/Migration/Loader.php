@@ -75,6 +75,7 @@ class Loader extends Object
         endforeach;
     }
 
+
     /**
      * Returns the migration(s) which match the given prefix.
      *
@@ -123,6 +124,7 @@ class Loader extends Object
     public static function createObject($connection = null, $loadGraph = true)
     {
         return new static($connection, $loadGraph);
+
     }
 
     /**

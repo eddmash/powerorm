@@ -67,6 +67,7 @@ class AlterField extends Operation
 
         $fields = $state->modelStates[$this->modelName]->fields;
         $newFields = [];
+
         foreach ($fields as $name => $oldField) :
             if ($name == $this->name):
                 $newFields[$name] = $alteredField;

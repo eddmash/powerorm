@@ -169,10 +169,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $metaSettings = $this->getMetaSettings();
 
         if (!empty($kwargs)):
+
             if (ArrayHelper::hasKey($kwargs, 'meta')):
                 $metaSettings = $kwargs['meta'];
             endif;
             if (ArrayHelper::hasKey($kwargs, 'registry')):
+
                 $metaSettings['registry'] = $kwargs['registry'];
             endif;
         endif;
@@ -272,6 +274,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $attrName = sprintf('%sPtr', $attrName);
 
             if ($this->_fieldCache == null || !ArrayHelper::hasKey($this->_fieldCache, $attrName)):
+
 
                 $field = OneToOneField::createObject([
                     'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
@@ -394,6 +397,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // if the parent is an abstract model and the current model is a proxy model
             // the parent should not have any fields. abstract models cant have fields
             // incases where the child is a proxy model
+
             if (($isOnCurrentModel && $isProxy) && $immediateParent === $previousAbstractParent):
                 $parentFields = $modelFields[$previousAbstractParent];
                 if (!empty($parentFields)):
@@ -416,7 +420,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             endif;
 
             if (!$isOnCurrentModel):
+
                 $immediateParent = ($parentName == $previousAbstractParent) ? '' : $parentName;
+
             endif;
 
             $modelFields[ClassHelper::getNameFromNs($parentName, $modelNamespace)] = $fields;

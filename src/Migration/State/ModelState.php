@@ -142,6 +142,7 @@ class ModelState extends Object
     {
         if (ArrayHelper::hasKey($this->fields, $name)):
             return ArrayHelper::getValue($this->fields, $name);
+
         endif;
         throw new ValueError(sprintf('No field called [ %s ] on model [ %s ]', $name, $this->name));
     }
@@ -165,6 +166,7 @@ class ModelState extends Object
     {
         if (!ClassHelper::classExists($className, BaseOrm::getModelsNamespace())):
             MigrationModel::defineClass($className, $extends);
+
         endif;
 
         return new $className();
@@ -173,10 +175,12 @@ class ModelState extends Object
     public function deepClone()
     {
         return static::createObject($this->name, $this->fields, ['meta' => $this->meta, 'extends' => $this->extends]);
+
     }
 
     public function __toString()
-    {
+    { 
         return (string) sprintf("<ModelState: '%s'>", $this->name);
+
     }
 }

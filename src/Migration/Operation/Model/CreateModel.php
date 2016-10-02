@@ -41,9 +41,11 @@ class CreateModel extends Operation
         if (isset($constructorArgs['meta']) && empty($constructorArgs['meta'])):
             unset($constructorArgs['meta']);
         endif;
+
         if (isset($constructorArgs['extends'])):
 
             if (StringHelper::isEmpty($constructorArgs['extends']) || Model::isModelBase($constructorArgs['extends'])):
+
                 unset($constructorArgs['extends']);
             else:
                 $constructorArgs['extends'] =

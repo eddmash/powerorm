@@ -240,6 +240,7 @@ class BaseOrm extends Object
 
         if (ENVIRONMENT == 'POWERORM_DEV'):
             $instance = static::_standAloneEnvironment($config);
+
         else:
             $instance = static::getOrmFromContext();
         endif;
@@ -257,7 +258,6 @@ class BaseOrm extends Object
 
     public static function _standAloneEnvironment($config)
     {
-
         return static::createObject($config);
     }
 
@@ -339,6 +339,7 @@ class BaseOrm extends Object
 
         foreach ($properties as $name => $value) :
             if (ArrayHelper::hasKey($map, $name)):
+
                 $name = $map[$name];
             endif;
 
