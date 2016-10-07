@@ -2,6 +2,8 @@
 PowerOrm User Guide
 #######################
 
+.. include:: top_notices.rst
+
 - :doc:`License Agreement <license>`
 - :doc:`Change Log <changelog>`
 
