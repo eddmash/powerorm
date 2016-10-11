@@ -129,7 +129,7 @@ class AutoDetector extends Object
      * @param ProjectState $toState
      * @param Asker        $asker
      */
-    public function __construct($fromState, $toState, $asker)
+    public function __construct($fromState, $toState, $asker=null)
     {
         $this->fromState = $fromState;
         $this->toState = $toState;
@@ -183,7 +183,6 @@ class AutoDetector extends Object
 
         // new state
         $newModelNames = array_keys($this->toState->getModelStates());
-
         foreach ($newModelNames as $newModelName) :
             $newModel = $this->newRegistry->getModel($newModelName);
 

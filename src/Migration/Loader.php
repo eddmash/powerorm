@@ -10,8 +10,12 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Exception\AmbiguityError;
+use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Helpers\FileHandler;
+use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Object;
 
 class Loader extends Object
@@ -20,6 +24,11 @@ class Loader extends Object
      * @var Graph
      */
     public $graph;
+    public $appliedMigrations;
+
+    /**
+     * @var Connection
+     */
     private $connection;
 
     public function __construct($connection = null, $loadGraph = true)
@@ -65,12 +74,50 @@ class Loader extends Object
         endforeach;
     }
 
-    public function getMigrationByPrefix($name) {
-        return $name;
+    /**
+     * Returns the migration(s) which match the given prefix.
+     *
+     * @param $prefix
+     *
+     * @return mixed
+     *
+     * @throws AmbiguityError
+     * @throws KeyError
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getMigrationByPrefix($prefix) {
+
+        $migrations = [];
+        foreach ($this->getMigrations() as $name => $migration) :
+            if(StringHelper::startsWith($prefix, $name)):
+                $migrations[] = $name;
+            endif;
+        endforeach;
+
+        if(count($migrations) > 1):
+            throw new AmbiguityError(sprintf("There is more than one migration with the prefix '%s'", $prefix));
+        elseif(count($migrations) == 0):
+            throw new KeyError(sprintf("There no migrations for '%s' with the prefix '%s'", $prefix));
+        endif;
+
+        return $migrations[0];
     }
 
-    public static function createObject() {
-        return new static();
+    /**
+     * @param null $connection
+     * @param bool $loadGraph
+     *
+     * @return Loader
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function createObject($connection = null, $loadGraph = true) {
+        return new static($connection, $loadGraph);
     }
 
     /**
@@ -81,9 +128,9 @@ class Loader extends Object
     public function getMigrations() {
         $migrations = [];
 
-        /** @var $migrationName Migration */
-        foreach ($this->getMigrationsClasses() as $migrationName) :
-            $fileName = $migrationName;
+        /* @var $migrationName Migration */
+        foreach ($this->getMigrationsClasses() as $fileName) :
+            $migrationName = $fileName;
             $migrationName = sprintf('app\migrations\%s', $migrationName);
             $migrations[$fileName] = $migrationName::createObject($fileName);
         endforeach;

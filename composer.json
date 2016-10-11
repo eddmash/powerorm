@@ -22,7 +22,7 @@
   "require": {
     "php": ">=5.4.0",
     "composer/installers": "~1.0",
-    "doctrine/dbal": ">=2.5-dev,<2.6-dev"
+    "doctrine/dbal": "v2.5.4"
   },
   "require-dev": {
     "phpunit/phpunit": "*"
@@ -30,6 +30,11 @@
   "autoload": {
     "psr-4": {
       "Eddmash\\PowerOrm\\": "src/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.1.x-dev"
     }
   },
   "support": {

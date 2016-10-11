@@ -30,11 +30,86 @@ class BaseOrm extends Object
     /**
      * @var Registry
      */
-    public $registryCache;
+    private $registryCache;
 
-    public $migrationPath;
+    /**
+     * The configurations to use to connect to the database.
+     *
+     * It should be an array which must contain at least one of the following.
+     *
+     * Either 'driver' with one of the following values:
+     *
+     *     pdo_mysql
+     *     pdo_sqlite
+     *     pdo_pgsql
+     *     pdo_oci (unstable)
+     *     pdo_sqlsrv
+     *     pdo_sqlsrv
+     *     mysqli
+     *     sqlanywhere
+     *     sqlsrv
+     *     ibm_db2 (unstable)
+     *     drizzle_pdo_mysql
+     *
+     * OR 'driverClass' that contains the full class name (with namespace) of the
+     * driver class to instantiate.
+     *
+     * Other (optional) parameters:
+     *
+     * <b>user (string)</b>:
+     * The username to use when connecting.
+     *
+     * <b>password (string)</b>:
+     * The password to use when connecting.
+     *
+     * <b>driverOptions (array)</b>:
+     * Any additional driver-specific options for the driver. These are just passed
+     * through to the driver.
+     *
+     * <b>pdo</b>:
+     * You can pass an existing PDO instance through this parameter. The PDO
+     * instance will be wrapped in a Doctrine\DBAL\Connection.
+     *
+     * <b>wrapperClass</b>:
+     * You may specify a custom wrapper class through the 'wrapperClass'
+     * parameter but this class MUST inherit from Doctrine\DBAL\Connection.
+     *
+     * <b>driverClass</b>:
+     * The driver class to use.
+     *
+     * <strong>USAGE:</strong>
+     *
+     * [
+     *       'dbname' => 'tester',
+     *       'user' => 'root',
+     *       'password' => 'root1.',
+     *       'host' => 'localhost',
+     *       'driver' => 'pdo_mysql',
+     * ]
+     *
+     * @var array
+     */
+    private $databaseConfigs = [
+        'dbname' => 'tester',
+        'user' => 'root',
+        'password' => '',
+        'host' => 'localhost',
+        'driver' => 'pdo_mysql',
+    ];
 
-    public $modelsPath;
+    /**
+     * path from where to get and put migration files.
+     *
+     * @var string
+     */
+    private $migrationPath;
+
+    /**
+     * Path from where to get the models.
+     *
+     * @var string
+     */
+    private $modelsPath;
 
     /**
      * @var Connection
@@ -77,6 +152,15 @@ class BaseOrm extends Object
         endif;
     }
 
+    /**
+     * @deprecated
+     *
+     * @return string
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function version()
     {
         return $this->getVersion();
@@ -147,21 +231,28 @@ class BaseOrm extends Object
         return get_instance();
     }
 
+    /**
+     * @return Connection
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public static function getDbConnection()
     {
+        return self::getInstance()->getDatabaseConnection();
+    }
 
+    /**
+     * @return Connection
+     * @throws \Doctrine\DBAL\DBALException
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getDatabaseConnection()
+    {
         if(static::$connection == null):
             $config = new Configuration();
 
-            $connectionParams = array(
-                'dbname' => 'tester',
-                'user' => 'root',
-                'password' => 'root1.',
-                'host' => 'localhost',
-                'driver' => 'pdo_mysql',
-            );
-
-            static::$connection = DriverManager::getConnection($connectionParams, $config);
+            static::$connection = DriverManager::getConnection($this->databaseConfigs, $config);
         endif;
 
         return static::$connection;

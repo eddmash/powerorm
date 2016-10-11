@@ -118,8 +118,13 @@ class Graph
     }
 
     /**
-     * Returns the lineage of the node, starting with the oldest (root node) upto the node.
-     * This method puts the current node as first in array index 0, and the older being in the other end.
+     * Given a node, returns a list of which previous nodes (dependencies) must be applied, ending with the node itself.
+     *
+     * This is the list you would follow if applying the migrations to a database.
+     *
+     * starting with the oldest upto the node.
+     *
+     * This puts the oldest node as the first element on the returned array while the node becomes the last.
      *
      * @param $node
      *
@@ -127,7 +132,7 @@ class Graph
      *
      * @throws NodeNotFoundError
      */
-    public function getBeforeLineage($node)
+    public function getAncestryTree($node)
     {
         // todo check for cyclic
         if (!array_key_exists($node, $this->nodes)):
@@ -138,8 +143,13 @@ class Graph
     }
 
     /**
-     * Get All nodes that depend on the existence of this node.
-     * This method puts the current node as first in array index 0, and the older being in the other end.
+     * Given a node, returns a list of which dependent nodes (dependencies) must be unapplied,ending with the node itself.
+     *
+     * i.e All nodes that depend on the existence of this node.
+     *
+     * This is the list you would follow if removing the migrations from a database.
+     *
+     * This puts the last child as the first element on the returned array while the node becomes the last.
      *
      * @param $node
      *
@@ -147,7 +157,7 @@ class Graph
      *
      * @throws NodeNotFoundError
      */
-    public function getAfterLineage($node)
+    public function getDecedentsTree($node)
     {
         if (!array_key_exists($node, $this->nodes)):
             throw new NodeNotFoundError(sprintf('Migration with the name %s does not exist', $node));

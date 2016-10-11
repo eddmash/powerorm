@@ -51,6 +51,7 @@ class Makemigrations extends BaseCommand
 
         $changes = $autodetector->getChanges($loader->graph);
 
+        var_dump($changes);
         if (empty($changes)):
             $this->normal('No changes were detected'.PHP_EOL);
             exit;

@@ -48,22 +48,23 @@ class Migrate extends BaseCommand
         $connection = BaseOrm::getDbConnection();
         $registry = BaseOrm::getRegistry();
 
-        $executor = new Executor($connection);
+        $executor = Executor::createObject($connection);
 
         // target migrations to act on
         if (!empty($name)):
             if ($name == 'zero'):
                 //todo confirm the migration exists
-                $target = [$name];
+                $targets = [$name];
             else:
-                $target = $executor->loader->getMigrationByPrefix($name);
+                $targets = $executor->loader->getMigrationByPrefix($name);
             endif;
         else:
-            $target = $executor->loader->graph->getLeafNodes();
+            $targets = $executor->loader->graph->getLeafNodes();
         endif;
+        
 
         // get migration plan
-        $plan = $executor->getMigrationPlan($target);
+        $plan = $executor->getMigrationPlan($targets);
 
         $this->dispatchSignal('powerorm.migration.pre_migrate', $this);
 
@@ -73,8 +74,7 @@ class Migrate extends BaseCommand
             $this->normal('  No migrations to apply.', true);
 
             //detect if a makemigrations is required
-            $auto_detector = new AutoDetector($executor->loader->createProjectState(),
-                ProjectState::fromApps($registry));
+            $auto_detector = new AutoDetector($executor->loader->getProjectState(), ProjectState::fromApps($registry));
 
             $changes = $auto_detector->getChanges($executor->loader->graph);
 
@@ -90,7 +90,7 @@ class Migrate extends BaseCommand
         else:
 
             // migrate
-            $executor->migrate($target, $plan, $fake);
+            $executor->migrate($targets, $plan, $fake);
 
         endif;
 

@@ -155,7 +155,7 @@ class Object
     /**
      * Create an instance of the current class.override this method to match with the class constructor.
      *
-     * @param array $config (optional) the configs to pass to the classes constructor
+     * @param array $config (optional) The configs to pass to the classes constructor
      *
      * @return static
      *
