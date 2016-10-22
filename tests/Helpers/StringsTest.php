@@ -42,11 +42,13 @@ class StringsTest extends \PHPUnit_Framework_TestCase
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function testStringIsEmpty($original) {
+    public function testStringIsEmpty($original)
+    {
         $this->assertTrue(StringHelper::isEmpty($original));
     }
 
-    public function providerEmptyStrings() {
+    public function providerEmptyStrings()
+    {
         return [
             [''],
             [null],

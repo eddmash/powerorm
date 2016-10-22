@@ -107,7 +107,8 @@ class ArrayHelper
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function hasKey($haystack, $key) {
+    public static function hasKey($haystack, $key)
+    {
         return array_key_exists($key, $haystack);
     }
 

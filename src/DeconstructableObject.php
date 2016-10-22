@@ -39,7 +39,7 @@ abstract class DeconstructableObject extends Object implements DeConstructableIn
     {
         $instance = (empty($config)) ? new static() : new static($config);
 
-        if($instance instanceof self) :
+        if ($instance instanceof self) :
             $instance->setConstructorArgs($config);
         endif;
 

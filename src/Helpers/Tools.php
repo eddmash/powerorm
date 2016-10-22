@@ -259,17 +259,18 @@ class Tools
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function lazyRelatedOperation($callback, $scopeModel, $relModel, $kwargs = []) {
+    public static function lazyRelatedOperation($callback, $scopeModel, $relModel, $kwargs = [])
+    {
 
         $relModels = (is_array($relModel)) ? $relModel : [$relModel];
 
         $relatedModels = [];
         foreach ($relModels as $relM) :
-            if(is_string($relM)):
+            if (is_string($relM)):
 
                 $relatedModels[] = $relM;
 
-            elseif($relM instanceof Model):
+            elseif ($relM instanceof Model):
                 $relatedModels[] = $relM->meta->modelName;
             endif;
         endforeach;

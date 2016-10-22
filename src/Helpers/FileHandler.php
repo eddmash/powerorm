@@ -36,7 +36,8 @@ class FileHandler extends Object
         $this->fileName = $fileName;
     }
 
-    public static function createObject($param = []) {
+    public static function createObject($param = [])
+    {
         $fileName = (empty($param['fileName'])) ? '' : $param['fileName'];
 
         return new static($param['path'], $fileName);
@@ -86,7 +87,7 @@ class FileHandler extends Object
 
         endforeach;
 
-        return null;
+        return;
     }
 
     /**
@@ -124,7 +125,7 @@ class FileHandler extends Object
 
         $directory = $this->_stableDir($this->path);
 
-        if(!file_exists($directory)):
+        if (!file_exists($directory)):
             return [];
         endif;
 

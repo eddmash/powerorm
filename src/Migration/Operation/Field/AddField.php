@@ -56,7 +56,7 @@ class AddField extends Operation
     public function updateState($state)
     {
         // remove default if preserveDefault==false, we dont want it in future updates.
-        if(false === $this->preserveDefault):
+        if (false === $this->preserveDefault):
             $field = $this->field->deepClone();
             $field->default = NOT_PROVIDED;
         else:
@@ -73,16 +73,16 @@ class AddField extends Operation
         $toModel = $toState->getRegistry()->getModel($this->modelName);
 
         /* @var $field Field */
-        if($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $field = $toModel->meta->getField($this->name);
-            if(false === $this->preserveDefault):
+            if (false === $this->preserveDefault):
                 $field->default = $this->field->default;
             endif;
 
             $schemaEditor->addField($fromModel, $field);
 
-            if(false === $this->preserveDefault):
+            if (false === $this->preserveDefault):
                 $field->default = NOT_PROVIDED;
             endif;
         endif;
@@ -94,7 +94,7 @@ class AddField extends Operation
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
         $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-        if($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
             $schemaEditor->removeField($fromModel, $fromModel->meta->getField($this->name));
         endif;
 
@@ -106,7 +106,7 @@ class AddField extends Operation
     public function getConstructorArgs()
     {
         $constArgs = parent::getConstructorArgs();
-        if(false === $this->preserveDefault):
+        if (false === $this->preserveDefault):
             unset($constArgs['preserveDefault']);
         endif;
 

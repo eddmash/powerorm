@@ -11,10 +11,10 @@
 
 namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
-use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Object;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Object;
 
 class ForeignObjectRel extends Object
 {
@@ -46,11 +46,13 @@ class ForeignObjectRel extends Object
 
     public $onDelete;
 
-    public function __construct($kwargs = []) {
+    public function __construct($kwargs = [])
+    {
         BaseOrm::configure($this, $kwargs, ['to' => 'toModel']);
     }
 
-    public static function createObject($kwargs = []) {
+    public static function createObject($kwargs = [])
+    {
         return new static($kwargs);
     }
 
@@ -64,19 +66,23 @@ class ForeignObjectRel extends Object
         return $this->fromField->scopeModel;
     }
 
-    public function isManyToMany() {
+    public function isManyToMany()
+    {
         return $this->fromField->manyToMany;
     }
 
-    public function isOneToMany() {
+    public function isOneToMany()
+    {
         return $this->fromField->oneToMany;
     }
 
-    public function isManyToOne() {
+    public function isManyToOne()
+    {
         return $this->fromField->manyToOne;
     }
 
-    public function isOneToOne() {
+    public function isOneToOne()
+    {
         return $this->fromField->oneToOne;
     }
 

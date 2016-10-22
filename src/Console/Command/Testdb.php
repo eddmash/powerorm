@@ -59,7 +59,8 @@ class Testdb extends BaseCommand
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function createTable($schemaM, $schema) {
+    public function createTable($schemaM, $schema)
+    {
         if ($schemaM->tablesExist('artists')):
 
             $schemaM->dropTable('artists');

@@ -20,12 +20,13 @@ class MigrationModel extends Model
 {
     public static $deferedClasses = [];
 
-    public static function defineClass($className, $extends = '') {
+    public static function defineClass($className, $extends = '')
+    {
 //        $namespace = 'Eddmash\PowerOrm\Migration\Model';
         $namespace = '';
         $use = '';
         $extendedClass = '';
-        if(empty($extends) || Model::isModelBase($extends)):
+        if (empty($extends) || Model::isModelBase($extends)):
             $extends = Model::getFullClassName();
         else:
             $extendedClass = sprintf('%s%s', ClassHelper::getFormatNamespace($namespace, true), $extends);
@@ -35,7 +36,7 @@ class MigrationModel extends Model
             $extends = trim(substr($extends, strripos($extends, '\\')), '\\');
         endif;
 
-        if(!StringHelper::isEmpty($extendedClass) && !ClassHelper::classExists($extendedClass, $namespace)):
+        if (!StringHelper::isEmpty($extendedClass) && !ClassHelper::classExists($extendedClass, $namespace)):
 
             self::$deferedClasses[$extends][] = ['class' => $className, 'extends' => $extends];
 
@@ -47,7 +48,7 @@ class MigrationModel extends Model
 
         $className = sprintf('%s%s', ClassHelper::getFormatNamespace($namespace, true), $className);
 
-        if(ArrayHelper::hasKey(self::$deferedClasses, $className)):
+        if (ArrayHelper::hasKey(self::$deferedClasses, $className)):
 
             foreach (self::$deferedClasses[$className] as $deferedClass) :
 
@@ -55,14 +56,15 @@ class MigrationModel extends Model
             endforeach;
         endif;
 
-        if(!ClassHelper::classExists($className, $namespace)):
+        if (!ClassHelper::classExists($className, $namespace)):
             eval($class);
         endif;
 
         return $className;
     }
 
-    public static function getTemplate() {
+    public static function getTemplate()
+    {
 
         return '%1$s;
             %2$s

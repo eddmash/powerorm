@@ -58,7 +58,7 @@ class AlterField extends Operation
      */
     public function updateState($state)
     {
-        if(false === $this->preserveDefault):
+        if (false === $this->preserveDefault):
             $field = $this->field->deepClone();
             $field->default = NOT_PROVIDED;
         else:
@@ -68,7 +68,7 @@ class AlterField extends Operation
         $fields = $state->modelStates[$this->modelName]->fields;
         $newFields = [];
         foreach ($fields as $name => $ofield) :
-            if($name == $this->name):
+            if ($name == $this->name):
                 $newFields[$name] = $field;
             else:
                 $newFields[$name] = $ofield;
@@ -105,7 +105,8 @@ class AlterField extends Operation
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function _alterField($schemaEditor, $fromState, $toState) {
+    private function _alterField($schemaEditor, $fromState, $toState)
+    {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
@@ -116,7 +117,7 @@ class AlterField extends Operation
             endif;
             $schemaEditor->alterField($fromModel, $fromField, $toField);
 
-            if(false === $this->preserveDefault):
+            if (false === $this->preserveDefault):
                 $toField->default = NOT_PROVIDED;
             endif;
         endif;

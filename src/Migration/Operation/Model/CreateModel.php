@@ -29,19 +29,21 @@ class CreateModel extends Operation
     public $meta;
     public $extends;
 
-    public function getDescription() {
+    public function getDescription()
+    {
         return sprintf('Create %smodel %s',
             (isset($this->meta['proxy']) && $this->meta['proxy']) ? 'proxy ' : '', $this->name);
     }
 
-    public function getConstructorArgs() {
+    public function getConstructorArgs()
+    {
         $constructorArgs = parent::getConstructorArgs();
-        if(isset($constructorArgs['meta']) && empty($constructorArgs['meta'])):
+        if (isset($constructorArgs['meta']) && empty($constructorArgs['meta'])):
             unset($constructorArgs['meta']);
         endif;
-        if(isset($constructorArgs['extends'])):
+        if (isset($constructorArgs['extends'])):
 
-            if(StringHelper::isEmpty($constructorArgs['extends']) || Model::isModelBase($constructorArgs['extends'])):
+            if (StringHelper::isEmpty($constructorArgs['extends']) || Model::isModelBase($constructorArgs['extends'])):
                 unset($constructorArgs['extends']);
             else:
                 $constructorArgs['extends'] =
@@ -67,7 +69,7 @@ class CreateModel extends Operation
     public function databaseForwards($schemaEditor, $fromState, $toState)
     {
         $model = $toState->getRegistry()->getModel($this->name);
-        if($this->allowMigrateModel($schemaEditor->connection, $model)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $model)):
             $schemaEditor->createModel($model);
         endif;
     }
@@ -78,7 +80,7 @@ class CreateModel extends Operation
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
         $model = $fromState->getRegistry()->getModel($this->name);
-        if($this->allowMigrateModel($schemaEditor->connection, $model)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $model)):
             $schemaEditor->deleteModel($model);
         endif;
     }

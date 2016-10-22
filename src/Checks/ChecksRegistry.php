@@ -3,7 +3,6 @@
 namespace Eddmash\PowerOrm\Checks;
 
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Model\Model;
 
 /**
  * Checks for ORM integrity.

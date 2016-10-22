@@ -81,7 +81,7 @@ class Recorder
 
     public function createTable()
     {
-        if($this->tableExist):
+        if ($this->tableExist):
             return;
         endif;
         $schemaM = $this->connection->getSchemaManager();

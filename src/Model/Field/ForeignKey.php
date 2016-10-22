@@ -43,9 +43,10 @@ class ForeignKey extends RelatedField
      */
     public $relation;
 
-    public function __construct($kwargs) {
+    public function __construct($kwargs)
+    {
 
-        if(!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
+        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
             $kwargs['rel'] = ManyToOneRel::createObject([
                 'fromField' => $this,
                 'to' => ArrayHelper::getValue($kwargs, 'to'),
@@ -75,11 +76,11 @@ class ForeignKey extends RelatedField
      */
     public function getRelatedField()
     {
-        if(is_string($this->relation->getToModel())):
+        if (is_string($this->relation->getToModel())):
             throw new ValueError(sprintf('Related model %s cannot be resolved', $this->relation->getToModel()));
         endif;
 
-        if(empty($this->toField)):
+        if (empty($this->toField)):
             return $this->relation->getToModel()->meta->primaryKey;
         endif;
 
@@ -93,8 +94,9 @@ class ForeignKey extends RelatedField
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function contributeToRelatedClass($related) {
-        if($this->relation->fieldName == null):
+    public function contributeToRelatedClass($related)
+    {
+        if ($this->relation->fieldName == null):
             $this->relation->fieldName = $related->meta->primaryKey->name;
         endif;
     }

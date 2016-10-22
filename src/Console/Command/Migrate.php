@@ -87,7 +87,7 @@ class Migrate extends BaseCommand
 
             endif;
         else:
-             // migrate
+            // migrate
             $executor->migrate($targets, $plan, $fake);
 
         endif;

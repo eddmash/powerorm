@@ -14,11 +14,13 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
      */
     public $instance;
 
-    public function setup() {
+    public function setup()
+    {
         $this->instance = new Object();
     }
 
-    public function teardown() {
+    public function teardown()
+    {
         unset($this->instance);
     }
 

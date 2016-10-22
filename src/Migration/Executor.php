@@ -52,7 +52,8 @@ class Executor extends Object
      *
      * @param Connection $connection
      */
-    public function __construct($connection) {
+    public function __construct($connection)
+    {
         $this->connection = $connection;
         $this->schemaEditor = SchemaEditor::createObject($connection);
         $this->loader = Loader::createObject($connection);
@@ -85,12 +86,13 @@ class Executor extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getMigrationPlan($targets, $cleanStart = false) {
+    public function getMigrationPlan($targets, $cleanStart = false)
+    {
         $plan = [];
 
         $targets = is_array($targets) ? $targets : [$targets];
 
-        if($cleanStart):
+        if ($cleanStart):
             $applied = [];
         else:
             $applied = $this->loader->appliedMigrations;
@@ -98,11 +100,11 @@ class Executor extends Object
 
         foreach ($targets as $target) :
             // if target is 'zero' unmigrate all
-            if($target == 'zero'):
+            if ($target == 'zero'):
 
                 foreach ($this->loader->graph->getRootNodes() as $rootNode) :
                     foreach ($this->loader->graph->getDecedentsTree($rootNode) as $migrationName) :
-                        if(in_array($migrationName, $applied)):
+                        if (in_array($migrationName, $applied)):
                             $plan[$migrationName] = [
                                 'migration' => $this->loader->graph->getMigration($migrationName),
                                 'unapply' => true,
@@ -111,14 +113,14 @@ class Executor extends Object
                         endif;
                     endforeach;
                 endforeach;
-            elseif(in_array($target, $applied)):
+            elseif (in_array($target, $applied)):
 
                 // if its applied then we need to unapply it.
 
                 /** @var $childNode Node */
                 foreach ($this->loader->graph->getNodeFamilyTree($target)->children as $childNode) :
                     foreach ($this->loader->graph->getDecedentsTree($childNode->name) as $migrationName) :
-                        if(in_array($migrationName, $applied)):
+                        if (in_array($migrationName, $applied)):
                             $plan[$migrationName] = [
                                 'migration' => $this->loader->graph->getMigration($migrationName),
                                 'unapply' => true,
@@ -132,7 +134,7 @@ class Executor extends Object
             else:
                 // if not applied and its not target is not zero, then apply it.
                 foreach ($this->loader->graph->getAncestryTree($target) as $migrationName) :
-                    if(!in_array($migrationName, $applied)):
+                    if (!in_array($migrationName, $applied)):
                         $plan[$migrationName] = [
                             'migration' => $this->loader->graph->getMigration($migrationName),
                             'unapply' => false,
@@ -157,8 +159,9 @@ class Executor extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function migrate($targets, $plan, $fake) {
-        if(empty($plan)):
+    public function migrate($targets, $plan, $fake)
+    {
+        if (empty($plan)):
             $plan = $this->getMigrationPlan($targets);
         endif;
 
@@ -179,12 +182,12 @@ class Executor extends Object
             // after we mutate we remove the migration from the $migrationsToRun list.
             // so if we get to a point where we dont have any more $migrationsToRun break
             // this is to avoid any further mutations by other migrations not in the list.
-            if(empty($migrationsToRun)):
+            if (empty($migrationsToRun)):
                 break;
             endif;
 
             $run = ArrayHelper::hasKey($migrationsToRun, $migName);
-            if($run):
+            if ($run):
                 $states[$migName] = $state->deepClone();
                 unset($migrationsToRun[$migName]);
             endif;
@@ -201,7 +204,7 @@ class Executor extends Object
         // Phase 2 -- Run the migrations
         foreach ($plan as $mName => $migrationMeta) :
 
-            if($migrationMeta['unapply']):
+            if ($migrationMeta['unapply']):
                 $this->unApplyMigration($states[$mName], $migrationMeta['migration'], $fake);
 
             else:
@@ -226,13 +229,13 @@ class Executor extends Object
     public function unApplyMigration($state, $migration, $fake = false)
     {
         Console::stdout(sprintf('UnApplying %s...', $migration->getName()));
-        if(!$fake):
+        if (!$fake):
             $state = $migration->unApply($state, $this->schemaEditor);
         endif;
 
         $this->recorder->recordUnApplied(['name' => $migration->getName()]);
 
-        if($fake):
+        if ($fake):
             $end = Console::ansiFormat('FAKED', [Console::FG_GREEN]);
         else:
             $end = Console::ansiFormat('OK', [Console::FG_GREEN]);
@@ -259,13 +262,13 @@ class Executor extends Object
     public function applyMigration($state, $migration, $fake = false)
     {
         Console::stdout(sprintf('Applying %s...', $migration->getName()));
-        if(!$fake):
+        if (!$fake):
             $state = $migration->apply($state, $this->schemaEditor);
         endif;
 
         $this->recorder->recordApplied(['name' => $migration->getName()]);
 
-        if($fake):
+        if ($fake):
             $end = Console::ansiFormat('FAKED', [Console::FG_GREEN]);
         else:
             $end = Console::ansiFormat('OK', [Console::FG_GREEN]);

@@ -152,10 +152,10 @@ class BaseOrm extends Object
         // setup the registry
         $this->registryCache = Registry::createObject();
 
-        if(empty($this->migrationPath)):
+        if (empty($this->migrationPath)):
             $this->migrationPath = sprintf('%smigrations%s', APPPATH, DIRECTORY_SEPARATOR);
         endif;
-        if(empty($this->modelsPath)):
+        if (empty($this->modelsPath)):
             $this->modelsPath = sprintf('%smodels%s', APPPATH, DIRECTORY_SEPARATOR);
         endif;
         self::getDatabaseConnection();
@@ -229,7 +229,7 @@ class BaseOrm extends Object
     {
         $instance = null;
 
-        if(ENVIRONMENT == 'POWERORM_DEV'):
+        if (ENVIRONMENT == 'POWERORM_DEV'):
             $instance = static::_standAloneEnvironment($config);
         else:
             $instance = static::getOrmFromContext();
@@ -238,14 +238,16 @@ class BaseOrm extends Object
         return $instance;
     }
 
-    public static function getOrmFromContext() {
+    public static function getOrmFromContext()
+    {
         $ci = static::getCiObject();
         $orm = &$ci->orm;
 
         return $orm;
     }
 
-    public static function _standAloneEnvironment($config) {
+    public static function _standAloneEnvironment($config)
+    {
 
         return static::createObject($config);
     }
@@ -298,10 +300,10 @@ class BaseOrm extends Object
      */
     public function getDatabaseConnection()
     {
-        if(empty($this->databaseConfigs)):
+        if (empty($this->databaseConfigs)):
             throw new OrmException('The database configuration have no been provided');
         endif;
-        if(static::$connection == null):
+        if (static::$connection == null):
             $config = new Configuration();
 
             static::$connection = DriverManager::getConnection($this->databaseConfigs, $config);
@@ -322,16 +324,16 @@ class BaseOrm extends Object
      */
     public static function configure($object, $properties, $map = [])
     {
-        if(empty($properties)):
+        if (empty($properties)):
             return $object;
         endif;
 
         foreach ($properties as $name => $value) :
-            if(ArrayHelper::hasKey($map, $name)):
+            if (ArrayHelper::hasKey($map, $name)):
                 $name = $map[$name];
             endif;
 
-            if(property_exists($object, $name)):
+            if (property_exists($object, $name)):
                 $object->$name = $value;
             endif;
 
@@ -340,10 +342,11 @@ class BaseOrm extends Object
         return $object;
     }
 
-    public static function createObject($config = []) {
-        if(static::$instance == null):
+    public static function createObject($config = [])
+    {
+        if (static::$instance == null):
 
-            if(ENVIRONMENT == 'POWERORM_DEV'):
+            if (ENVIRONMENT == 'POWERORM_DEV'):
                 require POWERORM_BASEPATH.DIRECTORY_SEPARATOR.'config.php';
             endif;
 
@@ -353,7 +356,8 @@ class BaseOrm extends Object
         return static::$instance;
     }
 
-    public static function consoleRunner($config = []) {
+    public static function consoleRunner($config = [])
+    {
         Manager::run();
     }
 
@@ -366,17 +370,20 @@ class BaseOrm extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function getFakeNamespace() {
+    public static function getFakeNamespace()
+    {
         return self::$fakeNamespace;
     }
 
-    public static function getModelsNamespace() {
+    public static function getModelsNamespace()
+    {
         $namespace = ClassHelper::getFormatNamespace(self::getInstance()->appNamespace, true);
 
         return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'models'), true, false);
     }
 
-    public static function getMigrationsNamespace() {
+    public static function getMigrationsNamespace()
+    {
         $namespace = ClassHelper::getFormatNamespace(self::getInstance()->appNamespace, true);
 
         return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'migrations'), true, false);

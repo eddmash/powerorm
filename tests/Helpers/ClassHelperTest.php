@@ -56,16 +56,19 @@ class ClassHelperTest extends PHPUnit_Framework_TestCase
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function testGettingNameFromNamespace($originalValue, $expectedValue) {
+    public function testGettingNameFromNamespace($originalValue, $expectedValue)
+    {
         $this->assertEquals($expectedValue, ClassHelper::getNameFromNs($originalValue, '\app\model'));
     }
 
-    public function nameFromNamespaceProvider() {
-        return[
+    public function nameFromNamespaceProvider()
+    {
+        return [
             ['app\model\farmers\Farmer', 'farmers\Farmer'],
             ['app\model\User\\', 'User'],
         ];
     }
+
     public function namespaceBothBackslashProvider()
     {
         return [

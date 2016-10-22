@@ -91,7 +91,7 @@ class ModelState extends Object
         $meta = [];
         $ignore = ['registry'];
         foreach ($overrides as $name => $value) :
-            if(in_array($name, $ignore)):
+            if (in_array($name, $ignore)):
                 continue;
             endif;
             $meta[$name] = $value;
@@ -99,7 +99,7 @@ class ModelState extends Object
 
         $extends = '';
         $parent = $model->getParent();
-        if(!$parent->isAbstract() && !Model::isModelBase($parent->getName())):
+        if (!$parent->isAbstract() && !Model::isModelBase($parent->getName())):
             $extends = ClassHelper::getNameFromNs($parent->getName(), BaseOrm::getModelsNamespace());
         endif;
         $kwargs = [
@@ -121,7 +121,8 @@ class ModelState extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function toModel($registry) {
+    public function toModel($registry)
+    {
 
         $metaData = $this->meta;
         $extends = $this->extends;
@@ -132,12 +133,14 @@ class ModelState extends Object
         return $model;
     }
 
-    public static function createObject($name, $field, $kwargs) {
+    public static function createObject($name, $field, $kwargs)
+    {
         return new static($name, $field, $kwargs);
     }
 
-    public function getFieldByName($name) {
-        if(ArrayHelper::hasKey($this->fields, $name)):
+    public function getFieldByName($name)
+    {
+        if (ArrayHelper::hasKey($this->fields, $name)):
             return ArrayHelper::getValue($this->fields, $name);
         endif;
         throw new ValueError(sprintf('No field called [ %s ] on model [ %s ]', $name, $this->name));
@@ -160,18 +163,20 @@ class ModelState extends Object
      */
     private static function createInstance($className, $extends = '')
     {
-        if(!ClassHelper::classExists($className, BaseOrm::getModelsNamespace())):
+        if (!ClassHelper::classExists($className, BaseOrm::getModelsNamespace())):
             MigrationModel::defineClass($className, $extends);
         endif;
 
         return new $className();
     }
 
-    public function deepClone() {
+    public function deepClone()
+    {
         return static::createObject($this->name, $this->fields, ['meta' => $this->meta, 'extends' => $this->extends]);
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return (string) sprintf("<ModelState: '%s'>", $this->name);
     }
 }

@@ -30,7 +30,8 @@ class Migration
         $this->requires = $this->getDependency();
     }
 
-    public static function createObject($param) {
+    public static function createObject($param)
+    {
         return new static($param);
     }
 
@@ -42,15 +43,17 @@ class Migration
         return $this->name;
     }
 
-    public static function createShortName($name) {
+    public static function createShortName($name)
+    {
 
         $pos = strripos($name, '\\');
-        if($pos):
+        if ($pos):
             $name = trim(substr($name, $pos), '\\');
         endif;
 
         return $name;
     }
+
     /**
      * @param mixed $name
      */
@@ -122,7 +125,8 @@ class Migration
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function apply($state, $schemaEditor) {
+    public function apply($state, $schemaEditor)
+    {
 
         /** @var $operation Operation */
         foreach ($this->operations as $operation) :
@@ -156,7 +160,8 @@ class Migration
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function unApply($state, $schemaEditor) {
+    public function unApply($state, $schemaEditor)
+    {
 
         // we
         $itemsToRun = [];
@@ -207,9 +212,10 @@ class Migration
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function updateState($state, $preserveState = true) {
+    public function updateState($state, $preserveState = true)
+    {
         $newState = $state;
-        if($preserveState):
+        if ($preserveState):
             $newState = $state->deepClone();
         endif;
 

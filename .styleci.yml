@@ -1,4 +1,4 @@
-preset: symfony2
+preset: symfony
 
 disabled:
   - braces

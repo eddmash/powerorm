@@ -167,11 +167,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         // get meta settings for this model
         $metaSettings = $this->getMetaSettings();
 
-        if(!empty($kwargs)):
-            if(ArrayHelper::hasKey($kwargs, 'meta')):
+        if (!empty($kwargs)):
+            if (ArrayHelper::hasKey($kwargs, 'meta')):
                 $metaSettings = $kwargs['meta'];
             endif;
-            if(ArrayHelper::hasKey($kwargs, 'registry')):
+            if (ArrayHelper::hasKey($kwargs, 'registry')):
                 $metaSettings['registry'] = $kwargs['registry'];
             endif;
         endif;
@@ -186,9 +186,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         // proxy model setup
         if ($this->meta->proxy):
-            try{
+            try {
                 $concreteParent = $meta->registry->getModel($concreteParentName);
-            }catch (LookupError $e){
+            } catch (LookupError $e) {
                 $concreteParent = $concreteParentName::createObject();
             }
             $this->proxySetup($concreteParent);
@@ -210,6 +210,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         return in_array($className, [\PModel::getFullClassName(), self::getFullClassName()]);
     }
+
     /**
      * @param string       $name
      * @param object|mixed $value
@@ -231,7 +232,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         if (empty($fields)):
 
-            $fields = $hierarchyFields[ClassHelper::getNameFromNs($this->getFullClassName(), BaseOrm::getModelsNamespace())];
+            $fields = $hierarchyFields[ClassHelper::getNameFromNs($this->getFullClassName(),
+                BaseOrm::getModelsNamespace())];
 
         endif;
 
@@ -263,12 +265,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function prepareMultiInheritance($parentModelName)
     {
-        if(!self::isModelBase($parentModelName) && !StringHelper::isEmpty($parentModelName)):
+        if (!self::isModelBase($parentModelName) && !StringHelper::isEmpty($parentModelName)):
             $name = ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace());
             $attrName = lcfirst(str_replace(' ', '', ucwords(str_replace('\\', ' ', $name))));
             $attrName = sprintf('%sPtr', $attrName);
 
-            if($this->_fieldCache == null || !ArrayHelper::hasKey($this->_fieldCache, $attrName)):
+            if ($this->_fieldCache == null || !ArrayHelper::hasKey($this->_fieldCache, $attrName)):
 
                 $field = OneToOneField::createObject([
                     'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
@@ -374,13 +376,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
              * takes place.
              *
              */
-            if($immediateParent != null && $immediateParent != $previousAbstractParent):
+            if ($immediateParent != null && $immediateParent != $previousAbstractParent):
 
                 $fieldKeys = array_keys($fields);
                 $parentKeys = (isset($modelFields[$immediateParent])) ? array_keys($modelFields[$immediateParent]) : [];
                 $commonFields = array_intersect($parentKeys, $fieldKeys);
 
-                if(!empty($commonFields)):
+                if (!empty($commonFields)):
                     throw new FieldError(
                         sprintf('Local field [ %s ] in class "%s" clashes with field of similar name from base class "%s" ',
                             implode(', ', $commonFields), $parentName, $immediateParent));
@@ -391,9 +393,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // if the parent is an abstract model and the current model is a proxy model
             // the parent should not have any fields. abstract models cant have fields
             // incases where the child is a proxy model
-            if(($isOnCurrentModel && $isProxy) && $immediateParent === $previousAbstractParent):
+            if (($isOnCurrentModel && $isProxy) && $immediateParent === $previousAbstractParent):
                 $parentFields = $modelFields[$previousAbstractParent];
-                if(!empty($parentFields)):
+                if (!empty($parentFields)):
                     throw new TypeError(sprintf('Abstract base class containing model fields not '.
                         "permitted for proxy model '%s'.", $parentName));
                 endif;
@@ -401,18 +403,18 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             // ****************** Import fields from Abstract ***************
             // get fields of immediate parent fields if it was an abstract model add them to child model.
-            if(!$isProxy && $previousAbstractParent != null):
+            if (!$isProxy && $previousAbstractParent != null):
                 $parentFields = (isset($modelFields[$previousAbstractParent])) ? $modelFields[$previousAbstractParent] : [];
                 $fields = array_merge($parentFields, $fields);
             endif;
 
-            if($reflectionParent->isAbstract()):
+            if ($reflectionParent->isAbstract()):
                 $previousAbstractParent = $parentName;
             else:
                 $previousAbstractParent = null;
             endif;
 
-            if(!$isOnCurrentModel):
+            if (!$isOnCurrentModel):
                 $immediateParent = ($parentName == $previousAbstractParent) ? '' : $parentName;
             endif;
 
@@ -500,7 +502,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function getQueryset($opts)
     {
-        return null;
+        return;
     }
 
     /**

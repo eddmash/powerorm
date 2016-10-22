@@ -25,7 +25,8 @@ class ArrayHelperTest extends PHPUnit_Framework_TestCase
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function testGetValue($array, $key, $expectedValue, $default) {
+    public function testGetValue($array, $key, $expectedValue, $default)
+    {
         $value = ArrayHelper::getValue($array, $key, $default);
         $this->assertEquals($expectedValue, $value);
     }
@@ -41,11 +42,13 @@ class ArrayHelperTest extends PHPUnit_Framework_TestCase
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function testArrayHasKey($array, $key, $expectedValue) {
+    public function testArrayHasKey($array, $key, $expectedValue)
+    {
         $this->assertEquals($expectedValue, ArrayHelper::hasKey($array, $key));
     }
 
-    public function providerHasKey() {
+    public function providerHasKey()
+    {
         return [
             [['a', 'b', 'c'], 0, true], // check non-assoc
             [['name' => 'mash', 'gender' => 'male'], 'name', true], // check assoc

@@ -41,7 +41,7 @@ class RemoveField extends Operation
 
         $fieldsNew = [];
         foreach ($fields as $name => $field) :
-            if($name !== $this->name):
+            if ($name !== $this->name):
                 $fieldsNew[$name] = $field;
             endif;
         endforeach;
@@ -63,7 +63,7 @@ class RemoveField extends Operation
     {
         $fromModel = $fromState->getRegistry()->getModel($this->modelName);
 
-        if($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
             $schemaEditor->removeField($fromModel, $fromModel->meta->getField($this->name));
         endif;
     }
@@ -74,7 +74,7 @@ class RemoveField extends Operation
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
-        if($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $schemaEditor->addField($fromModel, $toModel->meta->getField($this->name));
         endif;

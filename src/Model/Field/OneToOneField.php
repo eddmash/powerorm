@@ -36,7 +36,7 @@ class OneToOneField extends ForeignKey
     {
         $kwargs['unique'] = true;
 
-        if(!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
+        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
             $kwargs['rel'] = OneToOneRel::createObject([
                 'fromField' => $this,
                 'to' => ArrayHelper::getValue($kwargs, 'to'),
@@ -54,8 +54,8 @@ class OneToOneField extends ForeignKey
      */
     public function formField($kwargs = [])
     {
-        if($this->relation->parentLink):
-            return null;
+        if ($this->relation->parentLink):
+            return;
         endif;
 
         return parent::formField($kwargs);

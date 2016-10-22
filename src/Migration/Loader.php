@@ -47,7 +47,7 @@ class Loader extends Object
 
     public function buildGraph()
     {
-        if(!empty($this->connection)):
+        if (!empty($this->connection)):
             $recoder = new Recorder($this->connection);
 
             $this->appliedMigrations = $recoder->getApplied();
@@ -89,20 +89,21 @@ class Loader extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getMigrationByPrefix($prefix) {
+    public function getMigrationByPrefix($prefix)
+    {
 
         $migrations = [];
 
         foreach ($this->getMigrations() as $name => $migration) :
             $shortName = ClassHelper::getNameFromNs($name, BaseOrm::getMigrationsNamespace());
-            if(StringHelper::startsWith($name, $prefix) || StringHelper::startsWith($shortName, $prefix)):
+            if (StringHelper::startsWith($name, $prefix) || StringHelper::startsWith($shortName, $prefix)):
                 $migrations[] = $name;
             endif;
         endforeach;
 
-        if(count($migrations) > 1):
+        if (count($migrations) > 1):
             throw new AmbiguityError(sprintf("There is more than one migration with the prefix '%s'", $prefix));
-        elseif(count($migrations) == 0):
+        elseif (count($migrations) == 0):
             throw new KeyError(sprintf("There no migrations with the prefix '%s'", $prefix));
         endif;
 
@@ -119,7 +120,8 @@ class Loader extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function createObject($connection = null, $loadGraph = true) {
+    public static function createObject($connection = null, $loadGraph = true)
+    {
         return new static($connection, $loadGraph);
     }
 
@@ -128,7 +130,8 @@ class Loader extends Object
      *
      * @return array
      */
-    public function getMigrations() {
+    public function getMigrations()
+    {
         $migrations = [];
 
         /* @var $migrationName Migration */
@@ -141,7 +144,8 @@ class Loader extends Object
         return $migrations;
     }
 
-    public function getMigrationsClasses() {
+    public function getMigrationsClasses()
+    {
         $migrationFiles = $this->getMigrationsFiles();
         $classes = [];
 
@@ -153,7 +157,8 @@ class Loader extends Object
         return $classes;
     }
 
-    public function getMigrationsFiles() {
+    public function getMigrationsFiles()
+    {
         $fileHandler = FileHandler::createObject(['path' => BaseOrm::getMigrationsPath()]);
 
         return $fileHandler->getPathFiles();
@@ -164,7 +169,8 @@ class Loader extends Object
      *
      * @return int
      */
-    public function getLatestMigrationVersion() {
+    public function getLatestMigrationVersion()
+    {
         $migration_files = $this->getMigrationsFiles();
         $last_version = array_pop($migration_files);
         $last_version = basename($last_version);
@@ -182,9 +188,10 @@ class Loader extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function detectConflicts() {
+    public function detectConflicts()
+    {
         $latest = $this->graph->getLeafNodes();
-        if(count($latest) > 1):
+        if (count($latest) > 1):
             return $latest;
         endif;
 

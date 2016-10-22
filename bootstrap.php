@@ -13,8 +13,8 @@ define('HOMEPATH', $baseDir);
 
 // if ENVIRONMENT is not set and our base dir is 'powerorm' we might be running test
 // otherwise we migh be on a codeigniter environmnent so create a codeigniter instance
-if(!defined('ENVIRONMENT')):
-    if(strtolower(basename(HOMEPATH)) === 'powerorm'):
+if (!defined('ENVIRONMENT')):
+    if (strtolower(basename(HOMEPATH)) === 'powerorm'):
         define('ENVIRONMENT', 'POWERORM_TESTING');
     else:
         $base_dir = HOMEPATH;
@@ -34,7 +34,7 @@ endif;
 
 $autoLoadFile = HOMEPATH.DIRECTORY_SEPARATOR.'vendor/autoload.php';
 
-if(file_exists($autoLoadFile)):
+if (file_exists($autoLoadFile)):
     require $autoLoadFile;
 endif;
 

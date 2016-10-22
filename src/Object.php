@@ -146,7 +146,7 @@ class Object
         $parents = [];
         while ($reflectionClass->getParentClass()):
             $reflectionClass = $reflectionClass->getParentClass();
-            if(in_array($reflectionClass->getName(), $stopAt)):
+            if (in_array($reflectionClass->getName(), $stopAt)):
                 break;
             endif;
             $parents[$reflectionClass->getName()] = $reflectionClass;
@@ -173,7 +173,8 @@ class Object
         throw new NotImplemented('method not implemented');
     }
 
-    public function __toString() {
+    public function __toString()
+    {
         return sprintf('%s Object', get_class($this));
     }
 }

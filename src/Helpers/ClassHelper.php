@@ -52,10 +52,11 @@ class ClassHelper
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function getNameFromNs($className, $namespace) {
+    public static function getNameFromNs($className, $namespace)
+    {
         $className = static::getFormatNamespace($className, true, true);
         $namespace = static::getFormatNamespace($namespace, true, true);
-        if(StringHelper::startsWith($className, $namespace)):
+        if (StringHelper::startsWith($className, $namespace)):
             $className = substr($className, strlen($namespace));
         endif;
 
@@ -75,16 +76,17 @@ class ClassHelper
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function getFormatNamespace($namespace, $leadingBackslash = false, $closingBackslash = true) {
+    public static function getFormatNamespace($namespace, $leadingBackslash = false, $closingBackslash = true)
+    {
         $namespace = trim($namespace, '\\');
 
         // if it does not end with a backslash add it.
-        if($closingBackslash):
+        if ($closingBackslash):
             $namespace = sprintf('%s\\', $namespace);
         endif;
 
         // if it does not start with a backslash add it.
-        if($leadingBackslash):
+        if ($leadingBackslash):
             $namespace = sprintf('\\%s', $namespace);
         endif;
 
@@ -104,17 +106,18 @@ class ClassHelper
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function classExists($className, $namespace) {
+    public static function classExists($className, $namespace)
+    {
         $orgClassName = $className;
 
-        if(class_exists($className)):
+        if (class_exists($className)):
             return $className;
         endif;
 
         // add namespace
         $className = sprintf('%s%s', static::getFormatNamespace($namespace, true), $className);
 
-        if(class_exists($className)):
+        if (class_exists($className)):
             return $className;
         endif;
 

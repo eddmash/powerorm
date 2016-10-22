@@ -35,14 +35,16 @@ class Asker extends Base
         return new static();
     }
 
-     /**
-      * @param Question $question
-      *
-      * @return string
-      *
-      * @since 1.1.0
-      *
-      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-      */
-     public function ask($question) {}
+    /**
+     * @param Question $question
+     *
+     * @return string
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function ask($question)
+    {
+    }
 }

@@ -34,7 +34,8 @@ class RelatedField extends Field
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getRelatedModel() {
+    public function getRelatedModel()
+    {
         BaseOrm::getRegistry()->isAppReady();
 
         return $this->relation->toModel;
@@ -68,7 +69,8 @@ class RelatedField extends Field
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function doRelatedClass($relatedModel, $scopeModel) {
+    public function doRelatedClass($relatedModel, $scopeModel)
+    {
         $this->contributeToRelatedClass($relatedModel, $scopeModel);
     }
 
@@ -80,14 +82,14 @@ class RelatedField extends Field
         $kwargs = parent::getConstructorArgs();
         $kwargs['onDelete'] = $this->relation->onDelete;
 
-        if(is_string($this->relation->toModel)):
+        if (is_string($this->relation->toModel)):
             $kwargs['to'] = $this->relation->toModel;
         else:
             $name = $this->relation->toModel->getFullClassName();
             $kwargs['to'] = ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace());
         endif;
 
-        if($this->relation->parentLink):
+        if ($this->relation->parentLink):
 
             $kwargs['parentLink'] = $this->relation->parentLink;
         endif;
@@ -95,7 +97,8 @@ class RelatedField extends Field
         return $kwargs;
     }
 
-    public function contributeToRelatedClass($relatedModel, $scopeModel) {
+    public function contributeToRelatedClass($relatedModel, $scopeModel)
+    {
 
     }
 

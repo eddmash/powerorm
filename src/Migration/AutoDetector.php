@@ -1045,7 +1045,8 @@ class AutoDetector extends Object
             // if it has through also depend on through model being created
             if ($field->relation->hasProperty('through') &&
                 $field->relation->through != null &&
-                !$field->relation->through->meta->autoCreated):
+                !$field->relation->through->meta->autoCreated
+            ):
 
                 $opDep[] = [
                     'target' => $field->relation->through->meta->modelName,

@@ -46,7 +46,7 @@ class DeleteModel extends Operation
     public function databaseForwards($schemaEditor, $fromState, $toState)
     {
         $model = $fromState->getRegistry()->getModel($this->name);
-        if($this->allowMigrateModel($schemaEditor->connection, $model)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $model)):
             $schemaEditor->deleteModel($model);
         endif;
     }
@@ -57,7 +57,7 @@ class DeleteModel extends Operation
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
         $model = $toState->getRegistry()->getModel($this->name);
-        if($this->allowMigrateModel($schemaEditor->connection, $model)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $model)):
             $schemaEditor->createModel($model);
         endif;
     }
