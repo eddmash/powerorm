@@ -34,11 +34,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">417</span></a></li>
+                <span class="label label-info">761</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">2</span></a></li>
 </ul>
 </li>
 </ul></div>
@@ -63,9 +63,8 @@
 <ul xmlns:php="http://php.net/xsl" class="side-nav nav nav-list"><li class="nav-header">
 <i title="Methods" class="icon-custom icon-method"></i> Methods
                     <ul>
-<li class="method public "><a href="#method_getMeta" title="getMeta() :: This method should return an array of all the configurations that need to made on the meta."><span class="description">This method should return an array of all the configurations that need to made on the meta.</span><pre>getMeta()</pre></a></li>
+<li class="method public "><a href="#method_getMetaSettings" title="getMetaSettings() :: This method should return an array of all the configurations that need to made on the meta."><span class="description">This method should return an array of all the configurations that need to made on the meta.</span><pre>getMetaSettings()</pre></a></li>
 <li class="method public "><a href="#method_getQueryset" title="getQueryset() :: Creates a Queryset that is used to interaract with the database."><span class="description">Creates a Queryset that is used to interaract with the database.</span><pre>getQueryset()</pre></a></li>
-<li class="method public "><a href="#method_getTableName" title="getTableName() :: The database table that this model represents."><span class="description">The database table that this model represents.</span><pre>getTableName()</pre></a></li>
 <li class="method public "><a href="#method_prepareMeta" title="prepareMeta() :: Should return an instance of the Meta class. which is used to hold meta information about the particular model."><span class="description">Should return an instance of the Meta class. which is used to hold meta information about the particular model.</span><pre>prepareMeta()</pre></a></li>
 <li class="method public "><a href="#method_unboundFields" title="unboundFields() :: All the model fields are set on this model."><span class="description">All the model fields are set on this model.</span><pre>unboundFields()</pre></a></li>
 </ul>
@@ -111,12 +110,19 @@
 </table>
 <h3>
 <i title="Methods" class="icon-custom icon-method"></i> Methods</h3>
-<a id="method_getMeta"></a><div class="element clickable method public method_getMeta " data-toggle="collapse" data-target=".method_getMeta .collapse" title="public">
+<a id="method_getMetaSettings"></a><div class="element clickable method public method_getMetaSettings " data-toggle="collapse" data-target=".method_getMetaSettings .collapse" title="public">
 <h2>This method should return an array of all the configurations that need to made on the meta.</h2>
-<pre>getMeta() : array</pre>
+<pre>getMetaSettings() : array</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
+<div class="long_description"><pre>public function getMetaSettings(){
+  return [
+     'proxy' => $this->proxy,
+     'managed' => $this->managed,
+     'verboseName' => $this->verboseName,
+ ];
+}
+</pre></div>
 <table class="table table-bordered">
 <tr>
 <th>since</th>
@@ -154,26 +160,6 @@
 </div>
 <h3>Returns</h3>
 <div class="subelement response"><code>\Eddmash\PowerOrm\Model\Queryset</code></div>
-</div></div>
-</div>
-<a id="method_getTableName"></a><div class="element clickable method public method_getTableName " data-toggle="collapse" data-target=".method_getTableName .collapse" title="public">
-<h2>The database table that this model represents.</h2>
-<pre>getTableName() : string</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<table class="table table-bordered">
-<tr>
-<th>since</th>
-<td>1.1.0</td>
-</tr>
-<tr>
-<th>author</th>
-<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
-</tr>
-</table>
-<h3>Returns</h3>
-<div class="subelement response"><code>string</code></div>
 </div></div>
 </div>
 <a id="method_prepareMeta"></a><div class="element clickable method public method_prepareMeta " data-toggle="collapse" data-target=".method_prepareMeta .collapse" title="public">
@@ -233,7 +219,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-09-15T23:23:26+03:00.<br></footer></div>
+            generated on 2016-10-22T11:28:11+03:00.<br></footer></div>
 </div>
 </body>
 </html>

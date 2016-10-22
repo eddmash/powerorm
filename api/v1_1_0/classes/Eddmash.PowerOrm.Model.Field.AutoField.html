@@ -34,11 +34,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">417</span></a></li>
+                <span class="label label-info">761</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">2</span></a></li>
 </ul>
 </li>
 </ul></div>
@@ -68,15 +68,17 @@
         </span><pre>__construct()</pre></a></li>
 <li class="method public inherited"><a href="#method___debugInfo" title="__debugInfo() :: "><span class="description">__debugInfo()
         </span><pre>__debugInfo()</pre></a></li>
+<li class="method public inherited"><a href="#method___toString" title="__toString() :: "><span class="description">__toString()
+        </span><pre>__toString()</pre></a></li>
 <li class="method public inherited"><a href="#method__checkFieldName" title="_checkFieldName() :: "><span class="description">_checkFieldName()
         </span><pre>_checkFieldName()</pre></a></li>
 <li class="method public inherited"><a href="#method_checks" title="checks() :: "><span class="description">checks()
         </span><pre>checks()</pre></a></li>
-<li class="method public inherited"><a href="#method_constructorArgs" title="constructorArgs() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>constructorArgs()</pre></a></li>
 <li class="method public inherited"><a href="#method_contributeToClass" title="contributeToClass() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>contributeToClass()</pre></a></li>
-<li class="method public inherited"><a href="#method_createObject" title="createObject() :: "><span class="description">createObject()
-        </span><pre>createObject()</pre></a></li>
+<li class="method public inherited"><a href="#method_createObject" title="createObject() :: Create an instance of the current class.override this method to match with the class constructor."><span class="description">Create an instance of the current class.override this method to match with the class constructor.</span><pre>createObject()</pre></a></li>
+<li class="method public "><a href="#method_dbType" title="dbType() :: Returns the database column data type for the Field, taking into account the connection."><span class="description">Returns the database column data type for the Field, taking into account the connection.</span><pre>dbType()</pre></a></li>
 <li class="method public inherited"><a href="#method_dbType" title="dbType() :: Returns the database column data type for the Field, taking into account the connection."><span class="description">Returns the database column data type for the Field, taking into account the connection.</span><pre>dbType()</pre></a></li>
+<li class="method public inherited"><a href="#method_deconstruct" title="deconstruct() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>deconstruct()</pre></a></li>
 <li class="method public inherited"><a href="#method_deepClone" title="deepClone() :: "><span class="description">deepClone()
         </span><pre>deepClone()</pre></a></li>
 <li class="method public inherited"><a href="#method_dispatchSignal" title="dispatchSignal() :: Dispatch signals if the Dispatch library is loaded."><span class="description">Dispatch signals if the Dispatch library is loaded.</span><pre>dispatchSignal()</pre></a></li>
@@ -84,6 +86,7 @@
 <li class="method public inherited"><a href="#method_fromDbValue" title="fromDbValue() :: Converts a value as returned by the database to a PHP object. It is the reverse of prepare_value()."><span class="description">Converts a value as returned by the database to a PHP object. It is the reverse of prepare_value().</span><pre>fromDbValue()</pre></a></li>
 <li class="method public inherited"><a href="#method_getAttrName" title="getAttrName() :: The attribute in the scope model the points to this field."><span class="description">The attribute in the scope model the points to this field.</span><pre>getAttrName()</pre></a></li>
 <li class="method public inherited"><a href="#method_getColumnName" title="getColumnName() :: The name of the database column to use for this field."><span class="description">The name of the database column to use for this field.</span><pre>getColumnName()</pre></a></li>
+<li class="method public inherited"><a href="#method_getConstructorArgs" title="getConstructorArgs() :: Should return an array of all the arguments that the constructor takes in."><span class="description">Should return an array of all the arguments that the constructor takes in.</span><pre>getConstructorArgs()</pre></a></li>
 <li class="method public inherited"><a href="#method_getDefault" title="getDefault() :: "><span class="description">getDefault()
         </span><pre>getDefault()</pre></a></li>
 <li class="method public inherited"><a href="#method_getFullClassName" title="getFullClassName() :: Returns the fully qualified name of this class."><span class="description">Returns the fully qualified name of this class.</span><pre>getFullClassName()</pre></a></li>
@@ -107,8 +110,8 @@ prepared for use as a parameter in a query.ie. in the database."><span class="de
 prepared for use as a parameter in a query.ie. in the database.</span><pre>prepareValue()</pre></a></li>
 <li class="method public inherited"><a href="#method_prepareValueBeforeSave" title="prepareValueBeforeSave() :: Same as the prepare_value_for_db(), but called when the field value must be saved to the database."><span class="description">Same as the prepare_value_for_db(), but called when the field value must be saved to the database.</span><pre>prepareValueBeforeSave()</pre></a></li>
 <li class="method public inherited"><a href="#method_prepareValueForDb" title="prepareValueForDb() :: Converts value to a backend-specific value."><span class="description">Converts value to a backend-specific value.</span><pre>prepareValueForDb()</pre></a></li>
+<li class="method public inherited"><a href="#method_setConstructorArgs" title="setConstructorArgs() :: Set the arguments passed to the constructor."><span class="description">Set the arguments passed to the constructor.</span><pre>setConstructorArgs()</pre></a></li>
 <li class="method public inherited"><a href="#method_setFromName" title="setFromName() :: set some values using the field name passed in. called in contributeToClass."><span class="description">set some values using the field name passed in. called in contributeToClass.</span><pre>setFromName()</pre></a></li>
-<li class="method public inherited"><a href="#method_skeleton" title="skeleton() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>skeleton()</pre></a></li>
 <li class="method public inherited"><a href="#method_toPhp" title="toPhp() :: Convert the value to a php value."><span class="description">Convert the value to a php value.</span><pre>toPhp()</pre></a></li>
 <li class="method public inherited"><a href="#method_valueFromObject" title="valueFromObject() :: Returns the value of this field in the given model instance."><span class="description">Returns the value of this field in the given model instance.</span><pre>valueFromObject()</pre></a></li>
 </ul>
@@ -116,31 +119,42 @@ prepared for use as a parameter in a query.ie. in the database.</span><pre>prepa
 <li class="nav-header">
 <i title="Properties" class="icon-custom icon-property"></i> Properties
                     <ul>
+<li class="property public "><a href="#property_auto" title="$auto() :: Indicates if is auto incremented field."><span class="description"></span><pre>$auto</pre></a></li>
 <li class="property public "><a href="#property_autoCreated" title="$autoCreated() :: indicates if this field automatically created by the orm. eg
 in most case the 'id' field of most models is automatically created."><span class="description"></span><pre>$autoCreated</pre></a></li>
 <li class="property public "><a href="#property_choices" title="$choices() :: An array consisting of items to use as choices for this field."><span class="description"></span><pre>$choices</pre></a></li>
+<li class="property public "><a href="#property_comment" title="$comment() :: The column comment. Supported by MySQL, PostgreSQL, Oracle, SQL Server, SQL Anywhere and Drizzle. Defaults to null."><span class="description"></span><pre>$comment</pre></a></li>
 <li class="property public "><a href="#property_concrete" title="$concrete() :: Indicates if this is a concrete field that can be represented by a column in the database table."><span class="description"></span><pre>$concrete</pre></a></li>
-<li class="property public "><a href="#property_dbColumn" title="$dbColumn() :: The name of the column that this field maps to on the database table represented by the scope model."><span class="description"></span><pre>$dbColumn</pre></a></li>
 <li class="property public "><a href="#property_dbIndex" title="$dbIndex() :: If True, this field will be indexed."><span class="description"></span><pre>$dbIndex</pre></a></li>
 <li class="property public "><a href="#property_default" title="$default() :: The default value for the field."><span class="description"></span><pre>$default</pre></a></li>
 <li class="property public "><a href="#property_helpText" title="$helpText() :: Extra “help” text to be displayed with the form widget."><span class="description"></span><pre>$helpText</pre></a></li>
 <li class="property public "><a href="#property_isRelation" title="$isRelation() :: Indicates if this field is  relationship field."><span class="description"></span><pre>$isRelation</pre></a></li>
+<li class="property public "><a href="#property_manyToMany" title="$manyToMany() :: "><span class="description"></span><pre>$manyToMany</pre></a></li>
+<li class="property public "><a href="#property_manyToOne" title="$manyToOne() :: "><span class="description"></span><pre>$manyToOne</pre></a></li>
 <li class="property public "><a href="#property_maxLength" title="$maxLength() :: The maximum length (in characters) of the field."><span class="description"></span><pre>$maxLength</pre></a></li>
 <li class="property public "><a href="#property_name" title="$name() :: "><span class="description"></span><pre>$name</pre></a></li>
 <li class="property public "><a href="#property_null" title="$null() :: If True, the orm will store empty values as NULL in the database. Default is False i.e NOT NULL."><span class="description"></span><pre>$null</pre></a></li>
+<li class="property public "><a href="#property_oneToMany" title="$oneToMany() :: "><span class="description"></span><pre>$oneToMany</pre></a></li>
+<li class="property public "><a href="#property_oneToOne" title="$oneToOne() :: "><span class="description"></span><pre>$oneToOne</pre></a></li>
 <li class="property public "><a href="#property_primaryKey" title="$primaryKey() :: If True, this field is the primary key for the model."><span class="description"></span><pre>$primaryKey</pre></a></li>
-<li class="property public "><a href="#property_remoteField" title="$remoteField() :: if this is a relationship field, this hold the Relationship object that this field represents."><span class="description"></span><pre>$remoteField</pre></a></li>
+<li class="property public "><a href="#property_relation" title="$relation() :: if this is a relationship field, this hold the Relationship object that this field represents."><span class="description"></span><pre>$relation</pre></a></li>
 <li class="property public "><a href="#property_scopeModel" title="$scopeModel() :: The model to which this field belongs to."><span class="description"></span><pre>$scopeModel</pre></a></li>
 <li class="property public "><a href="#property_unique" title="$unique() :: If True, this field must be unique throughout the table."><span class="description"></span><pre>$unique</pre></a></li>
 <li class="property public "><a href="#property_verboseName" title="$verboseName() :: Human friendly name."><span class="description"></span><pre>$verboseName</pre></a></li>
 </ul>
 </li>
 <li class="nav-header protected">» Protected
-                    <ul><li class="property protected "><a href="#property_attrName" title="$attrName() :: This is the attribute name on the scope model that is going to be bound to the model its going to be used to
-access this field from the model like normal class attributes."><span class="description"></span><pre>$attrName</pre></a></li></ul>
+                    <ul>
+<li class="property protected "><a href="#property_attrName" title="$attrName() :: This is the attribute name on the scope model that is going to be bound to the model its going to be used to
+access this field from the model like normal class attributes."><span class="description"></span><pre>$attrName</pre></a></li>
+<li class="property protected "><a href="#property_dbColumn" title="$dbColumn() :: The name of the column that this field maps to on the database table represented by the scope model."><span class="description"></span><pre>$dbColumn</pre></a></li>
+</ul>
 </li>
 <li class="nav-header private">» Private
-                    <ul><li class="property private "><a href="#property__signal" title="$_signal() :: "><span class="description"></span><pre>$_signal</pre></a></li></ul>
+                    <ul>
+<li class="property private "><a href="#property__signal" title="$_signal() :: "><span class="description"></span><pre>$_signal</pre></a></li>
+<li class="property private "><a href="#property_constructorArgs" title="$constructorArgs() :: "><span class="description"></span><pre>$constructorArgs</pre></a></li>
+</ul>
 </li>
 <li class="nav-header">
 <i title="Constants" class="icon-custom icon-constant"></i> Constants
@@ -168,10 +182,19 @@ access this field from the model like normal class attributes."><span class="des
 </li>
 </ul>
 <div xmlns:php="http://php.net/xsl" class="element class">
-<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<p class="short_description">An IntegerField that automatically increments according to available IDs.</p>
 <div class="details">
-<div class="long_description"><p>Class Object.</p></div>
+<div class="long_description"><p>You usually won’t need to use this directly; a primary key field will automatically be added to your model
+if you don’t specify otherwise. See Automatic primary key fields.</p></div>
 <table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.0.1</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
 <tr>
 <th>package</th>
 <td><a href="../packages/Default.html">Default</a></td>
@@ -201,6 +224,13 @@ access this field from the model like normal class attributes."><span class="des
 <div class="labels"><span class="label">Inherited</span></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
+<a id="method___toString"></a><div class="element clickable method public method___toString inherited" data-toggle="collapse" data-target=".method___toString .collapse" title="public">
+<h2>__toString()
+        </h2>
+<pre>__toString() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
 <a id="method__checkFieldName"></a><div class="element clickable method public method__checkFieldName inherited" data-toggle="collapse" data-target=".method__checkFieldName .collapse" title="public">
 <h2>_checkFieldName()
         </h2>
@@ -215,34 +245,79 @@ access this field from the model like normal class attributes."><span class="des
 <div class="labels"><span class="label">Inherited</span></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="method_constructorArgs"></a><div class="element clickable method public method_constructorArgs inherited" data-toggle="collapse" data-target=".method_constructorArgs .collapse" title="public">
-<h2>{@inheritdoc}</h2>
-<pre>constructorArgs() </pre>
-<div class="labels"><span class="label">Inherited</span></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
 <a id="method_contributeToClass"></a><div class="element clickable method public method_contributeToClass inherited" data-toggle="collapse" data-target=".method_contributeToClass .collapse" title="public">
 <h2>{@inheritdoc}</h2>
-<pre>contributeToClass($fieldName, $modelObject) </pre>
+<pre>contributeToClass(string $fieldName, \Eddmash\PowerOrm\Model\Model $modelObject) </pre>
 <div class="labels"><span class="label">Inherited</span></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
 <h3>Parameters</h3>
-<div class="subelement argument"><h4>$fieldName</h4></div>
-<div class="subelement argument"><h4>$modelObject</h4></div>
+<div class="subelement argument">
+<h4>$fieldName</h4>
+<code>string</code>
+</div>
+<div class="subelement argument">
+<h4>$modelObject</h4>
+<code>\Eddmash\PowerOrm\Model\Model</code>
+</div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exception\FieldError</code></th>
+<td></td>
+</tr></table>
 </div></div>
 </div>
 <a id="method_createObject"></a><div class="element clickable method public method_createObject inherited" data-toggle="collapse" data-target=".method_createObject .collapse" title="public">
-<h2>createObject()
-        </h2>
-<pre>createObject($config<code> = array()</code>) </pre>
+<h2>Create an instance of the current class.override this method to match with the class constructor.</h2>
+<pre>createObject($kwargs<code> = array()</code>) : static</pre>
 <div class="labels">
 <span class="label">Inherited</span><span class="label">Static</span>
 </div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
 <h3>Parameters</h3>
-<div class="subelement argument"><h4>$config</h4></div>
+<div class="subelement argument"><h4>$kwargs</h4></div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exception\NotImplemented</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>static</code></div>
+</div></div>
+</div>
+<a id="method_dbType"></a><div class="element clickable method public method_dbType " data-toggle="collapse" data-target=".method_dbType .collapse" title="public">
+<h2>Returns the database column data type for the Field, taking into account the connection.</h2>
+<pre>dbType($connection) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Model\Field\Field::dbType()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$connection</h4></div>
 </div></div>
 </div>
 <a id="method_dbType"></a><div class="element clickable method public method_dbType inherited" data-toggle="collapse" data-target=".method_dbType .collapse" title="public">
@@ -258,6 +333,12 @@ access this field from the model like normal class attributes."><span class="des
 <h3>Parameters</h3>
 <div class="subelement argument"><h4>$connection</h4></div>
 </div></div>
+</div>
+<a id="method_deconstruct"></a><div class="element clickable method public method_deconstruct inherited" data-toggle="collapse" data-target=".method_deconstruct .collapse" title="public">
+<h2>{@inheritdoc}</h2>
+<pre>deconstruct() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
 <a id="method_deepClone"></a><div class="element clickable method public method_deepClone inherited" data-toggle="collapse" data-target=".method_deepClone .collapse" title="public">
 <h2>deepClone()
@@ -354,6 +435,18 @@ or the backend itself does the conversion.</p></div>
 <div class="subelement response"><code>string</code></div>
 </div></div>
 </div>
+<a id="method_getConstructorArgs"></a><div class="element clickable method public method_getConstructorArgs inherited" data-toggle="collapse" data-target=".method_getConstructorArgs .collapse" title="public">
+<h2>Should return an array of all the arguments that the constructor takes in.</h2>
+<pre>getConstructorArgs() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\DeConstructableInterface::getConstructorArgs()</td>
+</tr></table>
+</div></div>
+</div>
 <a id="method_getDefault"></a><div class="element clickable method public method_getDefault inherited" data-toggle="collapse" data-target=".method_getDefault .collapse" title="public">
 <h2>getDefault()
         </h2>
@@ -397,7 +490,7 @@ or the backend itself does the conversion.</p></div>
 <a id="method_getParents"></a><div class="element clickable method public method_getParents inherited" data-toggle="collapse" data-target=".method_getParents .collapse" title="public">
 <h2>Returns all the parents for this object static with the youngest to the oldest
 The resolution order to follow when going up a inheritance hierarchy.</h2>
-<pre>getParents() : array</pre>
+<pre>getParents($stopAt<code> = array()</code>) : array</pre>
 <div class="labels"><span class="label">Inherited</span></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -411,6 +504,8 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 <td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
 </tr>
 </table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$stopAt</h4></div>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>array</code>this an array of ReflectionClass</div>
@@ -574,6 +669,19 @@ prepared for use as a parameter in a query.ie. in the database.</h2>
 <div class="subelement argument"><h4>$prepared</h4></div>
 </div></div>
 </div>
+<a id="method_setConstructorArgs"></a><div class="element clickable method public method_setConstructorArgs inherited" data-toggle="collapse" data-target=".method_setConstructorArgs .collapse" title="public">
+<h2>Set the arguments passed to the constructor.</h2>
+<pre>setConstructorArgs(mixed $constructorArgs) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$constructorArgs</h4>
+<code>mixed</code>
+</div>
+</div></div>
+</div>
 <a id="method_setFromName"></a><div class="element clickable method public method_setFromName inherited" data-toggle="collapse" data-target=".method_setFromName .collapse" title="public">
 <h2>set some values using the field name passed in. called in contributeToClass.</h2>
 <pre>setFromName($fieldName) </pre>
@@ -593,12 +701,6 @@ prepared for use as a parameter in a query.ie. in the database.</h2>
 <h3>Parameters</h3>
 <div class="subelement argument"><h4>$fieldName</h4></div>
 </div></div>
-</div>
-<a id="method_skeleton"></a><div class="element clickable method public method_skeleton inherited" data-toggle="collapse" data-target=".method_skeleton .collapse" title="public">
-<h2>{@inheritdoc}</h2>
-<pre>skeleton() </pre>
-<div class="labels"><span class="label">Inherited</span></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
 <a id="method_toPhp"></a><div class="element clickable method public method_toPhp inherited" data-toggle="collapse" data-target=".method_toPhp .collapse" title="public">
 <h2>Convert the value to a php value.</h2>
@@ -630,13 +732,23 @@ prepared for use as a parameter in a query.ie. in the database.</h2>
 </div>
 <h3>
 <i title="Properties" class="icon-custom icon-property"></i> Properties</h3>
+<a id="property_auto"> </a><div class="element clickable property public property_auto" data-toggle="collapse" data-target=".property_auto .collapse" title="public">
+<h2>Indicates if is auto incremented field.</h2>
+<pre>$auto : boolean</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
 <a id="property_autoCreated"> </a><div class="element clickable property public property_autoCreated" data-toggle="collapse" data-target=".property_autoCreated .collapse" title="public">
 <h2>indicates if this field automatically created by the orm. eg
 in most case the 'id' field of most models is automatically created.</h2>
 <pre>$autoCreated : boolean</pre>
 <div class="row collapse"><div class="detail-description">
 <h3>Default</h3>
-<div class="subelement argument"></div>
+<div class="subelement argument"><code>false</code></div>
 </div></div>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
@@ -646,7 +758,7 @@ in most case the 'id' field of most models is automatically created.</h2>
 <pre>$choices : </pre>
 <div class="row collapse"><div class="detail-description">
 <h3>Default</h3>
-<div class="subelement argument"></div>
+<div class="subelement argument"><code>array()</code></div>
 </div></div>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"><p>If this is given, the default form widget will be a select box with these choices instead of the
@@ -660,9 +772,9 @@ $gender_choices = [
 ]</p>
 <p>$gender =  PModel::CharField(['max_length'=2, 'choices'=$gender_choices])</p></div></div></div>
 </div>
-<a id="property_concrete"> </a><div class="element clickable property public property_concrete" data-toggle="collapse" data-target=".property_concrete .collapse" title="public">
-<h2>Indicates if this is a concrete field that can be represented by a column in the database table.</h2>
-<pre>$concrete : boolean</pre>
+<a id="property_comment"> </a><div class="element clickable property public property_comment" data-toggle="collapse" data-target=".property_comment .collapse" title="public">
+<h2>The column comment. Supported by MySQL, PostgreSQL, Oracle, SQL Server, SQL Anywhere and Drizzle. Defaults to null.</h2>
+<pre>$comment : string</pre>
 <div class="row collapse"><div class="detail-description">
 <h3>Default</h3>
 <div class="subelement argument"></div>
@@ -670,9 +782,9 @@ $gender_choices = [
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="property_dbColumn"> </a><div class="element clickable property public property_dbColumn" data-toggle="collapse" data-target=".property_dbColumn .collapse" title="public">
-<h2>The name of the column that this field maps to on the database table represented by the scope model.</h2>
-<pre>$dbColumn : string</pre>
+<a id="property_concrete"> </a><div class="element clickable property public property_concrete" data-toggle="collapse" data-target=".property_concrete .collapse" title="public">
+<h2>Indicates if this is a concrete field that can be represented by a column in the database table.</h2>
+<pre>$concrete : boolean</pre>
 <div class="row collapse"><div class="detail-description">
 <h3>Default</h3>
 <div class="subelement argument"></div>
@@ -705,7 +817,7 @@ $gender_choices = [
 <pre>$helpText : </pre>
 <div class="row collapse"><div class="detail-description">
 <h3>Default</h3>
-<div class="subelement argument"></div>
+<div class="subelement argument"><code>''</code></div>
 </div></div>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"><p>It’s useful for documentation even if your field isn’t used on a form.</p>
@@ -717,6 +829,26 @@ This lets you include HTML in helpText if you so desire.</p>
 <a id="property_isRelation"> </a><div class="element clickable property public property_isRelation" data-toggle="collapse" data-target=".property_isRelation .collapse" title="public">
 <h2>Indicates if this field is  relationship field.</h2>
 <pre>$isRelation : boolean</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_manyToMany"> </a><div class="element clickable property public property_manyToMany" data-toggle="collapse" data-target=".property_manyToMany .collapse" title="public">
+<h2>$manyToMany</h2>
+<pre>$manyToMany </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_manyToOne"> </a><div class="element clickable property public property_manyToOne" data-toggle="collapse" data-target=".property_manyToOne .collapse" title="public">
+<h2>$manyToOne</h2>
+<pre>$manyToOne </pre>
 <div class="row collapse"><div class="detail-description">
 <h3>Default</h3>
 <div class="subelement argument"><code>false</code></div>
@@ -754,6 +886,26 @@ This lets you include HTML in helpText if you so desire.</p>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
+<a id="property_oneToMany"> </a><div class="element clickable property public property_oneToMany" data-toggle="collapse" data-target=".property_oneToMany .collapse" title="public">
+<h2>$oneToMany</h2>
+<pre>$oneToMany </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_oneToOne"> </a><div class="element clickable property public property_oneToOne" data-toggle="collapse" data-target=".property_oneToOne .collapse" title="public">
+<h2>$oneToOne</h2>
+<pre>$oneToOne </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
 <a id="property_primaryKey"> </a><div class="element clickable property public property_primaryKey" data-toggle="collapse" data-target=".property_primaryKey .collapse" title="public">
 <h2>If True, this field is the primary key for the model.</h2>
 <pre>$primaryKey : boolean</pre>
@@ -770,9 +922,9 @@ primary-key behavior.</p>
 <p>The primary key field is read-only. If you change the value of the primary key on an existing object and then
 save it, a new object will be created alongside the old one.</p></div></div></div>
 </div>
-<a id="property_remoteField"> </a><div class="element clickable property public property_remoteField" data-toggle="collapse" data-target=".property_remoteField .collapse" title="public">
+<a id="property_relation"> </a><div class="element clickable property public property_relation" data-toggle="collapse" data-target=".property_relation .collapse" title="public">
 <h2>if this is a relationship field, this hold the Relationship object that this field represents.</h2>
-<pre>$remoteField : \Eddmash\PowerOrm\Model\Field\RelationObject</pre>
+<pre>$relation : \Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel</pre>
 <div class="row collapse"><div class="detail-description">
 <h3>Default</h3>
 <div class="subelement argument"></div>
@@ -824,12 +976,32 @@ access this field from the model like normal class attributes.</h2>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
+<a id="property_dbColumn"> </a><div class="element clickable property protected property_dbColumn" data-toggle="collapse" data-target=".property_dbColumn .collapse" title="protected">
+<h2>The name of the column that this field maps to on the database table represented by the scope model.</h2>
+<pre>$dbColumn : string</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
 <a id="property__signal"> </a><div class="element clickable property private property__signal" data-toggle="collapse" data-target=".property__signal .collapse" title="private">
 <h2>$_signal</h2>
 <pre>$_signal : boolean</pre>
 <div class="row collapse"><div class="detail-description">
 <h3>Default</h3>
 <div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_constructorArgs"> </a><div class="element clickable property private property_constructorArgs" data-toggle="collapse" data-target=".property_constructorArgs .collapse" title="private">
+<h2>$constructorArgs</h2>
+<pre>$constructorArgs </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
 </div></div>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
@@ -849,7 +1021,7 @@ access this field from the model like normal class attributes.</h2>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-09-15T23:23:26+03:00.<br></footer></div>
+            generated on 2016-10-22T11:28:10+03:00.<br></footer></div>
 </div>
 </body>
 </html>

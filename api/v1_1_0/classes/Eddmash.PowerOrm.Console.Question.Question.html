@@ -34,11 +34,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">417</span></a></li>
+                <span class="label label-info">761</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">2</span></a></li>
 </ul>
 </li>
 </ul></div>
@@ -66,6 +66,9 @@
                     <ul>
 <li class="method public "><a href="#method___construct" title="__construct() :: "><span class="description">__construct()
         </span><pre>__construct()</pre></a></li>
+<li class="method public inherited"><a href="#method___toString" title="__toString() :: "><span class="description">__toString()
+        </span><pre>__toString()</pre></a></li>
+<li class="method public inherited"><a href="#method_createObject" title="createObject() :: Create an instance of the current class.override this method to match with the class constructor."><span class="description">Create an instance of the current class.override this method to match with the class constructor.</span><pre>createObject()</pre></a></li>
 <li class="method public inherited"><a href="#method_dispatchSignal" title="dispatchSignal() :: Dispatch signals if the Dispatch library is loaded."><span class="description">Dispatch signals if the Dispatch library is loaded.</span><pre>dispatchSignal()</pre></a></li>
 <li class="method public "><a href="#method_getDefault" title="getDefault() :: "><span class="description">getDefault()
         </span><pre>getDefault()</pre></a></li>
@@ -167,6 +170,42 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 <div class="subelement argument"><h4>$default</h4></div>
 </div></div>
 </div>
+<a id="method___toString"></a><div class="element clickable method public method___toString inherited" data-toggle="collapse" data-target=".method___toString .collapse" title="public">
+<h2>__toString()
+        </h2>
+<pre>__toString() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_createObject"></a><div class="element clickable method public method_createObject inherited" data-toggle="collapse" data-target=".method_createObject .collapse" title="public">
+<h2>Create an instance of the current class.override this method to match with the class constructor.</h2>
+<pre>createObject($kwargs<code> = array()</code>) : static</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$kwargs</h4></div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exception\NotImplemented</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>static</code></div>
+</div></div>
+</div>
 <a id="method_dispatchSignal"></a><div class="element clickable method public method_dispatchSignal inherited" data-toggle="collapse" data-target=".method_dispatchSignal .collapse" title="public">
 <h2>Dispatch signals if the Dispatch library is loaded.</h2>
 <pre>dispatchSignal($signal_name, $object) </pre>
@@ -253,7 +292,7 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 <a id="method_getParents"></a><div class="element clickable method public method_getParents inherited" data-toggle="collapse" data-target=".method_getParents .collapse" title="public">
 <h2>Returns all the parents for this object static with the youngest to the oldest
 The resolution order to follow when going up a inheritance hierarchy.</h2>
-<pre>getParents() : array</pre>
+<pre>getParents($stopAt<code> = array()</code>) : array</pre>
 <div class="labels"><span class="label">Inherited</span></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -267,6 +306,8 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 <td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
 </tr>
 </table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$stopAt</h4></div>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>array</code>this an array of ReflectionClass</div>
@@ -557,7 +598,7 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-09-15T23:23:26+03:00.<br></footer></div>
+            generated on 2016-10-22T11:28:12+03:00.<br></footer></div>
 </div>
 </body>
 </html>

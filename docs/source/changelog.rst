@@ -3,7 +3,11 @@ Change Log
 ##########
 
 Version 1.1.0-Pre-Alpha
-======================
+=================================
+
+.. contents::
+    :local:
+    :depth: 4
 
 **Rewrite of the PowerOrm**
 
@@ -21,28 +25,29 @@ Additions
         no need for users to create a migration controller to be able to work with 
         the orm anymore
         
-    - db schemas
+    - Doctrine Dbal
     
-        Adds db schemas to extend the functionality of the db forge in an easy and 
-        consistent manner
+        Uses Doctrine Dbal to interact with the database.
 
     - Support
 
-        - Migrations now supports postgres 9+
+        - Migrations now supports all database supported by Doctrine Dbal
         
-    - A different Migration Module and Migrations commands
+    - Migration Module:
 
-        - check
-        - showmigration
-        - migrate
-        - makemigrations 
-        - robot 
-        - help
-        - version
+        - Add Migrations commands
+
+            - check
+            - showmigration
+            - migrate
+            - makemigrations
+            - robot
+            - help
+            - version
         
-    - Migrations is able to support :
+        - Migrations is able to support :
         
-         - field name
+            - Alter/Remove/Add Operations relating to models.
          
     - Forms class
         
@@ -121,7 +126,7 @@ Rewrites
     - The whole console module
         
          - This removes the need for user to create a migration controller to be able 
-           to use the orm just copy the `pmanger.php` file located at eddmash\powerorm\bin\pmanger.php
+           to use the orm just copy the `pmanger.php` file located at ORM_PATH/pmanager.php
            to the same directory as `index.php`
          
          - This also provides a consistent api for adding more commands within the orm

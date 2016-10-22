@@ -34,11 +34,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">417</span></a></li>
+                <span class="label label-info">761</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">2</span></a></li>
 </ul>
 </li>
 </ul></div>
@@ -66,13 +66,19 @@
                     <ul>
 <li class="method public "><a href="#method___construct" title="__construct() :: "><span class="description">__construct()
         </span><pre>__construct()</pre></a></li>
+<li class="method public "><a href="#method___toString" title="__toString() :: "><span class="description">__toString()
+        </span><pre>__toString()</pre></a></li>
+<li class="method public inherited"><a href="#method___toString" title="__toString() :: "><span class="description">__toString()
+        </span><pre>__toString()</pre></a></li>
+<li class="method public "><a href="#method_createObject" title="createObject() :: Create an instance of the current class.override this method to match with the class constructor."><span class="description">Create an instance of the current class.override this method to match with the class constructor.</span><pre>createObject()</pre></a></li>
+<li class="method public inherited"><a href="#method_createObject" title="createObject() :: Create an instance of the current class.override this method to match with the class constructor."><span class="description">Create an instance of the current class.override this method to match with the class constructor.</span><pre>createObject()</pre></a></li>
+<li class="method public "><a href="#method_deepClone" title="deepClone() :: "><span class="description">deepClone()
+        </span><pre>deepClone()</pre></a></li>
 <li class="method public inherited"><a href="#method_dispatchSignal" title="dispatchSignal() :: Dispatch signals if the Dispatch library is loaded."><span class="description">Dispatch signals if the Dispatch library is loaded.</span><pre>dispatchSignal()</pre></a></li>
 <li class="method public "><a href="#method_fromModel" title="fromModel() :: Takes a model returns a ModelState representing it."><span class="description">Takes a model returns a ModelState representing it.</span><pre>fromModel()</pre></a></li>
-<li class="method public "><a href="#method_getFields" title="getFields() :: "><span class="description">getFields()
-        </span><pre>getFields()</pre></a></li>
+<li class="method public "><a href="#method_getFieldByName" title="getFieldByName() :: "><span class="description">getFieldByName()
+        </span><pre>getFieldByName()</pre></a></li>
 <li class="method public inherited"><a href="#method_getFullClassName" title="getFullClassName() :: Returns the fully qualified name of this class."><span class="description">Returns the fully qualified name of this class.</span><pre>getFullClassName()</pre></a></li>
-<li class="method public "><a href="#method_getName" title="getName() :: "><span class="description">getName()
-        </span><pre>getName()</pre></a></li>
 <li class="method public inherited"><a href="#method_getParent" title="getParent() :: Returns the ReflectionClass of  the immediate parent of this object."><span class="description">Returns the ReflectionClass of  the immediate parent of this object.</span><pre>getParent()</pre></a></li>
 <li class="method public inherited"><a href="#method_getParents" title="getParents() :: Returns all the parents for this object static with the youngest to the oldest
 The resolution order to follow when going up a inheritance hierarchy."><span class="description">Returns all the parents for this object static with the youngest to the oldest
@@ -82,20 +88,19 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 <li class="method public inherited"><a href="#method_hasMethod" title="hasMethod() :: Returns a value indicating whether a method is defined."><span class="description">Returns a value indicating whether a method is defined.</span><pre>hasMethod()</pre></a></li>
 <li class="method public inherited"><a href="#method_hasProperty" title="hasProperty() :: Checks if the provided propert exists in the current object."><span class="description">Checks if the provided propert exists in the current object.</span><pre>hasProperty()</pre></a></li>
 <li class="method public inherited"><a href="#method_normalizeKey" title="normalizeKey() :: A normalizes key names to all lowercase."><span class="description">A normalizes key names to all lowercase.</span><pre>normalizeKey()</pre></a></li>
-<li class="method public "><a href="#method_setFields" title="setFields() :: "><span class="description">setFields()
-        </span><pre>setFields()</pre></a></li>
-<li class="method public "><a href="#method_setName" title="setName() :: "><span class="description">setName()
-        </span><pre>setName()</pre></a></li>
+<li class="method public "><a href="#method_toModel" title="toModel() :: Converts the current modelState into a model."><span class="description">Converts the current modelState into a model.</span><pre>toModel()</pre></a></li>
 </ul>
+</li>
+<li class="nav-header private">» Private
+                    <ul><li class="method private "><a href="#method_createInstance" title="createInstance() :: Defines a new model class."><span class="description">Defines a new model class.</span><pre>createInstance()</pre></a></li></ul>
 </li>
 <li class="nav-header">
 <i title="Properties" class="icon-custom icon-property"></i> Properties
-                    <ul></ul>
-</li>
-<li class="nav-header protected">» Protected
                     <ul>
-<li class="property protected "><a href="#property_fields" title="$fields() :: "><span class="description"></span><pre>$fields</pre></a></li>
-<li class="property protected "><a href="#property_name" title="$name() :: "><span class="description"></span><pre>$name</pre></a></li>
+<li class="property public "><a href="#property_extends" title="$extends() :: "><span class="description"></span><pre>$extends</pre></a></li>
+<li class="property public "><a href="#property_fields" title="$fields() :: "><span class="description"></span><pre>$fields</pre></a></li>
+<li class="property public "><a href="#property_meta" title="$meta() :: "><span class="description"></span><pre>$meta</pre></a></li>
+<li class="property public "><a href="#property_name" title="$name() :: "><span class="description"></span><pre>$name</pre></a></li>
 </ul>
 </li>
 <li class="nav-header private">» Private
@@ -123,10 +128,21 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 </li>
 </ul>
 <div xmlns:php="http://php.net/xsl" class="element class">
-<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<p class="short_description">Represents a PowerOrm Model.</p>
 <div class="details">
-<div class="long_description"><p>Class Object.</p></div>
+<div class="long_description"><p>We don't use the actual Model class as it's not designed to have its options changed -instead, we mutate this one
+and then render it into a Model as required.</p>
+<p>Note that while you are allowed to mutate .fields, you are not allowed to mutate the Field instances inside there
+themselves - you must instead assign new ones, as these are not detached during a clone.</p></div>
 <table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
 <tr>
 <th>package</th>
 <td><a href="../packages/Default.html">Default</a></td>
@@ -141,15 +157,87 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 <a id="method___construct"></a><div class="element clickable method public method___construct " data-toggle="collapse" data-target=".method___construct .collapse" title="public">
 <h2>__construct()
         </h2>
-<pre>__construct($name, $fields, $options<code> = array()</code>) </pre>
+<pre>__construct($name, $fields, $kwargs<code> = array()</code>) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
 <h3>Parameters</h3>
 <div class="subelement argument"><h4>$name</h4></div>
 <div class="subelement argument"><h4>$fields</h4></div>
-<div class="subelement argument"><h4>$options</h4></div>
+<div class="subelement argument"><h4>$kwargs</h4></div>
 </div></div>
+</div>
+<a id="method___toString"></a><div class="element clickable method public method___toString " data-toggle="collapse" data-target=".method___toString .collapse" title="public">
+<h2>__toString()
+        </h2>
+<pre>__toString() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Object::__toString()</td>
+</tr></table>
+</div></div>
+</div>
+<a id="method___toString"></a><div class="element clickable method public method___toString inherited" data-toggle="collapse" data-target=".method___toString .collapse" title="public">
+<h2>__toString()
+        </h2>
+<pre>__toString() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_createObject"></a><div class="element clickable method public method_createObject " data-toggle="collapse" data-target=".method_createObject .collapse" title="public">
+<h2>Create an instance of the current class.override this method to match with the class constructor.</h2>
+<pre>createObject($name, $field, $kwargs) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Object::createObject()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
+<div class="subelement argument"><h4>$field</h4></div>
+<div class="subelement argument"><h4>$kwargs</h4></div>
+</div></div>
+</div>
+<a id="method_createObject"></a><div class="element clickable method public method_createObject inherited" data-toggle="collapse" data-target=".method_createObject .collapse" title="public">
+<h2>Create an instance of the current class.override this method to match with the class constructor.</h2>
+<pre>createObject($kwargs<code> = array()</code>) : static</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$kwargs</h4></div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exception\NotImplemented</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>static</code></div>
+</div></div>
+</div>
+<a id="method_deepClone"></a><div class="element clickable method public method_deepClone " data-toggle="collapse" data-target=".method_deepClone .collapse" title="public">
+<h2>deepClone()
+        </h2>
+<pre>deepClone() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
 <a id="method_dispatchSignal"></a><div class="element clickable method public method_dispatchSignal inherited" data-toggle="collapse" data-target=".method_dispatchSignal .collapse" title="public">
 <h2>Dispatch signals if the Dispatch library is loaded.</h2>
@@ -199,22 +287,22 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 </div>
 <h3>Exceptions</h3>
 <table class="table table-bordered"><tr>
-<th><code>\Eddmash\PowerOrm\Exceptions\TypeError</code></th>
+<th><code>\Eddmash\PowerOrm\Exception\TypeError</code></th>
 <td></td>
 </tr></table>
 <h3>Returns</h3>
 <div class="subelement response"><code>static</code></div>
 </div></div>
 </div>
-<a id="method_getFields"></a><div class="element clickable method public method_getFields " data-toggle="collapse" data-target=".method_getFields .collapse" title="public">
-<h2>getFields()
+<a id="method_getFieldByName"></a><div class="element clickable method public method_getFieldByName " data-toggle="collapse" data-target=".method_getFieldByName .collapse" title="public">
+<h2>getFieldByName()
         </h2>
-<pre>getFields() : array</pre>
+<pre>getFieldByName($name) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
-<h3>Returns</h3>
-<div class="subelement response"><code>array</code></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
 </div></div>
 </div>
 <a id="method_getFullClassName"></a><div class="element clickable method public method_getFullClassName inherited" data-toggle="collapse" data-target=".method_getFullClassName .collapse" title="public">
@@ -228,17 +316,6 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 <h3>Returns</h3>
 <div class="subelement response">
 <code>string</code>the fully qualified name of this class</div>
-</div></div>
-</div>
-<a id="method_getName"></a><div class="element clickable method public method_getName " data-toggle="collapse" data-target=".method_getName .collapse" title="public">
-<h2>getName()
-        </h2>
-<pre>getName() : mixed</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Returns</h3>
-<div class="subelement response"><code>mixed</code></div>
 </div></div>
 </div>
 <a id="method_getParent"></a><div class="element clickable method public method_getParent inherited" data-toggle="collapse" data-target=".method_getParent .collapse" title="public">
@@ -264,7 +341,7 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 <a id="method_getParents"></a><div class="element clickable method public method_getParents inherited" data-toggle="collapse" data-target=".method_getParents .collapse" title="public">
 <h2>Returns all the parents for this object static with the youngest to the oldest
 The resolution order to follow when going up a inheritance hierarchy.</h2>
-<pre>getParents() : array</pre>
+<pre>getParents($stopAt<code> = array()</code>) : array</pre>
 <div class="labels"><span class="label">Inherited</span></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -278,6 +355,8 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 <td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
 </tr>
 </table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$stopAt</h4></div>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>array</code>this an array of ReflectionClass</div>
@@ -349,37 +428,74 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 <div class="subelement response"><code>string</code></div>
 </div></div>
 </div>
-<a id="method_setFields"></a><div class="element clickable method public method_setFields " data-toggle="collapse" data-target=".method_setFields .collapse" title="public">
-<h2>setFields()
-        </h2>
-<pre>setFields(array $fields) </pre>
+<a id="method_toModel"></a><div class="element clickable method public method_toModel " data-toggle="collapse" data-target=".method_toModel .collapse" title="public">
+<h2>Converts the current modelState into a model.</h2>
+<pre>toModel(\Eddmash\PowerOrm\App\Registry $registry) : \Eddmash\PowerOrm\Model\Model</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
 <h3>Parameters</h3>
 <div class="subelement argument">
-<h4>$fields</h4>
-<code>array</code>
+<h4>$registry</h4>
+<code>\Eddmash\PowerOrm\App\Registry</code>
 </div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Eddmash\PowerOrm\Model\Model</code></div>
 </div></div>
 </div>
-<a id="method_setName"></a><div class="element clickable method public method_setName " data-toggle="collapse" data-target=".method_setName .collapse" title="public">
-<h2>setName()
-        </h2>
-<pre>setName(mixed $name) </pre>
-<div class="labels"></div>
+<a id="method_createInstance"></a><div class="element clickable method private method_createInstance " data-toggle="collapse" data-target=".method_createInstance .collapse" title="private">
+<h2>Defines a new model class.</h2>
+<pre>createInstance(string $className, string $extends<code> = ''</code>) : \Eddmash\PowerOrm\Model\Model</pre>
+<div class="labels"><span class="label">Static</span></div>
 <div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
+<div class="long_description"><p>we create a new namespace and define new classes because, we might be dealing with a model that has been dropped
+Meaning if we try to load the model using the normal way, we will get and error of model does not exist.</p></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
 <h3>Parameters</h3>
 <div class="subelement argument">
-<h4>$name</h4>
-<code>mixed</code>
+<h4>$className</h4>
+<code>string</code>
 </div>
+<div class="subelement argument">
+<h4>$extends</h4>
+<code>string</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Eddmash\PowerOrm\Model\Model</code></div>
 </div></div>
 </div>
 <h3>
 <i title="Properties" class="icon-custom icon-property"></i> Properties</h3>
-<a id="property_fields"> </a><div class="element clickable property protected property_fields" data-toggle="collapse" data-target=".property_fields .collapse" title="protected">
+<a id="property_extends"> </a><div class="element clickable property public property_extends" data-toggle="collapse" data-target=".property_extends .collapse" title="public">
+<h2>$extends</h2>
+<pre>$extends </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_fields"> </a><div class="element clickable property public property_fields" data-toggle="collapse" data-target=".property_fields .collapse" title="public">
 <h2>$fields</h2>
 <pre>$fields </pre>
 <div class="row collapse"><div class="detail-description">
@@ -389,7 +505,17 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="property_name"> </a><div class="element clickable property protected property_name" data-toggle="collapse" data-target=".property_name .collapse" title="protected">
+<a id="property_meta"> </a><div class="element clickable property public property_meta" data-toggle="collapse" data-target=".property_meta .collapse" title="public">
+<h2>$meta</h2>
+<pre>$meta </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>array()</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_name"> </a><div class="element clickable property public property_name" data-toggle="collapse" data-target=".property_name .collapse" title="public">
 <h2>$name</h2>
 <pre>$name </pre>
 <div class="row collapse"><div class="detail-description">
@@ -416,7 +542,7 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-09-15T23:23:26+03:00.<br></footer></div>
+            generated on 2016-10-22T11:28:11+03:00.<br></footer></div>
 </div>
 </body>
 </html>

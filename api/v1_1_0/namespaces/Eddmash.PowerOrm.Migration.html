@@ -34,11 +34,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">417</span></a></li>
+                <span class="label label-info">761</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">2</span></a></li>
 </ul>
 </li>
 </ul></div>
@@ -59,17 +59,40 @@
 <li class="nav-header">
 <i class="icon-map-marker"></i> Namespaces</li>
 <li>
-<a href="../namespaces/Eddmash.PowerOrm.Migration.html" title="Migration"><i class="icon-th"></i>Migration</a><ul class="nav nav-list nav-namespaces"><li>
+<a href="../namespaces/Eddmash.PowerOrm.Migration.html" title="Migration"><i class="icon-th"></i>Migration</a><ul class="nav nav-list nav-namespaces">
+<li>
+<a href="../namespaces/Eddmash.PowerOrm.Migration.Model.html" title="Model"><i class="icon-th"></i>Model</a><ul class="nav nav-list nav-namespaces"></ul>
+</li>
+<li>
+<a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.html" title="Operation"><i class="icon-th"></i>Operation</a><ul class="nav nav-list nav-namespaces">
+<li>
+<a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.Field.html" title="Field"><i class="icon-th"></i>Field</a><ul class="nav nav-list nav-namespaces"></ul>
+</li>
+<li>
+<a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.Model.html" title="Model"><i class="icon-th"></i>Model</a><ul class="nav nav-list nav-namespaces"></ul>
+</li>
+</ul>
+</li>
+<li>
 <a href="../namespaces/Eddmash.PowerOrm.Migration.State.html" title="State"><i class="icon-th"></i>State</a><ul class="nav nav-list nav-namespaces"></ul>
-</li></ul>
+</li>
+</ul>
 </li>
 <li class="nav-header">
 <i title="Classes" class="icon-custom icon-class"></i> Classes</li>
+<li><a href="#Executor" title="End-to-end migration execution - loads migrations, and runs them up or down to a specified set of targets.">Executor</a></li>
+<li><a href="#AutoDetector" title="Takes a pair of ProjectStates, and compares them to see what the first would need doing to
+make it match the second (the second usually being the project's current state).">AutoDetector</a></li>
+<li><a href="#MigrationFile" title="This class represent a migration file.">MigrationFile</a></li>
+<li><a href="#Node" title="This class represents a migration and its family tree infomartion
+i.e what migrations need to exist before this one can exist (parent)
+and which migrations cannot exist if this one does not (children).">Node</a></li>
+<li><a href="#FormatFileContent" title="Takes a series of content that need to be properly indented for writing on disk.">FormatFileContent</a></li>
 <li><a href="#Migration" title="">Migration</a></li>
+<li><a href="#Recorder" title="">Recorder</a></li>
 <li><a href="#Graph" title="">Graph</a></li>
-<li><a href="#AutoDetector" title="Base class for powerorm classes, provides some base functionalities to classes that inherit from it.">AutoDetector</a></li>
-<li><a href="#Node" title="">Node</a></li>
-<li><a href="#Loader" title="">Loader</a></li>
+<li><a href="#Loader" title="Base class for powerorm classes, provides some base functionalities to classes that inherit from it.">Loader</a></li>
+<li><a href="#MigrationQuestion" title="">MigrationQuestion</a></li>
 </ul>
 </div>
 <div class="span8 namespace-contents">
@@ -91,9 +114,24 @@
 <div xmlns:php="http://php.net/xsl" id="AutoDetector" class="element ajax clickable class">
 <h1>AutoDetector<a href="../classes/Eddmash.PowerOrm.Migration.AutoDetector.html">¶</a>
 </h1>
-<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<p class="short_description">Takes a pair of ProjectStates, and compares them to see what the first would need doing to
+make it match the second (the second usually being the project's current state).</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.AutoDetector.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="Executor" class="element ajax clickable class">
+<h1>Executor<a href="../classes/Eddmash.PowerOrm.Migration.Executor.html">¶</a>
+</h1>
+<p class="short_description">End-to-end migration execution - loads migrations, and runs them up or down to a specified set of targets.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Executor.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="FormatFileContent" class="element ajax clickable class">
+<h1>FormatFileContent<a href="../classes/Eddmash.PowerOrm.Migration.FormatFileContent.html">¶</a>
+</h1>
+<p class="short_description">Takes a series of content that need to be properly indented for writing on disk.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.FormatFileContent.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="Graph" class="element ajax clickable class">
 <h1>Graph<a href="../classes/Eddmash.PowerOrm.Migration.Graph.html">¶</a>
@@ -105,7 +143,7 @@
 <div xmlns:php="http://php.net/xsl" id="Loader" class="element ajax clickable class">
 <h1>Loader<a href="../classes/Eddmash.PowerOrm.Migration.Loader.html">¶</a>
 </h1>
-<p class="short_description"></p>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.Loader.html" class="more">« More »</a>
 </div>
@@ -116,12 +154,201 @@
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.Migration.html" class="more">« More »</a>
 </div>
-<div xmlns:php="http://php.net/xsl" id="Node" class="element ajax clickable class">
-<h1>Node<a href="../classes/Eddmash.PowerOrm.Migration.Node.html">¶</a>
+<div xmlns:php="http://php.net/xsl" id="MigrationFile" class="element ajax clickable class">
+<h1>MigrationFile<a href="../classes/Eddmash.PowerOrm.Migration.MigrationFile.html">¶</a>
+</h1>
+<p class="short_description">This class represent a migration file.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.MigrationFile.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="MigrationQuestion" class="element ajax clickable class">
+<h1>MigrationQuestion<a href="../classes/Eddmash.PowerOrm.Migration.MigrationQuestion.html">¶</a>
 </h1>
 <p class="short_description"></p>
 <div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.MigrationQuestion.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="Node" class="element ajax clickable class">
+<h1>Node<a href="../classes/Eddmash.PowerOrm.Migration.Node.html">¶</a>
+</h1>
+<p class="short_description">This class represents a migration and its family tree infomartion
+i.e what migrations need to exist before this one can exist (parent)
+and which migrations cannot exist if this one does not (children).</p>
+<div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.Node.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="Recorder" class="element ajax clickable class">
+<h1>Recorder<a href="../classes/Eddmash.PowerOrm.Migration.Recorder.html">¶</a>
+</h1>
+<p class="short_description"></p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Recorder.html" class="more">« More »</a>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.html">Migration</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Model.html">Model</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="MigrationModel" class="element ajax clickable class">
+<h1>MigrationModel<a href="../classes/Eddmash.PowerOrm.Migration.Model.MigrationModel.html">¶</a>
+</h1>
+<p class="short_description">Base class for all models in the ORM, this class cannot be instantiated on its own.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Model.MigrationModel.html" class="more">« More »</a>
+</div>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.html">Migration</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.html">Operation</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="OperationInterface" class="element ajax clickable interface">
+<h1>OperationInterface<a href="../classes/Eddmash.PowerOrm.Migration.Operation.OperationInterface.html">¶</a>
+</h1>
+<p class="short_description"></p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.OperationInterface.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="Operation" class="element ajax clickable class">
+<h1>Operation<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Operation.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Operation.html" class="more">« More »</a>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.html">Migration</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.html">Operation</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.Field.html">Field</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="AddField" class="element ajax clickable class">
+<h1>AddField<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.AddField.html">¶</a>
+</h1>
+<p class="short_description">Adds a field to a model.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.AddField.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="AlterField" class="element ajax clickable class">
+<h1>AlterField<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.AlterField.html">¶</a>
+</h1>
+<p class="short_description">Alters a field's database column (e.g. null, max_length) to the provided new field.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.AlterField.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="RemoveField" class="element ajax clickable class">
+<h1>RemoveField<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.RemoveField.html">¶</a>
+</h1>
+<p class="short_description">Removes a field from a model.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.RemoveField.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="RenameField" class="element ajax clickable class">
+<h1>RenameField<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.RenameField.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.RenameField.html" class="more">« More »</a>
+</div>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.html">Migration</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.html">Operation</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.Model.html">Model</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="AlterModelMeta" class="element ajax clickable class">
+<h1>AlterModelMeta<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.AlterModelMeta.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.AlterModelMeta.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="AlterModelTable" class="element ajax clickable class">
+<h1>AlterModelTable<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.AlterModelTable.html">¶</a>
+</h1>
+<p class="short_description">Renames a model's table.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.AlterModelTable.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="CreateModel" class="element ajax clickable class">
+<h1>CreateModel<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.CreateModel.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.CreateModel.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="DeleteModel" class="element ajax clickable class">
+<h1>DeleteModel<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.DeleteModel.html">¶</a>
+</h1>
+<p class="short_description">Drops a model's table.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.DeleteModel.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="RenameModel" class="element ajax clickable class">
+<h1>RenameModel<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.RenameModel.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.RenameModel.html" class="more">« More »</a>
+</div>
+</div>
 </div>
 <ul class="breadcrumb">
 <li>
@@ -144,21 +371,21 @@
 <div xmlns:php="http://php.net/xsl" id="ModelState" class="element ajax clickable class">
 <h1>ModelState<a href="../classes/Eddmash.PowerOrm.Migration.State.ModelState.html">¶</a>
 </h1>
-<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<p class="short_description">Represents a PowerOrm Model.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.State.ModelState.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="ProjectState" class="element ajax clickable class">
 <h1>ProjectState<a href="../classes/Eddmash.PowerOrm.Migration.State.ProjectState.html">¶</a>
 </h1>
-<p class="short_description"></p>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.State.ProjectState.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="StateRegistry" class="element ajax clickable class">
 <h1>StateRegistry<a href="../classes/Eddmash.PowerOrm.Migration.State.StateRegistry.html">¶</a>
 </h1>
-<p class="short_description"></p>
+<p class="short_description">This is the applications register.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.State.StateRegistry.html" class="more">« More »</a>
 </div>
@@ -169,7 +396,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-09-15T23:23:26+03:00.<br></footer></div>
+            generated on 2016-10-22T11:28:10+03:00.<br></footer></div>
 </div>
 </body>
 </html>

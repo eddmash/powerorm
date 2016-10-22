@@ -34,11 +34,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">417</span></a></li>
+                <span class="label label-info">761</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">2</span></a></li>
 </ul>
 </li>
 </ul></div>
@@ -83,31 +83,53 @@
 </ul>
 </li>
 <li>
-<a href="../namespaces/Eddmash.PowerOrm.Exceptions.html" title="Exceptions"><i class="icon-th"></i>Exceptions</a><ul class="nav nav-list nav-namespaces"></ul>
+<a href="../namespaces/Eddmash.PowerOrm.Db.html" title="Db"><i class="icon-th"></i>Db</a><ul class="nav nav-list nav-namespaces"></ul>
+</li>
+<li>
+<a href="../namespaces/Eddmash.PowerOrm.Exception.html" title="Exception"><i class="icon-th"></i>Exception</a><ul class="nav nav-list nav-namespaces"></ul>
 </li>
 <li>
 <a href="../namespaces/Eddmash.PowerOrm.Helpers.html" title="Helpers"><i class="icon-th"></i>Helpers</a><ul class="nav nav-list nav-namespaces"></ul>
 </li>
 <li>
-<a href="../namespaces/Eddmash.PowerOrm.Migration.html" title="Migration"><i class="icon-th"></i>Migration</a><ul class="nav nav-list nav-namespaces"><li>
+<a href="../namespaces/Eddmash.PowerOrm.Migration.html" title="Migration"><i class="icon-th"></i>Migration</a><ul class="nav nav-list nav-namespaces">
+<li>
+<a href="../namespaces/Eddmash.PowerOrm.Migration.Model.html" title="Model"><i class="icon-th"></i>Model</a><ul class="nav nav-list nav-namespaces"></ul>
+</li>
+<li>
+<a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.html" title="Operation"><i class="icon-th"></i>Operation</a><ul class="nav nav-list nav-namespaces">
+<li>
+<a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.Field.html" title="Field"><i class="icon-th"></i>Field</a><ul class="nav nav-list nav-namespaces"></ul>
+</li>
+<li>
+<a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.Model.html" title="Model"><i class="icon-th"></i>Model</a><ul class="nav nav-list nav-namespaces"></ul>
+</li>
+</ul>
+</li>
+<li>
 <a href="../namespaces/Eddmash.PowerOrm.Migration.State.html" title="State"><i class="icon-th"></i>State</a><ul class="nav nav-list nav-namespaces"></ul>
-</li></ul>
+</li>
+</ul>
 </li>
 <li>
 <a href="../namespaces/Eddmash.PowerOrm.Model.html" title="Model"><i class="icon-th"></i>Model</a><ul class="nav nav-list nav-namespaces"><li>
-<a href="../namespaces/Eddmash.PowerOrm.Model.Field.html" title="Field"><i class="icon-th"></i>Field</a><ul class="nav nav-list nav-namespaces"></ul>
+<a href="../namespaces/Eddmash.PowerOrm.Model.Field.html" title="Field"><i class="icon-th"></i>Field</a><ul class="nav nav-list nav-namespaces"><li>
+<a href="../namespaces/Eddmash.PowerOrm.Model.Field.RelatedObjects.html" title="RelatedObjects"><i class="icon-th"></i>RelatedObjects</a><ul class="nav nav-list nav-namespaces"></ul>
+</li></ul>
 </li></ul>
 </li>
 </ul>
 </li>
 <li class="nav-header">
 <i title="Interfaces" class="icon-custom icon-interface"></i> Interfaces</li>
-<li><a href="#ContributorInterface" title="">ContributorInterface</a></li>
+<li><a href="#ArrayObjectInterface" title="Interface that allows objects to work as arrays.">ArrayObjectInterface</a></li>
 <li><a href="#DeConstructableInterface" title="">DeConstructableInterface</a></li>
+<li><a href="#ContributorInterface" title="">ContributorInterface</a></li>
 <li class="nav-header">
 <i title="Classes" class="icon-custom icon-class"></i> Classes</li>
-<li><a href="#Object" title="Base class for powerorm classes, provides some base functionalities to classes that inherit from it.">Object</a></li>
+<li><a href="#DeconstructableObject" title="Base class for powerorm classes, provides some base functionalities to classes that inherit from it.">DeconstructableObject</a></li>
 <li><a href="#BaseOrm" title="Base class for powerorm classes, provides some base functionalities to classes that inherit from it.">BaseOrm</a></li>
+<li><a href="#Object" title="Base class for powerorm classes, provides some base functionalities to classes that inherit from it.">Object</a></li>
 </ul>
 </div>
 <div class="span8 namespace-contents">
@@ -123,6 +145,13 @@
 <div class="namespace-indent">
 <h3>
 <i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="ArrayObjectInterface" class="element ajax clickable interface">
+<h1>ArrayObjectInterface<a href="../classes/Eddmash.PowerOrm.ArrayObjectInterface.html">¶</a>
+</h1>
+<p class="short_description">Interface that allows objects to work as arrays.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.ArrayObjectInterface.html" class="more">« More »</a>
+</div>
 <div xmlns:php="http://php.net/xsl" id="ContributorInterface" class="element ajax clickable interface">
 <h1>ContributorInterface<a href="../classes/Eddmash.PowerOrm.ContributorInterface.html">¶</a>
 </h1>
@@ -143,6 +172,13 @@
 <p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.BaseOrm.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="DeconstructableObject" class="element ajax clickable class">
+<h1>DeconstructableObject<a href="../classes/Eddmash.PowerOrm.DeconstructableObject.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.DeconstructableObject.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="Object" class="element ajax clickable class">
 <h1>Object<a href="../classes/Eddmash.PowerOrm.Object.html">¶</a>
@@ -335,13 +371,6 @@
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Console.Manager.html" class="more">« More »</a>
 </div>
-<div xmlns:php="http://php.net/xsl" id="Parser" class="element ajax clickable class">
-<h1>Parser<a href="../classes/Eddmash.PowerOrm.Console.Parser.html">¶</a>
-</h1>
-<p class="short_description"></p>
-<div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Console.Parser.html" class="more">« More »</a>
-</div>
 <ul class="breadcrumb">
 <li>
 <a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
@@ -401,6 +430,13 @@
 <p class="short_description">Class Showmigrations.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Console.Command.Showmigrations.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="Testdb" class="element ajax clickable class">
+<h1>Testdb<a href="../classes/Eddmash.PowerOrm.Console.Command.Testdb.html">¶</a>
+</h1>
+<p class="short_description">Borrowed from fuelphp oil robot.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Console.Command.Testdb.html" class="more">« More »</a>
 </div>
 </div>
 <ul class="breadcrumb">
@@ -474,165 +510,209 @@
 <span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
 </li>
 <li class="active">
-<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Exceptions.html">Exceptions</a>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Db.html">Db</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="SchemaEditor" class="element ajax clickable class">
+<h1>SchemaEditor<a href="../classes/Eddmash.PowerOrm.Db.SchemaEditor.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Db.SchemaEditor.html" class="more">« More »</a>
+</div>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Exception.html">Exception</a>
 </li>
 </ul>
 <div class="namespace-indent">
 <h3>
 <i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
 <div xmlns:php="http://php.net/xsl" id="AmbiguityError" class="element ajax clickable class">
-<h1>AmbiguityError<a href="../classes/Eddmash.PowerOrm.Exceptions.AmbiguityError.html">¶</a>
+<h1>AmbiguityError<a href="../classes/Eddmash.PowerOrm.Exception.AmbiguityError.html">¶</a>
 </h1>
 <p class="short_description"></p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.AmbiguityError.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.AmbiguityError.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="AppRegistryNotReady" class="element ajax clickable class">
-<h1>AppRegistryNotReady<a href="../classes/Eddmash.PowerOrm.Exceptions.AppRegistryNotReady.html">¶</a>
+<h1>AppRegistryNotReady<a href="../classes/Eddmash.PowerOrm.Exception.AppRegistryNotReady.html">¶</a>
 </h1>
 <p class="short_description"></p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.AppRegistryNotReady.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.AppRegistryNotReady.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="AttributeError" class="element ajax clickable class">
+<h1>AttributeError<a href="../classes/Eddmash.PowerOrm.Exception.AttributeError.html">¶</a>
+</h1>
+<p class="short_description"></p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Exception.AttributeError.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="ClassNotFoundException" class="element ajax clickable class">
+<h1>ClassNotFoundException<a href="../classes/Eddmash.PowerOrm.Exception.ClassNotFoundException.html">¶</a>
+</h1>
+<p class="short_description">Class ClassNotFoundException.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Exception.ClassNotFoundException.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="CommandError" class="element ajax clickable class">
-<h1>CommandError<a href="../classes/Eddmash.PowerOrm.Exceptions.CommandError.html">¶</a>
+<h1>CommandError<a href="../classes/Eddmash.PowerOrm.Exception.CommandError.html">¶</a>
 </h1>
 <p class="short_description">Class CommandError.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.CommandError.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.CommandError.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="DuplicatedField" class="element ajax clickable class">
-<h1>DuplicatedField<a href="../classes/Eddmash.PowerOrm.Exceptions.DuplicatedField.html">¶</a>
+<h1>DuplicatedField<a href="../classes/Eddmash.PowerOrm.Exception.DuplicatedField.html">¶</a>
 </h1>
 <p class="short_description">Class DuplicateField.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.DuplicatedField.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.DuplicatedField.html" class="more">« More »</a>
 </div>
-<div xmlns:php="http://php.net/xsl" id="FieldError" class="element ajax clickable class">
-<h1>FieldError<a href="../classes/Eddmash.PowerOrm.Exceptions.FieldError.html">¶</a>
+<div xmlns:php="http://php.net/xsl" id="FieldDoesNotExist" class="element ajax clickable class">
+<h1>FieldDoesNotExist<a href="../classes/Eddmash.PowerOrm.Exception.FieldDoesNotExist.html">¶</a>
 </h1>
 <p class="short_description"></p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.FieldError.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.FieldDoesNotExist.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="FieldError" class="element ajax clickable class">
+<h1>FieldError<a href="../classes/Eddmash.PowerOrm.Exception.FieldError.html">¶</a>
+</h1>
+<p class="short_description"></p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Exception.FieldError.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="FileHandlerException" class="element ajax clickable class">
-<h1>FileHandlerException<a href="../classes/Eddmash.PowerOrm.Exceptions.FileHandlerException.html">¶</a>
+<h1>FileHandlerException<a href="../classes/Eddmash.PowerOrm.Exception.FileHandlerException.html">¶</a>
 </h1>
 <p class="short_description">Class FileHandlerException.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.FileHandlerException.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.FileHandlerException.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="FormException" class="element ajax clickable class">
-<h1>FormException<a href="../classes/Eddmash.PowerOrm.Exceptions.FormException.html">¶</a>
+<h1>FormException<a href="../classes/Eddmash.PowerOrm.Exception.FormException.html">¶</a>
 </h1>
 <p class="short_description">Class FormException.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.FormException.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.FormException.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="FormNotReadyException" class="element ajax clickable class">
-<h1>FormNotReadyException<a href="../classes/Eddmash.PowerOrm.Exceptions.FormNotReadyException.html">¶</a>
+<h1>FormNotReadyException<a href="../classes/Eddmash.PowerOrm.Exception.FormNotReadyException.html">¶</a>
 </h1>
 <p class="short_description">Class FormNotReadyException.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.FormNotReadyException.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.FormNotReadyException.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="KeyError" class="element ajax clickable class">
-<h1>KeyError<a href="../classes/Eddmash.PowerOrm.Exceptions.KeyError.html">¶</a>
+<h1>KeyError<a href="../classes/Eddmash.PowerOrm.Exception.KeyError.html">¶</a>
 </h1>
 <p class="short_description">Class KeyError.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.KeyError.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.KeyError.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="LookupError" class="element ajax clickable class">
-<h1>LookupError<a href="../classes/Eddmash.PowerOrm.Exceptions.LookupError.html">¶</a>
+<h1>LookupError<a href="../classes/Eddmash.PowerOrm.Exception.LookupError.html">¶</a>
 </h1>
 <p class="short_description">Class LookupError.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.LookupError.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.LookupError.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="MultipleObjectsReturned" class="element ajax clickable class">
-<h1>MultipleObjectsReturned<a href="../classes/Eddmash.PowerOrm.Exceptions.MultipleObjectsReturned.html">¶</a>
+<h1>MultipleObjectsReturned<a href="../classes/Eddmash.PowerOrm.Exception.MultipleObjectsReturned.html">¶</a>
 </h1>
 <p class="short_description">Class MultipleObjectsReturned.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.MultipleObjectsReturned.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.MultipleObjectsReturned.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="NodeNotFoundError" class="element ajax clickable class">
-<h1>NodeNotFoundError<a href="../classes/Eddmash.PowerOrm.Exceptions.NodeNotFoundError.html">¶</a>
+<h1>NodeNotFoundError<a href="../classes/Eddmash.PowerOrm.Exception.NodeNotFoundError.html">¶</a>
 </h1>
 <p class="short_description">Class NodeNotFoundError.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.NodeNotFoundError.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.NodeNotFoundError.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="NotImplemented" class="element ajax clickable class">
-<h1>NotImplemented<a href="../classes/Eddmash.PowerOrm.Exceptions.NotImplemented.html">¶</a>
+<h1>NotImplemented<a href="../classes/Eddmash.PowerOrm.Exception.NotImplemented.html">¶</a>
 </h1>
 <p class="short_description">Class NotImplemented.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.NotImplemented.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.NotImplemented.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="NotSupported" class="element ajax clickable class">
-<h1>NotSupported<a href="../classes/Eddmash.PowerOrm.Exceptions.NotSupported.html">¶</a>
+<h1>NotSupported<a href="../classes/Eddmash.PowerOrm.Exception.NotSupported.html">¶</a>
 </h1>
 <p class="short_description">Class NotSupported.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.NotSupported.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.NotSupported.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="ObjectDoesNotExist" class="element ajax clickable class">
-<h1>ObjectDoesNotExist<a href="../classes/Eddmash.PowerOrm.Exceptions.ObjectDoesNotExist.html">¶</a>
+<h1>ObjectDoesNotExist<a href="../classes/Eddmash.PowerOrm.Exception.ObjectDoesNotExist.html">¶</a>
 </h1>
 <p class="short_description">Class ObjectDoesNotExist.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.ObjectDoesNotExist.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.ObjectDoesNotExist.html" class="more">« More »</a>
 </div>
-<div xmlns:php="http://php.net/xsl" id="OrmErrors" class="element ajax clickable class">
-<h1>OrmErrors<a href="../classes/Eddmash.PowerOrm.Exceptions.OrmErrors.html">¶</a>
+<div xmlns:php="http://php.net/xsl" id="OrmError" class="element ajax clickable class">
+<h1>OrmError<a href="../classes/Eddmash.PowerOrm.Exception.OrmError.html">¶</a>
 </h1>
-<p class="short_description">Class OrmErrors.</p>
+<p class="short_description">Class OrmError.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.OrmErrors.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.OrmError.html" class="more">« More »</a>
 </div>
-<div xmlns:php="http://php.net/xsl" id="OrmExceptions" class="element ajax clickable class">
-<h1>OrmExceptions<a href="../classes/Eddmash.PowerOrm.Exceptions.OrmExceptions.html">¶</a>
+<div xmlns:php="http://php.net/xsl" id="OrmException" class="element ajax clickable class">
+<h1>OrmException<a href="../classes/Eddmash.PowerOrm.Exception.OrmException.html">¶</a>
 </h1>
-<p class="short_description">Class OrmExceptions.</p>
+<p class="short_description">Class OrmException.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.OrmExceptions.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.OrmException.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="RelatedObjectDoesNotExist" class="element ajax clickable class">
-<h1>RelatedObjectDoesNotExist<a href="../classes/Eddmash.PowerOrm.Exceptions.RelatedObjectDoesNotExist.html">¶</a>
+<h1>RelatedObjectDoesNotExist<a href="../classes/Eddmash.PowerOrm.Exception.RelatedObjectDoesNotExist.html">¶</a>
 </h1>
 <p class="short_description">Class RelatedObjectDoesNotExist.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.RelatedObjectDoesNotExist.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.RelatedObjectDoesNotExist.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="SystemCheckError" class="element ajax clickable class">
-<h1>SystemCheckError<a href="../classes/Eddmash.PowerOrm.Exceptions.SystemCheckError.html">¶</a>
+<h1>SystemCheckError<a href="../classes/Eddmash.PowerOrm.Exception.SystemCheckError.html">¶</a>
 </h1>
 <p class="short_description">Class SystemCheckError.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.SystemCheckError.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.SystemCheckError.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="TypeError" class="element ajax clickable class">
-<h1>TypeError<a href="../classes/Eddmash.PowerOrm.Exceptions.TypeError.html">¶</a>
+<h1>TypeError<a href="../classes/Eddmash.PowerOrm.Exception.TypeError.html">¶</a>
 </h1>
-<p class="short_description">Class OrmErrors.</p>
+<p class="short_description">Class OrmError.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.TypeError.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.TypeError.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="ValidationError" class="element ajax clickable class">
-<h1>ValidationError<a href="../classes/Eddmash.PowerOrm.Exceptions.ValidationError.html">¶</a>
+<h1>ValidationError<a href="../classes/Eddmash.PowerOrm.Exception.ValidationError.html">¶</a>
 </h1>
 <p class="short_description">Class ValidationError.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.ValidationError.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.ValidationError.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="ValueError" class="element ajax clickable class">
-<h1>ValueError<a href="../classes/Eddmash.PowerOrm.Exceptions.ValueError.html">¶</a>
+<h1>ValueError<a href="../classes/Eddmash.PowerOrm.Exception.ValueError.html">¶</a>
 </h1>
 <p class="short_description">Class ValueError.</p>
 <div class="details collapse"></div>
-<a href="../classes/Eddmash.PowerOrm.Exceptions.ValueError.html" class="more">« More »</a>
+<a href="../classes/Eddmash.PowerOrm.Exception.ValueError.html" class="more">« More »</a>
 </div>
 </div>
 <ul class="breadcrumb">
@@ -656,6 +736,13 @@
 <p class="short_description">Class Arrays.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Helpers.ArrayHelper.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="ClassHelper" class="element ajax clickable class">
+<h1>ClassHelper<a href="../classes/Eddmash.PowerOrm.Helpers.ClassHelper.html">¶</a>
+</h1>
+<p class="short_description">A Helper class for dealing with common class related tasks.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Helpers.ClassHelper.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="DbHelper" class="element ajax clickable class">
 <h1>DbHelper<a href="../classes/Eddmash.PowerOrm.Helpers.DbHelper.html">¶</a>
@@ -704,9 +791,24 @@
 <div xmlns:php="http://php.net/xsl" id="AutoDetector" class="element ajax clickable class">
 <h1>AutoDetector<a href="../classes/Eddmash.PowerOrm.Migration.AutoDetector.html">¶</a>
 </h1>
-<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<p class="short_description">Takes a pair of ProjectStates, and compares them to see what the first would need doing to
+make it match the second (the second usually being the project's current state).</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.AutoDetector.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="Executor" class="element ajax clickable class">
+<h1>Executor<a href="../classes/Eddmash.PowerOrm.Migration.Executor.html">¶</a>
+</h1>
+<p class="short_description">End-to-end migration execution - loads migrations, and runs them up or down to a specified set of targets.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Executor.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="FormatFileContent" class="element ajax clickable class">
+<h1>FormatFileContent<a href="../classes/Eddmash.PowerOrm.Migration.FormatFileContent.html">¶</a>
+</h1>
+<p class="short_description">Takes a series of content that need to be properly indented for writing on disk.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.FormatFileContent.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="Graph" class="element ajax clickable class">
 <h1>Graph<a href="../classes/Eddmash.PowerOrm.Migration.Graph.html">¶</a>
@@ -718,7 +820,7 @@
 <div xmlns:php="http://php.net/xsl" id="Loader" class="element ajax clickable class">
 <h1>Loader<a href="../classes/Eddmash.PowerOrm.Migration.Loader.html">¶</a>
 </h1>
-<p class="short_description"></p>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.Loader.html" class="more">« More »</a>
 </div>
@@ -729,12 +831,201 @@
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.Migration.html" class="more">« More »</a>
 </div>
-<div xmlns:php="http://php.net/xsl" id="Node" class="element ajax clickable class">
-<h1>Node<a href="../classes/Eddmash.PowerOrm.Migration.Node.html">¶</a>
+<div xmlns:php="http://php.net/xsl" id="MigrationFile" class="element ajax clickable class">
+<h1>MigrationFile<a href="../classes/Eddmash.PowerOrm.Migration.MigrationFile.html">¶</a>
+</h1>
+<p class="short_description">This class represent a migration file.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.MigrationFile.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="MigrationQuestion" class="element ajax clickable class">
+<h1>MigrationQuestion<a href="../classes/Eddmash.PowerOrm.Migration.MigrationQuestion.html">¶</a>
 </h1>
 <p class="short_description"></p>
 <div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.MigrationQuestion.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="Node" class="element ajax clickable class">
+<h1>Node<a href="../classes/Eddmash.PowerOrm.Migration.Node.html">¶</a>
+</h1>
+<p class="short_description">This class represents a migration and its family tree infomartion
+i.e what migrations need to exist before this one can exist (parent)
+and which migrations cannot exist if this one does not (children).</p>
+<div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.Node.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="Recorder" class="element ajax clickable class">
+<h1>Recorder<a href="../classes/Eddmash.PowerOrm.Migration.Recorder.html">¶</a>
+</h1>
+<p class="short_description"></p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Recorder.html" class="more">« More »</a>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.html">Migration</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Model.html">Model</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="MigrationModel" class="element ajax clickable class">
+<h1>MigrationModel<a href="../classes/Eddmash.PowerOrm.Migration.Model.MigrationModel.html">¶</a>
+</h1>
+<p class="short_description">Base class for all models in the ORM, this class cannot be instantiated on its own.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Model.MigrationModel.html" class="more">« More »</a>
+</div>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.html">Migration</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.html">Operation</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="OperationInterface" class="element ajax clickable interface">
+<h1>OperationInterface<a href="../classes/Eddmash.PowerOrm.Migration.Operation.OperationInterface.html">¶</a>
+</h1>
+<p class="short_description"></p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.OperationInterface.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="Operation" class="element ajax clickable class">
+<h1>Operation<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Operation.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Operation.html" class="more">« More »</a>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.html">Migration</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.html">Operation</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.Field.html">Field</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="AddField" class="element ajax clickable class">
+<h1>AddField<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.AddField.html">¶</a>
+</h1>
+<p class="short_description">Adds a field to a model.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.AddField.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="AlterField" class="element ajax clickable class">
+<h1>AlterField<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.AlterField.html">¶</a>
+</h1>
+<p class="short_description">Alters a field's database column (e.g. null, max_length) to the provided new field.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.AlterField.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="RemoveField" class="element ajax clickable class">
+<h1>RemoveField<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.RemoveField.html">¶</a>
+</h1>
+<p class="short_description">Removes a field from a model.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.RemoveField.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="RenameField" class="element ajax clickable class">
+<h1>RenameField<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.RenameField.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Field.RenameField.html" class="more">« More »</a>
+</div>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.html">Migration</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.html">Operation</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Migration.Operation.Model.html">Model</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="AlterModelMeta" class="element ajax clickable class">
+<h1>AlterModelMeta<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.AlterModelMeta.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.AlterModelMeta.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="AlterModelTable" class="element ajax clickable class">
+<h1>AlterModelTable<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.AlterModelTable.html">¶</a>
+</h1>
+<p class="short_description">Renames a model's table.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.AlterModelTable.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="CreateModel" class="element ajax clickable class">
+<h1>CreateModel<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.CreateModel.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.CreateModel.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="DeleteModel" class="element ajax clickable class">
+<h1>DeleteModel<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.DeleteModel.html">¶</a>
+</h1>
+<p class="short_description">Drops a model's table.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.DeleteModel.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="RenameModel" class="element ajax clickable class">
+<h1>RenameModel<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.RenameModel.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Migration.Operation.Model.RenameModel.html" class="more">« More »</a>
+</div>
+</div>
 </div>
 <ul class="breadcrumb">
 <li>
@@ -757,21 +1048,21 @@
 <div xmlns:php="http://php.net/xsl" id="ModelState" class="element ajax clickable class">
 <h1>ModelState<a href="../classes/Eddmash.PowerOrm.Migration.State.ModelState.html">¶</a>
 </h1>
-<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<p class="short_description">Represents a PowerOrm Model.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.State.ModelState.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="ProjectState" class="element ajax clickable class">
 <h1>ProjectState<a href="../classes/Eddmash.PowerOrm.Migration.State.ProjectState.html">¶</a>
 </h1>
-<p class="short_description"></p>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.State.ProjectState.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="StateRegistry" class="element ajax clickable class">
 <h1>StateRegistry<a href="../classes/Eddmash.PowerOrm.Migration.State.StateRegistry.html">¶</a>
 </h1>
-<p class="short_description"></p>
+<p class="short_description">This is the applications register.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Migration.State.StateRegistry.html" class="more">« More »</a>
 </div>
@@ -805,6 +1096,13 @@
 <p class="short_description">Interface ModelInterface.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Model.ModelInterface.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="Delete" class="element ajax clickable class">
+<h1>Delete<a href="../classes/Eddmash.PowerOrm.Model.Delete.html">¶</a>
+</h1>
+<p class="short_description"></p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Delete.html" class="more">« More »</a>
 </div>
 <div xmlns:php="http://php.net/xsl" id="Meta" class="element ajax clickable class">
 <h1>Meta<a href="../classes/Eddmash.PowerOrm.Model.Meta.html">¶</a>
@@ -848,7 +1146,7 @@
 <div xmlns:php="http://php.net/xsl" id="AutoField" class="element ajax clickable class">
 <h1>AutoField<a href="../classes/Eddmash.PowerOrm.Model.Field.AutoField.html">¶</a>
 </h1>
-<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<p class="short_description">An IntegerField that automatically increments according to available IDs.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Model.Field.AutoField.html" class="more">« More »</a>
 </div>
@@ -866,6 +1164,86 @@
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Model.Field.Field.html" class="more">« More »</a>
 </div>
+<div xmlns:php="http://php.net/xsl" id="ForeignKey" class="element ajax clickable class">
+<h1>ForeignKey<a href="../classes/Eddmash.PowerOrm.Model.Field.ForeignKey.html">¶</a>
+</h1>
+<p class="short_description">Base class that all relational fields inherit from.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Field.ForeignKey.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="ManyToManyField" class="element ajax clickable class">
+<h1>ManyToManyField<a href="../classes/Eddmash.PowerOrm.Model.Field.ManyToManyField.html">¶</a>
+</h1>
+<p class="short_description">Base class that all relational fields inherit from.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Field.ManyToManyField.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="OneToOneField" class="element ajax clickable class">
+<h1>OneToOneField<a href="../classes/Eddmash.PowerOrm.Model.Field.OneToOneField.html">¶</a>
+</h1>
+<p class="short_description">A OneToOneField is essentially the same as a ForeignKey, with the exception that
+always carries a "unique" constraint with it and the reverse relation always returns the object pointed
+to (since there will only ever be one), rather than returning a list.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Field.OneToOneField.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="RelatedField" class="element ajax clickable class">
+<h1>RelatedField<a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedField.html">¶</a>
+</h1>
+<p class="short_description">Base class that all relational fields inherit from.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedField.html" class="more">« More »</a>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Model.html">Model</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Model.Field.html">Field</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Model.Field.RelatedObjects.html">RelatedObjects</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="ForeignObjectRel" class="element ajax clickable class">
+<h1>ForeignObjectRel<a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedObjects.ForeignObjectRel.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedObjects.ForeignObjectRel.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="ManyToManyRel" class="element ajax clickable class">
+<h1>ManyToManyRel<a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedObjects.ManyToManyRel.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedObjects.ManyToManyRel.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="ManyToOneRel" class="element ajax clickable class">
+<h1>ManyToOneRel<a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedObjects.ManyToOneRel.html">¶</a>
+</h1>
+<p class="short_description">Used by ForeignObject to store information about the relation.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedObjects.ManyToOneRel.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="OneToOneRel" class="element ajax clickable class">
+<h1>OneToOneRel<a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedObjects.OneToOneRel.html">¶</a>
+</h1>
+<p class="short_description">Used by ForeignObject to store information about the relation.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedObjects.OneToOneRel.html" class="more">« More »</a>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -874,7 +1252,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-09-15T23:23:25+03:00.<br></footer></div>
+            generated on 2016-10-22T11:28:09+03:00.<br></footer></div>
 </div>
 </body>
 </html>

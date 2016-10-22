@@ -34,11 +34,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">417</span></a></li>
+                <span class="label label-info">761</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">2</span></a></li>
 </ul>
 </li>
 </ul></div>
@@ -60,7 +60,35 @@
 <button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button><button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
 </div>
 </div>
-<ul xmlns:php="http://php.net/xsl" class="side-nav nav nav-list"></ul>
+<ul xmlns:php="http://php.net/xsl" class="side-nav nav nav-list">
+<li class="nav-header">
+<i title="Methods" class="icon-custom icon-method"></i> Methods
+                    <ul>
+<li class="method public "><a href="#method___construct" title="__construct() :: "><span class="description">__construct()
+        </span><pre>__construct()</pre></a></li>
+<li class="method public "><a href="#method_addDependency" title="addDependency() :: "><span class="description">addDependency()
+        </span><pre>addDependency()</pre></a></li>
+<li class="method public "><a href="#method_addNode" title="addNode() :: "><span class="description">addNode()
+        </span><pre>addNode()</pre></a></li>
+<li class="method public "><a href="#method_getAncestryTree" title="getAncestryTree() :: Given a node, returns a list of which previous nodes (dependencies) must be applied, ending with the node itself."><span class="description">Given a node, returns a list of which previous nodes (dependencies) must be applied, ending with the node itself.</span><pre>getAncestryTree()</pre></a></li>
+<li class="method public "><a href="#method_getDecedentsTree" title="getDecedentsTree() :: Given a node, returns a list of which dependent nodes (dependencies) must be unapplied,ending with the node itself."><span class="description">Given a node, returns a list of which dependent nodes (dependencies) must be unapplied,ending with the node itself.</span><pre>getDecedentsTree()</pre></a></li>
+<li class="method public "><a href="#method_getLeafNodes" title="getLeafNodes() :: This is a list of all the migrations that are the latest, that is no other dependency depends on them."><span class="description">This is a list of all the migrations that are the latest, that is no other dependency depends on them.</span><pre>getLeafNodes()</pre></a></li>
+<li class="method public "><a href="#method_getMigration" title="getMigration() :: "><span class="description">getMigration()
+        </span><pre>getMigration()</pre></a></li>
+<li class="method public "><a href="#method_getNodeFamilyTree" title="getNodeFamilyTree() :: "><span class="description">getNodeFamilyTree()
+        </span><pre>getNodeFamilyTree()</pre></a></li>
+<li class="method public "><a href="#method_getRootNodes" title="getRootNodes() :: This is a list of all the migrations that were the first, i.e they don't depend on any other migrations."><span class="description">This is a list of all the migrations that were the first, i.e they don't depend on any other migrations.</span><pre>getRootNodes()</pre></a></li>
+<li class="method public "><a href="#method_getState" title="getState() :: Create ProjectState based on migrations on disk."><span class="description">Create ProjectState based on migrations on disk.</span><pre>getState()</pre></a></li>
+</ul>
+</li>
+<li class="nav-header">
+<i title="Properties" class="icon-custom icon-property"></i> Properties
+                    <ul>
+<li class="property public "><a href="#property_nodeFamilyTree" title="$nodeFamilyTree() :: contains a family tree for each node representing a migration."><span class="description"></span><pre>$nodeFamilyTree</pre></a></li>
+<li class="property public "><a href="#property_nodes" title="$nodes() :: keeps track of Migrations already taken care of in the graph."><span class="description"></span><pre>$nodes</pre></a></li>
+</ul>
+</li>
+</ul>
 </div>
 <div class="span8">
 <a xmlns:php="http://php.net/xsl" id="\Eddmash\PowerOrm\Migration\Graph"></a><ul xmlns:php="http://php.net/xsl" class="breadcrumb">
@@ -86,6 +114,217 @@
 <th>package</th>
 <td><a href="../packages/Default.html">Default</a></td>
 </tr></table>
+<h3>
+<i title="Methods" class="icon-custom icon-method"></i> Methods</h3>
+<a id="method___construct"></a><div class="element clickable method public method___construct " data-toggle="collapse" data-target=".method___construct .collapse" title="public">
+<h2>__construct()
+        </h2>
+<pre>__construct() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_addDependency"></a><div class="element clickable method public method_addDependency " data-toggle="collapse" data-target=".method_addDependency .collapse" title="public">
+<h2>addDependency()
+        </h2>
+<pre>addDependency($child, $parent, \Eddmash\PowerOrm\Migration\Migration $migration) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$child</h4></div>
+<div class="subelement argument"><h4>$parent</h4></div>
+<div class="subelement argument">
+<h4>$migration</h4>
+<code>\Eddmash\PowerOrm\Migration\Migration</code>
+</div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exception\NodeNotFoundError</code></th>
+<td></td>
+</tr></table>
+</div></div>
+</div>
+<a id="method_addNode"></a><div class="element clickable method public method_addNode " data-toggle="collapse" data-target=".method_addNode .collapse" title="public">
+<h2>addNode()
+        </h2>
+<pre>addNode($migrationName, $migrationObject) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$migrationName</h4></div>
+<div class="subelement argument"><h4>$migrationObject</h4></div>
+</div></div>
+</div>
+<a id="method_getAncestryTree"></a><div class="element clickable method public method_getAncestryTree " data-toggle="collapse" data-target=".method_getAncestryTree .collapse" title="public">
+<h2>Given a node, returns a list of which previous nodes (dependencies) must be applied, ending with the node itself.</h2>
+<pre>getAncestryTree($node) : mixed</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>This is the list you would follow if applying the migrations to a database.</p>
+<p>starting with the oldest upto the node.</p>
+<p>This puts the oldest node as the first element on the returned array while the node becomes the last.</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$node</h4></div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exception\NodeNotFoundError</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>mixed</code></div>
+</div></div>
+</div>
+<a id="method_getDecedentsTree"></a><div class="element clickable method public method_getDecedentsTree " data-toggle="collapse" data-target=".method_getDecedentsTree .collapse" title="public">
+<h2>Given a node, returns a list of which dependent nodes (dependencies) must be unapplied,ending with the node itself.</h2>
+<pre>getDecedentsTree($node) : mixed</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>i.e All nodes that depend on the existence of this node.</p>
+<p>This is the list you would follow if removing the migrations from a database.</p>
+<p>This puts the last child as the first element on the returned array while the node becomes the last.</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$node</h4></div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exception\NodeNotFoundError</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>mixed</code></div>
+</div></div>
+</div>
+<a id="method_getLeafNodes"></a><div class="element clickable method public method_getLeafNodes " data-toggle="collapse" data-target=".method_getLeafNodes .collapse" title="public">
+<h2>This is a list of all the migrations that are the latest, that is no other dependency depends on them.</h2>
+<pre>getLeafNodes() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getMigration"></a><div class="element clickable method public method_getMigration " data-toggle="collapse" data-target=".method_getMigration .collapse" title="public">
+<h2>getMigration()
+        </h2>
+<pre>getMigration(string $migrationName) : \Eddmash\PowerOrm\Migration\Migration</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$migrationName</h4>
+<code>string</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Eddmash\PowerOrm\Migration\Migration</code></div>
+</div></div>
+</div>
+<a id="method_getNodeFamilyTree"></a><div class="element clickable method public method_getNodeFamilyTree " data-toggle="collapse" data-target=".method_getNodeFamilyTree .collapse" title="public">
+<h2>getNodeFamilyTree()
+        </h2>
+<pre>getNodeFamilyTree(string $node) : \Eddmash\PowerOrm\Migration\Node</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$node</h4>
+<code>string</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Eddmash\PowerOrm\Migration\Node</code></div>
+</div></div>
+</div>
+<a id="method_getRootNodes"></a><div class="element clickable method public method_getRootNodes " data-toggle="collapse" data-target=".method_getRootNodes .collapse" title="public">
+<h2>This is a list of all the migrations that were the first, i.e they don't depend on any other migrations.</h2>
+<pre>getRootNodes() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getState"></a><div class="element clickable method public method_getState " data-toggle="collapse" data-target=".method_getState .collapse" title="public">
+<h2>Create ProjectState based on migrations on disk.</h2>
+<pre>getState() : \Eddmash\PowerOrm\Migration\State\ProjectState</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exception\NodeNotFoundError</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Eddmash\PowerOrm\Migration\State\ProjectState</code></div>
+</div></div>
+</div>
+<h3>
+<i title="Properties" class="icon-custom icon-property"></i> Properties</h3>
+<a id="property_nodeFamilyTree"> </a><div class="element clickable property public property_nodeFamilyTree" data-toggle="collapse" data-target=".property_nodeFamilyTree .collapse" title="public">
+<h2>contains a family tree for each node representing a migration.</h2>
+<pre>$nodeFamilyTree : array</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>array()</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_nodes"> </a><div class="element clickable property public property_nodes" data-toggle="collapse" data-target=".property_nodes .collapse" title="public">
+<h2>keeps track of Migrations already taken care of in the graph.</h2>
+<pre>$nodes : array</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
 </div>
 </div>
 </div>
@@ -93,7 +332,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-09-15T23:23:26+03:00.<br></footer></div>
+            generated on 2016-10-22T11:28:11+03:00.<br></footer></div>
 </div>
 </body>
 </html>

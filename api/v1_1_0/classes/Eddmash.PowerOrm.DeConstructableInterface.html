@@ -34,11 +34,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">417</span></a></li>
+                <span class="label label-info">761</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">2</span></a></li>
 </ul>
 </li>
 </ul></div>
@@ -63,8 +63,8 @@
 <ul xmlns:php="http://php.net/xsl" class="side-nav nav nav-list"><li class="nav-header">
 <i title="Methods" class="icon-custom icon-method"></i> Methods
                     <ul>
-<li class="method public "><a href="#method_constructorArgs" title="constructorArgs() :: Should return an array of all the arguments that the constructor takes in."><span class="description">Should return an array of all the arguments that the constructor takes in.</span><pre>constructorArgs()</pre></a></li>
-<li class="method public "><a href="#method_skeleton" title="skeleton() :: This should return all the information (as an array) required to recreate this object again."><span class="description">This should return all the information (as an array) required to recreate this object again.</span><pre>skeleton()</pre></a></li>
+<li class="method public "><a href="#method_deconstruct" title="deconstruct() :: This should return all the information (as an array) required to recreate an object again."><span class="description">This should return all the information (as an array) required to recreate an object again.</span><pre>deconstruct()</pre></a></li>
+<li class="method public "><a href="#method_getConstructorArgs" title="getConstructorArgs() :: Should return an array of all the arguments that the constructor takes in."><span class="description">Should return an array of all the arguments that the constructor takes in.</span><pre>getConstructorArgs()</pre></a></li>
 </ul>
 </li></ul>
 </div>
@@ -91,31 +91,21 @@
 </tr></table>
 <h3>
 <i title="Methods" class="icon-custom icon-method"></i> Methods</h3>
-<a id="method_constructorArgs"></a><div class="element clickable method public method_constructorArgs " data-toggle="collapse" data-target=".method_constructorArgs .collapse" title="public">
-<h2>Should return an array of all the arguments that the constructor takes in.</h2>
-<pre>constructorArgs() : array</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Returns</h3>
-<div class="subelement response"><code>array</code></div>
-</div></div>
-</div>
-<a id="method_skeleton"></a><div class="element clickable method public method_skeleton " data-toggle="collapse" data-target=".method_skeleton .collapse" title="public">
-<h2>This should return all the information (as an array) required to recreate this object again.</h2>
-<pre>skeleton() : array</pre>
+<a id="method_deconstruct"></a><div class="element clickable method public method_deconstruct " data-toggle="collapse" data-target=".method_deconstruct .collapse" title="public">
+<h2>This should return all the information (as an array) required to recreate an object again.</h2>
+<pre>deconstruct() : array</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"><p>i.e.</p>
 <ul>
 <li>the class name</li>
-<li>the absolute path to the class as a string</li>
+<li>the absolute path to the class as a string,This should be the most portable version, so less specific may be better.</li>
 <li>the constructor arguments as an array</li>
 </ul>
 <p>e.g.</p>
 <pre><code> $name = Orm::Charfield(['max_length'=>20]);
 
-var_dump($name->skeleton());
+var_dump($name->deconstruct());
 
 [
      'name'=> 'Charfield',
@@ -131,6 +121,16 @@ var_dump($name->skeleton());
 <div class="subelement response"><code>array</code></div>
 </div></div>
 </div>
+<a id="method_getConstructorArgs"></a><div class="element clickable method public method_getConstructorArgs " data-toggle="collapse" data-target=".method_getConstructorArgs .collapse" title="public">
+<h2>Should return an array of all the arguments that the constructor takes in.</h2>
+<pre>getConstructorArgs() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>array</code></div>
+</div></div>
+</div>
 </div>
 </div>
 </div>
@@ -138,7 +138,7 @@ var_dump($name->skeleton());
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-09-15T23:23:26+03:00.<br></footer></div>
+            generated on 2016-10-22T11:28:11+03:00.<br></footer></div>
 </div>
 </body>
 </html>

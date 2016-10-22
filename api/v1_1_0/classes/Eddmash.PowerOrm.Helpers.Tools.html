@@ -34,11 +34,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">417</span></a></li>
+                <span class="label label-info">761</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">2</span></a></li>
 </ul>
 </li>
 </ul></div>
@@ -68,8 +68,9 @@
 <li class="method public "><a href="#method_getCountry" title="getCountry() :: Fetches Countries based on the code passed in."><span class="description">Fetches Countries based on the code passed in.</span><pre>getCountry()</pre></a></li>
 <li class="method public "><a href="#method_getCurrency" title="getCurrency() :: Fetches currency based on the code passed in."><span class="description">Fetches currency based on the code passed in.</span><pre>getCurrency()</pre></a></li>
 <li class="method public "><a href="#method_getPhoneCodeCountry" title="getPhoneCodeCountry() :: Fetches the country based on the phone code passed in."><span class="description">Fetches the country based on the phone code passed in.</span><pre>getPhoneCodeCountry()</pre></a></li>
-<li class="method public "><a href="#method_invokeCallback" title="invokeCallback() :: "><span class="description">invokeCallback()
-        </span><pre>invokeCallback()</pre></a></li>
+<li class="method public "><a href="#method_lazyRelatedOperation" title="lazyRelatedOperation() :: Schedule `callback` to be called once `model` and all `related_models` have been imported and registered with
+the app registry."><span class="description">Schedule `callback` to be called once `model` and all `related_models` have been imported and registered with
+the app registry.</span><pre>lazyRelatedOperation()</pre></a></li>
 <li class="method public "><a href="#method_normalizeKey" title="normalizeKey() :: "><span class="description">normalizeKey()
         </span><pre>normalizeKey()</pre></a></li>
 <li class="method public "><a href="#method_phoneCodesList" title="phoneCodesList() :: returns a list of phones codes and there country code."><span class="description">returns a list of phones codes and there country code.</span><pre>phoneCodesList()</pre></a></li>
@@ -179,17 +180,37 @@
 <div class="subelement response"><code>mixed</code></div>
 </div></div>
 </div>
-<a id="method_invokeCallback"></a><div class="element clickable method public method_invokeCallback " data-toggle="collapse" data-target=".method_invokeCallback .collapse" title="public">
-<h2>invokeCallback()
-        </h2>
-<pre>invokeCallback($callback, $model, $kwargs<code> = array()</code>) </pre>
+<a id="method_lazyRelatedOperation"></a><div class="element clickable method public method_lazyRelatedOperation " data-toggle="collapse" data-target=".method_lazyRelatedOperation .collapse" title="public">
+<h2>Schedule `callback` to be called once `model` and all `related_models` have been imported and registered with
+the app registry.</h2>
+<pre>lazyRelatedOperation(callback $callback, \Eddmash\PowerOrm\Model\Model $scopeModel, mixed $relModel, array $kwargs<code> = array()</code>) </pre>
 <div class="labels"><span class="label">Static</span></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
 <h3>Parameters</h3>
-<div class="subelement argument"><h4>$callback</h4></div>
-<div class="subelement argument"><h4>$model</h4></div>
-<div class="subelement argument"><h4>$kwargs</h4></div>
+<div class="subelement argument">
+<h4>$callback</h4>
+<code>callback</code><p>will be called with the newly-loaded model classes as its any optional keyword arguments</p></div>
+<div class="subelement argument">
+<h4>$scopeModel</h4>
+<code>\Eddmash\PowerOrm\Model\Model</code><p>the model on which the method was invoked</p></div>
+<div class="subelement argument">
+<h4>$relModel</h4>
+<code>mixed</code><p>the related models that need to be resolved</p></div>
+<div class="subelement argument">
+<h4>$kwargs</h4>
+<code>array</code>
+</div>
 </div></div>
 </div>
 <a id="method_normalizeKey"></a><div class="element clickable method public method_normalizeKey " data-toggle="collapse" data-target=".method_normalizeKey .collapse" title="public">
@@ -275,7 +296,7 @@ forms of data</p></div>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-09-15T23:23:26+03:00.<br></footer></div>
+            generated on 2016-10-22T11:28:11+03:00.<br></footer></div>
 </div>
 </body>
 </html>

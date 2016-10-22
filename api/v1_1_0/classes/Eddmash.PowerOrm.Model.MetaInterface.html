@@ -34,11 +34,11 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">417</span></a></li>
+                <span class="label label-info">761</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
-                <span class="label label-info">0</span></a></li>
+                <span class="label label-info">2</span></a></li>
 </ul>
 </li>
 </ul></div>
@@ -65,9 +65,13 @@
                     <ul>
 <li class="method public "><a href="#method_addField" title="addField() :: Adds a field into the meta object."><span class="description">Adds a field into the meta object.</span><pre>addField()</pre></a></li>
 <li class="method public "><a href="#method_getConcreteFields" title="getConcreteFields() :: Returns a list of all concrete fields on the model and its parents."><span class="description">Returns a list of all concrete fields on the model and its parents.</span><pre>getConcreteFields()</pre></a></li>
+<li class="method public "><a href="#method_getField" title="getField() :: Returns a field instance given a field name. The field can be either a forward or reverse field,
+unless $manyToMany is specified; if it is, only forward fields will be returned."><span class="description">Returns a field instance given a field name. The field can be either a forward or reverse field,
+unless $manyToMany is specified; if it is, only forward fields will be returned.</span><pre>getField()</pre></a></li>
 <li class="method public "><a href="#method_getFields" title="getFields() :: Returns a list of all forward fields on the model and its parents,excluding ManyToManyFields."><span class="description">Returns a list of all forward fields on the model and its parents,excluding ManyToManyFields.</span><pre>getFields()</pre></a></li>
-<li class="method public "><a href="#method_getRelatedObjects" title="getRelatedObjects() :: "><span class="description">getRelatedObjects()
-        </span><pre>getRelatedObjects()</pre></a></li>
+<li class="method public "><a href="#method_getReverseRelatedObjects" title="getReverseRelatedObjects() :: Returns all related objects pointing to the current model. The related objects can come from a one-to-one,
+one-to-many, or many-to-many field relation type."><span class="description">Returns all related objects pointing to the current model. The related objects can come from a one-to-one,
+one-to-many, or many-to-many field relation type.</span><pre>getReverseRelatedObjects()</pre></a></li>
 </ul>
 </li></ul>
 </div>
@@ -148,6 +152,29 @@
 <div class="subelement response"><code>mixed</code></div>
 </div></div>
 </div>
+<a id="method_getField"></a><div class="element clickable method public method_getField " data-toggle="collapse" data-target=".method_getField .collapse" title="public">
+<h2>Returns a field instance given a field name. The field can be either a forward or reverse field,
+unless $manyToMany is specified; if it is, only forward fields will be returned.</h2>
+<pre>getField($name) : mixed</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>mixed</code></div>
+</div></div>
+</div>
 <a id="method_getFields"></a><div class="element clickable method public method_getFields " data-toggle="collapse" data-target=".method_getFields .collapse" title="public">
 <h2>Returns a list of all forward fields on the model and its parents,excluding ManyToManyFields.</h2>
 <pre>getFields() : mixed</pre>
@@ -168,12 +195,27 @@
 <div class="subelement response"><code>mixed</code></div>
 </div></div>
 </div>
-<a id="method_getRelatedObjects"></a><div class="element clickable method public method_getRelatedObjects " data-toggle="collapse" data-target=".method_getRelatedObjects .collapse" title="public">
-<h2>getRelatedObjects()
-        </h2>
-<pre>getRelatedObjects() </pre>
+<a id="method_getReverseRelatedObjects"></a><div class="element clickable method public method_getReverseRelatedObjects " data-toggle="collapse" data-target=".method_getReverseRelatedObjects .collapse" title="public">
+<h2>Returns all related objects pointing to the current model. The related objects can come from a one-to-one,
+one-to-many, or many-to-many field relation type.</h2>
+<pre>getReverseRelatedObjects() : mixed</pre>
 <div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>As this method is very expensive and is accessed frequently (it looks up every field in a model, in every app),
+it is computed on first access and then is set as a property on every model.</p></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>mixed</code></div>
+</div></div>
 </div>
 </div>
 </div>
@@ -182,7 +224,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-09-15T23:23:26+03:00.<br></footer></div>
+            generated on 2016-10-22T11:28:10+03:00.<br></footer></div>
 </div>
 </body>
 </html>

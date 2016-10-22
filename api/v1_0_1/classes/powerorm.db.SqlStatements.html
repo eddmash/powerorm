@@ -1,0 +1,240 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+<meta charset="utf-8">
+<title>API Documentation » \powerorm\db\SqlStatements</title>
+<meta name="author" content="Mike van Riel">
+<meta name="description" content="">
+<link href="../css/template.css" rel="stylesheet" media="all">
+<script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script><script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script><script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script><script src="../js/bootstrap.js" type="text/javascript"></script><script src="../js/template.js" type="text/javascript"></script><script src="../js/prettify/prettify.min.js" type="text/javascript"></script><link rel="shortcut icon" href="../img/favicon.ico">
+<link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+<div class="navbar-inner"><div class="container">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">API Documentation</a><div class="nav-collapse"><ul class="nav">
+<li class="dropdown">
+<a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                                    API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a>Namespaces</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
+<li><a href="../namespaces/powerorm.html"><i class="icon-th"></i> powerorm</a></li>
+<li><a>Packages</a></li>
+<li><a href="../packages/Default.html"><i class="icon-folder-open"></i> Default</a></li>
+<li><a href="../packages/powerorm.html"><i class="icon-folder-open"></i> powerorm</a></li>
+</ul>
+</li>
+<li class="dropdown" id="charts-menu">
+<a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                                    Charts <b class="caret"></b></a><ul class="dropdown-menu"><li><a href="../graph_class.html"><i class="icon-list-alt"></i> Class hierarchy diagram</a></li></ul>
+</li>
+<li class="dropdown" id="reports-menu">
+<a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                                    Reports <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
+                <span class="label label-info">471</span></a></li>
+<li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
+                <ul></ul></a></li>
+<li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
+                <span class="label label-info">0</span></a></li>
+</ul>
+</li>
+</ul></div>
+</div></div>
+<div class="go_to_top"><a href="#___" style="color: inherit">Back to top  <i class="icon-upload icon-white"></i></a></div>
+</div>
+<div id="___" class="container">
+<noscript><div class="alert alert-warning">
+                            Javascript is disabled; several features are only available
+                            if Javascript is enabled.
+                        </div></noscript>
+<div class="row">
+<div class="span4">
+<div xmlns:php="http://php.net/xsl" class="btn-toolbar">
+<div class="btn-group visibility" data-toggle="buttons-checkbox">
+<button class="btn public active" title="Show public elements">Public</button><button class="btn protected" title="Show protected elements">Protected</button><button class="btn private" title="Show private elements">Private</button><button class="btn inherited active" title="Show inherited elements">Inherited</button>
+</div>
+<div class="btn-group view pull-right" data-toggle="buttons-radio">
+<button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button><button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+</div>
+</div>
+<ul xmlns:php="http://php.net/xsl" class="side-nav nav nav-list"><li class="nav-header">
+<i title="Methods" class="icon-custom icon-method"></i> Methods
+                    <ul>
+<li class="method public "><a href="#method__string_add_column_constraint" title="_string_add_column_constraint() :: "><span class="description">_string_add_column_constraint()
+        </span><pre>_string_add_column_constraint()</pre></a></li>
+<li class="method public "><a href="#method__string_add_field" title="_string_add_field() :: "><span class="description">_string_add_field()
+        </span><pre>_string_add_field()</pre></a></li>
+<li class="method public "><a href="#method__string_add_field_constraint" title="_string_add_field_constraint() :: "><span class="description">_string_add_field_constraint()
+        </span><pre>_string_add_field_constraint()</pre></a></li>
+<li class="method public "><a href="#method__string_alter_add_field" title="_string_alter_add_field() :: "><span class="description">_string_alter_add_field()
+        </span><pre>_string_alter_add_field()</pre></a></li>
+<li class="method public "><a href="#method__string_custom_field_add" title="_string_custom_field_add() :: "><span class="description">_string_custom_field_add()
+        </span><pre>_string_custom_field_add()</pre></a></li>
+<li class="method public "><a href="#method__string_custom_field_modify" title="_string_custom_field_modify() :: "><span class="description">_string_custom_field_modify()
+        </span><pre>_string_custom_field_modify()</pre></a></li>
+<li class="method public "><a href="#method__string_drop_constraint" title="_string_drop_constraint() :: "><span class="description">_string_drop_constraint()
+        </span><pre>_string_drop_constraint()</pre></a></li>
+<li class="method public "><a href="#method__string_drop_field" title="_string_drop_field() :: "><span class="description">_string_drop_field()
+        </span><pre>_string_drop_field()</pre></a></li>
+<li class="method public "><a href="#method__string_modify_field" title="_string_modify_field() :: "><span class="description">_string_modify_field()
+        </span><pre>_string_modify_field()</pre></a></li>
+<li class="method public "><a href="#method_to_db" title="to_db() :: "><span class="description">to_db()
+        </span><pre>to_db()</pre></a></li>
+</ul>
+</li></ul>
+</div>
+<div class="span8">
+<a xmlns:php="http://php.net/xsl" id="\powerorm\db\SqlStatements"></a><ul xmlns:php="http://php.net/xsl" class="breadcrumb">
+<li>
+<a href="../index.html"><i title="Classes" class="icon-custom icon-class"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/powerorm.html">powerorm</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/powerorm.db.html">db</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../classes/powerorm.db.SqlStatements.html">SqlStatements</a>
+</li>
+</ul>
+<div xmlns:php="http://php.net/xsl" class="element class">
+<p class="short_description"></p>
+<div class="details">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>package</th>
+<td><a href="../packages/Default.html">Default</a></td>
+</tr></table>
+<h3>
+<i title="Methods" class="icon-custom icon-method"></i> Methods</h3>
+<a id="method__string_add_column_constraint"></a><div class="element clickable method public method__string_add_column_constraint " data-toggle="collapse" data-target=".method__string_add_column_constraint .collapse" title="public">
+<h2>_string_add_column_constraint()
+        </h2>
+<pre>_string_add_column_constraint($table, $field) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$table</h4></div>
+<div class="subelement argument"><h4>$field</h4></div>
+</div></div>
+</div>
+<a id="method__string_add_field"></a><div class="element clickable method public method__string_add_field " data-toggle="collapse" data-target=".method__string_add_field .collapse" title="public">
+<h2>_string_add_field()
+        </h2>
+<pre>_string_add_field($field) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$field</h4></div>
+</div></div>
+</div>
+<a id="method__string_add_field_constraint"></a><div class="element clickable method public method__string_add_field_constraint " data-toggle="collapse" data-target=".method__string_add_field_constraint .collapse" title="public">
+<h2>_string_add_field_constraint()
+        </h2>
+<pre>_string_add_field_constraint($field) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$field</h4></div>
+</div></div>
+</div>
+<a id="method__string_alter_add_field"></a><div class="element clickable method public method__string_alter_add_field " data-toggle="collapse" data-target=".method__string_alter_add_field .collapse" title="public">
+<h2>_string_alter_add_field()
+        </h2>
+<pre>_string_alter_add_field($table, $field) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$table</h4></div>
+<div class="subelement argument"><h4>$field</h4></div>
+</div></div>
+</div>
+<a id="method__string_custom_field_add"></a><div class="element clickable method public method__string_custom_field_add " data-toggle="collapse" data-target=".method__string_custom_field_add .collapse" title="public">
+<h2>_string_custom_field_add()
+        </h2>
+<pre>_string_custom_field_add($table, $field) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$table</h4></div>
+<div class="subelement argument"><h4>$field</h4></div>
+</div></div>
+</div>
+<a id="method__string_custom_field_modify"></a><div class="element clickable method public method__string_custom_field_modify " data-toggle="collapse" data-target=".method__string_custom_field_modify .collapse" title="public">
+<h2>_string_custom_field_modify()
+        </h2>
+<pre>_string_custom_field_modify($table, $field) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$table</h4></div>
+<div class="subelement argument"><h4>$field</h4></div>
+</div></div>
+</div>
+<a id="method__string_drop_constraint"></a><div class="element clickable method public method__string_drop_constraint " data-toggle="collapse" data-target=".method__string_drop_constraint .collapse" title="public">
+<h2>_string_drop_constraint()
+        </h2>
+<pre>_string_drop_constraint($table, $field) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$table</h4></div>
+<div class="subelement argument"><h4>$field</h4></div>
+</div></div>
+</div>
+<a id="method__string_drop_field"></a><div class="element clickable method public method__string_drop_field " data-toggle="collapse" data-target=".method__string_drop_field .collapse" title="public">
+<h2>_string_drop_field()
+        </h2>
+<pre>_string_drop_field($table, $field) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$table</h4></div>
+<div class="subelement argument"><h4>$field</h4></div>
+</div></div>
+</div>
+<a id="method__string_modify_field"></a><div class="element clickable method public method__string_modify_field " data-toggle="collapse" data-target=".method__string_modify_field .collapse" title="public">
+<h2>_string_modify_field()
+        </h2>
+<pre>_string_modify_field($table, $field_options) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$table</h4></div>
+<div class="subelement argument"><h4>$field_options</h4></div>
+</div></div>
+</div>
+<a id="method_to_db"></a><div class="element clickable method public method_to_db " data-toggle="collapse" data-target=".method_to_db .collapse" title="public">
+<h2>to_db()
+        </h2>
+<pre>to_db($field) </pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$field</h4></div>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="row"><footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
+            generated on 2016-10-11T09:12:07+03:00.<br></footer></div>
+</div>
+</body>
+</html>
