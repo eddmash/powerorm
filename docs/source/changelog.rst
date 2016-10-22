@@ -3,11 +3,11 @@ Change Log
 ##########
 
 Version 1.1.0-Pre-Alpha
-=================================
 
 .. contents::
     :local:
     :depth: 4
+=============================
 
 **Rewrite of the PowerOrm**
 
@@ -24,7 +24,7 @@ Additions
         This is in charge of managing all the command line related tasks for the orm, 
         no need for users to create a migration controller to be able to work with 
         the orm anymore
-        
+
     - Doctrine Dbal
     
         Uses Doctrine Dbal to interact with the database.
@@ -48,7 +48,7 @@ Additions
         - Migrations is able to support :
         
             - Alter/Remove/Add Operations relating to models.
-         
+
     - Forms class
         
         - You can deal with forms in two ways :
@@ -125,7 +125,7 @@ Rewrites
 
     - The whole console module
         
-         - This removes the need for user to create a migration controller to be able 
+         - This removes the need for user to create a migration controller to be able
            to use the orm just copy the `pmanger.php` file located at ORM_PATH/pmanager.php
            to the same directory as `index.php`
          
