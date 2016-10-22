@@ -1,4 +1,5 @@
 preset: symfony
 
 disabled:
-  - braces
+  - braces 
+  - method_separation
