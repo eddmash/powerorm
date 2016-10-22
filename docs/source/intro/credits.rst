@@ -11,5 +11,6 @@ The following frameworks assisted me greatly in creating this project :
 - CakePHP framework
 - Laravel framework
 - Symfony2 framework
+- Codeigniter 3/4 framework
 
 
