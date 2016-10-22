@@ -470,7 +470,6 @@ class AutoDetector extends Object
 
             /** @var $localM2MField RelatedField */
             foreach ($meta->localManyToMany as $localM2MField) :
-
                 if ($localM2MField->relation->toModel != null):
                     $relatedFields[$localM2MField->name] = $localM2MField;
                 endif;
@@ -616,7 +615,6 @@ class AutoDetector extends Object
 
             /** @var $localM2MField Field */
             foreach ($localM2MFields as $localM2MField) :
-
                 if ($localField->relation != null && $localField->relation->toModel != null):
                     $relatedFields[$localM2MField->name] = $localM2MField;
                 endif;
