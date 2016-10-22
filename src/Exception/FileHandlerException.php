@@ -2,8 +2,7 @@
 /**
  * Created by http://eddmash.com
  * User: eddmash
- * Date: 7/31/16
- * Time: 9:19 AM.
+ * Date: 7/31/16.
  */
 namespace Eddmash\PowerOrm\Exception;
 

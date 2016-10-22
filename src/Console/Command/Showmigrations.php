@@ -27,12 +27,12 @@ class Showmigrations extends BaseCommand
         $leaves = $loader->graph->getLeafNodes();
 
         foreach ($leaves as $leaf) :
-            $list = $loader->graph->before_lineage($leaf);
+            $list = $loader->graph->getAncestryTree($leaf);
 
             foreach ($list as $item) :
                 $migrationName = array_pop(explode('\\', $item));
 
-                if (in_array($item, $loader->applied_migrations)):
+                if (in_array($item, $loader->appliedMigrations)):
                     $indicator = $this->ansiFormat('(applied)', Console::FG_GREEN);
                 else:
                     $indicator = '(pending)';

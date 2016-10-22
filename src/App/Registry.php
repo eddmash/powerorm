@@ -14,6 +14,8 @@ namespace Eddmash\PowerOrm\App;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\LookupError;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Object;
@@ -111,19 +113,21 @@ class Registry extends Object
 
         $modelClasses = $this->getModelClasses();
 
+        /* @var $className Model */
+
         if (!empty($modelClasses)) :
-            foreach ($modelClasses as $modelName) :
-                $reflect = new \ReflectionClass(ucfirst($modelName));
+            foreach ($modelClasses as $className) :
+                $reflect = new \ReflectionClass($className);
 
                 // if we cannot create an instance of a class just skip, e.g traits abstrat etc
                 if (!$reflect->isInstantiable()) :
                     continue;
                 endif;
 
-                if ($this->hasModel($this->normalizeKey($modelName))):
+                if ($this->hasModel($className)):
                     continue;
                 endif;
-                new $modelName();
+                new $className();
             endforeach;
         endif;
     }
@@ -152,7 +156,7 @@ class Registry extends Object
 
     public function hasModel($name)
     {
-        return array_key_exists($name, $this->allModels);
+        return ArrayHelper::hasKey($this->allModels, $name);
     }
 
     /**
@@ -170,29 +174,18 @@ class Registry extends Object
             return false;
         }
 
-        foreach ($this->getModelFiles() as $file) {
-            $models[] = $this->getModelName($file);
-        }
+        $namespace = BaseOrm::getModelsNamespace();
+        foreach ($this->getModelFiles() as $file) :
+            $models[] = ClassHelper::getClassNameFromFile($file, BaseOrm::getModelsPath(), $namespace);
+        endforeach;
 
         return $models;
     }
 
-    /**
-     * Gets a model name from its model file name.
-     *
-     * @param $file
-     *
-     * @return string
-     */
-    public function getModelName($file)
-    {
-        return strtolower(trim(basename($file, '.php')));
-    }
-
     public function registerModel(Model $model)
     {
-        $name = $model->meta->modelName;
-        if (!array_key_exists($name, $this->allModels)) {
+        $name = ClassHelper::getNameFromNs($model->meta->modelName, BaseOrm::getModelsNamespace());
+        if (!ArrayHelper::hasKey($this->allModels, $name)) {
             $this->allModels[$name] = $model;
         }
         $this->resolvePendingOps($model);
@@ -210,7 +203,6 @@ class Registry extends Object
      */
     public function lazyModelOps($callback, $modelNames, $kwargs)
     {
-
         // get the first
         $modelName = $modelNames[0];
 
@@ -221,7 +213,7 @@ class Registry extends Object
 
         try {
             $model = $this->getModel($modelName);
-            $kwargs['related'] = $model;
+            $kwargs['relatedModel'] = $model;
             $callback($kwargs);
         } catch (LookupError $err) {
             $this->_pendingOps[$modelName][] = [$callback, $kwargs];
@@ -241,7 +233,7 @@ class Registry extends Object
             $todoActions = $this->_pendingOps[$model->meta->modelName];
             foreach ($todoActions as $todoAction) {
                 list($callback, $kwargs) = $todoAction;
-                $kwargs['related'] = $model;
+                $kwargs['relatedModel'] = $model;
                 $callback($kwargs);
             }
         }
@@ -249,6 +241,6 @@ class Registry extends Object
 
     public function __toString()
     {
-        return sprintf('%s Object', $this->getFullClassName());
+        return (string) sprintf('%s Object', $this->getFullClassName());
     }
 }

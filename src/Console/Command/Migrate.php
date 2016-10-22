@@ -48,22 +48,22 @@ class Migrate extends BaseCommand
         $connection = BaseOrm::getDbConnection();
         $registry = BaseOrm::getRegistry();
 
-        $executor = new Executor($connection);
+        $executor = Executor::createObject($connection);
 
         // target migrations to act on
         if (!empty($name)):
             if ($name == 'zero'):
                 //todo confirm the migration exists
-                $target = [$name];
+                $targets = [$name];
             else:
-                $target = $executor->loader->getMigrationByPrefix($name);
+                $targets = $executor->loader->getMigrationByPrefix($name);
             endif;
         else:
-            $target = $executor->loader->graph->getLeafNodes();
+            $targets = $executor->loader->graph->getLeafNodes();
         endif;
 
         // get migration plan
-        $plan = $executor->getMigrationPlan($target);
+        $plan = $executor->getMigrationPlan($targets);
 
         $this->dispatchSignal('powerorm.migration.pre_migrate', $this);
 
@@ -72,9 +72,8 @@ class Migrate extends BaseCommand
         if (empty($plan)):
             $this->normal('  No migrations to apply.', true);
 
-            //detect if a makemigrations is required
-            $auto_detector = new AutoDetector($executor->loader->createProjectState(),
-                ProjectState::fromApps($registry));
+            //detect if we need to make migrations
+            $auto_detector = new AutoDetector($executor->loader->getProjectState(), ProjectState::fromApps($registry));
 
             $changes = $auto_detector->getChanges($executor->loader->graph);
 
@@ -83,14 +82,13 @@ class Migrate extends BaseCommand
                 $this->warning('  Your models have changes that are not yet reflected '.
                     "in a migration, and so won't be applied.", true);
 
-                $this->warning("  Run 'manage.py makemigrations' to make new ".
-                    "migrations, and then re-run 'manage.py migrate' to apply them.", true);
+                $this->warning("  Run 'php pmanager.php makemigrations' to make new ".
+                    "migrations, and then re-run 'php pmanager.php migrate' to apply them.", true);
 
             endif;
         else:
-
             // migrate
-            $executor->migrate($target, $plan, $fake);
+            $executor->migrate($targets, $plan, $fake);
 
         endif;
 

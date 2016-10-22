@@ -139,13 +139,16 @@ class Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getParents()
+    public function getParents($stopAt = [])
     {
         $reflectionClass = new \ReflectionObject($this);
 
         $parents = [];
         while ($reflectionClass->getParentClass()):
             $reflectionClass = $reflectionClass->getParentClass();
+            if (in_array($reflectionClass->getName(), $stopAt)):
+                break;
+            endif;
             $parents[$reflectionClass->getName()] = $reflectionClass;
         endwhile;
 
@@ -155,7 +158,7 @@ class Object
     /**
      * Create an instance of the current class.override this method to match with the class constructor.
      *
-     * @param array $config (optional) the configs to pass to the classes constructor
+     * @param array $config (optional) The configs to pass to the classes constructor
      *
      * @return static
      *
@@ -170,4 +173,8 @@ class Object
         throw new NotImplemented('method not implemented');
     }
 
+    public function __toString()
+    {
+        return sprintf('%s Object', get_class($this));
+    }
 }

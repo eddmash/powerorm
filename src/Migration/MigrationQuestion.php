@@ -1,8 +1,7 @@
 <?php
 /**
  * Created by eddmash <http://eddmash.com>
- * Date: 9/30/16
- * Time: 10:54 AM.
+ * Date: 9/30/16.
  */
 namespace Eddmash\PowerOrm\Migration;
 

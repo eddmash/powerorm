@@ -2,14 +2,16 @@
 
 namespace Eddmash\PowerOrm\Model;
 
-use Eddmash\PowerOrm\app\Registry;
+use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
-use Eddmash\PowerOrm\Model\field\AutoField;
-use Eddmash\PowerOrm\Model\field\Field;
-use Eddmash\PowerOrm\Model\Field\Related\RelatedField;
+use Eddmash\PowerOrm\Model\Field\AutoField;
+use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Object;
 
 /**
@@ -73,11 +75,11 @@ class Meta extends DeconstructableObject implements MetaInterface
     public $primaryKey;
 
     /**
-     * Holds the parents of the model, this is mostly for multi-inheritance.
+     * Holds the parent of the model, this is mostly for multi-inheritance.
      *
      * @var array
      */
-    public $parents = [];
+    public $parents;
 
     /**
      * Holds many to many relationship that the model initiated.
@@ -122,7 +124,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     public $uniqueTogether = [];
 
     /**
-     * This will hold items that will be overriden in the current meta instance.
+     * This will hold items that will be overridden in the current meta instance.
      *
      * @var array
      */
@@ -137,7 +139,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     /**
      * This attribute will only be set if the scopeModel contains a parent model
-     * that is not abstact/PModel/Eddmash\PowerOrm\Model.
+     * that is not abstract e.g PModel or Eddmash\PowerOrm\Model.
      *
      * @var
      */
@@ -173,13 +175,26 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a field instance given a field name. The field can be either a forward or reverse field,
+     * unless $manyToMany is specified; if it is, only forward fields will be returned.
+     *
+     * @param $name
+     *
+     * @since 1.1.0
+     *
+     * @return Field
+     *
+     * @throws FieldDoesNotExist
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getField($name)
     {
         // first look in the forward fields only
         $fields = $this->_getForwardOnlyField();
-        if (array_key_exists($name, $fields)):
+
+        if (ArrayHelper::hasKey($fields, $name)):
+
             return $fields[$name];
         endif;
 
@@ -190,7 +205,9 @@ class Meta extends DeconstructableObject implements MetaInterface
                     "related field, it won't  be available yet.", $this->modelName, $name));
         endif;
         $reverseFields = $this->_getReverseOnlyField();
-        if (array_key_exists($name, $reverseFields)):
+
+        if (ArrayHelper::hasKey($reverseFields, $name)):
+
             return $reverseFields[$name];
         endif;
 
@@ -235,7 +252,9 @@ class Meta extends DeconstructableObject implements MetaInterface
                 foreach ($fields as $field) :
 
                     if ($field->isRelation && $field->getRelatedModel() !== null):
-                        $allRelations[$field->remoteField->model->meta->modelName][$field->name] = $field;
+
+                        $allRelations[$field->relation->toModel->meta->modelName][$field->name] = $field;
+
                     endif;
                 endforeach;
 
@@ -253,18 +272,27 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Add the current object to the passed in object.
+     *
+     * @param string $propertyName the name map the current object to, in the class object passed in
+     * @param Model  $classObject  the object to attach the current object to
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function contributeToClass($propertyName, $classObject)
     {
         $classObject->{$propertyName} = $this;
-        $this->modelName = $classObject->getShortClassName();
+
+        $this->modelName = $this->getName($classObject->getFullClassName());
+
         $this->scopeModel = $classObject;
 
         // override with the configs now.
         foreach (static::$DEFAULT_NAMES as $defaultName) :
 
-            if (array_key_exists($defaultName, $this->overrides)):
+            if (ArrayHelper::hasKey($this->overrides, $defaultName)):
 
                 $this->{$defaultName} = $this->overrides[$defaultName];
             endif;
@@ -337,11 +365,12 @@ class Meta extends DeconstructableObject implements MetaInterface
     public function prepare($model)
     {
         if (empty($this->primaryKey)):
-            if (empty($this->parents)):
-
-                // todo $this->setupPrimaryKey($field);
+            if (!empty($this->parents)):
+                $field = current(array_values($this->parents));
+                $field->primaryKey = true;
+                $this->setupPrimaryKey($field);
             else:
-                $field = new AutoField(['verboseName' => 'ID', 'primaryKey' => true, 'autoCreated' => true]);
+                $field = AutoField::createObject(['verboseName' => 'ID', 'primaryKey' => true, 'autoCreated' => true]);
                 $model->addToClass('id', $field);
             endif;
         endif;
@@ -370,6 +399,16 @@ class Meta extends DeconstructableObject implements MetaInterface
         return $this->overrides;
     }
 
+    public function getName($name)
+    {
+        return ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace());
+    }
+
+    public function canMigrate()
+    {
+        return $this->managed && !$this->proxy;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -380,7 +419,8 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     private function _getTableName()
     {
-        return $this->modelName;
+        return sprintf('%s%s', BaseOrm::getDbPrefix(), str_replace('\\', '_', $this->normalizeKey($this->modelName)));
+
     }
 
     public function __debugInfo()

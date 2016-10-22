@@ -16,12 +16,79 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\Console\Manager;
+use Eddmash\PowerOrm\Exception\OrmException;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
 
 define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
 
+/**
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class BaseOrm extends Object
 {
-    private static $instance;
+    /**
+     * The configurations to use to connect to the database.
+     *
+     * It should be an array which must contain at least one of the following.
+     *
+     * Either 'driver' with one of the following values:
+     *
+     *     pdo_mysql
+     *     pdo_sqlite
+     *     pdo_pgsql
+     *     pdo_oci (unstable)
+     *     pdo_sqlsrv
+     *     pdo_sqlsrv
+     *     mysqli
+     *     sqlanywhere
+     *     sqlsrv
+     *     ibm_db2 (unstable)
+     *     drizzle_pdo_mysql
+     *
+     * OR 'driverClass' that contains the full class name (with namespace) of the
+     * driver class to instantiate.
+     *
+     * Other (optional) parameters:
+     *
+     * <b>user (string)</b>:
+     * The username to use when connecting.
+     *
+     * <b>password (string)</b>:
+     * The password to use when connecting.
+     *
+     * <b>driverOptions (array)</b>:
+     * Any additional driver-specific options for the driver. These are just passed
+     * through to the driver.
+     *
+     * <b>pdo</b>:
+     * You can pass an existing PDO instance through this parameter. The PDO
+     * instance will be wrapped in a Doctrine\DBAL\Connection.
+     *
+     * <b>wrapperClass</b>:
+     * You may specify a custom wrapper class through the 'wrapperClass'
+     * parameter but this class MUST inherit from Doctrine\DBAL\Connection.
+     *
+     * <b>driverClass</b>:
+     * The driver class to use.
+     *
+     * <strong>USAGE:</strong>
+     *
+     * [
+     *       'dbname' => 'tester',
+     *       'user' => 'root',
+     *       'password' => 'root1.',
+     *       'host' => 'localhost',
+     *       'driver' => 'pdo_mysql',
+     * ]
+     *
+     * @var array
+     */
+    private $databaseConfigs;
+
+    public static $instance;
     public static $SET_NULL = 'set_null';
     public static $CASCADE = 'cascade';
     public static $PROTECT = 'protect';
@@ -30,16 +97,49 @@ class BaseOrm extends Object
     /**
      * @var Registry
      */
-    public $registryCache;
+    private $registryCache;
 
+    /**
+     * path from where to get and put migration files.
+     *
+     * @var string
+     */
     public $migrationPath;
 
+    /**
+     * Path from where to get the models.
+     *
+     * @var string
+     */
     public $modelsPath;
+
+    /**
+     * The value to prefix the database tables with.
+     *
+     * @var string
+     */
+    public $dbPrefix;
+
+    /**
+     * The namespace to check for the application models and migrations.
+     *
+     * @var string
+     */
+    public $appNamespace = 'app\\';
+
+    /**
+     * Namespace used in migration.
+     *
+     * @internal
+     *
+     * @var string
+     */
+    public static $fakeNamespace = 'Eddmash\PowerOrm\__Fake';
 
     /**
      * @var Connection
      */
-    private static $connection;
+    public static $connection;
 
     /**
      * @param array $config
@@ -51,16 +151,24 @@ class BaseOrm extends Object
 
         // setup the registry
         $this->registryCache = Registry::createObject();
+
+        if (empty($this->migrationPath)):
+            $this->migrationPath = sprintf('%smigrations%s', APPPATH, DIRECTORY_SEPARATOR);
+        endif;
+        if (empty($this->modelsPath)):
+            $this->modelsPath = sprintf('%smodels%s', APPPATH, DIRECTORY_SEPARATOR);
+        endif;
+        self::getDatabaseConnection();
     }
 
     public static function getModelsPath()
     {
-        return APPPATH.'models/';
+        return self::getInstance()->modelsPath;
     }
 
     public static function getMigrationsPath()
     {
-        return APPPATH.'migrations/';
+        return self::getInstance()->migrationPath;
     }
 
     //********************************** ORM Registry*********************************
@@ -77,6 +185,15 @@ class BaseOrm extends Object
         endif;
     }
 
+    /**
+     * @deprecated
+     *
+     * @return string
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function version()
     {
         return $this->getVersion();
@@ -108,19 +225,20 @@ class BaseOrm extends Object
      *
      * @return BaseOrm
      */
-    public static function &getInstance()
+    public static function &getInstance($config = null)
     {
         $instance = null;
+
         if (ENVIRONMENT == 'POWERORM_DEV'):
-            $instance = static::_standAloneEnvironment();
+            $instance = static::_standAloneEnvironment($config);
         else:
-            $instance = static::_ciEnvironment();
+            $instance = static::getOrmFromContext();
         endif;
 
         return $instance;
     }
 
-    public static function _ciEnvironment()
+    public static function getOrmFromContext()
     {
         $ci = static::getCiObject();
         $orm = &$ci->orm;
@@ -128,13 +246,9 @@ class BaseOrm extends Object
         return $orm;
     }
 
-    public static function _standAloneEnvironment()
+    public static function _standAloneEnvironment($config)
     {
-        if (static::$instance == null):
-            static::$instance = self::createObject();
-        endif;
-
-        return self::$instance;
+        return static::createObject($config);
     }
 
     /**
@@ -146,24 +260,52 @@ class BaseOrm extends Object
      */
     public static function &getCiObject()
     {
-        return get_instance();
+        return \get_instance();
     }
 
+    /**
+     * @return Connection
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public static function getDbConnection()
     {
+        return self::getInstance()->getDatabaseConnection();
+    }
 
+    /**
+     * Returns the prefix to use on database tables.
+     *
+     * @return string
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function getDbPrefix()
+    {
+        return self::getInstance()->dbPrefix;
+    }
+
+    /**
+     * @return Connection
+     *
+     * @throws OrmException
+     * @throws \Doctrine\DBAL\DBALException
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getDatabaseConnection()
+    {
+        if (empty($this->databaseConfigs)):
+            throw new OrmException('The database configuration have no been provided');
+        endif;
         if (static::$connection == null):
             $config = new Configuration();
 
-            $connectionParams = array(
-                'dbname' => 'tester',
-                'user' => 'root',
-                'password' => 'root1.',
-                'host' => 'localhost',
-                'driver' => 'pdo_mysql',
-            );
-
-            static::$connection = DriverManager::getConnection($connectionParams, $config);
+            static::$connection = DriverManager::getConnection($this->databaseConfigs, $config);
         endif;
 
         return static::$connection;
@@ -181,8 +323,13 @@ class BaseOrm extends Object
      */
     public static function configure($object, $properties, $map = [])
     {
+        if (empty($properties)):
+            return $object;
+        endif;
+
         foreach ($properties as $name => $value) :
-            if (array_key_exists($name, $map)):
+
+            if (ArrayHelper::hasKey($map, $name)):
                 $name = $map[$name];
             endif;
 
@@ -197,13 +344,48 @@ class BaseOrm extends Object
 
     public static function createObject($config = [])
     {
+        if (static::$instance == null):
 
-        return new static($config);
+            if (ENVIRONMENT == 'POWERORM_DEV'):
+                require POWERORM_BASEPATH.DIRECTORY_SEPARATOR.'config.php';
+            endif;
+
+            static::$instance = new static($config);
+        endif;
+
+        return static::$instance;
     }
 
-    public static function consoleRun($config = [])
+    public static function consoleRunner($config = [])
     {
-        static::createObject($config);
         Manager::run();
+    }
+
+    /**
+     * The fake namespace to use in migration.
+     *
+     * @return string
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function getFakeNamespace()
+    {
+        return self::$fakeNamespace;
+    }
+
+    public static function getModelsNamespace()
+    {
+        $namespace = ClassHelper::getFormatNamespace(self::getInstance()->appNamespace, true);
+
+        return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'models'), true, false);
+    }
+
+    public static function getMigrationsNamespace()
+    {
+        $namespace = ClassHelper::getFormatNamespace(self::getInstance()->appNamespace, true);
+
+        return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'migrations'), true, false);
     }
 }

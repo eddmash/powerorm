@@ -40,7 +40,7 @@ class AddField extends Operation
     /**
      * @var bool
      */
-    public $preserveDefault;
+    public $preserveDefault = false;
 
     /**
      * {@inheritdoc}
@@ -55,14 +55,49 @@ class AddField extends Operation
      */
     public function updateState($state)
     {
-        if (!$this->preserveDefault):
+        // remove default if preserveDefault==false, we dont want it in future updates.
+        if (false === $this->preserveDefault):
             $field = $this->field->deepClone();
             $field->default = NOT_PROVIDED;
         else:
             $field = $this->field;
         endif;
-
         $state->modelStates[$this->modelName]->fields[$this->name] = $field;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function databaseForwards($schemaEditor, $fromState, $toState)
+    {
+        $toModel = $toState->getRegistry()->getModel($this->modelName);
+
+        /* @var $field Field */
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+            $fromModel = $fromState->getRegistry()->getModel($this->modelName);
+            $field = $toModel->meta->getField($this->name);
+            if (false === $this->preserveDefault):
+                $field->default = $this->field->default;
+            endif;
+
+            $schemaEditor->addField($fromModel, $field);
+
+            if (false === $this->preserveDefault):
+                $field->default = NOT_PROVIDED;
+            endif;
+        endif;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    {
+        $fromModel = $fromState->getRegistry()->getModel($this->modelName);
+        if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
+            $schemaEditor->removeField($fromModel, $fromModel->meta->getField($this->name));
+        endif;
+
     }
 
     /**

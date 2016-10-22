@@ -11,9 +11,13 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation;
 
+use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
+use Eddmash\PowerOrm\Model\Model;
 
 abstract class Operation extends DeconstructableObject implements OperationInterface
 {
@@ -81,4 +85,72 @@ abstract class Operation extends DeconstructableObject implements OperationInter
             'constructorArgs' => $this->getConstructorArgs(),
         ];
     }
+
+    /**
+     * Migration use this method to contribute to the current state of the project.
+     *
+     * @param ProjectState $state
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function updateState($state)
+    {
+        // TODO: Implement updateState() method.
+    }
+
+    /**
+     * @param SchemaEditor $schemaEditor
+     * @param ProjectState $fromState
+     * @param ProjectState $toState
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function databaseForwards($schemaEditor, $fromState, $toState)
+    {
+        // TODO: Implement databaseForwards() method.
+    }
+
+    /**
+     * @param SchemaEditor $schemaEditor
+     * @param ProjectState $fromState
+     * @param ProjectState $toState
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    {
+        // TODO: Implement databaseBackwards() method.
+    }
+
+    /**
+     * Returns if we're allowed to migrate the model.
+     *
+     * it preemptively rejects any proxy, unmanaged model.
+     *
+     * @param Connection $connection
+     * @param Model      $model
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function allowMigrateModel($connection, $model)
+    {
+        return $model->meta->canMigrate();
+    }
+
 }

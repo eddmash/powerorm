@@ -156,7 +156,7 @@ class Base extends Object
         if ($newline):
             $message = $message.PHP_EOL;
         endif;
-        $this->stdout(' '.$message, Console::FG_BLUE);
+        $this->stdout(' '.$message, Console::FG_CYAN);
     }
 
     public function error($message, $newline = false)

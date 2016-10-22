@@ -33,6 +33,28 @@ class StringsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @dataProvider providerEmptyStrings
+     *
+     * @param $original
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function testStringIsEmpty($original)
+    {
+        $this->assertTrue(StringHelper::isEmpty($original));
+    }
+
+    public function providerEmptyStrings()
+    {
+        return [
+            [''],
+            [null],
+        ];
+    }
+
     public function providerCamelToUnderscore()
     {
         return [

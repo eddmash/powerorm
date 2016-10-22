@@ -80,6 +80,7 @@ class Makemigrations extends BaseCommand
             $migrationFile = MigrationFile::createObject($migration);
 
             $fileName = $migrationFile->getFileName();
+
             $this->normal('  '.$fileName, true);
 
             $operations = $migration->getOperations();

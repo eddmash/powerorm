@@ -11,9 +11,18 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
+use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
 use Eddmash\PowerOrm\Model\Field\Field;
 
+/**
+ * Alters a field's database column (e.g. null, max_length) to the provided new field.
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class AlterField extends Operation
 {
     /**
@@ -29,7 +38,7 @@ class AlterField extends Operation
     /**
      * @var bool
      */
-    public $preserveDefault;
+    public $preserveDefault = false;
 
     /**
      * @var Field
@@ -49,7 +58,7 @@ class AlterField extends Operation
      */
     public function updateState($state)
     {
-        if (false == $this->preserveDefault):
+        if (false === $this->preserveDefault):
             $field = $this->field->deepClone();
             $field->default = NOT_PROVIDED;
         else:
@@ -66,6 +75,52 @@ class AlterField extends Operation
             endif;
         endforeach;
         $state->modelStates[$this->modelName]->fields = $newFields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function databaseForwards($schemaEditor, $fromState, $toState)
+    {
+
+        $this->_alterField($schemaEditor, $fromState, $toState);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    {
+        $this->_alterField($schemaEditor, $fromState, $toState);
+    }
+
+    /**
+     * Does the actual field alteration.
+     *
+     * @param SchemaEditor $schemaEditor
+     * @param ProjectState $fromState
+     * @param ProjectState $toState
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function _alterField($schemaEditor, $fromState, $toState)
+    {
+        $toModel = $toState->getRegistry()->getModel($this->modelName);
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+            $fromModel = $fromState->getRegistry()->getModel($this->modelName);
+            $fromField = $fromModel->meta->getField($this->name);
+            $toField = $toModel->meta->getField($this->name);
+            if (false === $this->preserveDefault):
+                $toField->default = $this->field->default;
+            endif;
+            $schemaEditor->alterField($fromModel, $fromField, $toField);
+
+            if (false === $this->preserveDefault):
+                $toField->default = NOT_PROVIDED;
+            endif;
+        endif;
     }
 
 }

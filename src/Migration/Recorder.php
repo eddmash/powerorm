@@ -11,74 +11,90 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Exception\NotImplemented;
+
 class Recorder
 {
-    public $connection;
-    public $migration_table_name = 'orm_migrations';
+    /**
+     * @var Connection
+     */
+    private $connection;
+//    private $schema;
+//    private $schemaManager;
+    private $tableExist;
+    private $migrationTableName = 'orm_migrations';
 
+    /**
+     * Recorder constructor.
+     *
+     * @param Connection $connection
+     */
     public function __construct($connection)
     {
         $this->connection = $connection;
+        $this->createTable();
+    }
 
+    /**
+     * @param array $config
+     *
+     * @return Recorder
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function createObject($connection)
+    {
+        return new static($connection);
     }
 
     public function getApplied()
     {
-        $this->create_table();
-        $applied_migrations = $this->connection->get($this->migration_table_name)->result();
 
+        $appliedMigrations = $this->connection->fetchAll(sprintf('SELECT * FROM %s', $this->migrationTableName));
         $applied = [];
-        foreach ($applied_migrations as $item) :
-            $applied[] = $item->name;
+        foreach ($appliedMigrations as $item) :
+            $applied[] = $item['name'];
         endforeach;
 
         return $applied;
     }
 
-    public function record_applied($data)
+    public function recordApplied($data)
     {
-        $this->create_table();
-
-        $this->connection->insert($this->migration_table_name, $data);
+        $this->connection->insert($this->migrationTableName, $data);
 
     }
 
-    public function record_unapplied($data)
+    public function recordUnApplied($data)
     {
-        $this->create_table();
 
-        $this->connection->delete($this->migration_table_name, $data);
+        $this->connection->delete($this->migrationTableName, $data);
     }
 
     public function flush()
     {
-        $this->createTable();
-        $this->connection->emptyTable($this->migration_table_name);
+        throw new NotImplemented();
     }
 
     public function createTable()
     {
-        if ($this->connection->tableExists($this->migration_table_name)):
+        if ($this->tableExist):
             return;
         endif;
+        $schemaM = $this->connection->getSchemaManager();
+        $schema = $schemaM->createSchema();
+        if (!$schemaM->tablesExist($this->migrationTableName)):
 
-        $fields = array(
-            'id' => array(
-                'type' => 'INT',
-                'constraint' => 5,
-                'unsigned' => true,
-                'auto_increment' => true,
-            ),
-            'name' => array(
-                'type' => 'TEXT',
-            ),
-        );
-
-        $this->connection->add_field($fields);
-        $this->connection->add_key('id', true);
-        if (!$this->connection->create_table($this->migration_table_name, true)) {
-            $this->error('Migration Table could not created, ensure you database is setup correctly');
-        }
+            $myTable = $schema->createTable($this->migrationTableName);
+            $myTable->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
+            $myTable->addColumn('name', 'string', ['length' => 60]);
+            $myTable->setPrimaryKey(['id']);
+            $schemaM->createTable($myTable);
+            $this->tableExist = true;
+        endif;
 
     }
 }

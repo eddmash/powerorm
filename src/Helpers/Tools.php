@@ -250,19 +250,33 @@ class Tools
      * Schedule `callback` to be called once `model` and all `related_models` have been imported and registered with
      * the app registry.
      *
-     * @param callback $callback will be called with the newly-loaded model classes as its any optional keyword arguments
-     * @param Model    $model
-     * @param $relModel
-     * @param array $kwargs
+     * @param callback $callback   will be called with the newly-loaded model classes as its any optional keyword arguments
+     * @param Model    $scopeModel the model on which the method was invoked
+     * @param mixed    $relModel   the related models that need to be resolved
+     * @param array    $kwargs
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function lazyRelatedOperation($callback, $model, $relModel, $kwargs = [])
+    public static function lazyRelatedOperation($callback, $scopeModel, $relModel, $kwargs = [])
     {
-        $relModel = (is_array($relModel)) ? $relModel : [$relModel];
 
-        return $model->meta->registry->lazyModelOps($callback, $relModel, $kwargs);
+        $relModels = (is_array($relModel)) ? $relModel : [$relModel];
+
+        $relatedModels = [];
+        foreach ($relModels as $relM) :
+            if (is_string($relM)):
+
+                $relatedModels[] = $relM;
+
+            elseif ($relM instanceof Model):
+                $relatedModels[] = $relM->meta->modelName;
+            endif;
+        endforeach;
+
+        $kwargs['scopeModel'] = $scopeModel;
+        $scopeModel->meta->registry->lazyModelOps($callback, $relatedModels, $kwargs);
     }
+
 }

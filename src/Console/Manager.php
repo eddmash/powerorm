@@ -3,7 +3,6 @@
 namespace Eddmash\PowerOrm\Console;
 
 use Eddmash\PowerOrm\Console\Command\BaseCommand;
-use Eddmash\PowerOrm\Console\Command\Command;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Helpers\Tools;
 
@@ -173,9 +172,10 @@ class Manager extends Base
         endif;
 
         // commands are in the commands namespace
-        $name = 'Eddmash\PowerOrm\Console\Command\\'.$name;
+        /** @var $className BaseCommand */
+        $className = 'Eddmash\PowerOrm\Console\Command\\'.$name;
 
-        return new $name();
+        return new $className();
     }
 
     public static function run()

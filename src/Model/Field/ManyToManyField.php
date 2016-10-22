@@ -9,7 +9,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Eddmash\PowerOrm\Model\Field\Related;
+namespace Eddmash\PowerOrm\Model\Field;
 
 class ManyToManyField extends RelatedField
 {

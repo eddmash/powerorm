@@ -1,11 +1,11 @@
 <?php
 /**
  * Created by eddmash <http://eddmash.com>
- * Date: 9/29/16
- * Time: 2:08 PM.
+ * Date: 9/29/16.
  */
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ModelState;
 
@@ -32,7 +32,8 @@ class AlterModelMeta extends Operation
         $meta = array_replace($meta, $this->meta);
 
         foreach (self::$alterableOptions as $alterableOption) :
-            if (!array_key_exists($alterableOption, $this->meta) && array_key_exists($alterableOption, $meta)):
+            if (!ArrayHelper::hasKey($this->meta, $alterableOption) && ArrayHelper::hasKey($meta, $alterableOption)):
+
                 unset($meta[$alterableOption]);
             endif;
         endforeach;

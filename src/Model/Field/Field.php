@@ -27,6 +27,20 @@ class Field extends DeconstructableObject implements FieldInterface
     public $name;
 
     /**
+     * The column comment. Supported by MySQL, PostgreSQL, Oracle, SQL Server, SQL Anywhere and Drizzle. Defaults to null.
+     *
+     * @var string
+     */
+    public $comment;
+
+    /**
+     * Indicates if is auto incremented field.
+     *
+     * @var bool
+     */
+    public $auto = false;
+
+    /**
      * If True, the orm will store empty values as NULL in the database. Default is False i.e NOT NULL.
      *
      * @var bool
@@ -47,6 +61,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * @var bool
      */
     public $unique = false;
+
     /**
      * If True, this field is the primary key for the model.
      *
@@ -156,7 +171,7 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * @var ForeignObjectRel
      */
-    public $remoteField;
+    public $relation;
 
     /**
      * Indicates if this field is  relationship field.
@@ -188,11 +203,26 @@ class Field extends DeconstructableObject implements FieldInterface
 
     public function __construct($config = [])
     {
-        BaseOrm::configure($this, $config, ['rel' => 'remoteField']);
+        BaseOrm::configure($this, $config, ['rel' => 'relation']);
 
-        if ($this->remoteField !== null):
+        if ($this->relation !== null):
+
             $this->isRelation = true;
         endif;
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return Field
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function createObject($config = [])
+    {
+        return new static($config);
     }
 
     /**
@@ -485,7 +515,7 @@ class Field extends DeconstructableObject implements FieldInterface
         $field = [];
         foreach (get_object_vars($this) as $name => $value) :
             if (in_array($name, self::DEBUG_IGNORE)):
-                $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
+                $meta[$name] = (is_subclass_of($value, Object::getFullClassName())) ?: '** hidden **';
                 continue;
             endif;
             $field[$name] = $value;

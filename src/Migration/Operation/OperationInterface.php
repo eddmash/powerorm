@@ -10,6 +10,7 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation;
 
+use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 interface OperationInterface
@@ -29,6 +30,29 @@ interface OperationInterface
      */
     public function updateState($state);
 
-//    public function databaseForwards();
-//    public function databaseBackwards();
+    /**
+     * @param SchemaEditor $schemaEditor
+     * @param ProjectState $fromState
+     * @param ProjectState $toState
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function databaseForwards($schemaEditor, $fromState, $toState);
+
+    /**
+     * @param SchemaEditor $schemaEditor
+     * @param ProjectState $fromState
+     * @param ProjectState $toState
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function databaseBackwards($schemaEditor, $fromState, $toState);
 }

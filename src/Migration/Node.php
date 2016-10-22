@@ -68,8 +68,8 @@ class Node
     }
 
     /**
-     * Get all nodes the consider this node there first ancestor, stating with this one.
-     * This method puts the current node as first in array index 0, and the newest being in the other end.
+     * Get all nodes the consider this node there first ancestor, including this one.
+     * This puts the last child as the first element on returned array while this node becomes the last.
      *
      * @return array
      */

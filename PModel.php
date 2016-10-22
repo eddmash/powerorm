@@ -6,22 +6,9 @@
 defined('BASEPATH') or exit('No direct script access allowed');
 
 use Eddmash\PowerOrm\Model\Field\AutoField;
-use Eddmash\PowerOrm\Model\Field\BooleanField;
 use Eddmash\PowerOrm\Model\Field\CharField;
-use Eddmash\PowerOrm\Model\Field\DateField;
-use Eddmash\PowerOrm\Model\Field\DateTimeField;
-use Eddmash\PowerOrm\Model\Field\DecimalField;
-use Eddmash\PowerOrm\Model\Field\EmailField;
-use Eddmash\PowerOrm\Model\Field\FileField;
-use Eddmash\PowerOrm\Model\Field\HasManyField;
-use Eddmash\PowerOrm\Model\Field\HasOneField;
-use Eddmash\PowerOrm\Model\Field\ImageField;
-use Eddmash\PowerOrm\Model\Field\IntegerField;
-use Eddmash\PowerOrm\Model\Field\ManyToManyField;
-use Eddmash\PowerOrm\Model\Field\ManyToOneField;
+use Eddmash\PowerOrm\Model\Field\ForeignKey;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
-use Eddmash\PowerOrm\Model\Field\TextField;
-use Eddmash\PowerOrm\Model\Field\TimeField;
 use Eddmash\PowerOrm\Model\Model;
 
 /**
@@ -184,11 +171,11 @@ abstract class PModel extends Model
      *
      * @param array $opts
      *
-     * @return ManyToOneField
+     * @return ForeignKey
      */
-    public static function ManyToOneField($opts = [])
+    public static function ForeignKey($opts = [])
     {
-        return ManyToOneField::createObject($opts);
+        return ForeignKey::createObject($opts);
     }
 
     /**

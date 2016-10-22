@@ -2,6 +2,8 @@
 
 namespace Eddmash\PowerOrm\Exception;
 
+use Exception;
+
 /**
  * Class NotImplemented.
  *
@@ -11,4 +13,8 @@ namespace Eddmash\PowerOrm\Exception;
  */
 class NotImplemented extends \ErrorException
 {
+    public function __construct($message = 'method not implemeted', $code = 0, Exception $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }
