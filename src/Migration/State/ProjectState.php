@@ -68,6 +68,15 @@ class ProjectState extends DeconstructableObject
         $this->modelStates[$model->name] = $model;
     }
 
+    /**
+     * Remove a model from the model state registry.
+     *
+     * @param $modelName
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function removeModelState($modelName) {
         unset($this->modelStates[$modelName]);
     }
@@ -80,7 +89,6 @@ class ProjectState extends DeconstructableObject
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getRegistry() {
-
         return StateRegistry::createObject($this->modelStates);
     }
 
@@ -93,7 +101,14 @@ class ProjectState extends DeconstructableObject
     }
 
     public function deepClone() {
-        return static::createObject();
+        $modelStates = [];
+
+        /** @var $modelState ModelState */
+        foreach ($this->modelStates as $name => $modelState) :
+            $modelStates[$name] = $modelState->deepClone();
+        endforeach;
+
+        return static::createObject($modelStates);
     }
 
     public function deconstruct() {

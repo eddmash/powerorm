@@ -25,7 +25,8 @@
     "doctrine/dbal": "v2.5.4"
   },
   "require-dev": {
-    "phpunit/phpunit": "*"
+    "phpunit/phpunit": "*",
+    "symfony/debug": "^3.1"
   },
   "autoload": {
     "psr-4": {

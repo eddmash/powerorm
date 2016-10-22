@@ -1,8 +1,7 @@
 <?php
 
-// if we are not in testing environment load the bootstrap,
-// other the bootstrap is loaded by phpunit.
-if (ENVIRONMENT != 'testing'):
+// if we not on cli we will need to bootstra the orm
+if (!is_cli()):
     require_once 'bootstrap.php';
 endif;
 

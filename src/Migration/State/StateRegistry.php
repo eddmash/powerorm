@@ -20,6 +20,7 @@ class StateRegistry extends Registry
      */
     public function __construct($modelStates) {
         parent::__construct();
+
         $this->_populate($modelStates);
     }
 

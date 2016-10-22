@@ -61,7 +61,6 @@ class Migrate extends BaseCommand
         else:
             $targets = $executor->loader->graph->getLeafNodes();
         endif;
-        
 
         // get migration plan
         $plan = $executor->getMigrationPlan($targets);
@@ -73,7 +72,7 @@ class Migrate extends BaseCommand
         if (empty($plan)):
             $this->normal('  No migrations to apply.', true);
 
-            //detect if a makemigrations is required
+            //detect if we need to make migrations
             $auto_detector = new AutoDetector($executor->loader->getProjectState(), ProjectState::fromApps($registry));
 
             $changes = $auto_detector->getChanges($executor->loader->graph);
@@ -83,13 +82,12 @@ class Migrate extends BaseCommand
                 $this->warning('  Your models have changes that are not yet reflected '.
                     "in a migration, and so won't be applied.", true);
 
-                $this->warning("  Run 'manage.py makemigrations' to make new ".
-                    "migrations, and then re-run 'manage.py migrate' to apply them.", true);
+                $this->warning("  Run 'php pmanager.php makemigrations' to make new ".
+                    "migrations, and then re-run 'php pmanager.php migrate' to apply them.", true);
 
             endif;
         else:
-
-            // migrate
+             // migrate
             $executor->migrate($targets, $plan, $fake);
 
         endif;

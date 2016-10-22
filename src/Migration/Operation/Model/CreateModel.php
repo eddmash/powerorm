@@ -11,6 +11,9 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
+use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
+use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ModelState;
 use Eddmash\PowerOrm\Model\Meta;
@@ -36,11 +39,13 @@ class CreateModel extends Operation
         if(isset($constructorArgs['meta']) && empty($constructorArgs['meta'])):
             unset($constructorArgs['meta']);
         endif;
-        if(isset($constructorArgs['extends']) && !empty($constructorArgs['extends'])):
+        if(isset($constructorArgs['extends'])):
 
-            if(in_array($constructorArgs['extends'], [Model::getFullClassName(), \PModel::getFullClassName()])):
+            if(StringHelper::isEmpty($constructorArgs['extends']) || Model::isModelBase($constructorArgs['extends'])):
                 unset($constructorArgs['extends']);
-
+            else:
+                $constructorArgs['extends'] =
+                    ClassHelper::getNameFromNs($constructorArgs['extends'], BaseOrm::getModelsNamespace());
             endif;
         endif;
 
@@ -54,6 +59,28 @@ class CreateModel extends Operation
     {
         $state->addModelState(ModelState::createObject(
             $this->name, $this->fields, ['meta' => $this->meta, 'extends' => $this->extends]));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function databaseForwards($schemaEditor, $fromState, $toState)
+    {
+        $model = $toState->getRegistry()->getModel($this->name);
+        if($this->allowMigrateModel($schemaEditor->connection, $model)):
+            $schemaEditor->createModel($model);
+        endif;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    {
+        $model = $fromState->getRegistry()->getModel($this->name);
+        if($this->allowMigrateModel($schemaEditor->connection, $model)):
+            $schemaEditor->deleteModel($model);
+        endif;
     }
 
 }

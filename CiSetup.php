@@ -73,5 +73,3 @@ function &get_instance()
 }
 
 chdir($cwd);
-
-return new CI_Controller();

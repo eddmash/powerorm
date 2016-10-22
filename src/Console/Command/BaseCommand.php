@@ -7,7 +7,7 @@ use Eddmash\PowerOrm\Checks\Checks;
 use Eddmash\PowerOrm\Checks\ChecksRegistry;
 use Eddmash\PowerOrm\Console\Base;
 use Eddmash\PowerOrm\Console\Console;
-use Eddmash\PowerOrm\exceptions\NotImplemented;
+use Eddmash\PowerOrm\Exception\NotImplemented;
 
 /**
  * Class Command.
@@ -25,13 +25,21 @@ class BaseCommand extends Base
      */
     public $systemCheck = true;
 
+    /**
+     * Name of the manager file.
+     *
+     * @var
+     */
+    private $managerName;
+
     public $headerMessage = '
-    **************************************************************************
-        *    ___   ___           ___  ___  ___  ___                      *
-        *   /___/ /  / \  /\  / /__  /__/ /  / /__/ /\  /\               *
-        *  /     /__/   \/  \/ /__  /  \ /__/ /  \ /  \/  \(%s)       *
-        *       by Eddilbert Macharia (www.eddmash.com)                  *
-    **************************************************************************
+    **********************************************************%4$s****
+        *    ___   ___           ___  ___  ___  ___           %3$s*
+        *   /___/ /  / \  /\  / /__  /__/ /  / /__/ /\  /\    %3$s*
+        *  /     /__/   \/  \/ /__  /  \ /__/ /  \ /  \/  \(%1$s) %2$s*
+        * /     by Eddilbert Macharia (www.eddmash.com)    \  %3$s*
+        *                                                     %3$s*
+    **********************************************************%4$s****
 
     ';
 
@@ -102,11 +110,16 @@ class BaseCommand extends Base
 
     public function execute($argOpts, $manager)
     {
-//        $consoleLabel = $this->ansiFormat($this->consoleLabel.PHP_EOL, Console::FG_GREEN);
         $message = $this->ansiFormat($this->headerMessage.PHP_EOL, Console::FG_GREEN);
 
-//        $this->normal(sprintf($consoleLabel, POWERORM_VERSION));
-        $this->normal(sprintf($message, POWERORM_VERSION), true);
+        $pad = 2;
+        $maxLength = strlen(POWERORM_VERSION) + $pad;
+        $padLength = $maxLength - strlen(POWERORM_VERSION);
+        $versionPad = str_pad('', $padLength, ' ');
+        $inLinePad = str_pad('', $maxLength, ' ');
+        $outLinePad = str_pad('', $maxLength, '*');
+
+        $this->normal(sprintf($message, POWERORM_VERSION, $versionPad, $inLinePad, $outLinePad), true);
 
         $this->managerName = $manager;
 

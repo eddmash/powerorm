@@ -5,16 +5,27 @@ use Eddmash\PowerOrm\Object;
 /**
  * Created by http://eddmash.com
  * User: eddmash
- * Date: 9/5/16
- * Time: 11:34 PM.
+ * Date: 9/5/16.
  */
 class ObjectTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var object
+     */
+    public $instance;
+
+    public function setup() {
+        $this->instance = new Object();
+    }
+
+    public function teardown() {
+        unset($this->instance);
+    }
+
     public function testFullClassName()
     {
         $expectedName = 'Eddmash\PowerOrm\Object';
-        $obj = new Object();
-        $returnedName = $obj->getFullClassName();
+        $returnedName = $this->instance->getFullClassName();
 
         $this->assertEquals(
             $expectedName,
@@ -26,8 +37,8 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
     public function testShortClassName()
     {
         $expectedName = 'Object';
-        $obj = new Object();
-        $returnedName = $obj->getShortClassName();
+
+        $returnedName = $this->instance->getShortClassName();
 
         $this->assertEquals(
             $expectedName,
@@ -38,14 +49,12 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
 
     public function testHasMethod()
     {
-        $obj = new Object();
-        $this->assertTrue($obj->hasMethod('getFullClassName'), 'Expected True, since the method exists');
+        $this->assertTrue($this->instance->hasMethod('getFullClassName'), 'Expected True, since the method exists');
     }
 
     public function testHasProperty()
     {
-        $obj = new Object();
-        $this->assertTrue($obj->hasProperty('_signal'), 'Expected return true, since the property exists');
+        $this->assertTrue($this->instance->hasProperty('_signal'), 'Expected return true, since the property exists');
     }
 
     /**

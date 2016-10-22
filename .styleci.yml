@@ -1,0 +1,4 @@
+preset: symfony2
+
+disabled:
+  - braces

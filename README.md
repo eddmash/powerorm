@@ -62,3 +62,4 @@ Load the library like any other Codeigniter library.
  - CakePHP framework
  - Laravel framework
  - Symfony2 framework
+ - Codeigniter 4 framework

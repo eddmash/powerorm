@@ -10,7 +10,7 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation;
 
-use Doctrine\DBAL\Schema\Schema;
+use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 interface OperationInterface
@@ -31,7 +31,7 @@ interface OperationInterface
     public function updateState($state);
 
     /**
-     * @param Schema       $schema
+     * @param SchemaEditor $schemaEditor
      * @param ProjectState $fromState
      * @param ProjectState $toState
      *
@@ -41,10 +41,10 @@ interface OperationInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function databaseForwards($schema, $fromState, $toState);
+    public function databaseForwards($schemaEditor, $fromState, $toState);
 
     /**
-     * @param Schema       $schema
+     * @param SchemaEditor $schemaEditor
      * @param ProjectState $fromState
      * @param ProjectState $toState
      *
@@ -54,5 +54,5 @@ interface OperationInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function databaseBackwards($schema, $fromState, $toState);
+    public function databaseBackwards($schemaEditor, $fromState, $toState);
 }

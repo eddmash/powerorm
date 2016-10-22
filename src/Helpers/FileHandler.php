@@ -136,9 +136,7 @@ class FileHandler extends Object
             endif;
 
             if ($file->isDir() && $recurse):
-                foreach ($file as $innerFile) :
-                    $_fileList = $this->_addFile($_fileList, $innerFile, $ext, $_fileObj);
-                endforeach;
+                $_fileList = array_merge($_fileList, (new static($file->getRealPath()))->readDir($ext, $recurse));
             else:
                 $_fileList = $this->_addFile($_fileList, $file, $ext, $_fileObj);
             endif;
@@ -147,6 +145,18 @@ class FileHandler extends Object
         return $_fileList;
     }
 
+    /**
+     * @param array        $_fileList
+     * @param \SplFileInfo $file
+     * @param $ext
+     * @param bool|false $_fileObj if true returns a file object, if false returns a file pathname
+     *
+     * @return array
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function _addFile(array $_fileList, \SplFileInfo $file, $ext, $_fileObj)
     {
         if (!empty($ext)):
@@ -154,7 +164,7 @@ class FileHandler extends Object
                 if ($_fileObj):
                     $_fileList[] = clone $file;
                 else:
-                    $_fileList[] = $file->getPathname();
+                    $_fileList[] = $file->getRealPath();
                 endif;
             endif;
 
@@ -165,7 +175,7 @@ class FileHandler extends Object
         if ($_fileObj):
             $_fileList[] = clone $file;
         else:
-            $_fileList[] = $file->getPathname();
+            $_fileList[] = $file->getRealPath();
         endif;
 
         return $_fileList;
@@ -181,4 +191,5 @@ class FileHandler extends Object
     {
         return (preg_match("/\/$/", $name)) ? $name : $name.'/';
     }
+
 }

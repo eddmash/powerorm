@@ -14,6 +14,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\AmbiguityError;
 use Eddmash\PowerOrm\Exception\KeyError;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Object;
@@ -91,8 +92,10 @@ class Loader extends Object
     public function getMigrationByPrefix($prefix) {
 
         $migrations = [];
+
         foreach ($this->getMigrations() as $name => $migration) :
-            if(StringHelper::startsWith($prefix, $name)):
+            $shortName = ClassHelper::getNameFromNs($name, BaseOrm::getMigrationsNamespace());
+            if(StringHelper::startsWith($name, $prefix) || StringHelper::startsWith($shortName, $prefix)):
                 $migrations[] = $name;
             endif;
         endforeach;
@@ -100,7 +103,7 @@ class Loader extends Object
         if(count($migrations) > 1):
             throw new AmbiguityError(sprintf("There is more than one migration with the prefix '%s'", $prefix));
         elseif(count($migrations) == 0):
-            throw new KeyError(sprintf("There no migrations for '%s' with the prefix '%s'", $prefix));
+            throw new KeyError(sprintf("There no migrations with the prefix '%s'", $prefix));
         endif;
 
         return $migrations[0];
@@ -131,7 +134,7 @@ class Loader extends Object
         /* @var $migrationName Migration */
         foreach ($this->getMigrationsClasses() as $fileName) :
             $migrationName = $fileName;
-            $migrationName = sprintf('app\migrations\%s', $migrationName);
+
             $migrations[$fileName] = $migrationName::createObject($fileName);
         endforeach;
 
@@ -140,10 +143,11 @@ class Loader extends Object
 
     public function getMigrationsClasses() {
         $migrationFiles = $this->getMigrationsFiles();
-
         $classes = [];
+
+        $namespace = BaseOrm::getMigrationsNamespace();
         foreach ($migrationFiles as $migrationFile) :
-            $classes[] = trim(basename($migrationFile, '.php'));
+            $classes[] = ClassHelper::getClassNameFromFile($migrationFile, BaseOrm::getMigrationsPath(), $namespace);
         endforeach;
 
         return $classes;

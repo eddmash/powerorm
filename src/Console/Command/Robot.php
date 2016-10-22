@@ -2,8 +2,7 @@
 /**
  * Created by http://eddmash.com
  * User: eddmash
- * Date: 6/2/16
- * Time: 10:20 PM.
+ * Date: 6/2/16.
  */
 namespace Eddmash\PowerOrm\Console\Command;
 

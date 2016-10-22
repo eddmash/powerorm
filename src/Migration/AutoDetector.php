@@ -26,8 +26,8 @@ use Eddmash\PowerOrm\Migration\State\ModelState;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 use Eddmash\PowerOrm\Migration\State\StateRegistry;
 use Eddmash\PowerOrm\Model\Field\Field;
-use Eddmash\PowerOrm\Model\Field\Related\ManyToManyField;
-use Eddmash\PowerOrm\Model\Field\Related\RelatedField;
+use Eddmash\PowerOrm\Model\Field\ManyToManyField;
+use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Object;
 
@@ -129,7 +129,7 @@ class AutoDetector extends Object
      * @param ProjectState $toState
      * @param Asker        $asker
      */
-    public function __construct($fromState, $toState, $asker=null)
+    public function __construct($fromState, $toState, $asker = null)
     {
         $this->fromState = $fromState;
         $this->toState = $toState;
@@ -183,6 +183,7 @@ class AutoDetector extends Object
 
         // new state
         $newModelNames = array_keys($this->toState->getModelStates());
+
         foreach ($newModelNames as $newModelName) :
             $newModel = $this->newRegistry->getModel($newModelName);
 
@@ -258,7 +259,7 @@ class AutoDetector extends Object
         if (empty($leaf)):
             $migrationNo = 1;
         else:
-            $migrationNo = $this->getMigrationNumber($leaf) + 1;
+            $migrationNo = $this->getMigrationNumber(Migration::createShortName($leaf)) + 1;
 
         endif;
 
@@ -332,11 +333,10 @@ class AutoDetector extends Object
         foreach ($fields as $name => $field) :
             $def = $this->deepDeconstruct($field);
 
-            if ($field->remoteField !== null && $field->remoteField->model !== null):
+            if ($field->relation !== null && $field->relation->toModel !== null):
                 unset($def['constructorArgs']['to']);
             endif;
 
-            //var_dump($def);
             $fieldDefs[] = $def;
         endforeach;
 
@@ -445,21 +445,22 @@ class AutoDetector extends Object
             $modelState = $this->toState->modelStates[$addedModelName];
             $meta = $this->newRegistry->getModel($addedModelName)->meta;
 
-            $localFields = $meta->localFields;
-
             $primaryKeyRel = null;
             $relatedFields = [];
 
-            // get all the relationship fields since they will need to be created in there own operations aside from
-            // the one that creates the model remember the model needs to exist first before enforcing the relationships.
+            // get all the relationship fields since they will need to
+            // be created in there own operations aside from
+            // the one that creates the model remember the model needs
+            // to exist first before enforcing the relationships.
 
             /** @var $localField Field */
-            foreach ($localFields as $localField) :
-                if ($localField->remoteField != null && $localField->remoteField->model != null):
+            foreach ($meta->localFields as $localField) :
+                if ($localField->relation != null && $localField->relation->toModel != null):
 
                     if ($localField->primaryKey):
-                        $primaryKeyRel = $localField->remoteField->model;
-                    elseif (!$localField->remoteField->parentLink):
+                        echo $meta->modelName.PHP_EOL;
+                        $primaryKeyRel = $localField->relation->toModel;
+                    elseif (!$localField->relation->parentLink):
                         $relatedFields[$localField->name] = $localField;
                     endif;
 
@@ -467,17 +468,16 @@ class AutoDetector extends Object
 
             endforeach;
 
-            $localM2MFields = $meta->localManyToMany;
             /** @var $localM2MField RelatedField */
-            foreach ($localM2MFields as $localM2MField) :
+            foreach ($meta->localManyToMany as $localM2MField) :
 
-                if ($localM2MField->remoteField->model != null):
+                if ($localM2MField->relation->toModel != null):
                     $relatedFields[$localM2MField->name] = $localM2MField;
                 endif;
 
                 // if field has a through model and it was not auto created, add it as a related field
-                if ($localM2MField->remoteField->hasProperty('through') &&
-                    !$localM2MField->remoteField->through->meta->autoCreated
+                if ($localM2MField->relation->hasProperty('through') &&
+                    !$localM2MField->relation->through->meta->autoCreated
                 ):
 
                     $relatedFields[$localM2MField->name] = $localM2MField;
@@ -527,22 +527,26 @@ class AutoDetector extends Object
             // take care of relationships
             foreach ($relatedFields as $fieldName => $relationField) :
                 // we need the current model to be in existence
-                $opDep[] = ['target' => $addedModelName, 'model' => true, 'create' => true];
+                $opDep[] = [
+                    'target' => $addedModelName,
+                    'model' => true,
+                    'create' => true,
+                ];
 
                 // depend on the related model also
                 $opDep[] = [
-                    'target' => $relationField->remoteField->model->meta->modelName,
+                    'target' => $relationField->relation->toModel->meta->modelName,
                     'model' => true,
                     'create' => true,
                 ];
 
                 // if the through model was not automatically created, depend on it also
-                if ($relationField->remoteField->hasProperty('through') &&
-                    !$relationField->remoteField->through->meta->autoCreated
+                if ($relationField->relation->hasProperty('through') &&
+                    !$relationField->relation->through->meta->autoCreated
                 ):
 
                     $opDep[] = [
-                        'target' => $relationField->remoteField->through->meta->modelName,
+                        'target' => $relationField->relation->through->meta->modelName,
                         'model' => true,
                         'create' => true,
                     ];
@@ -596,13 +600,15 @@ class AutoDetector extends Object
 
             $relatedFields = [];
 
-            // get all the relationship fields that we initiated since they will need to be created in there own
-            // operations aside from  the one that creates the model remember the model needs to exist first before
+            // get all the relationship fields that we initiated since they
+            // will need to be created in there own
+            // operations aside from  the one that creates the model
+            // remember the model needs to exist first before
             // enforcing the relationships.
 
             /** @var $localField Field */
             foreach ($localFields as $localField) :
-                if ($localField->remoteField != null && $localField->remoteField->model != null):
+                if ($localField->relation != null && $localField->relation->toModel != null):
                     $relatedFields[$localField->name] = $localField;
                 endif;
 
@@ -611,7 +617,7 @@ class AutoDetector extends Object
             /** @var $localM2MField Field */
             foreach ($localM2MFields as $localM2MField) :
 
-                if ($localField->remoteField != null && $localField->remoteField->model != null):
+                if ($localField->relation != null && $localField->relation->toModel != null):
                     $relatedFields[$localM2MField->name] = $localM2MField;
                 endif;
 
@@ -630,16 +636,24 @@ class AutoDetector extends Object
 
             $opDep = [];
 
-            // we also need to drop all relationship fields that point from us, initiated by other models.
+            // we also need to drop all relationship fields that point to us, initiated by other models.
             $reverseRelatedFields = $meta->getReverseRelatedObjects();
 
             /** @var $reverseRelatedField RelatedField */
             foreach ($reverseRelatedFields as $reverseRelatedField) :
-                $modelName = $reverseRelatedField->remoteField->getRelatedModel()->meta->modelName;
-                $fieldName = $reverseRelatedField->remoteField->field->name;
-                $opDep[] = ['target' => $fieldName, 'model' => $modelName, 'create' => false];
-                if (!$reverseRelatedField->remoteField->isManyToMany()):
-                    $opDep[] = ['target' => $fieldName, 'model' => $modelName, 'create' => 'alter'];
+                $modelName = $reverseRelatedField->relation->toModel->meta->modelName;
+                $fieldName = $reverseRelatedField->relation->fromField->name;
+                $opDep[] = [
+                    'target' => $fieldName,
+                    'model' => $modelName,
+                    'create' => false,
+                ];
+                if (!$reverseRelatedField->relation->isManyToMany()):
+                    $opDep[] = [
+                        'target' => $fieldName,
+                        'model' => $modelName,
+                        'create' => 'alter',
+                    ];
                 endif;
             endforeach;
 
@@ -834,7 +848,7 @@ class AutoDetector extends Object
                 foreach ($removedFields as $remField) :
                     $oldFieldDef = $this->deepDeconstruct($oldModelState->getFieldByName($remField));
 
-                    if ($field->remoteField !== null && $field->remoteField->model !== null):
+                    if ($field->relation !== null && $field->relation->toModel !== null):
                         unset($oldFieldDef['constructorArgs']['to']);
                     endif;
 
@@ -1001,6 +1015,19 @@ class AutoDetector extends Object
 
     }
 
+    /**
+     * Does the actual add of the field.
+     *
+     * @param $modelName
+     * @param $fieldName
+     *
+     * @since 1.1.0
+     *
+     * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
+     * @throws \Eddmash\PowerOrm\Exception\LookupError
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function _generateAddedFields($modelName, $fieldName)
     {
         /** @var $field Field */
@@ -1009,12 +1036,25 @@ class AutoDetector extends Object
 
         $preserveDefault = true;
 
-        if ($field->remoteField !== null && $field->remoteField->model):
+        if ($field->relation !== null && $field->relation->toModel):
             // depend on related model being created
-            $opDep[] = ['target' => $field->remoteField->model->meta->modelName, 'model' => true, 'create' => true];
+            $opDep[] = [
+                'target' => $field->relation->toModel->meta->modelName,
+                'model' => true,
+                'create' => true,
+            ];
+
             // if it has through also depend on through model being created
-            if ($field->hasProperty('through') && $field->remoteField->through->meta->autoCreated):
-                $opDep[] = ['target' => $field->through->model->meta->modelName, 'model' => true, 'create' => true];
+            if ($field->relation->hasProperty('through') &&
+                $field->relation->through != null &&
+                !$field->relation->through->meta->autoCreated):
+
+                $opDep[] = [
+                    'target' => $field->relation->through->meta->modelName,
+                    'model' => true,
+                    'create' => true,
+                ];
+
             endif;
 
         endif;

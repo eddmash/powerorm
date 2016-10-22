@@ -2,6 +2,8 @@
 
 namespace Eddmash\PowerOrm\Console;
 
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
+
 /**
  * Borrows heavily from the the yii\helpers\BaseConsole class,.
  *
@@ -366,7 +368,7 @@ class Console
             }
             static::output(' ? - Show help');
             goto top;
-        } elseif (!array_key_exists($input, $options)) {
+        } elseif (!ArrayHelper::hasKey($options, $input)) {
             goto top;
         }
 

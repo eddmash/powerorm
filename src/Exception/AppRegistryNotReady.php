@@ -1,8 +1,7 @@
 <?php
 /**
  * Created by eddmash <http://eddmash.com>
- * Date: 8/29/16
- * Time: 4:11 PM.
+ * Date: 8/29/16.
  */
 namespace Eddmash\PowerOrm\Exception;
 

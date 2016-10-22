@@ -15,6 +15,9 @@ use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
+use Eddmash\PowerOrm\Migration\Model\MigrationModel;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Object;
@@ -38,8 +41,6 @@ class ModelState extends Object
     public $fields = [];
     public $meta = [];
     public $extends;
-
-    private $fakeNamespace = 'Eddmash\PowerOrm\__Fake__\Model';
 
     public function __construct($name, $fields, $kwargs = [])
     {
@@ -96,9 +97,14 @@ class ModelState extends Object
             $meta[$name] = $value;
         endforeach;
 
+        $extends = '';
+        $parent = $model->getParent();
+        if(!$parent->isAbstract() && !Model::isModelBase($parent->getName())):
+            $extends = ClassHelper::getNameFromNs($parent->getName(), BaseOrm::getModelsNamespace());
+        endif;
         $kwargs = [
             'meta' => $meta,
-            'extends' => $model->getParent()->getName(),
+            'extends' => $extends,
         ];
 
         return new static($model->meta->modelName, $fields, $kwargs);
@@ -120,7 +126,7 @@ class ModelState extends Object
         $metaData = $this->meta;
         $extends = $this->extends;
 
-        $model = $this->_defineLoadClass($this->name, $extends);
+        $model = $this->createInstance($this->name, $extends);
         $model->init($this->fields, ['meta' => $metaData, 'registry' => $registry]);
 
         return $model;
@@ -131,13 +137,18 @@ class ModelState extends Object
     }
 
     public function getFieldByName($name) {
-        if(array_key_exists($name, $this->fields)):
-            return $this->fields[$name];
+        if(ArrayHelper::hasKey($this->fields, $name)):
+            return ArrayHelper::getValue($this->fields, $name);
         endif;
         throw new ValueError(sprintf('No field called [ %s ] on model [ %s ]', $name, $this->name));
     }
 
     /**
+     * Defines a new model class.
+     *
+     * we create a new namespace and define new classes because, we might be dealing with a model that has been dropped
+     * Meaning if we try to load the model using the normal way, we will get and error of model does not exist.
+     *
      * @param string $className
      * @param string $extends
      *
@@ -147,39 +158,20 @@ class ModelState extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function _defineLoadClass($className, $extends = '') {
-        $className = ucfirst($className);
-        // we create a new namespace and define new classes because,
-        // we might be dealing with a model that has been dropped
-        // Meaning if we try to load the model using the normal way,
-        // we will get and error of model does not exist
-        $class = 'namespace %1$s;
-
-            class %2$s extends \%3$s{
-
-                 public function unboundFields(){return [];}
-            }';
-
-        if(empty($extends)):
-            $extends = 'Eddmash\PowerOrm\Model\Model';
-        endif;
-
-        $class = sprintf($class, $this->fakeNamespace, $className, $extends);
-
-        $className = sprintf('%s\%s', $this->fakeNamespace, $className);
-
-        if(!class_exists($className, false)):
-            eval($class);
+    private static function createInstance($className, $extends = '')
+    {
+        if(!ClassHelper::classExists($className, BaseOrm::getModelsNamespace())):
+            MigrationModel::defineClass($className, $extends);
         endif;
 
         return new $className();
     }
 
     public function deepClone() {
-        return static::createObject($this->name, $this->fields, $this->kwargs);
+        return static::createObject($this->name, $this->fields, ['meta' => $this->meta, 'extends' => $this->extends]);
     }
 
     public function __toString() {
-        return sprintf("<ModelState: '%s'>", $this->name);
+        return (string) sprintf("<ModelState: '%s'>", $this->name);
     }
 }

@@ -11,6 +11,7 @@
 namespace Eddmash\PowerOrm\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
+use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
@@ -41,6 +42,15 @@ class Migration
         return $this->name;
     }
 
+    public static function createShortName($name) {
+
+        $pos = strripos($name, '\\');
+        if($pos):
+            $name = trim(substr($name, $pos), '\\');
+        endif;
+
+        return $name;
+    }
     /**
      * @param mixed $name
      */
@@ -104,7 +114,7 @@ class Migration
      * Returns the resulting project state for efficient re-use by following Migrations.
      *
      * @param ProjectState $state
-     * @param Schema       $schema
+     * @param SchemaEditor $schemaEditor
      *
      * @return mixed
      *
@@ -112,14 +122,17 @@ class Migration
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function apply($state, $schema) {
+    public function apply($state, $schemaEditor) {
 
         /** @var $operation Operation */
         foreach ($this->operations as $operation) :
             // preserve state before operation
             $oldState = $state->deepClone();
+
             $operation->updateState($state);
-            $operation->databaseForwards($schema, $oldState, $state);
+            $schemaEditor->connection->transactional(function () use ($operation, $schemaEditor, $oldState, $state) {
+                $operation->databaseForwards($schemaEditor, $oldState, $state);
+            });
         endforeach;
 
         return $state;
@@ -135,7 +148,7 @@ class Migration
      *      2. The operations are applied in reverse order using the states recorded in step 1.
      *
      * @param ProjectState $state
-     * @param Schema       $schema
+     * @param SchemaEditor $schemaEditor
      *
      * @return mixed
      *
@@ -143,15 +156,14 @@ class Migration
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function unApply($state, $schema) {
+    public function unApply($state, $schemaEditor) {
 
         // we
         $itemsToRun = [];
 
         // Phase 1 --
-        /** @var $operation Operation */
+        /* @var $operation Operation */
         /** @var $newState ProjectState */
-
         $newState = $state;
         // we need to reverse the operations so that foreignkeys are removed before model is destroyed
         foreach ($this->operations as $operation) :
@@ -165,12 +177,17 @@ class Migration
             array_unshift($itemsToRun, ['operation' => $operation, 'oldState' => $oldState, 'newState' => $newState]);
         endforeach;
 
-        // Phase 2 --
+        // Phase 2 -- Since we are un applying the old state is where we want to go back to
+        //   and the new state is where we are moving away from i.e
+        //   we are moving from $newState to $oldState
+
         foreach ($itemsToRun as $runItem) :
-            $operation = $runItem['operation'];
-            $oldState = $runItem['oldState'];
-            $newState = $runItem['newState'];
-            $operation->databaseBackwards($schema, $oldState, $newState);
+
+            $schemaEditor->connection->transactional(function () use ($runItem, $schemaEditor) {
+                /** @var $operation Operation */
+                $operation = $runItem['operation'];
+                $operation->databaseBackwards($schemaEditor, $runItem['newState'], $runItem['oldState']);
+            });
         endforeach;
 
         return $state;
@@ -199,11 +216,11 @@ class Migration
         /** @var $operation Operation */
         foreach ($this->operations as $operation) :
 
-            $operation->updateState($state);
+            $operation->updateState($newState);
 
         endforeach;
 
-        return $state;
+        return $newState;
     }
 
     public function __toString()

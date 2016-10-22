@@ -2,16 +2,27 @@
 /**
  * Bootstrap the application.
  */
-use Doctrine\Common\ClassLoader;
 use Eddmash\PowerOrm\Autoloader\Autoloader;
 use Eddmash\PowerOrm\Config\OrmConfig;
 
-define('POWERORM_VERSION', '1.1.0');
+define('POWERORM_VERSION', '1.1.0-pre-alpha');
+
+$baseDir = isset($baseDir) ? $baseDir : __DIR__;
+
+define('HOMEPATH', $baseDir);
+
+// if ENVIRONMENT is not set and our base dir is 'powerorm' we might be running test
+// otherwise we migh be on a codeigniter environmnent so create a codeigniter instance
+if(!defined('ENVIRONMENT')):
+    if(strtolower(basename(HOMEPATH)) === 'powerorm'):
+        define('ENVIRONMENT', 'POWERORM_TESTING');
+    else:
+        $base_dir = HOMEPATH;
+        require 'CiSetup.php';
+    endif;
+endif;
 
 if (!defined('BASEPATH')) :
-    if(!defined('ENVIRONMENT')):
-        define('ENVIRONMENT', 'testing');
-    endif;
     define('BASEPATH', __DIR__.DIRECTORY_SEPARATOR);
     define('APPPATH', BASEPATH);
     define('POWERORM_BASEPATH', BASEPATH);
@@ -21,9 +32,10 @@ else :
     define('POWERORM_SRCPATH', APPPATH.'libraries/powerorm/src'.DIRECTORY_SEPARATOR);
 endif;
 
-$autoloadFile = POWERORM_BASEPATH.'vendor/autoload.php';
-if(file_exists($autoloadFile)):
-    require $autoloadFile;
+$autoLoadFile = HOMEPATH.DIRECTORY_SEPARATOR.'vendor/autoload.php';
+
+if(file_exists($autoLoadFile)):
+    require $autoLoadFile;
 endif;
 
 require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';
@@ -34,10 +46,3 @@ require_once POWERORM_SRCPATH.'Autoloader/Config/OrmConfig.php';
 $loader = new Autoloader();
 $loader->initialize(new OrmConfig());
 $loader->register();
-
-// load doctrine DBAL
-if(file_exists('vendor/doctrine')):
-    require 'vendor/doctrine/common/lib/Doctrine/Common/ClassLoader.php';
-    $classLoader = new ClassLoader('Doctrine', 'vendor/doctrine');
-    $classLoader->register();
-endif;

@@ -14,63 +14,74 @@ namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Object;
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Model\Field\Field;
 
 class ForeignObjectRel extends Object
 {
     public $autoCreated = true;
     public $isRelation = true;
+    public $multiple = true;
 
     // Reverse relations are always nullable (PowerOrm can't enforce that a
     // foreign key on the related model points to this model).
     public $null = true;
 
     /**
+     * The model to which the scopeModel is related.
+     *
      * @var Model
      */
-    public $model;
+    public $toModel;
+    /**
+     * @var Model
+     */
+    public $through;
 
     /**
      * @var Field
      */
-    public $field;
+    public $fromField;
+
     public $parentLink;
+
     public $onDelete;
 
     public function __construct($kwargs = []) {
-        BaseOrm::configure($this, $kwargs, ['to' => 'model']);
+        BaseOrm::configure($this, $kwargs, ['to' => 'toModel']);
     }
 
     public static function createObject($kwargs = []) {
         return new static($kwargs);
     }
 
-    public function getRemoteField() {
-        return $this->field;
+    public function getToModel()
+    {
+        return $this->toModel;
     }
 
-    public function getRelatedModel() {
-        if($this->field->scopeModel == null):
-            throw new OrmException(
-                "This method can't be accessed before field contributeToClass has been called.");
-        endif;
-
-        return $this->field->scopeModel;
+    public function getFromModel()
+    {
+        return $this->fromField->scopeModel;
     }
 
     public function isManyToMany() {
-        return $this->field->manyToMany;
+        return $this->fromField->manyToMany;
     }
+
     public function isOneToMany() {
-        return $this->field->oneToMany;
+        return $this->fromField->oneToMany;
     }
 
     public function isManyToOne() {
-        return $this->field->manyToOne;
+        return $this->fromField->manyToOne;
     }
 
     public function isOneToOne() {
-        return $this->field->oneToOne;
+        return $this->fromField->oneToOne;
+    }
+
+    public function __toString()
+    {
+        return (string) sprintf('<Rel %s>', $this->toModel->meta->modelName);
     }
 }

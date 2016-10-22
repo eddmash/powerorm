@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Helpers;
 
-/**
+/*
  * some method borrowed from Yii\helpers\BaseArrayHelper
  * Part of the Yii framework.
  *
@@ -24,6 +24,8 @@ namespace Eddmash\PowerOrm\Helpers;
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
+use Eddmash\PowerOrm\Exception\KeyError;
+
 /**
  * Class Arrays.
  *
@@ -44,6 +46,8 @@ class ArrayHelper
      * @param array $array      the array being checked
      * @param bool  $allStrings whether the array keys must be all strings in order for
      *                          the array to be treated as associative
+     *
+     * @since 1.1.0
      *
      * @return bool whether the array is associative
      */
@@ -71,4 +75,40 @@ class ArrayHelper
             return false;
         }
     }
+
+    /**
+     * Return the value for key if key is in the array, else default. If default is not given, it defaults to null.
+     * This never raise 'PHP Notice:  Undefined index: '.
+     *
+     * @param $haystack
+     * @param $key
+     * @param null $default
+     *
+     * @throws KeyError
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function getValue($haystack, $key, $default = null)
+    {
+        return isset($haystack[$key]) ? $haystack[$key] : $default;
+    }
+
+    /**
+     * Checks if  a key exists in the provided array.
+     *
+     * @param $haystack
+     * @param $key
+     *
+     * @return bool
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function hasKey($haystack, $key) {
+        return array_key_exists($key, $haystack);
+    }
+
 }

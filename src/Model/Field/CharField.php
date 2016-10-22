@@ -10,6 +10,13 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Doctrine\DBAL\Types\Type;
+
 class CharField extends Field
 {
+    public function dbType($connection)
+    {
+        return Type::STRING;
+    }
+
 }

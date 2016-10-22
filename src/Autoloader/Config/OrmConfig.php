@@ -52,6 +52,7 @@ class OrmConfig extends BaseConfig
          */
         $psr4 = [
             'app\migrations' => APPPATH.'migrations',
+            'app\models' => APPPATH.'models',
             'Eddmash\PowerOrm' => POWERORM_SRCPATH,
         ];
 

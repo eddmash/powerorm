@@ -2,8 +2,7 @@
 /**
  * Created by http://eddmash.com
  * User: eddmash
- * Date: 6/18/16
- * Time: 2:23 PM.
+ * Date: 6/18/16.
  */
 namespace Eddmash\PowerOrm\Helpers;
 
@@ -119,5 +118,9 @@ class StringHelper
     public static function isValidVariableName($name)
     {
         return preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/', $name);
+    }
+
+    public static function isEmpty($string) {
+        return $string === '' || $string === null;
     }
 }

@@ -13,9 +13,9 @@ namespace Eddmash\PowerOrm\Model;
 
 class Delete
 {
-    const CASCADE = 'cascade';
-    const PROTECT = 'protect';
-    const DONOTHING = 'donothing';
-    const SETNULL = 'setnull';
-    const SETDEFAULT = 'setdefault';
+    const CASCADE = 'CASCADE';
+    const PROTECT = 'PROTECT';
+    const DONOTHING = 'DONOTHIN';
+    const SETNULL = 'SETNULL';
+    const SETDEFAULT = 'SETDEFAULT';
 }

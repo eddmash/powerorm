@@ -11,6 +11,7 @@
 namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\Exception\NodeNotFoundError;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 class Graph
@@ -25,9 +26,9 @@ class Graph
     /**
      * contains a family tree for each node representing a migration.
      *
-     * @var
+     * @var array
      */
-    public $nodeFamilyTree;
+    public $nodeFamilyTree = [];
 
     public function __construct()
     {
@@ -47,6 +48,7 @@ class Graph
     public function getNodeFamilyTree($node) {
         return $this->nodeFamilyTree[$node];
     }
+
     /**
      * @param $migrationName
      * @param $migrationObject
@@ -80,11 +82,11 @@ class Graph
     public function addDependency($child, $parent, $migration)
     {
         // both parent and child need to be already in the graph
-        if (!array_key_exists($child, $this->nodes)):
+        if (!ArrayHelper::hasKey($this->nodes, $child)):
             throw new NodeNotFoundError(
                 sprintf('Migration %s dependencies reference nonexistent child node %s', $migration->getName(), $child));
         endif;
-        if (!array_key_exists($parent, $this->nodes)):
+        if (!ArrayHelper::hasKey($this->nodes, $parent)):
             throw new NodeNotFoundError(
                 sprintf('Migration %s dependencies reference nonexistent parent node %s', $migration->getName(), $parent));
         endif;
@@ -101,7 +103,6 @@ class Graph
     public function getLeafNodes()
     {
         $leaves = [];
-
         foreach ($this->nodes as $name => $migration) :
 
             // get the nodes  children
@@ -135,7 +136,7 @@ class Graph
     public function getAncestryTree($node)
     {
         // todo check for cyclic
-        if (!array_key_exists($node, $this->nodes)):
+        if (!ArrayHelper::hasKey($this->nodes, $node)):
             throw new NodeNotFoundError(sprintf('Migration with the name %s does not exist', $node));
         endif;
 
@@ -159,7 +160,7 @@ class Graph
      */
     public function getDecedentsTree($node)
     {
-        if (!array_key_exists($node, $this->nodes)):
+        if (!ArrayHelper::hasKey($this->nodes, $node)):
             throw new NodeNotFoundError(sprintf('Migration with the name %s does not exist', $node));
         endif;
 
@@ -213,7 +214,7 @@ class Graph
         foreach ($leaves as $leaf) :
 
             // get lineage
-            $lineage_members = $this->getBeforeLineage($leaf);
+            $lineage_members = $this->getAncestryTree($leaf);
 
             foreach ($lineage_members as $i => $l_member) :
 
@@ -225,16 +226,28 @@ class Graph
 
         endforeach;
 
-        // use the lineage to get the project state based on the migrations.
+        // use the lineage to update the project state based on the migrations.
         /* @var $migration Migration */
         foreach ($lineage as $member) :
 
             $migration = $this->nodes[$member];
-
             $state = $migration->updateState($state);
 
         endforeach;
 
         return $state;
+    }
+
+    /**
+     * @param string $migrationName
+     *
+     * @return Migration
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getMigration($migrationName) {
+        return $this->nodes[$migrationName];
     }
 }
