@@ -15310,18 +15310,18 @@ or the backend itself does the conversion.</long-description>
     </parse_markers>
     <source>eJzlV81u3DYQvusp5uDD2ljLzbWJUyOxjRqoG6M2eqkLgxJHK9YUqZKUN4ugQF+jr5cnyQwpybtrrdECPcTtXrTi38x83zcz1Jvv2rrNsqOD7ABuauWhUhqBnq1wAWwFoUZo7RKddQ0NlvdigXnGy2flPpxJqXSBtPRSlLVwSsAblDIv7VKYk0UjlKb/zdu44dy6eFzVaQ2lbVdOLeoAwkjQqkTjybCpyI4Iypo5tBoFjT0oXMZ9P1y8P/vx+oxOik6GWgRYCg9S+eBU0QWUsFShphkKwNvOlUh2JPt7lGVGNOgpAmSvG+Hr2yuO64Nrbi9pkb49V6jl6yzr/MSS99YkI9ZdmICuooNeTy89RVpMLnVlEIXGteWE80EGBzAOQbQ5vuY0yfMnXhmafJW/yr8ZhkQXagJwAvFZHUL77dERJkcY8P0dNAABoXYYB/wY0EgPu/yfwxQI2acM6Bcj498B/IShc8ZHzqSgM5jF0uquMfEdwqolFfRqiE7MIYh7ZRYkgGBBlKXtTIjTpTUGSxZE3p8/mDlx0Q4w+WaxPbmB4ObUv4NkPOwoPtuuIAGTrk10FGRxQxHO9h593yfut1AiLB/YOAf5IHRHgqbIgdIxvT4JlzJSNLAXJ3dA0aiPKL8mJIK9qttZ8nkCg0EpYiwxOed/HjVBWvBBsO9JKpTTo5rigpcjCA4qujzbu18Kt/BwDL/8OgHIJZInEkqhNRWz1imO3NIfJPbxLuJ4R6fdyWK2vzazpqICaZ4fnE5ePIyCgBnmizyCeSoCJggpdHtn7HJ/G8yGS+LdSIFK6Ty+h9QrmKYCtTUUEsuXSrmQklcvawoF3eYuGl/zi3fQ9GBxJHeoDJVynvJDNU9y4SKAr21HxnvKH8PvW5ZoW2cJPwoUROjbA1TONtuRjeKq1jVFzXB9I/cO9l4Z2OPFh2/jyCxu5GaDAboWilVS5hM0h+SNtrcGC2s17P1j2J7D66WUB1LvNYU0S7jMIwoTWZGY7SVYds4hNYcNuuP+z3/+5R85m0c1xsmUVJuKiY2I6BSQbhzpOlELhhrNYLlPLxkx5mYvYrFi3pD6Xzrg9w7dKleY8+s6M/+JEt5D8DP7vLuS993Mr7eygm6LdKE49C2WqqIzN/oavFuBxEp0OoAKPS3DflWN0B/fOBpgLjeqIJU/WkSaOBf67yE9Dj625ZfIAd2iT4ueiPl6MPQyyvUYKoZlgqhrrlsipdJ0W5kDpc/Qgqgemb64cK1P7DQd1ZkCp8vRNhVrNA8cT9v9H3H4LvboVPqeEvlceomeAmIwBUoEUNfZ6Acx+a6+vwJb/EYn5twu++LpkI7xsWxuZdM2+vFjsK+c9M/YwPUvFcLGMv+d0uGQKl5Uhh80NXrRZz8I7VDI1Uh+utRTDS9DdJI/BuaD1b6TDXtV8KgrkBaHfQyDf+Zj4Kujna8cp0Wqns/cgLcuMOPlqu8oC/VAeRi73Hgt2JUvxPpLASdGfE4IfYhKnbHvBNIf2RfUShdc</source>
   </file>
-  <file path="Orm.php" generated-path="Orm.html" hash="d170b28f07893f088131520dc5a2dc25" package="Default">
+  <file path="Orm.php" generated-path="Orm.html" hash="57c1af193fb5e7c4fc72aaa386750546" package="Default">
     <docblock line="0">
       <description></description>
       <long-description></long-description>
       <tag name="package" line="0" description="Default"/>
     </docblock>
     <namespace-alias name="BaseOrm">\Eddmash\PowerOrm\BaseOrm</namespace-alias>
-    <class final="false" abstract="false" namespace="" line="27" package="Default">
+    <class final="false" abstract="false" namespace="" line="28" package="Default">
       <extends>\Eddmash\PowerOrm\BaseOrm</extends>
       <name>Orm</name>
       <full_name>\Orm</full_name>
-      <docblock line="27">
+      <docblock line="28">
         <description>This class makes the orm available to codeigniter since the orm uses namespaces.</description>
         <long-description>&lt;h4&gt;Version 1.0.1 Documentation&lt;/h4&gt;
 
@@ -15332,9 +15332,9 @@ visit [http://eddmash.github.io/powerorm/docs/v1_0_1](http://eddmash.github.io/p
 visit [http://eddmash.github.io/powerorm/docs/v1_1_0](http://eddmash.github.io/powerorm/docs/v1_1_0)
 
 Class Orm.</long-description>
-        <tag name="since" line="27" description="1.0.0"/>
-        <tag name="author" line="27" description="Eddilbert Macharia (http://eddmash.com)" link="mailto:edd.cowan@gmail.com"/>
-        <tag name="package" line="27" description="Default"/>
+        <tag name="since" line="28" description="1.0.0"/>
+        <tag name="author" line="28" description="Eddilbert Macharia (http://eddmash.com)" link="mailto:edd.cowan@gmail.com"/>
+        <tag name="package" line="28" description="Default"/>
         <tag name="inherited_from" description="\Eddmash\PowerOrm\BaseOrm" refers="\Eddmash\PowerOrm\BaseOrm" link="/classes/Eddmash.PowerOrm.BaseOrm.html"/>
       </docblock>
       <property static="false" visibility="private" namespace="" line="89" package="Default">
@@ -15966,7 +15966,7 @@ The resolution order to follow when going up a inheritance hierarchy.</descripti
     <parse_markers>
       <error line="0" code="PPC:ERR-50000">No summary was found for this file</error>
     </parse_markers>
-    <source>eJytkTtvwjAQx3d/iuvEY4iJ1AlQi/oYq3aoOiEhxznwicROfQ5UQnz3ngtZqo71Yt/zd/f38r5znVJaA23hiOBDguDBNpStIzUNeMQaUoAqhMQpGkgOIcRWScX4hngjyePJZK5ATsTPniJugrcIo6GkK4QyWij0NW0XSvWM8FzXrWG3fgtHjK+xXT8YRrklrKdTBVN4d8QyiWGG1uyRBzCYg6HGVA3msWyokXaeEkZgytghTSgM3rTInbHIhfTMbZfu9u4DI5PsWRazooSnYPsWfTJJfEst8WvqgZgSnFYN+T24lLq51niZu9hRcn1VUNBd3kCAug6W9aHczDbl+U+Y4P4dJrgB9vijlWg4rLq6CJK3nA0u0ycXYpafmgpjghdjnYlkYPwLakM7gaVY8joav9q1Inv25om1sgMN8CvJzzJcf1Cd1Fl9A7Fmwmo=</source>
+    <source>eJytkTtvwjAQx3d/iuvEY4iJ1AlQi/oYq3aoOiEhxznwicROfQ5UQnz3ngtZqo71Yt/zd/f38r5znVJaA23hiOBDguDBNpStIzUNeMQaUoAqhMQpGkgOIcRWScX4hngjyePJZK5ATsTPniJugrcIo6GkK4QyWij0NW0XSvWM8FzXrWG3fgtHjK+xXT8YRrklrPR0qmAK745YRjHM0Jo98kAGczDUmKrBPJcNNdLOU8IITJk7pAmGwZsWuTMWuZCeue3S3d59YGSSRctiVpTwFGzfok8miW+pJX5NPRBTgtOqIb8Hl1I31xovgxc7Sq6vCgq6yysIUNfBsj6Um9mmPP8JE9y/wwQ3wB5/tBIRh1VXF0HylrPBZfrkQsz6U1NhTPBirDORDIx/QW1oJ7AUS15H41e7VmTP3jyxVnagAX4l+VqG6xeqkzor9Q222sJ+</source>
   </file>
   <file path="src/Model/Field/CharField.php" generated-path="src.Model.Field.CharField.html" hash="609508c50d6a1b19f2598c907b54e03a" package="Default">
     <docblock line="0">
