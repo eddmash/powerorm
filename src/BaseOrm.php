@@ -15,6 +15,7 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\Console\Console;
 use Eddmash\PowerOrm\Console\Manager;
 use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -251,6 +252,12 @@ class BaseOrm extends Object
     public static function getOrmFromContext()
     {
         $ci = static::getCiObject();
+        if(!isset($ci->orm)):
+            $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the '.
+                '$autoload[\'libraries\'] = array(\'powerorm/orm\'). On the autoload.php';
+
+            throw new OrmException($message);
+        endif;
         $orm = &$ci->orm;
 
         return $orm;
@@ -310,7 +317,10 @@ class BaseOrm extends Object
     public function getDatabaseConnection()
     {
         if (empty($this->databaseConfigs)):
-            throw new OrmException('The database configuration have no been provided');
+
+            $message = 'The database configuration have no been provided, On Codeigniter 3 create orm.php and '.
+                'add configuration, consult documentation for options';
+            throw new OrmException($message);
         endif;
         if (static::$connection == null):
             $config = new Configuration();
