@@ -15,7 +15,6 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Eddmash\PowerOrm\App\Registry;
-use Eddmash\PowerOrm\Console\Console;
 use Eddmash\PowerOrm\Console\Manager;
 use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;

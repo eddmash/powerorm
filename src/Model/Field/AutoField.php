@@ -32,4 +32,19 @@ class AutoField extends Field
         return Type::INTEGER;
     }
 
+    public function contributeToClass($field, $model) {
+        parent::contributeToClass($field, $model);
+        assertTrue($model->meta->hasAutoField, "A model can't have more than one AutoField.");
+        $this->scopeModel->meta->hasAutoField = true;
+        $this->scopeModel->meta->autoField = $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function formField($kwargs = [])
+    {
+        return;
+    }
+
 }
