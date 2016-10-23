@@ -1,26 +1,5 @@
-
-#-------------------------
-# Composer
-#-------------------------
-vendor/
-composer.lock
-cs_fixer*
-
-
-#-------------------------
-# # Jetbrains editors (PHPStorm, etc)
-#-------------------------
-.idea
-
-
-#-------------------------
-# User Guide Temp Files
-#-------------------------
-docs/build/*
-docs/cilexer
-
-
-#-------------------------
-# API Temp Files
-#-------------------------
+*
+!docs/source
+!index.html
+!api
 api/raw

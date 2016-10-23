@@ -7,6 +7,7 @@ endif;
 
 use Eddmash\PowerOrm\BaseOrm;
 
+
 /**
  * This class makes the orm available to codeigniter since the orm uses namespaces.
  *
