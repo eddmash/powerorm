@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+<meta charset="utf-8">
+<title>PowerOrm v1.1.0 API » \Eddmash\PowerOrm\Helpers\ClassHelper</title>
+<meta name="author" content="Mike van Riel">
+<meta name="description" content="">
+<link href="../css/template.css" rel="stylesheet" media="all">
+<script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script><script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script><script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script><script src="../js/bootstrap.js" type="text/javascript"></script><script src="../js/template.js" type="text/javascript"></script><script src="../js/prettify/prettify.min.js" type="text/javascript"></script><link rel="shortcut icon" href="../img/favicon.ico">
+<link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+<div class="navbar-inner"><div class="container">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">PowerOrm v1.1.0 API</a><div class="nav-collapse"><ul class="nav">
+<li class="dropdown">
+<a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                                    API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a>Namespaces</a></li>
+<li><a href="../namespaces/Eddmash.html"><i class="icon-th"></i> Eddmash</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
+<li><a>Packages</a></li>
+<li><a href="../packages/Default.html"><i class="icon-folder-open"></i> Default</a></li>
+</ul>
+</li>
+<li class="dropdown" id="charts-menu">
+<a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                                    Charts <b class="caret"></b></a><ul class="dropdown-menu"><li><a href="../graph_class.html"><i class="icon-list-alt"></i> Class hierarchy diagram</a></li></ul>
+</li>
+<li class="dropdown" id="reports-menu">
+<a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                                    Reports <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
+                <span class="label label-info">793</span></a></li>
+<li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
+                <ul></ul></a></li>
+<li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
+                <span class="label label-info">2</span></a></li>
+</ul>
+</li>
+</ul></div>
+</div></div>
+<div class="go_to_top"><a href="#___" style="color: inherit">Back to top  <i class="icon-upload icon-white"></i></a></div>
+</div>
+<div id="___" class="container">
+<noscript><div class="alert alert-warning">
+                            Javascript is disabled; several features are only available
+                            if Javascript is enabled.
+                        </div></noscript>
+<div class="row">
+<div class="span4">
+<div xmlns:php="http://php.net/xsl" class="btn-toolbar">
+<div class="btn-group visibility" data-toggle="buttons-checkbox">
+<button class="btn public active" title="Show public elements">Public</button><button class="btn protected" title="Show protected elements">Protected</button><button class="btn private" title="Show private elements">Private</button><button class="btn inherited active" title="Show inherited elements">Inherited</button>
+</div>
+<div class="btn-group view pull-right" data-toggle="buttons-radio">
+<button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button><button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+</div>
+</div>
+<ul xmlns:php="http://php.net/xsl" class="side-nav nav nav-list"><li class="nav-header">
+<i title="Methods" class="icon-custom icon-method"></i> Methods
+                    <ul>
+<li class="method public "><a href="#method_classExists" title="classExists() :: checks of a class exists on the global scope try the namespace."><span class="description">checks of a class exists on the global scope try the namespace.</span><pre>classExists()</pre></a></li>
+<li class="method public "><a href="#method_getClassNameFromFile" title="getClassNameFromFile() :: Gets the class name of a class defined in a file."><span class="description">Gets the class name of a class defined in a file.</span><pre>getClassNameFromFile()</pre></a></li>
+<li class="method public "><a href="#method_getFormatNamespace" title="getFormatNamespace() :: Format a namespace to have a  leading or a closing backslash or both."><span class="description">Format a namespace to have a  leading or a closing backslash or both.</span><pre>getFormatNamespace()</pre></a></li>
+<li class="method public "><a href="#method_getNameFromNs" title="getNameFromNs() :: Gets a class name from the namespace by trimming out the namespace from the classname."><span class="description">Gets a class name from the namespace by trimming out the namespace from the classname.</span><pre>getNameFromNs()</pre></a></li>
+</ul>
+</li></ul>
+</div>
+<div class="span8">
+<a xmlns:php="http://php.net/xsl" id="\Eddmash\PowerOrm\Helpers\ClassHelper"></a><ul xmlns:php="http://php.net/xsl" class="breadcrumb">
+<li>
+<a href="../index.html"><i title="Classes" class="icon-custom icon-class"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Helpers.html">Helpers</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../classes/Eddmash.PowerOrm.Helpers.ClassHelper.html">ClassHelper</a>
+</li>
+</ul>
+<div xmlns:php="http://php.net/xsl" class="element class">
+<p class="short_description">A Helper class for dealing with common class related tasks.</p>
+<div class="details">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+<tr>
+<th>package</th>
+<td><a href="../packages/Default.html">Default</a></td>
+</tr>
+</table>
+<h3>
+<i title="Methods" class="icon-custom icon-method"></i> Methods</h3>
+<a id="method_classExists"></a><div class="element clickable method public method_classExists " data-toggle="collapse" data-target=".method_classExists .collapse" title="public">
+<h2>checks of a class exists on the global scope try the namespace.</h2>
+<pre>classExists($className, $namespace) : string</pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$className</h4></div>
+<div class="subelement argument"><h4>$namespace</h4></div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exception\ClassNotFoundException</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_getClassNameFromFile"></a><div class="element clickable method public method_getClassNameFromFile " data-toggle="collapse" data-target=".method_getClassNameFromFile .collapse" title="public">
+<h2>Gets the class name of a class defined in a file.</h2>
+<pre>getClassNameFromFile($file, $classesDir, $classNamespace<code> = ''</code>) : string</pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$file</h4></div>
+<div class="subelement argument"><h4>$classesDir</h4></div>
+<div class="subelement argument"><h4>$classNamespace</h4></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_getFormatNamespace"></a><div class="element clickable method public method_getFormatNamespace " data-toggle="collapse" data-target=".method_getFormatNamespace .collapse" title="public">
+<h2>Format a namespace to have a  leading or a closing backslash or both.</h2>
+<pre>getFormatNamespace($namespace, boolean|false $leadingBackslash<code> = false</code>, boolean|true $closingBackslash<code> = true</code>) : string</pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$namespace</h4></div>
+<div class="subelement argument">
+<h4>$leadingBackslash</h4>
+<code>boolean</code><code>false</code>
+</div>
+<div class="subelement argument">
+<h4>$closingBackslash</h4>
+<code>boolean</code><code>true</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_getNameFromNs"></a><div class="element clickable method public method_getNameFromNs " data-toggle="collapse" data-target=".method_getNameFromNs .collapse" title="public">
+<h2>Gets a class name from the namespace by trimming out the namespace from the classname.</h2>
+<pre>getNameFromNs($className, $namespace) : mixed</pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$className</h4></div>
+<div class="subelement argument"><h4>$namespace</h4></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>mixed</code></div>
+</div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="row"><footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
+            generated on 2016-10-23T16:41:21+03:00.<br></footer></div>
+</div>
+</body>
+</html>

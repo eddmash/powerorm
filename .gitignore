@@ -1,16 +1,8 @@
-
-#-------------------------
-# Composer
-#-------------------------
-vendor/
-composer.lock
-cs_fixer*
-
-
-#-------------------------
-# # Jetbrains editors (PHPStorm, etc)
-#-------------------------
-.idea
-
-api
-docs
+/*
+!docs/source
+!readme
+!index.html
+!api
+!README.md
+api/raw
+!requirements.txt

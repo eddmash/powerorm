@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+    <meta charset="utf-8">
+    <title>API Documentation » \Migrator</title>
+    <meta name="author" content="Mike van Riel">
+    <meta name="description" content="">
+    <link href="../css/template.css" rel="stylesheet" media="all">
+    <script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
+    <script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script>
+    <script src="../js/bootstrap.js" type="text/javascript"></script>
+    <script src="../js/template.js" type="text/javascript"></script>
+    <script src="../js/prettify/prettify.min.js" type="text/javascript"></script>
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span
+                    class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a
+                class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li class="dropdown">
+                        <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a>Namespaces</a></li>
+                            <li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
+                            <li><a href="../namespaces/powerorm.html"><i class="icon-th"></i> powerorm</a></li>
+                            <li><a>Packages</a></li>
+                            <li><a href="../packages/Default.html"><i class="icon-folder-open"></i> Default</a></li>
+                            <li><a href="../packages/powerorm.html"><i class="icon-folder-open"></i> powerorm</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="charts-menu">
+                        <a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="../graph_class.html"><i class="icon-list-alt"></i> Class hierarchy diagram</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
+                                <span class="label label-info">471</span></a></li>
+                            <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
+                                <ul></ul>
+                            </a></li>
+                            <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
+                                <span class="label label-info">0</span></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="go_to_top"><a href="#___" style="color: inherit">Back to top  <i class="icon-upload icon-white"></i></a>
+    </div>
+</div>
+<div id="___" class="container">
+    <noscript>
+        <div class="alert alert-warning">
+            Javascript is disabled; several features are only available
+            if Javascript is enabled.
+        </div>
+    </noscript>
+    <div class="row">
+        <div class="span4">
+            <div class="btn-toolbar">
+                <div class="btn-group visibility" data-toggle="buttons-checkbox">
+                    <button class="btn public active" title="Show public elements">Public</button>
+                    <button class="btn protected" title="Show protected elements">Protected</button>
+                    <button class="btn private" title="Show private elements">Private</button>
+                    <button class="btn inherited active" title="Show inherited elements">Inherited</button>
+                </div>
+                <div class="btn-group view pull-right" data-toggle="buttons-radio">
+                    <button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i>
+                    </button>
+                    <button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i>
+                    </button>
+                </div>
+            </div>
+            <ul class="side-nav nav nav-list">
+                <li class="nav-header">
+                    <i title="Methods" class="icon-custom icon-method"></i> Methods
+                    <ul>
+                        <li class="method public "><a href="#method__format"
+                                                      title="_format() :: Ensures the string output has enough indents for proper alignment in the migration file."><span
+                                class="description">Ensures the string output has enough indents for proper alignment in the migration file.</span>
+                            <pre>_format()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method__stamp" title="_stamp() :: Create a stamp for each migration file, this will generate timestamp or sequntial numbers base on the
+`migration_type` setting on the migration config file."><span class="description">Create a stamp for each migration file, this will generate timestamp or sequntial numbers base on the
+`migration_type` setting on the migration config file.</span>
+                            <pre>_stamp()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method__validate_stamp" title="_validate_stamp() :: Ensure the generated stamp and the stamp used previously match, this is to avoid having timestamp based
+migration files and sequential based migration files on the same application"><span class="description">Ensure the generated stamp and the stamp used previously match, this is to avoid having timestamp based
+migration files and sequential based migration files on the same application</span>
+                            <pre>_validate_stamp()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method__writer"
+                                                      title="_writer() :: Creates a migration file that represent operation passed in."><span
+                                class="description">Creates a migration file that represent operation passed in.</span>
+                            <pre>_writer()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method_class_name" title="class_name() :: "><span
+                                class="description">class_name()
+        </span>
+                            <pre>class_name()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method_file_stamp"
+                                                      title="file_stamp() :: Gets the stamp to use on migration file."><span
+                                class="description">Gets the stamp to use on migration file.</span>
+                            <pre>file_stamp()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method_last_stamp"
+                                                      title="last_stamp() :: Gets the latest migration stamp."><span
+                                class="description">Gets the latest migration stamp.</span>
+                            <pre>last_stamp()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method_make_files"
+                                                      title="make_files() :: Makes a migration file for each of the passed in operations."><span
+                                class="description">Makes a migration file for each of the passed in operations.</span>
+                            <pre>make_files()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method_makemigrations"
+                                                      title="makemigrations() :: Initiates the migration files generation process."><span
+                                class="description">Initiates the migration files generation process.</span>
+                            <pre>makemigrations()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method_migrate" title="migrate() :: "><span
+                                class="description">migrate()
+        </span>
+                            <pre>migrate()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method_migration_template"
+                                                      title="migration_template() :: Generates a Migration class for an Operation passed in."><span
+                                class="description">Generates a Migration class for an Operation passed in.</span>
+                            <pre>migration_template()</pre>
+                        </a></li>
+                        <li class="method public "><a href="#method_rollback" title="rollback() :: "><span
+                                class="description">rollback()
+        </span>
+                            <pre>rollback()</pre>
+                        </a></li>
+                    </ul>
+                </li>
+                <li class="nav-header">
+                    <i title="Properties" class="icon-custom icon-property"></i> Properties
+                    <ul>
+                        <li class="property public "><a href="#property__migrations_path"
+                                                        title="$_migrations_path() :: "><span
+                                class="description"></span>
+                            <pre>$_migrations_path</pre>
+                        </a></li>
+                        <li class="property public "><a href="#property_tab" title="$tab() :: "><span
+                                class="description"></span>
+                            <pre>$tab</pre>
+                        </a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="span8">
+            <a id="\Migrator"></a>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="../index.html"><i title="Classes" class="icon-custom icon-class"></i></a><span
+                        class="divider">\</span>
+                </li>
+                <li class="active">
+                    <span class="divider">\</span><a href="../classes/Migrator.html">Migrator</a>
+                </li>
+            </ul>
+            <div class="element class">
+                <p class="short_description">Responsible for creating migration files</p>
+
+                <div class="details">
+                    <div class="long_description"></div>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>package</th>
+                            <td><a href="../packages/powerorm.migrations.html">powerorm\migrations</a></td>
+                        </tr>
+                        <tr>
+                            <th>since</th>
+                            <td>1.0.0</td>
+                        </tr>
+                        <tr>
+                            <th>author</th>
+                            <td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+                        </tr>
+                    </table>
+                    <h3>
+                        <i title="Methods" class="icon-custom icon-method"></i> Methods</h3>
+                    <a id="method__format"></a>
+
+                    <div class="element clickable method public method__format " data-toggle="collapse"
+                         data-target=".method__format .collapse" title="public">
+                        <h2>Ensures the string output has enough indents for proper alignment in the migration
+                            file.</h2>
+                        <pre>_format(mixed $items, integer $indent<code> = 1</code>, boolean|TRUE $newline<code> = TRUE</code>) : string</pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                                <h3>Parameters</h3>
+
+                                <div class="subelement argument">
+                                    <h4>$items</h4>
+                                    <code>mixed</code>
+
+                                    <p>the item to format</p></div>
+                                <div class="subelement argument">
+                                    <h4>$indent</h4>
+                                    <code>integer</code>
+
+                                    <p>hhw many tab characters to use.</p></div>
+                                <div class="subelement argument">
+                                    <h4>$newline</h4>
+                                    <code>boolean</code><code>TRUE</code>
+
+                                    <p>if TRUE create a newline after current item is output.</p></div>
+                                <h3>Returns</h3>
+
+                                <div class="subelement response"><code>string</code></div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method__stamp"></a>
+
+                    <div class="element clickable method public method__stamp " data-toggle="collapse"
+                         data-target=".method__stamp .collapse" title="public">
+                        <h2>Create a stamp for each migration file, this will generate timestamp or sequntial numbers
+                            base on the
+                            `migration_type` setting on the migration config file.</h2>
+                        <pre>_stamp() : boolean | integer | string</pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                                <h3>Exceptions</h3>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th><code>\powerorm\exceptions\AmbiguityError</code></th>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                                <h3>Returns</h3>
+
+                                <div class="subelement response">
+                                    <code>boolean</code><code>integer</code><code>string</code>the stamp to use.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method__validate_stamp"></a>
+
+                    <div class="element clickable method public method__validate_stamp " data-toggle="collapse"
+                         data-target=".method__validate_stamp .collapse" title="public">
+                        <h2>Ensure the generated stamp and the stamp used previously match, this is to avoid having
+                            timestamp based
+                            migration files and sequential based migration files on the same application</h2>
+                        <pre>_validate_stamp($migration_stamp) </pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                                <h3>Parameters</h3>
+
+                                <div class="subelement argument"><h4>$migration_stamp</h4></div>
+                                <h3>Exceptions</h3>
+                                <table class="table table-bordered">
+                                    <tr>
+                                        <th><code>\powerorm\exceptions\AmbiguityError</code></th>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method__writer"></a>
+
+                    <div class="element clickable method public method__writer " data-toggle="collapse"
+                         data-target=".method__writer .collapse" title="public">
+                        <h2>Creates a migration file that represent operation passed in.</h2>
+                        <pre>_writer(\powerorm\migrations\operations\Operation $operation) </pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                                <h3>Parameters</h3>
+
+                                <div class="subelement argument">
+                                    <h4>$operation</h4>
+                                    <code>\powerorm\migrations\operations\Operation</code>
+
+                                    <p>the operation to write into file.</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method_class_name"></a>
+
+                    <div class="element clickable method public method_class_name " data-toggle="collapse"
+                         data-target=".method_class_name .collapse" title="public">
+                        <h2>class_name()
+                        </h2>
+                        <pre>class_name(\powerorm\migrations\operations\Operation $operation, integer $timestamp) : mixed | string</pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                                <h3>Parameters</h3>
+
+                                <div class="subelement argument">
+                                    <h4>$operation</h4>
+                                    <code>\powerorm\migrations\operations\Operation</code>
+
+                                    <p>the operation being worked on.</p></div>
+                                <div class="subelement argument">
+                                    <h4>$timestamp</h4>
+                                    <code>integer</code>
+
+                                    <p>the timestamp to ensure name uniqueness.</p></div>
+                                <h3>Returns</h3>
+
+                                <div class="subelement response">
+                                    <code>mixed</code><code>string</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method_file_stamp"></a>
+
+                    <div class="element clickable method public method_file_stamp " data-toggle="collapse"
+                         data-target=".method_file_stamp .collapse" title="public">
+                        <h2>Gets the stamp to use on migration file.</h2>
+                        <pre>file_stamp() : boolean | integer | string</pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                                <h3>Returns</h3>
+
+                                <div class="subelement response">
+                                    <code>boolean</code><code>integer</code><code>string</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method_last_stamp"></a>
+
+                    <div class="element clickable method public method_last_stamp " data-toggle="collapse"
+                         data-target=".method_last_stamp .collapse" title="public">
+                        <h2>Gets the latest migration stamp.</h2>
+                        <pre>last_stamp() : integer</pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                                <h3>Returns</h3>
+
+                                <div class="subelement response"><code>integer</code></div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method_make_files"></a>
+
+                    <div class="element clickable method public method_make_files " data-toggle="collapse"
+                         data-target=".method_make_files .collapse" title="public">
+                        <h2>Makes a migration file for each of the passed in operations.</h2>
+                        <pre>make_files(array $operations) </pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                                <h3>Parameters</h3>
+
+                                <div class="subelement argument">
+                                    <h4>$operations</h4>
+                                    <code>array</code>
+
+                                    <p>an array of operations to create migrations for.</p></div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method_makemigrations"></a>
+
+                    <div class="element clickable method public method_makemigrations " data-toggle="collapse"
+                         data-target=".method_makemigrations .collapse" title="public">
+                        <h2>Initiates the migration files generation process.</h2>
+                        <pre>makemigrations() </pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method_migrate"></a>
+
+                    <div class="element clickable method public method_migrate " data-toggle="collapse"
+                         data-target=".method_migrate .collapse" title="public">
+                        <h2>migrate()
+                        </h2>
+                        <pre>migrate() </pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method_migration_template"></a>
+
+                    <div class="element clickable method public method_migration_template " data-toggle="collapse"
+                         data-target=".method_migration_template .collapse" title="public">
+                        <h2>Generates a Migration class for an Operation passed in.</h2>
+                        <pre>migration_template(\powerorm\migrations\operations\Operation $operation, integer $timestamp) : string</pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                                <h3>Parameters</h3>
+
+                                <div class="subelement argument">
+                                    <h4>$operation</h4>
+                                    <code>\powerorm\migrations\operations\Operation</code>
+
+                                    <p>the operation to create the migration class for.</p></div>
+                                <div class="subelement argument">
+                                    <h4>$timestamp</h4>
+                                    <code>integer</code>
+
+                                    <p>timestamp to ensure uniqueness.</p></div>
+                                <h3>Returns</h3>
+
+                                <div class="subelement response"><code>string</code></div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="method_rollback"></a>
+
+                    <div class="element clickable method public method_rollback " data-toggle="collapse"
+                         data-target=".method_rollback .collapse" title="public">
+                        <h2>rollback()
+                        </h2>
+                        <pre>rollback($version) </pre>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                                <h3>Parameters</h3>
+
+                                <div class="subelement argument"><h4>$version</h4></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3>
+                        <i title="Properties" class="icon-custom icon-property"></i> Properties</h3>
+                    <a id="property__migrations_path"> </a>
+
+                    <div class="element clickable property public property__migrations_path" data-toggle="collapse"
+                         data-target=".property__migrations_path .collapse" title="public">
+                        <h2>$_migrations_path</h2>
+                        <pre>$_migrations_path </pre>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <h3>Default</h3>
+
+                                <div class="subelement argument"></div>
+                            </div>
+                        </div>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="property_tab"> </a>
+
+                    <div class="element clickable property public property_tab" data-toggle="collapse"
+                         data-target=".property_tab .collapse" title="public">
+                        <h2>$tab</h2>
+                        <pre>$tab </pre>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <h3>Default</h3>
+
+                                <div class="subelement argument"><code>"\t\t"</code></div>
+                            </div>
+                        </div>
+                        <div class="labels"><span class="label">Static</span></div>
+                        <div class="row collapse">
+                            <div class="detail-description">
+                                <div class="long_description"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons
+            provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
+            generated on 2016-10-11T09:12:07+03:00.<br></footer>
+    </div>
+</div>
+</body>
+</html>
