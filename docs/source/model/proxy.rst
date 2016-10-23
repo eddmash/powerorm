@@ -18,7 +18,7 @@ This is what proxy model inheritance is for:
 - The difference is that you can change things like the default model ordering in
   the proxy, without having to alter the original.
 
-Proxy models are declared like normal models. You tell PowerOrm that it’s a proxy model by setting
+Proxy models are declared like normal models. You tell PowerOrm that it's a proxy model by setting
 the `proxy` meta setting of the class to True.
 
 .. code-block:: php
