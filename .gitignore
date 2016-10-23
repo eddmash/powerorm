@@ -12,5 +12,15 @@ cs_fixer*
 #-------------------------
 .idea
 
-api
-docs
+
+#-------------------------
+# User Guide Temp Files
+#-------------------------
+docs/build/*
+docs/cilexer
+
+
+#-------------------------
+# API Temp Files
+#-------------------------
+api/raw

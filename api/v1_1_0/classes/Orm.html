@@ -1,0 +1,817 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+<meta charset="utf-8">
+<title>PowerOrm v1.1.0 API » \Orm</title>
+<meta name="author" content="Mike van Riel">
+<meta name="description" content="">
+<link href="../css/template.css" rel="stylesheet" media="all">
+<script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script><script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script><script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script><script src="../js/bootstrap.js" type="text/javascript"></script><script src="../js/template.js" type="text/javascript"></script><script src="../js/prettify/prettify.min.js" type="text/javascript"></script><link rel="shortcut icon" href="../img/favicon.ico">
+<link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+<div class="navbar-inner"><div class="container">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">PowerOrm v1.1.0 API</a><div class="nav-collapse"><ul class="nav">
+<li class="dropdown">
+<a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                                    API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a>Namespaces</a></li>
+<li><a href="../namespaces/Eddmash.html"><i class="icon-th"></i> Eddmash</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
+<li><a>Packages</a></li>
+<li><a href="../packages/Default.html"><i class="icon-folder-open"></i> Default</a></li>
+</ul>
+</li>
+<li class="dropdown" id="charts-menu">
+<a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                                    Charts <b class="caret"></b></a><ul class="dropdown-menu"><li><a href="../graph_class.html"><i class="icon-list-alt"></i> Class hierarchy diagram</a></li></ul>
+</li>
+<li class="dropdown" id="reports-menu">
+<a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                                    Reports <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
+                <span class="label label-info">761</span></a></li>
+<li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
+                <ul></ul></a></li>
+<li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
+                <span class="label label-info">2</span></a></li>
+</ul>
+</li>
+</ul></div>
+</div></div>
+<div class="go_to_top"><a href="#___" style="color: inherit">Back to top  <i class="icon-upload icon-white"></i></a></div>
+</div>
+<div id="___" class="container">
+<noscript><div class="alert alert-warning">
+                            Javascript is disabled; several features are only available
+                            if Javascript is enabled.
+                        </div></noscript>
+<div class="row">
+<div class="span4">
+<div xmlns:php="http://php.net/xsl" class="btn-toolbar">
+<div class="btn-group visibility" data-toggle="buttons-checkbox">
+<button class="btn public active" title="Show public elements">Public</button><button class="btn protected" title="Show protected elements">Protected</button><button class="btn private" title="Show private elements">Private</button><button class="btn inherited active" title="Show inherited elements">Inherited</button>
+</div>
+<div class="btn-group view pull-right" data-toggle="buttons-radio">
+<button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button><button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+</div>
+</div>
+<ul xmlns:php="http://php.net/xsl" class="side-nav nav nav-list">
+<li class="nav-header">
+<i title="Methods" class="icon-custom icon-method"></i> Methods
+                    <ul>
+<li class="method public inherited"><a href="#method___toString" title="__toString() :: "><span class="description">__toString()
+        </span><pre>__toString()</pre></a></li>
+<li class="method public inherited"><a href="#method__standAloneEnvironment" title="_standAloneEnvironment() :: "><span class="description">_standAloneEnvironment()
+        </span><pre>_standAloneEnvironment()</pre></a></li>
+<li class="method public inherited"><a href="#method_configure" title="configure() :: Configures an object with the initial property values."><span class="description">Configures an object with the initial property values.</span><pre>configure()</pre></a></li>
+<li class="method public inherited"><a href="#method_consoleRunner" title="consoleRunner() :: "><span class="description">consoleRunner()
+        </span><pre>consoleRunner()</pre></a></li>
+<li class="method public inherited"><a href="#method_createObject" title="createObject() :: Create an instance of the current class.override this method to match with the class constructor."><span class="description">Create an instance of the current class.override this method to match with the class constructor.</span><pre>createObject()</pre></a></li>
+<li class="method public inherited"><a href="#method_dispatchSignal" title="dispatchSignal() :: Dispatch signals if the Dispatch library is loaded."><span class="description">Dispatch signals if the Dispatch library is loaded.</span><pre>dispatchSignal()</pre></a></li>
+<li class="method public inherited"><a href="#method_getCiObject" title="getCiObject() :: "><span class="description">getCiObject()
+        </span><pre>getCiObject()</pre></a></li>
+<li class="method public inherited"><a href="#method_getDatabaseConnection" title="getDatabaseConnection() :: "><span class="description">getDatabaseConnection()
+        </span><pre>getDatabaseConnection()</pre></a></li>
+<li class="method public inherited"><a href="#method_getDbConnection" title="getDbConnection() :: "><span class="description">getDbConnection()
+        </span><pre>getDbConnection()</pre></a></li>
+<li class="method public inherited"><a href="#method_getDbPrefix" title="getDbPrefix() :: Returns the prefix to use on database tables."><span class="description">Returns the prefix to use on database tables.</span><pre>getDbPrefix()</pre></a></li>
+<li class="method public inherited"><a href="#method_getFakeNamespace" title="getFakeNamespace() :: The fake namespace to use in migration."><span class="description">The fake namespace to use in migration.</span><pre>getFakeNamespace()</pre></a></li>
+<li class="method public inherited"><a href="#method_getFullClassName" title="getFullClassName() :: Returns the fully qualified name of this class."><span class="description">Returns the fully qualified name of this class.</span><pre>getFullClassName()</pre></a></li>
+<li class="method public inherited"><a href="#method_getInstance" title="getInstance() :: This is just a shortcut method. get the current instance of the orm."><span class="description">This is just a shortcut method. get the current instance of the orm.</span><pre>getInstance()</pre></a></li>
+<li class="method public inherited"><a href="#method_getMigrationsNamespace" title="getMigrationsNamespace() :: "><span class="description">getMigrationsNamespace()
+        </span><pre>getMigrationsNamespace()</pre></a></li>
+<li class="method public inherited"><a href="#method_getMigrationsPath" title="getMigrationsPath() :: "><span class="description">getMigrationsPath()
+        </span><pre>getMigrationsPath()</pre></a></li>
+<li class="method public inherited"><a href="#method_getModelsNamespace" title="getModelsNamespace() :: "><span class="description">getModelsNamespace()
+        </span><pre>getModelsNamespace()</pre></a></li>
+<li class="method public inherited"><a href="#method_getModelsPath" title="getModelsPath() :: "><span class="description">getModelsPath()
+        </span><pre>getModelsPath()</pre></a></li>
+<li class="method public inherited"><a href="#method_getOrmFromContext" title="getOrmFromContext() :: "><span class="description">getOrmFromContext()
+        </span><pre>getOrmFromContext()</pre></a></li>
+<li class="method public inherited"><a href="#method_getParent" title="getParent() :: Returns the ReflectionClass of  the immediate parent of this object."><span class="description">Returns the ReflectionClass of  the immediate parent of this object.</span><pre>getParent()</pre></a></li>
+<li class="method public inherited"><a href="#method_getParents" title="getParents() :: Returns all the parents for this object static with the youngest to the oldest
+The resolution order to follow when going up a inheritance hierarchy."><span class="description">Returns all the parents for this object static with the youngest to the oldest
+The resolution order to follow when going up a inheritance hierarchy.</span><pre>getParents()</pre></a></li>
+<li class="method public inherited"><a href="#method_getRegistry" title="getRegistry() :: Returns the application registry. This method populates the registry the first time its invoked and caches it since
+its a very expensive method. subsequent calls get the cached registry."><span class="description">Returns the application registry. This method populates the registry the first time its invoked and caches it since
+its a very expensive method. subsequent calls get the cached registry.</span><pre>getRegistry()</pre></a></li>
+<li class="method public inherited"><a href="#method_getShortClassName" title="getShortClassName() :: "><span class="description">getShortClassName()
+        </span><pre>getShortClassName()</pre></a></li>
+<li class="method public inherited"><a href="#method_getVersion" title="getVersion() :: Returns the numeric version of the orm."><span class="description">Returns the numeric version of the orm.</span><pre>getVersion()</pre></a></li>
+<li class="method public inherited"><a href="#method_hasMethod" title="hasMethod() :: Returns a value indicating whether a method is defined."><span class="description">Returns a value indicating whether a method is defined.</span><pre>hasMethod()</pre></a></li>
+<li class="method public inherited"><a href="#method_hasProperty" title="hasProperty() :: Checks if the provided propert exists in the current object."><span class="description">Checks if the provided propert exists in the current object.</span><pre>hasProperty()</pre></a></li>
+<li class="method public inherited"><a href="#method_normalizeKey" title="normalizeKey() :: A normalizes key names to all lowercase."><span class="description">A normalizes key names to all lowercase.</span><pre>normalizeKey()</pre></a></li>
+<li class="method public inherited"><a href="#method_version" title="version() :: "><span class="description">version()
+        </span><pre>version()</pre></a></li>
+</ul>
+</li>
+<li class="nav-header">
+<i title="Properties" class="icon-custom icon-property"></i> Properties
+                    <ul>
+<li class="property public "><a href="#property_CASCADE" title="$CASCADE() :: "><span class="description"></span><pre>$CASCADE</pre></a></li>
+<li class="property public "><a href="#property_PROTECT" title="$PROTECT() :: "><span class="description"></span><pre>$PROTECT</pre></a></li>
+<li class="property public "><a href="#property_SET_DEFAULT" title="$SET_DEFAULT() :: "><span class="description"></span><pre>$SET_DEFAULT</pre></a></li>
+<li class="property public "><a href="#property_SET_NULL" title="$SET_NULL() :: "><span class="description"></span><pre>$SET_NULL</pre></a></li>
+<li class="property public "><a href="#property_appNamespace" title="$appNamespace() :: The namespace to check for the application models and migrations."><span class="description"></span><pre>$appNamespace</pre></a></li>
+<li class="property public "><a href="#property_connection" title="$connection() :: "><span class="description"></span><pre>$connection</pre></a></li>
+<li class="property public "><a href="#property_dbPrefix" title="$dbPrefix() :: The value to prefix the database tables with."><span class="description"></span><pre>$dbPrefix</pre></a></li>
+<li class="property public "><a href="#property_instance" title="$instance() :: "><span class="description"></span><pre>$instance</pre></a></li>
+<li class="property public "><a href="#property_migrationPath" title="$migrationPath() :: path from where to get and put migration files."><span class="description"></span><pre>$migrationPath</pre></a></li>
+<li class="property public "><a href="#property_modelsPath" title="$modelsPath() :: Path from where to get the models."><span class="description"></span><pre>$modelsPath</pre></a></li>
+</ul>
+</li>
+<li class="nav-header private">» Private
+                    <ul>
+<li class="property private "><a href="#property__signal" title="$_signal() :: "><span class="description"></span><pre>$_signal</pre></a></li>
+<li class="property private "><a href="#property_databaseConfigs" title="$databaseConfigs() :: The configurations to use to connect to the database."><span class="description"></span><pre>$databaseConfigs</pre></a></li>
+<li class="property private "><a href="#property_registryCache" title="$registryCache() :: "><span class="description"></span><pre>$registryCache</pre></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="span8">
+<a xmlns:php="http://php.net/xsl" id="\Orm"></a><ul xmlns:php="http://php.net/xsl" class="breadcrumb">
+<li>
+<a href="../index.html"><i title="Classes" class="icon-custom icon-class"></i></a><span class="divider">\</span>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../classes/Orm.html">Orm</a>
+</li>
+</ul>
+<div xmlns:php="http://php.net/xsl" class="element class">
+<p class="short_description">This class makes the orm available to codeigniter since the orm uses namespaces.</p>
+<div class="details">
+<div class="long_description"><h4>Version 1.0.1 Documentation</h4>
+<p>visit <a href="http://eddmash.github.io/powerorm/docs/v1_0_1"><a href="http://eddmash.github.io/powerorm/docs/v1_0_1">http://eddmash.github.io/powerorm/docs/v1_0_1</a></a></p>
+<h4>Version 1.1.0 Documentation</h4>
+<p>visit <a href="http://eddmash.github.io/powerorm/docs/v1_1_0"><a href="http://eddmash.github.io/powerorm/docs/v1_1_0">http://eddmash.github.io/powerorm/docs/v1_1_0</a></a></p>
+<p>Class Orm.</p></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.0.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+<tr>
+<th>package</th>
+<td><a href="../packages/Default.html">Default</a></td>
+</tr>
+<tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\BaseOrm</td>
+</tr>
+</table>
+<h3>
+<i title="Methods" class="icon-custom icon-method"></i> Methods</h3>
+<a id="method___toString"></a><div class="element clickable method public method___toString inherited" data-toggle="collapse" data-target=".method___toString .collapse" title="public">
+<h2>__toString()
+        </h2>
+<pre>__toString() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method__standAloneEnvironment"></a><div class="element clickable method public method__standAloneEnvironment inherited" data-toggle="collapse" data-target=".method__standAloneEnvironment .collapse" title="public">
+<h2>_standAloneEnvironment()
+        </h2>
+<pre>_standAloneEnvironment($config) </pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$config</h4></div>
+</div></div>
+</div>
+<a id="method_configure"></a><div class="element clickable method public method_configure inherited" data-toggle="collapse" data-target=".method_configure .collapse" title="public">
+<h2>Configures an object with the initial property values.</h2>
+<pre>configure(object $object, array $properties, array $map<code> = array()</code>) : object</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$object</h4>
+<code>object</code><p>the object to be configured</p></div>
+<div class="subelement argument">
+<h4>$properties</h4>
+<code>array</code><p>the property initial values given in terms of name-value pairs</p></div>
+<div class="subelement argument">
+<h4>$map</h4>
+<code>array</code><p>if set the the key should be a key on the $properties and the value should a a property on
+the $object to which the the values of $properties will be assigned to</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>object</code>the object itself</div>
+</div></div>
+</div>
+<a id="method_consoleRunner"></a><div class="element clickable method public method_consoleRunner inherited" data-toggle="collapse" data-target=".method_consoleRunner .collapse" title="public">
+<h2>consoleRunner()
+        </h2>
+<pre>consoleRunner($config<code> = array()</code>) </pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$config</h4></div>
+</div></div>
+</div>
+<a id="method_createObject"></a><div class="element clickable method public method_createObject inherited" data-toggle="collapse" data-target=".method_createObject .collapse" title="public">
+<h2>Create an instance of the current class.override this method to match with the class constructor.</h2>
+<pre>createObject($kwargs<code> = array()</code>) : static</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$kwargs</h4></div>
+<h3>Exceptions</h3>
+<table class="table table-bordered"><tr>
+<th><code>\Eddmash\PowerOrm\Exception\NotImplemented</code></th>
+<td></td>
+</tr></table>
+<h3>Returns</h3>
+<div class="subelement response"><code>static</code></div>
+</div></div>
+</div>
+<a id="method_dispatchSignal"></a><div class="element clickable method public method_dispatchSignal inherited" data-toggle="collapse" data-target=".method_dispatchSignal .collapse" title="public">
+<h2>Dispatch signals if the Dispatch library is loaded.</h2>
+<pre>dispatchSignal($signal_name, $object) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$signal_name</h4></div>
+<div class="subelement argument"><h4>$object</h4></div>
+</div></div>
+</div>
+<a id="method_getCiObject"></a><div class="element clickable method public method_getCiObject inherited" data-toggle="collapse" data-target=".method_getCiObject .collapse" title="public">
+<h2>getCiObject()
+        </h2>
+<pre>getCiObject() : \CI_Controller</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>\CI_Controller</code></div>
+</div></div>
+</div>
+<a id="method_getDatabaseConnection"></a><div class="element clickable method public method_getDatabaseConnection inherited" data-toggle="collapse" data-target=".method_getDatabaseConnection .collapse" title="public">
+<h2>getDatabaseConnection()
+        </h2>
+<pre>getDatabaseConnection() : \Doctrine\DBAL\Connection</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr></table>
+<h3>Exceptions</h3>
+<table class="table table-bordered">
+<tr>
+<th><code>\Eddmash\PowerOrm\Exception\OrmException</code></th>
+<td></td>
+</tr>
+<tr>
+<th><code>\Doctrine\DBAL\DBALException</code></th>
+<td></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Doctrine\DBAL\Connection</code></div>
+</div></div>
+</div>
+<a id="method_getDbConnection"></a><div class="element clickable method public method_getDbConnection inherited" data-toggle="collapse" data-target=".method_getDbConnection .collapse" title="public">
+<h2>getDbConnection()
+        </h2>
+<pre>getDbConnection() : \Doctrine\DBAL\Connection</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Doctrine\DBAL\Connection</code></div>
+</div></div>
+</div>
+<a id="method_getDbPrefix"></a><div class="element clickable method public method_getDbPrefix inherited" data-toggle="collapse" data-target=".method_getDbPrefix .collapse" title="public">
+<h2>Returns the prefix to use on database tables.</h2>
+<pre>getDbPrefix() : string</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_getFakeNamespace"></a><div class="element clickable method public method_getFakeNamespace inherited" data-toggle="collapse" data-target=".method_getFakeNamespace .collapse" title="public">
+<h2>The fake namespace to use in migration.</h2>
+<pre>getFakeNamespace() : string</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_getFullClassName"></a><div class="element clickable method public method_getFullClassName inherited" data-toggle="collapse" data-target=".method_getFullClassName .collapse" title="public">
+<h2>Returns the fully qualified name of this class.</h2>
+<pre>getFullClassName() : string</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code>the fully qualified name of this class</div>
+</div></div>
+</div>
+<a id="method_getInstance"></a><div class="element clickable method public method_getInstance inherited" data-toggle="collapse" data-target=".method_getInstance .collapse" title="public">
+<h2>This is just a shortcut method. get the current instance of the orm.</h2>
+<pre>getInstance($config<code> = null</code>) : \Eddmash\PowerOrm\BaseOrm</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$config</h4></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Eddmash\PowerOrm\BaseOrm</code></div>
+</div></div>
+</div>
+<a id="method_getMigrationsNamespace"></a><div class="element clickable method public method_getMigrationsNamespace inherited" data-toggle="collapse" data-target=".method_getMigrationsNamespace .collapse" title="public">
+<h2>getMigrationsNamespace()
+        </h2>
+<pre>getMigrationsNamespace() </pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getMigrationsPath"></a><div class="element clickable method public method_getMigrationsPath inherited" data-toggle="collapse" data-target=".method_getMigrationsPath .collapse" title="public">
+<h2>getMigrationsPath()
+        </h2>
+<pre>getMigrationsPath() </pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getModelsNamespace"></a><div class="element clickable method public method_getModelsNamespace inherited" data-toggle="collapse" data-target=".method_getModelsNamespace .collapse" title="public">
+<h2>getModelsNamespace()
+        </h2>
+<pre>getModelsNamespace() </pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getModelsPath"></a><div class="element clickable method public method_getModelsPath inherited" data-toggle="collapse" data-target=".method_getModelsPath .collapse" title="public">
+<h2>getModelsPath()
+        </h2>
+<pre>getModelsPath() </pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getOrmFromContext"></a><div class="element clickable method public method_getOrmFromContext inherited" data-toggle="collapse" data-target=".method_getOrmFromContext .collapse" title="public">
+<h2>getOrmFromContext()
+        </h2>
+<pre>getOrmFromContext() </pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getParent"></a><div class="element clickable method public method_getParent inherited" data-toggle="collapse" data-target=".method_getParent .collapse" title="public">
+<h2>Returns the ReflectionClass of  the immediate parent of this object.</h2>
+<pre>getParent() : \ReflectionClass</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>\ReflectionClass</code></div>
+</div></div>
+</div>
+<a id="method_getParents"></a><div class="element clickable method public method_getParents inherited" data-toggle="collapse" data-target=".method_getParents .collapse" title="public">
+<h2>Returns all the parents for this object static with the youngest to the oldest
+The resolution order to follow when going up a inheritance hierarchy.</h2>
+<pre>getParents($stopAt<code> = array()</code>) : array</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$stopAt</h4></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>this an array of ReflectionClass</div>
+</div></div>
+</div>
+<a id="method_getRegistry"></a><div class="element clickable method public method_getRegistry inherited" data-toggle="collapse" data-target=".method_getRegistry .collapse" title="public">
+<h2>Returns the application registry. This method populates the registry the first time its invoked and caches it since
+its a very expensive method. subsequent calls get the cached registry.</h2>
+<pre>getRegistry() : \Eddmash\PowerOrm\App\Registry</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Eddmash\PowerOrm\App\Registry</code></div>
+</div></div>
+</div>
+<a id="method_getShortClassName"></a><div class="element clickable method public method_getShortClassName inherited" data-toggle="collapse" data-target=".method_getShortClassName .collapse" title="public">
+<h2>getShortClassName()
+        </h2>
+<pre>getShortClassName() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="method_getVersion"></a><div class="element clickable method public method_getVersion inherited" data-toggle="collapse" data-target=".method_getVersion .collapse" title="public">
+<h2>Returns the numeric version of the orm.</h2>
+<pre>getVersion() : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_hasMethod"></a><div class="element clickable method public method_hasMethod inherited" data-toggle="collapse" data-target=".method_hasMethod .collapse" title="public">
+<h2>Returns a value indicating whether a method is defined.</h2>
+<pre>hasMethod(string $name) : boolean</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>The default implementation is a call to php function <code>method_exists()</code>.</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$name</h4>
+<code>string</code><p>the method name</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>boolean</code>whether the method is defined</div>
+</div></div>
+</div>
+<a id="method_hasProperty"></a><div class="element clickable method public method_hasProperty inherited" data-toggle="collapse" data-target=".method_hasProperty .collapse" title="public">
+<h2>Checks if the provided propert exists in the current object.</h2>
+<pre>hasProperty($name) : boolean</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>boolean</code></div>
+</div></div>
+</div>
+<a id="method_normalizeKey"></a><div class="element clickable method public method_normalizeKey inherited" data-toggle="collapse" data-target=".method_normalizeKey .collapse" title="public">
+<h2>A normalizes key names to all lowercase.</h2>
+<pre>normalizeKey($name) : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$name</h4></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_version"></a><div class="element clickable method public method_version inherited" data-toggle="collapse" data-target=".method_version .collapse" title="public">
+<h2>version()
+        </h2>
+<pre>version() : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>deprecated</th>
+<td></td>
+</tr>
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<h3>
+<i title="Properties" class="icon-custom icon-property"></i> Properties</h3>
+<a id="property_CASCADE"> </a><div class="element clickable property public property_CASCADE" data-toggle="collapse" data-target=".property_CASCADE .collapse" title="public">
+<h2>$CASCADE</h2>
+<pre>$CASCADE </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>'cascade'</code></div>
+</div></div>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_PROTECT"> </a><div class="element clickable property public property_PROTECT" data-toggle="collapse" data-target=".property_PROTECT .collapse" title="public">
+<h2>$PROTECT</h2>
+<pre>$PROTECT </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>'protect'</code></div>
+</div></div>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_SET_DEFAULT"> </a><div class="element clickable property public property_SET_DEFAULT" data-toggle="collapse" data-target=".property_SET_DEFAULT .collapse" title="public">
+<h2>$SET_DEFAULT</h2>
+<pre>$SET_DEFAULT </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>'set_default'</code></div>
+</div></div>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_SET_NULL"> </a><div class="element clickable property public property_SET_NULL" data-toggle="collapse" data-target=".property_SET_NULL .collapse" title="public">
+<h2>$SET_NULL</h2>
+<pre>$SET_NULL </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>'set_null'</code></div>
+</div></div>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_appNamespace"> </a><div class="element clickable property public property_appNamespace" data-toggle="collapse" data-target=".property_appNamespace .collapse" title="public">
+<h2>The namespace to check for the application models and migrations.</h2>
+<pre>$appNamespace : string</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>'app\\'</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_connection"> </a><div class="element clickable property public property_connection" data-toggle="collapse" data-target=".property_connection .collapse" title="public">
+<h2>$connection</h2>
+<pre>$connection : \Doctrine\DBAL\Connection</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_dbPrefix"> </a><div class="element clickable property public property_dbPrefix" data-toggle="collapse" data-target=".property_dbPrefix .collapse" title="public">
+<h2>The value to prefix the database tables with.</h2>
+<pre>$dbPrefix : string</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_instance"> </a><div class="element clickable property public property_instance" data-toggle="collapse" data-target=".property_instance .collapse" title="public">
+<h2>$instance</h2>
+<pre>$instance </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_migrationPath"> </a><div class="element clickable property public property_migrationPath" data-toggle="collapse" data-target=".property_migrationPath .collapse" title="public">
+<h2>path from where to get and put migration files.</h2>
+<pre>$migrationPath : string</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_modelsPath"> </a><div class="element clickable property public property_modelsPath" data-toggle="collapse" data-target=".property_modelsPath .collapse" title="public">
+<h2>Path from where to get the models.</h2>
+<pre>$modelsPath : string</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property__signal"> </a><div class="element clickable property private property__signal" data-toggle="collapse" data-target=".property__signal .collapse" title="private">
+<h2>$_signal</h2>
+<pre>$_signal : boolean</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_databaseConfigs"> </a><div class="element clickable property private property_databaseConfigs" data-toggle="collapse" data-target=".property_databaseConfigs .collapse" title="private">
+<h2>The configurations to use to connect to the database.</h2>
+<pre>$databaseConfigs : array</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"><p>It should be an array which must contain at least one of the following.</p>
+<p>Either 'driver' with one of the following values:</p>
+<pre><code>pdo_mysql
+pdo_sqlite
+pdo_pgsql
+pdo_oci (unstable)
+pdo_sqlsrv
+pdo_sqlsrv
+mysqli
+sqlanywhere
+sqlsrv
+ibm_db2 (unstable)
+drizzle_pdo_mysql</code></pre>
+<p>OR 'driverClass' that contains the full class name (with namespace) of the
+driver class to instantiate.</p>
+<p>Other (optional) parameters:</p>
+<p><b>user (string)</b>:
+The username to use when connecting.</p>
+<p><b>password (string)</b>:
+The password to use when connecting.</p>
+<p><b>driverOptions (array)</b>:
+Any additional driver-specific options for the driver. These are just passed
+through to the driver.</p>
+<p><b>pdo</b>:
+You can pass an existing PDO instance through this parameter. The PDO
+instance will be wrapped in a Doctrine\DBAL\Connection.</p>
+<p><b>wrapperClass</b>:
+You may specify a custom wrapper class through the 'wrapperClass'
+parameter but this class MUST inherit from Doctrine\DBAL\Connection.</p>
+<p><b>driverClass</b>:
+The driver class to use.</p>
+<p><strong>USAGE:</strong></p>
+<p>[
+'dbname' =&gt; 'tester',
+'user' =&gt; 'root',
+'password' =&gt; 'root1.',
+'host' =&gt; 'localhost',
+'driver' =&gt; 'pdo_mysql',
+]</p></div></div></div>
+</div>
+<a id="property_registryCache"> </a><div class="element clickable property private property_registryCache" data-toggle="collapse" data-target=".property_registryCache .collapse" title="private">
+<h2>$registryCache</h2>
+<pre>$registryCache : \Eddmash\PowerOrm\App\Registry</pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="row"><footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
+            generated on 2016-10-22T11:57:08+03:00.<br></footer></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,543 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+<meta charset="utf-8">
+<title>API Documentation » \powerorm\model\ProxyModel</title>
+<meta name="author" content="Mike van Riel">
+<meta name="description" content="">
+<link href="../css/template.css" rel="stylesheet" media="all">
+<script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script><script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script><script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script><script src="../js/bootstrap.js" type="text/javascript"></script><script src="../js/template.js" type="text/javascript"></script><script src="../js/prettify/prettify.min.js" type="text/javascript"></script><link rel="shortcut icon" href="../img/favicon.ico">
+<link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png">
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+<div class="navbar-inner"><div class="container">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">API Documentation</a><div class="nav-collapse"><ul class="nav">
+<li class="dropdown">
+<a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                                    API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a>Namespaces</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
+<li><a href="../namespaces/powerorm.html"><i class="icon-th"></i> powerorm</a></li>
+<li><a>Packages</a></li>
+<li><a href="../packages/Default.html"><i class="icon-folder-open"></i> Default</a></li>
+<li><a href="../packages/powerorm.html"><i class="icon-folder-open"></i> powerorm</a></li>
+</ul>
+</li>
+<li class="dropdown" id="charts-menu">
+<a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                                    Charts <b class="caret"></b></a><ul class="dropdown-menu"><li><a href="../graph_class.html"><i class="icon-list-alt"></i> Class hierarchy diagram</a></li></ul>
+</li>
+<li class="dropdown" id="reports-menu">
+<a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                                    Reports <b class="caret"></b></a><ul class="dropdown-menu">
+<li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
+                <span class="label label-info">471</span></a></li>
+<li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
+                <ul></ul></a></li>
+<li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
+                <span class="label label-info">0</span></a></li>
+</ul>
+</li>
+</ul></div>
+</div></div>
+<div class="go_to_top"><a href="#___" style="color: inherit">Back to top  <i class="icon-upload icon-white"></i></a></div>
+</div>
+<div id="___" class="container">
+<noscript><div class="alert alert-warning">
+                            Javascript is disabled; several features are only available
+                            if Javascript is enabled.
+                        </div></noscript>
+<div class="row">
+<div class="span4">
+<div xmlns:php="http://php.net/xsl" class="btn-toolbar">
+<div class="btn-group visibility" data-toggle="buttons-checkbox">
+<button class="btn public active" title="Show public elements">Public</button><button class="btn protected" title="Show protected elements">Protected</button><button class="btn private" title="Show private elements">Private</button><button class="btn inherited active" title="Show inherited elements">Inherited</button>
+</div>
+<div class="btn-group view pull-right" data-toggle="buttons-radio">
+<button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button><button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+</div>
+</div>
+<ul xmlns:php="http://php.net/xsl" class="side-nav nav nav-list">
+<li class="nav-header">
+<i title="Methods" class="icon-custom icon-method"></i> Methods
+                    <ul>
+<li class="method public "><a href="#method___construct" title="__construct() :: "><span class="description">__construct()
+        </span><pre>__construct()</pre></a></li>
+<li class="method public inherited"><a href="#method_add" title="add() :: Stores Many To Many relationship"><span class="description">Stores Many To Many relationship</span><pre>add()</pre></a></li>
+<li class="method public inherited"><a href="#method_delete" title="delete() :: This method clears all the records in the database table represented by the model."><span class="description">This method clears all the records in the database table represented by the model.</span><pre>delete()</pre></a></li>
+<li class="method public "><a href="#method_fields" title="fields() :: All the model fields are set on this model."><span class="description">All the model fields are set on this model.</span><pre>fields()</pre></a></li>
+<li class="method public inherited"><a href="#method_fields" title="fields() :: All the model fields are set on this model."><span class="description">All the model fields are set on this model.</span><pre>fields()</pre></a></li>
+<li class="method public inherited"><a href="#method_first" title="first() :: Gets the first record in the table represented by this model."><span class="description">Gets the first record in the table represented by this model.</span><pre>first()</pre></a></li>
+<li class="method public inherited"><a href="#method_form_builder" title="form_builder() :: Creates a form builder used to customize the way the form that represents current model is created."><span class="description">Creates a form builder used to customize the way the form that represents current model is created.</span><pre>form_builder()</pre></a></li>
+<li class="method public inherited"><a href="#method_full_table_name" title="full_table_name() :: The database table that this model represents with the prefix appended if one
+was set on the database configuration"><span class="description">The database table that this model represents with the prefix appended if one
+was set on the database configuration</span><pre>full_table_name()</pre></a></li>
+<li class="method public inherited"><a href="#method_get_table_name" title="get_table_name() :: The database table that this model represents"><span class="description">The database table that this model represents</span><pre>get_table_name()</pre></a></li>
+<li class="method public inherited"><a href="#method_get_uri" title="get_uri() :: Sets the relative uri to an instance of the model e.g. user/1 ."><span class="description">Sets the relative uri to an instance of the model e.g. user/1 .</span><pre>get_uri()</pre></a></li>
+<li class="method public inherited"><a href="#method_last" title="last() :: Gets the last record in the table represented by this model."><span class="description">Gets the last record in the table represented by this model.</span><pre>last()</pre></a></li>
+<li class="method public inherited"><a href="#method_permissions" title="permissions() :: The Permissions to set for this model."><span class="description">The Permissions to set for this model.</span><pre>permissions()</pre></a></li>
+<li class="method public inherited"><a href="#method_queryset" title="queryset() :: Creates a Queryset that is used to interaract with the database"><span class="description">Creates a Queryset that is used to interaract with the database</span><pre>queryset()</pre></a></li>
+<li class="method public inherited"><a href="#method_save" title="save() :: Creates or Updates an object in the database,"><span class="description">Creates or Updates an object in the database,</span><pre>save()</pre></a></li>
+<li class="method public inherited"><a href="#method_table_prefix" title="table_prefix() :: Returns the database prefix to used on the table represent by current model."><span class="description">Returns the database prefix to used on the table represent by current model.</span><pre>table_prefix()</pre></a></li>
+<li class="method public inherited"><a href="#method_toForm" title="toForm() :: Returns a Form that represents the current model."><span class="description">Returns a Form that represents the current model.</span><pre>toForm()</pre></a></li>
+<li class="method public inherited"><a href="#method_with" title="with() :: Eager loading, this will solve the N+1 ISSUE"><span class="description">Eager loading, this will solve the N+1 ISSUE</span><pre>with()</pre></a></li>
+</ul>
+</li>
+<li class="nav-header">
+<i title="Properties" class="icon-custom icon-property"></i> Properties
+                    <ul>
+<li class="property public "><a href="#property_inverse_model" title="$inverse_model() :: "><span class="description"></span><pre>$inverse_model</pre></a></li>
+<li class="property public "><a href="#property_model_name" title="$model_name() :: "><span class="description"></span><pre>$model_name</pre></a></li>
+<li class="property public "><a href="#property_owner_model" title="$owner_model() :: "><span class="description"></span><pre>$owner_model</pre></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="span8">
+<a xmlns:php="http://php.net/xsl" id="\powerorm\model\ProxyModel"></a><ul xmlns:php="http://php.net/xsl" class="breadcrumb">
+<li>
+<a href="../index.html"><i title="Classes" class="icon-custom icon-class"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/powerorm.html">powerorm</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/powerorm.model.html">model</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../classes/powerorm.model.ProxyModel.html">ProxyModel</a>
+</li>
+</ul>
+<div xmlns:php="http://php.net/xsl" class="element class">
+<p class="short_description">Class ProxyModel</p>
+<div class="details">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>package</th>
+<td><a href="../packages/powerorm.model.html">powerorm\model</a></td>
+</tr>
+<tr>
+<th>since</th>
+<td>1.0.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+<tr>
+<th>inherited_from</th>
+<td>\PModel</td>
+</tr>
+</table>
+<h3>
+<i title="Methods" class="icon-custom icon-method"></i> Methods</h3>
+<a id="method___construct"></a><div class="element clickable method public method___construct " data-toggle="collapse" data-target=".method___construct .collapse" title="public">
+<h2>__construct()
+        </h2>
+<pre>__construct($owner_model, $inverse_model) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$owner_model</h4></div>
+<div class="subelement argument"><h4>$inverse_model</h4></div>
+</div></div>
+</div>
+<a id="method_add"></a><div class="element clickable method public method_add inherited" data-toggle="collapse" data-target=".method_add .collapse" title="public">
+<h2>Stores Many To Many relationship</h2>
+<pre>add(array $related<code> = array()</code>, string $using_db_group<code> = ''</code>) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>This methods expects and array, the array should contain object of related model or
+a Queryset object of the related model</p>
+<h4><strong>! Important </strong>Each call of this method can only handle one type of related model and expect
+the related models to have already been saved in the database</h4>
+<p>e.g. the following will raise an OrmExceptions,</p>
+<pre><code>$user = $this->user_model->get(1);
+$role = $this->role->get(1);
+$perm = $this->permission_model->get(1);
+$user->add([$role, $perm]);
+</code></pre>
+<p>use two calls</p>
+<pre><code>$user = $this->user_model->get(1);
+$role = $this->role->get(1);
+$perm = $this->permission_model->get(1);
+$user->add([$role]);
+$user->add([$perm]);
+
+// passing a Queryset
+$role = $this->role->all());
+$user->add([$role]);
+</code></pre></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$related</h4>
+<code>array</code><p>the objects of related models to associate with the current model.</p></div>
+<div class="subelement argument">
+<h4>$using_db_group</h4>
+<code>string</code>
+</div>
+<h3>Exceptions</h3>
+<table class="table table-bordered">
+<tr>
+<th><code>\powerorm\exceptions\OrmExceptions</code></th>
+<td></td>
+</tr>
+<tr>
+<th><code>\powerorm\exceptions\TypeError</code></th>
+<td></td>
+</tr>
+</table>
+</div></div>
+</div>
+<a id="method_delete"></a><div class="element clickable method public method_delete inherited" data-toggle="collapse" data-target=".method_delete .collapse" title="public">
+<h2>This method clears all the records in the database table represented by the model.</h2>
+<pre>delete(array $opts<code> = array()</code>) </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><h4>USAGE:</h4>
+<p>Deleting all the records.</p>
+<pre><code>$this->role->delete()</code></pre>
+<p><strong>NB</strong> also consider using the Queryset delete().
+{@link }</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$opts</h4>
+<code>array</code>
+</div>
+</div></div>
+</div>
+<a id="method_fields"></a><div class="element clickable method public method_fields " data-toggle="collapse" data-target=".method_fields .collapse" title="public">
+<h2>All the model fields are set on this model.</h2>
+<pre>fields() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><pre><code>public function fields(){
+     $this->username = ORM::CharField(['max_length'=>30]);
+     $this->first_name = ORM::CharField(['max_length'=>30]);
+     $this->last_name = ORM::CharField(['max_length'=>30]);
+     $this->password = ORM::CharField(['max_length'=>255]);
+     $this->phone_number = ORM::CharField(['max_length'=>30]);
+}</code></pre></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\PModel::fields()</td>
+</tr></table>
+</div></div>
+</div>
+<a id="method_fields"></a><div class="element clickable method public method_fields inherited" data-toggle="collapse" data-target=".method_fields .collapse" title="public">
+<h2>All the model fields are set on this model.</h2>
+<pre>fields() </pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"><pre><code>public function fields(){
+     $this->username = ORM::CharField(['max_length'=>30]);
+     $this->first_name = ORM::CharField(['max_length'=>30]);
+     $this->last_name = ORM::CharField(['max_length'=>30]);
+     $this->password = ORM::CharField(['max_length'=>255]);
+     $this->phone_number = ORM::CharField(['max_length'=>30]);
+}</code></pre></div></div></div>
+</div>
+<a id="method_first"></a><div class="element clickable method public method_first inherited" data-toggle="collapse" data-target=".method_first .collapse" title="public">
+<h2>Gets the first record in the table represented by this model.</h2>
+<pre>first(array $opts<code> = array()</code>) : \powerorm\model\ProxyModel</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><h4>USAGE:</h4>
+<p>$users = $this-&gt;user_model-&gt;first();</p>
+<p>echo $users-&gt;username;</p></div>
+<table class="table table-bordered"><tr>
+<th>fluent</th>
+<td>This method is part of a fluent interface and will return the same instance</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$opts</h4>
+<code>array</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\powerorm\model\ProxyModel</code></div>
+</div></div>
+</div>
+<a id="method_form_builder"></a><div class="element clickable method public method_form_builder inherited" data-toggle="collapse" data-target=".method_form_builder .collapse" title="public">
+<h2>Creates a form builder used to customize the way the form that represents current model is created.</h2>
+<pre>form_builder() : \powerorm\form\ModelForm</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\powerorm\form\ModelForm</code></div>
+</div></div>
+</div>
+<a id="method_full_table_name"></a><div class="element clickable method public method_full_table_name inherited" data-toggle="collapse" data-target=".method_full_table_name .collapse" title="public">
+<h2>The database table that this model represents with the prefix appended if one
+was set on the database configuration</h2>
+<pre>full_table_name(null $name<code> = NULL</code>) : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$name</h4>
+<code>null</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_get_table_name"></a><div class="element clickable method public method_get_table_name inherited" data-toggle="collapse" data-target=".method_get_table_name .collapse" title="public">
+<h2>The database table that this model represents</h2>
+<pre>get_table_name() : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_get_uri"></a><div class="element clickable method public method_get_uri inherited" data-toggle="collapse" data-target=".method_get_uri .collapse" title="public">
+<h2>Sets the relative uri to an instance of the model e.g. user/1 .</h2>
+<pre>get_uri(boolean $slug<code> = FALSE</code>) : string</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><pre><code>public function get_uri($slug=FALSE){
+  $route = $this->id;
+
+  if($slug==TRUE){
+     $route = $this->slug;
+  }
+  return 'user/'.$route;
+}</code></pre></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$slug</h4>
+<code>boolean</code><p>if set to true returns the url as a slug e.g. user/admin</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>string</code></div>
+</div></div>
+</div>
+<a id="method_last"></a><div class="element clickable method public method_last inherited" data-toggle="collapse" data-target=".method_last .collapse" title="public">
+<h2>Gets the last record in the table represented by this model.</h2>
+<pre>last(array $opts<code> = array()</code>) : \powerorm\model\ProxyModel</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><h4>USAGE:</h4>
+<p>$users = $this-&gt;user_model-&gt;last();</p>
+<p>echo $users-&gt;username;</p></div>
+<table class="table table-bordered"><tr>
+<th>fluent</th>
+<td>This method is part of a fluent interface and will return the same instance</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$opts</h4>
+<code>array</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\powerorm\model\ProxyModel</code></div>
+</div></div>
+</div>
+<a id="method_permissions"></a><div class="element clickable method public method_permissions inherited" data-toggle="collapse" data-target=".method_permissions .collapse" title="public">
+<h2>The Permissions to set for this model.</h2>
+<pre>permissions() : array</pre>
+<div class="labels">
+<span class="label">Inherited</span><span class="label">Static</span>
+</div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>The permission include the following</p>
+<ul>
+<li>can_add ------------------ User with this permission can a new item of the model</li>
+<li>can_update ------------------ User with this permission can a update item of the model</li>
+<li>can_view ------------------ User with this permission can a view details about a single item of the model</li>
+<li>can_delete ------------------ User with this permission can delete item of the model</li>
+<li>can_list ------------------ User with this permission can a see a list of items belonging to the model</li>
+</ul>
+<p>To Add more permissions in your model overrride this method as below, remember to call the parent method
+e.g in the roles model</p>
+<pre><code>public static function permissions(){
+     $perms = parent::permissions();
+     $perms["can_assign_user_roles"]= "Can Assign User Roles";
+     return $perms;
+}</code></pre></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>array</code></div>
+</div></div>
+</div>
+<a id="method_queryset"></a><div class="element clickable method public method_queryset inherited" data-toggle="collapse" data-target=".method_queryset .collapse" title="public">
+<h2>Creates a Queryset that is used to interaract with the database</h2>
+<pre>queryset(string $opts) : \powerorm\queries\Queryset</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$opts</h4>
+<code>string</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\powerorm\queries\Queryset</code></div>
+</div></div>
+</div>
+<a id="method_save"></a><div class="element clickable method public method_save inherited" data-toggle="collapse" data-target=".method_save .collapse" title="public">
+<h2>Creates or Updates an object in the database,</h2>
+<pre>save(array $opts<code> = array()</code>) : mixed</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><h4>How it differentiates between update and create</h4>
+<p>This methods does an update if the model contains a value on its primary key value else it creates.</p>
+<p>On create or update this method will return the created object.</p>
+<h4>Signal Emitted</h4>
+<p>If the <a href="https://github.com/eddmash/powerdispatch"><a href="https://github.com/eddmash/powerdispatch">https://github.com/eddmash/powerdispatch</a></a> is enabled, this method emits two signals</p>
+<ul>
+<li>
+<p><strong>powerorm.model.pre_save</strong></p>
+<p>allowing any receivers listening for that signal to take some customized action.</p>
+</li>
+<li>
+<p><strong>powerorm.model.post_save</strong></p>
+<p>allowing any receivers listening for that signal to take some customized action.</p>
+</li>
+</ul>
+<h4>USAGE</h4>
+<p>To create an new object</p>
+<pre><code>$role = new role();
+$role->name = "ceo";
+$role = $role->save();</code></pre>
+<p>To update existing an new object</p>
+<p>e.g. assuming the above object got a primary key of <code>3</code> we can update its name as follows</p>
+<pre><code> $role = $this->role->get(3);
+$role->name = "chief executive officer";
+$role = $cat->save();</code></pre></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$opts</h4>
+<code>array</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>mixed</code></div>
+</div></div>
+</div>
+<a id="method_table_prefix"></a><div class="element clickable method public method_table_prefix inherited" data-toggle="collapse" data-target=".method_table_prefix .collapse" title="public">
+<h2>Returns the database prefix to used on the table represent by current model.</h2>
+<pre>table_prefix() : mixed</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>mixed</code></div>
+</div></div>
+</div>
+<a id="method_toForm"></a><div class="element clickable method public method_toForm inherited" data-toggle="collapse" data-target=".method_toForm .collapse" title="public">
+<h2>Returns a Form that represents the current model.</h2>
+<pre>toForm() : \powerorm\model\ProxyModel</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>fluent</th>
+<td>This method is part of a fluent interface and will return the same instance</td>
+</tr></table>
+<h3>Exceptions</h3>
+<table class="table table-bordered">
+<tr>
+<th><code>\powerorm\exceptions\OrmExceptions</code></th>
+<td></td>
+</tr>
+<tr>
+<th><code>\powerorm\exceptions\DuplicateField</code></th>
+<td></td>
+</tr>
+<tr>
+<th><code>\powerorm\exceptions\FormException</code></th>
+<td></td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response"><code>\powerorm\model\ProxyModel</code></div>
+</div></div>
+</div>
+<a id="method_with"></a><div class="element clickable method public method_with inherited" data-toggle="collapse" data-target=".method_with .collapse" title="public">
+<h2>Eager loading, this will solve the N+1 ISSUE</h2>
+<pre>with(array $conditions, array $opts<code> = array()</code>) : \powerorm\queries\Queryset</pre>
+<div class="labels"><span class="label">Inherited</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><h4>USAGE:</h4>
+<p>To Eager load related items of a single item</p>
+<p>This method takes all the fields that need to be eagerly loaded.</p>
+<pre><code>$category = $this->category_model->with(["products"])->get(array("id"=>1));
+
+$category->products; // the products are now accessible like so
+
+foreach($rr->products as $product){
+         echo $product->name;
+}</code></pre>
+<p>To Eager Many To Many Relationship</p>
+<pre><code>$roles = $this->role->with(['permissions'])->filter(array('user_model::id'=>1));
+foreach ($roles as $role) {
+        echo $role ;
+
+     foreach ($role->permissions as $perm) {
+         echo $perm->name;
+     }
+}</code></pre>
+<p>To Eager Load more than one relationship , this eager loads a user roles and products.</p>
+<pre><code>$usr= $this->user_model->with(["products", "roles"])->get(["id"=>1]);
+
+</code></pre></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$conditions</h4>
+<code>array</code><p>the name/names of model fields.</p></div>
+<div class="subelement argument">
+<h4>$opts</h4>
+<code>array</code>
+</div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\powerorm\queries\Queryset</code></div>
+</div></div>
+</div>
+<h3>
+<i title="Properties" class="icon-custom icon-property"></i> Properties</h3>
+<a id="property_inverse_model"> </a><div class="element clickable property public property_inverse_model" data-toggle="collapse" data-target=".property_inverse_model .collapse" title="public">
+<h2>$inverse_model</h2>
+<pre>$inverse_model </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_model_name"> </a><div class="element clickable property public property_model_name" data-toggle="collapse" data-target=".property_model_name .collapse" title="public">
+<h2>$model_name</h2>
+<pre>$model_name </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_owner_model"> </a><div class="element clickable property public property_owner_model" data-toggle="collapse" data-target=".property_owner_model .collapse" title="public">
+<h2>$owner_model</h2>
+<pre>$owner_model </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="row"><footer class="span12">
+            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
+            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
+            generated on 2016-10-11T09:12:07+03:00.<br></footer></div>
+</div>
+</body>
+</html>
