@@ -275,7 +275,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             if ($this->_fieldCache == null || !ArrayHelper::hasKey($this->_fieldCache, $attrName)):
 
-
                 $field = OneToOneField::createObject([
                     'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
                     'onDelete' => Delete::CASCADE,

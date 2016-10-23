@@ -179,7 +179,7 @@ class ModelState extends Object
     }
 
     public function __toString()
-    { 
+    {
         return (string) sprintf("<ModelState: '%s'>", $this->name);
 
     }

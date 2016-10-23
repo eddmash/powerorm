@@ -285,7 +285,6 @@ class Executor extends Object
             $migrations[$name] = $migrationArr['migration'];
         endforeach;
 
-
         return $migrations;
     }
 }

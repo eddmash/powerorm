@@ -75,7 +75,6 @@ class Loader extends Object
         endforeach;
     }
 
-
     /**
      * Returns the migration(s) which match the given prefix.
      *
