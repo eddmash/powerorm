@@ -338,6 +338,7 @@ class BaseOrm extends Object
         endif;
 
         foreach ($properties as $name => $value) :
+
             if (ArrayHelper::hasKey($map, $name)):
 
                 $name = $map[$name];

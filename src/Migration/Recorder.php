@@ -87,7 +87,6 @@ class Recorder
         endif;
         $schemaM = $this->connection->getSchemaManager();
         $schema = $schemaM->createSchema();
-
         if (!$schemaM->tablesExist($this->migrationTableName)):
 
             $myTable = $schema->createTable($this->migrationTableName);

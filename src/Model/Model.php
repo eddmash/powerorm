@@ -392,6 +392,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                             implode(', ', $commonFields), $parentName, $immediateParent));
 
                 endif;
+
             endif;
 
             // if the parent is an abstract model and the current model is a proxy model
@@ -400,6 +401,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             if (($isOnCurrentModel && $isProxy) && $immediateParent === $previousAbstractParent):
                 $parentFields = $modelFields[$previousAbstractParent];
+
                 if (!empty($parentFields)):
                     throw new TypeError(sprintf('Abstract base class containing model fields not '.
                         "permitted for proxy model '%s'.", $parentName));

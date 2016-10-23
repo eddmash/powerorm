@@ -31,7 +31,6 @@ class Executor extends Object
      * @var Loader
      */
     public $loader;
-
     /**
      * @var Connection
      */
