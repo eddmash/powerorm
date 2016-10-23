@@ -34,7 +34,7 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">761</span></a></li>
+                <span class="label label-info">793</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
@@ -70,8 +70,12 @@
         </span><pre>__toString()</pre></a></li>
 <li class="method public inherited"><a href="#method_allowMigrateModel" title="allowMigrateModel() :: Returns if we're allowed to migrate the model."><span class="description">Returns if we're allowed to migrate the model.</span><pre>allowMigrateModel()</pre></a></li>
 <li class="method public inherited"><a href="#method_createObject" title="createObject() :: Create an instance of the current class.override this method to match with the class constructor."><span class="description">Create an instance of the current class.override this method to match with the class constructor.</span><pre>createObject()</pre></a></li>
+<li class="method public "><a href="#method_databaseBackwards" title="databaseBackwards() :: "><span class="description">databaseBackwards()
+        </span><pre>databaseBackwards()</pre></a></li>
 <li class="method public inherited"><a href="#method_databaseBackwards" title="databaseBackwards() :: "><span class="description">databaseBackwards()
         </span><pre>databaseBackwards()</pre></a></li>
+<li class="method public "><a href="#method_databaseForwards" title="databaseForwards() :: "><span class="description">databaseForwards()
+        </span><pre>databaseForwards()</pre></a></li>
 <li class="method public inherited"><a href="#method_databaseForwards" title="databaseForwards() :: "><span class="description">databaseForwards()
         </span><pre>databaseForwards()</pre></a></li>
 <li class="method public inherited"><a href="#method_deconstruct" title="deconstruct() :: "><span class="description">deconstruct()
@@ -226,6 +230,23 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 <div class="subelement response"><code>static</code></div>
 </div></div>
 </div>
+<a id="method_databaseBackwards"></a><div class="element clickable method public method_databaseBackwards " data-toggle="collapse" data-target=".method_databaseBackwards .collapse" title="public">
+<h2>databaseBackwards()
+        </h2>
+<pre>databaseBackwards(\Eddmash\PowerOrm\Db\SchemaEditor $schemaEditor, \Eddmash\PowerOrm\Migration\State\ProjectState $fromState, \Eddmash\PowerOrm\Migration\State\ProjectState $toState) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Migration\Operation\Operation::databaseBackwards()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$schemaEditor</h4></div>
+<div class="subelement argument"><h4>$fromState</h4></div>
+<div class="subelement argument"><h4>$toState</h4></div>
+</div></div>
+</div>
 <a id="method_databaseBackwards"></a><div class="element clickable method public method_databaseBackwards inherited" data-toggle="collapse" data-target=".method_databaseBackwards .collapse" title="public">
 <h2>databaseBackwards()
         </h2>
@@ -262,6 +283,23 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 </div>
 <h3>Returns</h3>
 <div class="subelement response"><code>mixed</code></div>
+</div></div>
+</div>
+<a id="method_databaseForwards"></a><div class="element clickable method public method_databaseForwards " data-toggle="collapse" data-target=".method_databaseForwards .collapse" title="public">
+<h2>databaseForwards()
+        </h2>
+<pre>databaseForwards(\Eddmash\PowerOrm\Db\SchemaEditor $schemaEditor, \Eddmash\PowerOrm\Migration\State\ProjectState $fromState, \Eddmash\PowerOrm\Migration\State\ProjectState $toState) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>inherited_from</th>
+<td>\Eddmash\PowerOrm\Migration\Operation\Operation::databaseForwards()</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$schemaEditor</h4></div>
+<div class="subelement argument"><h4>$fromState</h4></div>
+<div class="subelement argument"><h4>$toState</h4></div>
 </div></div>
 </div>
 <a id="method_databaseForwards"></a><div class="element clickable method public method_databaseForwards inherited" data-toggle="collapse" data-target=".method_databaseForwards .collapse" title="public">
@@ -594,7 +632,7 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-10-22T11:57:09+03:00.<br></footer></div>
+            generated on 2016-10-23T15:29:03+03:00.<br></footer></div>
 </div>
 </body>
 </html>

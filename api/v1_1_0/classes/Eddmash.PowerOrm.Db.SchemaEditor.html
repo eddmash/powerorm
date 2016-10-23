@@ -34,7 +34,7 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">761</span></a></li>
+                <span class="label label-info">793</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
@@ -68,11 +68,11 @@
         </span><pre>__construct()</pre></a></li>
 <li class="method public inherited"><a href="#method___toString" title="__toString() :: "><span class="description">__toString()
         </span><pre>__toString()</pre></a></li>
+<li class="method public "><a href="#method__alterField" title='_alterField() :: Actually perform a "physical" (non-ManyToMany) field update.'><span class="description">Actually perform a "physical" (non-ManyToMany) field update.</span><pre>_alterField()</pre></a></li>
+<li class="method public "><a href="#method__alterManyToMany" title="_alterManyToMany() :: Alters M2Ms to repoint their to= endpoints."><span class="description">Alters M2Ms to repoint their to= endpoints.</span><pre>_alterManyToMany()</pre></a></li>
 <li class="method public "><a href="#method_addField" title="addField() :: Creates a field on a model."><span class="description">Creates a field on a model.</span><pre>addField()</pre></a></li>
-<li class="method public "><a href="#method_alterDbTable" title="alterDbTable() :: "><span class="description">alterDbTable()
-        </span><pre>alterDbTable()</pre></a></li>
-<li class="method public "><a href="#method_alterField" title="alterField() :: "><span class="description">alterField()
-        </span><pre>alterField()</pre></a></li>
+<li class="method public "><a href="#method_alterDbTable" title="alterDbTable() :: Renames the table a model points to."><span class="description">Renames the table a model points to.</span><pre>alterDbTable()</pre></a></li>
+<li class="method public "><a href="#method_alterField" title="alterField() :: Allows a field's type, uniqueness, nullability, default, column,  constraints etc. to be modified."><span class="description">Allows a field's type, uniqueness, nullability, default, column,  constraints etc. to be modified.</span><pre>alterField()</pre></a></li>
 <li class="method public "><a href="#method_constraintName" title="constraintName() :: "><span class="description">constraintName()
         </span><pre>constraintName()</pre></a></li>
 <li class="method public "><a href="#method_createModel" title="createModel() :: Creates database table represented by the model."><span class="description">Creates database table represented by the model.</span><pre>createModel()</pre></a></li>
@@ -108,7 +108,6 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 <li class="nav-header private">» Private
                     <ul>
 <li class="property private "><a href="#property__signal" title="$_signal() :: "><span class="description"></span><pre>$_signal</pre></a></li>
-<li class="property private "><a href="#property_schema" title="$schema() :: "><span class="description"></span><pre>$schema</pre></a></li>
 <li class="property private "><a href="#property_schemaManager" title="$schemaManager() :: "><span class="description"></span><pre>$schemaManager</pre></a></li>
 </ul>
 </li>
@@ -167,6 +166,67 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 <div class="labels"><span class="label">Inherited</span></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
+<a id="method__alterField"></a><div class="element clickable method public method__alterField " data-toggle="collapse" data-target=".method__alterField .collapse" title="public">
+<h2>Actually perform a "physical" (non-ManyToMany) field update.</h2>
+<pre>_alterField($model, $oldField, $newField, boolean|false $strict<code> = false</code>) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$model</h4></div>
+<div class="subelement argument"><h4>$oldField</h4></div>
+<div class="subelement argument"><h4>$newField</h4></div>
+<div class="subelement argument">
+<h4>$strict</h4>
+<code>boolean</code><code>false</code>
+</div>
+</div></div>
+</div>
+<a id="method__alterManyToMany"></a><div class="element clickable method public method__alterManyToMany " data-toggle="collapse" data-target=".method__alterManyToMany .collapse" title="public">
+<h2>Alters M2Ms to repoint their to= endpoints.</h2>
+<pre>_alterManyToMany(\Eddmash\PowerOrm\Model\Model $model, \Eddmash\PowerOrm\Model\Field\Field $oldField, \Eddmash\PowerOrm\Model\Field\Field $newField, boolean|false $strict<code> = false</code>) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$model</h4>
+<code>\Eddmash\PowerOrm\Model\Model</code>
+</div>
+<div class="subelement argument">
+<h4>$oldField</h4>
+<code>\Eddmash\PowerOrm\Model\Field\Field</code>
+</div>
+<div class="subelement argument">
+<h4>$newField</h4>
+<code>\Eddmash\PowerOrm\Model\Field\Field</code>
+</div>
+<div class="subelement argument">
+<h4>$strict</h4>
+<code>boolean</code><code>false</code>
+</div>
+</div></div>
+</div>
 <a id="method_addField"></a><div class="element clickable method public method_addField " data-toggle="collapse" data-target=".method_addField .collapse" title="public">
 <h2>Creates a field on a model.</h2>
 <pre>addField(\Eddmash\PowerOrm\Model\Model $model, \Eddmash\PowerOrm\Model\Field\Field $field) </pre>
@@ -195,30 +255,70 @@ The resolution order to follow when going up a inheritance hierarchy.</span><pre
 </div></div>
 </div>
 <a id="method_alterDbTable"></a><div class="element clickable method public method_alterDbTable " data-toggle="collapse" data-target=".method_alterDbTable .collapse" title="public">
-<h2>alterDbTable()
-        </h2>
-<pre>alterDbTable($model, $oldDbTable, $newDbTable) </pre>
+<h2>Renames the table a model points to.</h2>
+<pre>alterDbTable(\Eddmash\PowerOrm\Model\Model $model, string $oldDbTableName, string $newDbTableName) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
 <h3>Parameters</h3>
-<div class="subelement argument"><h4>$model</h4></div>
-<div class="subelement argument"><h4>$oldDbTable</h4></div>
-<div class="subelement argument"><h4>$newDbTable</h4></div>
+<div class="subelement argument">
+<h4>$model</h4>
+<code>\Eddmash\PowerOrm\Model\Model</code>
+</div>
+<div class="subelement argument">
+<h4>$oldDbTableName</h4>
+<code>string</code>
+</div>
+<div class="subelement argument">
+<h4>$newDbTableName</h4>
+<code>string</code>
+</div>
 </div></div>
 </div>
 <a id="method_alterField"></a><div class="element clickable method public method_alterField " data-toggle="collapse" data-target=".method_alterField .collapse" title="public">
-<h2>alterField()
-        </h2>
-<pre>alterField($model, $oldField, $newField, $strict<code> = false</code>) </pre>
+<h2>Allows a field's type, uniqueness, nullability, default, column,  constraints etc. to be modified.</h2>
+<pre>alterField(\Eddmash\PowerOrm\Model\Model $model, \Eddmash\PowerOrm\Model\Field\Field $oldField, \Eddmash\PowerOrm\Model\Field\Field $newField, boolean|false $strict<code> = false</code>) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
+<div class="long_description"><p>Requires a copy of the old field as well so we can only perform changes that are required.
+If strict is true, raises errors if the old column does not match old_field precisely.</p></div>
+<table class="table table-bordered">
+<tr>
+<th>since</th>
+<td>1.1.0</td>
+</tr>
+<tr>
+<th>author</th>
+<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
+</tr>
+</table>
 <h3>Parameters</h3>
-<div class="subelement argument"><h4>$model</h4></div>
-<div class="subelement argument"><h4>$oldField</h4></div>
-<div class="subelement argument"><h4>$newField</h4></div>
-<div class="subelement argument"><h4>$strict</h4></div>
+<div class="subelement argument">
+<h4>$model</h4>
+<code>\Eddmash\PowerOrm\Model\Model</code>
+</div>
+<div class="subelement argument">
+<h4>$oldField</h4>
+<code>\Eddmash\PowerOrm\Model\Field\Field</code>
+</div>
+<div class="subelement argument">
+<h4>$newField</h4>
+<code>\Eddmash\PowerOrm\Model\Field\Field</code>
+</div>
+<div class="subelement argument">
+<h4>$strict</h4>
+<code>boolean</code><code>false</code>
+</div>
 </div></div>
 </div>
 <a id="method_constraintName"></a><div class="element clickable method public method_constraintName " data-toggle="collapse" data-target=".method_constraintName .collapse" title="public">
@@ -594,16 +694,6 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="property_schema"> </a><div class="element clickable property private property_schema" data-toggle="collapse" data-target=".property_schema .collapse" title="private">
-<h2>$schema</h2>
-<pre>$schema : \Doctrine\DBAL\Schema\Schema</pre>
-<div class="row collapse"><div class="detail-description">
-<h3>Default</h3>
-<div class="subelement argument"></div>
-</div></div>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
 <a id="property_schemaManager"> </a><div class="element clickable property private property_schemaManager" data-toggle="collapse" data-target=".property_schemaManager .collapse" title="private">
 <h2>$schemaManager</h2>
 <pre>$schemaManager : \Doctrine\DBAL\Schema\AbstractSchemaManager</pre>
@@ -621,7 +711,7 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-10-22T11:57:08+03:00.<br></footer></div>
+            generated on 2016-10-23T15:29:05+03:00.<br></footer></div>
 </div>
 </body>
 </html>

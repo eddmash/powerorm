@@ -34,7 +34,7 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">761</span></a></li>
+                <span class="label label-info">793</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
@@ -78,6 +78,7 @@
 <li class="method public "><a href="#method_isValidVariableName" title="isValidVariableName() :: "><span class="description">isValidVariableName()
         </span><pre>isValidVariableName()</pre></a></li>
 <li class="method public "><a href="#method_startsWith" title="startsWith() :: Check if given string starts with specified substring."><span class="description">Check if given string starts with specified substring.</span><pre>startsWith()</pre></a></li>
+<li class="method public "><a href="#method_truncate" title="truncate() :: Truncates a string to the number of characters specified."><span class="description">Truncates a string to the number of characters specified.</span><pre>truncate()</pre></a></li>
 </ul>
 </li></ul>
 </div>
@@ -239,6 +240,30 @@
 <code>boolean</code>Returns true if first input starts with second input, false otherwise</div>
 </div></div>
 </div>
+<a id="method_truncate"></a><div class="element clickable method public method_truncate " data-toggle="collapse" data-target=".method_truncate .collapse" title="public">
+<h2>Truncates a string to the number of characters specified.</h2>
+<pre>truncate(string $string, integer $length, string $suffix<code> = '...'</code>, string $encoding<code> = null</code>) : string</pre>
+<div class="labels"><span class="label">Static</span></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$string</h4>
+<code>string</code><p>The string to truncate</p></div>
+<div class="subelement argument">
+<h4>$length</h4>
+<code>integer</code><p>How many characters from original string to include into truncated string</p></div>
+<div class="subelement argument">
+<h4>$suffix</h4>
+<code>string</code><p>String to append to the end of truncated string</p></div>
+<div class="subelement argument">
+<h4>$encoding</h4>
+<code>string</code><p>The charset to use, defaults to charset currently used by application</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code>the truncated string</div>
+</div></div>
+</div>
 </div>
 </div>
 </div>
@@ -246,7 +271,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-10-22T11:57:08+03:00.<br></footer></div>
+            generated on 2016-10-23T15:29:04+03:00.<br></footer></div>
 </div>
 </body>
 </html>

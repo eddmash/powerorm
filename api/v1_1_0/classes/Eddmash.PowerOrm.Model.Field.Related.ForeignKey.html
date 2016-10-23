@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 <meta charset="utf-8">
-<title>PowerOrm v1.1.0 API » \Eddmash\PowerOrm\Model\Field\ManyToManyField</title>
+<title>PowerOrm v1.1.0 API » \Eddmash\PowerOrm\Model\Field\Related\ForeignKey</title>
 <meta name="author" content="Mike van Riel">
 <meta name="description" content="">
 <link href="../css/template.css" rel="stylesheet" media="all">
@@ -74,26 +74,15 @@
         </span><pre>__toString()</pre></a></li>
 <li class="method public inherited"><a href="#method__checkFieldName" title="_checkFieldName() :: "><span class="description">_checkFieldName()
         </span><pre>_checkFieldName()</pre></a></li>
-<li class="method public "><a href="#method__checkIgnoredKwargOptions" title="_checkIgnoredKwargOptions() :: "><span class="description">_checkIgnoredKwargOptions()
-        </span><pre>_checkIgnoredKwargOptions()</pre></a></li>
-<li class="method public "><a href="#method__getM2MDbTable" title="_getM2MDbTable() :: provides the m2m table name for this relation."><span class="description">provides the m2m table name for this relation.</span><pre>_getM2MDbTable()</pre></a></li>
-<li class="method public "><a href="#method_checks" title="checks() :: "><span class="description">checks()
-        </span><pre>checks()</pre></a></li>
 <li class="method public inherited"><a href="#method_checks" title="checks() :: "><span class="description">checks()
         </span><pre>checks()</pre></a></li>
-<li class="method public "><a href="#method_contributeToClass" title="contributeToClass() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>contributeToClass()</pre></a></li>
 <li class="method public inherited"><a href="#method_contributeToClass" title="contributeToClass() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>contributeToClass()</pre></a></li>
-<li class="method public inherited"><a href="#method_contributeToRelatedClass" title="contributeToRelatedClass() :: "><span class="description">contributeToRelatedClass()
-        </span><pre>contributeToRelatedClass()</pre></a></li>
-<li class="method public "><a href="#method_createManyToManyIntermediaryModel" title="createManyToManyIntermediaryModel() :: Creates an intermediary model."><span class="description">Creates an intermediary model.</span><pre>createManyToManyIntermediaryModel()</pre></a></li>
 <li class="method public inherited"><a href="#method_createObject" title="createObject() :: Create an instance of the current class.override this method to match with the class constructor."><span class="description">Create an instance of the current class.override this method to match with the class constructor.</span><pre>createObject()</pre></a></li>
 <li class="method public inherited"><a href="#method_dbType" title="dbType() :: Returns the database column data type for the Field, taking into account the connection."><span class="description">Returns the database column data type for the Field, taking into account the connection.</span><pre>dbType()</pre></a></li>
 <li class="method public inherited"><a href="#method_deconstruct" title="deconstruct() :: {@inheritdoc}"><span class="description">{@inheritdoc}</span><pre>deconstruct()</pre></a></li>
 <li class="method public inherited"><a href="#method_deepClone" title="deepClone() :: "><span class="description">deepClone()
         </span><pre>deepClone()</pre></a></li>
 <li class="method public inherited"><a href="#method_dispatchSignal" title="dispatchSignal() :: Dispatch signals if the Dispatch library is loaded."><span class="description">Dispatch signals if the Dispatch library is loaded.</span><pre>dispatchSignal()</pre></a></li>
-<li class="method public inherited"><a href="#method_doRelatedClass" title="doRelatedClass() :: "><span class="description">doRelatedClass()
-        </span><pre>doRelatedClass()</pre></a></li>
 <li class="method public inherited"><a href="#method_formField" title="formField() :: Returns a powerorm.form.Field instance for this database Field."><span class="description">Returns a powerorm.form.Field instance for this database Field.</span><pre>formField()</pre></a></li>
 <li class="method public inherited"><a href="#method_fromDbValue" title="fromDbValue() :: Converts a value as returned by the database to a PHP object. It is the reverse of prepare_value()."><span class="description">Converts a value as returned by the database to a PHP object. It is the reverse of prepare_value().</span><pre>fromDbValue()</pre></a></li>
 <li class="method public inherited"><a href="#method_getAttrName" title="getAttrName() :: The attribute in the scope model the points to this field."><span class="description">The attribute in the scope model the points to this field.</span><pre>getAttrName()</pre></a></li>
@@ -106,7 +95,8 @@
 <li class="method public inherited"><a href="#method_getParents" title="getParents() :: Returns all the parents for this object static with the youngest to the oldest
 The resolution order to follow when going up a inheritance hierarchy."><span class="description">Returns all the parents for this object static with the youngest to the oldest
 The resolution order to follow when going up a inheritance hierarchy.</span><pre>getParents()</pre></a></li>
-<li class="method public inherited"><a href="#method_getRelatedModel" title="getRelatedModel() :: Points to the model the field relates to. For example, Author in ForeignKey(['model'=&gt;Author])."><span class="description">Points to the model the field relates to. For example, Author in ForeignKey(['model'=&gt;Author]).</span><pre>getRelatedModel()</pre></a></li>
+<li class="method public inherited"><a href="#method_getRelatedModel" title="getRelatedModel() :: "><span class="description">getRelatedModel()
+        </span><pre>getRelatedModel()</pre></a></li>
 <li class="method public inherited"><a href="#method_getShortClassName" title="getShortClassName() :: "><span class="description">getShortClassName()
         </span><pre>getShortClassName()</pre></a></li>
 <li class="method public inherited"><a href="#method_hasDefault" title="hasDefault() :: "><span class="description">hasDefault()
@@ -139,13 +129,12 @@ in most case the 'id' field of most models is automatically created."><span clas
 <li class="property public "><a href="#property_comment" title="$comment() :: The column comment. Supported by MySQL, PostgreSQL, Oracle, SQL Server, SQL Anywhere and Drizzle. Defaults to null."><span class="description"></span><pre>$comment</pre></a></li>
 <li class="property public "><a href="#property_concrete" title="$concrete() :: Indicates if this is a concrete field that can be represented by a column in the database table."><span class="description"></span><pre>$concrete</pre></a></li>
 <li class="property public "><a href="#property_dbIndex" title="$dbIndex() :: If True, this field will be indexed."><span class="description"></span><pre>$dbIndex</pre></a></li>
-<li class="property public "><a href="#property_dbTable" title="$dbTable() :: "><span class="description"></span><pre>$dbTable</pre></a></li>
 <li class="property public "><a href="#property_default" title="$default() :: The default value for the field."><span class="description"></span><pre>$default</pre></a></li>
 <li class="property public "><a href="#property_helpText" title="$helpText() :: Extra “help” text to be displayed with the form widget."><span class="description"></span><pre>$helpText</pre></a></li>
 <li class="property public "><a href="#property_inverse" title="$inverse() :: "><span class="description"></span><pre>$inverse</pre></a></li>
 <li class="property public "><a href="#property_isRelation" title="$isRelation() :: Indicates if this field is  relationship field."><span class="description"></span><pre>$isRelation</pre></a></li>
-<li class="property public "><a href="#property_manyToMany" title="$manyToMany() :: {@inheritdoc}"><span class="description"></span><pre>$manyToMany</pre></a></li>
 <li class="property public "><a href="#property_manyToMany" title="$manyToMany() :: "><span class="description"></span><pre>$manyToMany</pre></a></li>
+<li class="property public "><a href="#property_manyToOne" title="$manyToOne() :: "><span class="description"></span><pre>$manyToOne</pre></a></li>
 <li class="property public "><a href="#property_manyToOne" title="$manyToOne() :: "><span class="description"></span><pre>$manyToOne</pre></a></li>
 <li class="property public "><a href="#property_maxLength" title="$maxLength() :: The maximum length (in characters) of the field."><span class="description"></span><pre>$maxLength</pre></a></li>
 <li class="property public "><a href="#property_name" title="$name() :: "><span class="description"></span><pre>$name</pre></a></li>
@@ -153,7 +142,6 @@ in most case the 'id' field of most models is automatically created."><span clas
 <li class="property public "><a href="#property_oneToMany" title="$oneToMany() :: "><span class="description"></span><pre>$oneToMany</pre></a></li>
 <li class="property public "><a href="#property_oneToOne" title="$oneToOne() :: "><span class="description"></span><pre>$oneToOne</pre></a></li>
 <li class="property public "><a href="#property_primaryKey" title="$primaryKey() :: If True, this field is the primary key for the model."><span class="description"></span><pre>$primaryKey</pre></a></li>
-<li class="property public "><a href="#property_relation" title="$relation() :: {@inheritdoc}"><span class="description"></span><pre>$relation</pre></a></li>
 <li class="property public "><a href="#property_relation" title="$relation() :: if this is a relationship field, this hold the Relationship object that this field represents."><span class="description"></span><pre>$relation</pre></a></li>
 <li class="property public "><a href="#property_scopeModel" title="$scopeModel() :: The model to which this field belongs to."><span class="description"></span><pre>$scopeModel</pre></a></li>
 <li class="property public "><a href="#property_unique" title="$unique() :: If True, this field must be unique throughout the table."><span class="description"></span><pre>$unique</pre></a></li>
@@ -180,7 +168,7 @@ access this field from the model like normal class attributes."><span class="des
 </ul>
 </div>
 <div class="span8">
-<a xmlns:php="http://php.net/xsl" id="\Eddmash\PowerOrm\Model\Field\ManyToManyField"></a><ul xmlns:php="http://php.net/xsl" class="breadcrumb">
+<a xmlns:php="http://php.net/xsl" id="\Eddmash\PowerOrm\Model\Field\Related\ForeignKey"></a><ul xmlns:php="http://php.net/xsl" class="breadcrumb">
 <li>
 <a href="../index.html"><i title="Classes" class="icon-custom icon-class"></i></a><span class="divider">\</span>
 </li>
@@ -194,32 +182,25 @@ access this field from the model like normal class attributes."><span class="des
 <li>
 <span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Model.Field.html">Field</a>
 </li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Model.Field.Related.html">Related</a>
+</li>
 <li class="active">
-<span class="divider">\</span><a href="../classes/Eddmash.PowerOrm.Model.Field.ManyToManyField.html">ManyToManyField</a>
+<span class="divider">\</span><a href="../classes/Eddmash.PowerOrm.Model.Field.Related.ForeignKey.html">ForeignKey</a>
 </li>
 </ul>
 <div xmlns:php="http://php.net/xsl" class="element class">
-<p class="short_description">Provide a many-to-many relation by using an intermediary model that holds two ForeignKey fields pointed at the two
-sides of the relation.</p>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
 <div class="details">
-<div class="long_description"><p>Unless a <code>through</code> model was provided, ManyToManyField will use the createManyToManyIntermediaryModel factory
-to automatically generate the intermediary model.</p></div>
+<div class="long_description"><p>Class Object.</p></div>
 <table class="table table-bordered">
-<tr>
-<th>since</th>
-<td>1.1.0</td>
-</tr>
-<tr>
-<th>author</th>
-<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
-</tr>
 <tr>
 <th>package</th>
 <td><a href="../packages/Default.html">Default</a></td>
 </tr>
 <tr>
 <th>inherited_from</th>
-<td>\Eddmash\PowerOrm\Model\Field\RelatedField</td>
+<td>\Eddmash\PowerOrm\Model\Field\Related\RelatedField</td>
 </tr>
 </table>
 <h3>
@@ -267,66 +248,12 @@ to automatically generate the intermediary model.</p></div>
 <div class="labels"><span class="label">Inherited</span></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="method__checkIgnoredKwargOptions"></a><div class="element clickable method public method__checkIgnoredKwargOptions " data-toggle="collapse" data-target=".method__checkIgnoredKwargOptions .collapse" title="public">
-<h2>_checkIgnoredKwargOptions()
-        </h2>
-<pre>_checkIgnoredKwargOptions() </pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
-<a id="method__getM2MDbTable"></a><div class="element clickable method public method__getM2MDbTable " data-toggle="collapse" data-target=".method__getM2MDbTable .collapse" title="public">
-<h2>provides the m2m table name for this relation.</h2>
-<pre>_getM2MDbTable(\Eddmash\PowerOrm\Model\Meta $meta) : string</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<table class="table table-bordered">
-<tr>
-<th>since</th>
-<td>1.1.0</td>
-</tr>
-<tr>
-<th>author</th>
-<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
-</tr>
-</table>
-<h3>Parameters</h3>
-<div class="subelement argument">
-<h4>$meta</h4>
-<code>\Eddmash\PowerOrm\Model\Meta</code>
-</div>
-<h3>Returns</h3>
-<div class="subelement response"><code>string</code></div>
-</div></div>
-</div>
-<a id="method_checks"></a><div class="element clickable method public method_checks " data-toggle="collapse" data-target=".method_checks .collapse" title="public">
-<h2>checks()
-        </h2>
-<pre>checks() </pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
 <a id="method_checks"></a><div class="element clickable method public method_checks inherited" data-toggle="collapse" data-target=".method_checks .collapse" title="public">
 <h2>checks()
         </h2>
 <pre>checks() </pre>
 <div class="labels"><span class="label">Inherited</span></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
-<a id="method_contributeToClass"></a><div class="element clickable method public method_contributeToClass " data-toggle="collapse" data-target=".method_contributeToClass .collapse" title="public">
-<h2>{@inheritdoc}</h2>
-<pre>contributeToClass(string $fieldName, \Eddmash\PowerOrm\Model\Model $modelObject) </pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<table class="table table-bordered"><tr>
-<th>inherited_from</th>
-<td>\Eddmash\PowerOrm\Model\Field\RelatedField::contributeToClass()</td>
-</tr></table>
-<h3>Parameters</h3>
-<div class="subelement argument"><h4>$fieldName</h4></div>
-<div class="subelement argument"><h4>$modelObject</h4></div>
-</div></div>
 </div>
 <a id="method_contributeToClass"></a><div class="element clickable method public method_contributeToClass inherited" data-toggle="collapse" data-target=".method_contributeToClass .collapse" title="public">
 <h2>{@inheritdoc}</h2>
@@ -358,47 +285,6 @@ to automatically generate the intermediary model.</p></div>
 <th><code>\Eddmash\PowerOrm\Exception\FieldError</code></th>
 <td></td>
 </tr></table>
-</div></div>
-</div>
-<a id="method_contributeToRelatedClass"></a><div class="element clickable method public method_contributeToRelatedClass inherited" data-toggle="collapse" data-target=".method_contributeToRelatedClass .collapse" title="public">
-<h2>contributeToRelatedClass()
-        </h2>
-<pre>contributeToRelatedClass($relatedModel, $scopeModel) </pre>
-<div class="labels"><span class="label">Inherited</span></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Parameters</h3>
-<div class="subelement argument"><h4>$relatedModel</h4></div>
-<div class="subelement argument"><h4>$scopeModel</h4></div>
-</div></div>
-</div>
-<a id="method_createManyToManyIntermediaryModel"></a><div class="element clickable method public method_createManyToManyIntermediaryModel " data-toggle="collapse" data-target=".method_createManyToManyIntermediaryModel .collapse" title="public">
-<h2>Creates an intermediary model.</h2>
-<pre>createManyToManyIntermediaryModel(\Eddmash\PowerOrm\Model\Field\ManyToManyField $field, \Eddmash\PowerOrm\Model\Model $model) : \Eddmash\PowerOrm\Model\Model</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<table class="table table-bordered">
-<tr>
-<th>since</th>
-<td>1.1.0</td>
-</tr>
-<tr>
-<th>author</th>
-<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
-</tr>
-</table>
-<h3>Parameters</h3>
-<div class="subelement argument">
-<h4>$field</h4>
-<code>\Eddmash\PowerOrm\Model\Field\ManyToManyField</code>
-</div>
-<div class="subelement argument">
-<h4>$model</h4>
-<code>\Eddmash\PowerOrm\Model\Model</code>
-</div>
-<h3>Returns</h3>
-<div class="subelement response"><code>\Eddmash\PowerOrm\Model\Model</code></div>
 </div></div>
 </div>
 <a id="method_createObject"></a><div class="element clickable method public method_createObject inherited" data-toggle="collapse" data-target=".method_createObject .collapse" title="public">
@@ -476,34 +362,6 @@ to automatically generate the intermediary model.</p></div>
 <h3>Parameters</h3>
 <div class="subelement argument"><h4>$signal_name</h4></div>
 <div class="subelement argument"><h4>$object</h4></div>
-</div></div>
-</div>
-<a id="method_doRelatedClass"></a><div class="element clickable method public method_doRelatedClass inherited" data-toggle="collapse" data-target=".method_doRelatedClass .collapse" title="public">
-<h2>doRelatedClass()
-        </h2>
-<pre>doRelatedClass(\Eddmash\PowerOrm\Model\Model $relatedModel, \Eddmash\PowerOrm\Model\Model $scopeModel) </pre>
-<div class="labels"><span class="label">Inherited</span></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<table class="table table-bordered">
-<tr>
-<th>since</th>
-<td>1.1.0</td>
-</tr>
-<tr>
-<th>author</th>
-<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
-</tr>
-</table>
-<h3>Parameters</h3>
-<div class="subelement argument">
-<h4>$relatedModel</h4>
-<code>\Eddmash\PowerOrm\Model\Model</code>
-</div>
-<div class="subelement argument">
-<h4>$scopeModel</h4>
-<code>\Eddmash\PowerOrm\Model\Model</code>
-</div>
 </div></div>
 </div>
 <a id="method_formField"></a><div class="element clickable method public method_formField inherited" data-toggle="collapse" data-target=".method_formField .collapse" title="public">
@@ -650,24 +508,11 @@ The resolution order to follow when going up a inheritance hierarchy.</h2>
 </div></div>
 </div>
 <a id="method_getRelatedModel"></a><div class="element clickable method public method_getRelatedModel inherited" data-toggle="collapse" data-target=".method_getRelatedModel .collapse" title="public">
-<h2>Points to the model the field relates to. For example, Author in ForeignKey(['model'=&gt;Author]).</h2>
-<pre>getRelatedModel() : \Eddmash\PowerOrm\Model\Model</pre>
+<h2>getRelatedModel()
+        </h2>
+<pre>getRelatedModel() </pre>
 <div class="labels"><span class="label">Inherited</span></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<table class="table table-bordered">
-<tr>
-<th>since</th>
-<td>1.1.0</td>
-</tr>
-<tr>
-<th>author</th>
-<td><a href="mailto:edd.cowan@gmail.com">Eddilbert Macharia (http://eddmash.com)</a></td>
-</tr>
-</table>
-<h3>Returns</h3>
-<div class="subelement response"><code>\Eddmash\PowerOrm\Model\Model</code></div>
-</div></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
 <a id="method_getShortClassName"></a><div class="element clickable method public method_getShortClassName inherited" data-toggle="collapse" data-target=".method_getShortClassName .collapse" title="public">
 <h2>getShortClassName()
@@ -960,16 +805,6 @@ $gender_choices = [
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="property_dbTable"> </a><div class="element clickable property public property_dbTable" data-toggle="collapse" data-target=".property_dbTable .collapse" title="public">
-<h2>$dbTable</h2>
-<pre>$dbTable </pre>
-<div class="row collapse"><div class="detail-description">
-<h3>Default</h3>
-<div class="subelement argument"></div>
-</div></div>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
 <a id="property_default"> </a><div class="element clickable property public property_default" data-toggle="collapse" data-target=".property_default .collapse" title="public">
 <h2>The default value for the field.</h2>
 <pre>$default : mixed</pre>
@@ -1015,21 +850,21 @@ This lets you include HTML in helpText if you so desire.</p>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
 <a id="property_manyToMany"> </a><div class="element clickable property public property_manyToMany" data-toggle="collapse" data-target=".property_manyToMany .collapse" title="public">
-<h2>{@inheritdoc}</h2>
-<pre>$manyToMany </pre>
-<div class="row collapse"><div class="detail-description">
-<h3>Default</h3>
-<div class="subelement argument"><code>true</code></div>
-</div></div>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
-<a id="property_manyToMany"> </a><div class="element clickable property public property_manyToMany" data-toggle="collapse" data-target=".property_manyToMany .collapse" title="public">
 <h2>$manyToMany</h2>
 <pre>$manyToMany </pre>
 <div class="row collapse"><div class="detail-description">
 <h3>Default</h3>
 <div class="subelement argument"><code>false</code></div>
+</div></div>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_manyToOne"> </a><div class="element clickable property public property_manyToOne" data-toggle="collapse" data-target=".property_manyToOne .collapse" title="public">
+<h2>$manyToOne</h2>
+<pre>$manyToOne </pre>
+<div class="row collapse"><div class="detail-description">
+<h3>Default</h3>
+<div class="subelement argument"><code>true</code></div>
 </div></div>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
@@ -1109,16 +944,6 @@ primary-key behavior.</p>
 <p>primary_key=True implies null=False and unique=True. Only one primary key is allowed on an object.</p>
 <p>The primary key field is read-only. If you change the value of the primary key on an existing object and then
 save it, a new object will be created alongside the old one.</p></div></div></div>
-</div>
-<a id="property_relation"> </a><div class="element clickable property public property_relation" data-toggle="collapse" data-target=".property_relation .collapse" title="public">
-<h2>{@inheritdoc}</h2>
-<pre>$relation : \Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToManyRel</pre>
-<div class="row collapse"><div class="detail-description">
-<h3>Default</h3>
-<div class="subelement argument"></div>
-</div></div>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
 <a id="property_relation"> </a><div class="element clickable property public property_relation" data-toggle="collapse" data-target=".property_relation .collapse" title="public">
 <h2>if this is a relationship field, this hold the Relationship object that this field represents.</h2>

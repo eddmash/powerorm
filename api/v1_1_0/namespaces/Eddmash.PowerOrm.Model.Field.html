@@ -34,7 +34,7 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">761</span></a></li>
+                <span class="label label-info">793</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
@@ -59,24 +59,30 @@
 <li class="nav-header">
 <i class="icon-map-marker"></i> Namespaces</li>
 <li>
-<a href="../namespaces/Eddmash.PowerOrm.Model.Field.html" title="Field"><i class="icon-th"></i>Field</a><ul class="nav nav-list nav-namespaces"><li>
+<a href="../namespaces/Eddmash.PowerOrm.Model.Field.html" title="Field"><i class="icon-th"></i>Field</a><ul class="nav nav-list nav-namespaces">
+<li>
+<a href="../namespaces/Eddmash.PowerOrm.Model.Field.Related.html" title="Related"><i class="icon-th"></i>Related</a><ul class="nav nav-list nav-namespaces"></ul>
+</li>
+<li>
 <a href="../namespaces/Eddmash.PowerOrm.Model.Field.RelatedObjects.html" title="RelatedObjects"><i class="icon-th"></i>RelatedObjects</a><ul class="nav nav-list nav-namespaces"></ul>
-</li></ul>
+</li>
+</ul>
 </li>
 <li class="nav-header">
 <i title="Interfaces" class="icon-custom icon-interface"></i> Interfaces</li>
 <li><a href="#FieldInterface" title="Interface FieldInterface.">FieldInterface</a></li>
 <li class="nav-header">
 <i title="Classes" class="icon-custom icon-class"></i> Classes</li>
+<li><a href="#AutoField" title="An IntegerField that automatically increments according to available IDs.">AutoField</a></li>
 <li><a href="#RelatedField" title="Base class that all relational fields inherit from.">RelatedField</a></li>
-<li><a href="#Field" title="Base class for powerorm classes, provides some base functionalities to classes that inherit from it.">Field</a></li>
-<li><a href="#CharField" title="Base class for powerorm classes, provides some base functionalities to classes that inherit from it.">CharField</a></li>
+<li><a href="#ForeignKey" title="Base class that all relational fields inherit from.">ForeignKey</a></li>
 <li><a href="#OneToOneField" title='A OneToOneField is essentially the same as a ForeignKey, with the exception that
 always carries a "unique" constraint with it and the reverse relation always returns the object pointed
 to (since there will only ever be one), rather than returning a list.'>OneToOneField</a></li>
-<li><a href="#ForeignKey" title="Base class that all relational fields inherit from.">ForeignKey</a></li>
-<li><a href="#AutoField" title="An IntegerField that automatically increments according to available IDs.">AutoField</a></li>
-<li><a href="#ManyToManyField" title="Base class that all relational fields inherit from.">ManyToManyField</a></li>
+<li><a href="#CharField" title="Base class for powerorm classes, provides some base functionalities to classes that inherit from it.">CharField</a></li>
+<li><a href="#ManyToManyField" title="Provide a many-to-many relation by using an intermediary model that holds two ForeignKey fields pointed at the two
+sides of the relation.">ManyToManyField</a></li>
+<li><a href="#Field" title="Base class for powerorm classes, provides some base functionalities to classes that inherit from it.">Field</a></li>
 </ul>
 </div>
 <div class="span8 namespace-contents">
@@ -136,7 +142,8 @@ to (since there will only ever be one), rather than returning a list.'>OneToOneF
 <div xmlns:php="http://php.net/xsl" id="ManyToManyField" class="element ajax clickable class">
 <h1>ManyToManyField<a href="../classes/Eddmash.PowerOrm.Model.Field.ManyToManyField.html">¶</a>
 </h1>
-<p class="short_description">Base class that all relational fields inherit from.</p>
+<p class="short_description">Provide a many-to-many relation by using an intermediary model that holds two ForeignKey fields pointed at the two
+sides of the relation.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Model.Field.ManyToManyField.html" class="more">« More »</a>
 </div>
@@ -155,6 +162,42 @@ to (since there will only ever be one), rather than returning a list.</p>
 <p class="short_description">Base class that all relational fields inherit from.</p>
 <div class="details collapse"></div>
 <a href="../classes/Eddmash.PowerOrm.Model.Field.RelatedField.html" class="more">« More »</a>
+</div>
+<ul class="breadcrumb">
+<li>
+<a href="../index.html"><i class="icon-th"></i></a><span class="divider">\</span>
+</li>
+<li><a href="../namespaces/Eddmash.html">Eddmash</a></li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.html">PowerOrm</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Model.html">Model</a>
+</li>
+<li>
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Model.Field.html">Field</a>
+</li>
+<li class="active">
+<span class="divider">\</span><a href="../namespaces/Eddmash.PowerOrm.Model.Field.Related.html">Related</a>
+</li>
+</ul>
+<div class="namespace-indent">
+<h3>
+<i title="Class" class="icon-custom icon-class"></i> Classes, interfaces, and traits</h3>
+<div xmlns:php="http://php.net/xsl" id="ForeignKey" class="element ajax clickable class">
+<h1>ForeignKey<a href="../classes/Eddmash.PowerOrm.Model.Field.Related.ForeignKey.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Field.Related.ForeignKey.html" class="more">« More »</a>
+</div>
+<div xmlns:php="http://php.net/xsl" id="RelatedField" class="element ajax clickable class">
+<h1>RelatedField<a href="../classes/Eddmash.PowerOrm.Model.Field.Related.RelatedField.html">¶</a>
+</h1>
+<p class="short_description">Base class for powerorm classes, provides some base functionalities to classes that inherit from it.</p>
+<div class="details collapse"></div>
+<a href="../classes/Eddmash.PowerOrm.Model.Field.Related.RelatedField.html" class="more">« More »</a>
+</div>
 </div>
 <ul class="breadcrumb">
 <li>
@@ -212,7 +255,7 @@ to (since there will only ever be one), rather than returning a list.</p>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.8.5</a> and<br>
-            generated on 2016-10-22T11:57:07+03:00.<br></footer></div>
+            generated on 2016-10-23T15:29:02+03:00.<br></footer></div>
 </div>
 </body>
 </html>
