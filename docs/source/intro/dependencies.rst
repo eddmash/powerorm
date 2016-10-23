@@ -3,11 +3,7 @@
 Dependencies
 #######################
 
-This orm heavily relies on the core libraries provided with CodeIgniter without making any alterations on them. This means that any configuration made for the following libraries will affect how the ORM operates
+PowerOrm relies on :
 
-- The CodeIgniter Database classes
-- The QueryBuilder Class.
-- The Form helpers.
-- The Form validation class.
-
+- `Doctrine Dbal <http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html>`_.
 

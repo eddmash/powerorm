@@ -12,12 +12,13 @@ be visible through the child models.
 
 There are three styles of inheritance that are possible in Powerorm:
 
-- Often, you will just want to use the parent class to hold information that you don’t want to have to type out for
-  each child model. This class isn’t going to ever be used in isolation, so Abstract base classes are what you’re after.
+- :doc:`Abstract base<abstract>` Often, you will just want to use the parent class to hold information that you
+  don't want to have to type out for each child model. This class isn’t going to ever be used in isolation,
+  so Abstract base classes are what you’re after.
 
-- If you’re subclassing an existing model (perhaps something from another application entirely) and want each model
+- :doc:`Multi-table inheritance<multi_table_inheritance>` If you’re subclassing an existing model and want each model
   to have its own database table, Multi-table inheritance is the way to go.
 
-- Finally, if you only want to modify the PHP-level behavior of a model, without changing the models fields in any
-  way, you can use Proxy models.
+- :doc:`Proxy models<proxy>` Finally, if you only want to modify the PHP-level behavior of a model, without changing
+  the models fields in any way, you can use Proxy models.
 

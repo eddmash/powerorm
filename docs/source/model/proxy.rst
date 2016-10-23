@@ -15,28 +15,40 @@ This is what proxy model inheritance is for:
 - creating a proxy for the original model. You can create, delete and update instances of the proxy model
   and all the data will be saved as if you were using the original (non-proxied) model.
 
-- The difference is that you can change things like the default model ordering or the default manager in
+- The difference is that you can change things like the default model ordering in
   the proxy, without having to alter the original.
 
-Proxy models are declared like normal models. You tell Powerorm that it’s a proxy model by setting
-the `proxy` attribute of the class to True.
+Proxy models are declared like normal models. You tell PowerOrm that it’s a proxy model by setting
+the `proxy` meta setting of the class to True.
 
 .. code-block:: php
 
-	 class Employee extends PModel{
-	      public function fields(){
-	         name = PModel::CharField(['max_length'=>100]);
-	         age = PModel::InteferField();
-	      }
-	 }
+    class Employee extends PModel
+    {
+        public function unboundFields()
+        {
+            return [
+                'name' => PModel::CharField(['maxLength' => 100]),
+                'age' => PModel::IntegerField()
+            ];
+        }
+    }
 
-	 class Auditor extends Employee{
+    class Auditor extends Employee
+    {
 
-	      public $proxy = TRUE;
+        public function pricePerAuditJob($employee)
+        {
+            // logic
+        }
 
-	      // get how many times a specific accountant has audited a specific employee.
-	      public function get_times_has_audited($employee){}
-	 }
+        public function getMetaSettings()
+        {
+            return [
+                'proxy' => true
+            ];
+        }
+    }
 
 .. note::
 	Because codeigniter does not autoload classes you need to load the base class first before

@@ -12,19 +12,27 @@ For example:
 
 .. code-block:: php
 
-	class Place extends PModel{
-	      public function fields(){
-		  name = PModel::CharField(['max_length'=>100]);
-		  address = PModel::CharField(['max_length'=>80]);
-	      }
-	 }
+    class Place extends PModel
+    {
+        public function unboundFields()
+        {
+            return [
+                'name' => PModel::CharField(['maxLength' => 100]),
+                'address' => PModel::CharField(['maxLength' => 80])
+            ];
+        }
+    }
 
-	 class Restaurant extends Place{
-	      public function fields(){
-		  serves_hot_dogs =PModel::BooleanField(['default'=>False]);
-		  serves_pizza =PModel::BooleanField(['default'=>False]);
-	      }
-	 }
+    class Restaurant extends Place
+    {
+        public function unboundFields()
+        {
+            return [
+                'serves_hot_dogs' => PModel::BooleanField(['default' => false]),
+                'serves_pizza' => PModel::BooleanField(['default' => false])
+            ];
+        }
+    }
 
 .. note::
 	Because codeigniter does not autoload classes you need to load the base class first before
@@ -45,7 +53,6 @@ different database table. So these are both possible:
 	$this->place->filter([name="Bob's Cafe"]);
  	$this->restaurant->filter([name="Bob's Cafe"]);
 
-.. warning:: todo Check on this reverse lookup
 
 If you have a Place that is also a Restaurant, you can get from the Place object to the Restaurant
 object by using the lower-case version of the model name:

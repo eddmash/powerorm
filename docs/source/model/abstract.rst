@@ -4,8 +4,8 @@ Abstract base classes
 #############################
 
 .. note::
-	Because codeigniter does not autoload classes you need to require the file with the abstract
-class in your model file.
+	Because Codeigniter does not autoload classes you need to require the file with the abstract class in your model
+	file.
 
 Abstract base classes are useful when you want to put some common information into a number of other models.
 You create an Abstract base class by simply creating a normal php abstract base class.
@@ -19,22 +19,30 @@ child class.:
 
 .. code-block:: php
 
-	abstract class CommonInfo extends PModel{
-	      public function fields(){
-		  name = PModel::CharField(['max_length'=>100]);
-		  age = PModel::IntegerField();
-	      }
-	 }
+    abstract class CommonInfo extends PModel
+    {
+        public function unboundFields()
+        {
+            return [
+                'name' => PModel::CharField(['maxLength' => 100]),
+                'age' => PModel::IntegerField()
+            ];
+        }
+    }
 
-	 class Student extends CommonInfo{
-	      public function fields(){
-		  home_group = PModel::CharField(['max_length'=>5]);
-	      }
-	 }
+    class Student extends CommonInfo
+    {
+        public function unboundFields()
+        {
+            return [
+                'home_group' => PModel::CharField(['maxLength' => 5])
+            ];
+        }
+    }
 
-The Student model will have three fields: name, age and home_group.
+The **Student** model will have three fields: name, age and home_group.
 
-The CommonInfo model cannot be used as a normal model, since it is an abstract base class.
+The **CommonInfo** model cannot be used as a normal model, since it is an abstract base class.
 It does not generate a database table, and cannot be instantiated or saved directly.
 
 For many uses, this type of model inheritance will be exactly what you want.
@@ -42,11 +50,13 @@ For many uses, this type of model inheritance will be exactly what you want.
 It provides a way to factor out common information at the php level, while still only
 creating one database table per child model at the database level.
 
-.. note:: Attribute inheritance
-	When inheriting, Some attributes will need to be overridden in child classes, since it doesn't make sense to
-	set them in the base class.
+Meta inheritance
+------------------
 
-For example, setting `table_name` would mean that all the child classes (the ones that don’t specify `table_name` explictly)
+When inheriting, Some attributes will need to be overridden in child classes, since it doesn't make sense to
+set them in the base class.
+
+For example, setting ``dbtable`` would mean that all the child classes (the ones that don't specify `dbtable` explicitly)
 would use the same database table,which is almost certainly not what you want.
 
 
