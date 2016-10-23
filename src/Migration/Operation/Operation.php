@@ -115,7 +115,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      */
     public function databaseForwards($schemaEditor, $fromState, $toState)
     {
-        // TODO: Implement databaseForwards() method.
+        return;
     }
 
     /**
@@ -131,7 +131,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      */
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
-        // TODO: Implement databaseBackwards() method.
+        return;
     }
 
     /**

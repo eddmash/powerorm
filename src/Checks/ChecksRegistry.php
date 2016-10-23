@@ -3,6 +3,7 @@
 namespace Eddmash\PowerOrm\Checks;
 
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Model\Model;
 
 /**
  * Checks for ORM integrity.
@@ -116,9 +117,7 @@ class ChecksRegistry
     {
         $models = BaseOrm::getRegistry()->getModels();
 
-        /*
-         * @var Model
-         */
+        /** @var $modelObj Model */
         foreach ($models as $name => $modelObj) :
 
             if (!$modelObj->hasMethod('checks')):

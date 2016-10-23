@@ -8,6 +8,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\CharField;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
+use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Model;
 

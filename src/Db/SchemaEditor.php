@@ -15,7 +15,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
-use Doctrine\DBAL\Schema\Schema;
+use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
@@ -28,10 +28,6 @@ class SchemaEditor extends Object
      * @var Connection
      */
     public $connection;
-    /**
-     * @var Schema
-     */
-    private $schema;
 
     /**
      * @var AbstractSchemaManager
@@ -45,7 +41,6 @@ class SchemaEditor extends Object
     {
         $this->connection = $connection;
         $this->schemaManager = $this->connection->getSchemaManager();
-        $this->schema = $this->schemaManager->createSchema();
     }
 
     /**
@@ -73,8 +68,8 @@ class SchemaEditor extends Object
      */
     public function createModel($model)
     {
-
-        $tableDef = $this->schema->createTable($model->meta->dbTable);
+        $schema = $this->schemaManager->createSchema();
+        $tableDef = $schema->createTable($model->meta->dbTable);
 
         // this assumes fields set_from_name has been invoked
         $primaryKeyFields = [];
@@ -104,7 +99,6 @@ class SchemaEditor extends Object
 
             if ($field->isRelation && $field->relation && $field->dbConstraint):
                 $relField = $field->getRelatedField();
-
                 $tableDef->addForeignKeyConstraint(
                     $relField->scopeModel->meta->dbTable,
                     [$field->getColumnName()],
@@ -161,8 +155,24 @@ class SchemaEditor extends Object
 
     }
 
-    public function alterDbTable($model, $oldDbTable, $newDbTable)
+    /**
+     * Renames the table a model points to.
+     *
+     * @param Model  $model
+     * @param string $oldDbTableName
+     * @param string $newDbTableName
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function alterDbTable($model, $oldDbTableName, $newDbTableName)
     {
+        if($oldDbTableName === $newDbTableName):
+            return;
+        endif;
+
+        $this->schemaManager->renameTable($oldDbTableName, $newDbTableName);
 
     }
 
@@ -181,6 +191,7 @@ class SchemaEditor extends Object
     public function addField($model, $field)
     {
 
+        $schema = $this->schemaManager->createSchema();
         // many to many
         if ($field->manyToMany && $field->relation->through->meta->autoCreated):
             $this->createModel($field->relation->through);
@@ -197,7 +208,7 @@ class SchemaEditor extends Object
             return;
         endif;
 
-        $tableDef = clone $this->schema->getTable($model->meta->dbTable);
+        $tableDef = clone $schema->getTable($model->meta->dbTable);
 
         // normal column
         $tableDef->addColumn($name, $type, $fieldOptions);
@@ -224,7 +235,7 @@ class SchemaEditor extends Object
         endif;
 
         $comparator = new Comparator();
-        $diff = $comparator->diffTable($this->schema->getTable($model->meta->dbTable), $tableDef);
+        $diff = $comparator->diffTable($schema->getTable($model->meta->dbTable), $tableDef);
 
         if ($diff !== false):
             $this->schemaManager->alterTable($diff);
@@ -244,6 +255,8 @@ class SchemaEditor extends Object
      */
     public function removeField($model, $field)
     {
+
+        $schema = $this->schemaManager->createSchema();
         // Special-case implicit M2M tables
         if ($field->manyToMany && $field->relation->through->meta->autoCreated):
             $this->deleteModel($field->relation->through);
@@ -260,7 +273,7 @@ class SchemaEditor extends Object
         endif;
 
         $table = $model->meta->dbTable;
-        $tableDef = clone $this->schema->getTable($table);
+        $tableDef = clone $schema->getTable($table);
 
         // Drop any FK constraints, MySQL requires explicit deletion
         if ($field->isRelation && $field->relation != null):
@@ -273,7 +286,7 @@ class SchemaEditor extends Object
         $tableDef->dropColumn($name);
 
         $comparator = new Comparator();
-        $diff = $comparator->diffTable($this->schema->getTable($table), $tableDef);
+        $diff = $comparator->diffTable($schema->getTable($table), $tableDef);
 
         if ($diff !== false):
             $this->schemaManager->alterTable($diff);
@@ -281,11 +294,96 @@ class SchemaEditor extends Object
 
     }
 
+    /**
+     * Allows a field's type, uniqueness, nullability, default, column,  constraints etc. to be modified.
+     *
+     * Requires a copy of the old field as well so we can only perform changes that are required.
+     * If strict is true, raises errors if the old column does not match old_field precisely.
+     *
+     * @param Model      $model
+     * @param Field      $oldField
+     * @param Field      $newField
+     * @param bool|false $strict
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function alterField($model, $oldField, $newField, $strict = false)
     {
 
+        $oldType = $oldField->dbType($this->connection);
+        $newType = $newField->dbType($this->connection);
+
+        if (($oldType == null and $oldField->relation == null) || ($newType == null && $newField->relation == null)):
+            throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define '.
+                    'db_type (are you using a badly-written custom field?)', $newField->name, $oldField->name));
+
+        elseif($oldType == null && $newType == null &&
+            (
+                $oldField->relation->through != null &&
+                $newField->relation->through != null &&
+                $oldField->relation->through->meta->autoCreated &&
+                $newField->relation->through->meta->autoCreated
+            )
+        ):
+            $this->_alterManyToMany($model, $oldField, $newField, $strict);
+        elseif($oldType == null && $newType == null &&
+            (
+                $oldField->relation->through != null &&
+                $newField->relation->through != null &&
+                !$oldField->relation->through->meta->autoCreated &&
+                !$newField->relation->through->meta->autoCreated
+            )
+        ):
+            return;
+        else:
+            throw new  ValueError(sprintf('Cannot alter field %s into %s - they are not compatible types '.
+                '(you cannot alter to or from M2M fields, or add or remove through= on M2M fields)',
+                    $oldField->name, $newField->name));
+        endif;
+
+        $this->_alterField($model, $oldField, $newField, $strict);
     }
 
+    /**
+     * Alters M2Ms to repoint their to= endpoints.
+     *
+     * @param Model      $model
+     * @param Field      $oldField
+     * @param Field      $newField
+     * @param bool|false $strict
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function _alterManyToMany($model, $oldField, $newField, $strict = false) {
+        //Rename the through table
+        if($oldField->relation->through->meta->dbTable != $newField->relation->through->meta->dbTable):
+            $this->alterDbTable(
+                $oldField->relation->through,
+                $oldField->relation->through->meta->dbTable,
+                $newField->relation->through->meta->dbTable
+            );
+        endif;
+    }
+
+    /**
+     * Actually perform a "physical" (non-ManyToMany) field update.
+     *
+     * @param $model
+     * @param $oldField
+     * @param $newField
+     * @param bool|false $strict
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function _alterField($model, $oldField, $newField, $strict = false) {
+
+    }
     /**
      * @param Field      $field
      * @param bool|false $includeDefault
@@ -352,13 +450,15 @@ class SchemaEditor extends Object
 
     public function constraintName($table, $column, $constraintType)
     {
+
+        $schema = $this->schemaManager->createSchema();
         $unique = $primaryKey = $index = $foreignKey = null;
         extract($constraintType);
 
         $fieldConstraints = [];
 
         if ($foreignKey):
-            $foreignKeys = $this->schema->getTable($table)->getForeignKeys();
+            $foreignKeys = $schema->getTable($table)->getForeignKeys();
 
             /** @var $fk ForeignKeyConstraint */
             foreach ($foreignKeys as $fk) :

@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Model;
@@ -80,7 +81,9 @@ class RelatedField extends Field
     public function getConstructorArgs()
     {
         $kwargs = parent::getConstructorArgs();
-        $kwargs['onDelete'] = $this->relation->onDelete;
+        if(ArrayHelper::hasKey($kwargs, 'onDelete')):
+            $kwargs['onDelete'] = $this->relation->onDelete;
+        endif;
 
         if (is_string($this->relation->toModel)):
             $kwargs['to'] = $this->relation->toModel;

@@ -32,7 +32,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         'overrides',
     ];
 
-    public static $DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy'];
+    public static $DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy', 'autoCreated'];
 
     /**
      * Th name of the model this meta holds information for.
@@ -95,6 +95,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      * @var array
      */
     public $localFields = [];
+
     public $inverseFields = [];
 
     /**
@@ -238,7 +239,7 @@ class Meta extends DeconstructableObject implements MetaInterface
             $allRelations = [];
             /* @var $model Model */
             /* @var $field RelatedField */
-            $allModels = $this->registry->getModels();
+            $allModels = $this->registry->getModels(true);
 
             // collect all relation fields for this each model
             foreach ($allModels as $name => $model) :
@@ -325,13 +326,15 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function addField($field)
     {
-        if ($field->isRelation && $field->manyToMany):
+        if ($field->relation != null && $field->manyToMany):
             $this->localManyToMany[$field->name] = $field;
+        elseif($field->relation != null && $field->inverse):
+            $this->inverseFields[$field->name] = $field;
         else:
             $this->localFields[$field->name] = $field;
             $this->setupPrimaryKey($field);
         endif;
-    }
+     }
 
     /**
      * Set the primary key field of the model.

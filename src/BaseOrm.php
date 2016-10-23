@@ -88,6 +88,11 @@ class BaseOrm extends Object
      */
     private $databaseConfigs;
 
+    /**
+     * @var
+     */
+    public $charset;
+
     public static $instance;
     public static $SET_NULL = 'set_null';
     public static $CASCADE = 'cascade';
@@ -169,6 +174,10 @@ class BaseOrm extends Object
     public static function getMigrationsPath()
     {
         return self::getInstance()->migrationPath;
+    }
+
+    public static function getCharset() {
+        return self::getInstance()->charset;
     }
 
     //********************************** ORM Registry*********************************

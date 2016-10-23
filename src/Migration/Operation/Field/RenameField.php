@@ -13,6 +13,13 @@ namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 
+/**
+ * Renames a field on the model. Might affect db_column too.
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class RenameField extends Operation
 {
     public $modelName;
@@ -43,6 +50,37 @@ class RenameField extends Operation
     public function getDescription()
     {
         return sprintf('Rename field %s on %s to %s', $this->oldName, $this->modelName, $this->newName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function databaseForwards($schemaEditor, $fromState, $toState)
+    {
+        $toModel = $toState->getRegistry()->getModel($this->modelName);
+        if($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+            $fromModel = $fromState->getRegistry()->getModel($this->modelName);
+            $schemaEditor->alterField($fromModel,
+                $fromModel->meta->getField($this->oldName),
+                $toModel->meta->getField($this->newName)
+            );
+        endif;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    {
+
+        $toModel = $toState->getRegistry()->getModel($this->modelName);
+        if($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+            $fromModel = $fromState->getRegistry()->getModel($this->modelName);
+            $schemaEditor->alterField($fromModel,
+                $toModel->meta->getField($this->newName),
+                $fromModel->meta->getField($this->oldName)
+            );
+        endif;
     }
 
 }

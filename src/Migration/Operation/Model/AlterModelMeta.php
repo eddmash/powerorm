@@ -12,9 +12,9 @@ use Eddmash\PowerOrm\Migration\State\ModelState;
 class AlterModelMeta extends Operation
 {
     public $name;
-    public $meta;
+    public $meta = [];
 
-    private static $alterableOptions = ['managed', 'verbose_name'];
+    private static $alterableOptions = ['managed', 'verbosename'];
 
     public static function isAlterableOption($name)
     {
@@ -28,7 +28,7 @@ class AlterModelMeta extends Operation
     {
         /** @var $modelState ModelState */
         $modelState = $state->modelStates[$this->name];
-        $meta = $modelState->meta;
+        $meta = ($modelState->meta) ? $modelState->meta : [];
         $meta = array_replace($meta, $this->meta);
 
         foreach (self::$alterableOptions as $alterableOption) :
@@ -42,6 +42,22 @@ class AlterModelMeta extends Operation
     public function getDescription()
     {
         return sprintf('Changed Meta options on %s', $this->name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function databaseForwards($schemaEditor, $fromState, $toState)
+    {
+        parent::databaseForwards($schemaEditor, $fromState, $toState);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    {
+        parent::databaseBackwards($schemaEditor, $fromState, $toState);
     }
 
 }

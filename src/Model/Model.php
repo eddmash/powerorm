@@ -21,6 +21,7 @@ use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Object;
 
@@ -465,9 +466,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function _checkFields()
     {
         $errors = [];
-        /*
-         * @var Field
-         */
+
+        /** @var $fields Field */
         foreach ($this->meta->localFields as $fields) :
             $errors = array_merge($errors, $fields->checks());
         endforeach;

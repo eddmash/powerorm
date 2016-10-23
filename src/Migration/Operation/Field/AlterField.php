@@ -59,19 +59,19 @@ class AlterField extends Operation
     public function updateState($state)
     {
         if (false === $this->preserveDefault):
-            $field = $this->field->deepClone();
-            $field->default = NOT_PROVIDED;
+            $alteredField = $this->field->deepClone();
+            $alteredField->default = NOT_PROVIDED;
         else:
-            $field = $this->field;
+            $alteredField = $this->field;
         endif;
 
         $fields = $state->modelStates[$this->modelName]->fields;
         $newFields = [];
-        foreach ($fields as $name => $ofield) :
+        foreach ($fields as $name => $oldField) :
             if ($name == $this->name):
-                $newFields[$name] = $field;
+                $newFields[$name] = $alteredField;
             else:
-                $newFields[$name] = $ofield;
+                $newFields[$name] = $oldField;
             endif;
         endforeach;
         $state->modelStates[$this->modelName]->fields = $newFields;

@@ -13,12 +13,12 @@ class ManyToManyRel extends ForeignObjectRel
     public $multiple = true;
     public $through;
     public $through_fields;
-    public $dbConstrait = true;
+    public $dbConstraint = true;
 
     public function __construct($kwargs = [])
     {
 
-        if ($this->through && !$this->dbConstrait):
+        if ($this->through && !$this->dbConstraint):
             throw new ValueError("Can't supply a through model and db_constraint=False");
         endif;
 

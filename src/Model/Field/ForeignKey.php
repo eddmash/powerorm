@@ -39,6 +39,8 @@ class ForeignKey extends RelatedField
     public $fromField;
 
     /**
+     * {@inheritdoc}
+     *
      * @var ManyToOneRel
      */
     public $relation;

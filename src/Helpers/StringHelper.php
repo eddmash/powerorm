@@ -6,7 +6,7 @@
  */
 namespace Eddmash\PowerOrm\Helpers;
 
-/**
+/*
  * some method borrowed from Yii\helpers\BaseStringHelper
  * Part of the Yii framework.
  *
@@ -20,6 +20,8 @@ namespace Eddmash\PowerOrm\Helpers;
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
+use Eddmash\PowerOrm\BaseOrm;
+
 /**
  * Class Strings.
  *
@@ -29,6 +31,27 @@ namespace Eddmash\PowerOrm\Helpers;
  */
 class StringHelper
 {
+    /**
+     * Truncates a string to the number of characters specified.
+     *
+     * @param string $string   The string to truncate
+     * @param int    $length   How many characters from original string to include into truncated string
+     * @param string $suffix   String to append to the end of truncated string
+     * @param string $encoding The charset to use, defaults to charset currently used by application
+     * @param bool   $asHtml   Whether to treat the string being truncated as HTML and preserve proper HTML tags.
+     *                         This parameter is available since version 2.0.1
+     *
+     * @return string the truncated string
+     */
+    public static function truncate($string, $length, $suffix = '...', $encoding = null)
+    {
+        if (mb_strlen($string, $encoding ?: self::getCharset()) > $length) {
+            return trim(mb_substr($string, 0, $length, $encoding ?: self::getCharset())).$suffix;
+        } else {
+            return $string;
+        }
+    }
+
     /**
      * Returns the number of bytes in the given string.
      * This method ensures the string is treated as a byte array by using `mb_strlen()`.
@@ -97,7 +120,7 @@ class StringHelper
     public static function getCharset()
     {
         //todo make character set independent of framework
-        return config_item('charset');
+        return BaseOrm::getCharset();
     }
 
     public static function camelToSpace($name)

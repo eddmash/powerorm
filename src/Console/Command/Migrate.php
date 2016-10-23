@@ -67,7 +67,7 @@ class Migrate extends BaseCommand
 
         $this->dispatchSignal('powerorm.migration.pre_migrate', $this);
 
-        $this->info('Running migrations', true);
+        $this->info('Running migrations:', true);
 
         if (empty($plan)):
             $this->normal('  No migrations to apply.', true);

@@ -23,7 +23,7 @@ class Recorder
 //    private $schema;
 //    private $schemaManager;
     private $tableExist;
-    private $migrationTableName = 'orm_migrations';
+    private $migrationTableName = 'powerorm_migrations';
 
     /**
      * Recorder constructor.
@@ -92,7 +92,9 @@ class Recorder
             $myTable = $schema->createTable($this->migrationTableName);
             $myTable->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
             $myTable->addColumn('name', 'string', ['length' => 60]);
+            $myTable->addColumn('applied', 'datetime', ['default' => 'CURRENT_TIMESTAMP']);
             $myTable->setPrimaryKey(['id']);
+
             $schemaM->createTable($myTable);
             $this->tableExist = true;
         endif;

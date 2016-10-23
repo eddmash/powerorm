@@ -91,11 +91,24 @@ class Registry extends Object
      *
      * @return array
      */
-    public function getModels()
+    public function getModels($includeAutoCreated = false)
     {
         $this->_populateRegistry();
 
-        return $this->allModels;
+        if($includeAutoCreated):
+            return $this->allModels;
+        endif;
+
+        $models = [];
+        /** @var $model Model */
+        foreach ($this->allModels as $name => $model) :
+            if($model->meta->autoCreated):
+                continue;
+            endif;
+            $models[$name] = $model;
+        endforeach;
+
+        return $models;
     }
 
     /**

@@ -228,7 +228,7 @@ class Executor extends Object
      */
     public function unApplyMigration($state, $migration, $fake = false)
     {
-        Console::stdout(sprintf('UnApplying %s...', $migration->getName()));
+        Console::stdout(sprintf(' UnApplying %s...', $migration->getName()));
         if (!$fake):
             $state = $migration->unApply($state, $this->schemaEditor);
         endif;
@@ -261,7 +261,7 @@ class Executor extends Object
      */
     public function applyMigration($state, $migration, $fake = false)
     {
-        Console::stdout(sprintf('Applying %s...', $migration->getName()));
+        Console::stdout(sprintf(' Applying %s...', $migration->getName()));
         if (!$fake):
             $state = $migration->apply($state, $this->schemaEditor);
         endif;

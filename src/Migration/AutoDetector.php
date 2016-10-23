@@ -236,6 +236,7 @@ class AutoDetector extends Object
         $this->generateAddedFields();
         $this->generateRemovedFields();
         $this->generateAlteredFields();
+        $this->generateAlteredDbTable();
 
         return (empty($this->generatedOperations)) ? [] : [$this->createMigration()];
     }
@@ -449,8 +450,11 @@ class AutoDetector extends Object
             $relatedFields = [];
 
             // get all the relationship fields since they will need to
+
             // be created in there own operations aside from
+
             // the one that creates the model remember the model needs
+
             // to exist first before enforcing the relationships.
 
             /** @var $localField Field */
@@ -469,7 +473,8 @@ class AutoDetector extends Object
             endforeach;
 
             /** @var $localM2MField RelatedField */
-            foreach ($meta->localManyToMany as $localM2MField) :
+            foreach ($meta->localManyToMany as $name => $localM2MField) :
+
                 if ($localM2MField->relation->toModel != null):
                     $relatedFields[$localM2MField->name] = $localM2MField;
                 endif;
@@ -540,7 +545,7 @@ class AutoDetector extends Object
                 ];
 
                 // if the through model was not automatically created, depend on it also
-                if ($relationField->relation->hasProperty('through') &&
+                if ($relationField->relation->hasProperty('through') && !$relationField->relation != null &&
                     !$relationField->relation->through->meta->autoCreated
                 ):
 
@@ -778,14 +783,17 @@ class AutoDetector extends Object
      */
     public function generateAlteredMeta()
     {
+
         //get unmanaged converted to managed
         $managed = array_intersect($this->oldUnmanagedKeys, $this->newModelKeys);
+
         //get managed converted to unmanaged
-        $unmanaged = array_intersect($this->oldModelKeys, $this->oldUnmanagedKeys);
+        $unmanaged = array_intersect($this->oldModelKeys, $this->newUnmanagedKeys);
 
         $modelsToCheck = array_merge($this->keptProxyKeys, $this->keptUnmanagedKeys, $managed, $unmanaged);
 
         $modelsToCheck = array_unique($modelsToCheck);
+
         /* @var $oldState ModelState */
         /* @var $newState ModelState */
         foreach ($modelsToCheck as $modelName) :
@@ -794,18 +802,23 @@ class AutoDetector extends Object
             $newState = $this->toState->modelStates[$modelName];
 
             $oldMeta = [];
-            foreach ($oldState->meta as $name => $opt) :
-                if (AlterModelMeta::isAlterableOption($name)):
-                    $oldMeta[$name] = $opt;
-                endif;
-            endforeach;
+
+            if($oldState->meta):
+                foreach ($oldState->meta as $name => $opt) :
+                    if (AlterModelMeta::isAlterableOption($name)):
+                        $oldMeta[$name] = $opt;
+                    endif;
+                endforeach;
+            endif;
 
             $newMeta = [];
-            foreach ($newState->meta as $name => $opt) :
-                if (AlterModelMeta::isAlterableOption($name)):
-                    $newMeta[$name] = $opt;
-                endif;
-            endforeach;
+            if($newState->meta):
+                foreach ($newState->meta as $name => $opt) :
+                    if (AlterModelMeta::isAlterableOption($name)):
+                        $newMeta[$name] = $opt;
+                    endif;
+                endforeach;
+            endif;
 
             if ($oldMeta !== $newMeta):
                 $this->addOperation(AlterModelMeta::createObject([
@@ -992,14 +1005,15 @@ class AutoDetector extends Object
     public function generateAlteredDbTable()
     {
         $modelToCheck = array_merge($this->keptModelKeys, $this->keptProxyKeys, $this->keptUnmanagedKeys);
+
         /* @var $oldModelState ModelState */
         /* @var $newModelState ModelState */
         foreach ($modelToCheck as $modelName) :
             $oldModelName = $this->getOldModelName($modelName);
             $oldModelState = $this->fromState->modelStates[$oldModelName];
             $newModelState = $this->toState->modelStates[$oldModelName];
-            $oldDbTableName = (!isset($oldModelState->meta['dbTable'])) ?: $oldModelState->meta['dbTable'];
-            $newDbTableName = (!isset($oldModelState->meta['dbTable'])) ?: $newModelState->meta['dbTable'];
+            $oldDbTableName = (!isset($oldModelState->meta['dbTable'])) ? '' : $oldModelState->meta['dbTable'];
+            $newDbTableName = (!isset($newModelState->meta['dbTable'])) ? '' : $newModelState->meta['dbTable'];
 
             if ($oldDbTableName !== $newDbTableName) :
                 $this->addOperation(
