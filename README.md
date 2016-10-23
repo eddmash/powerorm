@@ -6,11 +6,13 @@
 [![Latest Unstable Version](https://poser.pugx.org/eddmash/powerorm/v/unstable)](https://packagist.org/packages/eddmash/powerorm)
 [![License](https://poser.pugx.org/eddmash/powerorm/license)](https://packagist.org/packages/eddmash/powerorm)
 
-# Powerorm
+# PowerOrm
 A light weight easy to use CodeIgniter ORM.
 
-# Help
-Post all question here [Powerorm Help!](https://groups.google.com/d/forum/powerorm-users) for assistance.
+# Help and Documentation
+Get the ORM documentation here [PowerOrm Documentation !](http://powerorm.readthedocs.io/).
+Get assistance on the ORM here [PowerOrm Help !](https://groups.google.com/d/forum/powerorm-users).
+
 # Introduction
 I created this project because i required a lightweight easy to use orm that i could use in my Codeigniter projects 
 with the least amount of configuration .
