@@ -2,6 +2,7 @@
 
 namespace Eddmash\PowerOrm\Helpers;
 
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -262,6 +263,8 @@ class Tools
     public static function lazyRelatedOperation($callback, $scopeModel, $relModel, $kwargs = [])
     {
 
+        $relModel = self::resolveRelation($scopeModel, $relModel);
+
         $relModels = (is_array($relModel)) ? $relModel : [$relModel];
 
         $relatedModels = [];
@@ -277,6 +280,16 @@ class Tools
 
         $kwargs['scopeModel'] = $scopeModel;
         $scopeModel->meta->registry->lazyModelOps($callback, $relatedModels, $kwargs);
+    }
+
+    public static function resolveRelation($model, $relModel){
+        if($relModel==BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT):
+            return $model;
+        elseif ($relModel instanceof Model):
+            return $relModel->meta->modelName;
+        endif;
+
+        return $relModel;
     }
 
 }

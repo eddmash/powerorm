@@ -90,6 +90,11 @@ class ManyToManyField extends RelatedField
         endif;
     }
 
+    public function contributeToRelatedClass($relatedModel, $scopeModel)
+    {
+
+    }
+
     /**
      * Creates an intermediary model.
      *
@@ -107,7 +112,7 @@ class ManyToManyField extends RelatedField
         $modelName = $model->meta->modelName;
 
         if(is_string($field->relation->toModel)):
-            $toModelName = $field->relation->toModel;
+            $toModelName = Tools::resolveRelation($model, $field->relation->toModel);
         else:
             $toModelName = $field->relation->toModel->meta->modelName;
         endif;

@@ -30,6 +30,7 @@ define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
  */
 class BaseOrm extends Object
 {
+    const RECURSIVE_RELATIONSHIP_CONSTANT = 'this';
     /**
      * The configurations to use to connect to the database.
      *

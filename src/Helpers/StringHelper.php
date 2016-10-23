@@ -125,7 +125,7 @@ class StringHelper
 
     public static function camelToSpace($name)
     {
-        return static::camelReplace($name, ' ');
+        return static::camelReplace(trim($name), ' ');
     }
 
     public static function camelToUnderscore($name)
