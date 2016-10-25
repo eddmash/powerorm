@@ -13,6 +13,13 @@ use Eddmash\PowerOrm\Helpers\ClassHelper;
 
 class ClassHelperTest extends PHPUnit_Framework_TestCase
 {
+    public function testGettingClassNameFromFile() {
+        $classDir = '/var/www/public/ci306/application/migrations';
+        $file = $classDir.'/m0001_Initial.php';
+
+        $this->assertEquals('m0001_Initial',  ClassHelper::getClassNameFromFile($file, $classDir, 'App\\Migrations'));
+    }
+
     /**
      * @dataProvider namespaceBothBackslashProvider
      *

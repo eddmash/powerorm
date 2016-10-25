@@ -34,7 +34,11 @@ class AutoField extends Field
 
     public function contributeToClass($field, $model) {
         parent::contributeToClass($field, $model);
-        assertTrue($model->meta->hasAutoField, "A model can't have more than one AutoField.");
+
+        assert(!$model->meta->hasAutoField,
+            sprintf("The Model '%s' more than one AutoField, which is not allowed.",
+                $this->scopeModel->meta->modelName));
+
         $this->scopeModel->meta->hasAutoField = true;
         $this->scopeModel->meta->autoField = $this;
     }

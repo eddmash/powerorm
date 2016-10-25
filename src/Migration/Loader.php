@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Migration;
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\AmbiguityError;
+use Eddmash\PowerOrm\Exception\ClassNotFoundException;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
@@ -138,13 +139,21 @@ class Loader extends Object
         /* @var $migrationName Migration */
         foreach ($this->getMigrationsClasses() as $fileName) :
             $migrationName = $fileName;
-
             $migrations[$fileName] = $migrationName::createObject($fileName);
         endforeach;
 
         return $migrations;
     }
 
+    /**
+     * @return array
+     *
+     * @throws ClassNotFoundException
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function getMigrationsClasses()
     {
         $migrationFiles = $this->getMigrationsFiles();
@@ -152,7 +161,13 @@ class Loader extends Object
 
         $namespace = BaseOrm::getMigrationsNamespace();
         foreach ($migrationFiles as $migrationFile) :
-            $classes[] = ClassHelper::getClassNameFromFile($migrationFile, BaseOrm::getMigrationsPath(), $namespace);
+            $className = ClassHelper::getClassNameFromFile($migrationFile, BaseOrm::getMigrationsPath());
+            $foundClass = ClassHelper::classExists($className, $namespace);
+            if(!$className):
+                throw new ClassNotFoundException(
+                    sprintf('The class [ %2$s\\%1$s or \\%1$s ] could not be located', $className, $namespace));
+            endif;
+            $classes[] = $foundClass;
         endforeach;
 
         return $classes;

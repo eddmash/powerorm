@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\App;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
+use Eddmash\PowerOrm\Exception\ClassNotFoundException;
 use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
@@ -175,7 +176,13 @@ class Registry extends Object
     /**
      * Returns a list of all model names in lowercase or false if not models were found.
      *
-     * @return array
+     * @return array|bool
+     *
+     * @throws ClassNotFoundException
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getModelClasses()
     {
@@ -186,10 +193,15 @@ class Registry extends Object
         if (empty($modelFiles)) {
             return false;
         }
-
         $namespace = BaseOrm::getModelsNamespace();
         foreach ($this->getModelFiles() as $file) :
-            $models[] = ClassHelper::getClassNameFromFile($file, BaseOrm::getModelsPath(), $namespace);
+            $className = ClassHelper::getClassNameFromFile($file, BaseOrm::getModelsPath());
+            $foundClass = ClassHelper::classExists($className, $namespace);
+            if(!$foundClass):
+                throw new ClassNotFoundException(
+                    sprintf('The class [ %1$s\\%2$s or \\%1$s ] could not be located', $className, $namespace));
+            endif;
+            $models[] = $foundClass;
         endforeach;
 
         return $models;

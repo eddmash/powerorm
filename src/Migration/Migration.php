@@ -15,7 +15,24 @@ use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
-class Migration
+/**
+ * The base class for all migrations.
+ *
+ * Migration files will import this from Eddmash\PowerOrm\Migration\Migration and subclass it as a class
+ * called Migration.
+ *
+ * It will have one or more of the following attributes:
+ * - getOperations: A list of Operation instances, probably from Eddmash\PowerOrm\Migration\Migration\Operation.
+ * - getDependency: A list of tuples of (app_path, migration_name)
+ *
+ * Note that all migrations come out of migrations and into the Loader or Graph as instances, having been
+ * initialized with their app name.
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+class Migration implements MigrationInterface
 {
     protected $name;
     protected $operations;
@@ -63,6 +80,8 @@ class Migration
     }
 
     /**
+     * Operations to apply during this migration, in order.
+     *
      * @return mixed
      */
     public function getOperations()
@@ -95,6 +114,8 @@ class Migration
     }
 
     /**
+     * Operations to apply during this migration, in order.
+     *
      * @return mixed
      */
     public function getDependency()

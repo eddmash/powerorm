@@ -131,7 +131,7 @@ class BaseOrm extends Object
      *
      * @var string
      */
-    public $appNamespace = 'app\\';
+    public $appNamespace = 'App\\';
 
     /**
      * Namespace used in migration.
@@ -407,6 +407,6 @@ class BaseOrm extends Object
     {
         $namespace = ClassHelper::getFormatNamespace(self::getInstance()->appNamespace, true);
 
-        return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'migrations'), true, false);
+        return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'Migrations'), true, false);
     }
 }

@@ -29,7 +29,7 @@ class ClassHelper
      *
      * @return string
      */
-    public static function getClassNameFromFile($file, $classesDir, $classNamespace = '')
+    public static function getClassNameFromFile($file, $classesDir)
     {
         $className = substr($file, strlen($classesDir)); // get path after the model directory
         $className = preg_replace("/^\//", '', $className); // remove any forward slash at the begining
@@ -37,7 +37,7 @@ class ClassHelper
 
         $className = preg_replace('/.php$/', '', $className); // remove extension.
 
-        return self::classExists($className, $classNamespace);
+        return $className;
     }
 
     /**

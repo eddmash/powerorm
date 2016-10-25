@@ -135,6 +135,25 @@ abstract class Operation extends DeconstructableObject implements OperationInter
     }
 
     /**
+     * Return either a list of operations the actual operation should be
+     * replaced with or a boolean that indicates whether or not the specified
+     * operation can be optimized across.
+     *
+     * @param Operation $operation
+     * @param array     $inBetween
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function reduce($operation, $inBetween)
+    {
+        // TODO: Implement reduce() method.
+    }
+
+    /**
      * Returns if we're allowed to migrate the model.
      *
      * it preemptively rejects any proxy, unmanaged model.
