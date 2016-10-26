@@ -73,7 +73,7 @@ class ManyToManyField extends RelatedField
         parent::contributeToClass($fieldName, $modelObject);
 
         // if through model is set
-        if($this->relation->through != null):
+        if ($this->relation->through != null):
             $callback = function ($kwargs) {
                 /* @var $field RelatedField */
                 /** @var $related Model */
@@ -107,11 +107,12 @@ class ManyToManyField extends RelatedField
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function createManyToManyIntermediaryModel($field, $model) {
+    public function createManyToManyIntermediaryModel($field, $model)
+    {
 
         $modelName = $model->meta->modelName;
 
-        if(is_string($field->relation->toModel)):
+        if (is_string($field->relation->toModel)):
             $toModelName = Tools::resolveRelation($model, $field->relation->toModel);
         else:
             $toModelName = $field->relation->toModel->meta->modelName;
@@ -122,13 +123,13 @@ class ManyToManyField extends RelatedField
             public function fields(){}
         }';
         $intermediaryClass = sprintf($intermediaryClass, $className, Model::getFullClassName());
-        if(!class_exists($className, false)):
+        if (!class_exists($className, false)):
             eval($intermediaryClass);
         endif;
 
         $from = strtolower($modelName);
         $to = strtolower($toModelName);
-        if($from == $to):
+        if ($from == $to):
             $to = sprintf('to_%s', $to);
             $from = sprintf('from_%s', $from);
         endif;
@@ -171,10 +172,11 @@ class ManyToManyField extends RelatedField
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _getM2MDbTable($meta) {
-        if($this->relation->through != null):
+    public function _getM2MDbTable($meta)
+    {
+        if ($this->relation->through != null):
             return $this->relation->through->meta->dbTable;
-        elseif($this->dbTable):
+        elseif ($this->dbTable):
             return $this->dbTable;
         else:
             // oracle allows identifier of 30 chars max

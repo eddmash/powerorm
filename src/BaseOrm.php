@@ -177,7 +177,8 @@ class BaseOrm extends Object
         return self::getInstance()->migrationPath;
     }
 
-    public static function getCharset() {
+    public static function getCharset()
+    {
         return self::getInstance()->charset;
     }
 
@@ -252,7 +253,7 @@ class BaseOrm extends Object
     public static function getOrmFromContext()
     {
         $ci = static::getCiObject();
-        if(!isset($ci->orm)):
+        if (!isset($ci->orm)):
             $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the '.
                 '$autoload[\'libraries\'] = array(\'powerorm/orm\'). On the autoload.php';
 

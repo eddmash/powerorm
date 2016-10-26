@@ -803,7 +803,7 @@ class AutoDetector extends Object
 
             $oldMeta = [];
 
-            if($oldState->meta):
+            if ($oldState->meta):
                 foreach ($oldState->meta as $name => $opt) :
                     if (AlterModelMeta::isAlterableOption($name)):
                         $oldMeta[$name] = $opt;
@@ -812,7 +812,7 @@ class AutoDetector extends Object
             endif;
 
             $newMeta = [];
-            if($newState->meta):
+            if ($newState->meta):
                 foreach ($newState->meta as $name => $opt) :
                     if (AlterModelMeta::isAlterableOption($name)):
                         $newMeta[$name] = $opt;

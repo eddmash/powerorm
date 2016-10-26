@@ -48,10 +48,11 @@ class Optimize
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function run($operations) {
-        while(true):
+    public static function run($operations)
+    {
+        while (true):
             $results = self::_optimize($operations);
-            if($results == $operations):
+            if ($results == $operations):
                 return $results;
             endif;
             $operations = $results;
@@ -69,7 +70,8 @@ class Optimize
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function _optimize($operations) {
+    public static function _optimize($operations)
+    {
         $newOperations = [];
         /** @var $outOperation Operation */
         foreach ($operations as $outIndex => $outOperation) :

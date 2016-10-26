@@ -334,13 +334,13 @@ class Meta extends DeconstructableObject implements MetaInterface
     {
         if ($field->relation != null && $field->manyToMany):
             $this->localManyToMany[$field->name] = $field;
-        elseif($field->relation != null && $field->inverse):
+        elseif ($field->relation != null && $field->inverse):
             $this->inverseFields[$field->name] = $field;
         else:
             $this->localFields[$field->name] = $field;
             $this->setupPrimaryKey($field);
         endif;
-     }
+    }
 
     /**
      * Set the primary key field of the model.

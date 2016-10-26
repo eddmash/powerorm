@@ -96,14 +96,14 @@ class Registry extends Object
     {
         $this->_populateRegistry();
 
-        if($includeAutoCreated):
+        if ($includeAutoCreated):
             return $this->allModels;
         endif;
 
         $models = [];
         /** @var $model Model */
         foreach ($this->allModels as $name => $model) :
-            if($model->meta->autoCreated):
+            if ($model->meta->autoCreated):
                 continue;
             endif;
             $models[$name] = $model;
@@ -197,7 +197,7 @@ class Registry extends Object
         foreach ($this->getModelFiles() as $file) :
             $className = ClassHelper::getClassNameFromFile($file, BaseOrm::getModelsPath());
             $foundClass = ClassHelper::classExists($className, $namespace);
-            if(!$foundClass):
+            if (!$foundClass):
                 throw new ClassNotFoundException(
                     sprintf('The class [ %1$s\\%2$s or \\%1$s ] could not be located', $className, $namespace));
             endif;

@@ -168,7 +168,7 @@ class SchemaEditor extends Object
      */
     public function alterDbTable($model, $oldDbTableName, $newDbTableName)
     {
-        if($oldDbTableName === $newDbTableName):
+        if ($oldDbTableName === $newDbTableName):
             return;
         endif;
 
@@ -317,9 +317,9 @@ class SchemaEditor extends Object
 
         if (($oldType == null and $oldField->relation == null) || ($newType == null && $newField->relation == null)):
             throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define '.
-                    'db_type (are you using a badly-written custom field?)', $newField->name, $oldField->name));
+                'db_type (are you using a badly-written custom field?)', $newField->name, $oldField->name));
 
-        elseif($oldType == null && $newType == null &&
+        elseif ($oldType == null && $newType == null &&
             (
                 $oldField->relation->through != null &&
                 $newField->relation->through != null &&
@@ -328,7 +328,7 @@ class SchemaEditor extends Object
             )
         ):
             $this->_alterManyToMany($model, $oldField, $newField, $strict);
-        elseif($oldType == null && $newType == null &&
+        elseif ($oldType == null && $newType == null &&
             (
                 $oldField->relation->through != null &&
                 $newField->relation->through != null &&
@@ -340,7 +340,7 @@ class SchemaEditor extends Object
         else:
             throw new  ValueError(sprintf('Cannot alter field %s into %s - they are not compatible types '.
                 '(you cannot alter to or from M2M fields, or add or remove through= on M2M fields)',
-                    $oldField->name, $newField->name));
+                $oldField->name, $newField->name));
         endif;
 
         $this->_alterField($model, $oldField, $newField, $strict);
@@ -358,9 +358,10 @@ class SchemaEditor extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _alterManyToMany($model, $oldField, $newField, $strict = false) {
+    public function _alterManyToMany($model, $oldField, $newField, $strict = false)
+    {
         //Rename the through table
-        if($oldField->relation->through->meta->dbTable != $newField->relation->through->meta->dbTable):
+        if ($oldField->relation->through->meta->dbTable != $newField->relation->through->meta->dbTable):
             $this->alterDbTable(
                 $oldField->relation->through,
                 $oldField->relation->through->meta->dbTable,
@@ -381,9 +382,11 @@ class SchemaEditor extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _alterField($model, $oldField, $newField, $strict = false) {
+    public function _alterField($model, $oldField, $newField, $strict = false)
+    {
 
     }
+
     /**
      * @param Field      $field
      * @param bool|false $includeDefault

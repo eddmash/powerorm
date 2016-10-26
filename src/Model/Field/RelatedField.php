@@ -81,7 +81,7 @@ class RelatedField extends Field
     public function getConstructorArgs()
     {
         $kwargs = parent::getConstructorArgs();
-        if(ArrayHelper::hasKey($kwargs, 'onDelete')):
+        if (ArrayHelper::hasKey($kwargs, 'onDelete')):
             $kwargs['onDelete'] = $this->relation->onDelete;
         endif;
 

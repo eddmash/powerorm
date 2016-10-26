@@ -78,7 +78,8 @@ class AlterModelTable extends Operation
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function _alterModelTable($schemaEditor, $fromState, $toState) {
+    private function _alterModelTable($schemaEditor, $fromState, $toState)
+    {
         $toModel = $toState->getRegistry()->getModel($this->name);
 
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
@@ -91,7 +92,7 @@ class AlterModelTable extends Operation
             /* @var $oldField ManyToManyField */
             foreach ($toModel->meta->localManyToMany as $newName => $newField) :
                 foreach ($fromModel->meta->localManyToMany as $oldName => $oldField) :
-                    if($newName === $oldName):
+                    if ($newName === $oldName):
                         $schemaEditor->alterDbTable(
                             $newField->relation->through,
                             $oldField->relation->through->meta->dbTable,

@@ -114,7 +114,8 @@ class ForeignKey extends RelatedField
         return $this->getRelatedField()->dbType($connection);
     }
 
-    public function getAttrName() {
+    public function getAttrName()
+    {
         return sprintf('%s_id', $this->name);
     }
 }

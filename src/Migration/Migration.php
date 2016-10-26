@@ -10,7 +10,6 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
-use Doctrine\DBAL\Schema\Schema;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;

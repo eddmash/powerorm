@@ -58,7 +58,7 @@ class RenameField extends Operation
     public function databaseForwards($schemaEditor, $fromState, $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
-        if($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $schemaEditor->alterField($fromModel,
                 $fromModel->meta->getField($this->oldName),
@@ -74,7 +74,7 @@ class RenameField extends Operation
     {
 
         $toModel = $toState->getRegistry()->getModel($this->modelName);
-        if($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $schemaEditor->alterField($fromModel,
                 $toModel->meta->getField($this->newName),

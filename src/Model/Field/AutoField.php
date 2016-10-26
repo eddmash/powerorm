@@ -32,7 +32,8 @@ class AutoField extends Field
         return Type::INTEGER;
     }
 
-    public function contributeToClass($field, $model) {
+    public function contributeToClass($field, $model)
+    {
         parent::contributeToClass($field, $model);
 
         assert(!$model->meta->hasAutoField,

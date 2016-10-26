@@ -282,8 +282,9 @@ class Tools
         $scopeModel->meta->registry->lazyModelOps($callback, $relatedModels, $kwargs);
     }
 
-    public static function resolveRelation($model, $relModel) {
-        if($relModel == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT):
+    public static function resolveRelation($model, $relModel)
+    {
+        if ($relModel == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT):
             return $model;
         elseif ($relModel instanceof Model):
             return $relModel->meta->modelName;

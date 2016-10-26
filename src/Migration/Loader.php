@@ -163,7 +163,7 @@ class Loader extends Object
         foreach ($migrationFiles as $migrationFile) :
             $className = ClassHelper::getClassNameFromFile($migrationFile, BaseOrm::getMigrationsPath());
             $foundClass = ClassHelper::classExists($className, $namespace);
-            if(!$className):
+            if (!$className):
                 throw new ClassNotFoundException(
                     sprintf('The class [ %2$s\\%1$s or \\%1$s ] could not be located', $className, $namespace));
             endif;
