@@ -42,6 +42,7 @@ class StateRegistry extends Registry
         foreach ($modelStates as $name => $modelState) :
             $modelState->toModel($this);
         endforeach;
+        $this->ready = true;
 
     }
 
