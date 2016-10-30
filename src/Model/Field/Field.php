@@ -246,9 +246,9 @@ class Field extends DeconstructableObject implements FieldInterface
                     $modelObject->getFullClassName()));
         endif;
 
-        $this->setFromName($fieldName);
         $this->scopeModel = $modelObject;
-        $modelObject->meta->addField($this);
+        $this->setFromName($fieldName);
+        $this->scopeModel->meta->addField($this);
     }
 
     /**
@@ -506,17 +506,17 @@ class Field extends DeconstructableObject implements FieldInterface
         return $this->scopeModel->getFullClassName().'->'.$this->name;
     }
 
-    public function __debugInfo()
-    {
-        $field = [];
-        foreach (get_object_vars($this) as $name => $value) :
-            if (in_array($name, self::DEBUG_IGNORE)):
-                $meta[$name] = (is_subclass_of($value, Object::getFullClassName())) ?: '** hidden **';
-                continue;
-            endif;
-            $field[$name] = $value;
-        endforeach;
-
-        return $field;
-    }
+//    public function __debugInfo()
+//    {
+//        $field = [];
+//        foreach (get_object_vars($this) as $name => $value) :
+//            if (in_array($name, self::DEBUG_IGNORE)):
+//                $meta[$name] = (is_subclass_of($value, Object::getFullClassName())) ?: '** hidden **';
+//                continue;
+//            endif;
+//            $field[$name] = $value;
+//        endforeach;
+//
+//        return $field;
+//    }
 }

@@ -96,7 +96,7 @@ class ForeignKey extends RelatedField
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function contributeToRelatedClass($related)
+    public function contributeToRelatedClass($related, $scopeModel)
     {
         if ($this->relation->fieldName == null):
             $this->relation->fieldName = $related->meta->primaryKey->name;

@@ -16,6 +16,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Eddmash\PowerOrm\Exception\ValueError;
+use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
@@ -119,6 +120,7 @@ class SchemaEditor extends Object
             $tableDef->addUniqueIndex($unique_fields);
         endif;
 
+        var_dump($schema->toSql($this->connection->getDatabasePlatform()));
         $this->schemaManager->createTable($tableDef);
 
         // many to many
@@ -444,8 +446,8 @@ class SchemaEditor extends Object
         endif;
 
         // auto increament option
-        if ($field->hasProperty('auto') && $field->auto):
-            $options['autoincrement'] = $field->auto;
+        if ($field instanceof AutoField):
+            $options['autoincrement'] = true;
         endif;
 
         return $options;
