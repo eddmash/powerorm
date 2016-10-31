@@ -16,6 +16,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\Console\Manager;
+use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
@@ -103,7 +104,7 @@ class BaseOrm extends Object
     /**
      * @var Registry
      */
-    private $registryCache;
+    public $registryCache;
 
     /**
      * path from where to get and put migration files.
@@ -164,7 +165,7 @@ class BaseOrm extends Object
         if (empty($this->modelsPath)):
             $this->modelsPath = sprintf('%smodels%s', APPPATH, DIRECTORY_SEPARATOR);
         endif;
-        self::getDatabaseConnection();
+
     }
 
     public static function getModelsPath()
@@ -211,7 +212,8 @@ class BaseOrm extends Object
     }
 
     /**
-     * Returns the application registry. This method populates the registry the first time its invoked and caches it since
+     * Returns the application registry. This method populates the registry the first time its invoked and caches
+     * it since
      * its a very expensive method. subsequent calls get the cached registry.
      *
      * @return Registry
@@ -220,15 +222,25 @@ class BaseOrm extends Object
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function getRegistry()
+    public static function &getRegistry($load = false)
     {
         $orm = static::getInstance();
 
-        if (!$orm->registryCache->isAppReady()):
-            $orm->registryCache->populate();
+        if($load):
+            self::loadRegistry();
         endif;
 
         return $orm->registryCache;
+    }
+
+    public static function loadRegistry() {
+        var_dump('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
+        $instance = self::getInstance();
+        try{
+            $instance->registryCache->isAppReady();
+        }catch (AppRegistryNotReady $e){
+            $instance->registryCache->populate();
+        }
     }
 
     /**
@@ -250,7 +262,7 @@ class BaseOrm extends Object
         return $instance;
     }
 
-    public static function getOrmFromContext()
+    public static function &getOrmFromContext()
     {
         $ci = static::getCiObject();
         if (!isset($ci->orm)):
@@ -264,7 +276,7 @@ class BaseOrm extends Object
         return $orm;
     }
 
-    public static function _standAloneEnvironment($config)
+    public static function &_standAloneEnvironment($config)
     {
         return static::createObject($config);
     }

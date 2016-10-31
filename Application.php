@@ -15,6 +15,9 @@ use Symfony\Component\Debug\ErrorHandler;
 
 class Application
 {
+    public static function webRun($config = []) {
+        static::run($config);
+    }
     public static function run($config)
     {
 
@@ -30,9 +33,13 @@ class Application
         // load doctrine DBAL
         self::loadThirdParty();
 
-        if (!StringHelper::startsWith(ENVIRONMENT, 'POWERORM_')):
+        if (!StringHelper::startsWith(ENVIRONMENT, 'POWERORM_') && is_cli()):
             new CI_Controller();
         endif;
+    }
+
+    public static function consoleRun($config) {
+        static::run($config);
 
         BaseOrm::consoleRunner();
     }

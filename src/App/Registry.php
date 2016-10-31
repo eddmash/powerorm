@@ -64,7 +64,7 @@ class Registry extends Object
     public function isAppReady()
     {
         if (!$this->ready) {
-            return new AppRegistryNotReady('Registry has not been loaded yet.');
+            throw new AppRegistryNotReady('Registry has not been loaded yet.');
         }
     }
 
@@ -94,7 +94,13 @@ class Registry extends Object
      */
     public function getModels($includeAutoCreated = false)
     {
-        $this->_populateRegistry();
+//        $this->_populateRegistry();
+
+        try{
+            $this->isAppReady();
+        }catch (AppRegistryNotReady $e){
+            $this->populate();
+        }
 
         if ($includeAutoCreated):
             return $this->allModels;
@@ -141,7 +147,9 @@ class Registry extends Object
                 if ($this->hasModel($className)):
                     continue;
                 endif;
+
                 new $className();
+
             endforeach;
         endif;
     }
@@ -237,12 +245,21 @@ class Registry extends Object
         }
 
         try {
-            $model = $this->getModel($modelName);
+            $model = $this->getRegisteredModel($modelName);
             $kwargs['relatedModel'] = $model;
             $callback($kwargs);
         } catch (LookupError $err) {
             $this->_pendingOps[$modelName][] = [$callback, $kwargs];
         }
+    }
+
+    public function getRegisteredModel($name) {
+        $model = ArrayHelper::getValue($this->allModels, $name);
+        if($model == null):
+            throw new LookupError(sprintf("Model '%s' not registered.", $name));
+        endif;
+
+        return $model;
     }
 
     /**

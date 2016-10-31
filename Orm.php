@@ -2,7 +2,8 @@
 
 // if we not on cli we will need to bootstra the orm
 if (!is_cli()):
-    require_once 'bootstrap.php';
+    require_once 'Application.php';
+    Application::webRun(['baseDir' => FCPATH]);
 endif;
 
 use Eddmash\PowerOrm\BaseOrm;

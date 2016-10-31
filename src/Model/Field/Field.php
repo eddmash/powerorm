@@ -516,7 +516,7 @@ class Field extends DeconstructableObject implements FieldInterface
 //            endif;
 //            $field[$name] = $value;
 //        endforeach;
-//
+
 //        return $field;
 //    }
 }

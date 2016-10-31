@@ -12,10 +12,9 @@ use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
-use Eddmash\PowerOrm\Object;
 
 /**
- * Class Meta.
+ * Metadata options that can be given to a mode..
  *
  * @since 1.0.0
  *
@@ -47,7 +46,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     public $proxy = false;
     /**
-     * Does this model have an autofield, will have if primary key was set automatically.
+     * Does this model have an AutoField, will have if primary key was set automatically.
      *
      * @var bool
      */
@@ -304,6 +303,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         endif;
 
         $vName = $this->verboseName;
+
         $this->verboseName = (empty($vName)) ? ucwords(StringHelper::camelToSpace($this->modelName)) : $vName;
     }
 
@@ -373,7 +373,11 @@ class Meta extends DeconstructableObject implements MetaInterface
                 $field->primaryKey = true;
                 $this->setupPrimaryKey($field);
             else:
-                $field = AutoField::createObject(['verboseName' => 'ID', 'primaryKey' => true, 'autoCreated' => true]);
+                $field = AutoField::createObject([
+                    'verboseName' => 'ID',
+                    'primaryKey' => true,
+                    'autoCreated' => true,
+                ]);
                 $model->addToClass('id', $field);
             endif;
         endif;
@@ -426,17 +430,17 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     }
 
-    public function __debugInfo()
-    {
-        $meta = [];
-        foreach (get_object_vars($this) as $name => $value) :
-            if (in_array($name, static::$DEBUG_IGNORE)):
-                $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
-                continue;
-            endif;
-            $meta[$name] = $value;
-        endforeach;
+//    public function __debugInfo()
+//    {
+//        $meta = [];
+//        foreach (get_object_vars($this) as $name => $value) :
+//            if (in_array($name, static::$DEBUG_IGNORE)):
+//                $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
+//                continue;
+//            endif;
+//            $meta[$name] = $value;
+//        endforeach;
 
-        return $meta;
-    }
+//        return $meta;
+//    }
 }

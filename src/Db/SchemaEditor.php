@@ -120,7 +120,6 @@ class SchemaEditor extends Object
             $tableDef->addUniqueIndex($unique_fields);
         endif;
 
-        var_dump($schema->toSql($this->connection->getDatabasePlatform()));
         $this->schemaManager->createTable($tableDef);
 
         // many to many

@@ -6,6 +6,7 @@
  */
 namespace Eddmash\PowerOrm\Console\Command;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
@@ -36,6 +37,30 @@ class Testdb extends BaseCommand
         $schemaM = $conn->getSchemaManager();
         $schema = $schemaM->createSchema();
 
+        $this->fetch($conn);
+
+    }
+
+    /**
+     * @param Connection $connection
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function fetch($connection) {
+        $connection->createQueryBuilder()->from();
+    }
+
+    /**
+     * @param AbstractSchemaManager $schemaM
+     * @param Schema                $schema
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function readSchema($schemaM, $schema) {
         $table = $schema->getTable('testing_jaked');
 
         /** @var $fk ForeignKeyConstraint */
@@ -48,7 +73,6 @@ class Testdb extends BaseCommand
             echo 'foreign columns :'.implode(',', $fk->getForeignColumns()).PHP_EOL;
             echo PHP_EOL.PHP_EOL;
         endforeach;
-
     }
 
     /**

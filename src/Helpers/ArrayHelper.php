@@ -24,7 +24,6 @@ namespace Eddmash\PowerOrm\Helpers;
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
-use Eddmash\PowerOrm\Exception\KeyError;
 
 /**
  * Class Arrays.
@@ -83,8 +82,6 @@ class ArrayHelper
      * @param $haystack
      * @param $key
      * @param null $default
-     *
-     * @throws KeyError
      *
      * @since 1.1.0
      *

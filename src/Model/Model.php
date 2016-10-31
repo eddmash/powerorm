@@ -21,6 +21,7 @@ use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Model\Query\Queryset;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Object;
@@ -160,7 +161,18 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function __construct($kwargs = [])
     {
         $this->constructorArgs = $kwargs;
+
         $this->init();
+    }
+
+    public function loadData($record = []) {
+
+            foreach ($record as $name => $value) :
+
+                $this->{$name} = $value;
+
+            endforeach;
+
     }
 
     public function init($fields = [], $kwargs = [])
@@ -507,14 +519,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     /**
      * {@inheritdoc}
      */
-    public function getQueryset($opts)
-    {
-        return;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function prepareMeta($config = [])
     {
         return new Meta($config);
@@ -632,17 +636,29 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         return sprintf('%s object', $this->getFullClassName());
     }
 
-    public function __debugInfo()
-    {
-        $model = [];
-        foreach (get_object_vars($this) as $name => $value) :
-            if (in_array($name, self::DEBUG_IGNORE)):
-                $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
-                continue;
-            endif;
-            $model[$name] = $value;
-        endforeach;
+//    public function __debugInfo()
+//    {
+//        $model = [];
+//        foreach (get_object_vars($this) as $name => $value) :
+//            if (in_array($name, self::DEBUG_IGNORE)):
+//                $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
+//                continue;
+//            endif;
+//            $model[$name] = $value;
+//        endforeach;
 
-        return $model;
+//        return $model;
+//    }
+
+    /**
+     * @return Queryset
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function objects()
+    {
+        return Queryset::createObject(BaseOrm::getDbConnection(), self::createObject());
     }
 }

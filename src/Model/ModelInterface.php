@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model;
 
 use Eddmash\PowerOrm\DeConstructableInterface;
+use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
  * Interface ModelInterface.
@@ -25,7 +26,7 @@ interface ModelInterface extends DeConstructableInterface
     /**
      * Creates a Queryset that is used to interaract with the database.
      *
-     * @param string $opts
+     * @param array $conditions
      *
      * @return Queryset
      *
@@ -33,7 +34,7 @@ interface ModelInterface extends DeConstructableInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getQueryset($opts);
+    public static function objects();
 
     /**
      * All the model fields are set on this model.
