@@ -20,7 +20,7 @@
 
 namespace Eddmash\PowerOrm;
 
-abstract class DeconstructableObject extends Object implements DeConstructableInterface
+abstract class DeconstructableObject extends BaseObject implements DeConstructableInterface
 {
     private $constructorArgs;
 

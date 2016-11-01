@@ -2,7 +2,7 @@
 
 namespace Eddmash\PowerOrm\Console;
 
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
 /**
  * Class Base.
@@ -11,7 +11,7 @@ use Eddmash\PowerOrm\Object;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Base extends Object
+class Base extends BaseObject
 {
     const EXIT_CODE_NORMAL = 0;
     const EXIT_CODE_ERROR = 1;

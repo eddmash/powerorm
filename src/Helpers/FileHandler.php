@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Helpers;
 
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
 /**
  * Responsible for creating files. creates files with the extension "php".
@@ -20,7 +20,7 @@ use Eddmash\PowerOrm\Object;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class FileHandler extends Object
+class FileHandler extends BaseObject
 {
     public $path;
     public $content;

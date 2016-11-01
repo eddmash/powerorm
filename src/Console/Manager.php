@@ -54,12 +54,14 @@ class Manager extends Base
 
         if (in_array($commandName, ['Help']) || empty($commandName)):
             $this->mainHelpText($argOpts);
-            exit;
+
+            return;
         endif;
 
         if (in_array($commandName, ['Version', '--version', '-v'])):
             $this->normal('PowerOrm Version : '.$this->ansiFormat(POWERORM_VERSION, Console::FG_CYAN).PHP_EOL);
-            exit;
+
+            return;
         endif;
 
         if (in_array('--command-dir', $argOpts)):
@@ -109,7 +111,7 @@ class Manager extends Base
                 $this->stdout("\n");
             endforeach;
 
-            exit;
+            return;
         endif;
 
         $this->info($this->defaultHelp.PHP_EOL.PHP_EOL);
@@ -168,7 +170,8 @@ class Manager extends Base
                     $this->path));
             $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
             $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
-            exit;
+
+            return;
         endif;
 
         // commands are in the commands namespace

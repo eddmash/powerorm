@@ -14,9 +14,9 @@ namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
-class ForeignObjectRel extends Object
+class ForeignObjectRel extends BaseObject
 {
     public $autoCreated = true;
     public $isRelation = true;

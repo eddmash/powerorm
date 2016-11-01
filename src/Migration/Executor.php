@@ -16,7 +16,7 @@ use Eddmash\PowerOrm\Console\Console;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
 /**
  * End-to-end migration execution - loads migrations, and runs them up or down to a specified set of targets.
@@ -25,7 +25,7 @@ use Eddmash\PowerOrm\Object;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Executor extends Object
+class Executor extends BaseObject
 {
     /**
      * @var Loader

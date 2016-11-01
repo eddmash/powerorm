@@ -53,7 +53,6 @@ class Migrate extends BaseCommand
         // target migrations to act on
         if (!empty($name)):
             if ($name == 'zero'):
-                //todo confirm the migration exists
                 $targets = [$name];
             else:
                 $targets = $executor->loader->getMigrationByPrefix($name);

@@ -125,7 +125,8 @@ class BaseCommand extends Base
 
         if (in_array('--help', $argOpts)):
             $this->usage();
-            exit;
+
+            return;
         endif;
 
         if ($this->systemCheck):
@@ -224,7 +225,8 @@ class BaseCommand extends Base
         $errors = array_merge($critical, $errors);
         if (!empty($errors)):
             $this->error(implode(PHP_EOL, $errors), true);
-            exit;
+
+            return;
         endif;
 
         if (!empty($warning)):

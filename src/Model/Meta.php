@@ -353,7 +353,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function setupPrimaryKey($field)
     {
-        if (!$this->primaryKey and $field->primaryKey):
+        if (!$this->primaryKey && $field->primaryKey):
             $this->primaryKey = $field;
         endif;
     }
@@ -435,7 +435,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 //        $meta = [];
 //        foreach (get_object_vars($this) as $name => $value) :
 //            if (in_array($name, static::$DEBUG_IGNORE)):
-//                $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
+//                $meta[$name] = (!is_subclass_of($value, BaseObject::getFullClassName())) ? '** hidden **' : (string) $value;
 //                continue;
 //            endif;
 //            $meta[$name] = $value;

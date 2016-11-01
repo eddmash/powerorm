@@ -1,6 +1,6 @@
 <?php
 
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
 /**
  * Created by http://eddmash.com
@@ -16,7 +16,7 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
 
     public function setup()
     {
-        $this->instance = new Object();
+        $this->instance = new BaseObject();
     }
 
     public function teardown()
@@ -26,7 +26,7 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
 
     public function testFullClassName()
     {
-        $expectedName = 'Eddmash\PowerOrm\Object';
+        $expectedName = 'Eddmash\PowerOrm\BaseObject';
         $returnedName = $this->instance->getFullClassName();
 
         $this->assertEquals(
@@ -38,7 +38,7 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
 
     public function testShortClassName()
     {
-        $expectedName = 'Object';
+        $expectedName = 'BaseObject';
 
         $returnedName = $this->instance->getShortClassName();
 
@@ -70,7 +70,7 @@ class ObjectTest extends \PHPUnit_Framework_TestCase
      */
     public function testConversionToNormalizeKey($originalName, $expectedName)
     {
-        $obj = new Object();
+        $obj = new BaseObject();
         $returnedName = $obj->normalizeKey($originalName);
 
         $this->assertEquals(

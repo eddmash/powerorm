@@ -20,7 +20,7 @@ use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Migration\Model\MigrationModel;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
 /**
  * Represents a PowerOrm Model.
@@ -35,7 +35,7 @@ use Eddmash\PowerOrm\Object;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class ModelState extends Object
+class ModelState extends BaseObject
 {
     public $name;
     public $fields = [];

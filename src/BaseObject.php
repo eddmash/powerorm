@@ -16,13 +16,13 @@ use Eddmash\PowerOrm\Helpers\Tools;
 
 /**
  * Base class for powerorm classes, provides some base functionalities to classes that inherit from it.
- * Class Object.
+ * Class BaseObject.
  *
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Object
+class BaseObject
 {
     /**
      * @var bool

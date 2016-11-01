@@ -28,7 +28,7 @@ define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class BaseOrm extends Object
+class BaseOrm extends BaseObject
 {
     const RECURSIVE_RELATIONSHIP_CONSTANT = 'this';
     /**
@@ -234,7 +234,6 @@ class BaseOrm extends Object
     }
 
     public static function loadRegistry() {
-        var_dump('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^');
         $instance = self::getInstance();
         try{
             $instance->registryCache->isAppReady();

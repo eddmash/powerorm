@@ -32,7 +32,7 @@ class MigrationModel extends Model
             $extendedClass = sprintf('%s%s', ClassHelper::getFormatNamespace($namespace, true), $extends);
 
             $use = sprintf('use %s;', $extendedClass);
-            // fixme load parent
+
             $extends = trim(substr($extends, strripos($extends, '\\')), '\\');
         endif;
 

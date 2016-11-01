@@ -3,8 +3,6 @@
 /**
  * The Orm Model that adds power to the CI Model.
  */
-defined('BASEPATH') or exit('No direct script access allowed');
-
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\CharField;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;

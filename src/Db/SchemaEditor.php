@@ -21,9 +21,9 @@ use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
-class SchemaEditor extends Object
+class SchemaEditor extends BaseObject
 {
     /**
      * @var Connection
@@ -220,7 +220,7 @@ class SchemaEditor extends Object
         endif;
 
         // index constraint
-        if ($field->dbIndex and !$field->isUnique()):
+        if ($field->dbIndex && !$field->isUnique()):
             $tableDef->addIndex([$name]);
         endif;
 
@@ -277,7 +277,7 @@ class SchemaEditor extends Object
         $tableDef = clone $schema->getTable($table);
 
         // Drop any FK constraints, MySQL requires explicit deletion
-        if ($field->isRelation && $field->relation != null):
+        if ($field->isRelation && $field->relation !== null):
             foreach ($this->constraintName($table, $name, ['foreignKey' => true]) as $fkConstraint) :
                 $tableDef->removeForeignKey($fkConstraint);
             endforeach;
@@ -316,7 +316,7 @@ class SchemaEditor extends Object
         $oldType = $oldField->dbType($this->connection);
         $newType = $newField->dbType($this->connection);
 
-        if (($oldType == null and $oldField->relation == null) || ($newType == null && $newField->relation == null)):
+        if (($oldType == null && $oldField->relation == null) || ($newType == null && $newField->relation == null)):
             throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define '.
                 'db_type (are you using a badly-written custom field?)', $newField->name, $oldField->name));
 

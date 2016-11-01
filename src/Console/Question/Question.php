@@ -10,10 +10,10 @@
 
 namespace Eddmash\PowerOrm\Console\Question;
 
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 use InvalidArgumentException;
 
-class Question extends Object
+class Question extends BaseObject
 {
     protected $question;
     protected $default;

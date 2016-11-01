@@ -18,7 +18,7 @@ use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
 class Field extends DeconstructableObject implements FieldInterface
 {
@@ -511,7 +511,7 @@ class Field extends DeconstructableObject implements FieldInterface
 //        $field = [];
 //        foreach (get_object_vars($this) as $name => $value) :
 //            if (in_array($name, self::DEBUG_IGNORE)):
-//                $meta[$name] = (is_subclass_of($value, Object::getFullClassName())) ?: '** hidden **';
+//                $meta[$name] = (is_subclass_of($value, BaseObject::getFullClassName())) ?: '** hidden **';
 //                continue;
 //            endif;
 //            $field[$name] = $value;

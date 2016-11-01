@@ -32,7 +32,6 @@ class Testdb extends BaseCommand
     {
         $conn = BaseOrm::getDbConnection();
         $platform = $conn->getDatabasePlatform();
-        var_dump('DB platform :: '.$platform->getName());
 
         $schemaM = $conn->getSchemaManager();
         $schema = $schemaM->createSchema();
@@ -93,7 +92,6 @@ class Testdb extends BaseCommand
             $schemaM->dropTable('user');
         endif;
         echo 'Tables :: ';
-        var_dump(implode('::', $schema->getTableNames()));
 
         $UTable = $schema->createTable('user');
         $UTable->addColumn('id', 'integer',
@@ -109,7 +107,6 @@ class Testdb extends BaseCommand
         $myTable->setPrimaryKey(['id']);
         $myTable->addForeignKeyConstraint($UTable, array('user_id'), array('id'), array('onUpdate' => 'CASCADE'));
 
-//        var_dump($schema->toSql($platform));
         $schemaM->createTable($UTable);
 
         $schemaM->createTable($myTable);

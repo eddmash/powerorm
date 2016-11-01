@@ -27,23 +27,30 @@ class Lookup
      * @var array
      */
     protected static $lookuOptions = [
-        'eq',
-        'in',
-        'gt',
-        'lt',
-        'gte',
-        'lte',
-        'contains',
-        'startswith',
-        'endswith',
-        'isnull',
-        'not',
-        'notin',
+        'eq' => ' = %s',
+        'in' => ' in %s',
+        'gt' => ' > %s',
+        'lt' => ' < %s',
+        'gte' => ' >= %s',
+        'lte' => ' <= %s',
+        'contains' => ' like %%s% ',
+        'icontains' => ' ilike % %s% ',
+        'startswith' => ' like %s% ',
+        'istartswith' => ' ilike %s% ',
+        'endswith' => '  %%s like  ',
+        'iendswith' => ' %%s ilike ',
+        'isnull' => '%s is null',
+        'not' => 'not %s',
+        'notin' => ' not in %s',
+        'range' => ' BETWEEN %s and %s',
     ];
+
+    protected static $lookup_pattern = '/__/';
+    protected static $where_concat_pattern = '/^~[.]*/';
 
     public static function validateLookup($lookup)
     {
-        if (!empty($lookup) && !in_array($lookup, self::$lookuOptions)):
+        if (!empty($lookup) && !array_key_exists($lookup, self::$lookuOptions)):
             throw new LookupError(
                 sprintf('`%1$s` is not a valid lookup parameter the options are %2$s',
                     $lookup, Tools::stringify(self::$lookuOptions)));
@@ -66,8 +73,6 @@ class Lookup
     {
         // default lookup is equal
         $lookup = 'eq';
-        $lookup_pattern = '/__/';
-        $where_concat_pattern = '/^~[.]*/';
 
         // we add the or conditions afterwards to avoid them being mistaken for "and" conditions when they come first
         $or_combine = [];
@@ -77,23 +82,6 @@ class Lookup
         foreach ($conditions as $condition) :
 
             foreach ($condition as  $key => $value) :
-                // check which where clause to use
-                if (preg_match($lookup_pattern, $key)):
-                    $options = preg_split($lookup_pattern, $key);
-                    $key = $options[0];
-                    $lookup = strtolower($options[1]);
-                endif;
-
-                // determine how to combine where statements
-                $use_or = preg_match($where_concat_pattern, $key);
-
-                // get the actual key
-                if ($use_or):
-                    $key = preg_split($where_concat_pattern, $key)[1];
-                endif;
-
-                // validate lookups
-                self::validateLookup($lookup);
 
                 $tableName = strtolower($tableName);
 
@@ -103,17 +91,53 @@ class Lookup
                 endif;
 
                 // check if we need to use OR to combine
-                if ($use_or):
-                    $or_combine[] = ['lookup' => $lookup, 'key' => $key, 'value' => $value];
-                else:
-                    // otherwise use "and"
-                    $and_combine[] = ['lookup' => $lookup, 'key' => $key, 'value' => $value];
+//                if ($use_or):
+//                    $or_combine[] = [sprintf(self::$lookuOptions[$lookup], $value)];
+//                else:
+//                    // otherwise use "and"
+//                    $and_combine[] = [sprintf(self::$lookuOptions[$lookup], $value)];
 
-                endif;
+//                endif;
             endforeach;
 
         endforeach;
 
         return [$and_combine, $or_combine];
+    }
+
+    public static function getLookUP($key) {
+        $lookup = 'eq';
+        // check which where clause to use
+        if (preg_match(self::$lookup_pattern, $key)):
+            $options = preg_split(self::$lookup_pattern, $key);
+            $key = $options[0];
+            $lookup = strtolower($options[1]);
+        endif;
+
+        // validate lookups
+        self::validateLookup($lookup);
+
+        return $lookup;
+    }
+
+    public static function combine($key) {
+
+        // determine how to combine where statements
+        $use_or = preg_match(self::$where_concat_pattern, $key);
+
+        // get the actual key
+        if ($use_or):
+            return ' || ';
+        endif;
+
+        return ' && ';
+    }
+
+    public static function getLookupColumn($key) {
+        if(preg_match(self::$lookup_pattern, $key)):
+            return reset(preg_split(self::$lookup_pattern, $key));
+        endif;
+
+        return $key;
     }
 }

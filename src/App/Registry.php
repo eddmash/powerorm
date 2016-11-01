@@ -19,7 +19,7 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
 /**
  * This is the applications register.
@@ -32,7 +32,7 @@ use Eddmash\PowerOrm\Object;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Registry extends Object
+class Registry extends BaseObject
 {
     private $allModels = [];
     private $_pendingOps = [];

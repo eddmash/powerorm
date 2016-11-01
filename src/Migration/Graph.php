@@ -138,7 +138,6 @@ class Graph
      */
     public function getAncestryTree($node)
     {
-        // todo check for cyclic
         if (!ArrayHelper::hasKey($this->nodes, $node)):
             throw new NodeNotFoundError(sprintf('Migration with the name %s does not exist', $node));
         endif;

@@ -50,7 +50,7 @@ class ManyToManyField extends RelatedField
     public function __construct($kwargs)
     {
 
-        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
+        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] === null)):
             $kwargs['rel'] = ManyToManyRel::createObject([
                 'fromField' => $this,
                 'to' => ArrayHelper::getValue($kwargs, 'to'),
@@ -73,7 +73,7 @@ class ManyToManyField extends RelatedField
         parent::contributeToClass($fieldName, $modelObject);
 
         // if through model is set
-        if ($this->relation->through != null):
+        if ($this->relation->through !== null):
             $callback = function ($kwargs) {
                 /* @var $field RelatedField */
                 /** @var $related Model */
@@ -174,7 +174,7 @@ class ManyToManyField extends RelatedField
      */
     public function _getM2MDbTable($meta)
     {
-        if ($this->relation->through != null):
+        if ($this->relation->through !== null):
             return $this->relation->through->meta->dbTable;
         elseif ($this->dbTable):
             return $this->dbTable;

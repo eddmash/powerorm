@@ -38,9 +38,10 @@ class Makemigrations extends BaseCommand
 
         if (!empty($issues)):
             $message = 'The following migrations seem to indicate they are both the latest migration :'.PHP_EOL;
-            $message .= ' %s '.PHP_EOL;
-            $this->error(sprintf($message, Tools::stringify($issues)));
-            exit;
+        $message .= ' %s '.PHP_EOL;
+        $this->error(sprintf($message, Tools::stringify($issues)));
+
+        return;
         endif;
 
         $autodetector = new AutoDetector(
@@ -53,7 +54,8 @@ class Makemigrations extends BaseCommand
 
         if (empty($changes)):
             $this->normal('No changes were detected'.PHP_EOL);
-            exit;
+
+        return;
         endif;
 
         if (in_array('--dry-run', $argOpts)):
@@ -62,8 +64,9 @@ class Makemigrations extends BaseCommand
             /** @var $migration Migration */
             foreach ($changes as $migration) :
                 $this->normal('  -- '.$migration->getName().PHP_EOL);
-            endforeach;
-            exit;
+        endforeach;
+
+        return;
         endif;
 
         $this->_writeMigrations($changes);
@@ -79,19 +82,19 @@ class Makemigrations extends BaseCommand
 
             $migrationFile = MigrationFile::createObject($migration);
 
-            $fileName = $migrationFile->getFileName();
+        $fileName = $migrationFile->getFileName();
 
-            $this->normal('  '.$fileName, true);
+        $this->normal('  '.$fileName, true);
 
-            $operations = $migration->getOperations();
-            foreach ($operations as $op) :
+        $operations = $migration->getOperations();
+        foreach ($operations as $op) :
                 $this->normal(sprintf('     - %s', ucwords($op->getDescription())), true);
-            endforeach;
+        endforeach;
 
             // write content to file.
             $handler = new FileHandler(BaseOrm::getMigrationsPath(), $fileName);
 
-            $handler->write($migrationFile->getContent());
+        $handler->write($migrationFile->getContent());
         endforeach;
     }
 

@@ -29,7 +29,7 @@ use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
 /**
  * Takes a pair of ProjectStates, and compares them to see what the first would need doing to
@@ -43,7 +43,7 @@ use Eddmash\PowerOrm\Object;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class AutoDetector extends Object
+class AutoDetector extends BaseObject
 {
     private $fromState;
     private $toState;
@@ -355,7 +355,7 @@ class AutoDetector extends Object
      */
     public function deepDeconstruct($value)
     {
-        if (!$value instanceof Object || ($value instanceof Object && !$value->hasMethod('deconstruct'))):
+        if (!$value instanceof BaseObject || ($value instanceof BaseObject && !$value->hasMethod('deconstruct'))):
             return $value;
         endif;
 

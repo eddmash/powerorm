@@ -18,9 +18,9 @@ use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Helpers\StringHelper;
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
-class Loader extends Object
+class Loader extends BaseObject
 {
     /**
      * @var Graph

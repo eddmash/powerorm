@@ -24,7 +24,7 @@ use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
-use Eddmash\PowerOrm\Object;
+use Eddmash\PowerOrm\BaseObject;
 
 /**
  * Base class for all models in the ORM, this class cannot be instantiated on its own.
@@ -319,7 +319,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param string    $method     the method to invoke
      * @param null      $args       the arguments to pass to the method
-     * @param bool|true $fromOldest do we traverse from Object to the child model
+     * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
      *
@@ -334,7 +334,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         $modelNamespace = BaseOrm::getModelsNamespace();
         $isProxy = $this->meta->proxy;
-        // start from oldest parent e.g Object to the last child model
+        // start from oldest parent e.g BaseObject to the last child model
         $parents = $this->getParents([\PModel::getFullClassName(), self::getFullClassName()]);
         $parents = array_merge([$this->getFullClassName() => new \ReflectionObject($this)], $parents);
         if ($fromOldest):
@@ -641,7 +641,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 //        $model = [];
 //        foreach (get_object_vars($this) as $name => $value) :
 //            if (in_array($name, self::DEBUG_IGNORE)):
-//                $meta[$name] = (!is_subclass_of($value, Object::getFullClassName())) ? '** hidden **' : (string) $value;
+//                $meta[$name] = (!is_subclass_of($value, BaseObject::getFullClassName())) ? '** hidden **' : (string) $value;
 //                continue;
 //            endif;
 //            $model[$name] = $value;

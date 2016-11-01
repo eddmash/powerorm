@@ -15,8 +15,6 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 interface OperationInterface
 {
-    //todo look ata djangos operation base
-
     /**
      * Migration use this method to contribute to the current state of the project.
      *
