@@ -110,7 +110,7 @@ class BaseCommand extends Base
 
     public function execute($argOpts, $manager)
     {
-        $message = $this->ansiFormat($this->headerMessage.PHP_EOL, Console::FG_GREEN);
+        $message = $this->ansiFormat($this->headerMessage . PHP_EOL, Console::FG_GREEN);
 
         $pad = 2;
         $maxLength = strlen(POWERORM_VERSION) + $pad;
@@ -136,7 +136,7 @@ class BaseCommand extends Base
         $output = $this->handle($argOpts);
 
         if (!empty($output)):
-            $this->normal($output.PHP_EOL);
+            $this->normal($output . PHP_EOL);
         endif;
     }
 
@@ -151,31 +151,31 @@ class BaseCommand extends Base
             endif;
         endforeach;
 
-        $this->normal('Position Arguments:'.PHP_EOL.PHP_EOL);
+        $this->normal('Position Arguments:' . PHP_EOL . PHP_EOL);
         $positional = $this->getPositionalOptions();
 
         if (!empty($positional)):
             foreach ($this->getPositionalOptions() as $key => $value) :
 
-                $this->stdout(' '.$this->ansiFormat($key, Console::FG_YELLOW));
+                $this->stdout(' ' . $this->ansiFormat($key, Console::FG_YELLOW));
                 $len = strlen($key) + 2;
 
                 if ($value !== '') {
-                    $this->stdout(str_repeat(' ', $maxlen - $len + 2).Console::wrapText($value, $maxlen + 2));
+                    $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
                 }
-                $this->stdout(PHP_EOL.PHP_EOL);
+                $this->stdout(PHP_EOL . PHP_EOL);
             endforeach;
         endif;
 
-        $this->normal('Optional Arguments:'.PHP_EOL.PHP_EOL);
+        $this->normal('Optional Arguments:' . PHP_EOL . PHP_EOL);
 
         foreach ($this->getOptions() as $key => $value) :
 
-            $this->stdout(' '.$this->ansiFormat($key, Console::FG_YELLOW));
+            $this->stdout(' ' . $this->ansiFormat($key, Console::FG_YELLOW));
             $len = strlen($key) + 2;
 
             if ($value !== '') {
-                $this->stdout(str_repeat(' ', $maxlen - $len + 2).Console::wrapText($value, $maxlen + 2));
+                $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
             }
             $this->stdout("\n");
         endforeach;
@@ -238,7 +238,7 @@ class BaseCommand extends Base
         endif;
 
         if (!empty($debugs)):
-            $this->normal(implode('  '.PHP_EOL, $debugs), true);
+            $this->normal(implode('  ' . PHP_EOL, $debugs), true);
         endif;
     }
 }

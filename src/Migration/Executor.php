@@ -12,11 +12,11 @@
 namespace Eddmash\PowerOrm\Migration;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Console\Console;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
-use Eddmash\PowerOrm\BaseObject;
 
 /**
  * End-to-end migration execution - loads migrations, and runs them up or down to a specified set of targets.
@@ -215,9 +215,9 @@ class Executor extends BaseObject
     /**
      * Rolls back the migrations on the database.
      *
-     * @param ProjectState $state     this is the state before the migration is applied
-     * @param Migration    $migration the migration to apply
-     * @param bool         $fake
+     * @param ProjectState $state this is the state before the migration is applied
+     * @param Migration $migration the migration to apply
+     * @param bool $fake
      *
      * @return mixed
      *
@@ -240,7 +240,7 @@ class Executor extends BaseObject
             $end = Console::ansiFormat('OK', [Console::FG_GREEN]);
         endif;
 
-        Console::stdout($end.PHP_EOL);
+        Console::stdout($end . PHP_EOL);
 
         return $state;
     }
@@ -248,9 +248,9 @@ class Executor extends BaseObject
     /**
      * Applies the migration to the database.
      *
-     * @param ProjectState $state     this is the state before the migration is applied
-     * @param Migration    $migration the migration to apply
-     * @param bool         $fake
+     * @param ProjectState $state this is the state before the migration is applied
+     * @param Migration $migration the migration to apply
+     * @param bool $fake
      *
      * @return mixed
      *
@@ -273,7 +273,7 @@ class Executor extends BaseObject
             $end = Console::ansiFormat('OK', [Console::FG_GREEN]);
         endif;
 
-        Console::stdout($end.PHP_EOL);
+        Console::stdout($end . PHP_EOL);
 
         return $state;
     }

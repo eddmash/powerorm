@@ -23,7 +23,8 @@ class LoookupTest extends \PHPUnit_Framework_TestCase
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function testLookupGetLookup($value, $expected) {
+    public function testLookupGetLookup($value, $expected)
+    {
         $this->assertEquals($expected, Lookup::getLookUP($value));
     }
 
@@ -37,7 +38,8 @@ class LoookupTest extends \PHPUnit_Framework_TestCase
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function testLookupColumn($value, $expected) {
+    public function testLookupColumn($value, $expected)
+    {
         $this->assertEquals($expected, Lookup::getLookupColumn($value));
     }
 
@@ -51,11 +53,13 @@ class LoookupTest extends \PHPUnit_Framework_TestCase
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function testLookupCombine($value, $expected) {
+    public function testLookupCombine($value, $expected)
+    {
         $this->assertEquals($expected, Lookup::combine($value));
     }
 
-    public function providerLookup() {
+    public function providerLookup()
+    {
 
         return [
             ['name__notin', 'notin'],
@@ -66,7 +70,8 @@ class LoookupTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function providerLookupColumn() {
+    public function providerLookupColumn()
+    {
 
         return [
             ['name__notin', 'name'],
@@ -76,7 +81,9 @@ class LoookupTest extends \PHPUnit_Framework_TestCase
             ['country__gte', 'country'],
         ];
     }
-    public function providerLookupCombine() {
+
+    public function providerLookupCombine()
+    {
 
         return [
             ['name__notin', ' && '],

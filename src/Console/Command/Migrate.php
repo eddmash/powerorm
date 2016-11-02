@@ -78,10 +78,10 @@ class Migrate extends BaseCommand
 
             if (!empty($changes)):
 
-                $this->warning('  Your models have changes that are not yet reflected '.
+                $this->warning('  Your models have changes that are not yet reflected ' .
                     "in a migration, and so won't be applied.", true);
 
-                $this->warning("  Run 'php pmanager.php makemigrations' to make new ".
+                $this->warning("  Run 'php pmanager.php makemigrations' to make new " .
                     "migrations, and then re-run 'php pmanager.php migrate' to apply them.", true);
 
             endif;

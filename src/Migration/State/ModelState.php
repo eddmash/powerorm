@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Migration\State;
 
 use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
@@ -20,7 +21,6 @@ use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Migration\Model\MigrationModel;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\BaseObject;
 
 /**
  * Represents a PowerOrm Model.
@@ -52,7 +52,7 @@ class ModelState extends BaseObject
     /**
      * Takes a model returns a ModelState representing it.
      *
-     * @param Model      $model
+     * @param Model $model
      * @param bool|false $excludeRels
      *
      * @return static
@@ -180,7 +180,7 @@ class ModelState extends BaseObject
 
     public function __toString()
     {
-        return (string) sprintf("<ModelState: '%s'>", $this->name);
+        return (string)sprintf("<ModelState: '%s'>", $this->name);
 
     }
 }

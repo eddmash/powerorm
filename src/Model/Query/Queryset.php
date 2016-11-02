@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Statement;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Model\Model;
 use PDO;
@@ -40,7 +39,8 @@ class Queryset implements QuerysetInterface
      */
     protected $_resultsCache;
 
-    public function __construct(Connection $connection, Model $model, QueryBuilder $qb = null) {
+    public function __construct(Connection $connection, Model $model, QueryBuilder $qb = null)
+    {
         $this->connection = $connection;
         $this->model = $model;
         $this->qb = ($qb == null) ? $this->getQueryBuilder() : $qb;
@@ -56,7 +56,8 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function createObject($connection, $model, $qb = null) {
+    public static function createObject($connection, $model, $qb = null)
+    {
         return new static($connection, $model, $qb);
     }
 
@@ -71,15 +72,17 @@ class Queryset implements QuerysetInterface
      *         ->leftJoin('u', 'phonenumbers', 'p', 'u.id = p.user_id');
      * </code>
      */
-    public function select($select = null) {
+    public function select($select = null)
+    {
         $selects = is_array($select) ? $select : func_get_args();
         $this->qb->addSelect($selects);
     }
 
-    public function get($conditions = null) {
+    public function get($conditions = null)
+    {
         $conditions = func_get_args();
 
-        if(count($conditions) == 1):
+        if (count($conditions) == 1):
             $value = reset($conditions);
             $conditions = [];
             $conditions[] = [$this->model->meta->primaryKey->name => $value];
@@ -88,27 +91,53 @@ class Queryset implements QuerysetInterface
         return $this->_filterOrExclude($conditions);
     }
 
+    /**
+     * This method takes associative array as parameters. or an assocative array whose first item is the connector to
+     * use for the generated where conditions, Valid choices are :.
+     *
+     * <code>
+     *   Role::objects()->filter(
+     *      ["name"=>"asdfasdf"],
+     *      ["or","name__not"=>"tr"],
+     *      ["and","name__in"=>"we"],
+     *      ["or", "name__contains"=>"qwe"]
+     *  );
+     * </code>
+     *
+     * @param null $conditions
+     *
+     * @return Queryset
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function filter($conditions = null)
     {
         return $this->_filterOrExclude(func_get_args());
     }
 
-    public function exclude($conditions = null) {
+    public function with($conditions = null)
+    {
+        return $this;
+    }
+
+    public function exclude($conditions = null)
+    {
         return $this->_filterOrExclude(func_get_args());
     }
 
-    public function _filterOrExclude($conditions = null) {
+    public function _filterOrExclude($conditions = null)
+    {
         $instance = $this->_clone();
 
-        echo '<pre>';
-        print_r($conditions);
-         print_r(Lookup::lookUp($this->model->meta->dbTable, $conditions));
-        echo '</pre>';
+        print_r(Lookup::lookUp($this->model->meta->dbTable, $conditions)); 
 
         return $instance;
     }
 
-    public function validateConditions($conditions) {
+    public function validateConditions($conditions)
+    {
         foreach ($conditions as $condition) :
 
         endforeach;
@@ -126,7 +155,8 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function all() {
+    public function all()
+    {
         $this->select('*');
         $this->qb->from($this->model->meta->dbTable);
 
@@ -149,7 +179,8 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getSql() {
+    public function getSql()
+    {
         return $this->qb->getSQL();
     }
 
@@ -165,10 +196,8 @@ class Queryset implements QuerysetInterface
         if (false != $this->_evaluated):
             return $this->_resultsCache;
         endif;
-
         $statement = $this->qb->execute();
-
-        $this->_resultsCache = $this->mapResults($this->model,  $statement->fetchAll(PDO::FETCH_ASSOC));
+        $this->_resultsCache = $this->mapResults($this->model, $statement->fetchAll(PDO::FETCH_ASSOC));
         $this->_evaluated = true;
 
         return $this->_resultsCache;
@@ -231,7 +260,8 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function count() {
+    public function count()
+    {
         $this->connection->executeQuery($this->getSql())->rowCount();
     }
 

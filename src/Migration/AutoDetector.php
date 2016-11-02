@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Console\Question\Asker;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\AlterField;
@@ -29,7 +30,6 @@ use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\BaseObject;
 
 /**
  * Takes a pair of ProjectStates, and compares them to see what the first would need doing to
@@ -127,7 +127,7 @@ class AutoDetector extends BaseObject
     /**
      * @param ProjectState $fromState
      * @param ProjectState $toState
-     * @param Asker        $asker
+     * @param Asker $asker
      */
     public function __construct($fromState, $toState, $asker = null)
     {
@@ -242,8 +242,8 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * @param array  $changes
-     * @param Graph  $graph
+     * @param array $changes
+     * @param Graph $graph
      * @param string $migrationName
      *
      * @return mixed
@@ -286,9 +286,9 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * @param Operation  $operation
-     * @param array      $dependencies
-     * @param bool|false $pushToTop    some operations should come before others, use this determine which
+     * @param Operation $operation
+     * @param array $dependencies
+     * @param bool|false $pushToTop some operations should come before others, use this determine which
      *
      * @since 1.1.0
      *
@@ -410,7 +410,7 @@ class AutoDetector extends BaseObject
     {
         $name = explode('_', $name);
 
-        return (int) str_replace($this->migrationNamePrefix, '', $name[0]);
+        return (int)str_replace($this->migrationNamePrefix, '', $name[0]);
     }
 
     private function getOldModelName($modelName)
@@ -462,7 +462,6 @@ class AutoDetector extends BaseObject
                 if ($localField->relation != null && $localField->relation->toModel != null):
 
                     if ($localField->primaryKey):
-                        echo $meta->modelName.PHP_EOL;
                         $primaryKeyRel = $localField->relation->toModel;
                     elseif (!$localField->relation->parentLink):
                         $relatedFields[$localField->name] = $localField;

@@ -15,13 +15,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\BaseObject;
 
 class SchemaEditor extends BaseObject
 {
@@ -159,7 +159,7 @@ class SchemaEditor extends BaseObject
     /**
      * Renames the table a model points to.
      *
-     * @param Model  $model
+     * @param Model $model
      * @param string $oldDbTableName
      * @param string $newDbTableName
      *
@@ -301,9 +301,9 @@ class SchemaEditor extends BaseObject
      * Requires a copy of the old field as well so we can only perform changes that are required.
      * If strict is true, raises errors if the old column does not match old_field precisely.
      *
-     * @param Model      $model
-     * @param Field      $oldField
-     * @param Field      $newField
+     * @param Model $model
+     * @param Field $oldField
+     * @param Field $newField
      * @param bool|false $strict
      *
      * @since 1.1.0
@@ -317,7 +317,7 @@ class SchemaEditor extends BaseObject
         $newType = $newField->dbType($this->connection);
 
         if (($oldType == null && $oldField->relation == null) || ($newType == null && $newField->relation == null)):
-            throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define '.
+            throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define ' .
                 'db_type (are you using a badly-written custom field?)', $newField->name, $oldField->name));
 
         elseif ($oldType == null && $newType == null &&
@@ -339,7 +339,7 @@ class SchemaEditor extends BaseObject
         ):
             return;
         else:
-            throw new  ValueError(sprintf('Cannot alter field %s into %s - they are not compatible types '.
+            throw new  ValueError(sprintf('Cannot alter field %s into %s - they are not compatible types ' .
                 '(you cannot alter to or from M2M fields, or add or remove through= on M2M fields)',
                 $oldField->name, $newField->name));
         endif;
@@ -350,9 +350,9 @@ class SchemaEditor extends BaseObject
     /**
      * Alters M2Ms to repoint their to= endpoints.
      *
-     * @param Model      $model
-     * @param Field      $oldField
-     * @param Field      $newField
+     * @param Model $model
+     * @param Field $oldField
+     * @param Field $newField
      * @param bool|false $strict
      *
      * @since 1.1.0
@@ -389,7 +389,7 @@ class SchemaEditor extends BaseObject
     }
 
     /**
-     * @param Field      $field
+     * @param Field $field
      * @param bool|false $includeDefault
      *
      * @return array

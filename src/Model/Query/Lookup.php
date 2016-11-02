@@ -19,6 +19,8 @@ use Eddmash\PowerOrm\Helpers\Tools;
  */
 class Lookup
 {
+    public static $and = 'and';
+    public static $or = 'or';
     /**
      * Lookup options.
      *
@@ -81,13 +83,13 @@ class Lookup
         // create where clause from the conditions given
         foreach ($conditions as $condition) :
 
-            foreach ($condition as  $key => $value) :
+            foreach ($condition as $key => $value) :
 
                 $tableName = strtolower($tableName);
 
                 // append table name to key
                 if (!empty($tableName)):
-                    $key = $tableName.".$key";
+                    $key = $tableName . ".$key";
                 endif;
 
                 // check if we need to use OR to combine
@@ -105,7 +107,8 @@ class Lookup
         return [$and_combine, $or_combine];
     }
 
-    public static function getLookUP($key) {
+    public static function getLookUP($key)
+    {
         $lookup = 'eq';
         // check which where clause to use
         if (preg_match(self::$lookup_pattern, $key)):
@@ -120,7 +123,8 @@ class Lookup
         return $lookup;
     }
 
-    public static function combine($key) {
+    public static function combine($key)
+    {
 
         // determine how to combine where statements
         $use_or = preg_match(self::$where_concat_pattern, $key);
@@ -133,8 +137,9 @@ class Lookup
         return ' && ';
     }
 
-    public static function getLookupColumn($key) {
-        if(preg_match(self::$lookup_pattern, $key)):
+    public static function getLookupColumn($key)
+    {
+        if (preg_match(self::$lookup_pattern, $key)):
             return reset(preg_split(self::$lookup_pattern, $key));
         endif;
 

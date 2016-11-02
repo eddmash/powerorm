@@ -11,19 +11,19 @@
 
 namespace Eddmash\PowerOrm\Helpers;
 
-/*
- * some method borrowed from Yii\helpers\BaseArrayHelper
- * Part of the Yii framework.
- *
- * @version    2.0
- *
- * @author Qiang Xue <qiang.xue@gmail.com>
- *
- * @link http://www.yiiframework.com/
- *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
- */
+    /*
+     * some method borrowed from Yii\helpers\BaseArrayHelper
+     * Part of the Yii framework.
+     *
+     * @version    2.0
+     *
+     * @author Qiang Xue <qiang.xue@gmail.com>
+     *
+     * @link http://www.yiiframework.com/
+     *
+     * @copyright Copyright (c) 2008 Yii Software LLC
+     * @license http://www.yiiframework.com/license/
+     */
 
 /**
  * Class Arrays.
@@ -42,8 +42,8 @@ class ArrayHelper
      *
      * Note that an empty array will NOT be considered associative.
      *
-     * @param array $array      the array being checked
-     * @param bool  $allStrings whether the array keys must be all strings in order for
+     * @param array $array the array being checked
+     * @param bool $allStrings whether the array keys must be all strings in order for
      *                          the array to be treated as associative
      *
      * @since 1.1.0

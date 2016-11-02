@@ -59,7 +59,7 @@ class Manager extends Base
         endif;
 
         if (in_array($commandName, ['Version', '--version', '-v'])):
-            $this->normal('PowerOrm Version : '.$this->ansiFormat(POWERORM_VERSION, Console::FG_CYAN).PHP_EOL);
+            $this->normal('PowerOrm Version : ' . $this->ansiFormat(POWERORM_VERSION, Console::FG_CYAN) . PHP_EOL);
 
             return;
         endif;
@@ -85,12 +85,12 @@ class Manager extends Base
             $help = $command->getHelp();
 
             $message = sprintf('php %1$s.php %2$s', $this->managerName, $subcommand);
-            $this->normal($help.PHP_EOL.PHP_EOL);
+            $this->normal($help . PHP_EOL . PHP_EOL);
 
             $this->normal(sprintf('Usage : %1$s %2$s',
-                    $this->normalizeKey($message), Tools::stringify(array_keys($options), false)).PHP_EOL.PHP_EOL);
+                    $this->normalizeKey($message), Tools::stringify(array_keys($options), false)) . PHP_EOL . PHP_EOL);
 
-            $this->normal('optional arguments:'.PHP_EOL.PHP_EOL);
+            $this->normal('optional arguments:' . PHP_EOL . PHP_EOL);
 
             $maxlen = 5;
             foreach ($options as $key => $value) :
@@ -102,11 +102,11 @@ class Manager extends Base
 
             foreach ($options as $key => $value) :
 
-                $this->stdout(' '.$this->ansiFormat($key, Console::FG_YELLOW));
+                $this->stdout(' ' . $this->ansiFormat($key, Console::FG_YELLOW));
                 $len = strlen($key) + 2;
 
                 if ($value !== '') {
-                    $this->stdout(str_repeat(' ', $maxlen - $len + 2).Console::wrapText($value, $maxlen + 2));
+                    $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
                 }
                 $this->stdout("\n");
             endforeach;
@@ -114,10 +114,10 @@ class Manager extends Base
             return;
         endif;
 
-        $this->info($this->defaultHelp.PHP_EOL.PHP_EOL);
+        $this->info($this->defaultHelp . PHP_EOL . PHP_EOL);
         $inMessage = $this->ansiFormat(sprintf('php %s.php help <subcommand>', $this->managerName), Console::FG_YELLOW);
-        $this->normal(sprintf('Type %s for help on a specific subcommand.', $inMessage).PHP_EOL.PHP_EOL);
-        $this->normal(sprintf('Available Commands : ').PHP_EOL);
+        $this->normal(sprintf('Type %s for help on a specific subcommand.', $inMessage) . PHP_EOL . PHP_EOL);
+        $this->normal(sprintf('Available Commands : ') . PHP_EOL);
 
         $path = sprintf($this->path, dirname(__FILE__));
 
@@ -133,7 +133,7 @@ class Manager extends Base
             if ($file == 'command'):
                 continue;
             endif;
-            $this->normal("\t ".$file.PHP_EOL);
+            $this->normal("\t " . $file . PHP_EOL);
         endforeach;
 
         foreach ($this->defaultCommands() as $name => $command) :
@@ -143,7 +143,7 @@ class Manager extends Base
             if ($file == 'command'):
                 continue;
             endif;
-            $this->normal("\t ".$file.PHP_EOL);
+            $this->normal("\t " . $file . PHP_EOL);
         endforeach;
     }
 
@@ -166,17 +166,17 @@ class Manager extends Base
 
         if (empty($file)):
             $this->error(
-                sprintf('Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?'.PHP_EOL, $name,
+                sprintf('Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?' . PHP_EOL, $name,
                     $this->path));
             $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
-            $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
+            $this->normal(sprintf('Type %s for usage.' . PHP_EOL, $message));
 
             return;
         endif;
 
         // commands are in the commands namespace
         /** @var $className BaseCommand */
-        $className = 'Eddmash\PowerOrm\Console\Command\\'.$name;
+        $className = 'Eddmash\PowerOrm\Console\Command\\' . $name;
 
         return new $className();
     }

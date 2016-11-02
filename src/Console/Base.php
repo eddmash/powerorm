@@ -138,41 +138,41 @@ class Base extends BaseObject
     public function normal($message, $newline = false)
     {
         if ($newline):
-            $message = $message.PHP_EOL;
+            $message = $message . PHP_EOL;
         endif;
-        $this->stdout(' '.$message);
+        $this->stdout(' ' . $message);
     }
 
     public function success($message, $newline = false)
     {
         if ($newline):
-            $message = $message.PHP_EOL;
+            $message = $message . PHP_EOL;
         endif;
-        $this->stdout(' '.$message, Console::FG_GREEN);
+        $this->stdout(' ' . $message, Console::FG_GREEN);
     }
 
     public function info($message, $newline = false)
     {
         if ($newline):
-            $message = $message.PHP_EOL;
+            $message = $message . PHP_EOL;
         endif;
-        $this->stdout(' '.$message, Console::FG_CYAN);
+        $this->stdout(' ' . $message, Console::FG_CYAN);
     }
 
     public function error($message, $newline = false)
     {
         if ($newline):
-            $message = $message.PHP_EOL;
+            $message = $message . PHP_EOL;
         endif;
-        $this->stderr(' '.$message, Console::FG_RED);
+        $this->stderr(' ' . $message, Console::FG_RED);
     }
 
     public function warning($message, $newline = false)
     {
         if ($newline):
-            $message = $message.PHP_EOL;
+            $message = $message . PHP_EOL;
         endif;
-        $this->stdout(' '.$message, Console::FG_PURPLE);
+        $this->stdout(' ' . $message, Console::FG_PURPLE);
     }
 
     public function input($message = ' ')

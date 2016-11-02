@@ -51,8 +51,8 @@ class OrmConfig extends BaseConfig
          *   `];
          */
         $psr4 = [
-            'App\Migrations' => APPPATH.'migrations',
-            'app\models' => APPPATH.'models',
+            'App\Migrations' => APPPATH . 'migrations',
+            'app\models' => APPPATH . 'models',
             'Eddmash\PowerOrm' => POWERORM_SRCPATH,
         ];
 
@@ -73,11 +73,11 @@ class OrmConfig extends BaseConfig
          *   ];
          */
         $classmap = [
-            'PModel' => POWERORM_BASEPATH.'PModel.php',
-            'CI_Model' => BASEPATH.'/core/Model.php',
-            'CI_DB_forge' => BASEPATH.'/database/DB_forge.php',
-            'CI_DB_driver' => BASEPATH.'/database/DB_driver.php',
-            'CI_DB_query_builder' => BASEPATH.'/database/DB_query_builder.php',
+            'PModel' => POWERORM_BASEPATH . 'PModel.php',
+            'CI_Model' => BASEPATH . '/core/Model.php',
+            'CI_DB_forge' => BASEPATH . '/database/DB_forge.php',
+            'CI_DB_driver' => BASEPATH . '/database/DB_driver.php',
+            'CI_DB_query_builder' => BASEPATH . '/database/DB_query_builder.php',
         ];
 
         //--------------------------------------------------------------------

@@ -47,36 +47,38 @@ class Testdb extends BaseCommand
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function fetch($connection) {
+    public function fetch($connection)
+    {
         $connection->createQueryBuilder()->from();
     }
 
     /**
      * @param AbstractSchemaManager $schemaM
-     * @param Schema                $schema
+     * @param Schema $schema
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function readSchema($schemaM, $schema) {
+    public function readSchema($schemaM, $schema)
+    {
         $table = $schema->getTable('testing_jaked');
 
         /** @var $fk ForeignKeyConstraint */
         foreach ($table->getForeignKeys() as $fk) :
-            echo '-----------------------------'.PHP_EOL;
-            echo 'name :'.$fk->getName().PHP_EOL;
-            echo 'columns :'.implode(',', $fk->getColumns()).PHP_EOL;
-            echo 'columns :'.implode(',', $fk->getLocalColumns()).PHP_EOL;
-            echo 'foreign table :'.$fk->getForeignTableName().PHP_EOL;
-            echo 'foreign columns :'.implode(',', $fk->getForeignColumns()).PHP_EOL;
-            echo PHP_EOL.PHP_EOL;
+            echo '-----------------------------' . PHP_EOL;
+            echo 'name :' . $fk->getName() . PHP_EOL;
+            echo 'columns :' . implode(',', $fk->getColumns()) . PHP_EOL;
+            echo 'columns :' . implode(',', $fk->getLocalColumns()) . PHP_EOL;
+            echo 'foreign table :' . $fk->getForeignTableName() . PHP_EOL;
+            echo 'foreign columns :' . implode(',', $fk->getForeignColumns()) . PHP_EOL;
+            echo PHP_EOL . PHP_EOL;
         endforeach;
     }
 
     /**
      * @param AbstractSchemaManager $schemaM
-     * @param Schema                $schema
+     * @param Schema $schema
      *
      * @since 1.1.0
      *

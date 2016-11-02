@@ -11,6 +11,7 @@
 namespace Eddmash\PowerOrm\Migration;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\AmbiguityError;
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
@@ -18,7 +19,6 @@ use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Helpers\StringHelper;
-use Eddmash\PowerOrm\BaseObject;
 
 class Loader extends BaseObject
 {
@@ -192,7 +192,7 @@ class Loader extends BaseObject
         $last_version = basename($last_version);
         $last_version = preg_split('/_/', $last_version)[0];
 
-        return (int) $last_version;
+        return (int)$last_version;
     }
 
     /**

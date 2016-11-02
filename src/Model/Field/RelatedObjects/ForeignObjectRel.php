@@ -11,10 +11,10 @@
 
 namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
+use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\BaseObject;
 
 class ForeignObjectRel extends BaseObject
 {
@@ -89,7 +89,7 @@ class ForeignObjectRel extends BaseObject
 
     public function __toString()
     {
-        return (string) sprintf('<Rel %s>', $this->toModel->meta->modelName);
+        return (string)sprintf('<Rel %s>', $this->toModel->meta->modelName);
 
     }
 }

@@ -22,8 +22,8 @@ class ChoiceQuestion extends Question
      * Constructor.
      *
      * @param string $question The question to ask to the user
-     * @param array  $choices  The list of available choices
-     * @param mixed  $default  The default answer to return
+     * @param array $choices The list of available choices
+     * @param mixed $default The default answer to return
      */
     public function __construct($question, array $choices, $default = null)
     {
@@ -34,10 +34,10 @@ class ChoiceQuestion extends Question
 
     public function getQuestion()
     {
-        $question = '%s :'.PHP_EOL;
+        $question = '%s :' . PHP_EOL;
         foreach ($this->choices as $index => $choice) :
 
-            $question .= sprintf("\t%s. %s".PHP_EOL, $index + 1, $choice);
+            $question .= sprintf("\t%s. %s" . PHP_EOL, $index + 1, $choice);
         endforeach;
 
         return sprintf($question, $this->question);
@@ -170,7 +170,7 @@ class ChoiceQuestion extends Question
                 if (false === $result) {
                     throw new \InvalidArgumentException(sprintf($errorMessage, $value));
                 }
-                $multiselectChoices[] = (string) $result;
+                $multiselectChoices[] = (string)$result;
             }
             if ($multiselect) {
                 return $multiselectChoices;

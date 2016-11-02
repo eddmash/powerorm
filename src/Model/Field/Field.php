@@ -18,7 +18,6 @@ use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\BaseObject;
 
 class Field extends DeconstructableObject implements FieldInterface
 {
@@ -230,7 +229,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model  $modelObject
+     * @param Model $modelObject
      *
      * @throws FieldError
      *
@@ -503,7 +502,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function __toString()
     {
-        return $this->scopeModel->getFullClassName().'->'.$this->name;
+        return $this->scopeModel->getFullClassName() . '->' . $this->name;
     }
 
 //    public function __debugInfo()

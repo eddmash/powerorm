@@ -212,6 +212,31 @@ class BaseOrm extends BaseObject
     }
 
     /**
+     * @return Connection
+     *
+     * @throws OrmException
+     * @throws \Doctrine\DBAL\DBALException
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getDatabaseConnection()
+    {
+        if (empty($this->databaseConfigs)):
+
+            $message = 'The database configuration have no been provided, On Codeigniter 3 create orm.php and ' .
+                'add configuration, consult documentation for options';
+            throw new OrmException($message);
+        endif;
+        if (static::$connection == null):
+            $config = new Configuration();
+
+            static::$connection = DriverManager::getConnection($this->databaseConfigs, $config);
+        endif;
+
+        return static::$connection;
+    }
+
+    /**
      * Returns the application registry. This method populates the registry the first time its invoked and caches
      * it since
      * its a very expensive method. subsequent calls get the cached registry.
@@ -226,18 +251,19 @@ class BaseOrm extends BaseObject
     {
         $orm = static::getInstance();
 
-        if($load):
+        if ($load):
             self::loadRegistry();
         endif;
 
         return $orm->registryCache;
     }
 
-    public static function loadRegistry() {
+    public static function loadRegistry()
+    {
         $instance = self::getInstance();
-        try{
+        try {
             $instance->registryCache->isAppReady();
-        }catch (AppRegistryNotReady $e){
+        } catch (AppRegistryNotReady $e) {
             $instance->registryCache->populate();
         }
     }
@@ -265,7 +291,7 @@ class BaseOrm extends BaseObject
     {
         $ci = static::getCiObject();
         if (!isset($ci->orm)):
-            $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the '.
+            $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the ' .
                 '$autoload[\'libraries\'] = array(\'powerorm/orm\'). On the autoload.php';
 
             throw new OrmException($message);
@@ -319,36 +345,11 @@ class BaseOrm extends BaseObject
     }
 
     /**
-     * @return Connection
-     *
-     * @throws OrmException
-     * @throws \Doctrine\DBAL\DBALException
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function getDatabaseConnection()
-    {
-        if (empty($this->databaseConfigs)):
-
-            $message = 'The database configuration have no been provided, On Codeigniter 3 create orm.php and '.
-                'add configuration, consult documentation for options';
-            throw new OrmException($message);
-        endif;
-        if (static::$connection == null):
-            $config = new Configuration();
-
-            static::$connection = DriverManager::getConnection($this->databaseConfigs, $config);
-        endif;
-
-        return static::$connection;
-    }
-
-    /**
      * Configures an object with the initial property values.
      *
-     * @param object $object     the object to be configured
-     * @param array  $properties the property initial values given in terms of name-value pairs
-     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object the object to be configured
+     * @param array $properties the property initial values given in terms of name-value pairs
+     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
@@ -380,7 +381,7 @@ class BaseOrm extends BaseObject
         if (static::$instance == null):
 
             if (ENVIRONMENT == 'POWERORM_DEV'):
-                require POWERORM_BASEPATH.DIRECTORY_SEPARATOR.'config.php';
+                require POWERORM_BASEPATH . DIRECTORY_SEPARATOR . 'config.php';
             endif;
 
             static::$instance = new static($config);
@@ -420,5 +421,10 @@ class BaseOrm extends BaseObject
         $namespace = ClassHelper::getFormatNamespace(self::getInstance()->appNamespace, true);
 
         return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'Migrations'), true, false);
+    }
+
+    public static function getQueryBuilder()
+    {
+        return self::getDbConnection()->createQueryBuilder();
     }
 }
