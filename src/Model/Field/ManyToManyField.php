@@ -156,6 +156,7 @@ class ManyToManyField extends RelatedField
         $className = '\\' . $className;
         /** @var $intermediaryObj Model */
         $intermediaryObj = new $className();
+
         $intermediaryObj->init($fields, ['meta' => $meta, 'registry' => $field->scopeModel->meta->registry]);
 
         return $intermediaryObj;
@@ -196,7 +197,7 @@ class ManyToManyField extends RelatedField
     {
         $warnings = [];
         if ($this->hasNullKwarg):
-            $warnings[] = [
+            $warnings = [
                 CheckWarning::createObject([
                     'message' => sprintf('null has no effect on ManyToManyField.'),
                     'hint' => null,

@@ -22,6 +22,7 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
@@ -489,6 +490,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         /** @var $fields Field */
         foreach ($this->meta->localFields as $fields) :
             $errors = array_merge($errors, $fields->checks());
+        endforeach;
+
+        /** @var $field ManyToManyField */
+        foreach ($this->meta->localManyToMany as $field) :
+            $errors = array_merge($errors, $field->checks());
         endforeach;
 
         return $errors;

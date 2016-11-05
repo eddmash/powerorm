@@ -2,6 +2,7 @@
 
 namespace Eddmash\PowerOrm\Checks;
 
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Console\Base;
 
 /**
@@ -33,9 +34,14 @@ abstract class CheckMessage extends Base
         $this->id = $id;
     }
 
-    public function isSerious()
+    public function isSilenced(){
+        return in_array($this->id, BaseOrm::getInstance()->silencedChecks);
+    }
+    
+    public function isSerious($level=null)
     {
-        return $this->level >= static::ERROR;
+        $level = ($level===null) ? static::ERROR : $level;
+        return $this->level >= $level;
     }
 
     public function __toString()
@@ -49,5 +55,16 @@ abstract class CheckMessage extends Base
         extract($config);
 
         return new static($message, $hint, $context, $id);
+    }
+    
+    public function __debugInfo(){
+        $model = [];
+        $model['level'] = $this->level;
+        $model['message'] = $this->message;
+        $model['hint'] = $this->hint;
+        $model['id'] = $this->id;
+        $model['context'] = "***";
+
+        return $model;
     }
 }

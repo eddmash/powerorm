@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
@@ -26,6 +27,40 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class RelatedField extends Field
 {
+    public function checks()
+    {
+        $checks = parent::checks();
+        $checks = array_merge($checks, $this->_checkRelationModelExists());
+        return $checks;
+    }
+
+    public function _checkRelationModelExists()
+    {
+        $relModel = $this->relation->toModel;
+        if ($relModel instanceof Model):
+            $relModel = $relModel->meta->modelName;
+        endif;
+
+        $relMissing = $this->scopeModel->meta->registry->hasModel($relModel);
+
+        $error = [];
+
+        if (!$relMissing) :
+            $msg = "Field defines a relation with model '%s', which is either does not exist, or is abstract.";
+
+            $error = [
+                CheckError::createObject([
+                    'message' => sprintf($msg, $relModel),
+                    'hint' => null,
+                    'context' => $this,
+                    'id' => 'fields.E300',
+                ])
+            ];
+        endif;
+
+        return $error;
+    }
+
     /**
      * Points to the model the field relates to. For example, Author in ForeignKey(['model'=>Author]).
      *

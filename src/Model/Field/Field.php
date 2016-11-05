@@ -241,7 +241,7 @@ class Field extends DeconstructableObject implements FieldInterface
     {
         if (!StringHelper::isValidVariableName($fieldName)):
             throw new FieldError(
-                sprintf(' "%s" is not a valid field name on model "%s" .', $fieldName,
+                sprintf(' "%s" is not a valid field name on the model "%s" .', $fieldName,
                     $modelObject->getFullClassName()));
         endif;
 

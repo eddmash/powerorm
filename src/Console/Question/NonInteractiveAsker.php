@@ -1,7 +1,7 @@
 <?php
 
 /*
-* This file is part of the powerorm package.
+* This file is part of the ci306 package.
 *
 * (c) Eddilbert Macharia <edd.cowan@gmail.com>
 *
@@ -11,29 +11,9 @@
 
 namespace Eddmash\PowerOrm\Console\Question;
 
-/**
- * {@inheritdoc}
- *
- *
- * Usage:
- *
- * <pre>$q = new Question('how old are you ?');
- * $asker = NonInteractiveAsker::createObject();
- * $asker->ask($q);</pre>
- *
- * Class NonInteractiveAsker
- *
- * @since 1.0.1
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class NonInteractiveAsker extends Asker
+
+
+class NonInteractiveAsker extends InteractiveAsker
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function ask($question)
-    {
-        return $question->getDefault();
-    }
+
 }

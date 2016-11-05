@@ -6,6 +6,9 @@
  */
 namespace Eddmash\PowerOrm\Console\Command;
 
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
 /**
  * Borrowed from fuelphp oil robot.
  *
@@ -20,9 +23,9 @@ class Robot extends BaseCommand
      */
     public $systemCheck = false;
 
-    public $help = 'A little fun is good for the soul';
+    public $help = '';
 
-    public function handle()
+    public function handle(InputInterface $input, OutputInterface $output)
     {
         $robot = '                    "KILL ALL HUMANS!"
                       _____     /
@@ -45,6 +48,16 @@ class Robot extends BaseCommand
                  |_____| |_____|
                  |HHHHH| |HHHHH|';
 
-        $this->normal($robot, true);
+        $output->writeln($robot);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
+    {
+        $this->setName($this->guessCommandName())
+            ->setDescription('A little fun is good for the soul')
+            ->setHelp('A little fun is good for the soul');
     }
 }

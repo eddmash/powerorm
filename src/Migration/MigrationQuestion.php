@@ -7,21 +7,31 @@ namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\Console\Console;
 use Eddmash\PowerOrm\Console\Question\Asker;
-use Eddmash\PowerOrm\Console\Question\ChoiceQuestion;
-use Eddmash\PowerOrm\Console\Question\ConfirmationQuestion;
-use Eddmash\PowerOrm\Console\Question\Question;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Question\Question;
 
 class MigrationQuestion
 {
-    public static function hasModelRenamed($oldModelName, $newModelName)
+    /**
+     * @param Asker $asker
+     * @param $oldModelName
+     * @param $newModelName
+     * @return ConfirmationQuestion
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function hasModelRenamed($asker, $oldModelName, $newModelName)
     {
         $msg = 'Did you rename the %s model to %s? [y/N]';
 
-        return new ConfirmationQuestion(sprintf($msg, $oldModelName, $newModelName));
+        $q =  new ConfirmationQuestion(sprintf($msg, $oldModelName, $newModelName));
+        return $asker->ask($q);
     }
 
     /**
+     * @param Asker $asker
      * @param $modelName
      * @param $oldName
      * @param $newName
@@ -33,11 +43,12 @@ class MigrationQuestion
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function hasFieldRenamed($modelName, $oldName, $newName, $fieldObj)
+    public static function hasFieldRenamed($asker, $modelName, $oldName, $newName, $fieldObj)
     {
         $msg = 'Did you rename %1$s.%2$s to %1$s.%3$s (a %4$s)? [y/N]';
 
-        return new ConfirmationQuestion(sprintf($msg, $modelName, $oldName, $newName, $fieldObj->getShortClassName()));
+        $q= new ConfirmationQuestion(sprintf($msg, $modelName, $oldName, $newName, $fieldObj->getShortClassName()));
+        return $asker->ask($q);
     }
 
     /**

@@ -5,6 +5,8 @@ namespace Eddmash\PowerOrm\Console\Command;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Console\Console;
 use Eddmash\PowerOrm\Migration\Loader;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class Showmigrations.
@@ -17,7 +19,7 @@ class Showmigrations extends BaseCommand
 {
     public $help = 'Provides help information about console commands.';
 
-    public function handle($argOpts = [])
+    public function handle(InputInterface $input, OutputInterface $output)
     {
         $connection = BaseOrm::getDbConnection();
 
@@ -33,13 +35,26 @@ class Showmigrations extends BaseCommand
                 $migrationName = array_pop(explode('\\', $item));
 
                 if (in_array($item, $loader->appliedMigrations)):
-                    $indicator = $this->ansiFormat('(applied)', Console::FG_GREEN);
+                    $indicator = '<info>(applied)</info>';
                 else:
                     $indicator = '(pending)';
                 endif;
 
-                $this->normal(sprintf('%1$s %2$s', $indicator, $migrationName), true);
+                $output->writeln(sprintf('%1$s %2$s', $indicator, $migrationName));
             endforeach;
         endforeach;
+    }
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
+    {
+
+        $this->setName($this->guessCommandName())
+            ->setDescription($this->help)
+            ->setHelp($this->help);
     }
 }

@@ -14,6 +14,17 @@ use Eddmash\PowerOrm\Helpers\StringHelper;
 class StringsTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @dataProvider providerValidVariableName
+     * @param $originalString
+     * @param $expectedString
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function testIsValidVariableName($originalString){
+        $this->assertTrue(StringHelper::isValidVariableName($originalString));
+    }
+
+    /**
      * @param $originalString
      * @param $expectedString
      * @dataProvider providerCamelToUnderscore
@@ -61,6 +72,17 @@ class StringsTest extends \PHPUnit_Framework_TestCase
             ['userModel', 'user_Model'],
             ['studentsModel', 'students_Model'],
             ['permissionRoleModel', 'permission_Role_Model'],
+        ];
+    }
+    
+    public function providerValidVariableName(){
+        return [
+            ["sfgsdfg"],
+            ["sfg_sdfg"],
+            ["_sfgsdfg"],
+            ["_sf45gsdfg"],
+            ["f45_gsdfg"],
+            ["f45_gsdfg80"],
         ];
     }
 }

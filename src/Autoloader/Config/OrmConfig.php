@@ -54,6 +54,7 @@ class OrmConfig extends BaseConfig
             'App\Migrations' => APPPATH . 'migrations',
             'app\models' => APPPATH . 'models',
             'Eddmash\PowerOrm' => POWERORM_SRCPATH,
+            'Eddmash\PowerOrmFaker' => APPPATH.'libraries'.DIRECTORY_SEPARATOR.'powerormfaker'.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR,
         ];
 
         /*

@@ -3,6 +3,7 @@
 namespace Eddmash\PowerOrm\Checks;
 
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Model\Model;
 
 /**
  * Checks for ORM integrity.
@@ -72,6 +73,7 @@ class ChecksRegistry
         endif;
 
         foreach ($checks as $check) :
+
             $functionName = '';
             if (is_array($check['check'])):
                 if (count($check['check']) > 1):
@@ -83,7 +85,8 @@ class ChecksRegistry
                 endif;
             endif;
 
-            $errors = call_user_func($check['check']);
+            $errors = array_merge($errors,  call_user_func($check['check']));
+
             assert(is_array($errors), sprintf('The function %s did not return a list. All functions registered ".
             "with the checks registry must return a list.', $functionName));
         endforeach;

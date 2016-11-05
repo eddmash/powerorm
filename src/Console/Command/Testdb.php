@@ -26,19 +26,21 @@ class Testdb extends BaseCommand
      */
     public $systemCheck = false;
 
-    public $help = 'A little fun is good for the soul';
+    public $help = 'dummy tests';
 
     public function handle()
     {
-        $conn = BaseOrm::getDbConnection();
-        $platform = $conn->getDatabasePlatform();
+//        $conn = BaseOrm::getDbConnection();
+//        $platform = $conn->getDatabasePlatform();
+//
+//        $schemaM = $conn->getSchemaManager();
+//        $schema = $schemaM->createSchema();
+//
+//        $this->fetch($conn);
 
-        $schemaM = $conn->getSchemaManager();
-        $schema = $schemaM->createSchema();
-
-        $this->fetch($conn);
 
     }
+
 
     /**
      * @param Connection $connection
@@ -112,5 +114,17 @@ class Testdb extends BaseCommand
         $schemaM->createTable($UTable);
 
         $schemaM->createTable($myTable);
+    }
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
+    {
+        $this->setName($this->guessCommandName())
+            ->setDescription($this->help)
+            ->setHelp($this->help);
     }
 }

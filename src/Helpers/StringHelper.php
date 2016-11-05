@@ -140,7 +140,7 @@ class StringHelper
 
     public static function isValidVariableName($name)
     {
-        return preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/', $name);
+        return 1===preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $name);
     }
 
     public static function isEmpty($string)

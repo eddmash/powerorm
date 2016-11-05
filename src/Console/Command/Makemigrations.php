@@ -4,6 +4,7 @@ namespace Eddmash\PowerOrm\Console\Command;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Console\Question\InteractiveAsker;
+use Eddmash\PowerOrm\Console\Question\NonInteractiveAsker;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Migration\AutoDetector;
@@ -12,6 +13,9 @@ use Eddmash\PowerOrm\Migration\Migration;
 use Eddmash\PowerOrm\Migration\MigrationFile;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class Makemigrations.
@@ -24,12 +28,8 @@ class Makemigrations extends BaseCommand
 {
     public $help = 'Updates database schema. Based on the migrations.';
 
-    public function handle($argOpts = [])
+    public function handle(InputInterface $input, OutputInterface $output)
     {
-        if (in_array('--help', $argOpts)):
-            $this->normal($this->help . PHP_EOL);
-        endif;
-
         $registry = BaseOrm::getRegistry();
 
         $loader = new Loader();
@@ -39,42 +39,49 @@ class Makemigrations extends BaseCommand
         if (!empty($issues)):
             $message = 'The following migrations seem to indicate they are both the latest migration :' . PHP_EOL;
             $message .= ' %s ' . PHP_EOL;
-            $this->error(sprintf($message, Tools::stringify($issues)));
+            $output->writeln(sprintf($message, Tools::stringify($issues)));
 
             return;
         endif;
+        
+        if($input->getOption('no-interaction')):
+            $asker = NonInteractiveAsker::createObject($input, $output);
+        else:
+            $asker = InteractiveAsker::createObject($input, $output);
+        endif;
+
 
         $autodetector = new AutoDetector(
             $loader->getProjectState(),
             ProjectState::fromApps($registry),
-            InteractiveAsker::createObject()
+            $asker
         );
 
         $changes = $autodetector->getChanges($loader->graph);
 
         if (empty($changes)):
-            $this->normal('No changes were detected' . PHP_EOL);
+            $output->writeln('No changes were detected');
 
             return;
         endif;
 
-        if (in_array('--dry-run', $argOpts)):
-            $this->info('Migrations :' . PHP_EOL);
+        if ($input->hasOption('dry-run')):
+            $output->writeln('<info>Migrations :</info>');
 
             /** @var $migration Migration */
             foreach ($changes as $migration) :
-                $this->normal('  -- ' . $migration->getName() . PHP_EOL);
+                $output->writeln('  -- ' . $migration->getName());
             endforeach;
 
             return;
         endif;
 
-        $this->_writeMigrations($changes);
+        $this->_writeMigrations($changes, $input, $output);
     }
 
-    public function _writeMigrations($migrationChanges)
+    public function _writeMigrations($migrationChanges, InputInterface $input, OutputInterface $output)
     {
-        $this->info('Creating Migrations :', true);
+        $output->writeln('Creating Migrations :');
 
         /** @var $migration Migration */
         /* @var $op Operation */
@@ -84,11 +91,11 @@ class Makemigrations extends BaseCommand
 
             $fileName = $migrationFile->getFileName();
 
-            $this->normal('  ' . $fileName, true);
+            $output->writeln('  ' . $fileName);
 
             $operations = $migration->getOperations();
             foreach ($operations as $op) :
-                $this->normal(sprintf('     - %s', ucwords($op->getDescription())), true);
+                $output->writeln(sprintf('     - %s', ucwords($op->getDescription())));
             endforeach;
 
             // write content to file.
@@ -98,11 +105,21 @@ class Makemigrations extends BaseCommand
         endforeach;
     }
 
-    public function getOptions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
     {
-        $options = parent::getOptions();
-        $options['--dry-run'] = "Just show what migrations would be made; don't actually write them.";
 
-        return $options;
+        $this->setName($this->guessCommandName())
+            ->setDescription($this->help)
+            ->setHelp($this->help)
+            ->addOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Just show what migrations would be made; don\'t actually write them.',
+                null
+            );
     }
 }

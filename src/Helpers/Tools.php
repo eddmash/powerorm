@@ -285,7 +285,7 @@ class Tools
     public static function resolveRelation($model, $relModel)
     {
         if ($relModel == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT):
-            return $model;
+            return self::resolveRelation($model, $model);
         elseif ($relModel instanceof Model):
             return $relModel->meta->modelName;
         endif;

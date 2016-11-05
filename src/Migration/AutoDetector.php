@@ -691,7 +691,7 @@ class AutoDetector extends BaseObject
 
                 if ($remModelDefinitionList == $modelDefinitionList):
 
-                    if ($this->asker->ask(MigrationQuestion::hasModelRenamed($removedModel, $addedModel))):
+                    if (MigrationQuestion::hasModelRenamed($this->asker, $removedModel, $addedModel)):
 
                         $this->addOperation(RenameModel::createObject([
                             'oldName' => $removedModel,
@@ -863,9 +863,8 @@ class AutoDetector extends BaseObject
                     endif;
 
                     if ($fieldDef === $oldFieldDef):
-                        if ($this->asker->ask(MigrationQuestion::hasFieldRenamed($modelName, $remField, $addedField,
-                            $field))
-                        ):
+                        if (MigrationQuestion::hasFieldRenamed($this->asker, $modelName, $remField, $addedField, $field)):
+
                             $this->addOperation(
                                 RenameField::createObject([
                                     'modelName' => $modelName,
@@ -879,6 +878,7 @@ class AutoDetector extends BaseObject
                             array_splice($this->oldFieldKeys[$modelName], $pos, 1, [$addedField]);
                             $this->renamedFields[$addedField] = $remField;
                             break;
+
                         endif;
                     endif;
                 endforeach;
@@ -1048,6 +1048,8 @@ class AutoDetector extends BaseObject
         $preserveDefault = true;
 
         if ($field->relation !== null && $field->relation->toModel):
+
+
             // depend on related model being created
             $opDep[] = [
                 'target' => $field->relation->toModel->meta->modelName,

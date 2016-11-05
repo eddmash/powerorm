@@ -6,6 +6,10 @@ use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Migration\AutoDetector;
 use Eddmash\PowerOrm\Migration\Executor;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class Migrate.
@@ -18,29 +22,34 @@ class Migrate extends BaseCommand
 {
     public $help = 'Shows all available migrations for the current project.';
 
-    public function getPositionalOptions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure()
     {
-        $option = parent::getPositionalOptions();
-        $option['migrationName'] = 'Database state will be brought to the state after the given migration. ';
 
-        return $option;
+        $this->setName($this->guessCommandName())
+            ->setDescription($this->help)
+            ->setHelp($this->help)
+            ->addArgument('migration_name',
+                InputArgument::OPTIONAL,
+                'Database state will be brought to the state after that migration. ' .
+                'Use the name "zero" to unapply all migrations.')
+            ->addOption(
+                'fake',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Mark migrations as run without actually running them.',
+                null
+            );
     }
 
-    public function getOptions()
+    public function handle(InputInterface $input, OutputInterface $output)
     {
-        $option = parent::getOptions();
-        $option['--fake'] = 'Mark migrations as run without actually running them.';
+        $name = $input->getArgument('migration_name');
 
-        return $option;
-    }
-
-    public function handle($argOpts = [])
-    {
-        $name = array_shift($argOpts);
-
-        if ($name === '--fake' || in_array('--fake', $argOpts)):
+        if ($input->hasOption('fake')):
             $fake = true;
-            $name = null;
         else:
             $fake = false;
         endif;
@@ -64,12 +73,12 @@ class Migrate extends BaseCommand
         // get migration plan
         $plan = $executor->getMigrationPlan($targets);
 
-        $this->dispatchSignal('powerorm.migration.pre_migrate', $this);
+        BaseOrm::signalDispatch('powerorm.migration.pre_migrate', $this);
 
-        $this->info('Running migrations:', true);
+        $output->writeln('<comment>Running migrations:</comment>');
 
         if (empty($plan)):
-            $this->normal('  No migrations to apply.', true);
+            $output->writeln('  No migrations to apply.');
 
             //detect if we need to make migrations
             $auto_detector = new AutoDetector($executor->loader->getProjectState(), ProjectState::fromApps($registry));
@@ -78,11 +87,11 @@ class Migrate extends BaseCommand
 
             if (!empty($changes)):
 
-                $this->warning('  Your models have changes that are not yet reflected ' .
-                    "in a migration, and so won't be applied.", true);
+                $output->writeln('<warning>  Your models have changes that are not yet reflected ' .
+                    "in a migration, and so won't be applied.</warning>");
 
-                $this->warning("  Run 'php pmanager.php makemigrations' to make new " .
-                    "migrations, and then re-run 'php pmanager.php migrate' to apply them.", true);
+                $output->writeln("<warning>  Run 'php pmanager.php makemigrations' to make new " .
+                    "migrations, and then re-run 'php pmanager.php migrate' to apply them.</warning>");
 
             endif;
         else:
@@ -91,6 +100,6 @@ class Migrate extends BaseCommand
 
         endif;
 
-        $this->dispatchSignal('powerorm.migration.post_migrate', $this);
+        BaseOrm::signalDispatch('powerorm.migration.post_migrate', $this);
     }
 }

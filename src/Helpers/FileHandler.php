@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Helpers;
 
 use Eddmash\PowerOrm\BaseObject;
+use SplFileInfo;
 
 /**
  * Responsible for creating files. creates files with the extension "php".
@@ -79,6 +80,7 @@ class FileHandler extends BaseObject
 
         $name = $this->normalizeKey($name);
 
+        /**@var $file SplFileInfo*/
         foreach ($files as $file) :
             $fileName = $file->getBaseName('.' . $ext);
             if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext):
@@ -87,7 +89,7 @@ class FileHandler extends BaseObject
 
         endforeach;
 
-        return;
+        return false;
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
+
 /*
-* This file is part of the powerorm package.
+* This file is part of the ci306 package.
 *
 * (c) Eddilbert Macharia <edd.cowan@gmail.com>
 *
@@ -10,41 +11,38 @@
 
 namespace Eddmash\PowerOrm\Console\Question;
 
-use Eddmash\PowerOrm\Console\Base;
 
-/**
- * The Asker class provides functions to ask the user for more information on the command line.
- *
- * Asking a smiple question like how old are you.
- * Usage:
- *
- * <pre>$q = new Question('how old are you ?');
- * $asker = InteractiveAsker::createObject();
- * $asker->ask($q);</pre>
- *
- * @since 1.0.1
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- */
-class Asker extends Base
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
+
+class Asker
 {
-    protected $question;
-
-    public static function createObject()
-    {
-        return new static();
-    }
 
     /**
-     * @param Question $question
-     *
-     * @return string
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @var InputInterface
      */
-    public function ask($question)
-    {
+    private $input;
+    /**
+     * @var OutputInterface
+     */
+    private $output;
+
+    public function __construct(InputInterface $input, OutputInterface $output){
+
+        $this->input = $input;
+        $this->output = $output;
     }
+
+    public function ask(Question $question){
+
+        $questionHelper = new QuestionHelper();
+        return $questionHelper->ask($this->input, $this->output, $question);
+    }
+
+    public static function createObject(InputInterface $input, OutputInterface $output){
+        return new static($input, $output);
+    }
+
 }
