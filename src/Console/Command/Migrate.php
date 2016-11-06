@@ -3,6 +3,8 @@
 namespace Eddmash\PowerOrm\Console\Command;
 
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Console\Question\InteractiveAsker;
+use Eddmash\PowerOrm\Console\Question\NonInteractiveAsker;
 use Eddmash\PowerOrm\Migration\AutoDetector;
 use Eddmash\PowerOrm\Migration\Executor;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
@@ -23,17 +25,16 @@ class Migrate extends BaseCommand
     public $help = 'Shows all available migrations for the current project.';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function configure()
     {
-
         $this->setName($this->guessCommandName())
             ->setDescription($this->help)
             ->setHelp($this->help)
             ->addArgument('migration_name',
                 InputArgument::OPTIONAL,
-                'Database state will be brought to the state after that migration. ' .
+                'Database state will be brought to the state after that migration. '.
                 'Use the name "zero" to unapply all migrations.')
             ->addOption(
                 'fake',
@@ -48,7 +49,7 @@ class Migrate extends BaseCommand
     {
         $name = $input->getArgument('migration_name');
 
-        if ($input->hasOption('fake')):
+        if ($input->getOption('fake')):
             $fake = true;
         else:
             $fake = false;
@@ -80,17 +81,26 @@ class Migrate extends BaseCommand
         if (empty($plan)):
             $output->writeln('  No migrations to apply.');
 
+            if ($input->getOption('no-interaction')):
+                $asker = NonInteractiveAsker::createObject($input, $output);
+            else:
+                $asker = InteractiveAsker::createObject($input, $output);
+            endif;
+
             //detect if we need to make migrations
-            $auto_detector = new AutoDetector($executor->loader->getProjectState(), ProjectState::fromApps($registry));
+            $auto_detector = new AutoDetector(
+                $executor->loader->getProjectState(),
+                ProjectState::fromApps($registry),
+                $asker);
 
             $changes = $auto_detector->getChanges($executor->loader->graph);
 
             if (!empty($changes)):
 
-                $output->writeln('<warning>  Your models have changes that are not yet reflected ' .
+                $output->writeln('<warning>  Your models have changes that are not yet reflected '.
                     "in a migration, and so won't be applied.</warning>");
 
-                $output->writeln("<warning>  Run 'php pmanager.php makemigrations' to make new " .
+                $output->writeln("<warning>  Run 'php pmanager.php makemigrations' to make new ".
                     "migrations, and then re-run 'php pmanager.php migrate' to apply them.</warning>");
 
             endif;

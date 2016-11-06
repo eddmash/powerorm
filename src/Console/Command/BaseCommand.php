@@ -2,10 +2,8 @@
 
 namespace Eddmash\PowerOrm\Console\Command;
 
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckMessage;
-use Eddmash\PowerOrm\Checks\Checks;
-use Eddmash\PowerOrm\Checks\ChecksRegistry;
-use Eddmash\PowerOrm\Console\Console;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\SystemCheckError;
 use Symfony\Component\Console\Command\Command;
@@ -58,7 +56,7 @@ abstract class BaseCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $message = sprintf("<info>%s</info>", $this->headerMessage);
+        $message = sprintf('<info>%s</info>', $this->headerMessage);
 
         $pad = 2;
         $maxLength = strlen(POWERORM_VERSION) + $pad;
@@ -70,9 +68,9 @@ abstract class BaseCommand extends Command
         $output->writeln(sprintf($message, POWERORM_VERSION, $versionPad, $inLinePad, $outLinePad));
 
         if ($this->systemCheck):
-            try{
+            try {
                 $this->check($input, $output);
-            }catch (SystemCheckError $e){
+            } catch (SystemCheckError $e) {
                 // we get a system check error, stop further processing
                 return;
             }
@@ -85,50 +83,14 @@ abstract class BaseCommand extends Command
         endif;
     }
 
-    public function command_options()
-    {
-        $maxlen = 5;
-        $default_help = '--help';
-        foreach ($this->getOptions() as $key => $value) :
-            $len = strlen($key) + 2 + ($key === $default_help ? 10 : 0);
-            if ($maxlen < $len) :
-                $maxlen = $len;
-            endif;
-        endforeach;
-
-        $this->normal('Position Arguments:' . PHP_EOL . PHP_EOL);
-        $positional = $this->getPositionalOptions();
-
-        if (!empty($positional)):
-            foreach ($this->getPositionalOptions() as $key => $value) :
-
-                $this->stdout(' ' . $this->ansiFormat($key, Console::FG_YELLOW));
-                $len = strlen($key) + 2;
-
-                if ($value !== '') {
-                    $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
-                }
-                $this->stdout(PHP_EOL . PHP_EOL);
-            endforeach;
-        endif;
-
-        $this->normal('Optional Arguments:' . PHP_EOL . PHP_EOL);
-
-        foreach ($this->getOptions() as $key => $value) :
-
-            $this->stdout(' ' . $this->ansiFormat($key, Console::FG_YELLOW));
-            $len = strlen($key) + 2;
-
-            if ($value !== '') {
-                $this->stdout(str_repeat(' ', $maxlen - $len + 2) . Console::wrapText($value, $maxlen + 2));
-            }
-            $this->stdout("\n");
-        endforeach;
-    }
-
-    public function check(InputInterface $input, OutputInterface $output, $failLevel=null)
-    {
-        $checks = (new ChecksRegistry())->runChecks();
+    public function check(
+        InputInterface $input,
+        OutputInterface $output,
+        $tags = null,
+        $showErrorCount = null,
+        $failLevel = null
+    ) {
+        $checks = BaseOrm::getCheckRegistry()->runChecks($tags);
 
         $debugs = [];
         $info = [];
@@ -137,10 +99,12 @@ abstract class BaseCommand extends Command
         $critical = [];
         $serious = [];
 
-        /**@var $check CheckMessage*/
+        $header = $body = $footer = '';
+
+        /** @var $check CheckMessage */
         foreach ($checks as $check) :
 
-            if($check->isSerious($failLevel) && !$check->isSilenced()):
+            if ($check->isSerious($failLevel) && !$check->isSilenced()):
                 $serious[] = $check;
             endif;
 
@@ -169,51 +133,70 @@ abstract class BaseCommand extends Command
             endif;
         endforeach;
 
-        $output->writeln('Perfoming system checks ...');
+        // get the count of visible issues only, hide the silenced ones
 
-        $issue = (count($checks) == 1) ? 'issue' : 'issues';
+        $visibleIssues = count($errors) + count($warning) + count($info) + count($debugs) + count($critical);
 
-        $output->writeln(sprintf('System check identified %1$s %2$s', count($checks), $issue));
-        $output->writeln(PHP_EOL);
+        if ($visibleIssues):
+            $header = 'System check identified issues: '.PHP_EOL;
+        endif;
 
         $errors = array_merge($critical, $errors);
 
+        $categorisedIssues = [
+            'critical' => $critical,
+            'errors' => $errors,
+            'warning' => $warning,
+            'info' => $info,
+            'debug' => $debugs,
+        ];
 
-        if (!empty($info)):
-            $output->writeln("INFO: ");
-            $output->writeln(sprintf("<info>%s</info>",implode(PHP_EOL, $info)));
-            $output->writeln(PHP_EOL);
+        /* @var $catIssue CheckMessage */
+        foreach ($categorisedIssues as $category => $categoryIssues) :
+            if (empty($categoryIssues)):
+                continue;
+            endif;
+            $body .= sprintf(PHP_EOL.' %s'.PHP_EOL, strtoupper($category));
+
+            foreach ($categoryIssues as $catIssue) :
+
+                if ($catIssue->isSerious()):
+                    $msg = ' <errorText>%s</errorText>'.PHP_EOL;
+                else:
+                    $msg = ' <warning>%s</warning>'.PHP_EOL;
+                endif;
+                $body .= sprintf($msg, $catIssue);
+            endforeach;
+
+        endforeach;
+
+        if ($showErrorCount):
+            $issueText = ($visibleIssues === 1) ? 'issue' : 'issues';
+            $silenced = count($checks) - $visibleIssues;
+            if($visibleIssues):
+                $footer .= PHP_EOL;
+            endif;
+            $footer .= sprintf(' System check identified %s %s (%s silenced) ',
+                $visibleIssues, $issueText, $silenced);
         endif;
 
-        if (!empty($debugs)):
-            $output->writeln("DEBUG: ");
-            $output->writeln(sprintf("<error>%s</error>", implode(PHP_EOL, $debugs)));
-            $output->writeln(PHP_EOL);
+        if (!empty($serious)):
+            $header = sprintf('<errorText> SystemCheckError: %s</errorText>', $header);
+            $message = $header.$body.$footer;
+            $output->writeln($message);
+            throw new SystemCheckError();
         endif;
 
-        if (!empty($warning)):
-            $output->writeln("WARNINGS: ");
-            $output->writeln(sprintf("<warning>%s</warning>", implode(PHP_EOL, $warning)));
-            $output->writeln(PHP_EOL);
-        endif;
-
-        if (!empty($errors)):
-            $output->writeln("ERROR: ");
-            $output->writeln(sprintf("<errortext>%s</errortext>",implode(PHP_EOL, $errors)));
-            $output->writeln(PHP_EOL);
-        endif;
-
-        if(!empty($serious)):
-            throw new SystemCheckError;
-        endif;
+        $message = $header.$body.$footer;
+        $output->writeln($message);
     }
 
     public function guessCommandName()
     {
         $name = get_class($this);
-        $name = substr($name, strripos($name, "\\") + 1);
+        $name = substr($name, strripos($name, '\\') + 1);
         $name = (false === strripos($name, 'Command')) ? $name : substr($name, 0, strripos($name, 'Command'));
+
         return strtolower($name);
     }
-
 }

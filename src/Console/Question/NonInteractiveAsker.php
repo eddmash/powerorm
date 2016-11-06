@@ -11,9 +11,6 @@
 
 namespace Eddmash\PowerOrm\Console\Question;
 
-
-
 class NonInteractiveAsker extends InteractiveAsker
 {
-
 }

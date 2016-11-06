@@ -2,9 +2,6 @@
 
 namespace Eddmash\PowerOrm\Checks;
 
-use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Model\Model;
-
 /**
  * Checks for ORM integrity.
  *
@@ -25,10 +22,21 @@ class ChecksRegistry
     }
 
     /**
+     * @return static
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function createObject() {
+        return new static();
+    }
+
+    /**
      * Register checks to be run with the check registry.
      *
      * @param callable $check
-     * @param array $tags
+     * @param array    $tags
      *
      * @since 1.1.0
      *
@@ -56,15 +64,14 @@ class ChecksRegistry
     public function runChecks($tags = [])
     {
         $errors = [];
-        // registered model checks
-        $this->registerModelChecks();
 
         $checks = $this->getChecks();
 
         if (!empty($tags)):
             $taggedChecks = [];
             foreach ($checks as $check) :
-
+                // a check can have many tags
+                // true if any of the tags provided appears in the check tags
                 if (array_intersect($check['tags'], $tags)):
                     $taggedChecks[] = $check;
                 endif;
@@ -79,13 +86,13 @@ class ChecksRegistry
                 if (count($check['check']) > 1):
                     $obj = reset($check['check']);
                     $method = end($check['check']);
-                    $functionName = get_class($obj) . '::' . $method;
+                    $functionName = get_class($obj).'::'.$method;
                 else:
                     $functionName = reset($check['check']);
                 endif;
             endif;
 
-            $errors = array_merge($errors,  call_user_func($check['check']));
+            $errors = array_merge($errors, call_user_func($check['check']));
 
             assert(is_array($errors), sprintf('The function %s did not return a list. All functions registered ".
             "with the checks registry must return a list.', $functionName));
@@ -108,26 +115,19 @@ class ChecksRegistry
         return $this->registeredChecks;
     }
 
-    /**
-     * Runs checks on the application models.
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function registerModelChecks()
-    {
-        $models = BaseOrm::getRegistry()->getModels();
+    public function tagsAvailable() {
+        $availableChecks = [];
 
-        /** @var $modelObj Model */
-        foreach ($models as $name => $modelObj) :
+        $checks = $this->getChecks();
 
-            if (!$modelObj->hasMethod('checks')):
-                continue;
-            endif;
+        foreach ($checks as $check) :
 
-            $this->register([$modelObj, 'checks'], [Tags::Model]);
-
+            $availableChecks = array_merge($availableChecks, $check['tags']);
         endforeach;
+
+        return $availableChecks;
+    }
+    public function tagExists($tag) {
+        return in_array($tag, $this->tagsAvailable());
     }
 }

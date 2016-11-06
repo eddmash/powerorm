@@ -37,19 +37,18 @@ class Makemigrations extends BaseCommand
         $issues = $loader->detectConflicts();
 
         if (!empty($issues)):
-            $message = 'The following migrations seem to indicate they are both the latest migration :' . PHP_EOL;
-            $message .= ' %s ' . PHP_EOL;
+            $message = 'The following migrations seem to indicate they are both the latest migration :'.PHP_EOL;
+            $message .= ' %s '.PHP_EOL;
             $output->writeln(sprintf($message, Tools::stringify($issues)));
 
             return;
         endif;
-        
-        if($input->getOption('no-interaction')):
+
+        if ($input->getOption('no-interaction')):
             $asker = NonInteractiveAsker::createObject($input, $output);
         else:
             $asker = InteractiveAsker::createObject($input, $output);
         endif;
-
 
         $autodetector = new AutoDetector(
             $loader->getProjectState(),
@@ -65,12 +64,13 @@ class Makemigrations extends BaseCommand
             return;
         endif;
 
-        if ($input->hasOption('dry-run')):
+        if ($input->getOption('dry-run')):
+
             $output->writeln('<info>Migrations :</info>');
 
             /** @var $migration Migration */
             foreach ($changes as $migration) :
-                $output->writeln('  -- ' . $migration->getName());
+                $output->writeln('  -- '.$migration->getName());
             endforeach;
 
             return;
@@ -91,7 +91,7 @@ class Makemigrations extends BaseCommand
 
             $fileName = $migrationFile->getFileName();
 
-            $output->writeln('  ' . $fileName);
+            $output->writeln('  '.$fileName);
 
             $operations = $migration->getOperations();
             foreach ($operations as $op) :
@@ -106,11 +106,10 @@ class Makemigrations extends BaseCommand
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function configure()
     {
-
         $this->setName($this->guessCommandName())
             ->setDescription($this->help)
             ->setHelp($this->help)

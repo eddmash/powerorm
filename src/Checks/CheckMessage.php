@@ -4,6 +4,7 @@ namespace Eddmash\PowerOrm\Checks;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Console\Base;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 
 /**
  * @since 1.0.0
@@ -18,6 +19,14 @@ abstract class CheckMessage extends Base
     const WARNING = 30;
     const ERROR = 40;
     const CRITICAL = 50;
+
+    public $levelsMap = [
+        'debug' => 10,
+        'info' => 20,
+        'warning' => 30,
+        'error' => 40,
+        'critical' => 50,
+    ];
 
     public $level;
     public $message;
@@ -34,14 +43,15 @@ abstract class CheckMessage extends Base
         $this->id = $id;
     }
 
-    public function isSilenced(){
+    public function isSilenced()
+    {
         return in_array($this->id, BaseOrm::getInstance()->silencedChecks);
     }
-    
-    public function isSerious($level=null)
+
+    public function isSerious($level = null)
     {
-        $level = ($level===null) ? static::ERROR : $level;
-        return $this->level >= $level;
+
+        return $this->level >= $this->toLevel($level);
     }
 
     public function __toString()
@@ -56,14 +66,25 @@ abstract class CheckMessage extends Base
 
         return new static($message, $hint, $context, $id);
     }
-    
-    public function __debugInfo(){
+
+    public function toLevel($level) {
+        $level = ($level === null) ? static::ERROR : $level;
+
+        if(is_string($level)):
+            $level = ArrayHelper::getValue($this->levelsMap, strtolower($level));
+        endif;
+
+        return $level;
+    }
+
+    public function __debugInfo()
+    {
         $model = [];
         $model['level'] = $this->level;
         $model['message'] = $this->message;
         $model['hint'] = $this->hint;
         $model['id'] = $this->id;
-        $model['context'] = "***";
+        $model['context'] = '***';
 
         return $model;
     }

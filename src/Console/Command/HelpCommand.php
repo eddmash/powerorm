@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Console\Command;
 
-
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Input\InputArgument;
@@ -21,9 +20,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class HelpCommand extends BaseCommand
 {
-
     /**
-     * @inheritDoc
+     * {@inheritdoc}
+     *
      * @var bool
      */
     public $systemCheck = false;
@@ -41,7 +40,8 @@ class HelpCommand extends BaseCommand
             ->setName('help')
             ->setDefinition(array(
                 new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
-                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED,
+                    'The output format (txt, xml, json, or md)', 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help'),
             ))
             ->setDescription('Displays help for a command')
@@ -56,8 +56,7 @@ You can also output the help in other formats by using the <comment>--format</co
 
 To display the list of available commands, please use the <info>list</info> command.
 EOF
-            )
-        ;
+            );
     }
 
     /**

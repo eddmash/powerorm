@@ -10,7 +10,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
-use Eddmash\PowerOrm\BaseOrm;
 
 /**
  * Borrowed from fuelphp oil robot.
@@ -30,17 +29,14 @@ class Testdb extends BaseCommand
 
     public function handle()
     {
-//        $conn = BaseOrm::getDbConnection();
+        //        $conn = BaseOrm::getDbConnection();
 //        $platform = $conn->getDatabasePlatform();
-//
+
 //        $schemaM = $conn->getSchemaManager();
 //        $schema = $schemaM->createSchema();
-//
+
 //        $this->fetch($conn);
-
-
     }
-
 
     /**
      * @param Connection $connection
@@ -116,10 +112,8 @@ class Testdb extends BaseCommand
         $schemaM->createTable($myTable);
     }
 
-
-
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function configure()
     {

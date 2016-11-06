@@ -3,7 +3,6 @@
 namespace Eddmash\PowerOrm\Console\Command;
 
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Console\Console;
 use Eddmash\PowerOrm\Migration\Loader;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -45,14 +44,11 @@ class Showmigrations extends BaseCommand
         endforeach;
     }
 
-
-
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     protected function configure()
     {
-
         $this->setName($this->guessCommandName())
             ->setDescription($this->help)
             ->setHelp($this->help);

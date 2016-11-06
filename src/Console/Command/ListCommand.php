@@ -20,9 +20,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ListCommand extends BaseCommand
 {
-
     /**
-     * @inheritDoc
+     * {@inheritdoc}
+     *
      * @var bool
      */
     public $systemCheck = false;
@@ -53,8 +53,7 @@ It's also possible to get raw list of commands (useful for embedding command run
 
   <info>php %command.full_name% --raw</info>
 EOF
-            )
-        ;
+            );
     }
 
     /**
@@ -86,7 +85,8 @@ EOF
         return new InputDefinition(array(
             new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
             new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
-            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)', 'txt'),
+            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)',
+                'txt'),
         ));
     }
 }

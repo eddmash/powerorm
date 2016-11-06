@@ -15,11 +15,14 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\Checks\ChecksRegistry;
+use Eddmash\PowerOrm\Checks\Tags;
 use Eddmash\PowerOrm\Console\Manager;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
+use Eddmash\PowerOrm\Model\Model;
 
 define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
 
@@ -31,6 +34,7 @@ define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
 class BaseOrm extends BaseObject
 {
     const RECURSIVE_RELATIONSHIP_CONSTANT = 'this';
+    private static $checkRegistry;
     /**
      * The configurations to use to connect to the database.
      *
@@ -125,7 +129,7 @@ class BaseOrm extends BaseObject
      *
      * @var array
      */
-    public $silencedChecks =[];
+    public $silencedChecks = [];
 
     /**
      * The namespace to check for the application models and migrations.
@@ -178,9 +182,6 @@ class BaseOrm extends BaseObject
         if (empty($this->modelsPath)):
             $this->modelsPath = sprintf('%smodels%s', APPPATH, DIRECTORY_SEPARATOR);
         endif;
-
-
-
     }
 
     public static function getModelsPath()
@@ -238,7 +239,7 @@ class BaseOrm extends BaseObject
     {
         if (empty($this->databaseConfigs)):
 
-            $message = 'The database configuration have no been provided, On Codeigniter 3 create orm.php and ' .
+            $message = 'The database configuration have no been provided, On Codeigniter 3 create orm.php and '.
                 'add configuration, consult documentation for options';
             throw new OrmException($message);
         endif;
@@ -294,7 +295,6 @@ class BaseOrm extends BaseObject
 
         if (ENVIRONMENT == 'POWERORM_DEV'):
             $instance = static::_standAloneEnvironment($config);
-
         else:
             $instance = static::getOrmFromContext();
         endif;
@@ -306,7 +306,7 @@ class BaseOrm extends BaseObject
     {
         $ci = static::getCiObject();
         if (!isset($ci->orm)):
-            $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the ' .
+            $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the '.
                 '$autoload[\'libraries\'] = array(\'powerorm/orm\'). On the autoload.php';
 
             throw new OrmException($message);
@@ -318,7 +318,9 @@ class BaseOrm extends BaseObject
 
     public static function &_standAloneEnvironment($config)
     {
-        return static::createObject($config);
+        $env = static::createObject($config);
+
+        return $env;
     }
 
     /**
@@ -362,9 +364,9 @@ class BaseOrm extends BaseObject
     /**
      * Configures an object with the initial property values.
      *
-     * @param object $object the object to be configured
-     * @param array $properties the property initial values given in terms of name-value pairs
-     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object     the object to be configured
+     * @param array  $properties the property initial values given in terms of name-value pairs
+     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
@@ -396,7 +398,7 @@ class BaseOrm extends BaseObject
         if (static::$instance == null):
 
             if (ENVIRONMENT == 'POWERORM_DEV'):
-                require POWERORM_BASEPATH . DIRECTORY_SEPARATOR . 'config.php';
+                require POWERORM_BASEPATH.DIRECTORY_SEPARATOR.'config.php';
             endif;
 
             static::$instance = new static($config);
@@ -407,7 +409,51 @@ class BaseOrm extends BaseObject
 
     public static function consoleRunner($config = [])
     {
+        // register model checks
+        self::registerModelChecks();
         Manager::run();
+    }
+
+    /**
+     * Runs checks on the application models.
+     *
+     * @internal
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function registerModelChecks()
+    {
+        $models = self::getRegistry()->getModels();
+
+        /** @var $modelObj Model */
+        foreach ($models as $name => $modelObj) :
+
+            if (!$modelObj->hasMethod('checks')):
+                continue;
+            endif;
+
+            self::getCheckRegistry()->register([$modelObj, 'checks'], [Tags::Model]);
+
+        endforeach;
+    }
+
+    /**
+     * @param bool|false $recreate
+     *
+     * @return ChecksRegistry
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function getCheckRegistry($recreate = false) {
+        if(self::$checkRegistry === null || ($recreate && self::$checkRegistry !== null)):
+            self::$checkRegistry = ChecksRegistry::createObject();
+        endif;
+
+        return self::$checkRegistry;
     }
 
     /**
@@ -443,7 +489,8 @@ class BaseOrm extends BaseObject
         return self::getDbConnection()->createQueryBuilder();
     }
 
-    public static function signalDispatch($signal, $object){
+    public static function signalDispatch($signal, $object)
+    {
         self::getInstance()->dispatchSignal($signal, $object);
     }
 }
