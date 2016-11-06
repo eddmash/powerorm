@@ -99,7 +99,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model $model
+     * @param Model           $model
      *
      * @return Model
      *
@@ -153,7 +153,7 @@ class ManyToManyField extends RelatedField
             'autoCreated' => true,
         ];
 
-        $className = '\\' . $className;
+        $className = '\\'.$className;
         /** @var $intermediaryObj Model */
         $intermediaryObj = new $className();
 
