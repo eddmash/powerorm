@@ -31,6 +31,7 @@ class RelatedField extends Field
     {
         $checks = parent::checks();
         $checks = array_merge($checks, $this->_checkRelationModelExists());
+
         return $checks;
     }
 
@@ -54,7 +55,7 @@ class RelatedField extends Field
                     'hint' => null,
                     'context' => $this,
                     'id' => 'fields.E300',
-                ])
+                ]),
             ];
         endif;
 

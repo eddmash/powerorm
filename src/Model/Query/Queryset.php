@@ -131,7 +131,7 @@ class Queryset implements QuerysetInterface
     {
         $instance = $this->_clone();
 
-        print_r(Lookup::lookUp($this->model->meta->dbTable, $conditions)); 
+        print_r(Lookup::lookUp($this->model->meta->dbTable, $conditions));
 
         return $instance;
     }

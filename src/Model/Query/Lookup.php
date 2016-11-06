@@ -89,7 +89,7 @@ class Lookup
 
                 // append table name to key
                 if (!empty($tableName)):
-                    $key = $tableName . ".$key";
+                    $key = $tableName.".$key";
                 endif;
 
                 // check if we need to use OR to combine

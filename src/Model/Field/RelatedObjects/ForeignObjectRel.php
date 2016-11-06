@@ -89,7 +89,7 @@ class ForeignObjectRel extends BaseObject
 
     public function __toString()
     {
-        return (string)sprintf('<Rel %s>', $this->toModel->meta->modelName);
+        return (string) sprintf('<Rel %s>', $this->toModel->meta->modelName);
 
     }
 }

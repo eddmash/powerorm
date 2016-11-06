@@ -23,25 +23,25 @@ if (!defined('ENVIRONMENT')):
 endif;
 
 if (!defined('BASEPATH')) :
-    define('BASEPATH', __DIR__ . DIRECTORY_SEPARATOR);
+    define('BASEPATH', __DIR__.DIRECTORY_SEPARATOR);
     define('APPPATH', BASEPATH);
     define('POWERORM_BASEPATH', BASEPATH);
-    define('POWERORM_SRCPATH', BASEPATH . 'src' . DIRECTORY_SEPARATOR);
+    define('POWERORM_SRCPATH', BASEPATH.'src'.DIRECTORY_SEPARATOR);
 else :
-    define('POWERORM_BASEPATH', APPPATH . 'libraries/powerorm' . DIRECTORY_SEPARATOR);
-    define('POWERORM_SRCPATH', APPPATH . 'libraries/powerorm/src' . DIRECTORY_SEPARATOR);
+    define('POWERORM_BASEPATH', APPPATH.'libraries/powerorm'.DIRECTORY_SEPARATOR);
+    define('POWERORM_SRCPATH', APPPATH.'libraries/powerorm/src'.DIRECTORY_SEPARATOR);
 endif;
 
-$autoLoadFile = HOMEPATH . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
+$autoLoadFile = HOMEPATH.DIRECTORY_SEPARATOR.'vendor/autoload.php';
 
 if (file_exists($autoLoadFile)):
     require $autoLoadFile;
 
 endif;
 
-require_once POWERORM_SRCPATH . 'Autoloader/Autoloader.php';
-require POWERORM_SRCPATH . 'Autoloader/Config/BaseConfig.php';
-require_once POWERORM_SRCPATH . 'Autoloader/Config/OrmConfig.php';
+require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';
+require POWERORM_SRCPATH.'Autoloader/Config/BaseConfig.php';
+require_once POWERORM_SRCPATH.'Autoloader/Config/OrmConfig.php';
 
 // setup Autoloader
 $loader = new Autoloader();

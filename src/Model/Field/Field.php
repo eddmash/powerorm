@@ -229,7 +229,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model $modelObject
+     * @param Model  $modelObject
      *
      * @throws FieldError
      *
@@ -502,7 +502,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function __toString()
     {
-        return $this->scopeModel->getFullClassName() . '->' . $this->name;
+        return $this->scopeModel->getFullClassName().'->'.$this->name;
     }
 
 //    public function __debugInfo()
