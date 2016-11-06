@@ -47,7 +47,6 @@ class ForeignKey extends RelatedField
 
     public function __construct($kwargs)
     {
-
         if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
             $kwargs['rel'] = ManyToOneRel::createObject([
                 'fromField' => $this,
@@ -62,7 +61,6 @@ class ForeignKey extends RelatedField
         $this->fromField = 'this';
 
         parent::__construct($kwargs);
-
     }
 
     /**

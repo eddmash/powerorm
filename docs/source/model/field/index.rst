@@ -3,10 +3,10 @@ Model Fields
 #############################
 
 .. contents::
-   :local:
+:local:
    :depth: 2
 
-This document contains all the API references of Field including the field options and field types PowerOrm offers.
+    This document contains all the API references of Field including the field options and field types PowerOrm offers.
 
 Field options
 =================

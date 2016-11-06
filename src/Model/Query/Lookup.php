@@ -7,6 +7,7 @@
  */
 namespace Eddmash\PowerOrm\Model\Query;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Helpers\Tools;
 
@@ -30,7 +31,7 @@ class Lookup
      */
     protected static $lookuOptions = [
         'eq' => ' = %s',
-        'in' => ' in %s',
+        'in' => ' in (%s)',
         'gt' => ' > %s',
         'lt' => ' < %s',
         'gte' => ' >= %s',
@@ -47,7 +48,7 @@ class Lookup
         'range' => ' BETWEEN %s and %s',
     ];
 
-    protected static $lookup_pattern = '/__/';
+    protected static $lookup_pattern = '/(?<=\w)__[!?.]*/';
     protected static $where_concat_pattern = '/^~[.]*/';
 
     public static function validateLookup($lookup)
@@ -71,7 +72,7 @@ class Lookup
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function lookUp($tableName, $conditions)
+    public static function filters(QueryBuilder $queryBuilder, $conditions)
     {
         // default lookup is equal
         $lookup = 'eq';
@@ -84,37 +85,35 @@ class Lookup
         foreach ($conditions as $condition) :
 
             foreach ($condition as $key => $value) :
+                $column = self::getLookupColumn($key);
+                $lookup = self::getLookUP($key);
+                $lookupCondition = sprintf(self::$lookuOptions[$lookup], $queryBuilder->createNamedParameter($value));
 
-                $tableName = strtolower($tableName);
-
-                // append table name to key
-                if (!empty($tableName)):
-                    $key = $tableName . ".$key";
+                $queryString = sprintf('%s %s', $column, $lookupCondition);
+                if(self::combine($key) === self::$or):
+                    $queryBuilder->orWhere($queryString);
+                else:
+                    $queryBuilder->andWhere($queryString);
                 endif;
-
-                // check if we need to use OR to combine
-//                if ($use_or):
-//                    $or_combine[] = [sprintf(self::$lookuOptions[$lookup], $value)];
-//                else:
-//                    // otherwise use "and"
-//                    $and_combine[] = [sprintf(self::$lookuOptions[$lookup], $value)];
-
-//                endif;
             endforeach;
 
         endforeach;
 
-        return [$and_combine, $or_combine];
     }
 
     public static function getLookUP($key)
     {
         $lookup = 'eq';
+
         // check which where clause to use
         if (preg_match(self::$lookup_pattern, $key)):
             $options = preg_split(self::$lookup_pattern, $key);
             $key = $options[0];
             $lookup = strtolower($options[1]);
+        else:
+            $key = sprintf('%s__%s', $key, $lookup);
+
+            return self::getLookUP($key);
         endif;
 
         // validate lookups
@@ -131,16 +130,23 @@ class Lookup
 
         // get the actual key
         if ($use_or):
-            return ' || ';
+            return self::$or;
         endif;
 
-        return ' && ';
+        return self::$and;
     }
 
     public static function getLookupColumn($key)
     {
         if (preg_match(self::$lookup_pattern, $key)):
-            return reset(preg_split(self::$lookup_pattern, $key));
+            $match = preg_split(self::$lookup_pattern, $key);
+
+            $key = reset($match);
+        endif;
+
+        if(self::combine($key) === self::$or):
+            $key = preg_split(self::$where_concat_pattern, $key);
+            $key = end($key);
         endif;
 
         return $key;

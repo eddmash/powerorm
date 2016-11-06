@@ -140,7 +140,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * operation can be optimized across.
      *
      * @param Operation $operation
-     * @param array $inBetween
+     * @param array     $inBetween
      *
      * @return mixed
      *
@@ -159,7 +159,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * it preemptively rejects any proxy, unmanaged model.
      *
      * @param Connection $connection
-     * @param Model $model
+     * @param Model      $model
      *
      * @return mixed
      *
@@ -171,5 +171,4 @@ abstract class Operation extends DeconstructableObject implements OperationInter
     {
         return $model->meta->canMigrate();
     }
-
 }

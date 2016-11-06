@@ -40,7 +40,6 @@ class FormatFileContent
     public function __construct($indentation = 0)
     {
         $this->indentation = $indentation;
-
     }
 
     public static function createObject($indentation = 0)
@@ -61,7 +60,7 @@ class FormatFileContent
     {
         $indentation = $this->indent($this->indentation);
 
-        $this->buffer[] = $indentation . $item;
+        $this->buffer[] = $indentation.$item;
     }
 
     /**
@@ -225,7 +224,7 @@ class FormatFileContent
 
         $string = trim($string, ',');
 
-        return [sprintf("%1\$s::createObject(%2\$s\t\t\t)", $class, PHP_EOL . $string . PHP_EOL), $import];
+        return [sprintf("%1\$s::createObject(%2\$s\t\t\t)", $class, PHP_EOL.$string.PHP_EOL), $import];
     }
 
     /**

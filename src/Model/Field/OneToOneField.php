@@ -60,5 +60,4 @@ class OneToOneField extends ForeignKey
 
         return parent::formField($kwargs);
     }
-
 }

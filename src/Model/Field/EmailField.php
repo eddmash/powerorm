@@ -28,5 +28,4 @@ class EmailField extends CharField
         $config['maxLength'] = ArrayHelper::getValue($config, 'maxLength', 254);
         parent::__construct($config);
     }
-
 }

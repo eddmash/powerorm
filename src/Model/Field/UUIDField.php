@@ -28,5 +28,4 @@ class UUIDField extends Field
     {
         return Type::GUID;
     }
-
 }

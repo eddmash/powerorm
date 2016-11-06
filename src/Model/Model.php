@@ -18,6 +18,7 @@ use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Exception\TypeError;
+use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
@@ -167,13 +168,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function loadData($record = [])
     {
-
         foreach ($record as $name => $value) :
 
             $this->{$name} = $value;
 
         endforeach;
-
     }
 
     public function init($fields = [], $kwargs = [])
@@ -219,7 +218,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         // register the model
         $meta->registry->registerModel($this);
-
     }
 
     public static function isModelBase($className)
@@ -228,7 +226,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string $name
+     * @param string       $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -274,7 +272,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function proxySetup($concreteParent)
     {
-
         $this->meta->setupProxy($concreteParent);
         $this->meta->concreteModel = $concreteParent->meta->concreteModel;
     }
@@ -301,7 +298,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             endif;
 
         endif;
-
     }
 
     public function prepare()
@@ -318,8 +314,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param string $method the method to invoke
-     * @param null $args the arguments to pass to the method
+     * @param string    $method     the method to invoke
+     * @param null      $args       the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -415,7 +411,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 $parentFields = $modelFields[$previousAbstractParent];
 
                 if (!empty($parentFields)):
-                    throw new TypeError(sprintf('Abstract base class containing model fields not ' .
+                    throw new TypeError(sprintf('Abstract base class containing model fields not '.
                         "permitted for proxy model '%s'.", $parentName));
                 endif;
             endif;
@@ -444,7 +440,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endforeach;
 
         if ($isProxy && $concreteParent == null):
-            throw new TypeError(sprintf("Proxy model '%s' has no non-abstract" .
+            throw new TypeError(sprintf("Proxy model '%s' has no non-abstract".
                 ' model base class.', $this->getShortClassName()));
         endif;
 
@@ -619,7 +615,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array)unserialize((string)$serialized);
+        $this->_fieldCache = (array) unserialize((string) $serialized);
     }
 
     public function __get($name)
@@ -666,5 +662,91 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public static function objects()
     {
         return Queryset::createObject(BaseOrm::getDbConnection(), self::createObject());
+    }
+
+    /**
+     * Saves the current instance. Override this in a subclass if you want to control the saving process.
+     *
+     * The 'force_insert' and 'force_update' parameters can be used to insist that the "save" must be an SQL
+     * insert or update (or equivalent for on-SQL backends), respectively. Normally, they should not be set.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function save($forceInsert = false, $forceUpdate = false, $connection = null, $updateField = null) {
+
+        // Ensure that a model instance without a PK hasn't been assigned to
+        // a ForeignKey or OneToOneField on this model. If the field is
+        // nullable, allowing the save() would result in silent data loss.
+
+        if ($forceInsert && ($forceInsert || $forceUpdate)):
+            throw new ValueError('Cannot force both insert and updating in model saving.');
+        endif;
+    }
+
+    /**
+     * Do an INSERT. If update_pk is defined then this method should return the new pk for the model.
+     *
+     * @param $fields
+     *
+     * @return \Doctrine\DBAL\Driver\Statement|int
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function _doInsert($fields) {
+        $qb = BaseOrm::getDbConnection()->createQueryBuilder();
+
+        $qb->insert($this->meta->dbTable);
+
+        foreach ($fields as $key => $value) :
+            $qb->setValue($key, $qb->createNamedParameter($value));
+        endforeach;
+
+        return $qb->execute();
+
+    }
+
+    /**
+     * This method will try to update the model. If the model was updated (in the sense that an update query was done
+     * and a matching row was found from the DB) the method will return True.
+     *
+     * @param $records
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function _doUpdate($records, $pkValue, $forceUpdate) {
+        $filtered = $this->objects()->filter([$this->meta->primaryKey->name => $pkValue]);
+
+        // We can end up here when saving a model in inheritance chain where
+        // update_fields doesn't target any field in current model. In that
+        // case we just say the update succeeded. Another case ending up here
+        // is a model with just PK - in that case check that the PK still
+        // exists.
+        if(ArrayHelper::isEmpty($records)):
+            return $filtered->exists();
+        endif;
+
+        if(!$forceUpdate):
+
+            // It may happen that the object is deleted from the DB right after
+            // this check, causing the subsequent UPDATE to return zero matching
+            // rows. The same result can occur in some rare cases when the
+            // database returns zero despite the UPDATE being executed
+            // successfully (a row is matched and updated). In order to
+            // distinguish these two cases, the object's existence in the
+            // database is again checked for if the UPDATE query returns 0.
+            if($filtered->exists()):
+                return $filtered->_update($records) || $filtered->exists();
+            else:
+                return false;
+            endif;
+        endif;
+
+        return $filtered->_update($records);
     }
 }

@@ -104,5 +104,4 @@ class AlterModelTable extends Operation
 
         endif;
     }
-
 }

@@ -29,5 +29,4 @@ class FloatField extends Field
     {
         return Type::FLOAT;
     }
-
 }

@@ -22,5 +22,4 @@ class IntegerField extends Field
     {
         return Type::INTEGER;
     }
-
 }

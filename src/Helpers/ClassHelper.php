@@ -68,7 +68,7 @@ class ClassHelper
      *
      * @param $namespace
      * @param bool|false $leadingBackslash
-     * @param bool|true $closingBackslash
+     * @param bool|true  $closingBackslash
      *
      * @return string
      *

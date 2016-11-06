@@ -97,7 +97,6 @@ class AddField extends Operation
         if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
             $schemaEditor->removeField($fromModel, $fromModel->meta->getField($this->name));
         endif;
-
     }
 
     /**
@@ -112,5 +111,4 @@ class AddField extends Operation
 
         return $constArgs;
     }
-
 }

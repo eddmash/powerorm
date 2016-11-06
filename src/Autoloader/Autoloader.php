@@ -243,7 +243,7 @@ class Autoloader
 
             foreach ($directories as $directory) {
                 if (strpos($class, $namespace) === 0) {
-                    $filePath = $directory . str_replace('\\', '/', substr($class, strlen($namespace))) . '.php';
+                    $filePath = $directory.str_replace('\\', '/', substr($class, strlen($namespace))).'.php';
 
                     $filename = $this->requireFile($filePath);
 
@@ -278,16 +278,16 @@ class Autoloader
         }
 
         $paths = [
-            APPPATH . 'controllers/',
-            APPPATH . 'libraries/',
-            APPPATH . 'models/',
-            APPPATH . 'forms/',
+            APPPATH.'controllers/',
+            APPPATH.'libraries/',
+            APPPATH.'models/',
+            APPPATH.'forms/',
         ];
 
-        $class = str_replace('\\', '/', $class) . '.php';
+        $class = str_replace('\\', '/', $class).'.php';
 
         foreach ($paths as $path) {
-            if ($file = $this->requireFile($path . $class)) {
+            if ($file = $this->requireFile($path.$class)) {
                 return $file;
             }
         }

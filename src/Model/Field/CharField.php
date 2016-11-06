@@ -18,5 +18,4 @@ class CharField extends Field
     {
         return Type::STRING;
     }
-
 }

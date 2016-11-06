@@ -129,7 +129,6 @@ class SchemaEditor extends BaseObject
                 $this->createModel($relationField->relation->through);
             endif;
         endforeach;
-
     }
 
     /**
@@ -153,13 +152,12 @@ class SchemaEditor extends BaseObject
         endforeach;
 
         $this->schemaManager->dropTable($model->meta->dbTable);
-
     }
 
     /**
      * Renames the table a model points to.
      *
-     * @param Model $model
+     * @param Model  $model
      * @param string $oldDbTableName
      * @param string $newDbTableName
      *
@@ -174,7 +172,6 @@ class SchemaEditor extends BaseObject
         endif;
 
         $this->schemaManager->renameTable($oldDbTableName, $newDbTableName);
-
     }
 
     /**
@@ -191,7 +188,6 @@ class SchemaEditor extends BaseObject
      */
     public function addField($model, $field)
     {
-
         $schema = $this->schemaManager->createSchema();
         // many to many
         if ($field->manyToMany && $field->relation->through->meta->autoCreated):
@@ -241,7 +237,6 @@ class SchemaEditor extends BaseObject
         if ($diff !== false):
             $this->schemaManager->alterTable($diff);
         endif;
-
     }
 
     /**
@@ -256,7 +251,6 @@ class SchemaEditor extends BaseObject
      */
     public function removeField($model, $field)
     {
-
         $schema = $this->schemaManager->createSchema();
         // Special-case implicit M2M tables
         if ($field->manyToMany && $field->relation->through->meta->autoCreated):
@@ -292,7 +286,6 @@ class SchemaEditor extends BaseObject
         if ($diff !== false):
             $this->schemaManager->alterTable($diff);
         endif;
-
     }
 
     /**
@@ -301,9 +294,9 @@ class SchemaEditor extends BaseObject
      * Requires a copy of the old field as well so we can only perform changes that are required.
      * If strict is true, raises errors if the old column does not match old_field precisely.
      *
-     * @param Model $model
-     * @param Field $oldField
-     * @param Field $newField
+     * @param Model      $model
+     * @param Field      $oldField
+     * @param Field      $newField
      * @param bool|false $strict
      *
      * @since 1.1.0
@@ -312,14 +305,12 @@ class SchemaEditor extends BaseObject
      */
     public function alterField($model, $oldField, $newField, $strict = false)
     {
-
         $oldType = $oldField->dbType($this->connection);
         $newType = $newField->dbType($this->connection);
 
         if (($oldType == null && $oldField->relation == null) || ($newType == null && $newField->relation == null)):
-            throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define ' .
+            throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define '.
                 'db_type (are you using a badly-written custom field?)', $newField->name, $oldField->name));
-
         elseif ($oldType == null && $newType == null &&
             (
                 $oldField->relation->through != null &&
@@ -339,7 +330,7 @@ class SchemaEditor extends BaseObject
         ):
             return;
         else:
-            throw new  ValueError(sprintf('Cannot alter field %s into %s - they are not compatible types ' .
+            throw new  ValueError(sprintf('Cannot alter field %s into %s - they are not compatible types '.
                 '(you cannot alter to or from M2M fields, or add or remove through= on M2M fields)',
                 $oldField->name, $newField->name));
         endif;
@@ -350,9 +341,9 @@ class SchemaEditor extends BaseObject
     /**
      * Alters M2Ms to repoint their to= endpoints.
      *
-     * @param Model $model
-     * @param Field $oldField
-     * @param Field $newField
+     * @param Model      $model
+     * @param Field      $oldField
+     * @param Field      $newField
      * @param bool|false $strict
      *
      * @since 1.1.0
@@ -385,11 +376,10 @@ class SchemaEditor extends BaseObject
      */
     public function _alterField($model, $oldField, $newField, $strict = false)
     {
-
     }
 
     /**
-     * @param Field $field
+     * @param Field      $field
      * @param bool|false $includeDefault
      *
      * @return array
@@ -454,7 +444,6 @@ class SchemaEditor extends BaseObject
 
     public function constraintName($table, $column, $constraintType)
     {
-
         $schema = $this->schemaManager->createSchema();
         $unique = $primaryKey = $index = $foreignKey = null;
         extract($constraintType);
@@ -482,17 +471,13 @@ class SchemaEditor extends BaseObject
      */
     public function skipDefault($field)
     {
-
     }
 
     public function prepareDefault($field)
     {
-
     }
 
     public function effectiveDefault($field)
     {
-
     }
-
 }

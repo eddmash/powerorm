@@ -61,5 +61,4 @@ class DeleteModel extends Operation
             $schemaEditor->createModel($model);
         endif;
     }
-
 }

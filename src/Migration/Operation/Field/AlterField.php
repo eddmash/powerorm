@@ -83,7 +83,6 @@ class AlterField extends Operation
      */
     public function databaseForwards($schemaEditor, $fromState, $toState)
     {
-
         $this->_alterField($schemaEditor, $fromState, $toState);
     }
 
@@ -123,5 +122,4 @@ class AlterField extends Operation
             endif;
         endif;
     }
-
 }

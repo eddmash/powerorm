@@ -55,5 +55,4 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
     {
         $this->constructorArgs = $constructorArgs;
     }
-
 }

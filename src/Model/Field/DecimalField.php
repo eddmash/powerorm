@@ -22,5 +22,4 @@ class DecimalField extends Field
     {
         return Type::DECIMAL;
     }
-
 }

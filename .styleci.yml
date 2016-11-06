@@ -2,4 +2,4 @@ preset: symfony
 
 disabled:
   - braces 
-  - method_separation
+  - method_separation 

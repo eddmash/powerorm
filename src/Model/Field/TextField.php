@@ -22,5 +22,4 @@ class TextField extends Field
     {
         return Type::TEXT;
     }
-
 }

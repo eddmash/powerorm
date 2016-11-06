@@ -92,7 +92,6 @@ class Loader extends BaseObject
      */
     public function getMigrationByPrefix($prefix)
     {
-
         $migrations = [];
 
         foreach ($this->getMigrations() as $name => $migration) :
@@ -124,7 +123,6 @@ class Loader extends BaseObject
     public static function createObject($connection = null, $loadGraph = true)
     {
         return new static($connection, $loadGraph);
-
     }
 
     /**
@@ -192,7 +190,7 @@ class Loader extends BaseObject
         $last_version = basename($last_version);
         $last_version = preg_split('/_/', $last_version)[0];
 
-        return (int)$last_version;
+        return (int) $last_version;
     }
 
     /**

@@ -32,5 +32,4 @@ class BigIntegerField extends IntegerField
     {
         return Type::BIGINT;
     }
-
 }

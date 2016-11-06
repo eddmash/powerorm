@@ -86,5 +86,4 @@ class CreateModel extends Operation
             $schemaEditor->deleteModel($model);
         endif;
     }
-
 }

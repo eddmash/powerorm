@@ -52,7 +52,7 @@ class ModelState extends BaseObject
     /**
      * Takes a model returns a ModelState representing it.
      *
-     * @param Model $model
+     * @param Model      $model
      * @param bool|false $excludeRels
      *
      * @return static
@@ -123,7 +123,6 @@ class ModelState extends BaseObject
      */
     public function toModel($registry)
     {
-
         $metaData = $this->meta;
         $extends = $this->extends;
 
@@ -175,12 +174,10 @@ class ModelState extends BaseObject
     public function deepClone()
     {
         return static::createObject($this->name, $this->fields, ['meta' => $this->meta, 'extends' => $this->extends]);
-
     }
 
     public function __toString()
     {
-        return (string)sprintf("<ModelState: '%s'>", $this->name);
-
+        return (string) sprintf("<ModelState: '%s'>", $this->name);
     }
 }

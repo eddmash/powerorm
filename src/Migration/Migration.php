@@ -61,7 +61,6 @@ class Migration implements MigrationInterface
 
     public static function createShortName($name)
     {
-
         $pos = strripos($name, '\\');
         if ($pos):
             $name = trim(substr($name, $pos), '\\');
@@ -224,7 +223,7 @@ class Migration implements MigrationInterface
      * Preserves the original object state by default and will return a mutated state from a copy.
      *
      * @param ProjectState $state
-     * @param bool|true $preserveState
+     * @param bool|true    $preserveState
      *
      * @return mixed
      *

@@ -127,13 +127,13 @@ class AutoDetector extends BaseObject
     /**
      * @param ProjectState $fromState
      * @param ProjectState $toState
-     * @param Asker $asker
+     * @param Asker        $asker
      */
-    public function __construct($fromState, $toState, $asker = null)
+    public function __construct(ProjectState $fromState, ProjectState $toState, Asker $asker)
     {
         $this->fromState = $fromState;
         $this->toState = $toState;
-        $this->asker = empty($asker) ? new Asker() : $asker;
+        $this->asker = $asker;
     }
 
     /**
@@ -192,7 +192,6 @@ class AutoDetector extends BaseObject
             elseif ($newModel->meta->proxy):
 
                 $this->newProxyKeys[] = $newModelName;
-
             else:
                 $this->newModelKeys[] = $newModelName;
             endif;
@@ -242,8 +241,8 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * @param array $changes
-     * @param Graph $graph
+     * @param array  $changes
+     * @param Graph  $graph
      * @param string $migrationName
      *
      * @return mixed
@@ -286,9 +285,9 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * @param Operation $operation
-     * @param array $dependencies
-     * @param bool|false $pushToTop some operations should come before others, use this determine which
+     * @param Operation  $operation
+     * @param array      $dependencies
+     * @param bool|false $pushToTop    some operations should come before others, use this determine which
      *
      * @since 1.1.0
      *
@@ -410,7 +409,7 @@ class AutoDetector extends BaseObject
     {
         $name = explode('_', $name);
 
-        return (int)str_replace($this->migrationNamePrefix, '', $name[0]);
+        return (int) str_replace($this->migrationNamePrefix, '', $name[0]);
     }
 
     private function getOldModelName($modelName)
@@ -567,7 +566,6 @@ class AutoDetector extends BaseObject
             endforeach;
 
         endforeach;
-
     }
 
     /**
@@ -580,7 +578,6 @@ class AutoDetector extends BaseObject
      */
     public function generateDeleteModel()
     {
-
         $newModelKeys = array_merge($this->newModelKeys, $this->newUnmanagedKeys);
         $deletedModels = array_diff($this->oldModelKeys, $newModelKeys);
         $deletedUnmanagedModels = array_diff($this->oldUnmanagedKeys, $newModelKeys);
@@ -663,7 +660,6 @@ class AutoDetector extends BaseObject
             $this->addOperation(DeleteModel::createObject(['name' => $modelState->name]), $opDep);
 
         endforeach;
-
     }
 
     /**
@@ -745,7 +741,6 @@ class AutoDetector extends BaseObject
                 $opDep
             );
         endforeach;
-
     }
 
     /**
@@ -769,7 +764,6 @@ class AutoDetector extends BaseObject
                 ])
             );
         endforeach;
-
     }
 
     /**
@@ -863,7 +857,9 @@ class AutoDetector extends BaseObject
                     endif;
 
                     if ($fieldDef === $oldFieldDef):
-                        if (MigrationQuestion::hasFieldRenamed($this->asker, $modelName, $remField, $addedField, $field)):
+                        if (MigrationQuestion::hasFieldRenamed($this->asker, $modelName, $remField, $addedField,
+                            $field)
+                        ):
 
                             $this->addOperation(
                                 RenameField::createObject([
@@ -908,7 +904,6 @@ class AutoDetector extends BaseObject
                 $this->_generateAddedFields($modelName, $addedField);
             endforeach;
         endforeach;
-
     }
 
     /**
@@ -1023,7 +1018,6 @@ class AutoDetector extends BaseObject
                 );
             endif;
         endforeach;
-
     }
 
     /**
@@ -1048,7 +1042,6 @@ class AutoDetector extends BaseObject
         $preserveDefault = true;
 
         if ($field->relation !== null && $field->relation->toModel):
-
 
             // depend on related model being created
             $opDep[] = [

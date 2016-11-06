@@ -1,4 +1,3 @@
-
 #######################
 Introduction
 #######################
@@ -17,9 +16,9 @@ This ORM is heavily inspired by Django ORM. Because i personally love how there 
 	:hidden:
 	:titlesonly:
 
-	self
-	install
-	configuration
-	dependencies
-	features
-	credits
+    	self
+    	install
+    	configuration
+    	dependencies
+    	features
+    	credits

@@ -52,7 +52,7 @@ class Testdb extends BaseCommand
 
     /**
      * @param AbstractSchemaManager $schemaM
-     * @param Schema $schema
+     * @param Schema                $schema
      *
      * @since 1.1.0
      *
@@ -64,19 +64,19 @@ class Testdb extends BaseCommand
 
         /** @var $fk ForeignKeyConstraint */
         foreach ($table->getForeignKeys() as $fk) :
-            echo '-----------------------------' . PHP_EOL;
-            echo 'name :' . $fk->getName() . PHP_EOL;
-            echo 'columns :' . implode(',', $fk->getColumns()) . PHP_EOL;
-            echo 'columns :' . implode(',', $fk->getLocalColumns()) . PHP_EOL;
-            echo 'foreign table :' . $fk->getForeignTableName() . PHP_EOL;
-            echo 'foreign columns :' . implode(',', $fk->getForeignColumns()) . PHP_EOL;
-            echo PHP_EOL . PHP_EOL;
+            echo '-----------------------------'.PHP_EOL;
+            echo 'name :'.$fk->getName().PHP_EOL;
+            echo 'columns :'.implode(',', $fk->getColumns()).PHP_EOL;
+            echo 'columns :'.implode(',', $fk->getLocalColumns()).PHP_EOL;
+            echo 'foreign table :'.$fk->getForeignTableName().PHP_EOL;
+            echo 'foreign columns :'.implode(',', $fk->getForeignColumns()).PHP_EOL;
+            echo PHP_EOL.PHP_EOL;
         endforeach;
     }
 
     /**
      * @param AbstractSchemaManager $schemaM
-     * @param Schema $schema
+     * @param Schema                $schema
      *
      * @since 1.1.0
      *

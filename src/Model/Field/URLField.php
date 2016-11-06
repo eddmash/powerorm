@@ -20,5 +20,4 @@ class URLField extends CharField
         $config['maxLength'] = ArrayHelper::getValue($config, 'maxLength', 200);
         parent::__construct($config);
     }
-
 }

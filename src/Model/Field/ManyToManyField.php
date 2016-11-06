@@ -49,7 +49,6 @@ class ManyToManyField extends RelatedField
 
     public function __construct($kwargs)
     {
-
         if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] === null)):
             $kwargs['rel'] = ManyToManyRel::createObject([
                 'fromField' => $this,
@@ -92,14 +91,13 @@ class ManyToManyField extends RelatedField
 
     public function contributeToRelatedClass($relatedModel, $scopeModel)
     {
-
     }
 
     /**
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model $model
+     * @param Model           $model
      *
      * @return Model
      *
@@ -153,7 +151,7 @@ class ManyToManyField extends RelatedField
             'autoCreated' => true,
         ];
 
-        $className = '\\' . $className;
+        $className = '\\'.$className;
         /** @var $intermediaryObj Model */
         $intermediaryObj = new $className();
 

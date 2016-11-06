@@ -52,7 +52,6 @@ class Recorder
 
     public function getApplied()
     {
-
         $appliedMigrations = $this->connection->fetchAll(sprintf('SELECT * FROM %s', $this->migrationTableName));
         $applied = [];
         foreach ($appliedMigrations as $item) :
@@ -65,12 +64,10 @@ class Recorder
     public function recordApplied($data)
     {
         $this->connection->insert($this->migrationTableName, $data);
-
     }
 
     public function recordUnApplied($data)
     {
-
         $this->connection->delete($this->migrationTableName, $data);
     }
 
@@ -98,6 +95,5 @@ class Recorder
             $schemaM->createTable($myTable);
             $this->tableExist = true;
         endif;
-
     }
 }

@@ -129,7 +129,6 @@ class Executor extends BaseObject
                     endforeach;
 
                 endforeach;
-
             else:
                 // if not applied and its not target is not zero, then apply it.
                 foreach ($this->loader->graph->getAncestryTree($target) as $migrationName) :
@@ -205,7 +204,6 @@ class Executor extends BaseObject
 
             if ($migrationMeta['unapply']):
                 $this->unApplyMigration($states[$mName], $migrationMeta['migration'], $fake);
-
             else:
                 $this->applyMigration($states[$mName], $migrationMeta['migration'], $fake);
             endif;
@@ -215,9 +213,9 @@ class Executor extends BaseObject
     /**
      * Rolls back the migrations on the database.
      *
-     * @param ProjectState $state this is the state before the migration is applied
-     * @param Migration $migration the migration to apply
-     * @param bool $fake
+     * @param ProjectState $state     this is the state before the migration is applied
+     * @param Migration    $migration the migration to apply
+     * @param bool         $fake
      *
      * @return mixed
      *
@@ -240,7 +238,7 @@ class Executor extends BaseObject
             $end = Console::ansiFormat('OK', [Console::FG_GREEN]);
         endif;
 
-        Console::stdout($end . PHP_EOL);
+        Console::stdout($end.PHP_EOL);
 
         return $state;
     }
@@ -248,9 +246,9 @@ class Executor extends BaseObject
     /**
      * Applies the migration to the database.
      *
-     * @param ProjectState $state this is the state before the migration is applied
-     * @param Migration $migration the migration to apply
-     * @param bool $fake
+     * @param ProjectState $state     this is the state before the migration is applied
+     * @param Migration    $migration the migration to apply
+     * @param bool         $fake
      *
      * @return mixed
      *
@@ -273,7 +271,7 @@ class Executor extends BaseObject
             $end = Console::ansiFormat('OK', [Console::FG_GREEN]);
         endif;
 
-        Console::stdout($end . PHP_EOL);
+        Console::stdout($end.PHP_EOL);
 
         return $state;
     }

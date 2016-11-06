@@ -94,7 +94,7 @@ class Registry extends BaseObject
      */
     public function getModels($includeAutoCreated = false)
     {
-//        $this->_populateRegistry();
+        //        $this->_populateRegistry();
 
         try {
             $this->isAppReady();
@@ -225,10 +225,10 @@ class Registry extends BaseObject
     }
 
     /**
-     * @param callback $callback the callback to invoke when a model has been created
-     * @param array $modelNames the model we are waiting for to be created, the model object is passed to
+     * @param callback $callback   the callback to invoke when a model has been created
+     * @param array    $modelNames the model we are waiting for to be created, the model object is passed to
      *                             the callback as the first argument
-     * @param array $kwargs an associative array to be passed to the callback
+     * @param array    $kwargs     an associative array to be passed to the callback
      *
      * @since 1.1.0
      *
@@ -282,8 +282,13 @@ class Registry extends BaseObject
         }
     }
 
+    public function getPendingOperations()
+    {
+        return $this->_pendingOps;
+    }
+
     public function __toString()
     {
-        return (string)sprintf('%s Object', $this->getFullClassName());
+        return (string) sprintf('%s Object', $this->getFullClassName());
     }
 }

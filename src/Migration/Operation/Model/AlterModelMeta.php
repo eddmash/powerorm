@@ -60,5 +60,4 @@ class AlterModelMeta extends Operation
     {
         parent::databaseBackwards($schemaEditor, $fromState, $toState);
     }
-
 }

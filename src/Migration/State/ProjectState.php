@@ -115,12 +115,9 @@ class ProjectState extends DeconstructableObject
         endforeach;
 
         return static::createObject($modelStates);
-
     }
 
     public function deconstruct()
     {
-
     }
-
 }

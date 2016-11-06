@@ -22,7 +22,7 @@ class MigrationModel extends Model
 
     public static function defineClass($className, $extends = '')
     {
-//        $namespace = 'Eddmash\PowerOrm\Migration\Model';
+        //        $namespace = 'Eddmash\PowerOrm\Migration\Model';
         $namespace = '';
         $use = '';
         $extendedClass = '';
@@ -65,7 +65,6 @@ class MigrationModel extends Model
 
     public static function getTemplate()
     {
-
         return '%1$s;
             %2$s
             class %3$s extends %4$s{
@@ -73,5 +72,4 @@ class MigrationModel extends Model
                  public function unboundFields(){return [];}
             }';
     }
-
 }

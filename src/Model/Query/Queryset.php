@@ -14,9 +14,17 @@ namespace Eddmash\PowerOrm\Model\Query;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Eddmash\PowerOrm\Exception\NotSupported;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Model;
 use PDO;
 
+/**
+ * Represents a lazy database lookup for a set of objects.
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class Queryset implements QuerysetInterface
 {
     /**
@@ -72,7 +80,7 @@ class Queryset implements QuerysetInterface
      *         ->leftJoin('u', 'phonenumbers', 'p', 'u.id = p.user_id');
      * </code>
      */
-    public function select($select = null)
+    public function only($select = null)
     {
         $selects = is_array($select) ? $select : func_get_args();
         $this->qb->addSelect($selects);
@@ -127,11 +135,35 @@ class Queryset implements QuerysetInterface
         return $this->_filterOrExclude(func_get_args());
     }
 
+    public function exists() {
+        if(!$this->_resultsCache):
+            $instance = $this->_clone();
+            $instance->qb->setMaxResults(1);
+            $this->_resultsCache = $instance->execute();
+        endif;
+
+        return (bool) $this->_resultsCache;
+    }
+
+    public function update() {
+
+    }
+
+    public function _update($records) {
+        return 1;
+    }
+
     public function _filterOrExclude($conditions = null)
     {
         $instance = $this->_clone();
 
-        print_r(Lookup::lookUp($this->model->meta->dbTable, $conditions)); 
+        //        $roles = $qb->select("*")
+        //            ->from('testing_user')
+        //            ->where("username =".$qb->createNamedParameter("df"))
+        //            ->execute()
+        //            ->fetchAll();
+
+        Lookup::filters($instance->qb, $conditions);
 
         return $instance;
     }
@@ -141,7 +173,6 @@ class Queryset implements QuerysetInterface
         foreach ($conditions as $condition) :
 
         endforeach;
-
     }
 
     /**
@@ -157,7 +188,6 @@ class Queryset implements QuerysetInterface
      */
     public function all()
     {
-        $this->select('*');
         $this->qb->from($this->model->meta->dbTable);
 
         return $this->_clone();
@@ -181,7 +211,19 @@ class Queryset implements QuerysetInterface
      */
     public function getSql()
     {
-        return $this->qb->getSQL();
+        $instance = $this->_clone();
+
+        return $instance->qb->getSQL();
+    }
+
+    public function getRawSql() {
+        $sql = $this->getSql();
+
+        foreach ($this->qb->getParameters() as $key => $value) :
+            $sql = str_replace(':'.$key, $this->connection->quote($value), $sql);
+        endforeach;
+
+        return $sql;
     }
 
     /**
@@ -193,14 +235,27 @@ class Queryset implements QuerysetInterface
      */
     private function getResults()
     {
-        if (false != $this->_evaluated):
-            return $this->_resultsCache;
+        if (false === $this->_evaluated):
+
+            $this->_resultsCache = $this->mapResults($this->model, $this->execute());
+
+            $this->_evaluated = true;
         endif;
-        $statement = $this->qb->execute();
-        $this->_resultsCache = $this->mapResults($this->model, $statement->fetchAll(PDO::FETCH_ASSOC));
-        $this->_evaluated = true;
 
         return $this->_resultsCache;
+    }
+
+    public function execute() {
+
+        if(ArrayHelper::isEmpty(ArrayHelper::getValue($this->qb->getQueryParts(), 'select', null))):
+            $this->qb->select('*');
+        endif;
+
+        if(ArrayHelper::isEmpty(ArrayHelper::getValue($this->qb->getQueryParts(), 'from', null))):
+            $this->qb->from($this->model->meta->dbTable);
+        endif;
+
+       return $this->qb->execute()->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function getQueryBuilder()
@@ -331,6 +386,13 @@ class Queryset implements QuerysetInterface
         throw new NotSupported('set/unset operations are not supported by Queryset');
     }
 
+    /**
+     * @return Queryset
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     private function _clone()
     {
         $qb = clone $this->qb;

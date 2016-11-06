@@ -41,7 +41,6 @@ class RenameField extends Operation
             endif;
         endforeach;
         $state->modelStates[$this->modelName]->fields = $fieldsNew;
-
     }
 
     /**
@@ -72,7 +71,6 @@ class RenameField extends Operation
      */
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
-
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
@@ -82,5 +80,4 @@ class RenameField extends Operation
             );
         endif;
     }
-
 }

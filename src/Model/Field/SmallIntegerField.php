@@ -31,5 +31,4 @@ class SmallIntegerField extends IntegerField
     {
         return Type::SMALLINT;
     }
-
 }

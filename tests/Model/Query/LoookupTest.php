@@ -79,6 +79,7 @@ class LoookupTest extends \PHPUnit_Framework_TestCase
             ['gender', 'gender'],
             ['city__icontains', 'city'],
             ['country__gte', 'country'],
+            ['~country__gte', 'country'],
         ];
     }
 
@@ -86,11 +87,11 @@ class LoookupTest extends \PHPUnit_Framework_TestCase
     {
 
         return [
-            ['name__notin', ' && '],
-            ['~age__in', ' || '],
-            ['gender', ' && '],
-            ['~city__icontains', ' || '],
-            ['country__gte', ' && '],
+            ['name__notin', Lookup::$and],
+            ['~age__in', Lookup::$or],
+            ['gender', Lookup::$and],
+            ['~city__icontains', Lookup::$or],
+            ['country__gte', Lookup::$and],
         ];
     }
 }

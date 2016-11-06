@@ -78,7 +78,5 @@ class RemoveField extends Operation
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $schemaEditor->addField($fromModel, $toModel->meta->getField($this->name));
         endif;
-
     }
-
 }
