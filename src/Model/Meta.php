@@ -204,6 +204,7 @@ class Meta extends DeconstructableObject implements MetaInterface
                 sprintf("%s has no field named %s. The App registry isn't ready yet, so if this is an autoCreated ".
                     "related field, it won't  be available yet.", $this->modelName, $name));
         endif;
+
         $reverseFields = $this->_getReverseOnlyField();
 
         if (ArrayHelper::hasKey($reverseFields, $name)):
@@ -213,6 +214,19 @@ class Meta extends DeconstructableObject implements MetaInterface
 
         // if we get here we didn't get the field.
         throw new FieldDoesNotExist(sprintf('%s has no field named %s', $this->modelName, $name));
+    }
+
+    public function getNonM2MForwardFields() {
+        $forwardFields = [];
+
+        /** @var $field Field */
+        foreach ($this->_getForwardOnlyField() as $name => $field) :
+            if(!$field->manyToMany):
+                $forwardFields[$name] = $field;
+            endif;
+        endforeach;
+
+        return $forwardFields;
     }
 
     public function _getForwardOnlyField()
@@ -230,7 +244,16 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getConcreteFields()
     {
-        // TODO: Implement getConcreteFields() method.
+        $concreteFields = [];
+
+        /** @var $field Field */
+        foreach ($this->_getForwardOnlyField() as $name => $field) :
+            if($field->concrete):
+                $concreteFields[$name] = $field;
+            endif;
+        endforeach;
+
+        return $concreteFields;
     }
 
     /**

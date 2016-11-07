@@ -5,9 +5,13 @@
  */
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\CharField;
+use Eddmash\PowerOrm\Model\Field\DecimalField;
+use Eddmash\PowerOrm\Model\Field\EmailField;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
+use Eddmash\PowerOrm\Model\Field\IntegerField;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
+use Eddmash\PowerOrm\Model\Field\TextField;
 use Eddmash\PowerOrm\Model\Model;
 
 /**

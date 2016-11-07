@@ -664,25 +664,161 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         return Queryset::createObject(BaseOrm::getDbConnection(), self::createObject());
     }
 
+    public function getDeferredFields()
+    {
+        $objectProperties = get_object_vars($this);
+        $concreteFields = $this->meta->getConcreteFields();
+
+        $deferedFields = [];
+        /** @var $concreteField Field */
+        foreach ($concreteFields as $concreteField) :
+            if (!array_key_exists($concreteField->name, $objectProperties)):
+                $deferedFields[] = $concreteField->name;
+            endif;
+
+        endforeach;
+
+        return $deferedFields;
+
+    }
+
     /**
      * Saves the current instance. Override this in a subclass if you want to control the saving process.
      *
      * The 'force_insert' and 'force_update' parameters can be used to insist that the "save" must be an SQL
      * insert or update (or equivalent for on-SQL backends), respectively. Normally, they should not be set.
      *
+     * @param bool|false $forceInsert
+     * @param bool|false $forceUpdate
+     * @param null       $connection
+     * @param null       $updateField
+     *
+     * @throws ValueError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function save($forceInsert = false, $forceUpdate = false, $connection = null, $updateField = null) {
+    public function save($forceInsert = false, $forceUpdate = false, $connection = null, $updateFields = null)
+    {
 
         // Ensure that a model instance without a PK hasn't been assigned to
         // a ForeignKey or OneToOneField on this model. If the field is
         // nullable, allowing the save() would result in silent data loss.
+        /* @var $relObject Model */
+        /** @var $field Field */
+        foreach ($this->meta->getConcreteFields() as $name => $field) :
+            if ($field->isRelation):
+
+                //If the related field isn't cached, then an instance hasn't
+                //been assigned and there's no need to worry about this check.
+                if ($this->hasProperty($field->getCacheName()) && $this->{$field->getCacheName()}):
+                    continue;
+                endif;
+
+                $relObject = $this->{$field->name};
+                if ($relObject && $relObject->meta->primaryKey !== null):
+                    throw new ValueError(
+                        sprintf('save() prohibited to prevent data loss due to '.
+                            "unsaved related object '%s'.", $field->name)
+                    );
+                endif;
+
+            endif;
+        endforeach;
 
         if ($forceInsert && ($forceInsert || $forceUpdate)):
             throw new ValueError('Cannot force both insert and updating in model saving.');
         endif;
+
+        $deferedFields = $this->getDeferredFields();
+        // if we got update_fields, ensure we got fields actually exist on the model
+        if ($updateFields):
+            $modelFields = $this->meta->getNonM2MForwardFields();
+            $fieldsNames = [];
+            /** @var $modelField Field */
+            foreach ($modelFields as $name => $modelField) :
+                if ($modelField->primaryKey):
+                    continue;
+                endif;
+                $fieldsNames[] = $modelField->name;
+            endforeach;
+
+            $nonModelFields = array_diff($updateFields, $fieldsNames);
+            if ($nonModelFields):
+                throw new ValueError(sprintf('The following fields do not exist in this '.
+                    'model or are m2m fields: %s'
+                    % ', '.implode(', ', $nonModelFields)));
+            endif;
+        elseif(!$forceInsert && $deferedFields):
+            // if we have some deferred fields, we need to set the fields to update as the onces that were loaded.
+            $concreteFields = $this->meta->getConcreteFields();
+
+            $fieldsNames = [];
+            /** @var $concreteField Field */
+            foreach ($concreteFields as $name => $concreteField) :
+                if(!$concreteField->primaryKey && !$concreteField->hasProperty('through')):
+                    $fieldsNames[] = $concreteField->name;
+                endif;
+            endforeach;
+            $loadedFields = array_diff($fieldsNames, $deferedFields);
+            if($loadedFields):
+                $updateFields = $loadedFields;
+            endif;
+        endif;
+
+        var_dump($updateFields);
+    }
+
+    /**
+     * Handles the parts of saving which should be done only once per save, yet need to be done in raw saves, too.
+     * This includes some sanity checks and signal sending.
+     *
+     * The 'raw' argument is telling save_base not to save any parent models and not to do any changes to the values
+     * before save. This is used by fixture loading.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function _save() {
+        $model = $this;
+
+        // for proxy models, we use the concreteModel
+        if($model->meta->proxy):
+            $model = $model->meta->concreteModel;
+        endif;
+
+        $meta = $model->meta;
+
+        // post save signal
+        if(!$meta->autoCreated):
+            $this->dispatchSignal('powerorm.model.pre_save', $model);
+        endif;
+
+        $this->_saveTable();
+
+        // presave signal
+        if(!$meta->autoCreated):
+            $this->dispatchSignal('powerorm.model.post_save', $model);
+        endif;
+    }
+
+    /**
+     * Does the heavy-lifting involved in saving. Updates or inserts the data for a single table.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function _saveTable() {
+        $meta = $this->meta;
+
+        $nonPkFields = [];
+        foreach ($meta->getConcreteFields() as $name => $field) :
+            $nonPkFields[$name] = $field;
+        endforeach;
+
     }
 
     /**
@@ -696,7 +832,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _doInsert($fields) {
+    public function _doInsert($fields)
+    {
         $qb = BaseOrm::getDbConnection()->createQueryBuilder();
 
         $qb->insert($this->meta->dbTable);
@@ -714,12 +851,17 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * and a matching row was found from the DB) the method will return True.
      *
      * @param $records
+     * @param $pkValue
+     * @param $forceUpdate
+     *
+     * @return bool|int
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _doUpdate($records, $pkValue, $forceUpdate) {
+    public function _doUpdate($records, $pkValue, $forceUpdate)
+    {
         $filtered = $this->objects()->filter([$this->meta->primaryKey->name => $pkValue]);
 
         // We can end up here when saving a model in inheritance chain where
@@ -727,11 +869,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         // case we just say the update succeeded. Another case ending up here
         // is a model with just PK - in that case check that the PK still
         // exists.
-        if(ArrayHelper::isEmpty($records)):
+        if (ArrayHelper::isEmpty($records)):
             return $filtered->exists();
         endif;
 
-        if(!$forceUpdate):
+        if (!$forceUpdate):
 
             // It may happen that the object is deleted from the DB right after
             // this check, causing the subsequent UPDATE to return zero matching
@@ -740,7 +882,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // successfully (a row is matched and updated). In order to
             // distinguish these two cases, the object's existence in the
             // database is again checked for if the UPDATE query returns 0.
-            if($filtered->exists()):
+            if ($filtered->exists()):
                 return $filtered->_update($records) || $filtered->exists();
             else:
                 return false;
