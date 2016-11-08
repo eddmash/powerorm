@@ -78,7 +78,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @var array
      */
-    public $parents;
+    public $parents = [];
 
     /**
      * Holds many to many relationship that the model initiated.

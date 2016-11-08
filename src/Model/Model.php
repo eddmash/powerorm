@@ -166,7 +166,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $this->init();
     }
 
-    public function loadData($record = [])
+    public function fromDb($record = [])
     {
         foreach ($record as $name => $value) :
 
@@ -732,6 +732,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
 
         $deferedFields = $this->getDeferredFields();
+
         // if we got update_fields, ensure we got fields actually exist on the model
         if ($updateFields):
             $modelFields = $this->meta->getNonM2MForwardFields();
@@ -742,13 +743,18 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                     continue;
                 endif;
                 $fieldsNames[] = $modelField->name;
+
+                // if attribute name and the field name provided arent the same,
+                // add also add the attribute name.e.g. in related fields
+                if($modelField->name !== $modelField->getAttrName()):
+                    $fieldsNames[] = $modelField->getAttrName();
+                endif;
             endforeach;
 
             $nonModelFields = array_diff($updateFields, $fieldsNames);
             if ($nonModelFields):
                 throw new ValueError(sprintf('The following fields do not exist in this '.
-                    'model or are m2m fields: %s'
-                    % ', '.implode(', ', $nonModelFields)));
+                    'model or are m2m fields: %s'.implode(', ', $nonModelFields)));
             endif;
         elseif(!$forceInsert && $deferedFields):
             // if we have some deferred fields, we need to set the fields to update as the onces that were loaded.
@@ -777,11 +783,17 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * The 'raw' argument is telling save_base not to save any parent models and not to do any changes to the values
      * before save. This is used by fixture loading.
      *
+     * @param bool|false $raw
+     * @param bool|false $forceInsert
+     * @param bool|false $forceUpdate
+     * @param null       $updateFields
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _save() {
+    private function saver($raw = false, $forceInsert = false, $forceUpdate = false, $updateFields = null) {
+
         $model = $this;
 
         // for proxy models, we use the concreteModel
@@ -796,7 +808,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $this->dispatchSignal('powerorm.model.pre_save', $model);
         endif;
 
-        $this->_saveTable();
+        if(!$raw):
+            $this->saveParent($model, $updateFields);
+        endif;
+        $this->saveTable($raw, $model, $forceInsert, $forceUpdate, $updateFields);
 
         // presave signal
         if(!$meta->autoCreated):
@@ -811,7 +826,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _saveTable() {
+    private function saveTable(Model $model, $raw = false, $forceInsert = false, $forceUpdate = false,
+        $updateFields = null) {
         $meta = $this->meta;
 
         $nonPkFields = [];
@@ -821,6 +837,26 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     }
 
+    /**
+     * Saves all the parents of cls using values from self.
+     *
+     * @param Model $model
+     * @param $updateFields
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function saveParent(Model $model, $updateFields)
+    {
+
+        $meta = $model->meta;
+        foreach ($meta->parents as $key => $field) :
+            // Make sure the link fields are synced between parent and self.
+
+        endforeach;
+
+    }
     /**
      * Do an INSERT. If update_pk is defined then this method should return the new pk for the model.
      *
@@ -832,7 +868,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _doInsert($fields)
+    private function doInsert($fields)
     {
         $qb = BaseOrm::getDbConnection()->createQueryBuilder();
 
@@ -860,7 +896,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _doUpdate($records, $pkValue, $forceUpdate)
+    private function doUpdate($records, $pkValue, $forceUpdate)
     {
         $filtered = $this->objects()->filter([$this->meta->primaryKey->name => $pkValue]);
 
