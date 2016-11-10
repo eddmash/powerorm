@@ -60,7 +60,6 @@ class LoookupTest extends \PHPUnit_Framework_TestCase
 
     public function providerLookup()
     {
-
         return [
             ['name__notin', 'notin'],
             ['name__in', 'in'],
@@ -72,7 +71,6 @@ class LoookupTest extends \PHPUnit_Framework_TestCase
 
     public function providerLookupColumn()
     {
-
         return [
             ['name__notin', 'name'],
             ['age__in', 'age'],
@@ -85,7 +83,6 @@ class LoookupTest extends \PHPUnit_Framework_TestCase
 
     public function providerLookupCombine()
     {
-
         return [
             ['name__notin', Lookup::$and],
             ['~age__in', Lookup::$or],

@@ -50,7 +50,6 @@ abstract class CheckMessage extends Base
 
     public function isSerious($level = null)
     {
-
         return $this->level >= $this->toLevel($level);
     }
 
@@ -67,10 +66,11 @@ abstract class CheckMessage extends Base
         return new static($message, $hint, $context, $id);
     }
 
-    public function toLevel($level) {
+    public function toLevel($level)
+    {
         $level = ($level === null) ? static::ERROR : $level;
 
-        if(is_string($level)):
+        if (is_string($level)):
             $level = ArrayHelper::getValue($this->levelsMap, strtolower($level));
         endif;
 

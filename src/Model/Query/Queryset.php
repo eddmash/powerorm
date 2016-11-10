@@ -92,8 +92,8 @@ class Queryset implements QuerysetInterface
 
         if (count($conditions) == 1):
             $value = reset($conditions);
-            $conditions = [];
-            $conditions[] = [$this->model->meta->primaryKey->name => $value];
+        $conditions = [];
+        $conditions[] = [$this->model->meta->primaryKey->name => $value];
         endif;
 
         return $this->_filterOrExclude($conditions);
@@ -135,21 +135,23 @@ class Queryset implements QuerysetInterface
         return $this->_filterOrExclude(func_get_args());
     }
 
-    public function exists() {
-        if(!$this->_resultsCache):
+    public function exists()
+    {
+        if (!$this->_resultsCache):
             $instance = $this->_clone();
-            $instance->qb->setMaxResults(1);
-            $this->_resultsCache = $instance->execute();
+        $instance->qb->setMaxResults(1);
+        $this->_resultsCache = $instance->execute();
         endif;
 
         return (bool) $this->_resultsCache;
     }
 
-    public function update() {
-
+    public function update()
+    {
     }
 
-    public function _update($records) {
+    public function _update($records)
+    {
         return 1;
     }
 
@@ -216,7 +218,8 @@ class Queryset implements QuerysetInterface
         return $instance->qb->getSQL();
     }
 
-    public function getRawSql() {
+    public function getRawSql()
+    {
         $sql = $this->getSql();
 
         foreach ($this->qb->getParameters() as $key => $value) :
@@ -239,23 +242,23 @@ class Queryset implements QuerysetInterface
 
             $this->_resultsCache = $this->mapResults($this->model, $this->execute());
 
-            $this->_evaluated = true;
+        $this->_evaluated = true;
         endif;
 
         return $this->_resultsCache;
     }
 
-    public function execute() {
-
-        if(ArrayHelper::isEmpty(ArrayHelper::getValue($this->qb->getQueryParts(), 'select', null))):
+    public function execute()
+    {
+        if (ArrayHelper::isEmpty(ArrayHelper::getValue($this->qb->getQueryParts(), 'select', null))):
             $this->qb->select('*');
         endif;
 
-        if(ArrayHelper::isEmpty(ArrayHelper::getValue($this->qb->getQueryParts(), 'from', null))):
+        if (ArrayHelper::isEmpty(ArrayHelper::getValue($this->qb->getQueryParts(), 'from', null))):
             $this->qb->from($this->model->meta->dbTable);
         endif;
 
-       return $this->qb->execute()->fetchAll(PDO::FETCH_ASSOC);
+        return $this->qb->execute()->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function getQueryBuilder()

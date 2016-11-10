@@ -28,7 +28,8 @@ class ChecksRegistry
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function createObject() {
+    public static function createObject()
+    {
         return new static();
     }
 
@@ -69,32 +70,31 @@ class ChecksRegistry
 
         if (!empty($tags)):
             $taggedChecks = [];
-            foreach ($checks as $check) :
+        foreach ($checks as $check) :
                 // a check can have many tags
                 // true if any of the tags provided appears in the check tags
                 if (array_intersect($check['tags'], $tags)):
                     $taggedChecks[] = $check;
-                endif;
-            endforeach;
-            $checks = $taggedChecks;
+        endif;
+        endforeach;
+        $checks = $taggedChecks;
         endif;
 
         foreach ($checks as $check) :
 
             $functionName = '';
-            if (is_array($check['check'])):
+        if (is_array($check['check'])):
                 if (count($check['check']) > 1):
                     $obj = reset($check['check']);
-                    $method = end($check['check']);
-                    $functionName = get_class($obj).'::'.$method;
-                else:
+        $method = end($check['check']);
+        $functionName = get_class($obj).'::'.$method; else:
                     $functionName = reset($check['check']);
-                endif;
-            endif;
+        endif;
+        endif;
 
-            $errors = array_merge($errors, call_user_func($check['check']));
+        $errors = array_merge($errors, call_user_func($check['check']));
 
-            assert(is_array($errors), sprintf('The function %s did not return a list. All functions registered ".
+        assert(is_array($errors), sprintf('The function %s did not return a list. All functions registered ".
             "with the checks registry must return a list.', $functionName));
         endforeach;
 
@@ -115,7 +115,8 @@ class ChecksRegistry
         return $this->registeredChecks;
     }
 
-    public function tagsAvailable() {
+    public function tagsAvailable()
+    {
         $availableChecks = [];
 
         $checks = $this->getChecks();
@@ -127,7 +128,8 @@ class ChecksRegistry
 
         return $availableChecks;
     }
-    public function tagExists($tag) {
+    public function tagExists($tag)
+    {
         return in_array($tag, $this->tagsAvailable());
     }
 }
