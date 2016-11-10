@@ -1,3 +1,4 @@
+
 #######################
 Introduction
 #######################
@@ -13,12 +14,12 @@ tables themselves and use this fields to interact with the database.
 This ORM is heavily inspired by Django ORM. Because i personally love how there orm works.
 
 .. toctree::
-	:hidden:
-	:titlesonly:
+   :hidden:
+   :titlesonly:
 
-    	self
-    	install
-    	configuration
-    	dependencies
-    	features
-    	credits
+   self
+   install
+   configuration
+   dependencies
+   features
+   credits

@@ -1,3 +1,4 @@
+
 #######################
 Install
 #######################
@@ -6,11 +7,12 @@ Via composer **(recommended)**::
     
 	composer require eddmash/powerorm:"@dev"
 
-or add To composer.json file.
+Or add this to the composer.json file::
 
-	"eddmash/powerorm":"@dev"
+	composer require eddmash/powerorm:@dev
 
 You could also Download or Clone package from github.
+
 
 Command Line
 =============
