@@ -447,15 +447,41 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Method called prior to prepare_value_for_db() to prepare the value before being saved
+     * (e.g. for DateField.auto_now).
+     *
+     * model is the instance this field belongs to and add is whether the instance is being saved to the
+     * database for the first time.
+     *
+     * It should return the value of the appropriate attribute from model for this field.
+     *
+     * The attribute name is in $this->getAttrName() (this is set up by Field).
+     *
+     * @param Model $model
+     * @param bool  $add   is whether the instance is being saved to the database for the first time
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function preSave($model, $add)
+    public function preSave(Model $model, $add)
     {
-        // TODO: Implement preSave() method.
+        return $model->{$this->getAttrName()};
     }
 
     /**
-     * {@inheritdoc}
+     * value is the current value of the model’s attribute, and the method should return data in a format that has been
+     * prepared for use as a parameter in a query.ie. in the database.
+     *
+     * @param $value
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function prepareValue($value)
     {
@@ -463,7 +489,17 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Converts value to a backend-specific value.
+     * By default it returns value if prepared=True and prepare_value() if is False.
+     *
+     * @param $value
+     * @param $connection
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function prepareValueForDb($value, $connection, $prepared = false)
     {
@@ -471,7 +507,18 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Same as the prepare_value_for_db(), but called when the field value must be saved to the database.
+     *
+     * By default returns prepare_value_for_db().
+     *
+     * @param $value
+     * @param $connection
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function prepareValueBeforeSave($value, $connection)
     {
@@ -479,7 +526,16 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Converts a value as returned by the database to a PHP object. It is the reverse of prepare_value().
+     *
+     * This method is not used for most built-in fields as the database backend already returns the correct PHP type,
+     * or the backend itself does the conversion.
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function fromDbValue()
     {

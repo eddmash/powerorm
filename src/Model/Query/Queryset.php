@@ -289,7 +289,7 @@ class Queryset implements QuerysetInterface
     {
         /** @var $newModel Model */
         $newModel = new $model->meta->modelName();
-        $newModel->loadData($result);
+        $newModel->fromDb($result);
 
         return $newModel;
     }

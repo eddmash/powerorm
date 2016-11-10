@@ -257,6 +257,23 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
+     * Returns all the localFields that are concrete.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getLocalConcreteFields() {
+
+        $concrete = [];
+        foreach ($this->localFields as $name => $field) :
+            $concrete[$name] = $field;
+        endforeach;
+
+        return $concrete;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getReverseRelatedObjects()

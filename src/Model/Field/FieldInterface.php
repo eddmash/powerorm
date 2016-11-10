@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\ContributorInterface;
 use Eddmash\PowerOrm\DeConstructableInterface;
+use Eddmash\PowerOrm\Model\Model;
 
 /**
  * Interface FieldInterface.
@@ -62,14 +63,15 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface
      * Method called prior to prepare_value_for_db() to prepare the value before being saved
      * (e.g. for DateField.auto_now).
      *
-     * model_instance is the instance this field belongs to and add is whether the instance is being saved to the
+     * model is the instance this field belongs to and add is whether the instance is being saved to the
      * database for the first time.
      *
-     * It should return the value of the appropriate attribute from model_instance for this field.
-     * The attribute name is in $this->name (this is set up by Field).
+     * It should return the value of the appropriate attribute from model for this field.
      *
-     * @param $model
-     * @param bool $add is whether the instance is being saved to the database for the first time
+     * The attribute name is in $this->getAttrName() (this is set up by Field).
+     *
+     * @param Model $model
+     * @param bool  $add   is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *
@@ -77,7 +79,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function preSave($model, $add);
+    public function preSave(Model $model, $add);
 
     /**
      * value is the current value of the model’s attribute, and the method should return data in a format that has been

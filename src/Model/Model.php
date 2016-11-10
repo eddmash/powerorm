@@ -22,9 +22,11 @@ use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
+use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
@@ -164,6 +166,37 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $this->constructorArgs = $kwargs;
 
         $this->init();
+
+        if($kwargs):
+            $fields = $this->meta->getConcreteFields();
+        else:
+            $fields = $this->meta->getFields();
+        endif;
+
+        /** @var $field Field */
+        foreach ($fields as $name => $field) :
+            $val = null;
+            $isRelated = false;
+            if($kwargs):
+                if($field instanceof RelatedField):
+                    //todo
+                    $isRelated = true;
+
+                else:
+                    $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), $field->getDefault());
+                endif;
+            else:
+                $val = $field->getDefault();
+            endif;
+
+            if($isRelated):
+                //todo
+
+            else:
+                $this->{$field->getAttrName()} = $val;
+            endif;
+        endforeach;
+
     }
 
     public function fromDb($record = [])
@@ -195,7 +228,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         $this->addToClass('meta', $meta);
 
-        list($concreteParentName, $immediateParent, $fieldsList) = $this->_getHierarchyMeta();
+        list($concreteParentName, $immediateParent, $fieldsList) = $this->getHierarchyMeta();
 
         $this->setupFields($fields, $fieldsList);
 
@@ -327,7 +360,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function _getHierarchyMeta($method = 'unboundFields', $args = null, $fromOldest = true)
+    private function getHierarchyMeta($method = 'unboundFields', $args = null, $fromOldest = true)
     {
         $modelNamespace = BaseOrm::getModelsNamespace();
         $isProxy = $this->meta->proxy;
@@ -454,13 +487,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function checks()
     {
         $errors = [];
-        $errors = array_merge($errors, $this->_checkModels());
-        $errors = array_merge($errors, $this->_checkFields());
+        $errors = array_merge($errors, $this->checkModels());
+        $errors = array_merge($errors, $this->checkFields());
 
         return $errors;
     }
 
-    public function _checkModels()
+    private function checkModels()
     {
         $error = [];
         if ($this->meta->proxy) :
@@ -479,7 +512,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         return $error;
     }
 
-    public function _checkFields()
+    private function checkFields()
     {
         $errors = [];
 
@@ -683,6 +716,26 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
+     * Get the value of the model primary key.
+     *
+     * @param Meta|null $meta
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function getPkValue(Meta $meta = null)
+    {
+        if($meta === null):
+            $meta = $this->meta;
+        endif;
+
+        return $this->{$meta->primaryKey->getAttrName()};
+    }
+
+    /**
      * Saves the current instance. Override this in a subclass if you want to control the saving process.
      *
      * The 'force_insert' and 'force_update' parameters can be used to insist that the "save" must be an SQL
@@ -699,7 +752,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function save($forceInsert = false, $forceUpdate = false, $connection = null, $updateFields = null)
+    public function save($updateFields = null, $forceInsert = false, $forceUpdate = false, $connection = null)
     {
 
         // Ensure that a model instance without a PK hasn't been assigned to
@@ -773,7 +826,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             endif;
         endif;
 
-        var_dump($updateFields);
+        $this->prepareSave($updateFields);
     }
 
     /**
@@ -792,7 +845,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function saver($raw = false, $forceInsert = false, $forceUpdate = false, $updateFields = null) {
+    private function prepareSave($updateFields = null, $raw = false, $forceInsert = false, $forceUpdate = false) {
 
         $model = $this;
 
@@ -811,7 +864,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if(!$raw):
             $this->saveParent($model, $updateFields);
         endif;
-        $this->saveTable($raw, $model, $forceInsert, $forceUpdate, $updateFields);
+        $this->saveTable($model, $raw, $forceInsert, $forceUpdate, $updateFields);
 
         // presave signal
         if(!$meta->autoCreated):
@@ -835,6 +888,34 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $nonPkFields[$name] = $field;
         endforeach;
 
+        $pkValue = null;
+//        $pkValue = $this->getPkValue($meta);
+
+        $updated = false;
+
+        if($pkValue !== null && !$forceInsert):
+
+        endif;
+
+        if(false === $updated):
+
+            /* @var $field $concreteField */
+            $concreteFields = $meta->getLocalConcreteFields();
+            $fields = [];
+            foreach ($concreteFields as $name => $concreteField) :
+                // skip AutoFields their value is auto created by the database.
+                if($concreteField instanceof AutoField):
+                    continue;
+                endif;
+                $fields[$name] = $concreteField;
+            endforeach;
+
+            $updatePk = ($meta->hasAutoField && $pkValue === null);
+            $result = $this->doInsert($this, $fields, $updatePk);
+            if($updatePk):
+                $this->{$meta->primaryKey->getAttrName()} = $result;
+            endif;
+        endif;
     }
 
     /**
@@ -857,28 +938,40 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endforeach;
 
     }
+
     /**
      * Do an INSERT. If update_pk is defined then this method should return the new pk for the model.
      *
+     * @param Model $model
      * @param $fields
+     * @param $returnId
      *
-     * @return \Doctrine\DBAL\Driver\Statement|int
+     * @return mixed
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function doInsert($fields)
+    private function doInsert(Model $model, $fields, $returnId)
     {
-        $qb = BaseOrm::getDbConnection()->createQueryBuilder();
 
-        $qb->insert($this->meta->dbTable);
+        $conn = BaseOrm::getDbConnection();
+        $qb = $conn->createQueryBuilder();
 
-        foreach ($fields as $key => $value) :
-            $qb->setValue($key, $qb->createNamedParameter($value));
+        $qb->insert($model->meta->dbTable);
+
+        /** @var $field Field */
+        foreach ($fields as $name => $field) :
+            $qb->setValue($field->getColumnName(), $qb->createNamedParameter($field->preSave($model, true)));
         endforeach;
 
-        return $qb->execute();
+        $qb->execute();
+
+        if($returnId):
+            return $conn->lastInsertId();
+        endif;
+
+        return;
 
     }
 

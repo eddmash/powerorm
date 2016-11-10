@@ -34,6 +34,9 @@
       "Eddmash\\PowerOrm\\": "src/"
     }
   },
+  "suggest": {
+    "eddmash/powerormfaker": "powerormfake generates dummy data when using PowerOrm. An extension of Faker library"
+  }
   "extra": {
     "branch-alias": {
       "dev-master": "1.1.x-dev"
