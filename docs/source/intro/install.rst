@@ -4,13 +4,13 @@ Install
 
 Via composer **(recommended)**::
     
-	composer require eddmash/powerorm
+	composer require eddmash/powerorm:"@dev"
 
-Download or Clone package from github.
+or add To composer.json file.
 
-Latest Orm version via composer::
+	"eddmash/powerorm":"@dev"
 
-	composer require eddmash/powerorm:@dev
+You could also Download or Clone package from github.
 
 Command Line
 =============
