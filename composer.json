@@ -22,7 +22,7 @@
   "require": {
     "php": ">=5.4.0",
     "composer/installers": "~1.0",
-    "doctrine/dbal": "v2.5.4",
+    "doctrine/dbal": "^v2.5",
     "symfony/console": "~2.8|~3.1"
   },
   "require-dev": {

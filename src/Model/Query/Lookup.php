@@ -36,12 +36,12 @@ class Lookup
         'lt' => ' < %s',
         'gte' => ' >= %s',
         'lte' => ' <= %s',
-        'contains' => ' like %%s% ',
-        'icontains' => ' ilike % %s% ',
-        'startswith' => ' like %s% ',
-        'istartswith' => ' ilike %s% ',
-        'endswith' => '  %%s like  ',
-        'iendswith' => ' %%s ilike ',
+        'contains' => ' like %s',
+        'icontains' => ' ilike %s',
+        'startswith' => ' like %s',
+        'istartswith' => ' ilike %s',
+        'endswith' => ' like %s ',
+        'iendswith' => ' ilike %s ',
         'isnull' => '%s is null',
         'not' => 'not %s',
         'notin' => ' not in %s',
@@ -56,7 +56,7 @@ class Lookup
         if (!empty($lookup) && !array_key_exists($lookup, self::$lookuOptions)):
             throw new LookupError(
                 sprintf('`%1$s` is not a valid lookup parameter the options are %2$s',
-                    $lookup, Tools::stringify(self::$lookuOptions)));
+                    $lookup, Tools::stringify(array_keys(self::$lookuOptions))));
         endif;
     }
 
@@ -87,6 +87,10 @@ class Lookup
             foreach ($condition as $key => $value) :
                 $column = self::getLookupColumn($key);
                 $lookup = self::getLookUP($key);
+                $value = self::prepareValue($value, $lookup);
+                echo self::$lookuOptions[$lookup].'<br>';
+                echo $queryBuilder->createNamedParameter($value).'<br>';
+                echo $value.'<br>';
                 $lookupCondition = sprintf(self::$lookuOptions[$lookup], $queryBuilder->createNamedParameter($value));
 
                 $queryString = sprintf('%s %s', $column, $lookupCondition);
@@ -150,5 +154,20 @@ class Lookup
         endif;
 
         return $key;
+    }
+
+    public static function prepareValue($value, $lookup) {
+        if(in_array($lookup, ['contains', 'icontains'])):
+            $value = sprintf('%%%s%%', $value);
+        elseif(in_array($lookup, ['startswith', 'istartswith'])):
+            $value = sprintf('%s%%', $value);
+        elseif(in_array($lookup, ['endswith', 'iendswith'])):
+            $value = sprintf('%%%s', $value);
+        elseif($lookup === 'in' && is_array($value)):
+            var_dump(Tools::stringify($value));
+            $value = sprintf('%s', implode(',', $value));
+        endif;
+
+        return $value;
     }
 }

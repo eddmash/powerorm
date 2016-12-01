@@ -30,7 +30,7 @@ This ORM is heavily inspired by Django ORM. Because i personally love how there 
 
 - Via Composer
 
-`composer require eddmash/powerorm`
+`composer require eddmash/powerorm:@dev`
 
 - Download or Clone package from github.
 
