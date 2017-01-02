@@ -15,6 +15,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
+use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Model;
 use PDO;
 
@@ -92,11 +94,11 @@ class Queryset implements QuerysetInterface
 
         if (count($conditions) == 1):
             $value = reset($conditions);
-        $conditions = [];
-        $conditions[] = [$this->model->meta->primaryKey->name => $value];
+            $conditions = [];
+            $conditions[] = [$this->model->meta->primaryKey->name => $value];
         endif;
 
-        return $this->_filterOrExclude($conditions);
+        return $this->_filterOrExclude(false, $conditions);
     }
 
     /**
@@ -122,7 +124,7 @@ class Queryset implements QuerysetInterface
      */
     public function filter($conditions = null)
     {
-        return $this->_filterOrExclude(func_get_args());
+        return $this->_filterOrExclude(false, func_get_args());
     }
 
     public function with($conditions = null)
@@ -132,15 +134,15 @@ class Queryset implements QuerysetInterface
 
     public function exclude($conditions = null)
     {
-        return $this->_filterOrExclude(func_get_args());
+        return $this->_filterOrExclude(true, func_get_args());
     }
 
     public function exists()
     {
         if (!$this->_resultsCache):
             $instance = $this->_clone();
-        $instance->qb->setMaxResults(1);
-        $this->_resultsCache = $instance->execute();
+            $instance->qb->setMaxResults(1);
+            $this->_resultsCache = $instance->execute();
         endif;
 
         return (bool) $this->_resultsCache;
@@ -155,17 +157,10 @@ class Queryset implements QuerysetInterface
         return 1;
     }
 
-    public function _filterOrExclude($conditions = null)
+    public function _filterOrExclude($negate, $conditions)
     {
         $instance = $this->_clone();
-
-        //        $roles = $qb->select("*")
-        //            ->from('testing_user')
-        //            ->where("username =".$qb->createNamedParameter("df"))
-        //            ->execute()
-        //            ->fetchAll();
-
-        Lookup::filters($instance->qb, $conditions);
+        $instance->addConditions($negate, $conditions);
 
         return $instance;
     }
@@ -190,8 +185,6 @@ class Queryset implements QuerysetInterface
      */
     public function all()
     {
-        $this->qb->from($this->model->meta->dbTable);
-
         return $this->_clone();
     }
 
@@ -223,7 +216,7 @@ class Queryset implements QuerysetInterface
         $sql = $this->getSql();
 
         foreach ($this->qb->getParameters() as $key => $value) :
-            $sql = str_replace(':'.$key, $this->connection->quote($value), $sql);
+            $sql = str_replace(':'.$key, $value, $sql);
         endforeach;
 
         return $sql;
@@ -242,7 +235,7 @@ class Queryset implements QuerysetInterface
 
             $this->_resultsCache = $this->mapResults($this->model, $this->execute());
 
-        $this->_evaluated = true;
+            $this->_evaluated = true;
         endif;
 
         return $this->_resultsCache;
@@ -250,15 +243,159 @@ class Queryset implements QuerysetInterface
 
     public function execute()
     {
-        if (ArrayHelper::isEmpty(ArrayHelper::getValue($this->qb->getQueryParts(), 'select', null))):
-            $this->qb->select('*');
-        endif;
-
-        if (ArrayHelper::isEmpty(ArrayHelper::getValue($this->qb->getQueryParts(), 'from', null))):
-            $this->qb->from($this->model->meta->dbTable);
-        endif;
-
         return $this->qb->execute()->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function addConditions($negate, $conditions)
+    {
+
+        $expressions = '';
+        foreach ($conditions as $condition) :
+            $expressions = $this->buildFilter($condition, $expressions);
+
+        endforeach;
+
+        if ($negate):
+            $expressions = "NOT ($expressions)";
+        endif;
+
+        $this->qb->where($expressions);
+    }
+
+    /**
+     * @param $condition
+     *
+     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function buildFilter($condition, $expressions)
+    {
+        $expressionBuilder = $this->qb->expr();
+
+        $deferOR = [];
+        $deferAND = [];
+        foreach ($condition as $name => $value) :
+            list($connector, $lookup, $field) = $this->solveLookupType($name);
+
+            $condition = $this->buildCondition($lookup, $field, $value);
+            if ($connector === BaseLookup::OR_CONNECTOR):
+                $deferOR[] = $condition;
+            else:
+                $deferAND[] = $condition;
+            endif;
+        endforeach;
+
+        if ($deferAND):
+            $andExpressions = '';
+            foreach ($deferAND as $andCondition) :
+                $expressions = $expressionBuilder->andX($andCondition->asSql($this->connection, $this->qb), $expressions);
+            endforeach;
+        endif;
+        if ($deferOR):
+
+            $exps = [];
+            /** @var $orCondition LookupInterface */
+            foreach ($deferOR as $orCondition) :
+                $expressions = $expressionBuilder->orX($orCondition->asSql($this->connection, $this->qb), $expressions);
+            endforeach;
+        endif;
+
+        return $expressions;
+
+    }
+
+    /**
+     * @param $lookup
+     * @param $rhs
+     * @param $lhs
+     *
+     * @return LookupInterface
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function buildCondition($lookup, $rhs, $lhs)
+    {
+        /* @var $lookup LookupInterface */
+        return $lookup::createObject($rhs, $lhs);
+    }
+
+    /**
+     * Gets a filter field and returns the an array consisting of :
+     * - the where clause connector to use e.g. and/ or.
+     * - the looku object.
+     *
+     * @param $name
+     *
+     * @return array
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function solveLookupType($name)
+    {
+        // get lookupand field
+        if (preg_match(BaseLookup::$lookupPattern, $name)):
+            list($name, $lookup) = preg_split(BaseLookup::$lookupPattern, $name);
+        else:
+            $lookup = 'exact';
+        endif;
+
+        // get connector
+        list($connector, $name) = $this->getConnector($name);
+
+        $field = $this->getLookupField($name);
+        $lookup = $field->getLookup($lookup);
+
+        return [$connector, $lookup, $field];
+    }
+
+    /**
+     * @param $name
+     *
+     * @return \Eddmash\PowerOrm\Model\Field\Field
+     *
+     * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function getLookupField($name)
+    {
+        //todo might need to look up the parent
+        return $this->model->meta->getField($name);
+    }
+
+    /**
+     * Determines the where clause connector to use.
+     *
+     * @param $name
+     *
+     * @return array
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function getConnector($name)
+    {
+        $connector = BaseLookup::AND_CONNECTOR;
+
+        // get the actual key
+        if (preg_match(BaseLookup::$whereConcatPattern, $name)):
+            // determine how to combine where statements
+            list($lookup, $name) = preg_split(BaseLookup::$whereConcatPattern, $name, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+            $connector = BaseLookup::OR_CONNECTOR;
+        endif;
+
+        return [$connector, $name];
     }
 
     private function getQueryBuilder()
@@ -320,23 +457,24 @@ class Queryset implements QuerysetInterface
      */
     public function count()
     {
-        $this->connection->executeQuery($this->getSql())->rowCount();
-    }
+        $instance = $this->_clone();
 
-    /**
-     * Evaluate the Queryset when a property is accessed from the Model Instance.
-     *
-     * @param $property
-     * @ignore
-     *
-     * @return mixed
-     */
-    public function __get($property)
-    {
-        // check if queryset is already evaluated
-        $this->getResults();
+        echo '<br><br>';
+        var_dump($this->connection
+            ->executeQuery(
+                $instance->getSql(),
+                $instance->qb->getParameters(),
+                $instance->qb->getParameterTypes()
+            ));
+        echo '<br><br>';
 
-        return $this->_resultsCache->{$property};
+        return $this->connection
+            ->executeQuery(
+                $instance->getSql(),
+                $instance->qb->getParameters(),
+                $instance->qb->getParameterTypes()
+            )
+            ->fetchAll();
     }
 
     /**
@@ -398,6 +536,14 @@ class Queryset implements QuerysetInterface
      */
     private function _clone()
     {
+
+        if (ArrayHelper::isEmpty(ArrayHelper::getValue($this->qb->getQueryParts(), 'select', null))):
+            $this->qb->select('*');
+        endif;
+
+        if (ArrayHelper::isEmpty(ArrayHelper::getValue($this->qb->getQueryParts(), 'from', null))):
+            $this->qb->from($this->model->meta->dbTable);
+        endif;
         $qb = clone $this->qb;
 
         return self::createObject($this->connection, $this->model, $qb);

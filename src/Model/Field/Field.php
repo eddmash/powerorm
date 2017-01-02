@@ -17,10 +17,18 @@ use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
+use Eddmash\PowerOrm\Model\Lookup\Contains;
+use Eddmash\PowerOrm\Model\Lookup\EndsWith;
+use Eddmash\PowerOrm\Model\Lookup\Exact;
+use Eddmash\PowerOrm\Model\Lookup\In;
+use Eddmash\PowerOrm\Model\Lookup\StartsWith;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Lookup\RegisterLookupTrait;
 
 class Field extends DeconstructableObject implements FieldInterface
 {
+    use RegisterLookupTrait;
+
     const DEBUG_IGNORE = ['scopeModel', 'relation'];
 
     public $name;
@@ -574,3 +582,9 @@ class Field extends DeconstructableObject implements FieldInterface
 //        return $field;
 //    }
 }
+
+Field::registerLookup(Contains::class);
+Field::registerLookup(In::class);
+Field::registerLookup(EndsWith::class);
+Field::registerLookup(StartsWith::class);
+Field::registerLookup(Exact::class);
