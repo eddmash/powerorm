@@ -26,6 +26,6 @@ class In extends BaseLookup
 
     public function processRHS(Connection $connection, QueryBuilder $queryBuilder)
     {
-        return $this->rhs;
+        return implode(',', $this->rhs);
     }
 }
