@@ -167,7 +167,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         $this->init();
 
-        if($kwargs):
+        if ($kwargs):
             $fields = $this->meta->getConcreteFields();
         else:
             $fields = $this->meta->getFields();
@@ -177,8 +177,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         foreach ($fields as $name => $field) :
             $val = null;
             $isRelated = false;
-            if($kwargs):
-                if($field instanceof RelatedField):
+            if ($kwargs):
+                if ($field instanceof RelatedField):
                     //todo
                     $isRelated = true;
 
@@ -189,7 +189,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 $val = $field->getDefault();
             endif;
 
-            if($isRelated):
+            if ($isRelated):
                 //todo
 
             else:
@@ -728,7 +728,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function getPkValue(Meta $meta = null)
     {
-        if($meta === null):
+        if ($meta === null):
             $meta = $this->meta;
         endif;
 
@@ -799,7 +799,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
                 // if attribute name and the field name provided arent the same,
                 // add also add the attribute name.e.g. in related fields
-                if($modelField->name !== $modelField->getAttrName()):
+                if ($modelField->name !== $modelField->getAttrName()):
                     $fieldsNames[] = $modelField->getAttrName();
                 endif;
             endforeach;
@@ -809,19 +809,19 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 throw new ValueError(sprintf('The following fields do not exist in this '.
                     'model or are m2m fields: %s'.implode(', ', $nonModelFields)));
             endif;
-        elseif(!$forceInsert && $deferedFields):
+        elseif (!$forceInsert && $deferedFields):
             // if we have some deferred fields, we need to set the fields to update as the onces that were loaded.
             $concreteFields = $this->meta->getConcreteFields();
 
             $fieldsNames = [];
             /** @var $concreteField Field */
             foreach ($concreteFields as $name => $concreteField) :
-                if(!$concreteField->primaryKey && !$concreteField->hasProperty('through')):
+                if (!$concreteField->primaryKey && !$concreteField->hasProperty('through')):
                     $fieldsNames[] = $concreteField->name;
                 endif;
             endforeach;
             $loadedFields = array_diff($fieldsNames, $deferedFields);
-            if($loadedFields):
+            if ($loadedFields):
                 $updateFields = $loadedFields;
             endif;
         endif;
@@ -845,29 +845,30 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function prepareSave($updateFields = null, $raw = false, $forceInsert = false, $forceUpdate = false) {
+    private function prepareSave($updateFields = null, $raw = false, $forceInsert = false, $forceUpdate = false)
+    {
 
         $model = $this;
 
         // for proxy models, we use the concreteModel
-        if($model->meta->proxy):
+        if ($model->meta->proxy):
             $model = $model->meta->concreteModel;
         endif;
 
         $meta = $model->meta;
 
         // post save signal
-        if(!$meta->autoCreated):
+        if (!$meta->autoCreated):
             $this->dispatchSignal('powerorm.model.pre_save', $model);
         endif;
 
-        if(!$raw):
+        if (!$raw):
             $this->saveParent($model, $updateFields);
         endif;
         $this->saveTable($model, $raw, $forceInsert, $forceUpdate, $updateFields);
 
         // presave signal
-        if(!$meta->autoCreated):
+        if (!$meta->autoCreated):
             $this->dispatchSignal('powerorm.model.post_save', $model);
         endif;
     }
@@ -880,7 +881,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     private function saveTable(Model $model, $raw = false, $forceInsert = false, $forceUpdate = false,
-        $updateFields = null) {
+                               $updateFields = null)
+    {
         $meta = $this->meta;
 
         $nonPkFields = [];
@@ -893,18 +895,18 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         $updated = false;
 
-        if($pkValue !== null && !$forceInsert):
+        if ($pkValue !== null && !$forceInsert):
 
         endif;
 
-        if(false === $updated):
+        if (false === $updated):
 
             /* @var $field $concreteField */
             $concreteFields = $meta->getLocalConcreteFields();
             $fields = [];
             foreach ($concreteFields as $name => $concreteField) :
                 // skip AutoFields their value is auto created by the database.
-                if($concreteField instanceof AutoField):
+                if ($concreteField instanceof AutoField):
                     continue;
                 endif;
                 $fields[$name] = $concreteField;
@@ -912,7 +914,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             $updatePk = ($meta->hasAutoField && $pkValue === null);
             $result = $this->doInsert($this, $fields, $updatePk);
-            if($updatePk):
+            if ($updatePk):
                 $this->{$meta->primaryKey->getAttrName()} = $result;
             endif;
         endif;
@@ -967,7 +969,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         $qb->execute();
 
-        if($returnId):
+        if ($returnId):
             return $conn->lastInsertId();
         endif;
 

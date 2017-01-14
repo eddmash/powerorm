@@ -31,30 +31,30 @@ class CheckCommand extends BaseCommand
     {
         $availableTags = BaseOrm::getCheckRegistry()->tagsAvailable();
 
-        if($input->getOption('list-tags')):
+        if ($input->getOption('list-tags')):
             $output->writeln(implode(PHP_EOL, $availableTags));
 
             return;
         endif;
 
         $tags = $input->getOption('tag');
-        if($tags):
+        if ($tags):
             $invalidTags = [];
             foreach ($tags as $tag) :
-               if(!BaseOrm::getCheckRegistry()->tagExists($tag)):
-                $invalidTags[] = $tag;
-               endif;
+                if (!BaseOrm::getCheckRegistry()->tagExists($tag)):
+                    $invalidTags[] = $tag;
+                endif;
             endforeach;
 
-            if($invalidTags):
+            if ($invalidTags):
                 throw new CommandError(sprintf('There is no system check with the "%s" tag(s).',
                     implode(', ', $invalidTags)));
             endif;
         endif;
 
         $failLevel = $input->getOption('fail-level');
-        if($failLevel):
-            if(!in_array(strtoupper($failLevel), ['ERROR', 'WARNING', 'INFO', 'DEBUG', 'CRITICAL'])):
+        if ($failLevel):
+            if (!in_array(strtoupper($failLevel), ['ERROR', 'WARNING', 'INFO', 'DEBUG', 'CRITICAL'])):
                 throw new CommandError(sprintf("--fail-level: invalid choice: '%s' ".
                     "(choices are 'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG')", $failLevel));
             endif;

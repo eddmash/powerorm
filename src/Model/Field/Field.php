@@ -21,9 +21,9 @@ use Eddmash\PowerOrm\Model\Lookup\Contains;
 use Eddmash\PowerOrm\Model\Lookup\EndsWith;
 use Eddmash\PowerOrm\Model\Lookup\Exact;
 use Eddmash\PowerOrm\Model\Lookup\In;
+use Eddmash\PowerOrm\Model\Lookup\RegisterLookupTrait;
 use Eddmash\PowerOrm\Model\Lookup\StartsWith;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Lookup\RegisterLookupTrait;
 
 class Field extends DeconstructableObject implements FieldInterface
 {

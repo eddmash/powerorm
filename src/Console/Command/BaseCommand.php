@@ -89,7 +89,8 @@ abstract class BaseCommand extends Command
         $tags = null,
         $showErrorCount = null,
         $failLevel = null
-    ) {
+    )
+    {
         $checks = BaseOrm::getCheckRegistry()->runChecks($tags);
 
         $debugs = [];
@@ -173,7 +174,7 @@ abstract class BaseCommand extends Command
         if ($showErrorCount):
             $issueText = ($visibleIssues === 1) ? 'issue' : 'issues';
             $silenced = count($checks) - $visibleIssues;
-            if($visibleIssues):
+            if ($visibleIssues):
                 $footer .= PHP_EOL;
             endif;
             $footer .= sprintf(' System check identified %s %s (%s silenced) ',

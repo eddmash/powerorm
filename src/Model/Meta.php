@@ -216,12 +216,13 @@ class Meta extends DeconstructableObject implements MetaInterface
         throw new FieldDoesNotExist(sprintf('%s has no field named %s', $this->modelName, $name));
     }
 
-    public function getNonM2MForwardFields() {
+    public function getNonM2MForwardFields()
+    {
         $forwardFields = [];
 
         /** @var $field Field */
         foreach ($this->_getForwardOnlyField() as $name => $field) :
-            if(!$field->manyToMany):
+            if (!$field->manyToMany):
                 $forwardFields[$name] = $field;
             endif;
         endforeach;
@@ -248,7 +249,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
         /** @var $field Field */
         foreach ($this->_getForwardOnlyField() as $name => $field) :
-            if($field->concrete):
+            if ($field->concrete):
                 $concreteFields[$name] = $field;
             endif;
         endforeach;
@@ -263,7 +264,8 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getLocalConcreteFields() {
+    public function getLocalConcreteFields()
+    {
 
         $concrete = [];
         foreach ($this->localFields as $name => $field) :

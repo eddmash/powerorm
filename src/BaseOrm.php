@@ -448,8 +448,9 @@ class BaseOrm extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function getCheckRegistry($recreate = false) {
-        if(self::$checkRegistry === null || ($recreate && self::$checkRegistry !== null)):
+    public static function getCheckRegistry($recreate = false)
+    {
+        if (self::$checkRegistry === null || ($recreate && self::$checkRegistry !== null)):
             self::$checkRegistry = ChecksRegistry::createObject();
         endif;
 

@@ -12,18 +12,18 @@
 namespace Eddmash\PowerOrm\Helpers;
 
 /*
-         * some method borrowed from Yii\helpers\BaseArrayHelper
-         * Part of the Yii framework.
-         *
-         * @version    2.0
-         *
-         * @author Qiang Xue <qiang.xue@gmail.com>
-         *
-         * @link http://www.yiiframework.com/
-         *
-         * @copyright Copyright (c) 2008 Yii Software LLC
-         * @license http://www.yiiframework.com/license/
-         */
+             * some method borrowed from Yii\helpers\BaseArrayHelper
+             * Part of the Yii framework.
+             *
+             * @version    2.0
+             *
+             * @author Qiang Xue <qiang.xue@gmail.com>
+             *
+             * @link http://www.yiiframework.com/
+             *
+             * @copyright Copyright (c) 2008 Yii Software LLC
+             * @license http://www.yiiframework.com/license/
+             */
 
 /**
  * Class Arrays.
@@ -111,7 +111,8 @@ class ArrayHelper
         return array_key_exists($key, $haystack);
     }
 
-    public static function isEmpty($array) {
+    public static function isEmpty($array)
+    {
         return $array === null || $array === [];
     }
 }

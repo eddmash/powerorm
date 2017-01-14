@@ -61,7 +61,7 @@ class BaseLookup implements LookupInterface
 
     public function getLookupOperation($rhs)
     {
-        if($this->operator):
+        if ($this->operator):
 
             return sprintf('%s %s', $this->operator, $rhs);
         endif;
