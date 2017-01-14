@@ -75,4 +75,3 @@ A sample configuration file. ``config/orm.php``
     $config['modelsPath']= sprintf("%smodels%s", APPPATH, DIRECTORY_SEPARATOR);
     $config['dbPrefix']= 'testing_';
     $config['charset']= config_item('charset');
-

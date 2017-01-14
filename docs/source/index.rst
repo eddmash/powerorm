@@ -27,6 +27,15 @@ Model
 
     model/index
 
+**************
+Queries
+**************
+
+.. toctree::
+    :titlesonly:
+
+    queries/index
+
 
 **************
 Migration
