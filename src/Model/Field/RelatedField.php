@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
+use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
@@ -139,4 +140,26 @@ class RelatedField extends Field
     public function contributeToRelatedClass($relatedModel, $scopeModel)
     {
     }
+
+    public function getLookup($name)
+    {
+        if ($name == 'in'):
+            return RelatedIn::class;
+        elseif ($name == 'exact'):
+            return RelatedExact::class;
+        elseif ($name == 'gt'):
+            return RelatedGreaterThan::class;
+        elseif ($name == 'gte'):
+            return RelatedGreaterThanOrEqual::class;
+        elseif ($name == 'lt'):
+            return RelatedLessThan::class;
+        elseif ($name == 'lte'):
+            return RelatedLessThanOrEqual::class;
+        elseif ($name == 'isnull'):
+            return RelatedIsNull::class;
+        else:
+            throw new TypeError(sprintf('Related Field got invalid lookup: %s', $name));
+        endif;
+    }
+
 }
