@@ -13,5 +13,6 @@ namespace Eddmash\PowerOrm\Model\Query;
 
 interface QuerysetInterface extends \IteratorAggregate, \ArrayAccess, \Countable
 {
-    public function filter($kwargs);
+    public function get();
+    public function filter();
 }

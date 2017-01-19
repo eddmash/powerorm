@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
+use Eddmash\PowerOrm\Model\Lookup\RelatedIn;
 use Eddmash\PowerOrm\Model\Model;
 
 /**

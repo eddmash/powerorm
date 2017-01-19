@@ -13,7 +13,9 @@ namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotSupported;
+use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
@@ -88,17 +90,21 @@ class Queryset implements QuerysetInterface
         $this->qb->addSelect($selects);
     }
 
-    public function get($conditions = null)
+    public function get()
     {
-        $conditions = func_get_args();
+        $queryset = $this->_filterOrExclude(false, func_get_args());
 
-        if (count($conditions) == 1):
-            $value = reset($conditions);
-            $conditions = [];
-            $conditions[] = [$this->model->meta->primaryKey->name => $value];
+        $resultCount = count($queryset);
+
+        if ($resultCount == 1):
+            return $queryset->getResults()[0];
+        elseif (!$resultCount):
+            throw new ObjectDoesNotExist(sprintf('%s matching query does not exist.',
+                $this->model->meta->modelName));
         endif;
 
-        return $this->_filterOrExclude(false, $conditions);
+        throw new MultipleObjectsReturned(sprintf('"get() returned more than one %s -- it returned %s!"',
+            $this->model->meta->modelName, $resultCount));
     }
 
     /**
@@ -122,7 +128,7 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function filter($conditions = null)
+    public function filter()
     {
         return $this->_filterOrExclude(false, func_get_args());
     }
@@ -132,7 +138,7 @@ class Queryset implements QuerysetInterface
         return $this;
     }
 
-    public function exclude($conditions = null)
+    public function exclude()
     {
         return $this->_filterOrExclude(true, func_get_args());
     }
@@ -252,7 +258,6 @@ class Queryset implements QuerysetInterface
         $expressions = '';
         foreach ($conditions as $condition) :
             $expressions = $this->buildFilter($condition, $expressions);
-
         endforeach;
 
         if ($negate):
@@ -458,23 +463,9 @@ class Queryset implements QuerysetInterface
     public function count()
     {
         $instance = $this->_clone();
+        $instance->qb->select('count(*)');
 
-        echo '<br><br>';
-        var_dump($this->connection
-            ->executeQuery(
-                $instance->getSql(),
-                $instance->qb->getParameters(),
-                $instance->qb->getParameterTypes()
-            ));
-        echo '<br><br>';
-
-        return $this->connection
-            ->executeQuery(
-                $instance->getSql(),
-                $instance->qb->getParameters(),
-                $instance->qb->getParameterTypes()
-            )
-            ->fetchAll();
+        return $instance->qb->execute()->fetchColumn(0);
     }
 
     /**
