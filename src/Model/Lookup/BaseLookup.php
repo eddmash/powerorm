@@ -11,6 +11,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
  * Class Filter.
@@ -56,6 +58,12 @@ class BaseLookup implements LookupInterface
 
     public function processRHS(Connection $connection, QueryBuilder $queryBuilder)
     {
+        if($this->rhs instanceof Model):
+            $this->rhs = $this->rhs->id;
+        elseif($this->rhs instanceof Queryset):
+            return $this->rhs->toSql($connection);
+        endif;
+
         return $queryBuilder->createNamedParameter($this->rhs);
     }
 

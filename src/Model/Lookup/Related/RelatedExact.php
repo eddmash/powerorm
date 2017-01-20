@@ -11,14 +11,8 @@
 
 namespace Eddmash\PowerOrm\Model\Lookup\Related;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
-use Eddmash\PowerOrm\Model\Lookup\In;
+use Eddmash\PowerOrm\Model\Lookup\Exact;
 
-class RelatedIn extends In
+class RelatedExact extends Exact
 {
-    public function processRHS(Connection $connection, QueryBuilder $queryBuilder)
-    {
-        return implode(',', $this->rhs);
-    }
 }

@@ -439,6 +439,11 @@ class Queryset implements QuerysetInterface
         return $newModel;
     }
 
+    public function toSql(Connection $connection) {
+//        return $this->qb->
+        return $this->qb;
+    }
+
     // **************************************************************************************************
 
     // ************************************** MAGIC METHODS Overrides ***********************************
