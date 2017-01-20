@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Exception\TypeError;
+use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
@@ -30,6 +31,22 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class RelatedField extends Field
 {
+
+    /**
+     * The field on the related object that the relation is to.
+     * By default, The Orm uses the primary key of the related object.
+     *
+     * @var
+     */
+    public $toField;
+
+    /**
+     * points to the current field instance.
+     *
+     * @var string
+     */
+    public $fromField;
+
     public function checks()
     {
         $checks = parent::checks();
@@ -164,4 +181,23 @@ class RelatedField extends Field
         endif;
     }
 
+    /**
+     * Returns the fields that are used to create the relation
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getRelatedFields()
+    {
+        if(is_string($this->relation->toModel)):
+            throw new ValueError(sprintf('Related model %s cannot be resolved', $this->relation->toModel));
+        endif;
+        // origin of relation
+        $this->fromField = ($this->fromField=='this') ? $this : $this->scopeModel->meta->getField($this->fromField);
+
+        //end point of relation
+        $this->toField = (!$this->toField) ?
+            $this->relation->toModel->meta->primaryKey :
+            $this->relation->toModel->meta->getField($this->toField);
+
+        return [$this->fromField, $this->toField];
+    }
 }

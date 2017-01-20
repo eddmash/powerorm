@@ -24,21 +24,6 @@ class ForeignKey extends RelatedField
     public $dbIndex = true;
 
     /**
-     * The field on the related object that the relation is to.
-     * By default, The Orm uses the primary key of the related object.
-     *
-     * @var
-     */
-    public $toField;
-
-    /**
-     * points to the current field instance.
-     *
-     * @var string
-     */
-    public $fromField;
-
-    /**
      * {@inheritdoc}
      *
      * @var ManyToOneRel

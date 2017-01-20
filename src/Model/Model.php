@@ -15,6 +15,7 @@ use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\ContributorInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
+use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Exception\TypeError;
@@ -259,7 +260,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string       $name
+     * @param string $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -279,8 +280,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         if (empty($fields)):
 
-            $fields = $hierarchyFields[ClassHelper::getNameFromNs($this->getFullClassName(),
-                BaseOrm::getModelsNamespace())];
+            $fields = $hierarchyFields[ClassHelper::getNameFromNs(
+                $this->getFullClassName(),
+                BaseOrm::getModelsNamespace()
+            )];
 
         endif;
 
@@ -318,13 +321,15 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             if ($this->_fieldCache == null || !ArrayHelper::hasKey($this->_fieldCache, $attrName)):
 
-                $field = OneToOneField::createObject([
-                    'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
-                    'onDelete' => Delete::CASCADE,
-                    'name' => $attrName,
-                    'autoCreated' => true,
-                    'parentLink' => true,
-                ]);
+                $field = OneToOneField::createObject(
+                    [
+                        'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
+                        'onDelete' => Delete::CASCADE,
+                        'name' => $attrName,
+                        'autoCreated' => true,
+                        'parentLink' => true,
+                    ]
+                );
 
                 $this->addToClass($attrName, $field);
                 $this->meta->parents[$name] = $field;
@@ -347,8 +352,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param string    $method     the method to invoke
-     * @param null      $args       the arguments to pass to the method
+     * @param string $method the method to invoke
+     * @param null $args the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -429,8 +434,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
                 if (!empty($commonFields)):
                     throw new FieldError(
-                        sprintf('Local field [ %s ] in class "%s" clashes with field of similar name from base class "%s" ',
-                            implode(', ', $commonFields), $parentName, $immediateParent));
+                        sprintf(
+                            'Local field [ %s ] in class "%s" clashes with field of similar name from base class "%s" ',
+                            implode(', ', $commonFields),
+                            $parentName,
+                            $immediateParent
+                        )
+                    );
 
                 endif;
 
@@ -444,8 +454,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 $parentFields = $modelFields[$previousAbstractParent];
 
                 if (!empty($parentFields)):
-                    throw new TypeError(sprintf('Abstract base class containing model fields not '.
-                        "permitted for proxy model '%s'.", $parentName));
+                    throw new TypeError(
+                        sprintf(
+                            'Abstract base class containing model fields not '.
+                            "permitted for proxy model '%s'.",
+                            $parentName
+                        )
+                    );
                 endif;
             endif;
 
@@ -473,8 +488,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endforeach;
 
         if ($isProxy && $concreteParent == null):
-            throw new TypeError(sprintf("Proxy model '%s' has no non-abstract".
-                ' model base class.', $this->getShortClassName()));
+            throw new TypeError(
+                sprintf(
+                    "Proxy model '%s' has no non-abstract".
+                    ' model base class.',
+                    $this->getShortClassName()
+                )
+            );
         endif;
 
         return [
@@ -499,12 +519,14 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if ($this->meta->proxy) :
             if (!empty($this->meta->localFields) || !empty($this->meta->localManyToMany)):
                 $error = [
-                    CheckError::createObject([
-                        'message' => sprintf('Proxy model "%s" contains model fields.', $this->getFullClassName()),
-                        'hint' => null,
-                        'context' => $this,
-                        'id' => 'models.E017',
-                    ]),
+                    CheckError::createObject(
+                        [
+                            'message' => sprintf('Proxy model "%s" contains model fields.', $this->getFullClassName()),
+                            'hint' => null,
+                            'context' => $this,
+                            'id' => 'models.E017',
+                        ]
+                    ),
                 ];
             endif;
         endif;
@@ -648,7 +670,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array) unserialize((string) $serialized);
+        $this->_fieldCache = (array)unserialize((string)$serialized);
     }
 
     public function __get($name)
@@ -658,6 +680,30 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __set($name, $value)
     {
+        try {
+            $field = $this->meta->getField($name);
+            if ($field->isRelation):
+                if (!$value instanceof $field->relation->toModel):
+                    throw new ValueError(
+                        sprintf(
+                            'Cannot assign "%s": "%s.%s" must be a "%s" instance.',
+                            $value,
+                            $this->meta->modelName,
+                            $field->name,
+                            $field->relation->toModel->meta->modelName
+                        )
+                    );
+                endif;
+                /**@var $fromField RelatedField*/
+                /**@var $toField RelatedField*/
+                /**@var $field RelatedField*/
+                list($fromField, $toField) = $field->getRelatedFields();
+                // store the values
+                $this->_fieldCache[$fromField->getAttrName()] = $value->{$toField->getAttrName()};
+            endif;
+        } catch (FieldDoesNotExist $e) {
+        }
+        // we assume this is not a model field being set
         $this->_fieldCache[$name] = $value;
     }
 
@@ -743,8 +789,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $connection
-     * @param null       $updateField
+     * @param null $connection
+     * @param null $updateField
      *
      * @throws ValueError
      *
@@ -772,8 +818,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 $relObject = $this->{$field->name};
                 if ($relObject && $relObject->meta->primaryKey !== null):
                     throw new ValueError(
-                        sprintf('save() prohibited to prevent data loss due to '.
-                            "unsaved related object '%s'.", $field->name)
+                        sprintf(
+                            'save() prohibited to prevent data loss due to '.
+                            "unsaved related object '%s'.",
+                            $field->name
+                        )
                     );
                 endif;
 
@@ -806,8 +855,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             $nonModelFields = array_diff($updateFields, $fieldsNames);
             if ($nonModelFields):
-                throw new ValueError(sprintf('The following fields do not exist in this '.
-                    'model or are m2m fields: %s'.implode(', ', $nonModelFields)));
+                throw new ValueError(
+                    sprintf(
+                        'The following fields do not exist in this '.
+                        'model or are m2m fields: %s'.implode(', ', $nonModelFields)
+                    )
+                );
             endif;
         elseif (!$forceInsert && $deferedFields):
             // if we have some deferred fields, we need to set the fields to update as the onces that were loaded.
@@ -839,7 +892,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $updateFields
+     * @param null $updateFields
      *
      * @since 1.1.0
      *
@@ -880,9 +933,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function saveTable(Model $model, $raw = false, $forceInsert = false, $forceUpdate = false,
-                               $updateFields = null)
-    {
+    private function saveTable(
+        Model $model,
+        $raw = false,
+        $forceInsert = false,
+        $forceUpdate = false,
+        $updateFields = null
+    ) {
         $meta = $this->meta;
 
         $nonPkFields = [];
@@ -956,7 +1013,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function doInsert(Model $model, $fields, $returnId)
     {
-
+        echo('<br><br> .....'.$model->meta->modelName."----------------<br>");
+        var_dump(array_keys($fields));
+        echo "<br>";
         $conn = BaseOrm::getDbConnection();
         $qb = $conn->createQueryBuilder();
 
@@ -964,9 +1023,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         /** @var $field Field */
         foreach ($fields as $name => $field) :
+            echo $field->name."<br>";
+            echo "--- ".$field->preSave($model, true)."<br>";
             $qb->setValue($field->getColumnName(), $qb->createNamedParameter($field->preSave($model, true)));
         endforeach;
 
+        // save to db
         $qb->execute();
 
         if ($returnId):
