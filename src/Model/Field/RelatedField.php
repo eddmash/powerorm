@@ -31,7 +31,6 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class RelatedField extends Field
 {
-
     /**
      * The field on the related object that the relation is to.
      * By default, The Orm uses the primary key of the related object.
@@ -182,7 +181,8 @@ class RelatedField extends Field
     }
 
     /**
-     * Returns the fields that are used to create the relation
+     * Returns the fields that are used to create the relation.
+     *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function getRelatedFields()
@@ -191,7 +191,7 @@ class RelatedField extends Field
             throw new ValueError(sprintf('Related model %s cannot be resolved', $this->relation->toModel));
         endif;
         // origin of relation
-        $this->fromField = ($this->fromField=='this') ? $this : $this->scopeModel->meta->getField($this->fromField);
+        $this->fromField = ($this->fromField == 'this') ? $this : $this->scopeModel->meta->getField($this->fromField);
 
         //end point of relation
         $this->toField = (!$this->toField) ?
