@@ -21,7 +21,6 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
 
 /**
  * Class Filter.
@@ -34,11 +33,11 @@ interface LookupInterface
 {
     public static function createObject($rhs, $lhs);
 
-    public function processLHS(Connection $connection, QueryBuilder $queryBuilder);
+    public function processLHS(Connection $connection);
 
-    public function processRHS(Connection $connection, QueryBuilder $queryBuilder);
+    public function processRHS(Connection $connection);
 
     public function getLookupOperation($rhs);
 
-    public function asSql(Connection $connection, QueryBuilder $queryBuilder);
+    public function asSql(Connection $connection);
 }

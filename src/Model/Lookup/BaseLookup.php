@@ -8,11 +8,9 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
  * Class Filter.
@@ -50,21 +48,28 @@ class BaseLookup implements LookupInterface
         return new static($rhs, $lhs);
     }
 
-    public function processLHS(Connection $connection, QueryBuilder $queryBuilder)
+    public function processLHS(Connection $connection)
     {
 
         return $this->lhs->getColumnName();
     }
 
-    public function processRHS(Connection $connection, QueryBuilder $queryBuilder)
+    public function processRHS(Connection $connection)
     {
         if($this->rhs instanceof Model):
-            $this->rhs = $this->rhs->id;
-        elseif($this->rhs instanceof Queryset):
-            return $this->rhs->toSql($connection);
+            // get pk field
+            $pk = $this->rhs->meta->primaryKey->getAttrName();
+            $this->rhs = $this->rhs->{$pk};
+        elseif(method_exists($this->rhs, 'toSql')):
+            list($sql, $params) = $this->rhs->toSql();
+            echo '-----------><br>';
+            var_dump($params);
+            echo '<-----------<br>';
+
+            return [sprintf('( %s )', $sql), $params];
         endif;
 
-        return $queryBuilder->createNamedParameter($this->rhs);
+        return [' ? ', $this->rhs];
     }
 
     public function getLookupOperation($rhs)
@@ -77,14 +82,14 @@ class BaseLookup implements LookupInterface
         throw new NotImplemented('The no operator was given for the lookup');
     }
 
-    public function asSql(Connection $connection, QueryBuilder $queryBuilder)
+    public function asSql(Connection $connection)
     {
-        $lhs_sql = $this->processLHS($connection, $queryBuilder);
-        $rhs_sql = $this->processRHS($connection, $queryBuilder);
+        $lhs_sql = $this->processLHS($connection);
+        list($rhs_sql, $rhs_params) = $this->processRHS($connection);
 
         $rhs_sql = $this->getLookupOperation($rhs_sql);
 
-        return sprintf('%s %s', $lhs_sql, $rhs_sql);
+        return [sprintf('%s %s', $lhs_sql, $rhs_sql), $rhs_params];
 
     }
 }

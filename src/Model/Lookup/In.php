@@ -12,7 +12,6 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
 
 class In extends BaseLookup
 {
@@ -24,7 +23,7 @@ class In extends BaseLookup
         return sprintf('%s (%s)', $this->operator, $rhs);
     }
 
-    public function processRHS(Connection $connection, QueryBuilder $queryBuilder)
+    public function processRHS(Connection $connection)
     {
         return implode(',', $this->rhs);
     }

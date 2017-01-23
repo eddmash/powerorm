@@ -15,6 +15,7 @@ use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\ContributorInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
+use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\LookupError;
@@ -646,7 +647,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->_fieldCache);
+        throw new TypeError(sprintf("TypeError: '%s' object is not iterable", $this->meta->modelName));
     }
 
     /**
@@ -654,7 +655,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function count()
     {
-        return count($this->_fieldCache);
+        throw new TypeError(sprintf("TypeError: object of type '%s' is not countable)", $this->meta->modelName));
     }
 
     /**
@@ -675,6 +676,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __get($name)
     {
+        if(!array_key_exists($name, $this->_fieldCache)):
+            throw new AttributeError(
+                sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->modelName, $name));
+        endif;
+
         return $this->_fieldCache[$name];
     }
 
