@@ -142,7 +142,7 @@ You can access the manager object for an model class via the objects() method:
 
    The filter method can take one/multiple arrays that contain the conditions to use when filtering.
 
-   Since its not possible to have the save array key repeated on the same array, use the a second array to add more
+   Since its not possible to have the same array key repeated on the same array, use a second array to add more
    conditions for the same key.
 
    For example to query roles based on the value of the **code** field.

@@ -55,4 +55,15 @@ Form
 
     form/index
 
- 
+
+************************
+Extra Information
+************************
+
+.. toctree::
+    :titlesonly:
+
+    license
+    changelog
+
+
