@@ -11,6 +11,15 @@
 
 namespace Eddmash\PowerOrm\Console\Question;
 
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Question\Question;
+
 class InteractiveAsker extends Asker
 {
+    public function ask(Question $question) {
+
+        $questionHelper = new QuestionHelper();
+
+        return $questionHelper->ask($this->input, $this->output, $question);
+    }
 }

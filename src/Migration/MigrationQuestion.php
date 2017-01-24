@@ -102,8 +102,7 @@ class MigrationQuestion
 
                 return;
             else:
-                $default_val = $default;
-                break;
+                return $default;
             endif;
         endwhile;
 
