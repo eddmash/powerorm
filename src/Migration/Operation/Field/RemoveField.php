@@ -11,8 +11,6 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
-use Eddmash\PowerOrm\Migration\Operation\Operation;
-
 /**
  * Removes a field from a model.
  *
@@ -22,7 +20,6 @@ use Eddmash\PowerOrm\Migration\Operation\Operation;
  */
 class RemoveField extends FieldOperation
 {
-
     /**
      * {@inheritdoc}
      */

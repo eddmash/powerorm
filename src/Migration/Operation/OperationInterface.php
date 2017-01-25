@@ -76,7 +76,9 @@ interface OperationInterface
      * Used for optimization. If in doubt, return True;
      * returning a false positive will merely make the optimizer a little less efficient, while returning a false
      * negative may result in an unusable optimized migration.
+     *
      * @param $modelName
+     *
      * @return mixed
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */

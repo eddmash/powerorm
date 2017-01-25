@@ -95,7 +95,7 @@ class CreateModel extends ModelOperation
         if ($operation instanceof DeleteModel && $this->name === $operation->name && !$this->meta->proxy) :
             return [];
         endif;
-        /**@var $between OperationInterface */
+        /** @var $between OperationInterface */
         if ($operation instanceof FieldOperation && $operation->modelName === $this->name) :
             if ($operation instanceof AddField) :
                 // check if there is an operation in between that references the same model if so, don't merge
@@ -116,6 +116,7 @@ class CreateModel extends ModelOperation
 
             endif;
         endif;
+
         return parent::reduce($operation, $inBetween);
     }
 }

@@ -88,7 +88,8 @@ class Optimize
                         // add points that fell in between those that merged
                         $newOperations = array_merge($newOperations, $inBetween);
                         // add points that come after
-                        $newOperations = array_merge($newOperations, array_slice($operations, $outIndex +$inIndex+ 2));
+                        $newOperations = array_merge($newOperations, array_slice($operations, $outIndex + $inIndex + 2));
+
                         return $newOperations;
                     else:
                         $newOperations[] = $outOperation;

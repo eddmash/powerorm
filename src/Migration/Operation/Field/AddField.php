@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
-use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Model\Field\Field;
 
 /**
@@ -23,7 +22,6 @@ use Eddmash\PowerOrm\Model\Field\Field;
  */
 class AddField extends FieldOperation
 {
-
     /**
      * {@inheritdoc}
      */

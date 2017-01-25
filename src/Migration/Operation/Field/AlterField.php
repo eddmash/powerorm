@@ -23,7 +23,6 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
  */
 class AlterField extends FieldOperation
 {
-
     /**
      * {@inheritdoc}
      */

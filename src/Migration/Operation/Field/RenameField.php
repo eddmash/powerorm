@@ -11,8 +11,6 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
-use Eddmash\PowerOrm\Migration\Operation\Operation;
-
 /**
  * Renames a field on the model. Might affect db_column too.
  *
