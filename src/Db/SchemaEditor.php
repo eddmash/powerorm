@@ -16,6 +16,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Eddmash\PowerOrm\BaseObject;
+use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
@@ -198,7 +199,7 @@ class SchemaEditor extends BaseObject
 
         $type = $field->dbType($this->connection);
         $name = $field->getColumnName();
-        $fieldOptions = $this->getDoctrineColumnOptions($field);
+        $fieldOptions = $this->getDoctrineColumnOptions($field, true);
 
         // It might not actually have a column behind it
         if (empty($type)):
@@ -298,6 +299,8 @@ class SchemaEditor extends BaseObject
      * @param Field      $oldField
      * @param Field      $newField
      * @param bool|false $strict
+     *
+     * @throws ValueError
      *
      * @since 1.1.0
      *
@@ -410,16 +413,14 @@ class SchemaEditor extends BaseObject
             $options['unsigned'] = $field->signed === false;
         endif;
 
-        if ($field->hasDefault() && ($includeDefault && !$this->skipDefault($field))):
+        if ($field->hasDefault() && $includeDefault):
 
             // the default value
             $default_value = $this->effectiveDefault($field);
 
             // if value is provided, create the defualt
-            if ($default_value == NOT_PROVIDED):
-
-                $options['default'] = $this->prepareDefault($field);
-
+            if ($default_value != NOT_PROVIDED):
+                $options['default'] = $default_value;
             endif;
 
         endif;
@@ -464,20 +465,36 @@ class SchemaEditor extends BaseObject
         return $fieldConstraints;
     }
 
-    /**Some backends don't accept default values for certain columns types (i.e. MySQL longtext and longblob).
-     * @param $field
-     * @since 1.1.0
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function skipDefault($field)
-    {
-    }
-
     public function prepareDefault($field)
     {
     }
 
+    /**
+     * @param Field $field
+     *
+     * @return mixed|null|string
+     *
+     * @throws NotImplemented
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function effectiveDefault($field)
     {
+        if ($field->hasDefault()):
+            $default = $field->getDefault();
+        elseif (($field->hasProperty('autoNow') && $field->autoNow) ||
+            ($field->hasProperty('addAutoNow') && $field->addAutoNow)):
+            throw new NotImplemented('Please implement the date defaults');
+        else:
+            $default = null;
+        endif;
+
+        if (is_callable($default)):
+            $default = $default();
+        endif;
+
+        return $default;
     }
 }
