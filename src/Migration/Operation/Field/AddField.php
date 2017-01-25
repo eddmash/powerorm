@@ -21,26 +21,8 @@ use Eddmash\PowerOrm\Model\Field\Field;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class AddField extends Operation
+class AddField extends FieldOperation
 {
-    /**
-     * @var string
-     */
-    public $name;
-
-    /**
-     * @var string
-     */
-    public $modelName;
-    /**
-     * @var Field
-     */
-    public $field;
-
-    /**
-     * @var bool
-     */
-    public $preserveDefault = false;
 
     /**
      * {@inheritdoc}

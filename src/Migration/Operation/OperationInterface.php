@@ -69,4 +69,16 @@ interface OperationInterface
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function reduce($operation, $inBetween);
+
+    /**
+     * Returns True if there is a chance this operation references the given  model name (as a string).
+     *
+     * Used for optimization. If in doubt, return True;
+     * returning a false positive will merely make the optimizer a little less efficient, while returning a false
+     * negative may result in an unusable optimized migration.
+     * @param $modelName
+     * @return mixed
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function referencesModel($modelName);
 }

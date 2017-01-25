@@ -20,17 +20,8 @@ use Eddmash\PowerOrm\Migration\Operation\Operation;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class RemoveField extends Operation
+class RemoveField extends FieldOperation
 {
-    /**
-     * @var string
-     */
-    public $name;
-
-    /**
-     * @var string
-     */
-    public $modelName;
 
     /**
      * {@inheritdoc}

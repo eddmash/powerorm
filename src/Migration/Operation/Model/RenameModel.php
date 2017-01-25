@@ -8,7 +8,7 @@ namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 
-class RenameModel extends Operation
+class RenameModel extends ModelOperation
 {
     public $oldName;
     public $newName;

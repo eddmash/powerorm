@@ -286,7 +286,6 @@ class FormatFileContent
             $class = $skel['name'];
 
             $constructor_args = [$skel['constructorArgs']];
-
             $cons_args = [];
             foreach ($constructor_args as $arg) :
 

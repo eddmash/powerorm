@@ -12,9 +12,7 @@
 namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
 use Eddmash\PowerOrm\Db\SchemaEditor;
-use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
-use Eddmash\PowerOrm\Model\Field\Field;
 
 /**
  * Alters a field's database column (e.g. null, max_length) to the provided new field.
@@ -23,27 +21,8 @@ use Eddmash\PowerOrm\Model\Field\Field;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class AlterField extends Operation
+class AlterField extends FieldOperation
 {
-    /**
-     * @var string
-     */
-    public $name;
-
-    /**
-     * @var string
-     */
-    public $modelName;
-
-    /**
-     * @var bool
-     */
-    public $preserveDefault = false;
-
-    /**
-     * @var Field
-     */
-    public $field;
 
     /**
      * {@inheritdoc}

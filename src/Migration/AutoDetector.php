@@ -307,7 +307,9 @@ class AutoDetector extends BaseObject
     private function createMigration()
     {
         $migration = new Migration('auto');
-        $migration->setOperations($this->generatedOperations);
+        // optimize the migrations
+        $operations = Optimize::run($this->generatedOperations);
+        $migration->setOperations($operations);
 
         return $migration;
     }
@@ -566,6 +568,7 @@ class AutoDetector extends BaseObject
             endforeach;
 
         endforeach;
+
     }
 
     /**

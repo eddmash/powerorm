@@ -150,8 +150,24 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      */
     public function reduce($operation, $inBetween)
     {
-        // TODO: Implement reduce() method.
+        return false;
     }
+
+    /**
+     * Returns True if there is a chance this operation references the given  model name (as a string).
+     *
+     * Used for optimization. If in doubt, return True;
+     * returning a false positive will merely make the optimizer a little less efficient, while returning a false
+     * negative may result in an unusable optimized migration.
+     * @param $modelName
+     * @return mixed
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function referencesModel($modelName)
+    {
+        return true;
+    }
+
 
     /**
      * Returns if we're allowed to migrate the model.

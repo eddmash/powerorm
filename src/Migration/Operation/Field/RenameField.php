@@ -20,7 +20,7 @@ use Eddmash\PowerOrm\Migration\Operation\Operation;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class RenameField extends Operation
+class RenameField extends FieldOperation
 {
     public $modelName;
     public $newName;

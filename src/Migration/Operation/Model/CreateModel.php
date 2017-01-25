@@ -14,19 +14,22 @@ namespace Eddmash\PowerOrm\Migration\Operation\Model;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
+use Eddmash\PowerOrm\Migration\Operation\Field\FieldOperation;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
+use Eddmash\PowerOrm\Migration\Operation\OperationInterface;
 use Eddmash\PowerOrm\Migration\State\ModelState;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 
-class CreateModel extends Operation
+class CreateModel extends ModelOperation
 {
-    public $name;
     public $fields;
     /**
      * @var Meta
      */
     public $meta;
+
     public $extends;
 
     public function getDescription()
@@ -85,5 +88,34 @@ class CreateModel extends Operation
         if ($this->allowMigrateModel($schemaEditor->connection, $model)):
             $schemaEditor->deleteModel($model);
         endif;
+    }
+
+    public function reduce($operation, $inBetween)
+    {
+        if ($operation instanceof DeleteModel && $this->name === $operation->name && !$this->meta->proxy) :
+            return [];
+        endif;
+        /**@var $between OperationInterface */
+        if ($operation instanceof FieldOperation && $operation->modelName === $this->name) :
+            if ($operation instanceof AddField) :
+                // check if there is an operation in between that references the same model if so, don't merge
+                if ($operation->field->isRelation) :
+                    $modelName = $operation->field->relation->toModel->meta->modelName;
+                    foreach ($inBetween as $between) :
+                        if ($between->referencesModel($modelName)) :
+                            return false;
+                        endif;
+                        if ($operation->field->relation->hasProperty('through')) :
+                            $modelName = $operation->field->through->toModel->meta->modelName;
+                            if ($between->referencesModel($modelName)) :
+                                return false;
+                            endif;
+                        endif;
+                    endforeach;
+                endif;
+
+            endif;
+        endif;
+        return parent::reduce($operation, $inBetween);
     }
 }

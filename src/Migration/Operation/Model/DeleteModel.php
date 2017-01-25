@@ -20,9 +20,8 @@ use Eddmash\PowerOrm\Migration\Operation\Operation;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class DeleteModel extends Operation
+class DeleteModel extends ModelOperation
 {
-    public $name;
 
     /**
      * {@inheritdoc}
