@@ -20,11 +20,19 @@ class In extends BaseLookup
 
     public function getLookupOperation($rhs)
     {
-        return sprintf('%s (%s)', $this->operator, $rhs);
+        return sprintf('%s %s', $this->operator, $rhs);
     }
 
     public function processRHS(Connection $connection)
     {
-        return implode(',', $this->rhs);
+        if ($this->valueIsDirect()):
+            $element = count($this->rhs);
+            $placeholders = implode(', ', array_fill(null, $element, '?'));
+
+            return [sprintf('(%s)', $placeholders), $this->rhs];
+        else:
+            return parent::processRHS($connection);
+        endif;
+
     }
 }

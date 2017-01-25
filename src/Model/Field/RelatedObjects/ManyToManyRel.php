@@ -3,6 +3,7 @@
  * Created by Eddilbert Macharia (edd.cowan@gmail.com)<http://eddmash.com>
  * Date: 10/14/16.
  */
+
 namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -18,7 +19,7 @@ class ManyToManyRel extends ForeignObjectRel
     public function __construct($kwargs = [])
     {
         if ($this->through && !$this->dbConstraint):
-            throw new ValueError("Can't supply a through model and db_constraint=False");
+            throw new ValueError("Can't supply a through model and db_constraint=false");
         endif;
 
         if ($this->through_fields && !$this->through):

@@ -5,6 +5,7 @@
  * Date: 6/19/16
  * Time: 1:17 AM.
  */
+
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
@@ -62,9 +63,6 @@ class BaseLookup implements LookupInterface
             $this->rhs = $this->rhs->{$pk};
         elseif(method_exists($this->rhs, 'toSql')):
             list($sql, $params) = $this->rhs->toSql();
-            echo '-----------><br>';
-            var_dump($params);
-            echo '<-----------<br>';
 
             return [sprintf('( %s )', $sql), $params];
         endif;
@@ -91,5 +89,10 @@ class BaseLookup implements LookupInterface
 
         return [sprintf('%s %s', $lhs_sql, $rhs_sql), $rhs_params];
 
+    }
+
+    public function valueIsDirect()
+    {
+        return !(method_exists($this->rhs, 'toSql'));
     }
 }

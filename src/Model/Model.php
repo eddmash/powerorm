@@ -1029,8 +1029,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         /** @var $field Field */
         foreach ($fields as $name => $field) :
-            echo $field->name.'<br>';
-            echo '--- '.$field->preSave($model, true).'<br>';
             $qb->setValue($field->getColumnName(), $qb->createNamedParameter($field->preSave($model, true)));
         endforeach;
 

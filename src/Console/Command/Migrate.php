@@ -91,7 +91,7 @@ class Migrate extends BaseCommand
             $auto_detector = new AutoDetector(
                 $executor->loader->getProjectState(),
                 ProjectState::fromApps($registry),
-                $asker);
+                NonInteractiveAsker::createObject($input, $output));
 
             $changes = $auto_detector->getChanges($executor->loader->graph);
 

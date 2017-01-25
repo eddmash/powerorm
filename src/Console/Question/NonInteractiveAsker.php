@@ -11,6 +11,12 @@
 
 namespace Eddmash\PowerOrm\Console\Question;
 
+use Symfony\Component\Console\Question\Question;
+
 class NonInteractiveAsker extends InteractiveAsker
 {
+    public function ask(Question $question)
+    {
+        return true;
+    }
 }

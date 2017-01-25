@@ -105,7 +105,7 @@ class AddField extends Operation
     public function getConstructorArgs()
     {
         $constArgs = parent::getConstructorArgs();
-        if (false === $this->preserveDefault):
+        if (true === $this->preserveDefault):
             unset($constArgs['preserveDefault']);
         endif;
 

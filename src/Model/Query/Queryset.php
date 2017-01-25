@@ -101,7 +101,7 @@ class Queryset implements QuerysetInterface
         $resultCount = count($queryset);
 
         if ($resultCount == 1):
-        return $queryset->getResults()[0];
+            return $queryset->getResults()[0];
         elseif (!$resultCount):
             throw new ObjectDoesNotExist(sprintf('%s matching query does not exist.',
                 $this->model->meta->modelName));
@@ -270,8 +270,10 @@ class Queryset implements QuerysetInterface
     public function execute()
     {
         list($sql, $params) = $this->query->asSql($this->connection);
+
         $stmt = $this->connection->prepare($sql);
         foreach ($params as $index => $value) :
+
             ++$index; // Columns/Parameters are 1-based, so need to start at 1 instead of zero
             $stmt->bindValue($index, $value);
         endforeach;

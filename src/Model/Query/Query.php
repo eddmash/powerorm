@@ -133,6 +133,7 @@ class Query extends BaseObject
         if(!is_array($select)):
             $select = [$select];
         endif;
+
         $this->select = array_merge($this->select, $select);
     }
 

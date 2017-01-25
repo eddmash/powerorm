@@ -12,13 +12,13 @@
 namespace Eddmash\PowerOrm\Model\Lookup\Related;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Eddmash\PowerOrm\Model\Lookup\In;
 
 class RelatedIn extends In
 {
-    public function processRHS(Connection $connection, QueryBuilder $queryBuilder)
-    {
-        return implode(',', $this->rhs);
-    }
+//    public function processRHS(Connection $connection)
+//    {
+
+//        return implode(',', $this->rhs);
+//    }
 }
