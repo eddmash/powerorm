@@ -16,7 +16,6 @@ use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\FieldOperation;
-use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\Operation\OperationInterface;
 use Eddmash\PowerOrm\Migration\State\ModelState;
 use Eddmash\PowerOrm\Model\Meta;
@@ -95,7 +94,7 @@ class CreateModel extends ModelOperation
         if ($operation instanceof DeleteModel && $this->name === $operation->name && !$this->meta->proxy) :
             return [];
         endif;
-        /** @var $between OperationInterface */
+        /* @var $between OperationInterface */
         if ($operation instanceof FieldOperation && $operation->modelName === $this->name) :
             if ($operation instanceof AddField) :
                 // check if there is an operation in between that references the same model if so, don't merge
@@ -105,8 +104,9 @@ class CreateModel extends ModelOperation
                         if ($between->referencesModel($modelName)) :
                             return false;
                         endif;
-                        if ($operation->field->relation->hasProperty('through')) :
-                            $modelName = $operation->field->through->toModel->meta->modelName;
+
+                        if ($operation->field->relation->hasProperty('through') && $operation->field->relation->through) :
+                            $modelName = $operation->field->relation->through->toModel->meta->modelName;
                             if ($between->referencesModel($modelName)) :
                                 return false;
                             endif;
@@ -114,9 +114,25 @@ class CreateModel extends ModelOperation
                     endforeach;
                 endif;
 
+                $fields = $this->fields;
+                $fields[$operation->field->name] = $operation->field;
+
+                return [
+                    static::createObject([
+                        'name' => $this->name,
+                        'fields' => $fields,
+                        'meta' => $this->meta,
+                        'extends' => $this->extends,
+                    ]),
+                ];
+
             endif;
         endif;
 
         return parent::reduce($operation, $inBetween);
+    }
+
+    public function __toString() {
+        return sprintf('%s <%s>', get_class($this), $this->name);
     }
 }

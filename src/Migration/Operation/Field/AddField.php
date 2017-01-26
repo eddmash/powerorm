@@ -91,4 +91,8 @@ class AddField extends FieldOperation
 
         return $constArgs;
     }
+
+    public function __toString() {
+        return sprintf('%s <%s:%s>', $this->getFullClassName(), $this->modelName, $this->name);
+    }
 }
