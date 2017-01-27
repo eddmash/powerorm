@@ -3,7 +3,6 @@
 namespace Eddmash\PowerOrm\Console\Command;
 
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Console\Question\InteractiveAsker;
 use Eddmash\PowerOrm\Console\Question\NonInteractiveAsker;
 use Eddmash\PowerOrm\Migration\AutoDetector;
 use Eddmash\PowerOrm\Migration\Executor;
@@ -80,12 +79,6 @@ class Migrate extends BaseCommand
 
         if (empty($plan)):
             $output->writeln('  No migrations to apply.');
-
-            if ($input->getOption('no-interaction')):
-                $asker = NonInteractiveAsker::createObject($input, $output);
-            else:
-                $asker = InteractiveAsker::createObject($input, $output);
-            endif;
 
             //detect if we need to make migrations
             $auto_detector = new AutoDetector(

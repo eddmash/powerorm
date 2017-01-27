@@ -11,6 +11,7 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Types\Type;
+use Eddmash\PowerOrm\Checks\CheckError;
 
 /**
  * An IntegerField that automatically increments according to available IDs.
@@ -24,6 +25,32 @@ use Doctrine\DBAL\Types\Type;
  */
 class AutoField extends Field
 {
+    public function checks()
+    {
+        $checks = [];
+        $checks = array_merge($checks, $this->checkPrimaryKey());
+
+        return $checks;
+    }
+
+    private function checkPrimaryKey()
+    {
+        $errors = [];
+
+        if (!$this->primaryKey):
+            $errors = [
+                CheckError::createObject([
+                    'message' => 'AutoFields must set primaryKey=true.',
+                    'hint' => null,
+                    'context' => $this,
+                    'id' => 'fields.E100',
+                ]),
+            ];
+        endif;
+
+        return $errors;
+    }
+
     /**
      * {@inheritdoc}
      */

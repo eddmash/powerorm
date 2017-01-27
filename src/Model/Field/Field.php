@@ -343,12 +343,12 @@ class Field extends DeconstructableObject implements FieldInterface
     public function checks()
     {
         $checks = [];
-        $checks = array_merge($checks, $this->_checkFieldName());
+        $checks = array_merge($checks, $this->checkFieldName());
 
         return $checks;
     }
 
-    public function _checkFieldName()
+    private function checkFieldName()
     {
         $errors = [];
 

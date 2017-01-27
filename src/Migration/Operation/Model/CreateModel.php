@@ -135,4 +135,12 @@ class CreateModel extends ModelOperation
     public function __toString() {
         return sprintf('%s <%s>', get_class($this), $this->name);
     }
+
+    public function __debugInfo()
+    {
+        $arr = parent::__debugInfo();
+        $arr['fields'] = array_keys($this->fields);
+
+        return $arr;
+    }
 }
