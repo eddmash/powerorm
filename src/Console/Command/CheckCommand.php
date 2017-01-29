@@ -4,7 +4,6 @@
  * User: eddmash
  * Date: 6/2/16.
  */
-
 namespace Eddmash\PowerOrm\Console\Command;
 
 use Eddmash\PowerOrm\BaseOrm;
