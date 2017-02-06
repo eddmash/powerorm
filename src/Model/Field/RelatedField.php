@@ -239,7 +239,7 @@ class RelatedField extends Field
     {
         $modelName = $this->getRelatedModel()->meta->modelName;
 
-        /** @var $modelName Model */
+        /* @var $modelName Model */
         return $modelName::objects()->all();
     }
 }
