@@ -680,6 +680,14 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             throw new AttributeError(
                 sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->modelName, $name));
         endif;
+        try {
+            /** @var $field RelatedField */
+            $field = $this->meta->getField($name);
+            if ($field->isRelation):
+                return $field->getRelatedValue($this);
+            endif;
+        } catch (FieldDoesNotExist $e) {
+        }
 
         return $this->_fieldCache[$name];
     }

@@ -194,7 +194,6 @@ class Meta extends DeconstructableObject implements MetaInterface
         $fields = $this->_getForwardOnlyField();
 
         if (ArrayHelper::hasKey($fields, $name)):
-
             return $fields[$name];
         endif;
 
