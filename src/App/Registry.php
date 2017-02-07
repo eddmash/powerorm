@@ -53,7 +53,9 @@ class Registry extends BaseObject
 
     public function populate()
     {
+
         if ($this->ready == false) :
+            echo 'reload'.PHP_EOL;
             $this->_populateRegistry();
             $this->ready = true;
         endif;
@@ -94,11 +96,12 @@ class Registry extends BaseObject
      */
     public function getModels($includeAutoCreated = false)
     {
-        //        $this->_populateRegistry();
 
         try {
             $this->isAppReady();
+            echo '   loaded '.PHP_EOL;
         } catch (AppRegistryNotReady $e) {
+            echo '   not loaded '.PHP_EOL;
             $this->populate();
         }
 

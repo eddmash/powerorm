@@ -277,6 +277,7 @@ class BaseOrm extends BaseObject
     public static function loadRegistry()
     {
         $instance = self::getInstance();
+
         try {
             $instance->registryCache->isAppReady();
         } catch (AppRegistryNotReady $e) {
@@ -437,6 +438,7 @@ class BaseOrm extends BaseObject
             self::getCheckRegistry()->register([$modelObj, 'checks'], [Tags::Model]);
 
         endforeach;
+        echo '&&&& BASEORM end <---'.PHP_EOL;
     }
 
     /**

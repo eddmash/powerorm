@@ -202,7 +202,8 @@ abstract class PModel extends Model
      *
      * @param array $opts
      *
-     * @return ManyToManyField
+     * @return \Eddmash\PowerOrm\Model\Field\Field
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public static function ManyToManyField($opts = [])
     {

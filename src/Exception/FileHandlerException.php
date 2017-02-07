@@ -4,6 +4,7 @@
  * User: eddmash
  * Date: 7/31/16.
  */
+
 namespace Eddmash\PowerOrm\Exception;
 
 /**

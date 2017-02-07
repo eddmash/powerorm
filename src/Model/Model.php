@@ -676,10 +676,19 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __get($name)
     {
-        if(!array_key_exists($name, $this->_fieldCache)):
+        if (!array_key_exists($name, $this->_fieldCache)):
             throw new AttributeError(
-                sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->modelName, $name));
+                sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->modelName, $name)
+            );
         endif;
+        try {
+            /** @var $field RelatedField */
+            $field = $this->meta->getField($name);
+            if ($field->isRelation):
+                return $field->getRelatedValue($this);
+            endif;
+        } catch (FieldDoesNotExist $e) {
+        }
 
         return $this->_fieldCache[$name];
     }
@@ -947,8 +956,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $forceInsert = false,
         $forceUpdate = false,
         $updateFields = null
-    )
-    {
+    ) {
         $meta = $this->meta;
 
         $nonPkFields = [];

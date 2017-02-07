@@ -69,12 +69,14 @@ class RelatedField extends Field
             $msg = "Field defines a relation with model '%s', which is either does not exist, or is abstract.";
 
             $error = [
-                CheckError::createObject([
-                    'message' => sprintf($msg, $relModel),
-                    'hint' => null,
-                    'context' => $this,
-                    'id' => 'fields.E300',
-                ]),
+                CheckError::createObject(
+                    [
+                        'message' => sprintf($msg, $relModel),
+                        'hint' => null,
+                        'context' => $this,
+                        'id' => 'fields.E300',
+                    ]
+                ),
             ];
         endif;
 
@@ -109,7 +111,6 @@ class RelatedField extends Field
             /** @var $related Model */
             $related = $kwargs['relatedModel'];
             $field = $kwargs['fromField'];
-
             $field->relation->toModel = $related;
             $field->doRelatedClass($related, $kwargs['scopeModel']);
         };
@@ -187,17 +188,57 @@ class RelatedField extends Field
      */
     public function getRelatedFields()
     {
-        if(is_string($this->relation->toModel)):
+        if (is_string($this->relation->toModel)):
             throw new ValueError(sprintf('Related model %s cannot be resolved', $this->relation->toModel));
         endif;
         // origin of relation
-        $this->fromField = ($this->fromField == 'this') ? $this : $this->scopeModel->meta->getField($this->fromField);
+//        $this->fromField = ($this->fromField == 'this') ? $this : ;
+        if ($this->fromField == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT) :
+            $this->fromField = $this;
+        elseif (is_string($this->fromField)):
+            $this->fromField = $this->scopeModel->meta->getField($this->fromField);
+        endif;
 
         //end point of relation
-        $this->toField = (!$this->toField) ?
-            $this->relation->toModel->meta->primaryKey :
-            $this->relation->toModel->meta->getField($this->toField);
+        if (is_string($this->toField)):
+            $this->toField = $this->relation->toModel->meta->getField($this->toField);
+        else:
+            $this->toField = $this->relation->toModel->meta->primaryKey;
+        endif;
 
         return [$this->fromField, $this->toField];
+    }
+
+    /**
+     * @param Model $modelInstance
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getRelatedValue(Model $modelInstance)
+    {
+        $qs = $this->getRelatedQueryset();
+
+        return $qs->filter($this->getReverseRelatedFilter($modelInstance))->get();
+    }
+
+    /**
+     * @param Model $modelInstance
+     *
+     * @return array
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getReverseRelatedFilter(Model $modelInstance)
+    {
+        list($fromField, $toField) = $this->getRelatedFields();
+        $value = $modelInstance->{$fromField->getAttrName()};
+
+        return [$toField->getAttrName() => $value];
+    }
+
+    public function getRelatedQueryset()
+    {
+        $modelName = $this->getRelatedModel()->meta->modelName;
+
+        /* @var $modelName Model */
+        return $modelName::objects()->all();
     }
 }

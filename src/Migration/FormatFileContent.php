@@ -116,6 +116,11 @@ class FormatFileContent
      */
     public function __toString()
     {
+        return $this->toString();
+    }
+
+    public function toString()
+    {
         return implode("\n", $this->buffer);
     }
 

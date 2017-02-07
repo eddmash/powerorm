@@ -28,7 +28,7 @@ class StateRegistry extends Registry
     /**
      * {@inheritdoc}
      */
-    public static function createObject($modelStates)
+    public static function createObject($modelStates = [])
     {
         return new static($modelStates);
     }

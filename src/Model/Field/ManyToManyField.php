@@ -15,6 +15,7 @@ use Eddmash\PowerOrm\Checks\CheckWarning;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
+use Eddmash\PowerOrm\Migration\FormatFileContent;
 use Eddmash\PowerOrm\Model\Delete;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToManyRel;
 use Eddmash\PowerOrm\Model\Meta;
@@ -117,13 +118,6 @@ class ManyToManyField extends RelatedField
         endif;
 
         $className = sprintf('%1$s_%2$s', $modelName, $field->name);
-        $intermediaryClass = 'class %1$s extends %2$s{
-            public function fields(){}
-        }';
-        $intermediaryClass = sprintf($intermediaryClass, $className, Model::getFullClassName());
-        if (!class_exists($className, false)):
-            eval($intermediaryClass);
-        endif;
 
         $from = strtolower($modelName);
         $to = strtolower($toModelName);
@@ -131,33 +125,35 @@ class ManyToManyField extends RelatedField
             $to = sprintf('to_%s', $to);
             $from = sprintf('from_%s', $from);
         endif;
-        $fields = [
-            $from => ForeignKey::createObject([
-                'to' => $modelName,
-                'dbConstraint' => $field->relation->dbConstraint,
-                'onDelete' => Delete::CASCADE,
-            ]),
-            $to => ForeignKey::createObject([
-                'to' => $toModelName,
-                'dbConstraint' => $field->relation->dbConstraint,
-                'onDelete' => Delete::CASCADE,
-            ]),
-        ];
 
-        $meta = [
-            'dbTable' => $field->_getM2MDbTable($model->meta),
-            'verboseName' => sprintf('%s-%s relationship', $from, $to),
-            'uniqueTogether' => [$from, $to],
-            'autoCreated' => true,
-        ];
+        $intermediaryClass = FormatFileContent::createObject();
+        $intermediaryClass->addItem(sprintf('class %1$s extends \%2$s{', $className, Model::getFullClassName()));
+        $intermediaryClass->addItem('public function fields(){');
+        $intermediaryClass->addItem('return [');
+        $intermediaryClass->addItem(sprintf(" '%s' =>", $from));
+        $intermediaryClass->addItem(sprintf("\\PModel::ForeignKey(['to' => %s, 'dbConstraint' => %s, 'onDelete' => 
+        Delete::CASCADE])", $modelName, $field->relation->dbConstraint));
+        $intermediaryClass->addItem(', ');
+        $intermediaryClass->addItem(sprintf(" '%s' =>", $to));
+        $intermediaryClass->addItem(sprintf("PModel::ForeignKey(['to' => %s,
+            'dbConstraint' => %s, 'onDelete' => Delete::CASCADE, ])", $toModelName, $field->relation->dbConstraint));
+        $intermediaryClass->addItem('];');
+        $intermediaryClass->addItem('}');
+        $intermediaryClass->addItem('public function getMetaSettings(){');
+        $intermediaryClass->addItem('return [');
+        $intermediaryClass->addItem(sprintf("'dbTable' => '%s',", $field->_getM2MDbTable($model->meta)));
+        $intermediaryClass->addItem(sprintf("'verboseName' => '%s',", sprintf('%s-%s relationship', $from, $to)));
+        $intermediaryClass->addItem(sprintf("'uniqueTogether' => ['%s','%s'],", $from, $to));
+        $intermediaryClass->addItem("'autoCreated' => true");
+        $intermediaryClass->addItem('];');
+        $intermediaryClass->addItem('}');
+        $intermediaryClass->addItem('}');
 
-        $className = '\\'.$className;
-        /** @var $intermediaryObj Model */
-        $intermediaryObj = new $className();
+        if (!class_exists($className, false)):
+            eval($intermediaryClass->toString());
+        endif;
 
-        $intermediaryObj->init($fields, ['meta' => $meta, 'registry' => $field->scopeModel->meta->registry]);
-
-        return $intermediaryObj;
+        return $className;
     }
 
     /**

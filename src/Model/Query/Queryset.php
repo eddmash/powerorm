@@ -72,9 +72,9 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function createObject($connection, $model, $qb = null)
+    public static function createObject($connection, $model, $query = null)
     {
-        return new static($connection, $model, $qb);
+        return new static($connection, $model, $query);
     }
 
     /**
@@ -97,7 +97,6 @@ class Queryset implements QuerysetInterface
     public function get()
     {
         $queryset = $this->_filterOrExclude(false, func_get_args());
-
         $resultCount = count($queryset);
 
         if ($resultCount == 1):
@@ -219,7 +218,6 @@ class Queryset implements QuerysetInterface
         $instance = $this->_clone();
 
         list($sql, $params) = $instance->query->asSql($this->connection);
-        var_dump($params);
 
         return $sql;
     }

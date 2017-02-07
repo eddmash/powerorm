@@ -194,7 +194,6 @@ class Meta extends DeconstructableObject implements MetaInterface
         $fields = $this->_getForwardOnlyField();
 
         if (ArrayHelper::hasKey($fields, $name)):
-
             return $fields[$name];
         endif;
 
@@ -280,11 +279,13 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getReverseRelatedObjects()
     {
+
         if (empty($this->_reverseRelationTreeCache)):
             $allRelations = [];
             /* @var $model Model */
             /* @var $field RelatedField */
             $allModels = $this->registry->getModels(true);
+            echo '--- '.$this->modelName.PHP_EOL;
 
             // collect all relation fields for this each model
             foreach ($allModels as $name => $model) :

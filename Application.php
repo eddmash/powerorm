@@ -84,8 +84,8 @@ class Application
 
         endif;
 
-        if (file_exists($vendorDir.$ds.'symfony'.$ds.'debug')):
-            ErrorHandler::register();
-        endif;
+//        if (file_exists($vendorDir.$ds.'symfony'.$ds.'debug')):
+//            ErrorHandler::register();
+//        endif;
     }
 }
