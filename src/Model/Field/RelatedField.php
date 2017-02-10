@@ -68,7 +68,7 @@ class RelatedField extends Field
         if (!$relMissing) :
             $msg = "Field defines a relation with model '%s', which is either does not exist, or is abstract.";
 
-        $error = [
+            $error = [
                 CheckError::createObject(
                     [
                         'message' => sprintf($msg, $relModel),
@@ -142,9 +142,10 @@ class RelatedField extends Field
         endif;
 
         if (is_string($this->relation->toModel)):
-            $kwargs['to'] = $this->relation->toModel; else:
+            $kwargs['to'] = $this->relation->toModel;
+        else:
             $name = $this->relation->toModel->getFullClassName();
-        $kwargs['to'] = ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace());
+            $kwargs['to'] = ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace());
         endif;
 
         if ($this->relation->parentLink):
@@ -162,13 +163,20 @@ class RelatedField extends Field
     public function getLookup($name)
     {
         if ($name == 'in'):
-            return RelatedIn::class; elseif ($name == 'exact'):
-            return RelatedExact::class; elseif ($name == 'gt'):
-            return RelatedGreaterThan::class; elseif ($name == 'gte'):
-            return RelatedGreaterThanOrEqual::class; elseif ($name == 'lt'):
-            return RelatedLessThan::class; elseif ($name == 'lte'):
-            return RelatedLessThanOrEqual::class; elseif ($name == 'isnull'):
-            return RelatedIsNull::class; else:
+            return RelatedIn::class;
+        elseif ($name == 'exact'):
+            return RelatedExact::class;
+        elseif ($name == 'gt'):
+            return RelatedGreaterThan::class;
+        elseif ($name == 'gte'):
+            return RelatedGreaterThanOrEqual::class;
+        elseif ($name == 'lt'):
+            return RelatedLessThan::class;
+        elseif ($name == 'lte'):
+            return RelatedLessThanOrEqual::class;
+        elseif ($name == 'isnull'):
+            return RelatedIsNull::class;
+        else:
             throw new TypeError(sprintf('Related Field got invalid lookup: %s', $name));
         endif;
     }
@@ -186,13 +194,15 @@ class RelatedField extends Field
         // origin of relation
 //        $this->fromField = ($this->fromField == 'this') ? $this : ;
         if ($this->fromField == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT) :
-            $this->fromField = $this; elseif (is_string($this->fromField)):
+            $this->fromField = $this;
+        elseif (is_string($this->fromField)):
             $this->fromField = $this->scopeModel->meta->getField($this->fromField);
         endif;
 
         //end point of relation
         if (is_string($this->toField)):
-            $this->toField = $this->relation->toModel->meta->getField($this->toField); else:
+            $this->toField = $this->relation->toModel->meta->getField($this->toField);
+        else:
             $this->toField = $this->relation->toModel->meta->primaryKey;
         endif;
 
@@ -274,6 +284,7 @@ class RelatedField extends Field
     {
         return $this->getInstanceValueForFields($modelInstance, $this->getForeignRelatedFields());
     }
+
     /**
      * Returns the value of fields provided from the model instance.
      *

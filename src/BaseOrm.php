@@ -437,7 +437,6 @@ class BaseOrm extends BaseObject
         self::getCheckRegistry()->register([$modelObj, 'checks'], [Tags::Model]);
 
         endforeach;
-        echo '&&&& BASEORM end <---'.PHP_EOL;
     }
 
     /**
