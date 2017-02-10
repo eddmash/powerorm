@@ -51,13 +51,15 @@ class ManyToManyField extends RelatedField
     public function __construct($kwargs)
     {
         if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && is_null($kwargs['rel']))):
-            $kwargs['rel'] = ManyToManyRel::createObject([
-                'fromField' => $this,
-                'to' => ArrayHelper::getValue($kwargs, 'to'),
-                'through' => ArrayHelper::getValue($kwargs, 'through'),
-                'throughFields' => ArrayHelper::getValue($kwargs, 'throughFields'),
-                'dbConstraint' => ArrayHelper::getValue($kwargs, 'dbConstraint', true),
-            ]);
+            $kwargs['rel'] = ManyToManyRel::createObject(
+                [
+                    'fromField' => $this,
+                    'to' => ArrayHelper::getValue($kwargs, 'to'),
+                    'through' => ArrayHelper::getValue($kwargs, 'through'),
+                    'throughFields' => ArrayHelper::getValue($kwargs, 'throughFields'),
+                    'dbConstraint' => ArrayHelper::getValue($kwargs, 'dbConstraint', true),
+                ]
+            );
         endif;
 
         $this->hasNullKwarg = ArrayHelper::hasKey($kwargs, 'null');
@@ -84,7 +86,8 @@ class ManyToManyField extends RelatedField
                 $field->doRelatedClass($related, $kwargs['scopeModel']);
             };
 
-        Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->through, ['fromField' => $this]); else:
+            Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->through, ['fromField' => $this]);
+        else:
             $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
         endif;
     }
@@ -110,7 +113,8 @@ class ManyToManyField extends RelatedField
         $modelName = $model->meta->modelName;
 
         if (is_string($field->relation->toModel)):
-            $toModelName = Tools::resolveRelation($model, $field->relation->toModel); else:
+            $toModelName = Tools::resolveRelation($model, $field->relation->toModel);
+        else:
             $toModelName = $field->relation->toModel->meta->modelName;
         endif;
 
@@ -120,18 +124,23 @@ class ManyToManyField extends RelatedField
         $to = strtolower($toModelName);
         if ($from == $to):
             $to = sprintf('to_%s', $to);
-        $from = sprintf('from_%s', $from);
+            $from = sprintf('from_%s', $from);
         endif;
         $fields = [
-            $from => ForeignKey::createObject([
-                'to' => $modelName,
-                'dbConstraint' => $field->relation->dbConstraint,
-                'onDelete' => Delete::CASCADE,
-            ]),
-            $to => ForeignKey::createObject(['to' => $toModelName,
-                'dbConstraint' => $field->relation->dbConstraint,
-                'onDelete' => Delete::CASCADE,
-            ]),
+            $from => ForeignKey::createObject(
+                [
+                    'to' => $modelName,
+                    'dbConstraint' => $field->relation->dbConstraint,
+                    'onDelete' => Delete::CASCADE,
+                ]
+            ),
+            $to => ForeignKey::createObject(
+                [
+                    'to' => $toModelName,
+                    'dbConstraint' => $field->relation->dbConstraint,
+                    'onDelete' => Delete::CASCADE,
+                ]
+            ),
         ];
 
 //        $className = '\\'.$className;
@@ -190,8 +199,10 @@ class ManyToManyField extends RelatedField
     public function _getM2MDbTable($meta)
     {
         if ($this->relation->through !== null):
-            return $this->relation->through->meta->dbTable; elseif ($this->dbTable):
-            return $this->dbTable; else:
+            return $this->relation->through->meta->dbTable;
+        elseif ($this->dbTable):
+            return $this->dbTable;
+        else:
             // oracle allows identifier of 30 chars max
             return StringHelper::truncate(sprintf('%s_%s', $meta->dbTable, $this->name), 30);
         endif;
@@ -210,12 +221,14 @@ class ManyToManyField extends RelatedField
         $warnings = [];
         if ($this->hasNullKwarg):
             $warnings = [
-                CheckWarning::createObject([
-                    'message' => sprintf('null has no effect on ManyToManyField.'),
-                    'hint' => null,
-                    'context' => $this,
-                    'id' => 'fields.W340',
-                ]),
+                CheckWarning::createObject(
+                    [
+                        'message' => sprintf('null has no effect on ManyToManyField.'),
+                        'hint' => null,
+                        'context' => $this,
+                        'id' => 'fields.W340',
+                    ]
+                ),
             ];
         endif;
 
@@ -239,17 +252,13 @@ class ManyToManyField extends RelatedField
      */
     public function getReverseRelatedFilter(Model $modelInstance)
     {
-        echo '======'.$this->scopeModel->meta->modelName;
-        echo '======'.$modelInstance->meta->modelName.PHP_EOL;
         /** @var $field RelatedField */
         $field = $this->relation->through->meta->getField($this->getM2MAttr($modelInstance, 'name'));
 
         list($lhs, $rhs) = $field->getRelatedFields();
-        var_dump($lhs->name);
-        var_dump($rhs->name);
         $name = sprintf('%s__%s', $lhs->name, $rhs->name);
-        var_dump($this->getForeignRelatedFieldsValues($modelInstance));
-//        return [$name => $modelInstance->{$rhs->getAttrName()}];
+
+        return [$name => $this->getForeignRelatedFieldsValues($modelInstance)];
     }
 
     public function getM2MAttr(Model $model, $attr)
