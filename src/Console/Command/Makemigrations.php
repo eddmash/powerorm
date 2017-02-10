@@ -38,15 +38,14 @@ class Makemigrations extends BaseCommand
 
         if (!empty($issues)):
             $message = 'The following migrations seem to indicate they are both the latest migration :'.PHP_EOL;
-            $message .= ' %s '.PHP_EOL;
-            $output->writeln(sprintf($message, Tools::stringify($issues)));
+        $message .= ' %s '.PHP_EOL;
+        $output->writeln(sprintf($message, Tools::stringify($issues)));
 
-            return;
+        return;
         endif;
 
         if ($input->getOption('no-interaction')):
-            $asker = NonInteractiveAsker::createObject($input, $output);
-        else:
+            $asker = NonInteractiveAsker::createObject($input, $output); else:
             $asker = InteractiveAsker::createObject($input, $output);
         endif;
 
@@ -61,7 +60,7 @@ class Makemigrations extends BaseCommand
         if (empty($changes)):
             $output->writeln('No changes were detected');
 
-            return;
+        return;
         endif;
 
         if ($input->getOption('dry-run')):
@@ -71,9 +70,9 @@ class Makemigrations extends BaseCommand
             /** @var $migration Migration */
             foreach ($changes as $migration) :
                 $output->writeln('  -- '.$migration->getName());
-            endforeach;
+        endforeach;
 
-            return;
+        return;
         endif;
 
         $this->_writeMigrations($changes, $input, $output);
@@ -89,19 +88,19 @@ class Makemigrations extends BaseCommand
 
             $migrationFile = MigrationFile::createObject($migration);
 
-            $fileName = $migrationFile->getFileName();
+        $fileName = $migrationFile->getFileName();
 
-            $output->writeln('  '.$fileName);
+        $output->writeln('  '.$fileName);
 
-            $operations = $migration->getOperations();
-            foreach ($operations as $op) :
+        $operations = $migration->getOperations();
+        foreach ($operations as $op) :
                 $output->writeln(sprintf('     - %s', ucwords($op->getDescription())));
-            endforeach;
+        endforeach;
 
             // write content to file.
             $handler = new FileHandler(BaseOrm::getMigrationsPath(), $fileName);
 
-            $handler->write($migrationFile->getContent());
+        $handler->write($migrationFile->getContent());
         endforeach;
     }
 

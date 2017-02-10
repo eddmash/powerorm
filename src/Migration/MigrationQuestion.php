@@ -94,17 +94,14 @@ class MigrationQuestion
         while (true):
             $default = $asker->ask(new Question($msg));
 
-            if (empty($default)):
-                $msg = "Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL;
-            elseif ($default == 'exit'):
-                return;
-            elseif ($default === false):
+        if (empty($default)):
+                $msg = "Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL; elseif ($default == 'exit'):
+                return; elseif ($default === false):
                 Console::error(PHP_EOL.' An error occured while trying to set default value');
 
-                return;
-            else:
+        return; else:
                 return $default;
-            endif;
+        endif;
         endwhile;
 
         return self::_getDefault($asker);
@@ -143,8 +140,7 @@ class MigrationQuestion
         $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if ($selected == 2):
-            return NOT_PROVIDED;
-        elseif ($selected == 3):
+            return NOT_PROVIDED; elseif ($selected == 3):
             return;
         endif;
 
@@ -166,17 +162,14 @@ class MigrationQuestion
         $msg = 'Please enter the default value now, as valid PHP '.PHP_EOL;
         while (true):
             $default = $asker->ask(new Question($msg));
-            if (empty($default)):
-                $msg = " Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL;
-            elseif ($default == 'exit'):
-                break;
-            elseif ($default === false):
+        if (empty($default)):
+                $msg = " Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL; elseif ($default == 'exit'):
+                break; elseif ($default === false):
                 Console::error(PHP_EOL.' An error occured while trying to set default value');
-                break;
-            else:
+        break; else:
                 $default_val = $default;
-                break;
-            endif;
+        break;
+        endif;
         endwhile;
 
         return $default_val;

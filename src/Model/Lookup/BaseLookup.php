@@ -51,20 +51,18 @@ class BaseLookup implements LookupInterface
 
     public function processLHS(Connection $connection)
     {
-
         return $this->lhs->getColumnName();
     }
 
     public function processRHS(Connection $connection)
     {
-        if($this->rhs instanceof Model):
+        if ($this->rhs instanceof Model):
             // get pk field
             $pk = $this->rhs->meta->primaryKey->getAttrName();
-            $this->rhs = $this->rhs->{$pk};
-        elseif(method_exists($this->rhs, 'toSql')):
+        $this->rhs = $this->rhs->{$pk}; elseif (method_exists($this->rhs, 'toSql')):
             list($sql, $params) = $this->rhs->toSql();
 
-            return [sprintf('( %s )', $sql), $params];
+        return [sprintf('( %s )', $sql), $params];
         endif;
 
         return [' ? ', $this->rhs];
@@ -88,7 +86,6 @@ class BaseLookup implements LookupInterface
         $rhs_sql = $this->getLookupOperation($rhs_sql);
 
         return [sprintf('%s %s', $lhs_sql, $rhs_sql), $rhs_params];
-
     }
 
     public function valueIsDirect()

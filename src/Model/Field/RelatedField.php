@@ -68,7 +68,7 @@ class RelatedField extends Field
         if (!$relMissing) :
             $msg = "Field defines a relation with model '%s', which is either does not exist, or is abstract.";
 
-            $error = [
+        $error = [
                 CheckError::createObject(
                     [
                         'message' => sprintf($msg, $relModel),
@@ -142,10 +142,9 @@ class RelatedField extends Field
         endif;
 
         if (is_string($this->relation->toModel)):
-            $kwargs['to'] = $this->relation->toModel;
-        else:
+            $kwargs['to'] = $this->relation->toModel; else:
             $name = $this->relation->toModel->getFullClassName();
-            $kwargs['to'] = ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace());
+        $kwargs['to'] = ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace());
         endif;
 
         if ($this->relation->parentLink):
@@ -163,20 +162,13 @@ class RelatedField extends Field
     public function getLookup($name)
     {
         if ($name == 'in'):
-            return RelatedIn::class;
-        elseif ($name == 'exact'):
-            return RelatedExact::class;
-        elseif ($name == 'gt'):
-            return RelatedGreaterThan::class;
-        elseif ($name == 'gte'):
-            return RelatedGreaterThanOrEqual::class;
-        elseif ($name == 'lt'):
-            return RelatedLessThan::class;
-        elseif ($name == 'lte'):
-            return RelatedLessThanOrEqual::class;
-        elseif ($name == 'isnull'):
-            return RelatedIsNull::class;
-        else:
+            return RelatedIn::class; elseif ($name == 'exact'):
+            return RelatedExact::class; elseif ($name == 'gt'):
+            return RelatedGreaterThan::class; elseif ($name == 'gte'):
+            return RelatedGreaterThanOrEqual::class; elseif ($name == 'lt'):
+            return RelatedLessThan::class; elseif ($name == 'lte'):
+            return RelatedLessThanOrEqual::class; elseif ($name == 'isnull'):
+            return RelatedIsNull::class; else:
             throw new TypeError(sprintf('Related Field got invalid lookup: %s', $name));
         endif;
     }
@@ -194,19 +186,27 @@ class RelatedField extends Field
         // origin of relation
 //        $this->fromField = ($this->fromField == 'this') ? $this : ;
         if ($this->fromField == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT) :
-            $this->fromField = $this;
-        elseif (is_string($this->fromField)):
+            $this->fromField = $this; elseif (is_string($this->fromField)):
             $this->fromField = $this->scopeModel->meta->getField($this->fromField);
         endif;
 
         //end point of relation
         if (is_string($this->toField)):
-            $this->toField = $this->relation->toModel->meta->getField($this->toField);
-        else:
+            $this->toField = $this->relation->toModel->meta->getField($this->toField); else:
             $this->toField = $this->relation->toModel->meta->primaryKey;
         endif;
 
         return [$this->fromField, $this->toField];
+    }
+
+    /**
+     * Fetches only fields that are foreign in a relationship i.e. on the toModel.
+     *
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getForeignRelatedFields()
+    {
+        return isset($this->getRelatedFields()[1]) ? [$this->getRelatedFields()[1]] : [];
     }
 
     /**
@@ -220,6 +220,30 @@ class RelatedField extends Field
         return $qs->filter($this->getReverseRelatedFilter($modelInstance))->get();
     }
 
+    public function setRelatedValue($value)
+    {
+        if (!$value instanceof $this->relation->toModel):
+            throw new ValueError(
+                sprintf(
+                    'Cannot assign "%s": "%s.%s" must be a "%s" instance.',
+                    $value,
+                    $this->scopeModel->meta->modelName,
+                    $this->name,
+                    $this->relation->toModel->meta->modelName
+                )
+            );
+        endif;
+        /** @var $fromField RelatedField */
+
+        /** @var $toField RelatedField */
+
+        /* @var $field RelatedField */
+        list($fromField, $toField) = $this->getRelatedFields();
+
+        // store the values
+        return [$fromField->getAttrName(), $value->{$toField->getAttrName()}];
+    }
+
     /**
      * @param Model $modelInstance
      *
@@ -228,17 +252,46 @@ class RelatedField extends Field
      */
     public function getReverseRelatedFilter(Model $modelInstance)
     {
+        /** @var $fromField Field */
+        /** @var $toField Field */
         list($fromField, $toField) = $this->getRelatedFields();
         $value = $modelInstance->{$fromField->getAttrName()};
 
         return [$toField->getAttrName() => $value];
     }
 
-    public function getRelatedQueryset()
+    public function getRelatedQueryset($modelName = null)
     {
-        $modelName = $this->getRelatedModel()->meta->modelName;
+        if (is_null($modelName)) :
+            $modelName = $this->getRelatedModel()->meta->modelName;
+        endif;
 
         /* @var $modelName Model */
         return $modelName::objects()->all();
+    }
+
+    public function getForeignRelatedFieldsValues(Model $modelInstance)
+    {
+        return $this->getInstanceValueForFields($modelInstance, $this->getForeignRelatedFields());
+    }
+    /**
+     * Returns the value of fields provided from the model instance.
+     *
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     *
+     * @param Model $modelInstance
+     * @param array $fields
+     *
+     * @return array
+     */
+    public function getInstanceValueForFields(Model $modelInstance, $fields)
+    {
+        $values = [];
+        /** @var $field Field */
+        foreach ($fields as $field) :
+            $values[] = $modelInstance->{$field->getAttrName()};
+        endforeach;
+
+        return $values;
     }
 }

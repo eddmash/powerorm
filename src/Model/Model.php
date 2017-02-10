@@ -198,7 +198,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 $this->{$field->getAttrName()} = $val;
             endif;
         endforeach;
-
     }
 
     public function fromDb($record = [])
@@ -210,6 +209,17 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endforeach;
     }
 
+    /**
+     * This method is for internal use only and should not be overriden.
+     *
+     * @ignore
+     *
+     * @internal
+     *
+     * @param array $fields
+     * @param array $kwargs
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
     public function init($fields = [], $kwargs = [])
     {
         // get meta settings for this model
@@ -695,28 +705,15 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __set($name, $value)
     {
+
+        /* @var $field RelatedField */
         try {
             $field = $this->meta->getField($name);
             if ($field->isRelation):
-                if (!$value instanceof $field->relation->toModel):
-                    throw new ValueError(
-                        sprintf(
-                            'Cannot assign "%s": "%s.%s" must be a "%s" instance.',
-                            $value,
-                            $this->meta->modelName,
-                            $field->name,
-                            $field->relation->toModel->meta->modelName
-                        )
-                    );
-                endif;
-                /** @var $fromField RelatedField */
 
-                /** @var $toField RelatedField */
-
-                /* @var $field RelatedField */
-                list($fromField, $toField) = $field->getRelatedFields();
+                list($lhs, $rhs) = $field->setRelatedValue($value);
                 // store the values
-                $this->_fieldCache[$fromField->getAttrName()] = $value->{$toField->getAttrName()};
+                $this->_fieldCache[$lhs] = $rhs;
             endif;
         } catch (FieldDoesNotExist $e) {
         }
@@ -775,7 +772,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endforeach;
 
         return $deferedFields;
-
     }
 
     /**
@@ -917,7 +913,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function prepareSave($updateFields = null, $raw = false, $forceInsert = false, $forceUpdate = false)
     {
-
         $model = $this;
 
         // for proxy models, we use the concreteModel
@@ -1006,13 +1001,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function saveParent(Model $model, $updateFields)
     {
-
         $meta = $model->meta;
         foreach ($meta->parents as $key => $field) :
             // Make sure the link fields are synced between parent and self.
 
         endforeach;
-
     }
 
     /**
@@ -1048,7 +1041,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
 
         return;
-
     }
 
     /**

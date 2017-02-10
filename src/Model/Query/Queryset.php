@@ -100,8 +100,7 @@ class Queryset implements QuerysetInterface
         $resultCount = count($queryset);
 
         if ($resultCount == 1):
-            return $queryset->getResults()[0];
-        elseif (!$resultCount):
+            return $queryset->getResults()[0]; elseif (!$resultCount):
             throw new ObjectDoesNotExist(sprintf('%s matching query does not exist.',
                 $this->model->meta->modelName));
         endif;
@@ -150,8 +149,8 @@ class Queryset implements QuerysetInterface
     {
         if (!$this->_resultsCache):
             $instance = $this->_clone();
-            $instance->qb->setMaxResults(1);
-            $this->_resultsCache = $instance->execute();
+        $instance->qb->setMaxResults(1);
+        $this->_resultsCache = $instance->execute();
         endif;
 
         return (bool) $this->_resultsCache;
@@ -235,27 +234,28 @@ class Queryset implements QuerysetInterface
 
             $this->_resultsCache = $this->mapResults($this->model, $this->execute()->fetchAll());
 
-            $this->_evaluated = true;
+        $this->_evaluated = true;
         endif;
 
         return $this->_resultsCache;
     }
 
-    public function toSql() {
+    public function toSql()
+    {
         $clone = $this->_clone();
         $clone->values($this->model->meta->primaryKey->getColumnName());
 
         return $clone->query->getNestedSql($this->connection);
     }
 
-    public function values() {
+    public function values()
+    {
         $fields = func_get_args();
 
-        if($fields):
+        if ($fields):
             $this->query->setDefaultCols(false);
-            $this->query->addSelect($fields, true);
+        $this->query->addSelect($fields, true);
         endif;
-
     }
 
     /**
@@ -302,9 +302,9 @@ class Queryset implements QuerysetInterface
         foreach ($condition as $name => $value) :
             list($connector, $lookup, $field) = $this->solveLookupType($name);
 
-            $condition = $this->buildCondition($lookup, $field, $value);
+        $condition = $this->buildCondition($lookup, $field, $value);
 
-            $this->query->addWhere($condition, $connector);
+        $this->query->addWhere($condition, $connector);
         endforeach;
     }
 
@@ -344,8 +344,7 @@ class Queryset implements QuerysetInterface
     {
         // get lookupand field
         if (preg_match(BaseLookup::$lookupPattern, $name)):
-            list($name, $lookup) = preg_split(BaseLookup::$lookupPattern, $name);
-        else:
+            list($name, $lookup) = preg_split(BaseLookup::$lookupPattern, $name); else:
             $lookup = 'exact';
         endif;
 
@@ -395,7 +394,7 @@ class Queryset implements QuerysetInterface
             // determine how to combine where statements
             list($lookup, $name) = preg_split(BaseLookup::$whereConcatPattern, $name, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-            $connector = BaseLookup::OR_CONNECTOR;
+        $connector = BaseLookup::OR_CONNECTOR;
         endif;
 
         return [$connector, $name];

@@ -241,12 +241,12 @@ class BaseOrm extends BaseObject
 
             $message = 'The database configuration have no been provided, On Codeigniter 3 create orm.php and '.
                 'add configuration, consult documentation for options';
-            throw new OrmException($message);
+        throw new OrmException($message);
         endif;
         if (static::$connection == null):
             $config = new Configuration();
 
-            static::$connection = DriverManager::getConnection($this->databaseConfigs, $config);
+        static::$connection = DriverManager::getConnection($this->databaseConfigs, $config);
         endif;
 
         return static::$connection;
@@ -295,8 +295,7 @@ class BaseOrm extends BaseObject
         $instance = null;
 
         if (ENVIRONMENT == 'POWERORM_DEV'):
-            $instance = static::_standAloneEnvironment($config);
-        else:
+            $instance = static::_standAloneEnvironment($config); else:
             $instance = static::getOrmFromContext();
         endif;
 
@@ -310,7 +309,7 @@ class BaseOrm extends BaseObject
             $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the '.
                 '$autoload[\'libraries\'] = array(\'powerorm/orm\'). On the autoload.php';
 
-            throw new OrmException($message);
+        throw new OrmException($message);
         endif;
         $orm = &$ci->orm;
 
@@ -383,11 +382,11 @@ class BaseOrm extends BaseObject
             if (ArrayHelper::hasKey($map, $name)):
 
                 $name = $map[$name];
-            endif;
+        endif;
 
-            if (property_exists($object, $name)):
+        if (property_exists($object, $name)):
                 $object->$name = $value;
-            endif;
+        endif;
 
         endforeach;
 
@@ -400,9 +399,9 @@ class BaseOrm extends BaseObject
 
             if (ENVIRONMENT == 'POWERORM_DEV'):
                 require POWERORM_BASEPATH.DIRECTORY_SEPARATOR.'config.php';
-            endif;
+        endif;
 
-            static::$instance = new static($config);
+        static::$instance = new static($config);
         endif;
 
         return static::$instance;
@@ -433,9 +432,9 @@ class BaseOrm extends BaseObject
 
             if (!$modelObj->hasMethod('checks')):
                 continue;
-            endif;
+        endif;
 
-            self::getCheckRegistry()->register([$modelObj, 'checks'], [Tags::Model]);
+        self::getCheckRegistry()->register([$modelObj, 'checks'], [Tags::Model]);
 
         endforeach;
         echo '&&&& BASEORM end <---'.PHP_EOL;

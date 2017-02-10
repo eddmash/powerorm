@@ -270,10 +270,9 @@ class Tools
         foreach ($relModels as $relM) :
             if (is_string($relM)):
 
-                $relatedModels[] = $relM;
-            elseif ($relM instanceof Model):
+                $relatedModels[] = $relM; elseif ($relM instanceof Model):
                 $relatedModels[] = $relM->meta->modelName;
-            endif;
+        endif;
         endforeach;
 
         $kwargs['scopeModel'] = $scopeModel;
@@ -283,8 +282,7 @@ class Tools
     public static function resolveRelation($model, $relModel)
     {
         if ($relModel == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT):
-            return self::resolveRelation($model, $model);
-        elseif ($relModel instanceof Model):
+            return self::resolveRelation($model, $model); elseif ($relModel instanceof Model):
             return $relModel->meta->modelName;
         endif;
 

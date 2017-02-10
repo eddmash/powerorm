@@ -23,5 +23,4 @@ class StartsWith extends PatternLookup
 
         return parent::processRHS($connection);
     }
-
 }

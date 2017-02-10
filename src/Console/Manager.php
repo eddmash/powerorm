@@ -75,13 +75,13 @@ class Manager extends Base
 
         foreach ($this->path as $path) :
             $files = (new FileHandler($path))->readDir();
-            foreach ($files as $file) :
+        foreach ($files as $file) :
                 $command = basename($file, '.php');
-                if ('BaseCommand' === $command):
+        if ('BaseCommand' === $command):
                     continue;
-                endif;
-                $console->add($this->fetchCommand($command));
-            endforeach;
+        endif;
+        $console->add($this->fetchCommand($command));
+        endforeach;
 
         endforeach;
 
@@ -112,21 +112,21 @@ class Manager extends Base
         foreach ($this->path as $package => $path) :
             $file_handler = new FileHandler($path);
 
-            $file = $file_handler->getFile($name);
-            if ($file !== false):
+        $file = $file_handler->getFile($name);
+        if ($file !== false):
                 $packageName = $package;
-                break;
-            endif;
+        break;
+        endif;
         endforeach;
 
         if (false === $file):
             $this->error(
                 sprintf('Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?'.PHP_EOL, $name,
                     $this->path));
-            $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
-            $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
+        $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
+        $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
 
-            return false;
+        return false;
         endif;
 
         // commands are in the commands namespace

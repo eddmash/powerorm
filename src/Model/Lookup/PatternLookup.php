@@ -17,5 +17,4 @@ class PatternLookup extends BaseLookup
     {
         return sprintf('LIKE %s', $rhs);
     }
-
 }

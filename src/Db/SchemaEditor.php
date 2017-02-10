@@ -82,31 +82,29 @@ class SchemaEditor extends BaseObject
         /** @var $field ForeignKey */
         foreach ($model->meta->localFields as $fname => $field) :
             $colName = $field->getColumnName();
-            $type = $field->dbType($this->connection);
+        $type = $field->dbType($this->connection);
 
             // if we don't have a type stop
             if (empty($type)):
                 continue;
-            endif;
+        endif;
 
-            if ($field->primaryKey):
-                $primaryKeyFields[] = $model->meta->primaryKey->getColumnName();
-            elseif ($field->isUnique()):
-                $unique_fields[] = $colName;
-            elseif ($field->dbIndex):
+        if ($field->primaryKey):
+                $primaryKeyFields[] = $model->meta->primaryKey->getColumnName(); elseif ($field->isUnique()):
+                $unique_fields[] = $colName; elseif ($field->dbIndex):
                 $indexes[] = $colName;
-            endif;
+        endif;
 
-            $tableDef->addColumn($colName, $type, $this->getDoctrineColumnOptions($field));
+        $tableDef->addColumn($colName, $type, $this->getDoctrineColumnOptions($field));
 
-            if ($field->isRelation && $field->relation && $field->dbConstraint):
+        if ($field->isRelation && $field->relation && $field->dbConstraint):
                 $relField = $field->getRelatedField();
-                $tableDef->addForeignKeyConstraint(
+        $tableDef->addForeignKeyConstraint(
                     $relField->scopeModel->meta->dbTable,
                     [$field->getColumnName()],
                     [$relField->getColumnName()]
                 );
-            endif;
+        endif;
         endforeach;
 
         // create the primary key
@@ -128,7 +126,7 @@ class SchemaEditor extends BaseObject
         foreach ($model->meta->localManyToMany as $name => $relationField) :
             if ($relationField->manyToMany && $relationField->relation->through->meta->autoCreated):
                 $this->createModel($relationField->relation->through);
-            endif;
+        endif;
         endforeach;
     }
 
@@ -149,7 +147,7 @@ class SchemaEditor extends BaseObject
         foreach ($model->meta->localManyToMany as $name => $relationField) :
             if ($relationField->relation->through->meta->autoCreated):
                 $this->deleteModel($relationField->relation->through);
-            endif;
+        endif;
         endforeach;
 
         $this->schemaManager->dropTable($model->meta->dbTable);
@@ -194,7 +192,7 @@ class SchemaEditor extends BaseObject
         if ($field->manyToMany && $field->relation->through->meta->autoCreated):
             $this->createModel($field->relation->through);
 
-            return;
+        return;
         endif;
 
         $type = $field->dbType($this->connection);
@@ -225,7 +223,7 @@ class SchemaEditor extends BaseObject
         if ($field->isRelation && $field->relation && $field->dbConstraint):
             $relField = $field->getRelatedField();
 
-            $tableDef->addForeignKeyConstraint(
+        $tableDef->addForeignKeyConstraint(
                 $relField->scopeModel->meta->dbTable,
                 [$field->getColumnName()],
                 [$relField->getColumnName()]
@@ -257,7 +255,7 @@ class SchemaEditor extends BaseObject
         if ($field->manyToMany && $field->relation->through->meta->autoCreated):
             $this->deleteModel($field->relation->through);
 
-            return;
+        return;
         endif;
 
         $type = $field->dbType($this->connection);
@@ -275,7 +273,7 @@ class SchemaEditor extends BaseObject
         if ($field->isRelation && $field->relation !== null):
             foreach ($this->constraintName($table, $name, ['foreignKey' => true]) as $fkConstraint) :
                 $tableDef->removeForeignKey($fkConstraint);
-            endforeach;
+        endforeach;
         endif;
 
         // remove column
@@ -313,8 +311,7 @@ class SchemaEditor extends BaseObject
 
         if (($oldType == null && $oldField->relation == null) || ($newType == null && $newField->relation == null)):
             throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define '.
-                'db_type (are you using a badly-written custom field?)', $newField->name, $oldField->name));
-        elseif ($oldType == null && $newType == null &&
+                'db_type (are you using a badly-written custom field?)', $newField->name, $oldField->name)); elseif ($oldType == null && $newType == null &&
             (
                 $oldField->relation->through != null &&
                 $newField->relation->through != null &&
@@ -322,8 +319,7 @@ class SchemaEditor extends BaseObject
                 $newField->relation->through->meta->autoCreated
             )
         ):
-            $this->_alterManyToMany($model, $oldField, $newField, $strict);
-        elseif ($oldType == null && $newType == null &&
+            $this->_alterManyToMany($model, $oldField, $newField, $strict); elseif ($oldType == null && $newType == null &&
             (
                 $oldField->relation->through != null &&
                 $newField->relation->through != null &&
@@ -331,8 +327,7 @@ class SchemaEditor extends BaseObject
                 !$newField->relation->through->meta->autoCreated
             )
         ):
-            return;
-        else:
+            return; else:
             throw new  ValueError(sprintf('Cannot alter field %s into %s - they are not compatible types '.
                 '(you cannot alter to or from M2M fields, or add or remove through= on M2M fields)',
                 $oldField->name, $newField->name));
@@ -421,7 +416,7 @@ class SchemaEditor extends BaseObject
             // if value is provided, create the defualt
             if ($default_value != NOT_PROVIDED):
                 $options['default'] = $default_value;
-            endif;
+        endif;
 
         endif;
 
@@ -458,8 +453,8 @@ class SchemaEditor extends BaseObject
             foreach ($foreignKeys as $fk) :
                 if (in_array($column, $fk->getLocalColumns())):
                     $fieldConstraints[] = $fk->getName();
-                endif;
-            endforeach;
+        endif;
+        endforeach;
         endif;
 
         return $fieldConstraints;
@@ -483,11 +478,9 @@ class SchemaEditor extends BaseObject
     public function effectiveDefault($field)
     {
         if ($field->hasDefault()):
-            $default = $field->getDefault();
-        elseif (($field->hasProperty('autoNow') && $field->autoNow) ||
+            $default = $field->getDefault(); elseif (($field->hasProperty('autoNow') && $field->autoNow) ||
             ($field->hasProperty('addAutoNow') && $field->addAutoNow)):
-            throw new NotImplemented('Please implement the date defaults');
-        else:
+            throw new NotImplemented('Please implement the date defaults'); else:
             $default = null;
         endif;
 

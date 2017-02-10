@@ -50,7 +50,7 @@ class ManyToManyField extends RelatedField
 
     public function __construct($kwargs)
     {
-        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] === null)):
+        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && is_null($kwargs['rel']))):
             $kwargs['rel'] = ManyToManyRel::createObject([
                 'fromField' => $this,
                 'to' => ArrayHelper::getValue($kwargs, 'to'),
@@ -73,7 +73,7 @@ class ManyToManyField extends RelatedField
         parent::contributeToClass($fieldName, $modelObject);
 
         // if through model is set
-        if ($this->relation->through !== null):
+        if (!is_null($this->relation->through)):
             $callback = function ($kwargs) {
                 /* @var $field RelatedField */
                 /** @var $related Model */
@@ -84,8 +84,7 @@ class ManyToManyField extends RelatedField
                 $field->doRelatedClass($related, $kwargs['scopeModel']);
             };
 
-            Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->through, ['fromField' => $this]);
-        else:
+        Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->through, ['fromField' => $this]); else:
             $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
         endif;
     }
@@ -108,12 +107,10 @@ class ManyToManyField extends RelatedField
      */
     public function createManyToManyIntermediaryModel($field, $model)
     {
-
         $modelName = $model->meta->modelName;
 
         if (is_string($field->relation->toModel)):
-            $toModelName = Tools::resolveRelation($model, $field->relation->toModel);
-        else:
+            $toModelName = Tools::resolveRelation($model, $field->relation->toModel); else:
             $toModelName = $field->relation->toModel->meta->modelName;
         endif;
 
@@ -123,21 +120,39 @@ class ManyToManyField extends RelatedField
         $to = strtolower($toModelName);
         if ($from == $to):
             $to = sprintf('to_%s', $to);
-            $from = sprintf('from_%s', $from);
+        $from = sprintf('from_%s', $from);
         endif;
+        $fields = [
+            $from => ForeignKey::createObject([
+                'to' => $modelName,
+                'dbConstraint' => $field->relation->dbConstraint,
+                'onDelete' => Delete::CASCADE,
+            ]),
+            $to => ForeignKey::createObject(['to' => $toModelName,
+                'dbConstraint' => $field->relation->dbConstraint,
+                'onDelete' => Delete::CASCADE,
+            ]),
+        ];
+
+//        $className = '\\'.$className;
+//        /** @var $intermediaryObj Model */
+
+//        $intermediaryObj = new $className();
+
+//        $intermediaryObj->init($fields, ['meta' => $meta, 'registry' => $field->scopeModel->meta->registry]);
 
         $intermediaryClass = FormatFileContent::createObject();
         $intermediaryClass->addItem(sprintf('class %1$s extends \%2$s{', $className, Model::getFullClassName()));
         $intermediaryClass->addItem('public function fields(){');
-        $intermediaryClass->addItem('return [');
-        $intermediaryClass->addItem(sprintf(" '%s' =>", $from));
-        $intermediaryClass->addItem(sprintf("\\PModel::ForeignKey(['to' => %s, 'dbConstraint' => %s, 'onDelete' => 
-        Delete::CASCADE])", $modelName, $field->relation->dbConstraint));
-        $intermediaryClass->addItem(', ');
-        $intermediaryClass->addItem(sprintf(" '%s' =>", $to));
-        $intermediaryClass->addItem(sprintf("PModel::ForeignKey(['to' => %s,
-            'dbConstraint' => %s, 'onDelete' => Delete::CASCADE, ])", $toModelName, $field->relation->dbConstraint));
-        $intermediaryClass->addItem('];');
+//        $intermediaryClass->addItem('return [');
+//        $intermediaryClass->addItem(sprintf(" '%s' =>", $from));
+//        $intermediaryClass->addItem(sprintf("\\PModel::ForeignKey(['to' => %s, 'dbConstraint' => %s, 'onDelete' =>
+//        Delete::CASCADE])", $modelName, $field->relation->dbConstraint));
+//        $intermediaryClass->addItem(', ');
+//        $intermediaryClass->addItem(sprintf(" '%s' =>", $to));
+//        $intermediaryClass->addItem(sprintf("PModel::ForeignKey(['to' => %s,
+//            'dbConstraint' => %s, 'onDelete' => Delete::CASCADE, ])", $toModelName, $field->relation->dbConstraint));
+//        $intermediaryClass->addItem('];');
         $intermediaryClass->addItem('}');
         $intermediaryClass->addItem('public function getMetaSettings(){');
         $intermediaryClass->addItem('return [');
@@ -153,7 +168,12 @@ class ManyToManyField extends RelatedField
             eval($intermediaryClass->toString());
         endif;
 
-        return $className;
+        /** @var $obj Model */
+        $obj = new $className();
+
+        $obj->init($fields);
+
+        return $obj;
     }
 
     /**
@@ -170,10 +190,8 @@ class ManyToManyField extends RelatedField
     public function _getM2MDbTable($meta)
     {
         if ($this->relation->through !== null):
-            return $this->relation->through->meta->dbTable;
-        elseif ($this->dbTable):
-            return $this->dbTable;
-        else:
+            return $this->relation->through->meta->dbTable; elseif ($this->dbTable):
+            return $this->dbTable; else:
             // oracle allows identifier of 30 chars max
             return StringHelper::truncate(sprintf('%s_%s', $meta->dbTable, $this->name), 30);
         endif;
@@ -202,5 +220,65 @@ class ManyToManyField extends RelatedField
         endif;
 
         return $warnings;
+    }
+
+    public function setRelatedValue($value)
+    {
+        $queryset = $this->getRelatedQueryset();
+        // apply filter
+        $this->getReverseRelatedFilter($this->relation->getToModel());
+
+        return [$this->getAttrName(), $queryset];
+    }
+
+    /**
+     * @param Model $modelInstance
+     *
+     * @return array
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getReverseRelatedFilter(Model $modelInstance)
+    {
+        echo '======'.$this->scopeModel->meta->modelName;
+        echo '======'.$modelInstance->meta->modelName.PHP_EOL;
+        /** @var $field RelatedField */
+        $field = $this->relation->through->meta->getField($this->getM2MAttr($modelInstance, 'name'));
+
+        list($lhs, $rhs) = $field->getRelatedFields();
+        var_dump($lhs->name);
+        var_dump($rhs->name);
+        $name = sprintf('%s__%s', $lhs->name, $rhs->name);
+        var_dump($this->getForeignRelatedFieldsValues($modelInstance));
+//        return [$name => $modelInstance->{$rhs->getAttrName()}];
+    }
+
+    public function getM2MAttr(Model $model, $attr)
+    {
+        $cache_attr = sprintf('_m2m_%s_cache', $attr);
+        if ($this->hasProperty($cache_attr)) :
+            return $this->{$cache_attr};
+        endif;
+
+        $linkName = null;
+        if ($this->relation->through_fields) :
+            $linkName = $this->relation->through_fields[0];
+        endif;
+
+        /** @var $field RelatedField */
+        foreach ($this->relation->through->meta->getFields() as $field) :
+            if ($field->isRelation &&
+                $field->relation->getToModel()->meta->modelName == $model->meta->modelName &&
+                (is_null($linkName) || $linkName == $field->name)
+            ) :
+                $this->{$cache_attr} = $field->{$attr};
+
+                return $this->{$cache_attr};
+            endif;
+        endforeach;
+    }
+
+    public function getRelatedQueryset($modelName = null)
+    {
+        return parent::getRelatedQueryset($this->relation->through->meta->modelName);
     }
 }

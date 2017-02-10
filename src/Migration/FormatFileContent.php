@@ -154,75 +154,71 @@ class FormatFileContent
             if (is_array($arg)):
 
                 if (empty($arg)):
-                    $content->addItem('[],');
-                else:
+                    $content->addItem('[],'); else:
                     $content->addItem('[');
 
-                    foreach ($arg as $key => $val) :
+        foreach ($arg as $key => $val) :
                         if (!is_int($key)):
                             $key_arr = static::forceString($key);
 
-                            if (is_array($val)):
+        if (is_array($val)):
 
                                 $content->addIndent();
-                                $content->addItem(sprintf('%1$s=>[ ', $key_arr[0]));
+        $content->addItem(sprintf('%1$s=>[ ', $key_arr[0]));
 
-                                foreach ($val as $val_key => $in_val) :
+        foreach ($val as $val_key => $in_val) :
 
                                     $val_arr = static::forceString($in_val);
-                                    $import = array_merge($import, $val_arr[1]);
+        $import = array_merge($import, $val_arr[1]);
 
-                                    $content->addIndent();
-                                    $content->addItem(sprintf("'%1\$s'=> %2\$s,", $val_key, $val_arr[0]));
-                                    $content->reduceIndent();
+        $content->addIndent();
+        $content->addItem(sprintf("'%1\$s'=> %2\$s,", $val_key, $val_arr[0]));
+        $content->reduceIndent();
 
-                                endforeach;
+        endforeach;
 
-                                $content->addItem('],');
-                                $content->reduceIndent();
-                            else:
+        $content->addItem('],');
+        $content->reduceIndent(); else:
                                 $val_arr = static::forceString($val);
-                                $content->addIndent();
-                                $content->addItem(sprintf('%1$s=> %2$s,', $key_arr[0], $val_arr[0]));
-                                $content->reduceIndent();
-                            endif;
+        $content->addIndent();
+        $content->addItem(sprintf('%1$s=> %2$s,', $key_arr[0], $val_arr[0]));
+        $content->reduceIndent();
+        endif;
 
                             // imports
                             if (!empty($key_arr[1])):
                                 $import = array_merge($import, $key_arr[1]);
-                            endif;
+        endif;
 
-                            if (!empty($val_arr[1])):
+        if (!empty($val_arr[1])):
                                 $import = array_merge($import, $val_arr[1]);
-                            endif;
-                        else:
+        endif; else:
 
                             $val_arr = static::forceString($val);
 
-                            $content->addIndent();
-                            $content->addItem(sprintf('%s', $val_arr[0]));
-                            $content->reduceIndent();
+        $content->addIndent();
+        $content->addItem(sprintf('%s', $val_arr[0]));
+        $content->reduceIndent();
 
-                            if (!empty($val_arr[1])):
+        if (!empty($val_arr[1])):
                                 $import = array_merge($import, $val_arr[1]);
-                            endif;
+        endif;
 
-                        endif;
-                    endforeach;
+        endif;
+        endforeach;
 
-                    $content->addItem('],');
+        $content->addItem('],');
 
-                endif;
-            else:
+        endif; else:
 
                 $val_array = static::forceString($arg);
-                $content->addItem(sprintf(' %s,', $val_array[0]));
+        $content->addItem(sprintf(' %s,', $val_array[0]));
 
-            endif;
+        endif;
 
-            if (!empty($val_array[1])):
+        if (!empty($val_array[1])):
                 $import = array_merge($import, $val_array[1]);
-            endif;
+        endif;
         endforeach;
 
         $string = implode(PHP_EOL, $content->buffer);
@@ -251,59 +247,58 @@ class FormatFileContent
 
         if (is_array($value)):
             $import = [];
-            $assoc = [];
+        $assoc = [];
 
-            foreach ($value as $key => $val) :
+        foreach ($value as $key => $val) :
                 if (!is_int($key)):
                     $key_arr = static::forceString($key);
-                    $val_arr = static::forceString($val);
+        $val_arr = static::forceString($val);
 
-                    array_push($assoc, sprintf('%1$s=> %2$s', $key_arr[0], $val_arr[0]));
+        array_push($assoc, sprintf('%1$s=> %2$s', $key_arr[0], $val_arr[0]));
 
-                    if (!empty($key_arr[1])):
+        if (!empty($key_arr[1])):
                         $import = array_merge($import, $key_arr[1]);
-                    endif;
+        endif;
 
-                    if (!empty($val_arr[1])):
+        if (!empty($val_arr[1])):
                         $import = array_merge($import, $val_arr[1]);
-                    endif;
-                else:
+        endif; else:
 
                     $val_arr = static::forceString($val);
-                    array_push($assoc, $val_arr[0]);
+        array_push($assoc, $val_arr[0]);
 
-                    if (!empty($val_arr[1])):
+        if (!empty($val_arr[1])):
                         $import = array_merge($import, $val_arr[1]);
-                    endif;
+        endif;
 
-                endif;
+        endif;
 
-            endforeach;
+        endforeach;
 
-            return [sprintf('[%s]', implode(', ', $assoc)), $import];
+        return [sprintf('[%s]', implode(', ', $assoc)), $import];
         endif;
 
         if (is_object($value) && $value instanceof DeConstructableInterface):
             $skel = $value->deconstruct();
 
-            $import = [$skel['path']];
+        $import = [$skel['path']];
 
-            $class = $skel['name'];
+        $class = $skel['name'];
 
-            $constructor_args = [$skel['constructorArgs']];
-            $cons_args = [];
-            foreach ($constructor_args as $arg) :
+        $constructor_args = [$skel['constructorArgs']];
+        $cons_args = [];
+        foreach ($constructor_args as $arg) :
 
                 $val_array = static::forceString($arg);
 
-                array_push($cons_args, $val_array[0]);
+        array_push($cons_args, $val_array[0]);
 
-                if (!empty($val_array[1])):
+        if (!empty($val_array[1])):
                     $import = array_merge($import, $val_array[1]);
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
-            return [sprintf('%1$s::createObject(%2$s)', $class, implode(',', $cons_args)), $import];
+        return [sprintf('%1$s::createObject(%2$s)', $class, implode(',', $cons_args)), $import];
         endif;
 
         if ($value === true):

@@ -8,11 +8,25 @@ namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\ValueError;
+use Eddmash\PowerOrm\Model\Model;
 
 class ManyToManyRel extends ForeignObjectRel
 {
     public $multiple = true;
+
+    /**
+     * @var Model
+     */
     public $through;
+
+    /**
+     * Only used when a custom intermediary model is specified.
+     *
+     * Accepts a 2-array ['field1', 'field2'], where field1 is the name of the foreign key to the model the
+     * ManyToManyField is defined on.
+     *
+     * @var array
+     */
     public $through_fields;
     public $dbConstraint = true;
 

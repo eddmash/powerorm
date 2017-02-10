@@ -332,9 +332,9 @@ class Field extends DeconstructableObject implements FieldInterface
         if ($this->hasDefault()):
             if (is_callable($this->default)):
                 return call_user_func($this->default);
-            endif;
+        endif;
 
-            return $this->default;
+        return $this->default;
         endif;
 
         return '';
@@ -420,11 +420,11 @@ class Field extends DeconstructableObject implements FieldInterface
         foreach ($defaults as $name => $default) :
             $value = ($this->hasProperty($name)) ? $this->{$name} : $default;
 
-            if ($value != $default):
+        if ($value != $default):
 
                 $constArgs[$name] = $value;
 
-            endif;
+        endif;
         endforeach;
 
         return $constArgs;

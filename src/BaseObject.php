@@ -146,10 +146,10 @@ class BaseObject
         $parents = [];
         while ($reflectionClass->getParentClass()):
             $reflectionClass = $reflectionClass->getParentClass();
-            if (in_array($reflectionClass->getName(), $stopAt)):
+        if (in_array($reflectionClass->getName(), $stopAt)):
                 break;
-            endif;
-            $parents[$reflectionClass->getName()] = $reflectionClass;
+        endif;
+        $parents[$reflectionClass->getName()] = $reflectionClass;
         endwhile;
 
         return $parents;
