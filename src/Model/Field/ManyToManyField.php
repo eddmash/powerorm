@@ -235,7 +235,7 @@ class ManyToManyField extends RelatedField
         return $warnings;
     }
 
-    public function setRelatedValue($value)
+    public function setRelatedValue(Model $modelInstance, $value)
     {
         $queryset = $this->getRelatedQueryset();
         // apply filter

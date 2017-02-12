@@ -7,4 +7,4 @@ This document explains how to use this API. Refer to the data model reference fo
 lookup options.
 
 .. note::
-    ... More Content Coming
+... More Content Coming

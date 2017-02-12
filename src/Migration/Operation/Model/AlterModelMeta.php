@@ -3,7 +3,6 @@
  * Created by eddmash <http://eddmash.com>
  * Date: 9/29/16.
  */
-
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -36,7 +35,7 @@ class AlterModelMeta extends Operation
             if (!ArrayHelper::hasKey($this->meta, $alterableOption) && ArrayHelper::hasKey($meta, $alterableOption)):
 
                 unset($meta[$alterableOption]);
-        endif;
+            endif;
         endforeach;
         $modelState->meta = $meta;
     }

@@ -70,12 +70,12 @@ abstract class Operation extends DeconstructableObject implements OperationInter
 
         if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Migration\Operation\Model')):
             $alias = 'modelOperation';
-        $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Model as %s', $alias);
+            $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Model as %s', $alias);
         endif;
 
         if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Migration\Operation\Field')):
             $alias = 'fieldOperation';
-        $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Field as %s', $alias);
+            $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Field as %s', $alias);
         endif;
 
         return [

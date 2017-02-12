@@ -5,7 +5,6 @@
  * Date: 6/19/16
  * Time: 1:17 AM.
  */
-
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
@@ -59,10 +58,11 @@ class BaseLookup implements LookupInterface
         if ($this->rhs instanceof Model):
             // get pk field
             $pk = $this->rhs->meta->primaryKey->getAttrName();
-        $this->rhs = $this->rhs->{$pk}; elseif (method_exists($this->rhs, 'toSql')):
+            $this->rhs = $this->rhs->{$pk};
+        elseif (method_exists($this->rhs, 'toSql')):
             list($sql, $params) = $this->rhs->toSql();
 
-        return [sprintf('( %s )', $sql), $params];
+            return [sprintf('( %s )', $sql), $params];
         endif;
 
         return [' ? ', $this->rhs];

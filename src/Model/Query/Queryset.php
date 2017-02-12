@@ -12,16 +12,29 @@
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
+use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
+use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
+use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 
 const PRIMARY_KEY_ID = 'pk';
 
+function getFieldNamesFromMeta(Meta $meta)
+{
+    $fieldNames = [];
+    /** @var $field Field */
+    foreach ($meta->getFields() as $field) :
+        $fieldNames[] = $field->name;
+    endforeach;
+
+    return $fieldNames;
+}
 /**
  * Represents a lazy database lookup for a set of objects.
  *
@@ -100,7 +113,8 @@ class Queryset implements QuerysetInterface
         $resultCount = count($queryset);
 
         if ($resultCount == 1):
-            return $queryset->getResults()[0]; elseif (!$resultCount):
+            return $queryset->getResults()[0];
+        elseif (!$resultCount):
             throw new ObjectDoesNotExist(sprintf('%s matching query does not exist.',
                 $this->model->meta->modelName));
         endif;
@@ -149,8 +163,8 @@ class Queryset implements QuerysetInterface
     {
         if (!$this->_resultsCache):
             $instance = $this->_clone();
-        $instance->qb->setMaxResults(1);
-        $this->_resultsCache = $instance->execute();
+            $instance->qb->setMaxResults(1);
+            $this->_resultsCache = $instance->execute();
         endif;
 
         return (bool) $this->_resultsCache;
@@ -234,7 +248,7 @@ class Queryset implements QuerysetInterface
 
             $this->_resultsCache = $this->mapResults($this->model, $this->execute()->fetchAll());
 
-        $this->_evaluated = true;
+            $this->_evaluated = true;
         endif;
 
         return $this->_resultsCache;
@@ -254,7 +268,7 @@ class Queryset implements QuerysetInterface
 
         if ($fields):
             $this->query->setDefaultCols(false);
-        $this->query->addSelect($fields, true);
+            $this->query->addSelect($fields, true);
         endif;
     }
 
@@ -302,9 +316,9 @@ class Queryset implements QuerysetInterface
         foreach ($condition as $name => $value) :
             list($connector, $lookup, $field) = $this->solveLookupType($name);
 
-        $condition = $this->buildCondition($lookup, $field, $value);
+            $condition = $this->buildCondition($lookup, $field, $value);
 
-        $this->query->addWhere($condition, $connector);
+            $this->query->addWhere($condition, $connector);
         endforeach;
     }
 
@@ -344,17 +358,51 @@ class Queryset implements QuerysetInterface
     {
         // get lookupand field
         if (preg_match(BaseLookup::$lookupPattern, $name)):
-            list($name, $lookup) = preg_split(BaseLookup::$lookupPattern, $name); else:
+            list($name, $lookup) = preg_split(BaseLookup::$lookupPattern, $name);
+        else:
             $lookup = 'exact';
         endif;
 
         // get connector
         list($connector, $name) = $this->getConnector($name);
-
+        //todo check for span relationships
+        $name = $this->validateField($name, $this->model->meta);
         $field = $this->getLookupField($name);
         $lookup = $field->getLookup($lookup);
 
         return [$connector, $lookup, $field];
+    }
+
+    /**
+     * @param $name
+     * @param Meta $meta
+     *
+     * @return
+     *
+     * @throws FieldError
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function validateField($name, Meta $meta)
+    {
+
+        if ($name === PRIMARY_KEY_ID):
+            $name = $meta->primaryKey->name;
+        endif;
+
+        $field = null;
+        try {
+
+            $field = $meta->getField($name);
+        } catch (FieldDoesNotExist $e) {
+            $available = getFieldNamesFromMeta($meta);
+            throw new FieldError(sprintf("Cannot resolve keyword '%s' into field. Choices are: [ %s ]", $name,
+                implode(', ', $available)));
+        }
+
+        return $field->name;
     }
 
     /**
@@ -394,7 +442,7 @@ class Queryset implements QuerysetInterface
             // determine how to combine where statements
             list($lookup, $name) = preg_split(BaseLookup::$whereConcatPattern, $name, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-        $connector = BaseLookup::OR_CONNECTOR;
+            $connector = BaseLookup::OR_CONNECTOR;
         endif;
 
         return [$connector, $name];
@@ -427,7 +475,6 @@ class Queryset implements QuerysetInterface
     private function mapResults($model, $results)
     {
         /* @var $newModel Model */
-
         $mapped = [];
         foreach ($results as $result) :
             $mapped[] = $this->mapResult($model, $result);
@@ -438,11 +485,10 @@ class Queryset implements QuerysetInterface
 
     private function mapResult($model, $result)
     {
-        /** @var $newModel Model */
-        $newModel = new $model->meta->modelName();
-        $newModel->fromDb($result);
+        /** @var $modelName Model */
+        $modelName = $model->meta->modelName;
 
-        return $newModel;
+        return $modelName::fromDb($modelName, $result);
     }
 
     // **************************************************************************************************

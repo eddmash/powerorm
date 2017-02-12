@@ -73,9 +73,9 @@ class Query extends BaseObject
         $results = array_merge($results, $fromClause);
         if ($this->where):
             $results[] = 'WHERE';
-        list($sql, $whereParams) = $this->getWhereSql($connection);
-        $results[] = $sql;
-        $params = array_merge($params, $whereParams);
+            list($sql, $whereParams) = $this->getWhereSql($connection);
+            $results[] = $sql;
+            $params = array_merge($params, $whereParams);
         endif;
 
         return [implode(' ', $results), $params];
@@ -92,14 +92,14 @@ class Query extends BaseObject
                 // if we have another condition already added, add the connector
                 if ($whereSql):
                     $whereSql[] = $connector;
-        endif;
-        list($sql, $parms) = $lookup->asSql($connection);
-        $whereSql[] = $sql;
-        if (!is_array($parms)):
+                endif;
+                list($sql, $parms) = $lookup->asSql($connection);
+                $whereSql[] = $sql;
+                if (!is_array($parms)):
                     $parms = [$parms];
-        endif;
-        $whereParams = array_merge($whereParams, $parms);
-        endforeach;
+                endif;
+                $whereParams = array_merge($whereParams, $parms);
+            endforeach;
 
         endforeach;
 
@@ -147,7 +147,7 @@ class Query extends BaseObject
             /** @var $field Field */
             foreach ($meta->getLocalConcreteFields() as $name => $field) :
                 $this->select[] = $field->getColumnName();
-        endforeach;
+            endforeach;
         endif;
 
         return implode(', ', $this->select);

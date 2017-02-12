@@ -54,8 +54,8 @@ class Registry extends BaseObject
     public function populate()
     {
         if ($this->ready == false) :
-        $this->_populateRegistry();
-        $this->ready = true;
+            $this->_populateRegistry();
+            $this->ready = true;
         endif;
 
         return;
@@ -109,8 +109,8 @@ class Registry extends BaseObject
         foreach ($this->allModels as $name => $model) :
             if ($model->meta->autoCreated):
                 continue;
-        endif;
-        $models[$name] = $model;
+            endif;
+            $models[$name] = $model;
         endforeach;
 
         return $models;
@@ -140,15 +140,15 @@ class Registry extends BaseObject
                 // if we cannot create an instance of a class just skip, e.g traits abstrat etc
                 if (!$reflect->isInstantiable()) :
                     continue;
-        endif;
+                endif;
 
-        if ($this->hasModel($className)):
+                if ($this->hasModel($className)):
                     continue;
-        endif;
+                endif;
 
-        new $className();
+                new $className();
 
-        endforeach;
+            endforeach;
         endif;
     }
 
@@ -202,12 +202,12 @@ class Registry extends BaseObject
         $namespace = BaseOrm::getModelsNamespace();
         foreach ($this->getModelFiles() as $file) :
             $className = ClassHelper::getClassNameFromFile($file, BaseOrm::getModelsPath());
-        $foundClass = ClassHelper::classExists($className, $namespace);
-        if (!$foundClass):
+            $foundClass = ClassHelper::classExists($className, $namespace);
+            if (!$foundClass):
                 throw new ClassNotFoundException(
                     sprintf('The class [ %1$s\\%2$s or \\%1$s ] could not be located', $className, $namespace));
-        endif;
-        $models[] = $foundClass;
+            endif;
+            $models[] = $foundClass;
         endforeach;
 
         return $models;

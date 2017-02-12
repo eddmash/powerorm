@@ -12,18 +12,19 @@
 namespace Eddmash\PowerOrm\Helpers;
 
 /*
-             * some method borrowed from Yii\helpers\BaseArrayHelper
-             * Part of the Yii framework.
-             *
-             * @version    2.0
-             *
-             * @author Qiang Xue <qiang.xue@gmail.com>
-             *
-             * @link http://www.yiiframework.com/
-             *
-             * @copyright Copyright (c) 2008 Yii Software LLC
-             * @license http://www.yiiframework.com/license/
-             */
+                     * some method borrowed from Yii\helpers\BaseArrayHelper
+                     * Part of the Yii framework.
+                     *
+                     * @version    2.0
+                     *
+                     * @author Qiang Xue <qiang.xue@gmail.com>
+                     *
+                     * @link http://www.yiiframework.com/
+                     *
+                     * @copyright Copyright (c) 2008 Yii Software LLC
+                     * @license http://www.yiiframework.com/license/
+                     */
+use Eddmash\PowerOrm\Exception\KeyError;
 
 /**
  * Class Arrays.
@@ -92,6 +93,33 @@ class ArrayHelper
     public static function getValue($haystack, $key, $default = null)
     {
         return isset($haystack[$key]) ? $haystack[$key] : $default;
+    }
+
+    /**
+     * Return the value for key if key is in the array, else default. If default is not given, raise key error
+     * This never raise 'PHP Notice:  Undefined index: '.
+     *
+     * @param $haystack
+     * @param $key
+     * @param null $default
+     *
+     * @return mixed
+     *
+     * @throws KeyError
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function pop($haystack, $key, $default = null)
+    {
+        if (isset($haystack[$key])):
+            return $haystack[$key];
+        elseif(!is_null($default)):
+            return $default;
+        endif;
+
+        throw new KeyError(sprintf(' %s does not exist in the array', $key));
     }
 
     /**

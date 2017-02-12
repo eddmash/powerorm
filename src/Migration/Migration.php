@@ -152,10 +152,10 @@ class Migration implements MigrationInterface
             // preserve state before operation
             $oldState = $state->deepClone();
 
-        $operation->updateState($state);
-        $schemaEditor->connection->transactional(function () use ($operation, $schemaEditor, $oldState, $state) {
-            $operation->databaseForwards($schemaEditor, $oldState, $state);
-        });
+            $operation->updateState($state);
+            $schemaEditor->connection->transactional(function () use ($operation, $schemaEditor, $oldState, $state) {
+                $operation->databaseForwards($schemaEditor, $oldState, $state);
+            });
         endforeach;
 
         return $state;
@@ -193,8 +193,8 @@ class Migration implements MigrationInterface
         foreach ($this->operations as $operation) :
             //Preserve new state from previous run to not tamper the same state over all operations
             $newState = $newState->deepClone();
-        $oldState = $newState->deepClone();
-        $operation->updateState($newState);
+            $oldState = $newState->deepClone();
+            $operation->updateState($newState);
             /*
              * we insert them in the reverse order so the last operation is run first
              */

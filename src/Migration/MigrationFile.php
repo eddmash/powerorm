@@ -83,9 +83,9 @@ class MigrationFile
         foreach ($this->migration->getOperations() as $op) :
             list($opString, $importString) = FormatFileContent::formatObject($op);
 
-        array_push($stringedOperations, $opString);
+            array_push($stringedOperations, $opString);
 
-        $imports = array_merge($imports, $importString);
+            $imports = array_merge($imports, $importString);
         endforeach;
 
         $imports = array_unique($imports);
@@ -94,7 +94,7 @@ class MigrationFile
 
         foreach ($imports as $import) :
             $import = sprintf('use %s;', $import);
-        $importPaths .= $import.PHP_EOL;
+            $importPaths .= $import.PHP_EOL;
         endforeach;
 
         $opContent = '['.PHP_EOL;

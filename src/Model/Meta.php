@@ -227,7 +227,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         foreach ($this->_getForwardOnlyField() as $name => $field) :
             if (!$field->manyToMany):
                 $forwardFields[$name] = $field;
-        endif;
+            endif;
         endforeach;
 
         return $forwardFields;
@@ -251,10 +251,11 @@ class Meta extends DeconstructableObject implements MetaInterface
         $concreteFields = [];
 
         /** @var $field Field */
-        foreach ($this->_getForwardOnlyField() as $name => $field) :
+        foreach ($this->getNonM2MForwardFields() as $name => $field) :
+
             if ($field->concrete):
                 $concreteFields[$name] = $field;
-        endif;
+            endif;
         endforeach;
 
         return $concreteFields;
@@ -293,23 +294,23 @@ class Meta extends DeconstructableObject implements MetaInterface
                 // just get the forward fields
                 $fields = $model->meta->_getFields(['includeParents' => false, 'reverse' => false]);
 
-        foreach ($fields as $field) :
+                foreach ($fields as $field) :
 
                     if ($field->isRelation && $field->getRelatedModel() !== null):
 
                         $allRelations[$field->relation->toModel->meta->modelName][$field->name] = $field;
 
-        endif;
-        endforeach;
+                    endif;
+                endforeach;
 
-        endforeach;
+            endforeach;
 
             // set cache relation to models
             foreach ($allModels as $name => $model) :
                 // get fields for each model
                 $fields = (isset($allRelations[$name])) ? $allRelations[$name] : [];
-        $model->meta->_reverseRelationTreeCache = $fields;
-        endforeach;
+                $model->meta->_reverseRelationTreeCache = $fields;
+            endforeach;
         endif;
 
         return $this->_reverseRelationTreeCache;
@@ -339,7 +340,7 @@ class Meta extends DeconstructableObject implements MetaInterface
             if (ArrayHelper::hasKey($this->overrides, $defaultName)):
 
                 $this->{$defaultName} = $this->overrides[$defaultName];
-        endif;
+            endif;
         endforeach;
 
         if ($this->dbTable == null):
@@ -376,10 +377,12 @@ class Meta extends DeconstructableObject implements MetaInterface
     public function addField($field)
     {
         if ($field->relation != null && $field->manyToMany):
-            $this->localManyToMany[$field->name] = $field; elseif ($field->relation != null && $field->inverse):
-            $this->inverseFields[$field->name] = $field; else:
+            $this->localManyToMany[$field->name] = $field;
+        elseif ($field->relation != null && $field->inverse):
+            $this->inverseFields[$field->name] = $field;
+        else:
             $this->localFields[$field->name] = $field;
-        $this->setupPrimaryKey($field);
+            $this->setupPrimaryKey($field);
         endif;
     }
 
@@ -411,8 +414,9 @@ class Meta extends DeconstructableObject implements MetaInterface
         if (empty($this->primaryKey)):
             if (!empty($this->parents)):
                 $field = current(array_values($this->parents));
-        $field->primaryKey = true;
-        $this->setupPrimaryKey($field); else:
+                $field->primaryKey = true;
+                $this->setupPrimaryKey($field);
+            else:
                 $field = AutoField::createObject(
                     [
                         'verboseName' => 'ID',
@@ -420,8 +424,8 @@ class Meta extends DeconstructableObject implements MetaInterface
                         'autoCreated' => true,
                     ]
                 );
-        $model->addToClass('id', $field);
-        endif;
+                $model->addToClass('id', $field);
+            endif;
         endif;
     }
 
@@ -480,9 +484,9 @@ class Meta extends DeconstructableObject implements MetaInterface
                     $value,
                     BaseObject::getFullClassName()
                 )) ? '** hidden **' : (string) $value;
-        continue;
-        endif;
-        $meta[$name] = $value;
+                continue;
+            endif;
+            $meta[$name] = $value;
         endforeach;
 
         return $meta;

@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Lookup\Related;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Model\Lookup\In;
 
 class RelatedIn extends In

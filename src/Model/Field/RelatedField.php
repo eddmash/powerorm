@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
+use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -21,6 +22,7 @@ use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedExact;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedIn;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
  * Base class that all relational fields inherit from.
@@ -222,15 +224,25 @@ class RelatedField extends Field
     /**
      * @param Model $modelInstance
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     *
+     * @return mixed
      */
     public function getRelatedValue(Model $modelInstance)
     {
-        $qs = $this->getRelatedQueryset();
+        $relObj = null;
 
-        return $qs->filter($this->getReverseRelatedFilter($modelInstance))->get();
+        try{
+            $relObj = $modelInstance->{$this->getAttrName()};
+        }catch (AttributeError $e){
+            $qs = $this->getRelatedQueryset();
+
+            $relObj = $qs->filter($this->getReverseRelatedFilter($modelInstance))->get();
+        }
+
+        return $relObj;
     }
 
-    public function setRelatedValue($value)
+    public function setRelatedValue(Model $modelInstance, $value)
     {
         if (!$value instanceof $this->relation->toModel):
             throw new ValueError(
@@ -249,8 +261,8 @@ class RelatedField extends Field
 
         /* @var $field RelatedField */
         list($fromField, $toField) = $this->getRelatedFields();
+        $modelInstance->{$fromField->name} = $value;
 
-        // store the values
         return [$fromField->getAttrName(), $value->{$toField->getAttrName()}];
     }
 
@@ -270,6 +282,15 @@ class RelatedField extends Field
         return [$toField->getAttrName() => $value];
     }
 
+    /**
+     * @param null $modelName
+     *
+     * @return Queryset
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function getRelatedQueryset($modelName = null)
     {
         if (is_null($modelName)) :

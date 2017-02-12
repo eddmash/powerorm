@@ -84,7 +84,7 @@ class ModelState extends BaseObject
                     throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name,
                         $model->meta->modelName));
                 }
-        endforeach;
+            endforeach;
         endif;
 
         $overrides = $model->meta->getOverrides();
@@ -93,8 +93,8 @@ class ModelState extends BaseObject
         foreach ($overrides as $name => $value) :
             if (in_array($name, $ignore)):
                 continue;
-        endif;
-        $meta[$name] = $value;
+            endif;
+            $meta[$name] = $value;
         endforeach;
 
         $extends = '';

@@ -13,9 +13,9 @@ Overview
 **************
 
 .. toctree::
-   :titlesonly:
+:titlesonly:
 
-   intro/index
+       intro/index
 
 
 **************
@@ -23,18 +23,18 @@ Model
 **************
 
 .. toctree::
-    :titlesonly:
+:titlesonly:
 
-    model/index
+        model/index
 
 **************
 Queries
 **************
 
 .. toctree::
-    :titlesonly:
+:titlesonly:
 
-    queries/index
+        queries/index
 
 
 **************
@@ -42,18 +42,18 @@ Migration
 **************
 
 .. toctree::
-    :titlesonly:
+:titlesonly:
 
-    migration/index
+        migration/index
 
 **************
 Form
 **************
 
 .. toctree::
-    :titlesonly:
+:titlesonly:
 
-    form/index
+        form/index
 
 
 ************************
@@ -61,9 +61,9 @@ Extra Information
 ************************
 
 .. toctree::
-    :titlesonly:
+:titlesonly:
 
-    license
-    changelog
+        license
+        changelog
 
 

@@ -114,7 +114,7 @@ class Graph
             // if not children exist this must be the latest migration
             if (empty($children)):
                 $leaves[] = $name;
-        endif;
+            endif;
 
         endforeach;
 
@@ -182,7 +182,7 @@ class Graph
             // if no parent exist this must be the first migration aka adam/eve which ever tickles your fancy
             if (empty($parents)):
                 $root[] = $name;
-        endif;
+            endif;
 
         endforeach;
 
@@ -218,13 +218,13 @@ class Graph
             // get lineage
             $lineage_members = $this->getAncestryTree($leaf);
 
-        foreach ($lineage_members as $i => $l_member) :
+            foreach ($lineage_members as $i => $l_member) :
 
                 if (in_array($l_member, $lineage)):
                     continue;
-        endif;
-        $lineage[] = $l_member;
-        endforeach;
+                endif;
+                $lineage[] = $l_member;
+            endforeach;
 
         endforeach;
 
@@ -233,7 +233,7 @@ class Graph
         foreach ($lineage as $member) :
 
             $migration = $this->nodes[$member];
-        $state = $migration->updateState($state);
+            $state = $migration->updateState($state);
 
         endforeach;
 

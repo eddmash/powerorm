@@ -201,6 +201,13 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public $scopeModel;
 
+    /**
+     * caches value for this field.
+     *
+     * @var
+     */
+    private $cacheName;
+
     public $oneToMany = false;
     public $oneToOne = false;
     public $manyToMany = false;
@@ -273,7 +280,7 @@ class Field extends DeconstructableObject implements FieldInterface
             $this->name = $fieldName;
         endif;
         $this->attrName = $this->getAttrName();
-        $this->concrete = empty($this->getColumnName());
+        $this->concrete = empty($this->getColumnName()) === false;
 
         if (empty($this->verboseName)):
             $this->verboseName = ucwords(str_replace('_', ' ', $this->name));
@@ -332,9 +339,9 @@ class Field extends DeconstructableObject implements FieldInterface
         if ($this->hasDefault()):
             if (is_callable($this->default)):
                 return call_user_func($this->default);
-        endif;
+            endif;
 
-        return $this->default;
+            return $this->default;
         endif;
 
         return '';
@@ -420,11 +427,11 @@ class Field extends DeconstructableObject implements FieldInterface
         foreach ($defaults as $name => $default) :
             $value = ($this->hasProperty($name)) ? $this->{$name} : $default;
 
-        if ($value != $default):
+            if ($value != $default):
 
                 $constArgs[$name] = $value;
 
-        endif;
+            endif;
         endforeach;
 
         return $constArgs;
@@ -566,6 +573,22 @@ class Field extends DeconstructableObject implements FieldInterface
     public function __toString()
     {
         return $this->scopeModel->getFullClassName().'->'.$this->name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCacheName()
+    {
+        return $this->cacheName;
+    }
+
+    /**
+     * @param mixed $cacheName
+     */
+    public function setCacheName($cacheName)
+    {
+        $this->cacheName = $cacheName;
     }
 
 //    public function __debugInfo()

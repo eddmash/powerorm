@@ -35,7 +35,8 @@ class CharField extends Field
                     'context' => $this,
                     'id' => 'fields.E120',
                 ]),
-            ]; elseif ($this->maxLength <= 0 || is_string($this->maxLength)):
+            ];
+        elseif ($this->maxLength <= 0 || is_string($this->maxLength)):
             $errors = [
                 CheckError::createObject([
                     'message' => '"maxLength" must be a positive integer.',

@@ -92,7 +92,8 @@ class Executor extends BaseObject
         $targets = is_array($targets) ? $targets : [$targets];
 
         if ($cleanStart):
-            $applied = []; else:
+            $applied = [];
+        else:
             $applied = $this->loader->appliedMigrations;
         endif;
 
@@ -107,10 +108,11 @@ class Executor extends BaseObject
                                 'migration' => $this->loader->graph->getMigration($migrationName),
                                 'unapply' => true,
                             ];
-        unset($applied[$migrationName]);
-        endif;
-        endforeach;
-        endforeach; elseif (in_array($target, $applied)):
+                            unset($applied[$migrationName]);
+                        endif;
+                    endforeach;
+                endforeach;
+            elseif (in_array($target, $applied)):
 
                 // if its applied then we need to unapply it.
 
@@ -122,11 +124,12 @@ class Executor extends BaseObject
                                 'migration' => $this->loader->graph->getMigration($migrationName),
                                 'unapply' => true,
                             ];
-        unset($applied[$migrationName]);
-        endif;
-        endforeach;
+                            unset($applied[$migrationName]);
+                        endif;
+                    endforeach;
 
-        endforeach; else:
+                endforeach;
+            else:
                 // if not applied and its not target is not zero, then apply it.
                 foreach ($this->loader->graph->getAncestryTree($target) as $migrationName) :
                     if (!in_array($migrationName, $applied)):
@@ -134,10 +137,10 @@ class Executor extends BaseObject
                             'migration' => $this->loader->graph->getMigration($migrationName),
                             'unapply' => false,
                         ];
-        $applied[] = $migrationName;
-        endif;
-        endforeach;
-        endif;
+                        $applied[] = $migrationName;
+                    endif;
+                endforeach;
+            endif;
         endforeach;
 
         return $plan;
@@ -179,13 +182,13 @@ class Executor extends BaseObject
             // this is to avoid any further mutations by other migrations not in the list.
             if (empty($migrationsToRun)):
                 break;
-        endif;
+            endif;
 
-        $run = ArrayHelper::hasKey($migrationsToRun, $migName);
-        if ($run):
+            $run = ArrayHelper::hasKey($migrationsToRun, $migName);
+            if ($run):
                 $states[$migName] = $state->deepClone();
-        unset($migrationsToRun[$migName]);
-        endif;
+                unset($migrationsToRun[$migName]);
+            endif;
 
             // $run will be false if the migration is not in the $migrationsToRun list
             // so there is not need to preserve state else if its in the list we need to  we will get a new state object
@@ -200,9 +203,10 @@ class Executor extends BaseObject
         foreach ($plan as $mName => $migrationMeta) :
 
             if ($migrationMeta['unapply']):
-                $this->unApplyMigration($states[$mName], $migrationMeta['migration'], $fake); else:
+                $this->unApplyMigration($states[$mName], $migrationMeta['migration'], $fake);
+            else:
                 $this->applyMigration($states[$mName], $migrationMeta['migration'], $fake);
-        endif;
+            endif;
         endforeach;
     }
 
@@ -229,7 +233,8 @@ class Executor extends BaseObject
         $this->recorder->recordUnApplied(['name' => $migration->getName()]);
 
         if ($fake):
-            $end = Console::ansiFormat('FAKED', [Console::FG_GREEN]); else:
+            $end = Console::ansiFormat('FAKED', [Console::FG_GREEN]);
+        else:
             $end = Console::ansiFormat('OK', [Console::FG_GREEN]);
         endif;
 
@@ -261,7 +266,8 @@ class Executor extends BaseObject
         $this->recorder->recordApplied(['name' => $migration->getName()]);
 
         if ($fake):
-            $end = Console::ansiFormat('FAKED', [Console::FG_GREEN]); else:
+            $end = Console::ansiFormat('FAKED', [Console::FG_GREEN]);
+        else:
             $end = Console::ansiFormat('OK', [Console::FG_GREEN]);
         endif;
 

@@ -48,10 +48,11 @@ class CreateModel extends ModelOperation
 
             if (StringHelper::isEmpty($constructorArgs['extends']) || Model::isModelBase($constructorArgs['extends'])):
 
-                unset($constructorArgs['extends']); else:
+                unset($constructorArgs['extends']);
+            else:
                 $constructorArgs['extends'] =
                     ClassHelper::getNameFromNs($constructorArgs['extends'], BaseOrm::getModelsNamespace());
-        endif;
+            endif;
         endif;
 
         return $constructorArgs;
@@ -99,24 +100,24 @@ class CreateModel extends ModelOperation
                 // check if there is an operation in between that references the same model if so, don't merge
                 if ($operation->field->isRelation) :
                     $modelName = $operation->field->relation->toModel->meta->modelName;
-        foreach ($inBetween as $between) :
+                    foreach ($inBetween as $between) :
                         if ($between->referencesModel($modelName)) :
                             return false;
-        endif;
+                        endif;
 
-        if ($operation->field->relation->hasProperty('through') && $operation->field->relation->through) :
+                        if ($operation->field->relation->hasProperty('through') && $operation->field->relation->through) :
                             $modelName = $operation->field->relation->through->toModel->meta->modelName;
-        if ($between->referencesModel($modelName)) :
+                            if ($between->referencesModel($modelName)) :
                                 return false;
-        endif;
-        endif;
-        endforeach;
-        endif;
+                            endif;
+                        endif;
+                    endforeach;
+                endif;
 
-        $fields = $this->fields;
-        $fields[$operation->field->name] = $operation->field;
+                $fields = $this->fields;
+                $fields[$operation->field->name] = $operation->field;
 
-        return [
+                return [
                     static::createObject([
                         'name' => $this->name,
                         'fields' => $fields,
@@ -125,7 +126,7 @@ class CreateModel extends ModelOperation
                     ]),
                 ];
 
-        endif;
+            endif;
         endif;
 
         return parent::reduce($operation, $inBetween);

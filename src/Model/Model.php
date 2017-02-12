@@ -18,6 +18,7 @@ use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
+use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
@@ -166,47 +167,68 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function __construct($kwargs = [])
     {
         $this->constructorArgs = $kwargs;
-
         $this->init();
-
         if ($kwargs):
-            $fields = $this->meta->getConcreteFields();
+            // get also related field if we have kwargs
+            $fields = $this->meta->getNonM2MForwardFields();
         else:
-            $fields = $this->meta->getFields();
+            // otherwise get only the concrete fields
+            $fields = $this->meta->getConcreteFields();
         endif;
 
-        /** @var $field Field */
+        /* @var $field Field */
         foreach ($fields as $name => $field) :
+            if (!array_key_exists($field->getAttrName(), $kwargs) and is_null($field->getColumnName())):
+                continue;
+            endif;
+
             $val = null;
             $isRelated = false;
+            $relObject = null;
             if ($kwargs):
                 if ($field instanceof RelatedField):
-                    //todo
-                    $isRelated = true;
+                    try {
+                        $relObject = ArrayHelper::pop($kwargs, $field->name);
+                        $isRelated = true;
+                    } catch (KeyError $e) {
+                        try {
+                            $val = ArrayHelper::pop($kwargs, $field->getAttrName());
+                        } catch (KeyError $e) {
+                            $val = $field->getDefault();
+                        }
+                    }
+
+                    // Object instance was passed in, You can
+                    // pass in null for related objects if it's allowed.
+                    if (is_null($relObject) && $field->null):
+                        $val = null;
+                    endif;
 
                 else:
-                    $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), $field->getDefault());
+                    try {
+                        $val = ArrayHelper::pop($kwargs, $field->getAttrName());
+                    } catch (KeyError $e) {
+                        $val = $field->getDefault();
+                    }
                 endif;
             else:
                 $val = $field->getDefault();
             endif;
 
             if ($isRelated):
-                //todo
-
+                $this->{$field->name} = $relObject;
             else:
                 $this->{$field->getAttrName()} = $val;
             endif;
         endforeach;
+//        endif;
     }
 
-    public function fromDb($record = [])
+    public static function fromDb($modelName, $records = [])
     {
-        foreach ($record as $name => $value) :
+        $newModel = new $modelName($records);
 
-            $this->{$name} = $value;
-
-        endforeach;
+        return $newModel;
     }
 
     /**
@@ -711,7 +733,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $field = $this->meta->getField($name);
             if ($field->isRelation):
 
-                list($lhs, $rhs) = $field->setRelatedValue($value);
+                list($lhs, $rhs) = $field->setRelatedValue($this, $value);
                 // store the values
                 $this->_fieldCache[$lhs] = $rhs;
             endif;
@@ -829,11 +851,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 endif;
 
                 $relObject = $this->{$field->name};
-                if ($relObject && $relObject->meta->primaryKey !== null):
+
+                if ($relObject && is_null($relObject->meta->primaryKey)):
                     throw new ValueError(
                         sprintf(
-                            'save() prohibited to prevent data loss due to '.
-                            "unsaved related object '%s'.",
+                            "save() prohibited to prevent data loss due to unsaved related object '%s'.",
                             $field->name
                         )
                     );
@@ -951,7 +973,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $forceInsert = false,
         $forceUpdate = false,
         $updateFields = null
-    ) {
+    )
+    {
         $meta = $this->meta;
 
         $nonPkFields = [];
@@ -1003,7 +1026,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         $meta = $model->meta;
         foreach ($meta->parents as $key => $field) :
-            // Make sure the link fields are synced between parent and self.
+            // Make sure the link fields are synced between parent and self.todo
 
         endforeach;
     }

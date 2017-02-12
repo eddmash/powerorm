@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm;
 
-use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Helpers\Tools;
 
 /**
@@ -146,10 +145,10 @@ class BaseObject
         $parents = [];
         while ($reflectionClass->getParentClass()):
             $reflectionClass = $reflectionClass->getParentClass();
-        if (in_array($reflectionClass->getName(), $stopAt)):
+            if (in_array($reflectionClass->getName(), $stopAt)):
                 break;
-        endif;
-        $parents[$reflectionClass->getName()] = $reflectionClass;
+            endif;
+            $parents[$reflectionClass->getName()] = $reflectionClass;
         endwhile;
 
         return $parents;

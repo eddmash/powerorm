@@ -3,7 +3,7 @@ Model Meta Settings
 #############################
 
 .. contents::
-   :local:
+:local:
    :depth: 1
 
 dbTable
