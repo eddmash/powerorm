@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Console\Question\Asker;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\AlterField;
 use Eddmash\PowerOrm\Migration\Operation\Field\RemoveField;
@@ -148,6 +149,7 @@ class AutoDetector extends BaseObject
     public function getChanges($graph, $migrationName = null)
     {
         $changes = $this->_detectChanges($graph);
+
         $changes = $this->_arrangeForGraph($changes, $graph, $migrationName);
 
         return $changes;
@@ -232,6 +234,7 @@ class AutoDetector extends BaseObject
 
         // *** fields
         $this->generateRenamedFields();
+
         $this->generateAddedFields();
         $this->generateRemovedFields();
         $this->generateAlteredFields();
@@ -417,6 +420,16 @@ class AutoDetector extends BaseObject
     private function getOldModelName($modelName)
     {
         return (in_array($modelName, $this->renamedModels)) ? $this->renamedModels[$modelName] : $modelName;
+    }
+
+    private function getOldFieldName($modelName, $fieldName)
+    {
+        $modelRenamedFields = ArrayHelper::getValue($this->renamedFields, $modelName, []);
+        if ($modelRenamedFields) :
+            $fieldName = ArrayHelper::getValue($modelRenamedFields, $fieldName, $fieldName);
+        endif;
+
+        return $fieldName;
     }
 
     // ******************** GENERATIONS CHANGES ***********************
@@ -873,8 +886,9 @@ class AutoDetector extends BaseObject
 
                             // remove the old name and update with the new name.
                             $pos = array_search($remField, $this->oldFieldKeys[$modelName]);
+
                             array_splice($this->oldFieldKeys[$modelName], $pos, 1, [$addedField]);
-                            $this->renamedFields[$addedField] = $remField;
+                            $this->renamedFields[$modelName][$addedField] = $remField;
                             break;
 
                         endif;
@@ -951,7 +965,8 @@ class AutoDetector extends BaseObject
             $oldModelName = $this->getOldModelName($modelName);
 
             foreach ($keptFieldKeys as $keptField) :
-                $oldField = $this->oldRegistry->getModel($oldModelName)->meta->getField($keptField);
+                $oldFieldName = $this->getOldFieldName($modelName, $keptField);
+                $oldField = $this->oldRegistry->getModel($oldModelName)->meta->getField($oldFieldName);
                 $newField = $this->newRegistry->getModel($modelName)->meta->getField($keptField);
 
                 $oldDec = $this->deepDeconstruct($oldField);
@@ -993,6 +1008,7 @@ class AutoDetector extends BaseObject
                         $this->_generateAddedFields($modelName, $keptField);
                     endif;
                 endif;
+
             endforeach;
 
         endforeach;

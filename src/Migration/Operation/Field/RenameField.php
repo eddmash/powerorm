@@ -32,12 +32,13 @@ class RenameField extends FieldOperation
         $fields = $state->modelStates[$this->modelName]->fields;
         $fieldsNew = [];
         foreach ($fields as $name => $field) :
-            if ($name == $this->oldName):
+            if ($name === $this->oldName):
                 $fieldsNew[$this->newName] = $field;
             else:
                 $fieldsNew[$name] = $field;
             endif;
         endforeach;
+
         $state->modelStates[$this->modelName]->fields = $fieldsNew;
     }
 

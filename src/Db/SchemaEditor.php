@@ -15,13 +15,16 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Doctrine\DBAL\Schema\Index;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\ValueError;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
+use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
 
 class SchemaEditor extends BaseObject
@@ -306,36 +309,39 @@ class SchemaEditor extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function alterField($model, $oldField, $newField, $strict = false)
+    public function alterField(Model $model, Field $oldField, Field $newField, $strict = false)
     {
         $oldType = $oldField->dbType($this->connection);
         $newType = $newField->dbType($this->connection);
 
-        if (($oldType == null && $oldField->relation == null) || ($newType == null && $newField->relation == null)):
+        if ((is_null($oldType) && is_null($oldField->relation)) || (is_null($newType) && is_null($newField->relation))):
             throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define '.
                 'db_type (are you using a badly-written custom field?)', $newField->name, $oldField->name));
-        elseif ($oldType == null && $newType == null &&
+        elseif (is_null($oldType) && is_null($newType) &&
             (
-                $oldField->relation->through != null &&
-                $newField->relation->through != null &&
+                $oldField->relation->through !== null &&
+                $newField->relation->through !== null &&
                 $oldField->relation->through->meta->autoCreated &&
                 $newField->relation->through->meta->autoCreated
             )
         ):
             $this->_alterManyToMany($model, $oldField, $newField, $strict);
-        elseif ($oldType == null && $newType == null &&
+        elseif (is_null($oldType) && is_null($newType) &&
             (
-                $oldField->relation->through != null &&
-                $newField->relation->through != null &&
+                $oldField->relation->through !== null &&
+                $newField->relation->through !== null &&
                 !$oldField->relation->through->meta->autoCreated &&
                 !$newField->relation->through->meta->autoCreated
             )
         ):
             return;
-        else:
+
+        elseif(is_null($oldType) && is_null($newType)):
+
             throw new  ValueError(sprintf('Cannot alter field %s into %s - they are not compatible types '.
                 '(you cannot alter to or from M2M fields, or add or remove through= on M2M fields)',
                 $oldField->name, $newField->name));
+
         endif;
 
         $this->_alterField($model, $oldField, $newField, $strict);
@@ -353,7 +359,7 @@ class SchemaEditor extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _alterManyToMany($model, $oldField, $newField, $strict = false)
+    public function _alterManyToMany(Model $model, Field $oldField, Field $newField, $strict = false)
     {
         //Rename the through table
         if ($oldField->relation->through->meta->dbTable != $newField->relation->through->meta->dbTable):
@@ -364,21 +370,118 @@ class SchemaEditor extends BaseObject
             );
         endif;
     }
+//
+//    /**
+//     * Actually perform a "physical" (non-ManyToMany) field update.
+//     *
+//     * @param Model $model
+//     *
+//     * @since 1.1.0
+//     *
+//     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+//     */
+//    public function alterTable(Model $model){
+//        $schema = $this->schemaManager->createSchema();
+//
+//        $tableDef = clone $schema->getTable($model->meta->dbTable);
+//
+//        // normal column
+//        $tableDef->addColumn($name, $type, $fieldOptions);
+//
+//        // unique constraint
+//        if ($field->isUnique()):
+//            $tableDef->addUniqueIndex([$name]);
+//        endif;
+//
+//        // index constraint
+//        if ($field->dbIndex && !$field->isUnique()):
+//            $tableDef->addIndex([$name]);
+//        endif;
+//
+//        /* @var $field ForeignKey */
+//        if ($field->isRelation && $field->relation && $field->dbConstraint):
+//            $relField = $field->getRelatedField();
+//
+//            $tableDef->addForeignKeyConstraint(
+//                $relField->scopeModel->meta->dbTable,
+//                [$field->getColumnName()],
+//                [$relField->getColumnName()]
+//            );
+//        endif;
+//
+//        $comparator = new Comparator();
+//        $diff = $comparator->diffTable($schema->getTable($model->meta->dbTable), $tableDef);
+//
+//        if ($diff !== false):
+//            $this->schemaManager->alterTable($diff);
+//        endif;
+//    }
 
-    /**
-     * Actually perform a "physical" (non-ManyToMany) field update.
-     *
-     * @param $model
-     * @param $oldField
-     * @param $newField
-     * @param bool|false $strict
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function _alterField($model, $oldField, $newField, $strict = false)
+    public function _alterField(Model $model, Field $oldField, Field $newField, $strict = false)
     {
+
+        $schema = $this->schemaManager->createSchema();
+
+        $tableDef = clone $schema->getTable($model->meta->dbTable);
+
+        $oldType = $oldField->dbType($this->connection);
+        $newType = $newField->dbType($this->connection);
+
+        $table = $model->meta->dbTable;
+
+        $droppedFks = [];
+
+        // *****************  get foreign keys and drop them, we will recreate them later *****************
+        if ($oldField->relation && $oldField->dbConstraint) :
+            foreach ($this->constraintName($table, $oldField->getColumnName(), ['foreignKey' => true]) as $fkConstraint) :
+                $tableDef->removeForeignKey($fkConstraint);
+                $droppedFks[] = $oldField->name;
+            endforeach;
+        endif;
+
+        // *****************  get uniques and drop them  *****************
+        if ($oldField->isUnique() && (!$newField->isUnique() || (!$oldField->primaryKey && $newField->primaryKey))) :
+            foreach ($this->constraintName($table, $oldField->getColumnName(), ['unique' => true]) as $constraint) :
+                $tableDef->dropIndex($constraint);
+            endforeach;
+        endif;
+
+        // *************  if Primary key is changing drop FK constraints that point to it first. *********
+        if ($oldField->primaryKey && $newField->primaryKey && $newType !== $oldType) :
+
+            $newRels = $newField->scopeModel->meta->getReverseRelatedObjects();
+
+            /**@var $newRel RelatedField*/
+            foreach ($newRels as $newRel) :
+                $fkConstraints = $this->constraintName($newRel->getRelatedModel()->meta->dbTable,
+                    [$newRel->getColumnName()], ['foreignKey' => true]);
+                foreach ($fkConstraints as $fkConstraint) :
+                    $schema->getTable($newRel->getRelatedModel()->meta->dbTable)->removeForeignKey($fkConstraint);
+                endforeach;
+            endforeach;
+        endif;
+
+
+        // *************  get index and drop them. *********
+        if ($oldField->dbIndex && !$newField->dbIndex &&
+            (!$oldField->isUnique() && (!$newField->isUnique() && $oldField->isUnique())) ) :
+            foreach ($this->constraintName($table, $oldField->getColumnName(), ['index' => true]) as $fkConstraint) :
+                $tableDef->dropIndex($fkConstraint);
+            endforeach;
+        endif;
+
+        // ******** todo Change check constraints? ***********
+        // ******** Have they renamed the column ? ***********
+        if ($oldField->getColumnName() === $newField->getColumnName()) :
+            $tableDef->addColumn($newField->getColumnName(), $newType, $this->getDoctrineColumnOptions($newField, true));
+        endif;
+
+        $comparator = new Comparator();
+        $diff = $comparator->diffTable($schema->getTable($model->meta->dbTable), $tableDef);
+
+        if ($diff !== false):
+            $this->schemaManager->alterTable($diff);
+        endif;
     }
 
     /**
@@ -443,16 +546,14 @@ class SchemaEditor extends BaseObject
         return $options;
     }
 
-    public function constraintName($table, $column, $constraintType)
+    public function constraintName($table, $column, $constraintType=[])
     {
-        $schema = $this->schemaManager->createSchema();
-        $unique = $primaryKey = $index = $foreignKey = null;
-        extract($constraintType);
+        $foreignKey = ArrayHelper::pop($constraintType, 'foreignKey', false);
 
         $fieldConstraints = [];
 
         if ($foreignKey):
-            $foreignKeys = $schema->getTable($table)->getForeignKeys();
+            $foreignKeys = $this->schemaManager->listTableForeignKeys($table);
 
             /** @var $fk ForeignKeyConstraint */
             foreach ($foreignKeys as $fk) :
@@ -460,6 +561,14 @@ class SchemaEditor extends BaseObject
                     $fieldConstraints[] = $fk->getName();
                 endif;
             endforeach;
+        else:
+            $indexes = $this->getIndexes($table, $constraintType);
+            foreach ($indexes as $index) :
+                if (in_array($column, $index->getColumns())):
+                    $fieldConstraints[] = $index->getName();
+                endif;
+            endforeach;
+
         endif;
 
         return $fieldConstraints;
@@ -497,5 +606,36 @@ class SchemaEditor extends BaseObject
         endif;
 
         return $default;
+    }
+
+
+    /**
+     * @param string $table
+     * @param string $type accepts (unique, primary_key, index) as values
+     * @return Index[]
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    private function getIndexes($table, $type=[])
+    {
+        $unique = $primaryKey = $index = null;
+        extract($type);
+        $indexes = $this->schemaManager->listTableIndexes($table);
+        $keys = [];
+        foreach ($indexes as $indexObj) :
+
+            if ($unique && $indexObj->isUnique()) :
+                $keys[] = $indexObj;
+            endif;
+
+            if ($primaryKey && $indexObj->isPrimary()) :
+                $keys[] = $indexObj;
+            endif;
+
+            if ($index && $indexObj->isSimpleIndex()) :
+                $keys[] = $indexObj;
+            endif;
+
+        endforeach;
+        return $keys;
     }
 }

@@ -11,6 +11,7 @@
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Symfony\Component\Debug\ErrorHandler;
 
 /**
  * Class Application.
