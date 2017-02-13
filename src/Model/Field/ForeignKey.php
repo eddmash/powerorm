@@ -101,4 +101,26 @@ class ForeignKey extends RelatedField
     {
         return sprintf('%s_id', $this->name);
     }
+
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConstructorArgs()
+    {
+        $kwargs = parent::getConstructorArgs();
+
+        if ($this->dbIndex) :
+            unset($kwargs['dbIndex']);
+        else:
+            $kwargs['dbIndex'] = false;
+        endif;
+        
+        if ($this->dbConstraint === false) :
+            $kwargs['dbConstraint'] = $this->dbConstraint;
+        endif;
+
+        return $kwargs;
+    }
 }

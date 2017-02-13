@@ -60,4 +60,20 @@ class OneToOneField extends ForeignKey
 
         return parent::formField($kwargs);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConstructorArgs()
+    {
+        $kwargs = parent::getConstructorArgs();
+
+        if (array_key_exists('unique', $kwargs)) :
+            unset($kwargs['unique']);
+        endif;
+
+        return $kwargs;
+    }
+
+
 }
