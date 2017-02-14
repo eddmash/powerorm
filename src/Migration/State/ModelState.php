@@ -174,7 +174,7 @@ class ModelState extends BaseObject
     public function deepClone()
     {
         $fields = [];
-        /**@var $field Field*/
+        /** @var $field Field */
         foreach ($this->fields as $name => $field) :
             $fields[$name] = $field->deepClone();
         endforeach;

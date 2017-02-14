@@ -165,7 +165,7 @@ class SchemaEditor extends BaseObject
     /**
      * Renames the table a model points to.
      *
-     * @param Model $model
+     * @param Model  $model
      * @param string $oldDbTableName
      * @param string $newDbTableName
      *
@@ -302,9 +302,9 @@ class SchemaEditor extends BaseObject
      * Requires a copy of the old field as well so we can only perform changes that are required.
      * If strict is true, raises errors if the old column does not match old_field precisely.
      *
-     * @param Model $model
-     * @param Field $oldField
-     * @param Field $newField
+     * @param Model      $model
+     * @param Field      $oldField
+     * @param Field      $newField
      * @param bool|false $strict
      *
      * @throws ValueError
@@ -319,7 +319,7 @@ class SchemaEditor extends BaseObject
         $newType = $newField->dbType($this->connection);
 
         if ((is_null($oldType) && is_null($oldField->relation)) || (is_null($newType) && is_null($newField->relation))):
-            throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define ' .
+            throw new ValueError(sprintf('Cannot alter field %s into %s - they do not properly define '.
                 'db_type (are you using a badly-written custom field?)', $newField->name, $oldField->name));
         elseif (is_null($oldType) && is_null($newType) &&
             (
@@ -342,7 +342,7 @@ class SchemaEditor extends BaseObject
 
         elseif (is_null($oldType) && is_null($newType)):
 
-            throw new  ValueError(sprintf('Cannot alter field %s into %s - they are not compatible types ' .
+            throw new  ValueError(sprintf('Cannot alter field %s into %s - they are not compatible types '.
                 '(you cannot alter to or from M2M fields, or add or remove through= on M2M fields)',
                 $oldField->name, $newField->name));
 
@@ -354,9 +354,9 @@ class SchemaEditor extends BaseObject
     /**
      * Alters M2Ms to repoint their to= endpoints.
      *
-     * @param Model $model
-     * @param Field $oldField
-     * @param Field $newField
+     * @param Model      $model
+     * @param Field      $oldField
+     * @param Field      $newField
      * @param bool|false $strict
      *
      * @since 1.1.0
@@ -374,7 +374,6 @@ class SchemaEditor extends BaseObject
             );
         endif;
     }
-
 
     public function _alterField(Model $model, Field $oldField, Field $newField, $strict = false)
     {
@@ -448,7 +447,7 @@ class SchemaEditor extends BaseObject
 
         // ******** Have they renamed the column ? ***********
         if ($oldField->getColumnName() !== $newField->getColumnName()) :
-            echo "<<<-----------------> ".PHP_EOL;
+            echo '<<<-----------------> '.PHP_EOL;
 
             $diff = new TableDiff($table);
             $type = Type::getType($newField->dbType($this->connection));
@@ -463,7 +462,7 @@ class SchemaEditor extends BaseObject
 //        if($newType !== $oldType):
 //            echo "-----------------> ".PHP_EOL;
 //            $diff = new TableDiff($table);
-//
+
 //            $type = Type::getType($newField->dbType($this->connection));
 //            $newCol = new Column($newField->getColumnName(), $type, $this->getDoctrineColumnOptions($newField, true));
 //            $diff->changedColumns[$oldField->getColumnName()]=new ColumnDiff(
@@ -484,7 +483,7 @@ class SchemaEditor extends BaseObject
             $diff = new TableDiff($table);
 
             $diff->addedIndexes[] = new Index(
-                sprintf("uniq_%s", mt_rand(1,1000), $newField->getColumnName()),
+                sprintf('uniq_%s', mt_rand(1, 1000), $newField->getColumnName()),
                 [$newField->getColumnName()],
                 true
             );
@@ -500,7 +499,7 @@ class SchemaEditor extends BaseObject
             $diff = new TableDiff($table);
 
             $diff->addedIndexes[] = new Index(
-                sprintf("idx_%s", mt_rand(1,1000), $newField->getColumnName()),
+                sprintf('idx_%s', mt_rand(1, 1000), $newField->getColumnName()),
                 [$newField->getColumnName()],
                 true
             );
@@ -512,9 +511,9 @@ class SchemaEditor extends BaseObject
 
         // **************** Does it have a foreign key? *************
 
-        /**@var $newField RelatedField*/
-        /**@var $fromField RelatedField*/
-        /**@var $toField RelatedField*/
+        /** @var $newField RelatedField */
+        /** @var $fromField RelatedField */
+        /** @var $toField RelatedField */
         if($newField->relation &&
             ($droppedFks || !$oldField->relation || !$oldField->dbConstraint) &&
             $newField->dbConstraint):
@@ -530,7 +529,6 @@ class SchemaEditor extends BaseObject
                 $this->schemaManager->alterTable($diff);
             endif;
         endif;
-
 
         // ****************** Rebuild FKs that pointed to us if we previously had to drop them ****************
         if ($oldField->primaryKey && $newField->primaryKey && $newType !== $oldType) :
@@ -552,7 +550,7 @@ class SchemaEditor extends BaseObject
                 foreach ($rels as $rel) :
                     list($fromField, $toField) = $rel->getRelatedFields();
 
-                    $relDiff->addedForeignKeys[] =  new ForeignKeyConstraint(
+                    $relDiff->addedForeignKeys[] = new ForeignKeyConstraint(
                         [$fromField->getColumnName()],
                         $toField->scopeModel->meta->dbTable,
                         [$toField->getColumnName()]
@@ -569,7 +567,7 @@ class SchemaEditor extends BaseObject
     }
 
     /**
-     * @param Field $field
+     * @param Field      $field
      * @param bool|false $includeDefault
      *
      * @return array
@@ -693,7 +691,7 @@ class SchemaEditor extends BaseObject
 
     /**
      * @param string $table
-     * @param string $type accepts (unique, primary_key, index) as values
+     * @param string $type  accepts (unique, primary_key, index) as values
      *
      * @return Index[]
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
