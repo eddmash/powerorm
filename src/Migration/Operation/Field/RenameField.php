@@ -32,12 +32,13 @@ class RenameField extends FieldOperation
         $fields = $state->modelStates[$this->modelName]->fields;
         $fieldsNew = [];
         foreach ($fields as $name => $field) :
-            if ($name == $this->oldName):
+            if ($name === $this->oldName):
                 $fieldsNew[$this->newName] = $field;
             else:
                 $fieldsNew[$name] = $field;
             endif;
         endforeach;
+
         $state->modelStates[$this->modelName]->fields = $fieldsNew;
     }
 
@@ -57,7 +58,8 @@ class RenameField extends FieldOperation
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-            $schemaEditor->alterField($fromModel,
+            $schemaEditor->alterField(
+                $fromModel,
                 $fromModel->meta->getField($this->oldName),
                 $toModel->meta->getField($this->newName)
             );
@@ -73,8 +75,8 @@ class RenameField extends FieldOperation
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $schemaEditor->alterField($fromModel,
-                $toModel->meta->getField($this->newName),
-                $fromModel->meta->getField($this->oldName)
+                $fromModel->meta->getField($this->newName),
+                $toModel->meta->getField($this->oldName)
             );
         endif;
     }

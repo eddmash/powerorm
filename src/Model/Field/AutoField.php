@@ -25,6 +25,7 @@ use Eddmash\PowerOrm\Checks\CheckError;
  */
 class AutoField extends Field
 {
+    public $primaryKey = true;
     public function checks()
     {
         $checks = [];

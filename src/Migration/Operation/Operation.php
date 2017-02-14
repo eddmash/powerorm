@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\DeconstructableObject;
+use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 use Eddmash\PowerOrm\Model\Model;
@@ -90,16 +91,15 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * Migration use this method to contribute to the current state of the project.
      *
      * @param ProjectState $state
-     *
      * @return mixed
-     *
+     * @throws NotImplemented
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function updateState($state)
     {
-        // TODO: Implement updateState() method.
+        throw new NotImplemented;
     }
 
     /**

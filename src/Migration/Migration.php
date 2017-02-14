@@ -10,6 +10,7 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
@@ -144,7 +145,7 @@ class Migration implements MigrationInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function apply($state, $schemaEditor)
+    public function apply(ProjectState $state, SchemaEditor $schemaEditor)
     {
 
         /** @var $operation Operation */
@@ -153,9 +154,12 @@ class Migration implements MigrationInterface
             $oldState = $state->deepClone();
 
             $operation->updateState($state);
-            $schemaEditor->connection->transactional(function () use ($operation, $schemaEditor, $oldState, $state) {
+
+            $forwardCallback = function (Connection $connection) use ($operation, $schemaEditor, $oldState, $state) {
                 $operation->databaseForwards($schemaEditor, $oldState, $state);
-            });
+            };
+
+            $schemaEditor->connection->transactional($forwardCallback);
         endforeach;
 
         return $state;
@@ -223,7 +227,7 @@ class Migration implements MigrationInterface
      * Preserves the original object state by default and will return a mutated state from a copy.
      *
      * @param ProjectState $state
-     * @param bool|true    $preserveState
+     * @param bool|true $preserveState
      *
      * @return mixed
      *
