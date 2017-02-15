@@ -172,6 +172,7 @@ class Queryset implements QuerysetInterface
     public function limit($start, $end)
     {
         $this->query->setLimit($start, $end);
+
         return $this;
     }
 
@@ -185,17 +186,18 @@ class Queryset implements QuerysetInterface
 
         $qb->update($this->model->meta->dbTable);
         $params = [];
-        foreach ($records as $name=>$value) :
-            $qb->set($name, "?");
+        foreach ($records as $name => $value) :
+            $qb->set($name, '?');
             $params[] = $value;
         endforeach;
 
         list($sql, $whereParams) = $this->query->getWhereSql($this->connection);
         $qb->where($sql);
         $params = array_merge($params, $whereParams);
-        foreach ($params as $index=>$param) :
+        foreach ($params as $index => $param) :
             $qb->setParameter($index, $param);
         endforeach;
+
         return $qb->execute() > 0;
     }
 

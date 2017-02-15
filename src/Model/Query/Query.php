@@ -81,12 +81,12 @@ class Query extends BaseObject
         endif;
 
         if ($this->limit) :
-            $results[] = "LIMIT";
+            $results[] = 'LIMIT';
             $results[] = $this->limit;
         endif;
 
         if ($this->offset) :
-            $results[] = "OFFSET";
+            $results[] = 'OFFSET';
             $results[] = $this->offset;
         endif;
 

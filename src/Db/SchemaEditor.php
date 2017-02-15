@@ -7,12 +7,12 @@
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
 */
+
 namespace Eddmash\PowerOrm\Db;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Schema\ColumnDiff;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
@@ -150,7 +150,7 @@ class SchemaEditor extends BaseObject
     /**
      * Renames the table a model points to.
      *
-     * @param Model $model
+     * @param Model  $model
      * @param string $oldDbTableName
      * @param string $newDbTableName
      *
@@ -293,9 +293,9 @@ class SchemaEditor extends BaseObject
      * Requires a copy of the old field as well so we can only perform changes that are required.
      * If strict is true, raises errors if the old column does not match old_field precisely.
      *
-     * @param Model $model
-     * @param Field $oldField
-     * @param Field $newField
+     * @param Model      $model
+     * @param Field      $oldField
+     * @param Field      $newField
      * @param bool|false $strict
      *
      * @throws ValueError
@@ -351,9 +351,9 @@ class SchemaEditor extends BaseObject
     /**
      * Alters M2Ms to repoint their to= endpoints.
      *
-     * @param Model $model
-     * @param Field $oldField
-     * @param Field $newField
+     * @param Model      $model
+     * @param Field      $oldField
+     * @param Field      $newField
      * @param bool|false $strict
      *
      * @since 1.1.0
@@ -440,7 +440,6 @@ class SchemaEditor extends BaseObject
         // ************************ We change the other column properties like null, default etc ********************
         // **********************************************************************************************************
 
-
         $tableClone = clone  $schema->getTable($table);
         if ($oldField->getColumnName() !== $newField->getColumnName()) :
             $tableClone->addColumn(
@@ -458,7 +457,6 @@ class SchemaEditor extends BaseObject
         if ($diff !== false):
             $this->schemaManager->alterTable($diff);
         endif;
-
 
         // **********************************************************************************************************
         // ************************ End of properties change *********************************** ********************
@@ -495,8 +493,8 @@ class SchemaEditor extends BaseObject
         // **************** Type alteration on primary key? Then we need to alter the column referring to us. *********
         // **************** Does it have a foreign key? *************
         /** @var $newField RelatedField */
-        /** @var $fromField RelatedField */
-        /** @var $toField RelatedField */
+        /* @var $fromField RelatedField */
+        /* @var $toField RelatedField */
         if ($newField->relation &&
             ($droppedFks || !$oldField->relation || !$oldField->dbConstraint) &&
             $newField->dbConstraint
@@ -541,7 +539,7 @@ class SchemaEditor extends BaseObject
     }
 
     /**
-     * @param Field $field
+     * @param Field      $field
      * @param bool|false $includeDefault
      *
      * @return array
@@ -650,7 +648,7 @@ class SchemaEditor extends BaseObject
 
     /**
      * @param string $table
-     * @param string $type accepts (unique, primary_key, index) as values
+     * @param string $type  accepts (unique, primary_key, index) as values
      *
      * @return Index[]
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>

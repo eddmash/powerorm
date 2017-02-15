@@ -293,7 +293,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string $name
+     * @param string       $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -385,8 +385,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param string $method the method to invoke
-     * @param null $args the arguments to pass to the method
+     * @param string    $method     the method to invoke
+     * @param null      $args       the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -703,7 +703,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array)unserialize((string)$serialized);
+        $this->_fieldCache = (array) unserialize((string) $serialized);
     }
 
     public function __get($name)
@@ -824,8 +824,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null $connection
-     * @param null $updateField
+     * @param null       $connection
+     * @param null       $updateField
      *
      * @throws ValueError
      *
@@ -927,7 +927,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null $updateFields
+     * @param null       $updateFields
      *
      * @since 1.1.0
      *
@@ -977,7 +977,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $meta = $this->meta;
 
         $nonPkFields = [];
-        /**@var $field Field*/
+        /** @var $field Field */
         foreach ($meta->getConcreteFields() as $name => $field) :
             if ($field->primaryKey) :
                 continue;
@@ -986,10 +986,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endforeach;
 
         // if any fields we passed in use those
-        /**@var $nonePkUpdateFields Field[]*/
+        /** @var $nonePkUpdateFields Field[] */
         $nonePkUpdateFields = [];
         if ($updateFields) :
-            foreach ($nonPkFields as $name=>$nonPkField) :
+            foreach ($nonPkFields as $name => $nonPkField) :
                 if (in_array($name, $updateFields)) :
                     $nonePkUpdateFields[$name] = $nonPkField;
                 endif;
@@ -1002,7 +1002,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $pkValue = $this->getPkValue($meta);
 
         if (!$pkValue && ($forceUpdate || $forceInsert)) :
-            throw new ValueError("Cannot force an update in save() with no primary key.");
+            throw new ValueError('Cannot force an update in save() with no primary key.');
         endif;
 
         $updated = false;

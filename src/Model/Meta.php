@@ -278,7 +278,6 @@ class Meta extends DeconstructableObject implements MetaInterface
         return $concrete;
     }
 
-
     /**
      *  Returns all related objects pointing to the current model. The related objects can come from a one-to-one,
      * one-to-many, or many-to-many field relation type.

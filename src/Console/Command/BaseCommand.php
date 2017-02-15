@@ -79,7 +79,7 @@ abstract class BaseCommand extends Command
         $out = $this->handle($input, $output);
 
         if (!empty($output) && !empty($out)):
-            $output->writeln("success");
+            $output->writeln('success');
         endif;
     }
 
