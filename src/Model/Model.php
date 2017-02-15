@@ -293,7 +293,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string       $name
+     * @param string $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -385,8 +385,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param string    $method     the method to invoke
-     * @param null      $args       the arguments to pass to the method
+     * @param string $method the method to invoke
+     * @param null $args the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -703,7 +703,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array) unserialize((string) $serialized);
+        $this->_fieldCache = (array)unserialize((string)$serialized);
     }
 
     public function __get($name)
@@ -824,8 +824,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $connection
-     * @param null       $updateField
+     * @param null $connection
+     * @param null $updateField
      *
      * @throws ValueError
      *
@@ -927,7 +927,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $updateFields
+     * @param null $updateFields
      *
      * @since 1.1.0
      *
@@ -973,22 +973,47 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $forceInsert = false,
         $forceUpdate = false,
         $updateFields = null
-    )
-    {
+    ) {
         $meta = $this->meta;
 
         $nonPkFields = [];
+        /**@var $field Field*/
         foreach ($meta->getConcreteFields() as $name => $field) :
+            if ($field->primaryKey) :
+                continue;
+            endif;
             $nonPkFields[$name] = $field;
         endforeach;
 
-        $pkValue = null;
-//        $pkValue = $this->getPkValue($meta);
+        // if any fields we passed in use those
+        /**@var $nonePkUpdateFields Field[]*/
+        $nonePkUpdateFields = [];
+        if ($updateFields) :
+            foreach ($nonPkFields as $name=>$nonPkField) :
+                if (in_array($name, $updateFields)) :
+                    $nonePkUpdateFields[$name] = $nonPkField;
+                endif;
+            endforeach;
+        else:
+            $nonePkUpdateFields = $nonPkFields;
+        endif;
+
+        // get pk value
+        $pkValue = $this->getPkValue($meta);
+
+        if (!$pkValue && ($forceUpdate || $forceInsert)) :
+            throw new ValueError("Cannot force an update in save() with no primary key.");
+        endif;
 
         $updated = false;
 
-        if ($pkValue !== null && !$forceInsert):
+        if ($pkValue && !$forceInsert):
 
+            $values = [];
+            foreach ($nonePkUpdateFields as $nonePkUpdateField) :
+                $values[$nonePkUpdateField->getColumnName()] = $nonePkUpdateField->preSave($this, false);
+            endforeach;
+            $updated = $this->doUpdate($values, $pkValue, $forceUpdate);
         endif;
 
         if (false === $updated):
@@ -1046,24 +1071,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function doInsert(Model $model, $fields, $returnId)
     {
-        $conn = BaseOrm::getDbConnection();
-        $qb = $conn->createQueryBuilder();
-
-        $qb->insert($model->meta->dbTable);
-
-        /** @var $field Field */
-        foreach ($fields as $name => $field) :
-            $qb->setValue($field->getColumnName(), $qb->createNamedParameter($field->preSave($model, true)));
-        endforeach;
-
-        // save to db
-        $qb->execute();
-
-        if ($returnId):
-            return $conn->lastInsertId();
-        endif;
-
-        return;
+        return $model::objects()->_insert($this, $fields, $returnId);
     }
 
     /**
@@ -1082,7 +1090,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function doUpdate($records, $pkValue, $forceUpdate)
     {
-        $filtered = $this->objects()->filter([$this->meta->primaryKey->name => $pkValue]);
+        $filtered = static::objects()->filter([$this->meta->primaryKey->name => $pkValue]);
 
         // We can end up here when saving a model in inheritance chain where
         // update_fields doesn't target any field in current model. In that

@@ -24,6 +24,8 @@ class Query extends BaseObject
     //  BaseLookup::AND_CONNECTOR => [],
     //  BaseLookup::OR_CONNECTOR => [],
     //];
+    private $offset;
+    private $limit;
     private $where = [];
     private $from = [];
 
@@ -76,6 +78,16 @@ class Query extends BaseObject
             list($sql, $whereParams) = $this->getWhereSql($connection);
             $results[] = $sql;
             $params = array_merge($params, $whereParams);
+        endif;
+
+        if ($this->limit) :
+            $results[] = "LIMIT";
+            $results[] = $this->limit;
+        endif;
+
+        if ($this->offset) :
+            $results[] = "OFFSET";
+            $results[] = $this->offset;
         endif;
 
         return [implode(' ', $results), $params];
@@ -196,5 +208,11 @@ class Query extends BaseObject
     public function setDefaultCols($defaultCols)
     {
         $this->defaultCols = $defaultCols;
+    }
+
+    public function setLimit($offset, $limit)
+    {
+        $this->offset = $offset;
+        $this->limit = $limit;
     }
 }

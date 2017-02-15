@@ -162,12 +162,17 @@ class Queryset implements QuerysetInterface
     public function exists()
     {
         if (!$this->_resultsCache):
-            $instance = $this->_clone();
-            $instance->qb->setMaxResults(1);
+            $instance = $this->all()->limit(0, 1);
             $this->_resultsCache = $instance->execute();
         endif;
 
         return (bool) $this->_resultsCache;
+    }
+
+    public function limit($start, $end)
+    {
+        $this->query->setLimit($start, $end);
+        return $this;
     }
 
     public function update()
@@ -176,7 +181,42 @@ class Queryset implements QuerysetInterface
 
     public function _update($records)
     {
-        return 1;
+        $qb = $this->connection->createQueryBuilder();
+
+        $qb->update($this->model->meta->dbTable);
+        $params = [];
+        foreach ($records as $name=>$value) :
+            $qb->set($name, "?");
+            $params[] = $value;
+        endforeach;
+
+        list($sql, $whereParams) = $this->query->getWhereSql($this->connection);
+        $qb->where($sql);
+        $params = array_merge($params, $whereParams);
+        foreach ($params as $index=>$param) :
+            $qb->setParameter($index, $param);
+        endforeach;
+        return $qb->execute() > 0;
+    }
+
+    public function _insert($model, $fields, $returnId)
+    {
+        $qb = $this->connection->createQueryBuilder();
+
+        $qb->insert($model->meta->dbTable);
+
+        /** @var $field Field */
+        foreach ($fields as $name => $field) :
+
+            $qb->setValue($field->getColumnName(), $qb->createNamedParameter($field->preSave($model, true)));
+        endforeach;
+
+        // save to db
+        $qb->execute();
+
+        if ($returnId):
+            return $this->connection->lastInsertId();
+        endif;
     }
 
     public function _filterOrExclude($negate, $conditions)

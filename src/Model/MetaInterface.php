@@ -76,5 +76,5 @@ interface MetaInterface extends ContributorInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function addField($field);
+    public function addField(Field $field);
 }

@@ -384,7 +384,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     /**
      * {@inheritdoc}
      */
-    public function addField($field)
+    public function addField(Field $field)
     {
         if ($field->relation != null && $field->manyToMany):
             $this->localManyToMany[$field->name] = $field;
@@ -405,7 +405,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function setupPrimaryKey($field)
+    public function setupPrimaryKey(Field $field)
     {
         if (!$this->primaryKey && $field->primaryKey):
             $this->primaryKey = $field;
@@ -419,7 +419,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function prepare($model)
+    public function prepare(Model $model)
     {
         if (empty($this->primaryKey)):
             if (!empty($this->parents)):
