@@ -101,9 +101,6 @@ class ForeignKey extends RelatedField
     {
         return sprintf('%s_id', $this->name);
     }
-
-
-
     /**
      * {@inheritdoc}
      */
@@ -116,7 +113,6 @@ class ForeignKey extends RelatedField
         else:
             $kwargs['dbIndex'] = false;
         endif;
-        
         if ($this->dbConstraint === false) :
             $kwargs['dbConstraint'] = $this->dbConstraint;
         endif;

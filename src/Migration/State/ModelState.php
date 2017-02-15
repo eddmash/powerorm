@@ -173,7 +173,13 @@ class ModelState extends BaseObject
 
     public function deepClone()
     {
-        return static::createObject($this->name, $this->fields, ['meta' => $this->meta, 'extends' => $this->extends]);
+        $fields = [];
+        /** @var $field Field */
+        foreach ($this->fields as $name => $field) :
+            $fields[$name] = $field->deepClone();
+        endforeach;
+
+        return static::createObject($this->name, $fields, ['meta' => $this->meta, 'extends' => $this->extends]);
     }
 
     public function __toString()

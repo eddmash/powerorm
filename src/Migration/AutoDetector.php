@@ -234,9 +234,8 @@ class AutoDetector extends BaseObject
 
         // *** fields
         $this->generateRenamedFields();
-
-        $this->generateAddedFields();
         $this->generateRemovedFields();
+        $this->generateAddedFields();
         $this->generateAlteredFields();
         $this->generateAlteredDbTable();
 
