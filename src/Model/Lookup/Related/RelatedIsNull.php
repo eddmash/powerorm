@@ -8,13 +8,10 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Eddmash\PowerOrm\Model\Lookup\Related;
-
 
 use Eddmash\PowerOrm\Model\Lookup\IsNull;
 
 class RelatedIsNull extends IsNull
 {
-
 }

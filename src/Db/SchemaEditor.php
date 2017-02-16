@@ -148,7 +148,7 @@ class SchemaEditor extends BaseObject
     /**
      * Renames the table a model points to.
      *
-     * @param Model $model
+     * @param Model  $model
      * @param string $oldDbTableName
      * @param string $newDbTableName
      *
@@ -291,9 +291,9 @@ class SchemaEditor extends BaseObject
      * Requires a copy of the old field as well so we can only perform changes that are required.
      * If strict is true, raises errors if the old column does not match old_field precisely.
      *
-     * @param Model $model
-     * @param Field $oldField
-     * @param Field $newField
+     * @param Model      $model
+     * @param Field      $oldField
+     * @param Field      $newField
      * @param bool|false $strict
      *
      * @throws ValueError
@@ -349,9 +349,9 @@ class SchemaEditor extends BaseObject
     /**
      * Alters M2Ms to repoint their to= endpoints.
      *
-     * @param Model $model
-     * @param Field $oldField
-     * @param Field $newField
+     * @param Model      $model
+     * @param Field      $oldField
+     * @param Field      $newField
      * @param bool|false $strict
      *
      * @since 1.1.0
@@ -537,7 +537,7 @@ class SchemaEditor extends BaseObject
     }
 
     /**
-     * @param Field $field
+     * @param Field      $field
      * @param bool|false $includeDefault
      *
      * @return array
@@ -646,7 +646,7 @@ class SchemaEditor extends BaseObject
 
     /**
      * @param string $table
-     * @param string $type accepts (unique, primary_key, index) as values
+     * @param string $type  accepts (unique, primary_key, index) as values
      *
      * @return Index[]
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>

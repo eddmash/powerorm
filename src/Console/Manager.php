@@ -55,7 +55,7 @@ class Manager extends Base
 
     public function getComponentsPath()
     {
-        $components = (array)BaseOrm::getInstance()->components;
+        $components = (array) BaseOrm::getInstance()->components;
 
         $paths = [];
 

@@ -121,7 +121,7 @@ class AutoDetector extends BaseObject
     /**
      * @param ProjectState $fromState
      * @param ProjectState $toState
-     * @param Asker $asker
+     * @param Asker        $asker
      */
     public function __construct(ProjectState $fromState, ProjectState $toState, Asker $asker)
     {
@@ -236,8 +236,8 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * @param array $changes
-     * @param Graph $graph
+     * @param array  $changes
+     * @param Graph  $graph
      * @param string $migrationName
      *
      * @return mixed
@@ -280,9 +280,9 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * @param Operation $operation
-     * @param array $dependencies
-     * @param bool|false $pushToTop some operations should come before others, use this determine which
+     * @param Operation  $operation
+     * @param array      $dependencies
+     * @param bool|false $pushToTop    some operations should come before others, use this determine which
      *
      * @since 1.1.0
      *
@@ -406,7 +406,7 @@ class AutoDetector extends BaseObject
     {
         $name = explode('_', $name);
 
-        return (int)str_replace($this->migrationNamePrefix, '', $name[0]);
+        return (int) str_replace($this->migrationNamePrefix, '', $name[0]);
     }
 
     private function getOldModelName($modelName)

@@ -214,7 +214,6 @@ class Field extends DeconstructableObject implements FieldInterface
     public $manyToOne = false;
     public $inverse = false;
 
-
     public function __construct($config = [])
     {
         BaseOrm::configure($this, $config, ['rel' => 'relation']);
@@ -243,7 +242,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model $modelObject
+     * @param Model  $modelObject
      *
      * @throws FieldError
      *
@@ -481,7 +480,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool $add is whether the instance is being saved to the database for the first time
+     * @param bool  $add   is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *

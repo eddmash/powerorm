@@ -52,7 +52,7 @@ class ModelState extends BaseObject
     /**
      * Takes a model returns a ModelState representing it.
      *
-     * @param Model $model
+     * @param Model      $model
      * @param bool|false $excludeRels
      *
      * @return static
@@ -189,6 +189,6 @@ class ModelState extends BaseObject
 
     public function __toString()
     {
-        return (string)sprintf("<ModelState: '%s'>", $this->name);
+        return (string) sprintf("<ModelState: '%s'>", $this->name);
     }
 }

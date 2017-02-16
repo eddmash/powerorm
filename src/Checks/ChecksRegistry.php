@@ -37,7 +37,7 @@ class ChecksRegistry
      * Register checks to be run with the check registry.
      *
      * @param callable $check
-     * @param array $tags
+     * @param array    $tags
      *
      * @since 1.1.0
      *

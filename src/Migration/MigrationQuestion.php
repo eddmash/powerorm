@@ -3,6 +3,7 @@
  * Created by eddmash <http://eddmash.com>
  * Date: 9/30/16.
  */
+
 namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\Console\Console;
@@ -57,14 +58,14 @@ class MigrationQuestion
 
     /**
      * @param Asker $asker
-     *
      * @param $modelName
      * @param $fieldName
+     *
      * @return string|void
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     *
      */
     public static function askNotNullAddition(Asker $asker, $modelName, $fieldName)
     {
@@ -84,7 +85,7 @@ class MigrationQuestion
 
         $msg .= 'Select an option: ';
 
-        $selected = (int)$asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
+        $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if ($selected == 2):
             return;
@@ -140,7 +141,7 @@ class MigrationQuestion
 
         $msg .= 'Select an option:';
 
-        $selected = (int)$asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
+        $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if ($selected == 2):
             return NOT_PROVIDED;

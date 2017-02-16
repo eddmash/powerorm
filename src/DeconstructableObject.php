@@ -65,7 +65,7 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
                 $meta[$name] = (!is_subclass_of(
                     $value,
                     BaseObject::getFullClassName()
-                )) ? '** hidden **' : (string)$value;
+                )) ? '** hidden **' : (string) $value;
                 continue;
             endif;
             $meta[$name] = $value;

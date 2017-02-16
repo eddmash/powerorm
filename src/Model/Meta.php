@@ -320,7 +320,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      * Add the current object to the passed in object.
      *
      * @param string $propertyName the name map the current object to, in the class object passed in
-     * @param Model $classObject the object to attach the current object to
+     * @param Model  $classObject  the object to attach the current object to
      *
      * @since 1.1.0
      *

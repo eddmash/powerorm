@@ -35,6 +35,7 @@ class Asker
 
     /**
      * @param Question $question
+     *
      * @throws NotImplemented
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>

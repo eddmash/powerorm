@@ -229,7 +229,7 @@ class Migration implements MigrationInterface
      * Preserves the original object state by default and will return a mutated state from a copy.
      *
      * @param ProjectState $state
-     * @param bool|true $preserveState
+     * @param bool|true    $preserveState
      *
      * @return mixed
      *

@@ -19,7 +19,7 @@ trait RegisterLookupTrait
 
     /**
      * @param LookupInterface $class
-     * @param null $name
+     * @param null            $name
      *
      * @since 1.1.0
      *

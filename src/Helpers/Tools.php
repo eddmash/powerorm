@@ -23,11 +23,11 @@ class Tools
     /**
      * Takes an array and turns it into a string .
      *
-     * @param mixed $data the array to be converted to string
-     * @param int $indent how to indent the items in the array
-     * @param string $close item to come at the after of the arrays closing braces
-     * @param string $start item to come at the before of the arrays opening braces
-     * @param int $level at what level we are operating at, level=0 is the encasing level,just unifies the different
+     * @param mixed  $data   the array to be converted to string
+     * @param int    $indent how to indent the items in the array
+     * @param string $close  item to come at the after of the arrays closing braces
+     * @param string $start  item to come at the before of the arrays opening braces
+     * @param int    $level  at what level we are operating at, level=0 is the encasing level,just unifies the different
      *                       forms of data
      *
      * @return string
@@ -131,8 +131,8 @@ class Tools
     /**
      * Reads a json file and return the files data converted to there respective php types.
      *
-     * @param string $full_file_path path to the json file to read
-     * @param bool|false $ass_array [optional]  When <b>TRUE</b>, returned objects will be converted into
+     * @param string     $full_file_path path to the json file to read
+     * @param bool|false $ass_array      [optional]  When <b>TRUE</b>, returned objects will be converted into
      *                                   associative arrays
      *
      * @return mixed
@@ -197,7 +197,7 @@ class Tools
     /**
      * Fetches the country based on the phone code passed in.
      *
-     * @param string $code the phone code to search for
+     * @param string     $code              the phone code to search for
      * @param bool|false $show_country_code if to show the country code or its full name
      *
      * @return mixed
@@ -251,10 +251,10 @@ class Tools
      * Schedule `callback` to be called once `model` and all `related_models` have been imported and registered with
      * the app registry.
      *
-     * @param callback $callback will be called with the newly-loaded model classes as its any optional keyword arguments
-     * @param Model $scopeModel the model on which the method was invoked
-     * @param mixed $relModel the related models that need to be resolved
-     * @param array $kwargs
+     * @param callback $callback   will be called with the newly-loaded model classes as its any optional keyword arguments
+     * @param Model    $scopeModel the model on which the method was invoked
+     * @param mixed    $relModel   the related models that need to be resolved
+     * @param array    $kwargs
      *
      * @since 1.1.0
      *

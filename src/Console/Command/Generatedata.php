@@ -20,13 +20,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class
-Generatedata extends BaseCommand
+class Generatedata extends BaseCommand
 {
     public $help = 'Generate sample data for your models.';
 
     public function handle(InputInterface $input, OutputInterface $output)
-    { 
+    {
         $faker = Factory::create();
         $populator = new Populator($faker);
 
@@ -140,11 +139,12 @@ Generatedata extends BaseCommand
         $failLevel = null
     ) {
         if (!class_exists('Eddmash\PowerOrmFaker\Populator')) :
-            throw new CommandError("This comand depends on 'eddmash\\powerormfaker' which is not installed, see how ".
-            "to install https://github.com/eddmash/powerormfaker");
+            throw new CommandError(
+                "This comand depends on 'eddmash\\powerormfaker' which is not installed, see how ".
+                'to install https://github.com/eddmash/powerormfaker'
+            );
         endif;
         parent::check($input, $output, $tags, $showErrorCount, $failLevel);
     }
-
 
 }

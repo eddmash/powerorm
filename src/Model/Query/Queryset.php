@@ -174,10 +174,10 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-            return (bool)$instance->execute()->fetch();
+            return (bool) $instance->execute()->fetch();
         endif;
 
-        return (bool)$this->_resultsCache;
+        return (bool) $this->_resultsCache;
     }
 
     public function limit($start, $end)
@@ -209,7 +209,7 @@ class Queryset implements QuerysetInterface
             $qb->setParameter($index, $param);
         endforeach;
 
-        return ($qb->execute() > 0);
+        return $qb->execute() > 0;
     }
 
     public function _insert($model, $fields, $returnId)

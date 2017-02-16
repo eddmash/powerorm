@@ -293,7 +293,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string $name
+     * @param string       $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -385,8 +385,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param string $method the method to invoke
-     * @param null $args the arguments to pass to the method
+     * @param string    $method     the method to invoke
+     * @param null      $args       the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -703,7 +703,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array)unserialize((string)$serialized);
+        $this->_fieldCache = (array) unserialize((string) $serialized);
     }
 
     public function __get($name)
@@ -810,8 +810,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null $connection
-     * @param null $updateField
+     * @param null       $connection
+     * @param null       $updateField
      *
      * @throws ValueError
      *
@@ -913,7 +913,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null $updateFields
+     * @param null       $updateFields
      *
      * @since 1.1.0
      *
