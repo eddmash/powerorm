@@ -24,7 +24,7 @@ class MigrationQuestion
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function hasModelRenamed($asker, $oldModelName, $newModelName)
+    public static function hasModelRenamed(Asker $asker, $oldModelName, $newModelName)
     {
         $msg = 'Did you rename the %s model to %s? [y/N]';
 
@@ -46,7 +46,7 @@ class MigrationQuestion
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function hasFieldRenamed($asker, $modelName, $oldName, $newName, $fieldObj)
+    public static function hasFieldRenamed(Asker $asker, $modelName, $oldName, $newName, Field $fieldObj)
     {
         $msg = 'Did you rename %1$s.%2$s to %1$s.%3$s (a %4$s)? [y/N]';
 
@@ -58,13 +58,15 @@ class MigrationQuestion
     /**
      * @param Asker $asker
      *
+     * @param $modelName
+     * @param $fieldName
+     * @return string|void
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
-     * @return string|void
      */
-    public static function askNotNullAddition($asker, $modelName, $fieldName)
+    public static function askNotNullAddition(Asker $asker, $modelName, $fieldName)
     {
         $msg = 'You are trying to add a non-nullable field "%s" to %s without a default; '.PHP_EOL.
             'we can\'t do that (the database needs something to populate existing rows).'.PHP_EOL.
@@ -82,13 +84,12 @@ class MigrationQuestion
 
         $msg .= 'Select an option: ';
 
-        $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
+        $selected = (int)$asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if ($selected == 2):
             return;
         endif;
 
-        $default_val = '';
         $msg = 'Please enter the default value now, as valid PHP'.PHP_EOL;
         while (true):
             $default = $asker->ask(new Question($msg));
@@ -106,7 +107,7 @@ class MigrationQuestion
             endif;
         endwhile;
 
-        return self::_getDefault($asker);
+        return self::getDefault($asker);
     }
 
     /**
@@ -139,7 +140,7 @@ class MigrationQuestion
 
         $msg .= 'Select an option:';
 
-        $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
+        $selected = (int)$asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if ($selected == 2):
             return NOT_PROVIDED;
@@ -147,7 +148,7 @@ class MigrationQuestion
             return;
         endif;
 
-        return self::_getDefault($asker);
+        return self::getDefault($asker);
     }
 
     /**
@@ -159,7 +160,7 @@ class MigrationQuestion
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private static function _getDefault($asker)
+    private static function getDefault($asker)
     {
         $default_val = '';
         $msg = 'Please enter the default value now, as valid PHP '.PHP_EOL;

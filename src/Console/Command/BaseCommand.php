@@ -89,8 +89,7 @@ abstract class BaseCommand extends Command
         $tags = null,
         $showErrorCount = null,
         $failLevel = null
-    )
-    {
+    ) {
         $checks = BaseOrm::getCheckRegistry()->runChecks($tags);
 
         $debugs = [];
@@ -124,7 +123,8 @@ abstract class BaseCommand extends Command
             endif;
 
             //error
-            if ($check->level >= CheckMessage::ERROR && $check->level < CheckMessage::CRITICAL && !$check->isSilenced()):
+            if ($check->level >= CheckMessage::ERROR && $check->level < CheckMessage::CRITICAL && !$check->isSilenced()
+            ):
                 $errors[] = $check;
             endif;
 
@@ -177,8 +177,12 @@ abstract class BaseCommand extends Command
             if ($visibleIssues):
                 $footer .= PHP_EOL;
             endif;
-            $footer .= sprintf(' System check identified %s %s (%s silenced) ',
-                $visibleIssues, $issueText, $silenced);
+            $footer .= sprintf(
+                ' System check identified %s %s (%s silenced) ',
+                $visibleIssues,
+                $issueText,
+                $silenced
+            );
         endif;
 
         if (!empty($serious)):

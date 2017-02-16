@@ -33,13 +33,15 @@ class ForeignKey extends RelatedField
     public function __construct($kwargs)
     {
         if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
-            $kwargs['rel'] = ManyToOneRel::createObject([
-                'fromField' => $this,
-                'to' => ArrayHelper::getValue($kwargs, 'to'),
-                'toField' => ArrayHelper::getValue($kwargs, 'toField'),
-                'parentLink' => ArrayHelper::getValue($kwargs, 'parentLink'),
-                'onDelete' => ArrayHelper::getValue($kwargs, 'onDelete', Delete::CASCADE),
-            ]);
+            $kwargs['rel'] = ManyToOneRel::createObject(
+                [
+                    'fromField' => $this,
+                    'to' => ArrayHelper::getValue($kwargs, 'to'),
+                    'toField' => ArrayHelper::getValue($kwargs, 'toField'),
+                    'parentLink' => ArrayHelper::getValue($kwargs, 'parentLink'),
+                    'onDelete' => ArrayHelper::getValue($kwargs, 'onDelete', Delete::CASCADE),
+                ]
+            );
         endif;
 
         $this->toField = ArrayHelper::getValue($kwargs, 'toField');
@@ -101,6 +103,7 @@ class ForeignKey extends RelatedField
     {
         return sprintf('%s_id', $this->name);
     }
+
     /**
      * {@inheritdoc}
      */

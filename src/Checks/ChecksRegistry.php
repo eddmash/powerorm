@@ -37,7 +37,7 @@ class ChecksRegistry
      * Register checks to be run with the check registry.
      *
      * @param callable $check
-     * @param array    $tags
+     * @param array $tags
      *
      * @since 1.1.0
      *
@@ -95,8 +95,14 @@ class ChecksRegistry
 
             $errors = array_merge($errors, call_user_func($check['check']));
 
-            assert(is_array($errors), sprintf('The function %s did not return a list. All functions registered ".
-            "with the checks registry must return a list.', $functionName));
+            assert(
+                is_array($errors),
+                sprintf(
+                    'The function %s did not return a list. All functions registered ".
+            "with the checks registry must return a list.',
+                    $functionName
+                )
+            );
         endforeach;
 
         return $errors;

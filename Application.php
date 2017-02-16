@@ -72,20 +72,24 @@ class Application
 
             require sprintf($path, $vendorDir, $ds);
 
-            $commonLoader = new \Doctrine\Common\ClassLoader('Doctrine',
-                $vendorDir.'doctrine'.$ds.'common'.$ds.'lib');
+            $commonLoader = new \Doctrine\Common\ClassLoader(
+                'Doctrine',
+                $vendorDir.'doctrine'.$ds.'common'.$ds.'lib'
+            );
 
             $commonLoader->register();
 
-            $dbalLoader = new \Doctrine\Common\ClassLoader('Doctrine',
-                $vendorDir.'doctrine'.$ds.'dbal'.$ds.'lib');
+            $dbalLoader = new \Doctrine\Common\ClassLoader(
+                'Doctrine',
+                $vendorDir.'doctrine'.$ds.'dbal'.$ds.'lib'
+            );
 
             $dbalLoader->register();
 
         endif;
 
-//        if (file_exists($vendorDir.$ds.'symfony'.$ds.'debug')):
-//            ErrorHandler::register();
-//        endif;
+        if (file_exists($vendorDir.$ds.'symfony'.$ds.'debug')):
+            ErrorHandler::register();
+        endif;
     }
 }

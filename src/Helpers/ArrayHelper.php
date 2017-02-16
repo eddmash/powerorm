@@ -43,8 +43,8 @@ class ArrayHelper
      *
      * Note that an empty array will NOT be considered associative.
      *
-     * @param array $array      the array being checked
-     * @param bool  $allStrings whether the array keys must be all strings in order for
+     * @param array $array the array being checked
+     * @param bool $allStrings whether the array keys must be all strings in order for
      *                          the array to be treated as associative
      *
      * @since 1.1.0
@@ -115,7 +115,7 @@ class ArrayHelper
     {
         if (isset($haystack[$key])):
             return $haystack[$key];
-        elseif(!is_null($default)):
+        elseif (!is_null($default)):
             return $default;
         endif;
 

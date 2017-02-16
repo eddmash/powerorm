@@ -56,7 +56,7 @@ class AlterModelTable extends Operation
      */
     public function databaseForwards($schemaEditor, $fromState, $toState)
     {
-        $this->_alterModelTable($schemaEditor, $fromState, $toState);
+        $this->alterModelTable($schemaEditor, $fromState, $toState);
     }
 
     /**
@@ -64,7 +64,7 @@ class AlterModelTable extends Operation
      */
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
-        $this->_alterModelTable($schemaEditor, $fromState, $toState);
+        $this->alterModelTable($schemaEditor, $fromState, $toState);
     }
 
     /**
@@ -78,7 +78,7 @@ class AlterModelTable extends Operation
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function _alterModelTable($schemaEditor, $fromState, $toState)
+    private function alterModelTable($schemaEditor, $fromState, $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->name);
 

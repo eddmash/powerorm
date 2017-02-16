@@ -214,7 +214,6 @@ class Field extends DeconstructableObject implements FieldInterface
     public $manyToOne = false;
     public $inverse = false;
 
-    private $constructorArgs;
 
     public function __construct($config = [])
     {
@@ -244,7 +243,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model  $modelObject
+     * @param Model $modelObject
      *
      * @throws FieldError
      *
@@ -256,8 +255,12 @@ class Field extends DeconstructableObject implements FieldInterface
     {
         if (!StringHelper::isValidVariableName($fieldName)):
             throw new FieldError(
-                sprintf(' "%s" is not a valid field name on the model "%s" .', $fieldName,
-                    $modelObject->getFullClassName()));
+                sprintf(
+                    ' "%s" is not a valid field name on the model "%s" .',
+                    $fieldName,
+                    $modelObject->getFullClassName()
+                )
+            );
         endif;
 
         $this->scopeModel = $modelObject;
@@ -361,13 +364,18 @@ class Field extends DeconstructableObject implements FieldInterface
 
         if (!StringHelper::isValidVariableName($this->name)):
             $errors = [
-                CheckError::createObject([
-                    'message' => sprintf(' "%s" is not a valid field name on model %s .',
-                        $this->name, $this->scopeModel->getFullClassName()),
-                    'hint' => null,
-                    'context' => $this,
-                    'id' => 'fields.E001',
-                ]),
+                CheckError::createObject(
+                    [
+                        'message' => sprintf(
+                            ' "%s" is not a valid field name on model %s .',
+                            $this->name,
+                            $this->scopeModel->getFullClassName()
+                        ),
+                        'hint' => null,
+                        'context' => $this,
+                        'id' => 'fields.E001',
+                    ]
+                ),
             ];
         endif;
 
@@ -473,7 +481,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool  $add   is whether the instance is being saved to the database for the first time
+     * @param bool $add is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *
@@ -590,20 +598,6 @@ class Field extends DeconstructableObject implements FieldInterface
     {
         $this->cacheName = $cacheName;
     }
-
-//    public function __debugInfo()
-//    {
-//        $field = [];
-//        foreach (get_object_vars($this) as $name => $value) :
-//            if (in_array($name, self::DEBUG_IGNORE)):
-//                $meta[$name] = (is_subclass_of($value, BaseObject::getFullClassName())) ?: '** hidden **';
-//                continue;
-//            endif;
-//            $field[$name] = $value;
-//        endforeach;
-
-//        return $field;
-//    }
 }
 
 Field::registerLookup(Contains::class);

@@ -75,10 +75,10 @@ class Makemigrations extends BaseCommand
             return;
         endif;
 
-        $this->_writeMigrations($changes, $input, $output);
+        $this->writeMigrations($changes, $input, $output);
     }
 
-    public function _writeMigrations($migrationChanges, InputInterface $input, OutputInterface $output)
+    private function writeMigrations($migrationChanges, InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Creating Migrations :');
 

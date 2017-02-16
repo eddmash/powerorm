@@ -20,7 +20,12 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedExact;
+use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThan;
+use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThanOrEqual;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedIn;
+use Eddmash\PowerOrm\Model\Lookup\Related\RelatedIsNull;
+use Eddmash\PowerOrm\Model\Lookup\Related\RelatedLessThan;
+use Eddmash\PowerOrm\Model\Lookup\Related\RelatedLessThanOrEqual;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
@@ -51,12 +56,12 @@ class RelatedField extends Field
     public function checks()
     {
         $checks = parent::checks();
-        $checks = array_merge($checks, $this->_checkRelationModelExists());
+        $checks = array_merge($checks, $this->checkRelationModelExists());
 
         return $checks;
     }
 
-    public function _checkRelationModelExists()
+    private function checkRelationModelExists()
     {
         $relModel = $this->relation->toModel;
         if ($relModel instanceof Model):
@@ -231,9 +236,9 @@ class RelatedField extends Field
     {
         $relObj = null;
 
-        try{
+        try {
             $relObj = $modelInstance->{$this->getAttrName()};
-        }catch (AttributeError $e){
+        } catch (AttributeError $e) {
             $qs = $this->getRelatedQueryset();
 
             $relObj = $qs->filter($this->getReverseRelatedFilter($modelInstance))->get();

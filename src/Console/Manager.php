@@ -55,7 +55,7 @@ class Manager extends Base
 
     public function getComponentsPath()
     {
-        $components = (array) BaseOrm::getInstance()->components;
+        $components = (array)BaseOrm::getInstance()->components;
 
         $paths = [];
 
@@ -121,8 +121,12 @@ class Manager extends Base
 
         if (false === $file):
             $this->error(
-                sprintf('Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?'.PHP_EOL, $name,
-                    $this->path));
+                sprintf(
+                    'Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?'.PHP_EOL,
+                    $name,
+                    $this->path
+                )
+            );
             $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
             $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
 

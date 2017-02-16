@@ -51,7 +51,7 @@ class Optimize
     public static function run($operations)
     {
         while (true):
-            $results = self::_optimize($operations);
+            $results = self::optimize($operations);
             if ($results == $operations):
                 return $results;
             endif;
@@ -70,7 +70,7 @@ class Optimize
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function _optimize($operations)
+    public static function optimize($operations)
     {
         $newOperations = [];
         /** @var $outOperation Operation */
@@ -98,7 +98,10 @@ class Optimize
                         // add points that fell in between those that merged
                         $newOperations = array_merge($newOperations, $inBetween);
                         // add points that come after
-                        $newOperations = array_merge($newOperations, array_slice($operations, $outIndex + $inIndex + 2));
+                        $newOperations = array_merge(
+                            $newOperations,
+                            array_slice($operations, $outIndex + $inIndex + 2)
+                        );
 
                         return $newOperations;
                     else:

@@ -34,11 +34,11 @@ class StringHelper
     /**
      * Truncates a string to the number of characters specified.
      *
-     * @param string $string   The string to truncate
-     * @param int    $length   How many characters from original string to include into truncated string
-     * @param string $suffix   String to append to the end of truncated string
+     * @param string $string The string to truncate
+     * @param int $length How many characters from original string to include into truncated string
+     * @param string $suffix String to append to the end of truncated string
      * @param string $encoding The charset to use, defaults to charset currently used by application
-     * @param bool   $asHtml   Whether to treat the string being truncated as HTML and preserve proper HTML tags.
+     * @param bool $asHtml Whether to treat the string being truncated as HTML and preserve proper HTML tags.
      *                         This parameter is available since version 2.0.1
      *
      * @return string the truncated string
@@ -69,9 +69,9 @@ class StringHelper
      * Check if given string starts with specified substring.
      * Binary and multibyte safe.
      *
-     * @param string $string        Input string
-     * @param string $with          Part to search
-     * @param bool   $caseSensitive Case sensitive search. Default is true
+     * @param string $string Input string
+     * @param string $with Part to search
+     * @param bool $caseSensitive Case sensitive search. Default is true
      *
      * @return bool Returns true if first input starts with second input, false otherwise
      */
@@ -84,7 +84,9 @@ class StringHelper
             return strncmp($string, $with, $bytes) === 0;
         } else {
             return mb_strtolower(
-                mb_substr($string, 0, $bytes, '8bit'), self::getCharset()) === mb_strtolower($with, self::getCharset());
+                mb_substr($string, 0, $bytes, '8bit'),
+                self::getCharset()
+            ) === mb_strtolower($with, self::getCharset());
         }
     }
 
@@ -94,7 +96,7 @@ class StringHelper
      *
      * @param string $string
      * @param string $with
-     * @param bool   $caseSensitive Case sensitive search. Default is true
+     * @param bool $caseSensitive Case sensitive search. Default is true
      *
      * @return bool Returns true if first input ends with second input, false otherwise
      */
@@ -112,8 +114,12 @@ class StringHelper
             return substr_compare($string, $with, -$bytes, $bytes) === 0;
         } else {
             return mb_strtolower(
-                mb_substr($string, -$bytes, null, '8bit'), self::getCharset()) === mb_strtolower($with,
-                self::getCharset());
+                mb_substr($string, -$bytes, null, '8bit'),
+                self::getCharset()
+            ) === mb_strtolower(
+                $with,
+                self::getCharset()
+            );
         }
     }
 

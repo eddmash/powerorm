@@ -295,7 +295,7 @@ class BaseOrm extends BaseObject
         $instance = null;
 
         if (ENVIRONMENT == 'POWERORM_DEV'):
-            $instance = static::_standAloneEnvironment($config);
+            $instance = static::standAloneEnvironment($config);
         else:
             $instance = static::getOrmFromContext();
         endif;
@@ -317,7 +317,7 @@ class BaseOrm extends BaseObject
         return $orm;
     }
 
-    public static function &_standAloneEnvironment($config)
+    private static function &standAloneEnvironment($config)
     {
         $env = static::createObject($config);
 
@@ -365,9 +365,9 @@ class BaseOrm extends BaseObject
     /**
      * Configures an object with the initial property values.
      *
-     * @param object $object     the object to be configured
-     * @param array  $properties the property initial values given in terms of name-value pairs
-     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object the object to be configured
+     * @param array $properties the property initial values given in terms of name-value pairs
+     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself

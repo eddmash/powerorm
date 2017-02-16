@@ -211,11 +211,13 @@ class Migration implements MigrationInterface
 
         foreach ($itemsToRun as $runItem) :
 
-            $schemaEditor->connection->transactional(function () use ($runItem, $schemaEditor) {
-                /** @var $operation Operation */
-                $operation = $runItem['operation'];
-                $operation->databaseBackwards($schemaEditor, $runItem['newState'], $runItem['oldState']);
-            });
+            $schemaEditor->connection->transactional(
+                function () use ($runItem, $schemaEditor) {
+                    /** @var $operation Operation */
+                    $operation = $runItem['operation'];
+                    $operation->databaseBackwards($schemaEditor, $runItem['newState'], $runItem['oldState']);
+                }
+            );
         endforeach;
 
         return $state;
@@ -227,7 +229,7 @@ class Migration implements MigrationInterface
      * Preserves the original object state by default and will return a mutated state from a copy.
      *
      * @param ProjectState $state
-     * @param bool|true    $preserveState
+     * @param bool|true $preserveState
      *
      * @return mixed
      *

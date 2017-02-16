@@ -100,7 +100,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model           $model
+     * @param Model $model
      *
      * @return Model
      *
@@ -143,29 +143,15 @@ class ManyToManyField extends RelatedField
             ),
         ];
 
-//        $className = '\\'.$className;
 //        /** @var $intermediaryObj Model */
-
-//        $intermediaryObj = new $className();
-
-//        $intermediaryObj->init($fields, ['meta' => $meta, 'registry' => $field->scopeModel->meta->registry]);
-
         $intermediaryClass = FormatFileContent::createObject();
         $intermediaryClass->addItem(sprintf('class %1$s extends \%2$s{', $className, Model::getFullClassName()));
         $intermediaryClass->addItem('public function fields(){');
-//        $intermediaryClass->addItem('return [');
-//        $intermediaryClass->addItem(sprintf(" '%s' =>", $from));
-//        $intermediaryClass->addItem(sprintf("\\PModel::ForeignKey(['to' => %s, 'dbConstraint' => %s, 'onDelete' =>
-//        Delete::CASCADE])", $modelName, $field->relation->dbConstraint));
-//        $intermediaryClass->addItem(', ');
-//        $intermediaryClass->addItem(sprintf(" '%s' =>", $to));
-//        $intermediaryClass->addItem(sprintf("PModel::ForeignKey(['to' => %s,
-//            'dbConstraint' => %s, 'onDelete' => Delete::CASCADE, ])", $toModelName, $field->relation->dbConstraint));
-//        $intermediaryClass->addItem('];');
+
         $intermediaryClass->addItem('}');
         $intermediaryClass->addItem('public function getMetaSettings(){');
         $intermediaryClass->addItem('return [');
-        $intermediaryClass->addItem(sprintf("'dbTable' => '%s',", $field->_getM2MDbTable($model->meta)));
+        $intermediaryClass->addItem(sprintf("'dbTable' => '%s',", $field->getM2MDbTable($model->meta)));
         $intermediaryClass->addItem(sprintf("'verboseName' => '%s',", sprintf('%s-%s relationship', $from, $to)));
         $intermediaryClass->addItem(sprintf("'uniqueTogether' => ['%s','%s'],", $from, $to));
         $intermediaryClass->addItem("'autoCreated' => true");
@@ -196,7 +182,7 @@ class ManyToManyField extends RelatedField
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _getM2MDbTable($meta)
+    private function getM2MDbTable($meta)
     {
         if ($this->relation->through !== null):
             return $this->relation->through->meta->dbTable;
@@ -211,12 +197,12 @@ class ManyToManyField extends RelatedField
     public function checks()
     {
         $checks = parent::checks();
-        $checks = array_merge($checks, $this->_checkIgnoredKwargOptions());
+        $checks = array_merge($checks, $this->checkIgnoredKwargOptions());
 
         return $checks;
     }
 
-    public function _checkIgnoredKwargOptions()
+    private function checkIgnoredKwargOptions()
     {
         $warnings = [];
         if ($this->hasNullKwarg):

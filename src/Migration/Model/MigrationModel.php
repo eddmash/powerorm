@@ -22,7 +22,6 @@ class MigrationModel extends Model
 
     public static function defineClass($className, $extends = '')
     {
-        //        $namespace = 'Eddmash\PowerOrm\Migration\Model';
         $namespace = '';
         $use = '';
         $extendedClass = '';

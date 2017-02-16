@@ -35,6 +35,7 @@ function getFieldNamesFromMeta(Meta $meta)
 
     return $fieldNames;
 }
+
 /**
  * Represents a lazy database lookup for a set of objects.
  *
@@ -115,12 +116,21 @@ class Queryset implements QuerysetInterface
         if ($resultCount == 1):
             return $queryset->getResults()[0];
         elseif (!$resultCount):
-            throw new ObjectDoesNotExist(sprintf('%s matching query does not exist.',
-                $this->model->meta->modelName));
+            throw new ObjectDoesNotExist(
+                sprintf(
+                    '%s matching query does not exist.',
+                    $this->model->meta->modelName
+                )
+            );
         endif;
 
-        throw new MultipleObjectsReturned(sprintf('"get() returned more than one %s -- it returned %s!"',
-            $this->model->meta->modelName, $resultCount));
+        throw new MultipleObjectsReturned(
+            sprintf(
+                '"get() returned more than one %s -- it returned %s!"',
+                $this->model->meta->modelName,
+                $resultCount
+            )
+        );
     }
 
     /**
@@ -163,10 +173,11 @@ class Queryset implements QuerysetInterface
     {
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
-            $this->_resultsCache = $instance->execute();
+
+            return (bool)$instance->execute()->fetch();
         endif;
 
-        return (bool) $this->_resultsCache;
+        return (bool)$this->_resultsCache;
     }
 
     public function limit($start, $end)
@@ -198,7 +209,7 @@ class Queryset implements QuerysetInterface
             $qb->setParameter($index, $param);
         endforeach;
 
-        return $qb->execute() > 0;
+        return ($qb->execute() > 0);
     }
 
     public function _insert($model, $fields, $returnId)
@@ -440,8 +451,13 @@ class Queryset implements QuerysetInterface
             $field = $meta->getField($name);
         } catch (FieldDoesNotExist $e) {
             $available = getFieldNamesFromMeta($meta);
-            throw new FieldError(sprintf("Cannot resolve keyword '%s' into field. Choices are: [ %s ]", $name,
-                implode(', ', $available)));
+            throw new FieldError(
+                sprintf(
+                    "Cannot resolve keyword '%s' into field. Choices are: [ %s ]",
+                    $name,
+                    implode(', ', $available)
+                )
+            );
         }
 
         return $field->name;

@@ -52,7 +52,7 @@ class ModelState extends BaseObject
     /**
      * Takes a model returns a ModelState representing it.
      *
-     * @param Model      $model
+     * @param Model $model
      * @param bool|false $excludeRels
      *
      * @return static
@@ -81,8 +81,13 @@ class ModelState extends BaseObject
                 try {
                     $fields[$name] = $field->deepClone();
                 } catch (\Exception $e) {
-                    throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name,
-                        $model->meta->modelName));
+                    throw new TypeError(
+                        sprintf(
+                            "Couldn't reconstruct field %s on %s: %s",
+                            $name,
+                            $model->meta->modelName
+                        )
+                    );
                 }
             endforeach;
         endif;
@@ -184,6 +189,6 @@ class ModelState extends BaseObject
 
     public function __toString()
     {
-        return (string) sprintf("<ModelState: '%s'>", $this->name);
+        return (string)sprintf("<ModelState: '%s'>", $this->name);
     }
 }

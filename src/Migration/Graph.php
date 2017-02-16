@@ -80,18 +80,26 @@ class Graph
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function addDependency($child, $parent, $migration)
+    public function addDependency($child, $parent, Migration $migration)
     {
         // both parent and child need to be already in the graph
         if (!ArrayHelper::hasKey($this->nodes, $child)):
             throw new NodeNotFoundError(
-                sprintf('Migration %s dependencies reference nonexistent child node %s', $migration->getName(),
-                    $child));
+                sprintf(
+                    'Migration %s dependencies reference nonexistent child node %s',
+                    $migration->getName(),
+                    $child
+                )
+            );
         endif;
         if (!ArrayHelper::hasKey($this->nodes, $parent)):
             throw new NodeNotFoundError(
-                sprintf('Migration %s dependencies reference nonexistent parent node %s', $migration->getName(),
-                    $parent));
+                sprintf(
+                    'Migration %s dependencies reference nonexistent parent node %s',
+                    $migration->getName(),
+                    $parent
+                )
+            );
         endif;
 
         // add to the family tree of both the child and parent

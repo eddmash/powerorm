@@ -14,7 +14,7 @@
 
         <p>To start using the orm, load it like any other CODIGNTER library, preferably using autoload, this load the
             orm early enough allowing for better perfomance</p>
-<pre><code>$autoload['libraries'] = array(
+        <pre><code>$autoload['libraries'] = array(
     'powerdispatch/signal',
     'powerorm/orm', <------------------------------------ the orm
     'powerauth/auth'
@@ -49,7 +49,7 @@
     <h4><strong>Extending</strong></h4>
 
     <p>Extend this class on model classes e.g.</p>
-<pre><code>User_model extends PModel{
+    <pre><code>User_model extends PModel{
     protected $table_name= '';
     ...
     }</code></pre>
@@ -71,12 +71,12 @@
         <li>
             <p>The first Queryset method invoked on the model creates that models Queryset.
                 Each of this methods below create a new Queryset instance.</p>
-<pre><code>$this->user_model->get(array('name'=>'john'));
+            <pre><code>$this->user_model->get(array('name'=>'john'));
     $this->user_model->all());</code></pre>
         </li>
         <li>
             <p>Several Queryset methods can be chained together to refine the query.</p>
-<pre><code>$this->user_model->all()->filter(array('username'=>'admin'));
+            <pre><code>$this->user_model->all()->filter(array('username'=>'admin'));
     **************************************************
     SELECT `user`.*
     FROM `user`
@@ -136,7 +136,7 @@
     <p>e.g count all users</p>
     <pre><code> $this->user_model->all()->size(array('name'=>'john')) </code></pre>
     <p>get all users with the name <code>name=john</code></p>
-<pre><code> $this->user_model->all()->filter(array('name'=>'john'))
+    <pre><code> $this->user_model->all()->filter(array('name'=>'john'))
 
     // which can also be handle as follows
 
@@ -151,7 +151,7 @@
     <ul>
         <li>
             <p>When looping through the Queryset using foreach.</p>
-<pre><code> $admins = $this->role->all();
+            <pre><code> $admins = $this->role->all();
     foreach($admins as $admin){
     ...
     } </code></pre>
@@ -162,7 +162,7 @@
         </li>
         <li>
             <p>When testing or existence of a property e.g. using isset().</p>
-<pre><code>$admin_role = $this->role->get(array('name'=>'admin'));
+            <pre><code>$admin_role = $this->role->get(array('name'=>'admin'));
     if(isset($admin_role->description)){
     ...
     }</code></pre>
@@ -196,14 +196,14 @@
     <p>We want to list articles along with their title and author’s name.</p>
 
     <p>This could be achieved using the following</p>
-<pre><code>$articles = $this->article_model->all()
+    <pre><code>$articles = $this->article_model->all()
 
     foreach($articles as $article){
     $article->author->name;
     }
 </code></pre>
     <p>Assuming we have 20 articles in the database, the above code will produce 20+1 queries to the database</p>
-<pre><code> // one to fetch all the articles
+    <pre><code> // one to fetch all the articles
 
     select * from articles;
 
@@ -219,7 +219,7 @@
 
     <p>The method tells the orm to eagerly load the article and authors in one go when the Queryset is being evaluated.
         which will result in two sql queries as shown below:</p>
-<pre><code>$articles = $this->with(['author'])->article_model->all()
+    <pre><code>$articles = $this->with(['author'])->article_model->all()
 
     foreach($articles as $article){
     $article->author->name;

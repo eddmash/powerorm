@@ -133,7 +133,7 @@ class FormatFileContent
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function formatObject($object)
+    public static function formatObject(DeconstructableObject $object)
     {
         $skel = $object->deconstruct();
 

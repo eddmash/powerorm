@@ -163,7 +163,8 @@ class Loader extends BaseObject
             $foundClass = ClassHelper::classExists($className, $namespace);
             if (!$className):
                 throw new ClassNotFoundException(
-                    sprintf('The class [ %2$s\\%1$s or \\%1$s ] could not be located', $className, $namespace));
+                    sprintf('The class [ %2$s\\%1$s or \\%1$s ] could not be located', $className, $namespace)
+                );
             endif;
             $classes[] = $foundClass;
         endforeach;
@@ -190,7 +191,7 @@ class Loader extends BaseObject
         $last_version = basename($last_version);
         $last_version = preg_split('/_/', $last_version)[0];
 
-        return (int) $last_version;
+        return (int)$last_version;
     }
 
     /**

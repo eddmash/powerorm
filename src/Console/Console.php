@@ -61,7 +61,7 @@ class Console
      * Will return a string formatted with the given ANSI style.
      *
      * @param string $string the string to be formatted
-     * @param array  $format An array containing formatting values.
+     * @param array $format An array containing formatting values.
      *                       You can pass any of the FG_*, BG_* and TEXT_* constants
      *                       and also [[xtermFgColor]] and [[xtermBgColor]] to specify a format
      *
@@ -198,24 +198,27 @@ class Console
             $output = [];
             exec('mode con', $output);
             if (isset($output, $output[1]) && strpos($output[1], 'CON') !== false) {
-                return $size = [(int) preg_replace('~\D~', '', $output[3]), (int) preg_replace('~\D~', '', $output[4])];
+                return $size = [(int)preg_replace('~\D~', '', $output[3]), (int)preg_replace('~\D~', '', $output[4])];
             }
         } else {
             // try stty if available
             $stty = [];
-            if (exec('stty -a 2>&1', $stty) && preg_match('/rows\s+(\d+);\s*columns\s+(\d+);/mi', implode(' ', $stty),
-                    $matches)
+            if (exec('stty -a 2>&1', $stty) && preg_match(
+                    '/rows\s+(\d+);\s*columns\s+(\d+);/mi',
+                    implode(' ', $stty),
+                    $matches
+                )
             ) {
                 return $size = [$matches[2], $matches[1]];
             }
 
             // fallback to tput, which may not be updated on terminal resize
-            if (($width = (int) exec('tput cols 2>&1')) > 0 && ($height = (int) exec('tput lines 2>&1')) > 0) {
+            if (($width = (int)exec('tput cols 2>&1')) > 0 && ($height = (int)exec('tput lines 2>&1')) > 0) {
                 return $size = [$width, $height];
             }
 
             // fallback to ENV variables, which may not be updated on terminal resize
-            if (($width = (int) getenv('COLUMNS')) > 0 && ($height = (int) getenv('LINES')) > 0) {
+            if (($width = (int)getenv('COLUMNS')) > 0 && ($height = (int)getenv('LINES')) > 0) {
                 return $size = [$width, $height];
             }
         }
@@ -237,9 +240,9 @@ class Console
      *     amet.
      * ```
      *
-     * @param string $text    the text to be wrapped
-     * @param int    $indent  number of spaces to use for indentation
-     * @param bool   $refresh whether to force refresh of screen size.
+     * @param string $text the text to be wrapped
+     * @param int $indent number of spaces to use for indentation
+     * @param bool $refresh whether to force refresh of screen size.
      *                        This will be passed to [[getScreenSize()]]
      *
      * @return string the wrapped text
@@ -269,8 +272,8 @@ class Console
     /**
      * Prompts the user for input and validates it.
      *
-     * @param string $text    prompt string
-     * @param array  $options the options to validate the input:
+     * @param string $text prompt string
+     * @param array $options the options to validate the input:
      *
      * - `required`: whether it is required or not
      * - `default`: default value if no input is inserted by the user
@@ -324,7 +327,7 @@ class Console
      * Asks user to confirm by typing y or n.
      *
      * @param string $message to print out before waiting for user input
-     * @param bool   $default this value is returned if no selection is made
+     * @param bool $default this value is returned if no selection is made
      *
      * @return bool whether user confirmed
      */
@@ -352,8 +355,8 @@ class Console
      * Gives the user an option to choose from. Giving '?' as an input will show
      * a list of options to choose from and their explanations.
      *
-     * @param string $prompt  the prompt message
-     * @param array  $options Key-value array of options to choose from
+     * @param string $prompt the prompt message
+     * @param array $options Key-value array of options to choose from
      *
      * @return string An option character the user chose
      */

@@ -54,7 +54,7 @@ class Registry extends BaseObject
     public function populate()
     {
         if ($this->ready == false) :
-            $this->_populateRegistry();
+            $this->hydrateRegistry();
             $this->ready = true;
         endif;
 
@@ -123,7 +123,7 @@ class Registry extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    protected function _populateRegistry()
+    protected function hydrateRegistry()
     {
         if ($this->ready):
             return;
@@ -205,7 +205,8 @@ class Registry extends BaseObject
             $foundClass = ClassHelper::classExists($className, $namespace);
             if (!$foundClass):
                 throw new ClassNotFoundException(
-                    sprintf('The class [ %1$s\\%2$s or \\%1$s ] could not be located', $className, $namespace));
+                    sprintf('The class [ %1$s\\%2$s or \\%1$s ] could not be located', $className, $namespace)
+                );
             endif;
             $models[] = $foundClass;
         endforeach;
@@ -223,10 +224,10 @@ class Registry extends BaseObject
     }
 
     /**
-     * @param callback $callback   the callback to invoke when a model has been created
-     * @param array    $modelNames the model we are waiting for to be created, the model object is passed to
+     * @param callback $callback the callback to invoke when a model has been created
+     * @param array $modelNames the model we are waiting for to be created, the model object is passed to
      *                             the callback as the first argument
-     * @param array    $kwargs     an associative array to be passed to the callback
+     * @param array $kwargs an associative array to be passed to the callback
      *
      * @since 1.1.0
      *
@@ -287,6 +288,6 @@ class Registry extends BaseObject
 
     public function __toString()
     {
-        return (string) sprintf('%s Object', $this->getFullClassName());
+        return (string)sprintf('%s Object', $this->getFullClassName());
     }
 }

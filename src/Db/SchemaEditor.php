@@ -12,12 +12,10 @@ namespace Eddmash\PowerOrm\Db;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\TableDiff;
-use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\ValueError;
@@ -150,7 +148,7 @@ class SchemaEditor extends BaseObject
     /**
      * Renames the table a model points to.
      *
-     * @param Model  $model
+     * @param Model $model
      * @param string $oldDbTableName
      * @param string $newDbTableName
      *
@@ -293,9 +291,9 @@ class SchemaEditor extends BaseObject
      * Requires a copy of the old field as well so we can only perform changes that are required.
      * If strict is true, raises errors if the old column does not match old_field precisely.
      *
-     * @param Model      $model
-     * @param Field      $oldField
-     * @param Field      $newField
+     * @param Model $model
+     * @param Field $oldField
+     * @param Field $newField
      * @param bool|false $strict
      *
      * @throws ValueError
@@ -325,7 +323,7 @@ class SchemaEditor extends BaseObject
                 $newField->relation->through->meta->autoCreated
             )
         ):
-            $this->_alterManyToMany($model, $oldField, $newField, $strict);
+            $this->alterManyToMany($model, $oldField, $newField, $strict);
         elseif (is_null($oldType) && is_null($newType) &&
             (
                 $oldField->relation->through !== null &&
@@ -345,22 +343,22 @@ class SchemaEditor extends BaseObject
                 )
             );
         endif;
-        $this->_alterField($model, $oldField, $newField, $strict);
+        $this->doFieldAlter($model, $oldField, $newField, $strict);
     }
 
     /**
      * Alters M2Ms to repoint their to= endpoints.
      *
-     * @param Model      $model
-     * @param Field      $oldField
-     * @param Field      $newField
+     * @param Model $model
+     * @param Field $oldField
+     * @param Field $newField
      * @param bool|false $strict
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _alterManyToMany(Model $model, Field $oldField, Field $newField, $strict = false)
+    private function alterManyToMany(Model $model, Field $oldField, Field $newField, $strict = false)
     {
         //Rename the through table
         if ($oldField->relation->through->meta->dbTable != $newField->relation->through->meta->dbTable):
@@ -372,10 +370,10 @@ class SchemaEditor extends BaseObject
         endif;
     }
 
-    public function _alterField(Model $model, Field $oldField, Field $newField, $strict = false)
+    private function doFieldAlter(Model $model, Field $oldField, Field $newField, $strict = false)
     {
         $schema = $this->schemaManager->createSchema();
-//        $tableDef = clone $schema->getTable($model->meta->dbTable);
+
         $oldType = $oldField->dbType($this->connection);
         $newType = $newField->dbType($this->connection);
         $table = $model->meta->dbTable;
@@ -539,7 +537,7 @@ class SchemaEditor extends BaseObject
     }
 
     /**
-     * @param Field      $field
+     * @param Field $field
      * @param bool|false $includeDefault
      *
      * @return array
@@ -648,7 +646,7 @@ class SchemaEditor extends BaseObject
 
     /**
      * @param string $table
-     * @param string $type  accepts (unique, primary_key, index) as values
+     * @param string $type accepts (unique, primary_key, index) as values
      *
      * @return Index[]
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>

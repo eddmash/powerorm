@@ -178,7 +178,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         /* @var $field Field */
         foreach ($fields as $name => $field) :
-            if (!array_key_exists($field->getAttrName(), $kwargs) and is_null($field->getColumnName())):
+            if (!array_key_exists($field->getAttrName(), $kwargs) && is_null($field->getColumnName())):
                 continue;
             endif;
 
@@ -293,7 +293,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string       $name
+     * @param string $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -385,8 +385,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param string    $method     the method to invoke
-     * @param null      $args       the arguments to pass to the method
+     * @param string $method the method to invoke
+     * @param null $args the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -703,7 +703,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array) unserialize((string) $serialized);
+        $this->_fieldCache = (array)unserialize((string)$serialized);
     }
 
     public function __get($name)
@@ -752,20 +752,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         return sprintf('%s object', $this->getFullClassName());
     }
-
-//    public function __debugInfo()
-//    {
-//        $model = [];
-//        foreach (get_object_vars($this) as $name => $value) :
-//            if (in_array($name, self::DEBUG_IGNORE)):
-//                $meta[$name] = (!is_subclass_of($value, BaseObject::getFullClassName())) ? '** hidden **' : (string) $value;
-//                continue;
-//            endif;
-//            $model[$name] = $value;
-//        endforeach;
-
-//        return $model;
-//    }
 
     /**
      * @return Queryset
@@ -824,8 +810,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $connection
-     * @param null       $updateField
+     * @param null $connection
+     * @param null $updateField
      *
      * @throws ValueError
      *
@@ -927,7 +913,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $updateFields
+     * @param null $updateFields
      *
      * @since 1.1.0
      *
@@ -1008,7 +994,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $updated = false;
 
         if ($pkValue && !$forceInsert):
-
             $values = [];
             foreach ($nonePkUpdateFields as $nonePkUpdateField) :
                 $values[$nonePkUpdateField->getColumnName()] = $nonePkUpdateField->preSave($this, false);
@@ -1110,6 +1095,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // successfully (a row is matched and updated). In order to
             // distinguish these two cases, the object's existence in the
             // database is again checked for if the UPDATE query returns 0.
+
             if ($filtered->exists()):
                 return $filtered->_update($records) || $filtered->exists();
             else:

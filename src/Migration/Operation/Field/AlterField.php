@@ -61,7 +61,7 @@ class AlterField extends FieldOperation
      */
     public function databaseForwards($schemaEditor, $fromState, $toState)
     {
-        $this->_alterField($schemaEditor, $fromState, $toState);
+        $this->alterField($schemaEditor, $fromState, $toState);
     }
 
     /**
@@ -69,7 +69,7 @@ class AlterField extends FieldOperation
      */
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
-        $this->_alterField($schemaEditor, $fromState, $toState);
+        $this->alterField($schemaEditor, $fromState, $toState);
     }
 
     /**
@@ -83,7 +83,7 @@ class AlterField extends FieldOperation
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function _alterField($schemaEditor, $fromState, $toState)
+    private function alterField($schemaEditor, $fromState, $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):

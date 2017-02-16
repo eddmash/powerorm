@@ -15,9 +15,4 @@ use Eddmash\PowerOrm\Model\Lookup\In;
 
 class RelatedIn extends In
 {
-    //    public function processRHS(Connection $connection)
-//    {
-
-//        return implode(',', $this->rhs);
-//    }
 }

@@ -33,8 +33,11 @@ class CreateModel extends ModelOperation
 
     public function getDescription()
     {
-        return sprintf('Create %smodel %s',
-            (isset($this->meta['proxy']) && $this->meta['proxy']) ? 'proxy ' : '', $this->name);
+        return sprintf(
+            'Create %smodel %s',
+            (isset($this->meta['proxy']) && $this->meta['proxy']) ? 'proxy ' : '',
+            $this->name
+        );
     }
 
     public function getConstructorArgs()
@@ -63,8 +66,13 @@ class CreateModel extends ModelOperation
      */
     public function updateState($state)
     {
-        $state->addModelState(ModelState::createObject(
-            $this->name, $this->fields, ['meta' => $this->meta, 'extends' => $this->extends]));
+        $state->addModelState(
+            ModelState::createObject(
+                $this->name,
+                $this->fields,
+                ['meta' => $this->meta, 'extends' => $this->extends]
+            )
+        );
     }
 
     /**
@@ -105,7 +113,10 @@ class CreateModel extends ModelOperation
                             return false;
                         endif;
 
-                        if ($operation->field->relation->hasProperty('through') && $operation->field->relation->through) :
+                        if ($operation->field->relation->hasProperty(
+                                'through'
+                            ) && $operation->field->relation->through
+                        ) :
                             $modelName = $operation->field->relation->through->toModel->meta->modelName;
                             if ($between->referencesModel($modelName)) :
                                 return false;
@@ -118,12 +129,14 @@ class CreateModel extends ModelOperation
                 $fields[$operation->field->name] = $operation->field;
 
                 return [
-                    static::createObject([
-                        'name' => $this->name,
-                        'fields' => $fields,
-                        'meta' => $this->meta,
-                        'extends' => $this->extends,
-                    ]),
+                    static::createObject(
+                        [
+                            'name' => $this->name,
+                            'fields' => $fields,
+                            'meta' => $this->meta,
+                            'extends' => $this->extends,
+                        ]
+                    ),
                 ];
 
             endif;

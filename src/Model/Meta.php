@@ -3,7 +3,6 @@
 namespace Eddmash\PowerOrm\Model;
 
 use Eddmash\PowerOrm\App\Registry;
-use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
@@ -23,7 +22,7 @@ use Eddmash\PowerOrm\Model\Field\RelatedField;
  */
 class Meta extends DeconstructableObject implements MetaInterface
 {
-    public static $DEBUG_IGNORE = [
+    const DEBUG_IGNORE = [
         'scopeModel',
         'registry',
         'concreteModel',
@@ -137,14 +136,6 @@ class Meta extends DeconstructableObject implements MetaInterface
     public $autoCreated = false;
 
     /**
-     * This attribute will only be set if the scopeModel contains a parent model
-     * that is not abstract e.g PModel or Eddmash\PowerOrm\Model.
-     *
-     * @var
-     */
-    private $parentLink;
-
-    /**
      * Holds all the fields that point to the scope model coming from other models.
      *
      * @var array
@@ -170,7 +161,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getFields($includeParents = true)
     {
-        return $this->_getFields(['includeParents' => $includeParents, 'reverse' => false]);
+        return $this->fetchFields(['includeParents' => $includeParents, 'reverse' => false]);
     }
 
     /**
@@ -190,7 +181,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     public function getField($name)
     {
         // first look in the forward fields only
-        $fields = $this->_getForwardOnlyField();
+        $fields = $this->getForwardOnlyField();
 
         if (ArrayHelper::hasKey($fields, $name)):
             return $fields[$name];
@@ -208,7 +199,7 @@ class Meta extends DeconstructableObject implements MetaInterface
             );
         endif;
 
-        $reverseFields = $this->_getReverseOnlyField();
+        $reverseFields = $this->getReverseOnlyField();
 
         if (ArrayHelper::hasKey($reverseFields, $name)):
 
@@ -224,7 +215,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         $forwardFields = [];
 
         /** @var $field Field */
-        foreach ($this->_getForwardOnlyField() as $name => $field) :
+        foreach ($this->getForwardOnlyField() as $name => $field) :
             if (!$field->manyToMany):
                 $forwardFields[$name] = $field;
             endif;
@@ -233,14 +224,14 @@ class Meta extends DeconstructableObject implements MetaInterface
         return $forwardFields;
     }
 
-    public function _getForwardOnlyField()
+    private function getForwardOnlyField()
     {
-        return $this->_getFields(['reverse' => false]);
+        return $this->fetchFields(['reverse' => false]);
     }
 
-    public function _getReverseOnlyField()
+    private function getReverseOnlyField()
     {
-        return $this->_getFields(['forward' => false]);
+        return $this->fetchFields(['forward' => false]);
     }
 
     /**
@@ -301,7 +292,7 @@ class Meta extends DeconstructableObject implements MetaInterface
             // collect all relation fields for this each model
             foreach ($allModels as $name => $model) :
                 // just get the forward fields
-                $fields = $model->meta->_getFields(['includeParents' => false, 'reverse' => false]);
+                $fields = $model->meta->fetchFields(['includeParents' => false, 'reverse' => false]);
 
                 foreach ($fields as $field) :
 
@@ -329,7 +320,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      * Add the current object to the passed in object.
      *
      * @param string $propertyName the name map the current object to, in the class object passed in
-     * @param Model  $classObject  the object to attach the current object to
+     * @param Model $classObject the object to attach the current object to
      *
      * @since 1.1.0
      *
@@ -353,7 +344,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         endforeach;
 
         if ($this->dbTable == null):
-            $this->dbTable = $this->_getTableName();
+            $this->dbTable = $this->getTableName();
         endif;
 
         $vName = $this->verboseName;
@@ -361,7 +352,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         $this->verboseName = (empty($vName)) ? ucwords(StringHelper::camelToSpace($this->modelName)) : $vName;
     }
 
-    public function _getFields($kwargs = [])
+    private function fetchFields($kwargs = [])
     {
         $forward = $reverse = $includeParents = true;
         extract($kwargs);
@@ -479,25 +470,9 @@ class Meta extends DeconstructableObject implements MetaInterface
         // TODO: Implement deconstruct() method.
     }
 
-    private function _getTableName()
+    private function getTableName()
     {
         return sprintf('%s%s', BaseOrm::getDbPrefix(), str_replace('\\', '_', $this->normalizeKey($this->modelName)));
     }
 
-    public function __debugInfo()
-    {
-        $meta = [];
-        foreach (get_object_vars($this) as $name => $value) :
-            if (in_array($name, static::$DEBUG_IGNORE)):
-                $meta[$name] = (!is_subclass_of(
-                    $value,
-                    BaseObject::getFullClassName()
-                )) ? '** hidden **' : (string) $value;
-                continue;
-            endif;
-            $meta[$name] = $value;
-        endforeach;
-
-        return $meta;
-    }
 }
