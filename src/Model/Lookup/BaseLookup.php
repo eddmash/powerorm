@@ -92,4 +92,9 @@ class BaseLookup implements LookupInterface
     {
         return !(method_exists($this->rhs, 'toSql'));
     }
+
+    public function __toString()
+    {
+        return get_class($this);
+    }
 }

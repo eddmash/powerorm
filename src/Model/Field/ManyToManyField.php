@@ -247,6 +247,13 @@ class ManyToManyField extends RelatedField
         return [$name => $this->getForeignRelatedFieldsValues($modelInstance)];
     }
 
+    /***
+     * Gets the m2m relationship field on the through model.
+     * @param Model $model
+     * @param $attr
+     * @return mixed
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
     public function getM2MAttr(Model $model, $attr)
     {
         $cache_attr = sprintf('_m2m_%s_cache', $attr);
@@ -276,4 +283,21 @@ class ManyToManyField extends RelatedField
     {
         return parent::getRelatedQueryset($this->relation->through->meta->modelName);
     }
+
+
+
+    /**
+     * Get path from this field to the related model.
+     * @return array
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getPathInfo()
+    {
+        $model = $this->relation->through;
+
+        /**@var $field RelatedField*/
+        $field = $model->meta->getField($this->getM2MAttr($this->scopeModel, "name"));
+        return $field->getPathInfo();
+    }
+
 }

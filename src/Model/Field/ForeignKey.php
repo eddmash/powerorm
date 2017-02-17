@@ -63,15 +63,8 @@ class ForeignKey extends RelatedField
      */
     public function getRelatedField()
     {
-        if (is_string($this->relation->getToModel())):
-            throw new ValueError(sprintf('Related model %s cannot be resolved', $this->relation->getToModel()));
-        endif;
-
-        if (empty($this->toField)):
-            return $this->relation->getToModel()->meta->primaryKey;
-        endif;
-
-        return $this->relation->getToModel()->meta->getField($this->toField);
+        $fields = $this->getRelatedFields();
+        return $fields[1];
     }
 
     /**
@@ -122,4 +115,5 @@ class ForeignKey extends RelatedField
 
         return $kwargs;
     }
+
 }

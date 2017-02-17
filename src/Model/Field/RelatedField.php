@@ -331,4 +331,24 @@ class RelatedField extends Field
 
         return $values;
     }
+
+
+    /**
+     * Get path from this field to the related model.
+     * @return array
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getPathInfo()
+    {
+        return [
+            [
+                'fromMeta' => $this->scopeModel->meta,
+                'toMeta' => $this->relation->toModel->meta,
+                'targetFields' => $this->getForeignRelatedFields(),
+                'joinField' => $this,//field that joins the relationship
+                'm2m' => false,
+                'direct' => true,
+            ],
+        ];
+    }
 }

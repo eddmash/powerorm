@@ -12,14 +12,10 @@
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
-use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
-use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
 use Eddmash\PowerOrm\Model\Field\Field;
-use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
-use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -174,10 +170,10 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-            return (bool) $instance->execute()->fetch();
+            return (bool)$instance->execute()->fetch();
         endif;
 
-        return (bool) $this->_resultsCache;
+        return (bool)$this->_resultsCache;
     }
 
     public function limit($start, $end)
@@ -338,7 +334,6 @@ class Queryset implements QuerysetInterface
 
         $stmt = $this->connection->prepare($sql);
         foreach ($params as $index => $value) :
-
             ++$index; // Columns/Parameters are 1-based, so need to start at 1 instead of zero
             $stmt->bindValue($index, $value);
         endforeach;
@@ -351,160 +346,10 @@ class Queryset implements QuerysetInterface
     private function addConditions($negate, $conditions)
     {
         foreach ($conditions as $condition) :
-            $this->buildFilter($condition, $negate);
+            $this->query->addConditions($condition, $negate);
         endforeach;
     }
 
-    /**
-     * @param $condition
-     *
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function buildFilter($condition, $negate = false)
-    {
-        foreach ($condition as $name => $value) :
-            list($connector, $lookup, $field) = $this->solveLookupType($name);
-
-            $condition = $this->buildCondition($lookup, $field, $value);
-
-            $this->query->addWhere($condition, $connector);
-        endforeach;
-    }
-
-    /**
-     * @param $lookup
-     * @param $rhs
-     * @param $lhs
-     *
-     * @return LookupInterface
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function buildCondition($lookup, $rhs, $lhs)
-    {
-        /* @var $lookup LookupInterface */
-        $lookup = $lookup::createObject($rhs, $lhs);
-
-        return $lookup;
-    }
-
-    /**
-     * Gets a filter field and returns the an array consisting of :
-     * - the where clause connector to use e.g. and/ or.
-     * - the looku object.
-     *
-     * @param $name
-     *
-     * @return array
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function solveLookupType($name)
-    {
-        // get lookupand field
-        if (preg_match(BaseLookup::$lookupPattern, $name)):
-            list($name, $lookup) = preg_split(BaseLookup::$lookupPattern, $name);
-        else:
-            $lookup = 'exact';
-        endif;
-
-        // get connector
-        list($connector, $name) = $this->getConnector($name);
-        //todo check for span relationships
-        $name = $this->validateField($name, $this->model->meta);
-        $field = $this->getLookupField($name);
-        $lookup = $field->getLookup($lookup);
-
-        return [$connector, $lookup, $field];
-    }
-
-    /**
-     * @param $name
-     * @param Meta $meta
-     *
-     * @return
-     *
-     * @throws FieldError
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function validateField($name, Meta $meta)
-    {
-
-        if ($name === PRIMARY_KEY_ID):
-            $name = $meta->primaryKey->name;
-        endif;
-
-        $field = null;
-        try {
-
-            $field = $meta->getField($name);
-        } catch (FieldDoesNotExist $e) {
-            $available = getFieldNamesFromMeta($meta);
-            throw new FieldError(
-                sprintf(
-                    "Cannot resolve keyword '%s' into field. Choices are: [ %s ]",
-                    $name,
-                    implode(', ', $available)
-                )
-            );
-        }
-
-        return $field->name;
-    }
-
-    /**
-     * @param $name
-     *
-     * @return \Eddmash\PowerOrm\Model\Field\Field
-     *
-     * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function getLookupField($name)
-    {
-        //todo might need to look up the parent
-        return $this->model->meta->getField($name);
-    }
-
-    /**
-     * Determines the where clause connector to use.
-     *
-     * @param $name
-     *
-     * @return array
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function getConnector($name)
-    {
-        $connector = BaseLookup::AND_CONNECTOR;
-
-        // get the actual key
-        if (preg_match(BaseLookup::$whereConcatPattern, $name)):
-            // determine how to combine where statements
-            list($lookup, $name) = preg_split(BaseLookup::$whereConcatPattern, $name, -1, PREG_SPLIT_DELIM_CAPTURE);
-
-            $connector = BaseLookup::OR_CONNECTOR;
-        endif;
-
-        return [$connector, $name];
-    }
 
     /**
      * @return Query
