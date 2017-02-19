@@ -332,22 +332,48 @@ class RelatedField extends Field
         return $values;
     }
 
-
     /**
      * Get path from this field to the related model.
+     *
      * @return array
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function getPathInfo()
     {
+        echo $this->scopeModel->meta->modelName.' = ';
+
+        echo $this->relation->toModel->meta->modelName.'<br>';
+
         return [
             [
                 'fromMeta' => $this->scopeModel->meta,
                 'toMeta' => $this->relation->toModel->meta,
                 'targetFields' => $this->getForeignRelatedFields(),
-                'joinField' => $this,//field that joins the relationship
+                'joinField' => $this, //field that joins the relationship
                 'm2m' => false,
                 'direct' => true,
+            ],
+        ];
+    }
+
+    /**
+     * Get path from the related model to this field's model.
+     *
+     * @return array
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getReversePathInfo()
+    {
+        $meta = $this->relation->toModel->meta;
+
+        return [
+            [
+                'fromMeta' => $meta,
+                'toMeta' => $this->scopeModel->meta,
+                'targetFields' => [$meta->primaryKey],
+                'joinField' => $this->relation, //field that joins the relationship
+                'm2m' => (!$this->isUnique()),
+                'direct' => false,
             ],
         ];
     }

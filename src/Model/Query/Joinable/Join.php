@@ -13,28 +13,29 @@ namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 
 class Join extends BaseJoin
 {
     /**
-     * @var RelatedField
+     * @var RelatedField|ForeignObjectRel
      */
     private $joinField;
 
     public function asSql(Connection $connection)
     {
         $joinConditions = [];
-        $fields = [$this->joinField->getRelatedFields()];
-        /**@var $from RelatedField*/
-        /**@var $to RelatedField*/
-        foreach ($fields as $index=>$relFields) :
+        $fields = [$this->joinField->getJoinColumns()];
+        /** @var $from RelatedField */
+        /** @var $to RelatedField */
+        foreach ($fields as $index => $relFields) :
             list($from, $to) = $relFields;
-            $joinConditions[] = sprintf(" %s.%s = %s.%s", $this->getParentAlias(), $from->getColumnName(),
+            $joinConditions[] = sprintf(' %s.%s = %s.%s', $this->getParentAlias(), $from->getColumnName(),
                 $this->getTableAlias(), $to->getColumnName());
         endforeach;
 
-        $onClauseSql = implode(" AND ", $joinConditions);
-        $alias = "";
+        $onClauseSql = implode(' AND ', $joinConditions);
+        $alias = '';
         $sql = sprintf('%s %s%s ON (%s)', $this->getJoinType(), $this->getTableName(), $alias, $onClauseSql);
 
         return [$sql, []];

@@ -227,6 +227,7 @@ class ManyToManyField extends RelatedField
         // apply filter
         $this->getReverseRelatedFilter($this->relation->getToModel());
 
+//        $modelInstance->{$fromField->name} = $value;
         return [$this->getAttrName(), $queryset];
     }
 
@@ -269,7 +270,39 @@ class ManyToManyField extends RelatedField
         /** @var $field RelatedField */
         foreach ($this->relation->through->meta->getFields() as $field) :
             if ($field->isRelation &&
-                $field->relation->getToModel()->meta->modelName == $model->meta->modelName &&
+                $field->relation->toModel->meta->modelName == $model->meta->modelName &&
+                (is_null($linkName) || $linkName == $field->name)
+            ) :
+                $this->{$cache_attr} = $field->{$attr};
+
+                return $this->{$cache_attr};
+            endif;
+        endforeach;
+    }
+
+    /***
+     * Gets the m2m relationship field on the through model.
+     * @param Model $model
+     * @param $attr
+     * @return mixed
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getM2MReverseAttr(Model $model, $attr)
+    {
+        $cache_attr = sprintf('_m2m_reverse_%s_cache', $attr);
+        if ($this->hasProperty($cache_attr)) :
+            return $this->{$cache_attr};
+        endif;
+
+        $linkName = null;
+        if ($this->relation->through_fields) :
+            $linkName = $this->relation->through_fields[1];
+        endif;
+
+        /** @var $field RelatedField */
+        foreach ($this->relation->through->meta->getFields() as $field) :
+            if ($field->isRelation &&
+                $field->relation->toModel->meta->modelName == $model->meta->modelName &&
                 (is_null($linkName) || $linkName == $field->name)
             ) :
                 $this->{$cache_attr} = $field->{$attr};
@@ -284,20 +317,43 @@ class ManyToManyField extends RelatedField
         return parent::getRelatedQueryset($this->relation->through->meta->modelName);
     }
 
-
-
     /**
      * Get path from this field to the related model.
+     *
      * @return array
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function getPathInfo()
+    private function pathInfo($direct = false)
     {
+        $paths = [];
         $model = $this->relation->through;
 
-        /**@var $field RelatedField*/
-        $field = $model->meta->getField($this->getM2MAttr($this->scopeModel, "name"));
-        return $field->getPathInfo();
+        /** @var $field RelatedField */
+        /** @var $reverseField RelatedField */
+
+        $field = $model->meta->getField($this->getM2MAttr($this->scopeModel, 'name'));
+
+        $reverseField = $model->meta->getField($this->getM2MReverseAttr($this->relation->toModel, 'name'));
+
+        if ($direct):
+            $paths = array_merge($paths, $field->getReversePathInfo());
+            $paths = array_merge($paths, $reverseField->getPathInfo());
+        else:
+            $paths = array_merge($paths, $reverseField->getReversePathInfo());
+            $paths = array_merge($paths, $field->getPathInfo());
+        endif;
+
+        return $paths;
+    }
+
+    public function getPathInfo()
+    {
+        return $this->pathInfo(true);
+    }
+
+    public function getReversePathInfo()
+    {
+        return $this->pathInfo(false);
     }
 
 }

@@ -235,7 +235,13 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a list of all concrete fields on the model and its parents.
+     *
+     * @return Field[]
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getConcreteFields()
     {
@@ -256,6 +262,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      * Returns all the localFields that are concrete.
      *
      * @since 1.1.0
+     * @deprecated use {@see getConcreteFields}
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

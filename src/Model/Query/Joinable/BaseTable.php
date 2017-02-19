@@ -11,14 +11,13 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
-
 use Doctrine\DBAL\Connection;
 
 class BaseTable extends BaseJoin
 {
-
     /**
      * BaseTable constructor.
+     *
      * @param $tableName
      * @param $tableAlias
      */
@@ -30,11 +29,12 @@ class BaseTable extends BaseJoin
 
     public function asSql(Connection $connection)
     {
-        $tableAlias = "";
+        $tableAlias = '';
         if($this->getTableName() !== $this->getTableAlias()):
-            $tableAlias = sprintf("%s", $this->getTableAlias());
+            $tableAlias = sprintf('%s', $this->getTableAlias());
         endif;
         $tableName = $this->getTableName();
-        return [sprintf("%s %s", $tableName, $tableAlias), []];
+
+        return [sprintf('%s %s', $tableName, $tableAlias), []];
     }
 }

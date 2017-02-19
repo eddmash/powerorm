@@ -11,6 +11,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
 /**
  * Class Filter.
@@ -33,7 +34,7 @@ class BaseLookup implements LookupInterface
     protected $operator;
 
     /**
-     * @var Field
+     * @var Col
      */
     protected $lhs;
 
@@ -50,7 +51,7 @@ class BaseLookup implements LookupInterface
 
     public function processLHS(Connection $connection)
     {
-        return $this->lhs->getColumnName();
+        return $this->lhs->asSql($connection);
     }
 
     public function processRHS(Connection $connection)
@@ -59,8 +60,8 @@ class BaseLookup implements LookupInterface
             // get pk field
             $pk = $this->rhs->meta->primaryKey->getAttrName();
             $this->rhs = $this->rhs->{$pk};
-        elseif (method_exists($this->rhs, 'toSql')):
-            list($sql, $params) = $this->rhs->toSql();
+        elseif (method_exists($this->rhs, '_toSql')):
+            list($sql, $params) = $this->rhs->_toSql();
 
             return [sprintf('( %s )', $sql), $params];
         endif;
@@ -90,7 +91,7 @@ class BaseLookup implements LookupInterface
 
     public function valueIsDirect()
     {
-        return !(method_exists($this->rhs, 'toSql'));
+        return !(method_exists($this->rhs, '_toSql'));
     }
 
     public function __toString()

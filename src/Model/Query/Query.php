@@ -17,11 +17,14 @@ use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Expression\Col;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
 use Eddmash\PowerOrm\Model\Query\Joinable\Join;
@@ -38,7 +41,7 @@ class Query extends BaseObject
     private $offset;
     private $limit;
 
-    /**@var Where */
+    /** @var Where */
     private $where;
     private $tables = [];
     private $tableMap = [];
@@ -47,13 +50,14 @@ class Query extends BaseObject
      * @var BaseJoin[]
      */
     private $tableAlias = [];
+    public $aliasRefCount = [];
 
-    //[
-    //  'local' => [],
-    //  'related' => [],
-    //]
-    private $select = [
-    ];
+    /**
+     * @var array
+     */
+    private $select = [];
+    private $valueSelect = [];
+    private $klassInfo;
     private $isSubQuery = false;
 
     /**
@@ -66,7 +70,7 @@ class Query extends BaseObject
      *
      * @var
      */
-    private $defaultCols = true;
+    public $useDefaultCols = true;
 
     /**
      * Query constructor.
@@ -83,14 +87,41 @@ class Query extends BaseObject
         return new self($model);
     }
 
+    private function preSqlSetup()
+    {
+        if (!$this->tables):
+            $this->getInitialAlias();
+        endif;
+
+        list($select, $klassInfo) = $this->getSelect();
+        $this->select = $select;
+        $this->klassInfo = $klassInfo;
+    }
+
     public function asSql(Connection $connection)
     {
+        $this->preSqlSetup();
         $params = [];
+        list($fromClause, $fromParams) = $this->getFrom($connection);
+
         $results = ['SELECT'];
-        $results[] = $this->getSelect();
+
+        // todo DISTINCT
+
+        $cols = [];
+        /** @var $col Col */
+        foreach ($this->select as $colInfo) :
+            list($col, $alias) = $colInfo;
+            if ($alias):
+                $cols[] = sprintf('%s AS %s', $col, $alias);
+            else:
+                $cols[] = $col->asSql($connection);
+            endif;
+        endforeach;
+        $results[] = implode(', ', $cols);
 
         $results[] = 'FROM';
-        list($fromClause, $fromParams) = $this->getFrom($connection);
+
         $results = array_merge($results, $fromClause);
         $params = array_merge($params, $fromParams);
 
@@ -121,7 +152,7 @@ class Query extends BaseObject
 
     public function getNestedSql(Connection $connection)
     {
-        $this->setIsSubQuery(true);
+        $this->isSubQuery = true;
 
         return $this->asSql($connection);
     }
@@ -134,19 +165,36 @@ class Query extends BaseObject
         $this->where = $where;
     }
 
-    /**
-     * @param array $select
-     */
-    public function addSelect($select, $flush = false)
+    public function addSelect(Col $col)
     {
-        if ($flush):
-            $this->select = [];
-        endif;
-        if (!is_array($select)):
-            $select = [$select];
-        endif;
+        $this->useDefaultCols = false;
+        $this->select[] = $col;
+    }
 
-        $this->select = array_merge($this->select, $select);
+    public function addFields($fieldNames, $allowM2M = true)
+    {
+        $alias = $this->getInitialAlias();
+        $meta = $this->model->meta;
+        foreach ($fieldNames as $fieldName) :
+            $names = StringHelper::split(BaseLookup::$lookupPattern, $fieldName);
+
+            list($field, $targets, $meta, $joinList, $paths) = $this->setupJoins($names, $meta, $alias);
+
+            /** @var $targets Field[] */
+            list($targets, $finalAlias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
+
+            foreach ($targets as $target) :
+                $this->addSelect($target->getColExpression($finalAlias));
+            endforeach;
+
+        endforeach;
+
+    }
+
+    public function clearSelectedFields()
+    {
+        $this->select = [];
+        $this->valueSelect = [];
     }
 
     /**
@@ -154,25 +202,58 @@ class Query extends BaseObject
      */
     public function getSelect()
     {
-        if ($this->defaultCols):
+        $klassInfo = [];
+        $select = [];
+        if ($this->useDefaultCols):
 
-            $meta = $this->model->meta;
-            /** @var $field Field */
-            foreach ($meta->getLocalConcreteFields() as $name => $field) :
-                $this->select[] = $field->getColumnName();
+            /* @var $field Field */
+            foreach ($this->getDefaultCols() as $col) :
+                $alias = false;
+                $select[] = [$col, $alias];
+                $klassInfo['model'] = $this->model;
+
             endforeach;
         endif;
 
-        return implode(', ', $this->select);
+        foreach ($this->select as $col) :
+            $alias = false;
+            $select[] = [$col, $alias];
+        endforeach;
+
+        return [$select, $klassInfo];
+    }
+
+    public function getDefaultCols($startAlias = null, Meta $meta = null)
+    {
+
+        $fields = [];
+        if (is_null($meta)):
+            $meta = $this->model->meta;
+        endif;
+        if (is_null($startAlias)):
+            $startAlias = $this->getInitialAlias();
+        endif;
+
+        foreach ($meta->getConcreteFields() as $field) :
+            $fields[] = $field->getColExpression($startAlias);
+        endforeach;
+
+        return $fields;
     }
 
     public function getFrom(Connection $connection)
     {
         $result = [];
         $params = [];
+
+        $refCount = $this->aliasRefCount;
+
         foreach ($this->tables as $alias) :
+            if (!ArrayHelper::getValue($refCount, $alias)):
+                continue;
+            endif;
             try {
-                /**@var $from BaseJoin */;
+                /** @var $from BaseJoin */
                 $from = ArrayHelper::getValue($this->tableMap, $alias, ArrayHelper::THROW_ERROR);
                 list($fromSql, $fromParams) = $from->asSql($connection);
                 array_push($result, $fromSql);
@@ -182,7 +263,7 @@ class Query extends BaseObject
             }
         endforeach;
 
-        return [$result, $params];
+        return [$result, []];
     }
 
     /**
@@ -198,7 +279,6 @@ class Query extends BaseObject
         $this->buildFilter($condition, $negate);
     }
 
-
     /**
      * @param $condition
      *
@@ -208,36 +288,50 @@ class Query extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function buildFilter($condition, $negate = false)
+    private function buildFilter($conditions, $negate = false)
     {
+        //todo $negate
         $alias = $this->getInitialAlias();
         $where = Where::createObject();
-        foreach ($condition as $name => $value) :
+        /** @var $targets Field[] */
+        /** @var $field Field */
+        foreach ($conditions as $name => $value) :
             list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
 
-            list($finalField, $targets, $meta, $join, $paths) = $this->setupJoins(
+            list($field, $targets, $meta, $joinList, $paths) = $this->setupJoins(
                 $fieldParts,
                 $this->model->meta,
                 $alias
             );
-
-            $field = $finalField;
-
+            list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
             if ($field->isRelation) :
-                $lookup = $field->getLookup($lookups[0]);
 
-                $condition = $this->buildCondition($lookups, $targets[0], $value);
+                $lookupClass = $field->getLookup($lookups[0]);
+                $col = $targets[0]->getColExpression($alias, $field);
+                $condition = $lookupClass::createObject($col, $value);
             else:
-
-                $condition = $this->buildCondition($lookups, $field, $value);
+                $col = $targets[0]->getColExpression($alias, $field);
+                $condition = $this->buildCondition($lookups, $col, $value);
             endif;
 
             $where->setConditions($connector, $condition);
 
-
         endforeach;
 
         $this->addWhere($where);
+    }
+
+    /**
+     * @param array $valueSelect
+     */
+    public function setValueSelect($valueSelect)
+    {
+        $this->valueSelect[] = $valueSelect;
+    }
+
+    private function checkRelatedObjects(Field $field, $value, Meta $meta)
+    {
+        //todo
     }
 
     /**
@@ -253,6 +347,7 @@ class Query extends BaseObject
      */
     private function buildCondition($lookup, $lhs, $rhs)
     {
+        $lookup = (array) $lookup;
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
         $lookup = $lookup::createObject($lhs, $rhs);
@@ -264,11 +359,7 @@ class Query extends BaseObject
     {
         list($connector, $names) = $this->getConnector($name);
         // get lookupand field
-        if (preg_match(BaseLookup::$lookupPattern, $names)):
-            $split_names = preg_split(BaseLookup::$lookupPattern, $names);
-        else:
-            $split_names = [$names];
-        endif;
+        $split_names = StringHelper::split(BaseLookup::$lookupPattern, $names);
 
         $paths = $this->getNamesPath($split_names, $this->model->meta);
         $lookup = $paths['others'];
@@ -298,7 +389,6 @@ class Query extends BaseObject
         return [$connector, $lookup, $fieldParts];
     }
 
-
     public function getNamesPath($names, Meta $meta, $failOnMissing = false)
     {
         $paths = $targets = [];
@@ -309,7 +399,7 @@ class Query extends BaseObject
                 $name = $meta->primaryKey->name;
             endif;
 
-            /**@var $field Field */
+            /** @var $field Field */
             $field = null;
 
             try {
@@ -333,7 +423,7 @@ class Query extends BaseObject
 
             if ($field->hasMethod('getPathInfo')) :
                 $pathsInfos = $field->getPathInfo();
-                $pInfo = $pathsInfos[0];
+                $pInfo = $pathsInfos[1];
                 $finalField = ArrayHelper::getValue($pInfo, 'joinField');
                 $targets = ArrayHelper::getValue($pInfo, 'targetFields');
                 $paths = array_merge($paths, $pathsInfos);
@@ -342,12 +432,10 @@ class Query extends BaseObject
                 $targets[] = $field;
             endif;
 
-
         endforeach;
 
-        return ["paths" => $paths, "finalField" => $finalField, "targets" => $targets, "others" => $noneField];
+        return ['paths' => $paths, 'finalField' => $finalField, 'targets' => $targets, 'others' => $noneField];
     }
-
 
     /**
      * Determines the where clause connector to use.
@@ -375,62 +463,6 @@ class Query extends BaseObject
         return [$connector, $name];
     }
 
-    private function setupJoins($names, Meta $meta, $alias)
-    {
-        $joins = [];
-
-        $namesPaths = $this->getNamesPath($names, $meta);
-        $pathInfos = $namesPaths['paths'];
-
-        /**@var $meta Meta */
-        foreach ($pathInfos as $pathInfo) :
-            $meta = $pathInfo['toMeta'];
-            $join = new Join();
-            $join->setTableName($meta->dbTable);
-            $join->setParentAlias($alias);
-            $join->setJoinType(INNER);
-            $join->setJoinField($pathInfo['joinField']);
-            $joinAlias = $this->join($join);
-
-            $joins[] = $joinAlias;
-        endforeach;
-
-
-        return [$namesPaths['finalField'], $namesPaths['targets'], $meta, $joins, $pathInfos];
-    }
-
-    /**
-     * @return bool
-     */
-    public function isIsSubQuery()
-    {
-        return $this->isSubQuery;
-    }
-
-    /**
-     * @param bool $isSubQuery
-     */
-    public function setIsSubQuery($isSubQuery)
-    {
-        $this->isSubQuery = $isSubQuery;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDefaultCols()
-    {
-        return $this->defaultCols;
-    }
-
-    /**
-     * @param mixed $defaultCols
-     */
-    public function setDefaultCols($defaultCols)
-    {
-        $this->defaultCols = $defaultCols;
-    }
-
     public function setLimit($offset, $limit)
     {
         $this->offset = $offset;
@@ -449,6 +481,31 @@ class Query extends BaseObject
         return $alias;
     }
 
+    private function setupJoins($names, Meta $meta, $alias)
+    {
+        $joins = [$alias];
+
+        $namesPaths = $this->getNamesPath($names, $meta, true);
+        $pathInfos = $namesPaths['paths'];
+
+        /** @var $meta Meta */
+        foreach ($pathInfos as $pathInfo) :
+            $meta = $pathInfo['toMeta'];
+
+            $join = new Join();
+            $join->setTableName($meta->dbTable);
+            $join->setParentAlias($alias);
+            $join->setJoinType(INNER);
+            $join->setJoinField($pathInfo['joinField']);
+
+            $alias = $this->join($join);
+
+            $joins[] = $alias;
+        endforeach;
+
+        return [$namesPaths['finalField'], $namesPaths['targets'], $meta, $joins, $pathInfos];
+    }
+
     public function join(BaseJoin $join, $reuse = [])
     {
         list($alias) = $this->getTableAlias($join->getTableName(), false);
@@ -461,8 +518,8 @@ class Query extends BaseObject
             endif;
             $join->setJoinType($joinType);
         endif;
-        $join->setTableAlias($alias);
 
+        $join->setTableAlias($alias);
         $this->tableMap[$alias] = $join;
 
         $this->tables[] = $alias;
@@ -470,14 +527,71 @@ class Query extends BaseObject
         return $alias;
     }
 
+    private function trimJoins($targets, $joinList, $path)
+    {
+        /** @var $joinField RelatedField */
+        /** @var $field Field */
+        /** @var $relField Field[] */
+        foreach (array_reverse($path) as $info) :
+            if (!$info['direct'] || count($joinList) === 1):
+                break;
+            endif;
+
+            $joinTargets = [];
+            $currentTargets = [];
+            $joinField = $info['joinField'];
+
+            foreach ($joinField->getForeignRelatedFields() as $field) :
+                $joinTargets[] = $field->getColumnName();
+            endforeach;
+
+            foreach ($targets as $field) :
+                $currentTargets[] = $field->getColumnName();
+            endforeach;
+
+            if (!array_intersect($joinTargets, $currentTargets)):
+                break;
+            endif;
+
+            $relFields = [$joinField->getRelatedFields()];
+            $relMap = [];
+            foreach ($relFields as $relField) :
+                if (in_array($relField[1]->getColumnName(), $currentTargets)):
+                    $relMap[$relField[1]->getColumnName()] = $relField[0];
+                endif;
+            endforeach;
+
+            $targetsNew = [];
+            foreach ($targets as $target) :
+                $targetsNew[] = $relMap[$target->getColumnName()];
+            endforeach;
+            $targets = $targetsNew;
+
+            $this->unrefalias(array_pop($joinList));
+        endforeach;
+
+        $alias = array_slice($joinList, -1)[0];
+
+        return [$targets, $alias, $joinList];
+    }
+
+    private function unrefalias($alias, $amount = 1)
+    {
+        $this->aliasRefCount[$alias] -= $amount;
+    }
+
     public function getTableAlias($tableName, $create = false)
     {
         if (ArrayHelper::hasKey($this->tableAlias, $tableName) && false === $create):
-            return [ArrayHelper::getValue($this->tableAlias, $tableName), false];
+            $alias = ArrayHelper::getValue($this->tableAlias, $tableName);
+            $this->aliasRefCount[$alias] += 1;
+
+            return [$alias, false];
         endif;
 
         $alias = $tableName;
         $this->tableAlias[$alias] = $alias;
+        $this->aliasRefCount[$alias] = 1;
 
         return [$alias, true];
     }

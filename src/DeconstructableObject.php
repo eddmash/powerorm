@@ -62,11 +62,14 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
         $meta = [];
         foreach (get_object_vars($this) as $name => $value) :
             if (in_array($name, $this->getIgnored())):
-                $meta[$name] = (!is_subclass_of(
-                    $value,
-                    BaseObject::getFullClassName()
-                )) ? '** hidden **' : (string) $value;
+//                $meta[$name] = (!is_subclass_of(
+//                    $value,
+//                    BaseObject::getFullClassName()
+//                )) ? '** hidden **' : (string) $value;
                 continue;
+            endif;
+            if(is_object($value)):
+                $value = (string) $value;
             endif;
             $meta[$name] = $value;
         endforeach;

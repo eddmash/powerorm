@@ -35,7 +35,7 @@ use Eddmash\PowerOrm\Exception\KeyError;
  */
 class ArrayHelper
 {
-    const THROW_ERROR = "ARRAYHELPERTHROWERROR";
+    const THROW_ERROR = 'ARRAYHELPERTHROWERROR';
 
     /**
      * Returns a value indicating whether the given array is an associative array.
@@ -45,8 +45,8 @@ class ArrayHelper
      *
      * Note that an empty array will NOT be considered associative.
      *
-     * @param array $array the array being checked
-     * @param bool $allStrings whether the array keys must be all strings in order for
+     * @param array $array      the array being checked
+     * @param bool  $allStrings whether the array keys must be all strings in order for
      *                          the array to be treated as associative
      *
      * @since 1.1.0
@@ -85,9 +85,11 @@ class ArrayHelper
      * @param $haystack
      * @param $key
      * @param null $default
+     *
      * @return mixed
+     *
      * @throws KeyError
-     * @internal param bool $throw if to throw and an
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -98,7 +100,7 @@ class ArrayHelper
             return $haystack[$key];
         endif;
         if ($default === self::THROW_ERROR) :
-            throw new KeyError(sprintf("%s does not exist", $key));
+            throw new KeyError(sprintf('%s does not exist', $key));
         endif;
 
         return $default;

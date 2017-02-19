@@ -43,7 +43,7 @@ interface MetaInterface extends ContributorInterface
     /**
      * Returns a list of all concrete fields on the model and its parents.
      *
-     * @return mixed
+     * @return Field[]
      *
      * @since 1.1.0
      *

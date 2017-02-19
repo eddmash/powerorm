@@ -153,4 +153,13 @@ class StringHelper
     {
         return $string === '' || $string === null;
     }
+
+    public static function split($pattern, $string)
+    {
+        if (preg_match($pattern, $string)):
+            return preg_split($pattern, $string);
+        endif;
+
+        return (array) $string;
+    }
 }

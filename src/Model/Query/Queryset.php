@@ -170,10 +170,10 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-            return (bool)$instance->execute()->fetch();
+            return (bool) $instance->execute()->fetch();
         endif;
 
-        return (bool)$this->_resultsCache;
+        return (bool) $this->_resultsCache;
     }
 
     public function limit($start, $end)
@@ -303,22 +303,33 @@ class Queryset implements QuerysetInterface
         return $this->_resultsCache;
     }
 
-    public function toSql()
+    public function _toSql()
     {
-        $clone = $this->_clone();
-        $clone->values($this->model->meta->primaryKey->getColumnName());
+
+        $clone = $this->values([$this->model->meta->primaryKey->getColumnName()]);
 
         return $clone->query->getNestedSql($this->connection);
     }
 
     public function values()
     {
+        $clone = $this->_clone();
         $fields = func_get_args();
+        $fields = (empty($fields)) ? [] : $fields[0];
 
         if ($fields):
-            $this->query->setDefaultCols(false);
-            $this->query->addSelect($fields, true);
+            $clone->query->clearSelectedFields();
+            $clone->query->useDefaultCols = false;
+        else:
+            foreach ($this->model->meta->getConcreteFields() as $field) :
+                $fields[] = $field->getAttrName();
+            endforeach;
+
         endif;
+        $clone->query->setValueSelect($fields);
+        $clone->query->addFields($fields, true);
+
+        return $clone;
     }
 
     /**
@@ -349,7 +360,6 @@ class Queryset implements QuerysetInterface
             $this->query->addConditions($condition, $negate);
         endforeach;
     }
-
 
     /**
      * @return Query

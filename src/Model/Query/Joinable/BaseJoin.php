@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
-
 use Doctrine\DBAL\Connection;
 
 abstract class BaseJoin

@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Doctrine\DBAL\Portability\Connection;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\DeconstructableObject;
@@ -24,6 +25,7 @@ use Eddmash\PowerOrm\Model\Lookup\In;
 use Eddmash\PowerOrm\Model\Lookup\RegisterLookupTrait;
 use Eddmash\PowerOrm\Model\Lookup\StartsWith;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
 class Field extends DeconstructableObject implements FieldInterface
 {
@@ -596,6 +598,34 @@ class Field extends DeconstructableObject implements FieldInterface
     public function setCacheName($cacheName)
     {
         $this->cacheName = $cacheName;
+    }
+
+    /**
+     * @param $alias
+     * @param Field|ForeignObjectRel $outputField
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @return Col
+     */
+    public function getColExpression($alias, $outputField = null)
+    {
+        if(is_null($outputField)):
+            $outputField = $this;
+        endif;
+
+        if($alias !== $this->scopeModel->meta->dbTable && $outputField->name !== $this->name):
+            return Col::createObject($alias, $this, $outputField);
+        endif;
+
+        return  Col::createObject($alias, $this);
+    }
+
+    public function selectFormat(Connection $connection, $sql, $params)
+    {
+        return [$sql, $params];
     }
 }
 
