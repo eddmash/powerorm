@@ -30,7 +30,7 @@ class BaseTable extends BaseJoin
     public function asSql(Connection $connection)
     {
         $tableAlias = '';
-        if($this->getTableName() !== $this->getTableAlias()):
+        if ($this->getTableName() !== $this->getTableAlias()):
             $tableAlias = sprintf('%s', $this->getTableAlias());
         endif;
         $tableName = $this->getTableName();

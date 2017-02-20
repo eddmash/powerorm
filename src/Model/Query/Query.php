@@ -109,7 +109,7 @@ class Query extends BaseObject
         // todo DISTINCT
 
         $cols = [];
-        /** @var $col Col */
+        /* @var $col Col */
         foreach ($this->select as $colInfo) :
             list($col, $alias) = $colInfo;
             if ($alias):
@@ -293,8 +293,8 @@ class Query extends BaseObject
         //todo $negate
         $alias = $this->getInitialAlias();
         $where = Where::createObject();
-        /** @var $targets Field[] */
-        /** @var $field Field */
+        /* @var $targets Field[] */
+        /* @var $field Field */
         foreach ($conditions as $name => $value) :
             list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
 
@@ -488,7 +488,7 @@ class Query extends BaseObject
         $namesPaths = $this->getNamesPath($names, $meta, true);
         $pathInfos = $namesPaths['paths'];
 
-        /** @var $meta Meta */
+        /* @var $meta Meta */
         foreach ($pathInfos as $pathInfo) :
             $meta = $pathInfo['toMeta'];
 
@@ -529,9 +529,9 @@ class Query extends BaseObject
 
     private function trimJoins($targets, $joinList, $path)
     {
-        /** @var $joinField RelatedField */
-        /** @var $field Field */
-        /** @var $relField Field[] */
+        /* @var $joinField RelatedField */
+        /* @var $field Field */
+        /* @var $relField Field[] */
         foreach (array_reverse($path) as $info) :
             if (!$info['direct'] || count($joinList) === 1):
                 break;

@@ -26,8 +26,8 @@ class Join extends BaseJoin
     {
         $joinConditions = [];
         $fields = [$this->joinField->getJoinColumns()];
-        /** @var $from RelatedField */
-        /** @var $to RelatedField */
+        /* @var $from RelatedField */
+        /* @var $to RelatedField */
         foreach ($fields as $index => $relFields) :
             list($from, $to) = $relFields;
             $joinConditions[] = sprintf(' %s.%s = %s.%s', $this->getParentAlias(), $from->getColumnName(),

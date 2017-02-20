@@ -47,6 +47,7 @@ class StringsTest extends \PHPUnit_Framework_TestCase
             sprintf('StringHelpercamelToUnderscore() returned %s but we expected %s', $returnedString, $expectedString)
         );
     }
+
     /**
      * @param $originalString
      * @param $expectedString
@@ -63,7 +64,7 @@ class StringsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             $expectedString,
             $returnedString
-           );
+        );
     }
 
     /**

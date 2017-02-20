@@ -323,9 +323,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         foreach ($fields as $name => $fieldObj) :
 
             $this->addToClass($name, $fieldObj);
-
-            // cache it
-            $this->_fieldCache[$name] = $fieldObj;
         endforeach;
     }
 
@@ -352,7 +349,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $attrName = lcfirst(str_replace(' ', '', ucwords(str_replace('\\', ' ', $name))));
             $attrName = sprintf('%sPtr', $attrName);
 
-            if ($this->_fieldCache == null || !ArrayHelper::hasKey($this->_fieldCache, $attrName)):
+            if (!ArrayHelper::hasKey($this->meta->getFields(), $attrName)):
 
                 $field = OneToOneField::createObject(
                     [
@@ -708,7 +705,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __get($name)
     {
-        if (!array_key_exists($name, $this->_fieldCache)):
+        if (!ArrayHelper::hasKey(get_object_vars($this), $name)):
             throw new AttributeError(
                 sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->modelName, $name)
             );
@@ -716,13 +713,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         try {
             /** @var $field RelatedField */
             $field = $this->meta->getField($name);
-            if ($field->isRelation):
-                return $field->getRelatedValue($this);
-            endif;
+
+            return $field->getValue($this);
         } catch (FieldDoesNotExist $e) {
         }
 
-        return $this->_fieldCache[$name];
+        return $this->{$name};
     }
 
     public function __set($name, $value)
@@ -731,16 +727,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         /* @var $field RelatedField */
         try {
             $field = $this->meta->getField($name);
-            if ($field->isRelation):
-
-                list($lhs, $rhs) = $field->setRelatedValue($this, $value);
-                // store the values
-                $this->_fieldCache[$lhs] = $rhs;
-            endif;
+            $field->setValue($this, $value);
         } catch (FieldDoesNotExist $e) {
         }
         // we assume this is not a model field being set
-        $this->_fieldCache[$name] = $value;
+        $this->{$name} = $value;
     }
 
     /**
@@ -959,7 +950,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $forceInsert = false,
         $forceUpdate = false,
         $updateFields = null
-    ) {
+    )
+    {
         $meta = $this->meta;
 
         $nonPkFields = [];

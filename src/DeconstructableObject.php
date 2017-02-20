@@ -68,7 +68,7 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
 //                )) ? '** hidden **' : (string) $value;
                 continue;
             endif;
-            if(is_object($value)):
+            if (is_object($value)):
                 $value = (string) $value;
             endif;
             $meta[$name] = $value;

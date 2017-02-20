@@ -31,11 +31,13 @@ class BaseExpression
         $this->outputField = $outputField;
     }
 
-    public function asSql(Connection $connection) {
+    public function asSql(Connection $connection)
+    {
 
     }
 
-    public function getLookup($lookup) {
+    public function getLookup($lookup)
+    {
         return $this->outputField->getLookup($lookup);
     }
 

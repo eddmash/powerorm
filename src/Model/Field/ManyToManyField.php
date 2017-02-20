@@ -90,6 +90,11 @@ class ManyToManyField extends RelatedField
         else:
             $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
         endif;
+
+//        $modelObject->{$this->name} = function ($field) {
+//            return $field->getValue();
+//        };
+        $this->setValue($this->scopeModel, null);
     }
 
     public function contributeToRelatedClass($relatedModel, $scopeModel)
@@ -221,14 +226,19 @@ class ManyToManyField extends RelatedField
         return $warnings;
     }
 
-    public function setRelatedValue(Model $modelInstance, $value)
+    public function setValue(Model $modelInstance, $value)
     {
-        $queryset = $this->getRelatedQueryset();
-        // apply filter
-        $this->getReverseRelatedFilter($this->relation->getToModel());
+        $queryset = $this->getValue($modelInstance);
+//        // apply filter
+//        $this->getReverseRelatedFilter($this->relation->getToModel());
 
-//        $modelInstance->{$fromField->name} = $value;
-        return [$this->getAttrName(), $queryset];
+        $modelInstance->{$this->name} = $queryset;
+
+    }
+
+    public function getValue(Model $modelInstance)
+    {
+        return $this->getRelatedQueryset($modelInstance);
     }
 
     /**
@@ -329,7 +339,7 @@ class ManyToManyField extends RelatedField
         $model = $this->relation->through;
 
         /** @var $field RelatedField */
-        /** @var $reverseField RelatedField */
+        /* @var $reverseField RelatedField */
 
         $field = $model->meta->getField($this->getM2MAttr($this->scopeModel, 'name'));
 

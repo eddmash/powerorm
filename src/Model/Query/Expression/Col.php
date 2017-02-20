@@ -22,11 +22,12 @@ class Col extends BaseExpression
      */
     private $targetField;
 
-    public function __construct($alias, Field $targetField, Field $outputField = null) {
+    public function __construct($alias, Field $targetField, Field $outputField = null)
+    {
 
         $this->alias = $alias;
         $this->targetField = $targetField;
-        if(is_null($outputField)):
+        if (is_null($outputField)):
             $outputField = $targetField;
         endif;
         parent::__construct($outputField);
@@ -37,7 +38,8 @@ class Col extends BaseExpression
         return new self($alias, $targetField, $outputField);
     }
 
-    public function asSql(Connection $connection) {
+    public function asSql(Connection $connection)
+    {
         return sprintf('%s.%s', $this->alias, $this->targetField->getColumnName());
     }
 

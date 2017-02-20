@@ -86,7 +86,8 @@ class ForeignObjectRel extends BaseObject
         return $this->fromField->oneToOne;
     }
 
-    public function getJoinColumns() {
+    public function getJoinColumns()
+    {
         return $this->fromField->getReverseJoinColumns();
     }
 

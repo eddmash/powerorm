@@ -232,7 +232,7 @@ class RelatedField extends Field
      *
      * @return mixed
      */
-    public function getRelatedValue(Model $modelInstance)
+    public function getValue(Model $modelInstance)
     {
         $relObj = null;
 
@@ -247,7 +247,7 @@ class RelatedField extends Field
         return $relObj;
     }
 
-    public function setRelatedValue(Model $modelInstance, $value)
+    public function setValue(Model $modelInstance, $value)
     {
         if (!$value instanceof $this->relation->toModel):
             throw new ValueError(
@@ -267,8 +267,9 @@ class RelatedField extends Field
         /* @var $field RelatedField */
         list($fromField, $toField) = $this->getRelatedFields();
         $modelInstance->{$fromField->name} = $value;
+        $modelInstance->{$fromField->getAttrName()} = $value;
 
-        return [$fromField->getAttrName(), $value->{$toField->getAttrName()}];
+//        return [$fromField->getAttrName(), $value->{$toField->getAttrName()}];
     }
 
     /**
@@ -349,7 +350,7 @@ class RelatedField extends Field
                 'fromMeta' => $this->scopeModel->meta,
                 'toMeta' => $this->relation->toModel->meta,
                 'targetFields' => $this->getForeignRelatedFields(),
-                'joinField' => $this, //field that joins the relationship
+                'joinField' => $this->relation, //field that joins the relationship
                 'm2m' => false,
                 'direct' => true,
             ],
@@ -372,7 +373,7 @@ class RelatedField extends Field
                 'toMeta' => $this->scopeModel->meta,
                 'targetFields' => [$meta->primaryKey],
                 'joinField' => $this->relation, //field that joins the relationship
-                'm2m' => (!$this->isUnique()),
+                'm2m' => false,
                 'direct' => false,
             ],
         ];

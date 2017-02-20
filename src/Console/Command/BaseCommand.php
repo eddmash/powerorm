@@ -89,7 +89,8 @@ abstract class BaseCommand extends Command
         $tags = null,
         $showErrorCount = null,
         $failLevel = null
-    ) {
+    )
+    {
         $checks = BaseOrm::getCheckRegistry()->runChecks($tags);
 
         $debugs = [];

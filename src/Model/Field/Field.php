@@ -612,20 +612,36 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function getColExpression($alias, $outputField = null)
     {
-        if(is_null($outputField)):
+        if (is_null($outputField)):
             $outputField = $this;
         endif;
 
-        if($alias !== $this->scopeModel->meta->dbTable && $outputField->name !== $this->name):
+        if ($alias !== $this->scopeModel->meta->dbTable && $outputField->name !== $this->name):
             return Col::createObject($alias, $this, $outputField);
         endif;
 
-        return  Col::createObject($alias, $this);
+        return Col::createObject($alias, $this);
     }
 
     public function selectFormat(Connection $connection, $sql, $params)
     {
         return [$sql, $params];
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue(Model $modelInstance)
+    {
+        return $modelInstance->{$this->name};
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function setValue(Model $modelInstance, $value)
+    {
+        $modelInstance->{$this->name} = $value;
     }
 }
 

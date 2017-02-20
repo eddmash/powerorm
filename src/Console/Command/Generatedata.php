@@ -137,7 +137,8 @@ class Generatedata extends BaseCommand
         $tags = null,
         $showErrorCount = null,
         $failLevel = null
-    ) {
+    )
+    {
         if (!class_exists('Eddmash\PowerOrmFaker\Populator')) :
             throw new CommandError(
                 "This comand depends on 'eddmash\\powerormfaker' which is not installed, see how ".

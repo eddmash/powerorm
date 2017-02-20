@@ -117,7 +117,8 @@ class ForeignKey extends RelatedField
         return $kwargs;
     }
 
-    public function getReverseRelatedFields() {
+    public function getReverseRelatedFields()
+    {
         list($fromField, $toField) = $this->getRelatedFields();
 
         return [$toField, $fromField];
@@ -125,14 +126,15 @@ class ForeignKey extends RelatedField
 
     public function getJoinColumns($reverse = false)
     {
-        if($reverse):
+        if ($reverse):
             return $this->getReverseRelatedFields();
         endif;
 
         return $this->getRelatedFields();
     }
 
-    public function getReverseJoinColumns() {
+    public function getReverseJoinColumns()
+    {
         return $this->getJoinColumns(true);
     }
 
@@ -141,7 +143,7 @@ class ForeignKey extends RelatedField
      */
     public function getColExpression($alias, $outputField = null)
     {
-        if(is_null($outputField)):
+        if (is_null($outputField)):
             $outputField = $this->getRelatedField();
         endif;
 
