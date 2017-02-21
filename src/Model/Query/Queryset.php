@@ -141,9 +141,6 @@ class Queryset implements QuerysetInterface
      *      ["or", "name__contains"=>"qwe"]
      *  );
      * </code>
-     *
-     * @param null $conditions
-     *
      * @return Queryset
      *
      * @since 1.1.0
@@ -155,6 +152,16 @@ class Queryset implements QuerysetInterface
         return $this->_filterOrExclude(false, func_get_args());
     }
 
+    /**
+     * @return Queryset
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function annotate()
+    {
+        $args = func_get_args();
+        return $this;
+    }
     public function with($conditions = null)
     {
         return $this;
@@ -427,10 +434,11 @@ class Queryset implements QuerysetInterface
      */
     public function count()
     {
-        $instance = $this->_clone();
-        $instance->query->addSelect('count(*)', true);
+        if($this->_resultsCache):
+            return count($this->_resultsCache);
+        endif;
 
-        return $instance->execute()->fetchColumn(0);
+        return $this->query->getCount();
     }
 
     /**

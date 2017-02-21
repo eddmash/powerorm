@@ -24,7 +24,9 @@ use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
+use Eddmash\PowerOrm\Model\Query\Expression\Exp;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
 use Eddmash\PowerOrm\Model\Query\Joinable\Join;
@@ -71,6 +73,11 @@ class Query extends BaseObject
      * @var
      */
     public $useDefaultCols = true;
+
+    /**
+     * @var BaseExpression[]
+     */
+    private $annotations;
 
     /**
      * Query constructor.
@@ -594,5 +601,47 @@ class Query extends BaseObject
         $this->aliasRefCount[$alias] = 1;
 
         return [$alias, true];
+    }
+
+    public function addAnnotation()
+    {
+        $annotation = ArrayHelper::getValue(func_get_args(), "annotation");
+        $alias = ArrayHelper::getValue(func_get_args(), "alias");
+        $isSummary = ArrayHelper::getValue(func_get_args(), "isSummary", false);
+
+        $this->annotations[$alias] = $annotation;
+
+    }
+
+    /**
+     * @return array
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getAggregation($addedAggregateNames=[])
+    {
+        if(!$this->annotations):
+            return [];
+        endif;
+
+        return [];
+    }
+
+    public function getCount()
+    {
+        $obj = $this->deepClone();
+        $obj->addAnnotation(["annotation"=>Exp::count("*"), "alias"=>"_count", "isSummary"=>true]);
+        $result = $obj->getAggregation(["alias"=>"_count"]);
+        return ArrayHelper::getValue($result, "_count", 0);
+    }
+
+    /**
+     * @return $this
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function deepClone()
+    {
+        return $this;
     }
 }
