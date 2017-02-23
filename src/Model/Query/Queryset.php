@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
+use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
@@ -54,7 +55,7 @@ class Queryset implements QuerysetInterface
     /**
      * @var Query
      */
-    private $query;
+    public $query;
 
     public $_evaluated = false;
 
@@ -162,6 +163,19 @@ class Queryset implements QuerysetInterface
         $args = func_get_args();
         return $this;
     }
+
+    public function aggregate($kwargs=[])
+    {
+        $query = $this->query->deepClone();
+        foreach ($kwargs as $alias=>$annotation) :
+            $query->addAnnotation(["annotation"=>$annotation, "alias"=>$alias, "isSummary"=>true]);
+            if (!$query->annotations[$alias]->containsAggregate) :
+                throw new TypeError(sprintf("%s is not an aggregate expression", $alias));
+            endif;
+        endforeach;
+        return $query->getAggregation($this->connection, array_keys($kwargs));
+    }
+
     public function with($conditions = null)
     {
         return $this;
@@ -177,7 +191,7 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-            return (bool) $instance->execute()->fetch();
+            return (bool) $instance->query->execute($this->connection)->fetch();
         endif;
 
         return (bool) $this->_resultsCache;
@@ -288,7 +302,9 @@ class Queryset implements QuerysetInterface
 
         list($sql, $params) = $instance->query->asSql($this->connection);
 
-        return $sql;
+        $sql = str_replace("?", "%s", $sql);
+
+        return sprintf($sql, implode(", ", $params)) ;
     }
 
     /**
@@ -302,7 +318,7 @@ class Queryset implements QuerysetInterface
     {
         if (false === $this->_evaluated):
 
-            $this->_resultsCache = $this->mapResults($this->model, $this->execute()->fetchAll());
+            $this->_resultsCache = $this->mapResults($this->model, $this->query->execute($this->connection)->fetchAll());
 
             $this->_evaluated = true;
         endif;
@@ -337,28 +353,6 @@ class Queryset implements QuerysetInterface
         $clone->query->addFields($fields, true);
 
         return $clone;
-    }
-
-    /**
-     * @return \Doctrine\DBAL\Driver\Statement|int
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function execute()
-    {
-        list($sql, $params) = $this->query->asSql($this->connection);
-
-        $stmt = $this->connection->prepare($sql);
-        foreach ($params as $index => $value) :
-            ++$index; // Columns/Parameters are 1-based, so need to start at 1 instead of zero
-            $stmt->bindValue($index, $value);
-        endforeach;
-
-        $stmt->execute();
-
-        return $stmt;
     }
 
     private function addConditions($negate, $conditions)
@@ -438,7 +432,7 @@ class Queryset implements QuerysetInterface
             return count($this->_resultsCache);
         endif;
 
-        return $this->query->getCount();
+        return $this->query->getCount($this->connection);
     }
 
     /**
@@ -498,7 +492,7 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function _clone()
+    public function _clone()
     {
         $qb = clone $this->query;
 

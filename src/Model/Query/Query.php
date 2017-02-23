@@ -24,9 +24,11 @@ use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Aggregates\BaseAggregate;
 use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 use Eddmash\PowerOrm\Model\Query\Expression\Exp;
+use Eddmash\PowerOrm\Model\Query\Expression\Func;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
 use Eddmash\PowerOrm\Model\Query\Joinable\Join;
@@ -40,32 +42,32 @@ class Query extends BaseObject
     //  BaseLookup::AND_CONNECTOR => [],
     //  BaseLookup::OR_CONNECTOR => [],
     //];
-    private $offset;
-    private $limit;
+    public $offset;
+    public $limit;
 
     /** @var Where */
-    private $where;
-    private $tables = [];
-    private $tableMap = [];
+    public $where;
+    public $tables = [];
+    public $tableMap = [];
 
     /**
      * @var BaseJoin[]
      */
-    private $tableAlias = [];
+    public $tableAlias = [];
     public $aliasRefCount = [];
 
     /**
      * @var array
      */
-    private $select = [];
-    private $valueSelect = [];
-    private $klassInfo;
-    private $isSubQuery = false;
+    public $select = [];
+    public $valueSelect = [];
+    public $klassInfo;
+    public $isSubQuery = false;
 
     /**
      * @var Model
      */
-    private $model;
+    public $model;
 
     /**
      * if true, get the columns to fetch from the model itself.
@@ -75,18 +77,24 @@ class Query extends BaseObject
     public $useDefaultCols = true;
 
     /**
-     * @var BaseExpression[]
+     * @var BaseAggregate[]
      */
-    private $annotations;
+    public $annotations=[];
 
     /**
      * Query constructor.
      *
      * @param Model $model
      */
-    public function __construct(Model $model)
+    public function __construct(Model $model, $where=null)
     {
         $this->model = $model;
+        if (is_null($where)) :
+            $this->where = Where::createObject();
+        else:
+            $this->where = $where;
+        endif;
+
     }
 
     public static function createObject(Model $model)
@@ -115,16 +123,24 @@ class Query extends BaseObject
 
         // todo DISTINCT
 
+
         $cols = [];
         /* @var $col Col */
         foreach ($this->select as $colInfo) :
+
             list($col, $alias) = $colInfo;
+
+            list($colSql, $colParams) = $col->asSql($connection);
+            echo "<br>";
+
             if ($alias):
-                $cols[] = sprintf('%s AS %s', $col, $alias);
+                $cols[] = sprintf('%s AS %s', $colSql, $alias);
             else:
-                $cols[] = $col->asSql($connection);
+                $cols[] = $colSql;
             endif;
+            $params = array_merge($params, $colParams);
         endforeach;
+
         $results[] = implode(', ', $cols);
 
         $results[] = 'FROM';
@@ -133,10 +149,12 @@ class Query extends BaseObject
         $params = array_merge($params, $fromParams);
 
         if ($this->where):
-            $results[] = 'WHERE';
-            list($sql, $whereParams) = $this->getWhereSql($connection);
-            $results[] = $sql;
-            $params = array_merge($params, $whereParams);
+            list($sql, $whereParams) = $this->where->asSql($connection);
+            if ($sql) :
+                $results[] = 'WHERE';
+                $results[] = $sql;
+                $params = array_merge($params, $whereParams);
+            endif;
         endif;
 
         if ($this->limit) :
@@ -152,24 +170,11 @@ class Query extends BaseObject
         return [implode(' ', $results), $params];
     }
 
-    public function getWhereSql(Connection $connection)
-    {
-        return $this->where->asSql($connection);
-    }
-
     public function getNestedSql(Connection $connection)
     {
         $this->isSubQuery = true;
 
         return $this->asSql($connection);
-    }
-
-    /**
-     * @param array $where
-     */
-    public function addWhere(Where $where)
-    {
-        $this->where = $where;
     }
 
     public function addSelect(Col $col)
@@ -209,8 +214,10 @@ class Query extends BaseObject
      */
     public function getSelect()
     {
+
         $klassInfo = [];
         $select = [];
+        $annotations = [];
         if ($this->useDefaultCols):
 
             /* @var $field Field */
@@ -227,7 +234,14 @@ class Query extends BaseObject
             $select[] = [$col, $alias];
         endforeach;
 
-        return [$select, $klassInfo];
+
+        foreach ($this->annotations as $alias=>$annotation) :
+            $annotations[$alias] = $annotation;
+            $select[] = [$annotation, $alias];
+        endforeach;
+
+
+        return [$select, $klassInfo, $annotations];
     }
 
     public function getDefaultCols($startAlias = null, Meta $meta = null)
@@ -261,7 +275,7 @@ class Query extends BaseObject
             endif;
             try {
                 /** @var $from BaseJoin */
-                $from = ArrayHelper::getValue($this->tableMap, $alias, ArrayHelper::THROW_ERROR);
+                $from = ArrayHelper::getValue($this->tableMap, $alias, ArrayHelper::STRICT);
                 list($fromSql, $fromParams) = $from->asSql($connection);
                 array_push($result, $fromSql);
                 $params = array_merge($params, $fromParams);
@@ -299,7 +313,7 @@ class Query extends BaseObject
     {
         //todo $negate
         $alias = $this->getInitialAlias();
-        $where = Where::createObject();
+
         /* @var $targets Field[] */
         /* @var $field Field */
         foreach ($conditions as $name => $value) :
@@ -321,11 +335,9 @@ class Query extends BaseObject
                 $condition = $this->buildCondition($lookups, $col, $value);
             endif;
 
-            $where->setConditions($connector, $condition);
+            $this->where->setConditions($connector, $condition);
 
         endforeach;
-
-        $this->addWhere($where);
     }
 
     /**
@@ -539,6 +551,7 @@ class Query extends BaseObject
         /* @var $joinField RelatedField */
         /* @var $field Field */
         /* @var $relField Field[] */
+
         foreach (array_reverse($path) as $info) :
             if (!$info['direct'] || count($joinList) === 1):
                 break;
@@ -574,7 +587,7 @@ class Query extends BaseObject
             endforeach;
             $targets = $targetsNew;
 
-            $this->unrefalias(array_pop($joinList));
+            $this->unrefAlias(array_pop($joinList));
         endforeach;
 
         $alias = array_slice($joinList, -1)[0];
@@ -582,7 +595,7 @@ class Query extends BaseObject
         return [$targets, $alias, $joinList];
     }
 
-    private function unrefalias($alias, $amount = 1)
+    private function unrefAlias($alias, $amount = 1)
     {
         $this->aliasRefCount[$alias] -= $amount;
     }
@@ -603,11 +616,11 @@ class Query extends BaseObject
         return [$alias, true];
     }
 
-    public function addAnnotation()
+    public function addAnnotation($kwargs=[])
     {
-        $annotation = ArrayHelper::getValue(func_get_args(), "annotation");
-        $alias = ArrayHelper::getValue(func_get_args(), "alias");
-        $isSummary = ArrayHelper::getValue(func_get_args(), "isSummary", false);
+        $annotation = ArrayHelper::getValue($kwargs, "annotation");
+        $alias = ArrayHelper::getValue($kwargs, "alias");
+        $isSummary = ArrayHelper::getValue($kwargs, "isSummary", false);
 
         $this->annotations[$alias] = $annotation;
 
@@ -627,19 +640,22 @@ class Query extends BaseObject
         if($hasExistingAnnotations):
         else:
             $outQuery = $this;
-            $outQuery->select = false;
+            $outQuery->select = [];
             $outQuery->useDefaultCols = false;
         endif;
 
-        return [];
+        return $this->execute($connection)->fetch();
+
     }
 
-    public function getCount()
+    public function getCount(Connection $connection)
     {
         $obj = $this->deepClone();
-        $obj->addAnnotation(["annotation"=>Exp::count("*"), "alias"=>"_count", "isSummary"=>true]);
-        $result = $obj->getAggregation(["alias"=>"_count"]);
-        return ArrayHelper::getValue($result, "_count", 0);
+        $obj->addAnnotation(["annotation"=>Exp::Count("*"), "alias"=>"_count", "isSummary"=>true]);
+        $alias = "_count";
+        $result = $obj->getAggregation($connection, ["alias"=>$alias]);
+
+        return ArrayHelper::getValue($result, $alias, 0);
     }
 
     /**
@@ -649,6 +665,40 @@ class Query extends BaseObject
      */
     public function deepClone()
     {
-        return $this;
+        $obj = new self($this->model);
+        $obj->aliasRefCount = $this->aliasRefCount;
+        $obj->useDefaultCols = $this->useDefaultCols;
+        $obj->tableAlias = $this->tableAlias;
+        $obj->tableMap = $this->tableMap;
+        $obj->tables = $this->tables;
+        $obj->select = $this->select;
+        $obj->annotations = $this->annotations;
+        $obj->offset = $this->offset;
+        $obj->limit = $this->limit;
+        $obj->where = $this->where->deepClone();
+        return $obj;
+    }
+
+
+    /**
+     * @return \Doctrine\DBAL\Driver\Statement|int
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function execute(Connection $connection)
+    {
+        list($sql, $params) = $this->asSql($connection);
+
+        $stmt = $connection->prepare($sql);
+        foreach ($params as $index => $value) :
+            ++$index; // Columns/Parameters are 1-based, so need to start at 1 instead of zero
+            $stmt->bindValue($index, $value);
+        endforeach;
+
+        $stmt->execute();
+
+        return $stmt;
     }
 }

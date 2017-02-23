@@ -581,7 +581,11 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function __toString()
     {
-        return $this->scopeModel->getFullClassName().'->'.$this->name;
+        $class = (!is_object($this->scopeModel))?"":$this->scopeModel->getFullClassName();
+
+        $name = (is_null($this->name))?"":$this->name;
+
+        return sprintf("< %s : (%s %s)>", self::class, $class, $name);
     }
 
     /**

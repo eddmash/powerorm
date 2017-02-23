@@ -196,10 +196,10 @@ class RelatedField extends Field
     public function getRelatedFields()
     {
         if (is_string($this->relation->toModel)):
-            throw new ValueError(sprintf('Related model %s cannot be resolved', $this->relation->toModel));
+            throw new ValueError(sprintf('Related model "%s" cannot be resolved', $this->relation->toModel));
         endif;
         // origin of relation
-//        $this->fromField = ($this->fromField == 'this') ? $this : ;
+
         if ($this->fromField == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT) :
             $this->fromField = $this;
         elseif (is_string($this->fromField)):
@@ -341,16 +341,12 @@ class RelatedField extends Field
      */
     public function getPathInfo()
     {
-        echo $this->scopeModel->meta->modelName.' = ';
-
-        echo $this->relation->toModel->meta->modelName.'<br>';
-
         return [
             [
                 'fromMeta' => $this->scopeModel->meta,
                 'toMeta' => $this->relation->toModel->meta,
                 'targetFields' => $this->getForeignRelatedFields(),
-                'joinField' => $this->relation, //field that joins the relationship
+                'joinField' => $this, //field that joins the relationship
                 'm2m' => false,
                 'direct' => true,
             ],

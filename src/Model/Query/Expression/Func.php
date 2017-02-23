@@ -36,6 +36,7 @@ class Func extends BaseExpression
     public function __construct($expression, $kwargs=[])
     {
         $outputField = ArrayHelper::pop($kwargs, "outputField");
+
         parent::__construct($outputField);
         $this->expression = $expression;
         $this->extra = $kwargs;
@@ -43,9 +44,11 @@ class Func extends BaseExpression
 
     public function asSql(Connection $connection)
     {
-        $expressions = (array)$this->expression;
-
-        $sqlParts = implode(" ", $this->extra);
+        $expressions = (is_array($this->expression))? $this->expression : [$this->expression];
+        $sqlParts = [];
+        if ($this->extra) :
+            $sqlParts[] =implode("", $this->extra);
+        endif;
         $params = [];
         /**@var $expression BaseExpression*/
         foreach ($expressions as $expression) :

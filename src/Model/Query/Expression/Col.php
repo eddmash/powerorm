@@ -40,7 +40,7 @@ class Col extends BaseExpression
 
     public function asSql(Connection $connection)
     {
-        return sprintf('%s.%s', $this->alias, $this->targetField->getColumnName());
+        return [sprintf('%s.%s', $this->alias, $this->targetField->getColumnName()), []];
     }
 
 }

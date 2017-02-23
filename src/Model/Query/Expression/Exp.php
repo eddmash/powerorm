@@ -12,7 +12,8 @@
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 
-use Symfony\Component\Validator\Constraints\Count;
+
+use Eddmash\PowerOrm\Model\Query\Aggregates\Count;
 
 class Exp
 {
@@ -21,9 +22,8 @@ class Exp
      * @since 1.1.0
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function count()
+    public static function Count($expression, $distinct=false)
     {
-        $args = func_get_args();
-        return new Count();
+        return new Count($expression, $distinct);
     }
 }

@@ -35,7 +35,7 @@ use Eddmash\PowerOrm\Exception\KeyError;
  */
 class ArrayHelper
 {
-    const THROW_ERROR = 'ARRAYHELPERTHROWERROR';
+    const STRICT = 'ARRAYHELPERTHROWERROR';
 
     /**
      * Returns a value indicating whether the given array is an associative array.
@@ -99,7 +99,7 @@ class ArrayHelper
         if (isset($haystack[$key])):
             return $haystack[$key];
         endif;
-        if ($default === self::THROW_ERROR) :
+        if ($default === self::STRICT) :
             throw new KeyError(sprintf('%s does not exist', $key));
         endif;
 
@@ -107,7 +107,8 @@ class ArrayHelper
     }
 
     /**
-     * Return the value for key if key is in the array, else default. If default is not given, raise key error
+     * Remove and return the value for key if key is in the array, else default. If default is not given, raise key
+     * error
      * This never raise 'PHP Notice:  Undefined index: '.
      *
      * @param $haystack
@@ -122,10 +123,12 @@ class ArrayHelper
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function pop($haystack, $key, $default = null)
+    public static function pop(&$haystack, $key, $default = null)
     {
         if (isset($haystack[$key])):
-            return $haystack[$key];
+            $value = $haystack[$key];
+            unset($haystack[$key]);
+            return $value;
         elseif (!is_null($default)):
             return $default;
         endif;

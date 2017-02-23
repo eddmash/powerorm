@@ -65,7 +65,7 @@ class BaseLookup implements LookupInterface
             return [sprintf('( %s )', $sql), $params];
         endif;
 
-        return [' ? ', $this->rhs];
+        return [' ? ', [$this->rhs]];
     }
 
     public function getLookupOperation($rhs)
@@ -80,12 +80,12 @@ class BaseLookup implements LookupInterface
 
     public function asSql(Connection $connection)
     {
-        $lhs_sql = $this->processLHS($connection);
+        list($lhs_sql, $params) = $this->processLHS($connection);
         list($rhs_sql, $rhs_params) = $this->processRHS($connection);
-
+        $params = array_merge($params, $rhs_params);
         $rhs_sql = $this->getLookupOperation($rhs_sql);
 
-        return [sprintf('%s %s', $lhs_sql, $rhs_sql), $rhs_params];
+        return [sprintf('%s %s', $lhs_sql, $rhs_sql), $params];
     }
 
     public function valueIsDirect()

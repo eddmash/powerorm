@@ -49,7 +49,21 @@ class Where
 
     public function setConditions($connector, $conditions)
     {
+        //todo what happend if we have same connnetor several times.
         $this->conditions[$connector] = $conditions;
     }
 
+    public function deepClone()
+    {
+        $obj = new self();
+        foreach ($this->conditions as $conector => $condition) :
+            if (method_exists($condition, "deepClone")) :
+                $obj->setConditions($conector, $condition->deepClone());
+            else:
+                $obj->setConditions($conector, $condition);
+            endif;
+        endforeach;
+
+        return $obj;
+    }
 }

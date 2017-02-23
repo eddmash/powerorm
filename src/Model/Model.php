@@ -188,11 +188,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             if ($kwargs):
                 if ($field instanceof RelatedField):
                     try {
-                        $relObject = ArrayHelper::pop($kwargs, $field->name);
+                        $relObject = ArrayHelper::getValue($kwargs, $field->name, ArrayHelper::STRICT);
                         $isRelated = true;
                     } catch (KeyError $e) {
                         try {
-                            $val = ArrayHelper::pop($kwargs, $field->getAttrName());
+                            $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), ArrayHelper::STRICT);
                         } catch (KeyError $e) {
                             $val = $field->getDefault();
                         }
@@ -206,7 +206,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
                 else:
                     try {
-                        $val = ArrayHelper::pop($kwargs, $field->getAttrName());
+                        $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), ArrayHelper::STRICT);
                     } catch (KeyError $e) {
                         $val = $field->getDefault();
                     }

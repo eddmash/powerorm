@@ -77,7 +77,6 @@ class Optimize
         foreach ($operations as $outIndex => $outOperation) :
             $inOperations = array_slice($operations, $outIndex + 1);
 
-            echo PHP_EOL.PHP_EOL;
             if ($inOperations) :
                 foreach ($inOperations as $inIndex => $inOperation) :
                     // get how many items to fetch
