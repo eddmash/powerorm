@@ -11,15 +11,14 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Aggregates;
 
-
 use Eddmash\PowerOrm\Model\Field\IntegerField;
 use Eddmash\PowerOrm\Model\Query\Expression\Func;
 use Eddmash\PowerOrm\Model\Query\Expression\Star;
 
 class Count extends Func
 {
-    protected $function = "COUNT";
-    protected $name = "COUNT";
+    protected $function = 'COUNT';
+    protected $name = 'COUNT';
     /**
      * @var bool
      */
@@ -30,20 +29,19 @@ class Count extends Func
      */
     public function __construct($expression, $distinct = false, $kwargs = [])
     {
-        if ($expression === "*"):
+        if ($expression === '*'):
             $expression = new Star();
         endif;
         $extra = [];
-        $extra["outputField"] = IntegerField::createObject();
+        $extra['outputField'] = IntegerField::createObject();
         if ($distinct) :
-            $extra['distinct'] = "DISTINCT";
+            $extra['distinct'] = 'DISTINCT';
         endif;
 
         parent::__construct(
             $expression,
-            $extra+ $kwargs
+            $extra + $kwargs
         );
     }
-
 
 }

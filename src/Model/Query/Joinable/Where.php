@@ -57,7 +57,7 @@ class Where
     {
         $obj = new self();
         foreach ($this->conditions as $conector => $condition) :
-            if (method_exists($condition, "deepClone")) :
+            if (method_exists($condition, 'deepClone')) :
                 $obj->setConditions($conector, $condition->deepClone());
             else:
                 $obj->setConditions($conector, $condition);

@@ -128,6 +128,7 @@ class ArrayHelper
         if (isset($haystack[$key])):
             $value = $haystack[$key];
             unset($haystack[$key]);
+
             return $value;
         elseif (!is_null($default)):
             return $default;

@@ -11,10 +11,9 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Aggregates;
 
-
 class Sum extends BaseAggregate
 {
-    protected $function = "SUM";
-    protected $name = "SUM";
+    protected $function = 'SUM';
+    protected $name = 'SUM';
 
 }

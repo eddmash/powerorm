@@ -11,10 +11,9 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Aggregates;
 
-
 class Avg extends BaseAggregate
 {
-    protected $function = "AVG";
-    protected $name = "AVG";
+    protected $function = 'AVG';
+    protected $name = 'AVG';
 
 }

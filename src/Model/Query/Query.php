@@ -25,10 +25,8 @@ use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Aggregates\BaseAggregate;
-use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 use Eddmash\PowerOrm\Model\Query\Expression\Exp;
-use Eddmash\PowerOrm\Model\Query\Expression\Func;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
 use Eddmash\PowerOrm\Model\Query\Joinable\Join;
@@ -79,14 +77,14 @@ class Query extends BaseObject
     /**
      * @var BaseAggregate[]
      */
-    public $annotations=[];
+    public $annotations = [];
 
     /**
      * Query constructor.
      *
      * @param Model $model
      */
-    public function __construct(Model $model, $where=null)
+    public function __construct(Model $model, $where = null)
     {
         $this->model = $model;
         if (is_null($where)) :
@@ -123,7 +121,6 @@ class Query extends BaseObject
 
         // todo DISTINCT
 
-
         $cols = [];
         /* @var $col Col */
         foreach ($this->select as $colInfo) :
@@ -131,7 +128,7 @@ class Query extends BaseObject
             list($col, $alias) = $colInfo;
 
             list($colSql, $colParams) = $col->asSql($connection);
-            echo "<br>";
+            echo '<br>';
 
             if ($alias):
                 $cols[] = sprintf('%s AS %s', $colSql, $alias);
@@ -234,12 +231,10 @@ class Query extends BaseObject
             $select[] = [$col, $alias];
         endforeach;
 
-
-        foreach ($this->annotations as $alias=>$annotation) :
+        foreach ($this->annotations as $alias => $annotation) :
             $annotations[$alias] = $annotation;
             $select[] = [$annotation, $alias];
         endforeach;
-
 
         return [$select, $klassInfo, $annotations];
     }
@@ -616,11 +611,11 @@ class Query extends BaseObject
         return [$alias, true];
     }
 
-    public function addAnnotation($kwargs=[])
+    public function addAnnotation($kwargs = [])
     {
-        $annotation = ArrayHelper::getValue($kwargs, "annotation");
-        $alias = ArrayHelper::getValue($kwargs, "alias");
-        $isSummary = ArrayHelper::getValue($kwargs, "isSummary", false);
+        $annotation = ArrayHelper::getValue($kwargs, 'annotation');
+        $alias = ArrayHelper::getValue($kwargs, 'alias');
+        $isSummary = ArrayHelper::getValue($kwargs, 'isSummary', false);
 
         $this->annotations[$alias] = $annotation;
 
@@ -628,16 +623,18 @@ class Query extends BaseObject
 
     /**
      * @return array
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getAggregation(Connection $connection, $addedAggregateNames=[])
+    public function getAggregation(Connection $connection, $addedAggregateNames = [])
     {
-        if(!$this->annotations):
+        if (!$this->annotations):
             return [];
         endif;
         $hasExistingAnnotations = false;
-        if($hasExistingAnnotations):
+        if ($hasExistingAnnotations):
         else:
             $outQuery = $this;
             $outQuery->select = [];
@@ -651,16 +648,18 @@ class Query extends BaseObject
     public function getCount(Connection $connection)
     {
         $obj = $this->deepClone();
-        $obj->addAnnotation(["annotation"=>Exp::Count("*"), "alias"=>"_count", "isSummary"=>true]);
-        $alias = "_count";
-        $result = $obj->getAggregation($connection, ["alias"=>$alias]);
+        $obj->addAnnotation(['annotation' => Exp::Count('*'), 'alias' => '_count', 'isSummary' => true]);
+        $alias = '_count';
+        $result = $obj->getAggregation($connection, ['alias' => $alias]);
 
         return ArrayHelper::getValue($result, $alias, 0);
     }
 
     /**
      * @return $this
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function deepClone()
@@ -676,9 +675,9 @@ class Query extends BaseObject
         $obj->offset = $this->offset;
         $obj->limit = $this->limit;
         $obj->where = $this->where->deepClone();
+
         return $obj;
     }
-
 
     /**
      * @return \Doctrine\DBAL\Driver\Statement|int

@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Aggregates;
 
-
 use Eddmash\PowerOrm\Model\Query\Expression\Func;
 
 class BaseAggregate extends Func

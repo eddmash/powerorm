@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
-
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
@@ -19,8 +18,8 @@ use Eddmash\PowerOrm\Model\Field\Field;
 class Func extends BaseExpression
 {
     protected $function;
-    protected $template="%s(%s)";
-    protected $argJoiner=", ";
+    protected $template = '%s(%s)';
+    protected $argJoiner = ', ';
     protected $extra;
 
     /**
@@ -33,9 +32,9 @@ class Func extends BaseExpression
      *
      * @param Field $outputField
      */
-    public function __construct($expression, $kwargs=[])
+    public function __construct($expression, $kwargs = [])
     {
-        $outputField = ArrayHelper::pop($kwargs, "outputField");
+        $outputField = ArrayHelper::pop($kwargs, 'outputField');
 
         parent::__construct($outputField);
         $this->expression = $expression;
@@ -44,23 +43,23 @@ class Func extends BaseExpression
 
     public function asSql(Connection $connection)
     {
-        $expressions = (is_array($this->expression))? $this->expression : [$this->expression];
+        $expressions = (is_array($this->expression)) ? $this->expression : [$this->expression];
         $sqlParts = [];
         if ($this->extra) :
-            $sqlParts[] =implode("", $this->extra);
+            $sqlParts[] = implode('', $this->extra);
         endif;
         $params = [];
-        /**@var $expression BaseExpression*/
+        /** @var $expression BaseExpression */
         foreach ($expressions as $expression) :
             list($sql, $param) = $expression->asSql($connection);
             $sqlParts[] = $sql;
             $params = array_merge($params, $param);
-         endforeach;
+        endforeach;
 
         $template = $this->getTemplate($this->function, implode($this->argJoiner, $sqlParts));
+
         return [$template, $params];
     }
-
 
     protected function getTemplate($function, $expression)
     {

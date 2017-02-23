@@ -11,9 +11,8 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Aggregates;
 
-
 class Min extends BaseAggregate
 {
-    protected $function = "MIN";
-    protected $name = "MIN";
+    protected $function = 'MIN';
+    protected $name = 'MIN';
 }

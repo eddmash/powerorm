@@ -11,14 +11,13 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
-
 use Doctrine\DBAL\Connection;
 
 class Star extends BaseExpression
 {
     public function asSql(Connection $connection)
     {
-        return ["*", []];
+        return ['*', []];
     }
 
 }

@@ -26,14 +26,14 @@ class BaseExpression
      *
      * @param Field $outputField
      */
-    public function __construct(Field $outputField=null)
+    public function __construct(Field $outputField = null)
     {
         $this->outputField = $outputField;
     }
 
     public function asSql(Connection $connection)
     {
-        return "";
+        return '';
     }
 
     public function getLookup($lookup)

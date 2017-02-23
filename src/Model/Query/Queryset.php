@@ -142,6 +142,7 @@ class Queryset implements QuerysetInterface
      *      ["or", "name__contains"=>"qwe"]
      *  );
      * </code>
+     *
      * @return Queryset
      *
      * @since 1.1.0
@@ -155,24 +156,28 @@ class Queryset implements QuerysetInterface
 
     /**
      * @return Queryset
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function annotate()
     {
         $args = func_get_args();
+
         return $this;
     }
 
-    public function aggregate($kwargs=[])
+    public function aggregate($kwargs = [])
     {
         $query = $this->query->deepClone();
-        foreach ($kwargs as $alias=>$annotation) :
-            $query->addAnnotation(["annotation"=>$annotation, "alias"=>$alias, "isSummary"=>true]);
+        foreach ($kwargs as $alias => $annotation) :
+            $query->addAnnotation(['annotation' => $annotation, 'alias' => $alias, 'isSummary' => true]);
             if (!$query->annotations[$alias]->containsAggregate) :
-                throw new TypeError(sprintf("%s is not an aggregate expression", $alias));
+                throw new TypeError(sprintf('%s is not an aggregate expression', $alias));
             endif;
         endforeach;
+
         return $query->getAggregation($this->connection, array_keys($kwargs));
     }
 
@@ -302,9 +307,9 @@ class Queryset implements QuerysetInterface
 
         list($sql, $params) = $instance->query->asSql($this->connection);
 
-        $sql = str_replace("?", "%s", $sql);
+        $sql = str_replace('?', '%s', $sql);
 
-        return sprintf($sql, implode(", ", $params)) ;
+        return sprintf($sql, implode(', ', $params));
     }
 
     /**
@@ -428,7 +433,7 @@ class Queryset implements QuerysetInterface
      */
     public function count()
     {
-        if($this->_resultsCache):
+        if ($this->_resultsCache):
             return count($this->_resultsCache);
         endif;
 
