@@ -618,10 +618,17 @@ class Query extends BaseObject
      * @since 1.1.0
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getAggregation($addedAggregateNames=[])
+    public function getAggregation(Connection $connection, $addedAggregateNames=[])
     {
         if(!$this->annotations):
             return [];
+        endif;
+        $hasExistingAnnotations = false;
+        if($hasExistingAnnotations):
+        else:
+            $outQuery = $this;
+            $outQuery->select = false;
+            $outQuery->useDefaultCols = false;
         endif;
 
         return [];
