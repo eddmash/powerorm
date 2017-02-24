@@ -80,12 +80,9 @@ class Optimize
             if ($inOperations) :
                 foreach ($inOperations as $inIndex => $inOperation) :
                     // get how many items to fetch
-                    $places = ($outIndex - ($inIndex + 1));
-                    if ($places < 0) :
-                        $places = 1;
-                    endif;
+                    $length = $inIndex;
 
-                    $inBetween = array_slice($operations, $outIndex + 1, $places);
+                    $inBetween = array_slice($operations, $outIndex + 1, $length);
                     $inBetween = array_slice($inBetween, 0, -1);
 
                     $result = $outOperation->reduce($inOperation, $inBetween);
@@ -103,12 +100,9 @@ class Optimize
                         );
 
                         return $newOperations;
-                    else:
-                        $newOperations[] = $outOperation;
-                        break;
                     endif;
-
                 endforeach;
+                $newOperations[] = $outOperation;
             else:
                 $newOperations[] = $outOperation;
             endif;
