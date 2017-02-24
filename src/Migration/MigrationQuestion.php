@@ -121,7 +121,7 @@ class MigrationQuestion
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function askNotNullAlteration($asker, $modelName, $fieldName)
+    public static function askNotNullAlteration(Asker $asker, $modelName, $fieldName)
     {
         $msg = 'You are trying to add a non-nullable field "%s" to %s without a default; '.PHP_EOL.
             ' we can\'t do that (the database needs something to populate existing rows).'.PHP_EOL.
@@ -160,7 +160,7 @@ class MigrationQuestion
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private static function getDefault($asker)
+    private static function getDefault(Asker $asker)
     {
         $default_val = '';
         $msg = 'Please enter the default value now, as valid PHP '.PHP_EOL;

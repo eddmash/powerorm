@@ -42,7 +42,7 @@ class Asker
      */
     public function ask(Question $question)
     {
-        throw new NotImplemented('ask() method needs to be implemented');
+        return;
     }
 
     public static function createObject(InputInterface $input, OutputInterface $output)

@@ -16,6 +16,7 @@ use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\TypeError;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
@@ -181,9 +182,19 @@ class Queryset implements QuerysetInterface
         return $query->getAggregation($this->connection, array_keys($kwargs));
     }
 
-    public function with($conditions = null)
+    public function selectRelated($fields = [])
     {
-        return $this;
+        //todo if we implement values/values_list check we dont call this after it
+        $obj = $this->_clone();
+        if (empty($fields)):
+            $obj->query->addSelectRelected($fields);
+        elseif ($fields):
+            $obj->query->selectRelected = false;
+        else:
+            $obj->query->selectRelected = true;
+        endif;
+
+        return $obj;
     }
 
     public function exclude()
@@ -323,7 +334,7 @@ class Queryset implements QuerysetInterface
     {
         if (false === $this->_evaluated):
 
-            $this->_resultsCache = $this->mapResults($this->model, $this->query->execute($this->connection)->fetchAll());
+            $this->_resultsCache = $this->mapResults();
 
             $this->_evaluated = true;
         endif;
@@ -391,23 +402,19 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function mapResults($model, $results)
+    private function mapResults()
     {
-        /* @var $newModel Model */
+        $results = $this->query->execute($this->connection)->fetchAll();
+        $klassInfo = $this->query->klassInfo;
+        $modelClass = ArrayHelper::getValue($klassInfo, 'modelClass');
+        /* @var $modelClass Model */
         $mapped = [];
         foreach ($results as $result) :
-            $mapped[] = $this->mapResult($model, $result);
+            $obj = $modelClass::fromDb($result);
+            $mapped[] = $obj;
         endforeach;
 
         return $mapped;
-    }
-
-    private function mapResult($model, $result)
-    {
-        /** @var $modelName Model */
-        $modelName = $model->meta->modelName;
-
-        return $modelName::fromDb($modelName, $result);
     }
 
     // **************************************************************************************************

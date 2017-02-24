@@ -224,9 +224,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 //        endif;
     }
 
-    public static function fromDb($modelName, $records = [])
+    public static function fromDb($records = [])
     {
-        $newModel = new $modelName($records);
+        $newModel = new static($records);
 
         return $newModel;
     }

@@ -47,7 +47,7 @@ class Query extends BaseObject
     public $where;
     public $tables = [];
     public $tableMap = [];
-
+    public $selectRelected = false;
     /**
      * @var BaseJoin[]
      */
@@ -221,7 +221,7 @@ class Query extends BaseObject
             foreach ($this->getDefaultCols() as $col) :
                 $alias = false;
                 $select[] = [$col, $alias];
-                $klassInfo['model'] = $this->model;
+                $klassInfo['modelClass'] = $this->model->getFullClassName();
 
             endforeach;
         endif;
@@ -618,6 +618,27 @@ class Query extends BaseObject
         $isSummary = ArrayHelper::getValue($kwargs, 'isSummary', false);
 
         $this->annotations[$alias] = $annotation;
+
+    }
+
+    /**Sets up the select_related data structure so that we only select certain related models
+     * (as opposed to all models, when self.select_related=True)
+     *
+     * @param array $fields
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function addSelectRelected($fields = [])
+    {
+        if (is_bool($this->selectRelected)):
+            $relatedFields = [];
+        else:
+            $relatedFields = $this->selectRelected;
+        endif;
+
+        foreach ($fields as $field) :
+
+        endforeach;
 
     }
 
