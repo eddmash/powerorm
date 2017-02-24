@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Console\Question\Asker;
+use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\AlterField;
@@ -46,6 +47,12 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class AutoDetector extends BaseObject
 {
+    const ACTION_CREATED = 'created';
+    const ACTION_DROPPED = 'dropped';
+    const ACTION_ALTER = 'alter';
+    const TYPE_MODEL = 'model';
+    const TYPE_FIELD = 'field';
+
     private $fromState;
     private $toState;
     /**
@@ -112,11 +119,10 @@ class AutoDetector extends BaseObject
     private $newFieldKeys;
     private $renamedFields;
 
-    const ACTION_CREATED = true;
-    const ACTION_NOT_CREATED = false;
-
-    const TYPE_MODEL = true;
-    const TYPE__NON_MODEL = false;
+    /**
+     * @var Operation[]
+     */
+    private $generatedOperations;
 
     /**
      * @param ProjectState $fromState
@@ -301,6 +307,7 @@ class AutoDetector extends BaseObject
 
     private function createMigration()
     {
+        $this->sortOperations();
         $migration = new Migration('auto');
         // optimize the migrations
         $operations = Optimize::run($this->generatedOperations);
@@ -365,11 +372,60 @@ class AutoDetector extends BaseObject
 
     private function checkDependency($operation, $dependency)
     {
-        return true;
+        //['target' => $addedModelName, 'type' => true, 'action' => false]
+        $target = ArrayHelper::getValue($dependency, 'target');
+        $type = ArrayHelper::getValue($dependency, 'type');
+        $action = ArrayHelper::getValue($dependency, 'action');
+        $model = ArrayHelper::getValue($dependency, 'model', null);
+
+        if ($type === self::TYPE_MODEL && $action === self::ACTION_CREATED):
+            // add model
+            return
+                $operation instanceof CreateModel &&
+                strtolower($operation->name) === strtolower($target)
+            ;
+        elseif ($type === self::TYPE_FIELD && $action === self::ACTION_CREATED):
+            // add field
+            return
+
+                    $operation instanceof AddField &&
+                    strtolower($operation->name) === strtolower($target) &&
+                    strtolower($operation->modelName) === strtolower($model)
+                ;
+//            ||(
+//                $operation instanceof CreateModel) &&
+//            strtolower($operation->name) === strtolower($target) &&
+//        any(dependency[2] == x for x, y in operation.fields)
+//                )
+//            )
+        elseif ($type === self::TYPE_FIELD && $action === self::ACTION_DROPPED):
+            // remove field
+            return
+                $operation instanceof RemoveField &&
+                strtolower($operation->modelName) === strtolower($model) &&
+                strtolower($operation->name) === strtolower($target)
+            ;
+        elseif ($type === self::TYPE_MODEL && $action === self::ACTION_DROPPED):
+            //dropped model
+            return
+                $operation instanceof DeleteModel &&
+                strtolower($operation->name) === strtolower($target)
+            ;
+        elseif ($type === self::TYPE_FIELD && $action === self::ACTION_ALTER):
+            // altered field
+            return
+                $operation instanceof AlterField &&
+                strtolower($operation->modelName) === strtolower($model) &&
+                strtolower($operation->name) === strtolower($target)
+            ;
+        // Unknown dependency. Raise an error.
+        else:
+            throw new ValueError(sprintf("Can't handle dependency %s %s '%s' ", $action, $target, $type));
+        endif;
     }
 
     /**
-     * Trys to guess a name for the migration that is to be created.
+     * Try to guess a name for the migration that is to be created.
      *
      * @param array $operations
      *
@@ -497,11 +553,12 @@ class AutoDetector extends BaseObject
             // we need to keep track of which operation need to run before us
 
             // first, check for operations that drops a proxy version of us has been dropped
-            $opDep = [['target' => $addedModelName, 'model' => true, 'create' => false]];
+            $opDep = [['target' => $addedModelName, 'type' => self::TYPE_MODEL, 'action' => self::ACTION_DROPPED]];
 
             // depend on related model being created if primary key is a relationship field
             if ($primaryKeyRel !== null):
-                $opDep[] = ['target' => $primaryKeyRel->meta->modelName, 'model' => true, 'create' => true];
+                $opDep[] = ['target' => $primaryKeyRel->meta->modelName,
+                    'type' => self::TYPE_MODEL, 'action' => self::ACTION_CREATED, ];
             endif;
 
             //we need to get the unbound fields
@@ -540,15 +597,15 @@ class AutoDetector extends BaseObject
                 // we need the current model to be in existence
                 $opDep[] = [
                     'target' => $addedModelName,
-                    'model' => true,
-                    'create' => true,
+                    'type' => self::TYPE_MODEL,
+                    'action' => self::ACTION_CREATED,
                 ];
 
                 // depend on the related model also
                 $opDep[] = [
                     'target' => $relationField->relation->toModel->meta->modelName,
-                    'model' => true,
-                    'create' => true,
+                    'type' => self::TYPE_MODEL,
+                    'action' => self::ACTION_CREATED,
                 ];
 
                 // if the through model was not automatically created, depend on it also
@@ -558,8 +615,8 @@ class AutoDetector extends BaseObject
 
                     $opDep[] = [
                         'target' => $relationField->relation->through->meta->modelName,
-                        'model' => true,
-                        'create' => true,
+                        'type' => self::TYPE_MODEL,
+                        'action' => self::ACTION_CREATED,
                     ];
                 endif;
 
@@ -658,13 +715,15 @@ class AutoDetector extends BaseObject
                 $opDep[] = [
                     'target' => $fieldName,
                     'model' => $modelName,
-                    'create' => false,
+                    'type' => self::TYPE_FIELD,
+                    'action' => self::ACTION_DROPPED,
                 ];
                 if (!$reverseRelatedField->relation->isManyToMany()):
                     $opDep[] = [
                         'target' => $fieldName,
                         'model' => $modelName,
-                        'create' => 'alter',
+                        'type' => self::TYPE_FIELD,
+                        'action' => self::ACTION_ALTER,
                     ];
                 endif;
             endforeach;
@@ -745,7 +804,11 @@ class AutoDetector extends BaseObject
             $modelState = $this->toState->modelStates[$addedProxy];
             assert($modelState->meta['proxy']);
 
-            $opDep = [['target' => $addedProxy, 'model' => true, 'create' => false]];
+            $opDep = [[
+                'target' => $addedProxy,
+                'type' => self::TYPE_MODEL,
+                'action' => self::ACTION_DROPPED,
+            ]];
 
             // create operation
             $this->addOperation(
@@ -1085,8 +1148,8 @@ class AutoDetector extends BaseObject
             // depend on related model being created
             $opDep[] = [
                 'target' => $field->relation->toModel->meta->modelName,
-                'model' => true,
-                'create' => true,
+                'type' => self::TYPE_MODEL,
+                'action' => self::ACTION_CREATED,
             ];
 
             // if it has through also depend on through model being created
@@ -1097,8 +1160,8 @@ class AutoDetector extends BaseObject
 
                 $opDep[] = [
                     'target' => $field->relation->through->meta->modelName,
-                    'model' => true,
-                    'create' => true,
+                    'type' => self::TYPE_MODEL,
+                    'action' => self::ACTION_CREATED,
                 ];
 
             endif;
@@ -1137,4 +1200,72 @@ class AutoDetector extends BaseObject
             )
         );
     }
+
+    private function sortOperations()
+    {
+        // get a map of operations and what operations the depend on.
+        $sorted = [];
+        $graphDependency = [];
+        foreach ($this->generatedOperations as $index => $operation) :
+            $graphDependency[$index] = [];
+            //check if a dependency exists on the current ops
+            foreach ($operation->getDependency() as $dep) :
+
+                foreach ($this->generatedOperations as $inIndex => $operation2) :
+
+                    if ($this->checkDependency($operation2, $dep)):
+                        $graphDependency[$index][] = $inIndex;
+                    endif;
+                endforeach;
+
+            endforeach;
+        endforeach;
+
+        $this->generatedOperations = $this->topologicalSort($this->generatedOperations, $graphDependency);
+    }
+
+    /**
+     * @param $operations
+     * @param $dependency
+     *
+     * @return array
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function topologicalSort($operations, $dependency)
+    {
+        $sorted = $arranged = [];
+        $deps = $dependency;
+        while ($deps):
+
+            $noDeps = [];
+
+            foreach ($deps as $index => $dep) :
+                if (!$dep):
+                    $noDeps[] = $index;
+                endif;
+            endforeach;
+
+            $arranged = array_merge($arranged, $noDeps);
+
+            $newDeps = [];
+            foreach ($deps as $index => $dep) :
+                if (!in_array($index, $noDeps)):
+                    $parents = array_diff($dep, $noDeps);
+                    $newDeps[$index] = $parents;
+                endif;
+            endforeach;
+            $deps = $newDeps;
+
+        endwhile;
+
+        foreach ($arranged as $index) :
+            $sorted[] = $operations[$index];
+        endforeach;
+
+        return $sorted;
+    }
+
 }

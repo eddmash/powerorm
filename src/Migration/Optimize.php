@@ -83,12 +83,10 @@ class Optimize
                     $length = $inIndex;
 
                     $inBetween = array_slice($operations, $outIndex + 1, $length);
-                    $inBetween = array_slice($inBetween, 0, -1);
 
                     $result = $outOperation->reduce($inOperation, $inBetween);
 
                     if ($result) :
-
                         // add the result of the two merging
                         $newOperations = array_merge($newOperations, $result);
                         // add points that fell in between those that merged
