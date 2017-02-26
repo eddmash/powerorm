@@ -253,7 +253,8 @@ class Queryset implements QuerysetInterface
 
         /** @var $field Field */
         foreach ($fields as $name => $field) :
-
+            echo $field.PHP_EOL;
+            echo $field->preSave($model, true).PHP_EOL;
             $qb->setValue($field->getColumnName(), $qb->createNamedParameter($field->preSave($model, true)));
         endforeach;
 

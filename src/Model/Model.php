@@ -978,14 +978,15 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         // get pk value
         $pkValue = $this->getPkValue($meta);
+        $pkSet = (false === empty($pkValue));
 
-        if (!$pkValue && ($forceUpdate || $forceInsert)) :
+        if (!$pkSet && ($forceUpdate || $forceInsert)) :
             throw new ValueError('Cannot force an update in save() with no primary key.');
         endif;
 
         $updated = false;
 
-        if ($pkValue && !$forceInsert):
+        if ($pkSet && !$forceInsert):
             $values = [];
             foreach ($nonePkUpdateFields as $nonePkUpdateField) :
                 $values[$nonePkUpdateField->getColumnName()] = $nonePkUpdateField->preSave($this, false);
@@ -1006,7 +1007,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 $fields[$name] = $concreteField;
             endforeach;
 
-            $updatePk = ($meta->hasAutoField && $pkValue === null);
+            $updatePk = ($meta->hasAutoField && !$pkSet);
+
             $result = $this->doInsert($this, $fields, $updatePk);
             if ($updatePk):
                 $this->{$meta->primaryKey->getAttrName()} = $result;

@@ -50,17 +50,13 @@ class Optimize
      */
     public static function run($operations)
     {
-        $results = null;
-        $break = true;
-        while ($break):
+        while (true):
             $results = self::optimize($operations);
             if ($results == $operations):
-                $break = false;
+               return $results;
             endif;
             $operations = $results;
         endwhile;
-
-        return $results;
     }
 
     /**

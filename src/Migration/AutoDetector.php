@@ -310,8 +310,7 @@ class AutoDetector extends BaseObject
         $this->sortOperations();
         $migration = new Migration('auto');
         // optimize the migrations
-        $operations = Optimize::run($this->generatedOperations);
-        $migration->setOperations($operations);
+        $migration->setOperations(Optimize::run($this->generatedOperations));
 
         return $migration;
     }

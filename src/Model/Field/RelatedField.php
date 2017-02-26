@@ -274,7 +274,8 @@ class RelatedField extends Field
         /* @var $field RelatedField */
         list($fromField, $toField) = $this->getRelatedFields();
         $modelInstance->{$fromField->name} = $value;
-        $modelInstance->{$fromField->getAttrName()} = $value;
+        echo $toField->getAttrName().' *** '.$value->{$toField->getAttrName()}.PHP_EOL;
+        $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
 
 //        return [$fromField->getAttrName(), $value->{$toField->getAttrName()}];
     }
