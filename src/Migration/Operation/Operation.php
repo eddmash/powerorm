@@ -142,8 +142,8 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * replaced with or a boolean that indicates whether or not the specified
      * operation can be optimized across.
      *
-     * @param Operation $operation
-     * @param array     $inBetween
+     * @param Operation   $operation
+     * @param Operation[] $inBetween
      *
      * @return mixed
      *

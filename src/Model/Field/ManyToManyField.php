@@ -90,10 +90,6 @@ class ManyToManyField extends RelatedField
         else:
             $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
         endif;
-
-//        $modelObject->{$this->name} = function ($field) {
-//            return $field->getValue();
-//        };
         $this->setValue($this->scopeModel, null);
     }
 

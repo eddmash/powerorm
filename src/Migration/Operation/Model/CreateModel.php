@@ -16,8 +16,9 @@ use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\FieldOperation;
-use Eddmash\PowerOrm\Migration\Operation\OperationInterface;
+use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ModelState;
+use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -86,9 +87,6 @@ class CreateModel extends ModelOperation
         endif;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
         $model = $fromState->getRegistry()->getModel($this->name);
@@ -97,36 +95,57 @@ class CreateModel extends ModelOperation
         endif;
     }
 
+    /**
+     * Return either a list of operations the actual operation should be
+     * replaced with or a boolean that indicates whether or not the specified
+     * operation can be optimized across.
+     *
+     * @param Operation   $operation
+     * @param Operation[] $inBetween
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function reduce($operation, $inBetween)
     {
         if ($operation instanceof DeleteModel && $this->name === $operation->name && !$this->meta->proxy) :
             return [];
         endif;
-        /* @var $between OperationInterface */
-        if ($operation instanceof FieldOperation && $operation->modelName === $this->name) :
+
+        if ($operation instanceof FieldOperation && strtolower($operation->modelName) === strtolower($this->name)) :
+            echo $this.PHP_EOL;
+            echo $operation.PHP_EOL;
             if ($operation instanceof AddField) :
                 // check if there is an operation in between that references the same model if so, don't merge
-                if ($operation->field->isRelation) :
-                    $modelName = $operation->field->relation->toModel->meta->modelName;
+                if ($operation->field->relation) :
+
+//                    if($operation->field instanceof ManyToManyField):
+//                        echo "$modelName %%% ".PHP_EOL;
+//                    endif;
                     foreach ($inBetween as $between) :
+                        $modelName = $operation->field->relation->toModel->meta->modelName;
                         if ($between->referencesModel($modelName)) :
                             return false;
                         endif;
 
-                        if ($operation->field->relation->hasProperty(
-                                'through'
-                            ) && $operation->field->relation->through
+                        if ($operation->field->relation->hasProperty('through') &&
+                            $operation->field->relation->through
                         ) :
-                            $modelName = $operation->field->relation->through->toModel->meta->modelName;
+                            $modelName = $operation->field->relation->through->meta->modelName;
                             if ($between->referencesModel($modelName)) :
                                 return false;
                             endif;
                         endif;
+                        echo PHP_EOL;
                     endforeach;
                 endif;
 
                 $fields = $this->fields;
                 $fields[$operation->field->name] = $operation->field;
+                echo '************************'.PHP_EOL;
 
                 return [
                     static::createObject(

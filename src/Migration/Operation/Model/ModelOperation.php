@@ -17,7 +17,7 @@ abstract class ModelOperation extends Operation
 
     public function referencesModel($modelName)
     {
-        return $this->name === $modelName;
+        return strtolower($this->name) === strtolower($modelName);
     }
 
     public function __debugInfo()

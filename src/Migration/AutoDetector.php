@@ -1224,7 +1224,14 @@ class AutoDetector extends BaseObject
         $this->generatedOperations = $this->topologicalSort($this->generatedOperations, $graphDependency);
     }
 
+    public function sortModels()
+    {
+
+    }
+
     /**
+     * sorts the operations in topological order using kahns algorithim.
+     *
      * @param $operations
      * @param $dependency
      *
@@ -1247,6 +1254,10 @@ class AutoDetector extends BaseObject
                     $noDeps[] = $index;
                 endif;
             endforeach;
+
+            if(!$noDeps):
+                throw new ValueError('Cyclic dependency on topological sort');
+            endif;
 
             $arranged = array_merge($arranged, $noDeps);
 
