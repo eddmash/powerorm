@@ -34,6 +34,7 @@ use Eddmash\PowerOrm\Model\Query\Joinable\Where;
 
 const INNER = 'INNER JOIN';
 const LOUTER = 'LEFT OUTER JOIN';
+
 class Query extends BaseObject
 {
     //[
@@ -263,14 +264,15 @@ class Query extends BaseObject
         $params = [];
 
         $refCount = $this->aliasRefCount;
-
         foreach ($this->tables as $alias) :
             if (!ArrayHelper::getValue($refCount, $alias)):
                 continue;
             endif;
             try {
+
                 /** @var $from BaseJoin */
                 $from = ArrayHelper::getValue($this->tableMap, $alias, ArrayHelper::STRICT);
+
                 list($fromSql, $fromParams) = $from->asSql($connection);
                 array_push($result, $fromSql);
                 $params = array_merge($params, $fromParams);
@@ -507,6 +509,7 @@ class Query extends BaseObject
             $meta = $pathInfo['toMeta'];
 
             $join = new Join();
+            echo '^^^ '.$meta->dbTable.'<br>';
             $join->setTableName($meta->dbTable);
             $join->setParentAlias($alias);
             $join->setJoinType(INNER);
@@ -523,7 +526,6 @@ class Query extends BaseObject
     public function join(BaseJoin $join, $reuse = [])
     {
         list($alias) = $this->getTableAlias($join->getTableName(), false);
-
         if ($join->getJoinType()):
             if ($this->tableMap[$join->getParentAlias()]->getJoinType() === LOUTER || $join->getNullable()):
                 $joinType = LOUTER;
@@ -535,7 +537,6 @@ class Query extends BaseObject
 
         $join->setTableAlias($alias);
         $this->tableMap[$alias] = $join;
-
         $this->tables[] = $alias;
 
         return $alias;

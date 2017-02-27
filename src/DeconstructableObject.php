@@ -20,6 +20,8 @@
 
 namespace Eddmash\PowerOrm;
 
+use Closure;
+
 abstract class DeconstructableObject extends BaseObject implements DeConstructableInterface
 {
     private $constructorArgs;
@@ -62,13 +64,9 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
         $meta = [];
         foreach (get_object_vars($this) as $name => $value) :
             if (in_array($name, $this->getIgnored())):
-//                $meta[$name] = (!is_subclass_of(
-//                    $value,
-//                    BaseObject::getFullClassName()
-//                )) ? '** hidden **' : (string) $value;
                 continue;
             endif;
-            if (is_object($value)):
+            if (is_object($value) && !($value instanceof Closure)):
                 $value = (string) $value;
             endif;
             $meta[$name] = $value;

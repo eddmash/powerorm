@@ -57,7 +57,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @var array
      */
-    public $_fieldCache=[];
+    public $_fieldCache = [];
 
     /**
      * Holds the name of the database table that this model represents.
@@ -754,6 +754,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public static function objects()
     {
         $queryset = self::getQuerysetClass();
+
         return $queryset::createObject(BaseOrm::getDbConnection(), self::createObject());
     }
 
@@ -1111,12 +1112,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function hasProperty($name)
     {
-        return parent::hasProperty($name) || array_key_exists($name , $this->_fieldCache);
+        return parent::hasProperty($name) || array_key_exists($name, $this->_fieldCache);
     }
-
 
 }

@@ -7,42 +7,82 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
 
 /**
- * Class M2MQueryset
- * @package Eddmash\PowerOrm\Model\Query
+ * Class M2MQueryset.
+ *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
 class M2MQueryset extends ParentQueryset
 {
+    /**
+     * @var Model
+     */
     private $instance;
-    private $field;
+    /**
+     * @var Model
+     */
+    private $through;
 
-    public function __construct(Connection $connection = null, Model $model = null, Query $query = null, $kwargs=[])
+    /**
+     * @var \Eddmash\PowerOrm\Model\Field\Field
+     */
+    private $fromField;
+
+    /**
+     * @var bool
+     */
+    private $reverse;
+
+    public function __construct(Connection $connection = null, Model $model = null, Query $query = null, $kwargs = [])
     {
-        $this->instance = ArrayHelper::getValue($kwargs, "instance");
+        $this->instance = ArrayHelper::getValue($kwargs, 'instance');
 
-        /**@var ForeignObjectRel $rel */
-        $rel = ArrayHelper::getValue($kwargs, "rel");
-        parent::__construct(null, $rel->getFromModel());
-        $this->field = $rel->fromField;
-    }
+        /** @var ForeignObjectRel $rel */
+        $rel = ArrayHelper::getValue($kwargs, 'rel');
+        $this->reverse = ArrayHelper::getValue($kwargs, 'reverse');
 
-    public static function createObject(
-        Connection $connection = null,
-        Model $model = null,
-        Query $query = null,
-        $kwargs=[]
-    ) {
-        return new static($connection, $model, $query, $kwargs=[]);
+        if($this->reverse === false):
+            $model = $rel->toModel;
+            $this->queryName = $rel->fromField->getRelatedQueryName();
+            $this->fromFieldName = call_user_func($rel->fromField->m2mField);
+            $this->toFieldName = call_user_func($rel->fromField->m2mReverseField);
+        else:
+            $model = $rel->getFromModel();
+            $this->queryName = $rel->fromField->name;
+            $this->fromFieldName = call_user_func($rel->fromField->m2mReverseField);
+            $this->toFieldName = call_user_func($rel->fromField->m2mField);
+        endif;
+
+        $this->through = $rel->through;
+
+        $this->fromField = $this->through->meta->getField($this->fromFieldName);
+        $this->toField = $this->through->meta->getField($this->toFieldName);
+        $this->filters = [];
+
+        foreach ([$this->fromField->getRelatedFields()] as $fields) :
+            list($lhsField, $rhsField) = $fields;
+            $key = sprintf('%s__%s', $this->queryName, $rhsField->name);
+            $this->filters[$key] = $this->instance->{$rhsField->getAttrName()};
+        endforeach;
+        var_dump($this->filters);
+        $this->relatedValues = $this->fromField->getForeignRelatedFieldsValues($this->instance);
+        var_dump($this->relatedValues);
+        if(empty($this->relatedValues)):
+            throw new ValueError(
+                sprintf('"%s" needs to have a value for field "%s" before this many-to-many relationship can be used.',
+                    $this->instance->meta->modelName,
+                    $this->fromFieldName));
+        endif;
+
+        parent::__construct(null, $model);
     }
 
     public function add()

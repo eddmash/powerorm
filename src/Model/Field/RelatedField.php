@@ -19,6 +19,7 @@ use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedExact;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThan;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThanOrEqual;
@@ -126,7 +127,7 @@ class RelatedField extends Field
             $related = $kwargs['relatedModel'];
             $field = $kwargs['fromField'];
             $field->relation->toModel = $related;
-            $field->doRelatedClass($related, $kwargs['scopeModel']);
+            $field->doRelatedClass($related, $this->relation);
         };
 
         Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->toModel, ['fromField' => $this]);
@@ -140,9 +141,9 @@ class RelatedField extends Field
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function doRelatedClass($relatedModel, $scopeModel)
+    public function doRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        $this->contributeToRelatedClass($relatedModel, $scopeModel);
+        $this->contributeToRelatedClass($relatedModel, $relation);
     }
 
     /**
@@ -170,10 +171,6 @@ class RelatedField extends Field
         return $kwargs;
     }
 
-    public function contributeToRelatedClass($relatedModel, $scopeModel)
-    {
-    }
-
     public function getLookup($name)
     {
         if ($name == 'in'):
@@ -199,7 +196,9 @@ class RelatedField extends Field
      * Returns the fields that are used to create the relation.
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     *
      * @return Field[]
+     *
      * @throws ValueError
      * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
      */
@@ -337,7 +336,11 @@ class RelatedField extends Field
         $values = [];
         /** @var $field Field */
         foreach ($fields as $field) :
-            $values[] = $modelInstance->{$field->getAttrName()};
+            $val = $modelInstance->{$field->getAttrName()};
+            if(!$val):
+                continue;
+            endif;
+            $values[] = $val;
         endforeach;
 
         return $values;
@@ -383,5 +386,10 @@ class RelatedField extends Field
                 'direct' => false,
             ],
         ];
+    }
+
+    public function getRelatedQueryName()
+    {
+        return strtolower($this->scopeModel->meta->modelName);
     }
 }

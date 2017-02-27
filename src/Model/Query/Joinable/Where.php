@@ -28,7 +28,8 @@ class Where
         $whereParams = [];
 
         /* @var $lookup BaseLookup */
-        foreach ($this->conditions as $connector => $lookup) :
+        foreach ($this->conditions as $conditionInfo) :
+            list($connector, $lookup) = $conditionInfo;
             // if we have another condition already added, add the connector
             if ($whereSql):
                 $whereSql[] = $connector;
@@ -49,14 +50,14 @@ class Where
 
     public function setConditions($connector, $conditions)
     {
-        //todo what happend if we have same connnetor several times.
-        $this->conditions[$connector] = $conditions;
+        $this->conditions[] = [$connector, $conditions];
     }
 
     public function deepClone()
     {
         $obj = new self();
-        foreach ($this->conditions as $conector => $condition) :
+        foreach ($this->conditions as $conditionInfo) :
+            list($conector, $condition) = $conditionInfo;
             if (method_exists($condition, 'deepClone')) :
                 $obj->setConditions($conector, $condition->deepClone());
             else:
