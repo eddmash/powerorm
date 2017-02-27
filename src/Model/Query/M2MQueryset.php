@@ -49,7 +49,7 @@ class M2MQueryset extends ParentQueryset
         $rel = ArrayHelper::getValue($kwargs, 'rel');
         $this->reverse = ArrayHelper::getValue($kwargs, 'reverse');
 
-        if($this->reverse === false):
+        if ($this->reverse === false):
             $model = $rel->toModel;
             $this->queryName = $rel->fromField->getRelatedQueryName();
             $this->fromFieldName = call_user_func($rel->fromField->m2mField);
@@ -68,14 +68,13 @@ class M2MQueryset extends ParentQueryset
         $this->filters = [];
 
         foreach ([$this->fromField->getRelatedFields()] as $fields) :
-            list($lhsField, $rhsField) = $fields;
+            $rhsField = $fields[1];
             $key = sprintf('%s__%s', $this->queryName, $rhsField->name);
             $this->filters[$key] = $this->instance->{$rhsField->getAttrName()};
         endforeach;
-        var_dump($this->filters);
+
         $this->relatedValues = $this->fromField->getForeignRelatedFieldsValues($this->instance);
-        var_dump($this->relatedValues);
-        if(empty($this->relatedValues)):
+        if (empty($this->relatedValues)):
             throw new ValueError(
                 sprintf('"%s" needs to have a value for field "%s" before this many-to-many relationship can be used.',
                     $this->instance->meta->modelName,

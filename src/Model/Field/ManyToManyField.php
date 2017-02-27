@@ -242,7 +242,7 @@ class ManyToManyField extends RelatedField
 
     public function setValue(Model $modelInstance, $value)
     {
-        /** @var $queryset M2MQueryset */
+        /* @var $queryset M2MQueryset */
 
         // on first round we are setting the queryset
         if (!$modelInstance->hasProperty($this->name)) :

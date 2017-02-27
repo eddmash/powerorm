@@ -26,13 +26,6 @@ abstract class BaseCommand extends Command
      */
     public $systemCheck = true;
 
-    /**
-     * Name of the manager file.
-     *
-     * @var
-     */
-    private $managerName;
-
     public $headerMessage = '
     **********************************************************%4$s****
         *    ___   ___           ___  ___  ___  ___           %3$s*

@@ -381,16 +381,14 @@ class AutoDetector extends BaseObject
             // add model
             return
                 $operation instanceof CreateModel &&
-                strtolower($operation->name) === strtolower($target)
-            ;
+                strtolower($operation->name) === strtolower($target);
         elseif ($type === self::TYPE_FIELD && $action === self::ACTION_CREATED):
             // add field
             return
 
-                    $operation instanceof AddField &&
-                    strtolower($operation->name) === strtolower($target) &&
-                    strtolower($operation->modelName) === strtolower($model)
-                ;
+                $operation instanceof AddField &&
+                strtolower($operation->name) === strtolower($target) &&
+                strtolower($operation->modelName) === strtolower($model);
 //            ||(
 //                $operation instanceof CreateModel) &&
 //            strtolower($operation->name) === strtolower($target) &&
@@ -402,21 +400,18 @@ class AutoDetector extends BaseObject
             return
                 $operation instanceof RemoveField &&
                 strtolower($operation->modelName) === strtolower($model) &&
-                strtolower($operation->name) === strtolower($target)
-            ;
+                strtolower($operation->name) === strtolower($target);
         elseif ($type === self::TYPE_MODEL && $action === self::ACTION_DROPPED):
             //dropped model
             return
                 $operation instanceof DeleteModel &&
-                strtolower($operation->name) === strtolower($target)
-            ;
+                strtolower($operation->name) === strtolower($target);
         elseif ($type === self::TYPE_FIELD && $action === self::ACTION_ALTER):
             // altered field
             return
                 $operation instanceof AlterField &&
                 strtolower($operation->modelName) === strtolower($model) &&
-                strtolower($operation->name) === strtolower($target)
-            ;
+                strtolower($operation->name) === strtolower($target);
         // Unknown dependency. Raise an error.
         else:
             throw new ValueError(sprintf("Can't handle dependency %s %s '%s' ", $action, $target, $type));
@@ -1203,7 +1198,6 @@ class AutoDetector extends BaseObject
     private function sortOperations()
     {
         // get a map of operations and what operations the depend on.
-        $sorted = [];
         $graphDependency = [];
         foreach ($this->generatedOperations as $index => $operation) :
             $graphDependency[$index] = [];
@@ -1254,7 +1248,7 @@ class AutoDetector extends BaseObject
                 endif;
             endforeach;
 
-            if(!$noDeps):
+            if (!$noDeps):
                 throw new ValueError('Cyclic dependency on topological sort');
             endif;
 

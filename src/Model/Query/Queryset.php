@@ -95,7 +95,8 @@ class Queryset implements QuerysetInterface
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    ) {
+    )
+    {
         return new static($connection, $model, $query, $kwargs);
     }
 

@@ -57,7 +57,7 @@ class Node
     {
         $ancestors = [];
 
-        if($ignoreSelf === false):
+        if ($ignoreSelf === false):
             $ancestors[] = $this->name;
         endif;
 

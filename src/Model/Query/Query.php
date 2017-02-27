@@ -129,7 +129,6 @@ class Query extends BaseObject
             list($col, $alias) = $colInfo;
 
             list($colSql, $colParams) = $col->asSql($connection);
-            echo '<br>';
 
             if ($alias):
                 $cols[] = sprintf('%s AS %s', $colSql, $alias);
@@ -509,7 +508,6 @@ class Query extends BaseObject
             $meta = $pathInfo['toMeta'];
 
             $join = new Join();
-            echo '^^^ '.$meta->dbTable.'<br>';
             $join->setTableName($meta->dbTable);
             $join->setParentAlias($alias);
             $join->setJoinType(INNER);

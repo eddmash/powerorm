@@ -53,7 +53,7 @@ class Optimize
         while (true):
             $results = self::optimize($operations);
             if ($results == $operations):
-               return $results;
+                return $results;
             endif;
             $operations = $results;
         endwhile;

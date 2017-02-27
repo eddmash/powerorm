@@ -54,8 +54,9 @@ class RelatedField extends Field
      */
     public $fromField;
 
-    public function __construct($kwargs = []) {
-        if(!ArrayHelper::hasKey($kwargs, 'to')):
+    public function __construct($kwargs = [])
+    {
+        if (!ArrayHelper::hasKey($kwargs, 'to')):
             throw new TypeError(sprintf("missing 1 required argument: 'to' for %s", static::class));
         endif;
         parent::__construct($kwargs);
@@ -337,7 +338,7 @@ class RelatedField extends Field
         /** @var $field Field */
         foreach ($fields as $field) :
             $val = $modelInstance->{$field->getAttrName()};
-            if(!$val):
+            if (!$val):
                 continue;
             endif;
             $values[] = $val;

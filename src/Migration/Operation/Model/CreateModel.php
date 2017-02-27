@@ -18,7 +18,6 @@ use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\FieldOperation;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ModelState;
-use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -116,15 +115,10 @@ class CreateModel extends ModelOperation
         endif;
 
         if ($operation instanceof FieldOperation && strtolower($operation->modelName) === strtolower($this->name)) :
-            echo $this.PHP_EOL;
-            echo $operation.PHP_EOL;
+
             if ($operation instanceof AddField) :
                 // check if there is an operation in between that references the same model if so, don't merge
                 if ($operation->field->relation) :
-
-//                    if($operation->field instanceof ManyToManyField):
-//                        echo "$modelName %%% ".PHP_EOL;
-//                    endif;
                     foreach ($inBetween as $between) :
                         $modelName = $operation->field->relation->toModel->meta->modelName;
                         if ($between->referencesModel($modelName)) :
@@ -139,13 +133,11 @@ class CreateModel extends ModelOperation
                                 return false;
                             endif;
                         endif;
-                        echo PHP_EOL;
                     endforeach;
                 endif;
 
                 $fields = $this->fields;
                 $fields[$operation->field->name] = $operation->field;
-                echo '************************'.PHP_EOL;
 
                 return [
                     static::createObject(

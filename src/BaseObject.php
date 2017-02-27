@@ -154,24 +154,6 @@ class BaseObject
         return $parents;
     }
 
-//    /**
-//     * Create an instance of the current class.override this method to match with the class constructor.
-//     *
-//     * @param array $config (optional) The configs to pass to the classes constructor
-//     *
-//     * @return static
-//     *
-//     * @throws NotImplemented
-//     *
-//     * @since 1.1.0
-//     *
-//     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-//     */
-//    public static function createObject()
-//    {
-//        throw new NotImplemented('method not implemented');
-//    }
-
     public function __toString()
     {
         return sprintf('%s Object', get_class($this));
