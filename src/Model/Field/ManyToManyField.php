@@ -90,7 +90,7 @@ class ManyToManyField extends RelatedField
         else:
             $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
         endif;
-        $this->setValue($this->scopeModel, null);
+        $this->setValue($this->scopeModel, $this->createManager());
     }
 
     public function contributeToRelatedClass($relatedModel, $scopeModel)
@@ -224,12 +224,9 @@ class ManyToManyField extends RelatedField
 
     public function setValue(Model $modelInstance, $value)
     {
-        $queryset = $this->getValue($modelInstance);
-//        // apply filter
-//        $this->getReverseRelatedFilter($this->relation->getToModel());
-
-        $modelInstance->{$this->name} = $queryset;
-
+        /**@var $callback Callable*/
+        $manager = $modelInstance->{$this->name};
+        $manager($modelInstance, $this->relation);
     }
 
     public function getValue(Model $modelInstance)

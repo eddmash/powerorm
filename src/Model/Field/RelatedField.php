@@ -199,6 +199,9 @@ class RelatedField extends Field
      * Returns the fields that are used to create the relation.
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     * @return Field[]
+     * @throws ValueError
+     * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
      */
     public function getRelatedFields()
     {
@@ -274,7 +277,6 @@ class RelatedField extends Field
         /* @var $field RelatedField */
         list($fromField, $toField) = $this->getRelatedFields();
         $modelInstance->{$fromField->name} = $value;
-        echo $toField->getAttrName().' *** '.$value->{$toField->getAttrName()}.PHP_EOL;
         $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
 
 //        return [$fromField->getAttrName(), $value->{$toField->getAttrName()}];
