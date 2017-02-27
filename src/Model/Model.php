@@ -57,7 +57,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @var array
      */
-    protected $_fieldCache;
+    public $_fieldCache=[];
 
     /**
      * Holds the name of the database table that this model represents.
@@ -705,11 +705,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __get($name)
     {
-        if (!ArrayHelper::hasKey(get_object_vars($this), $name)):
+        if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
             throw new AttributeError(
                 sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->modelName, $name)
             );
         endif;
+
         try {
             /** @var $field RelatedField */
             $field = $this->meta->getField($name);
@@ -723,7 +724,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __set($name, $value)
     {
-
         /* @var $field RelatedField */
         try {
             $field = $this->meta->getField($name);
@@ -753,7 +753,17 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public static function objects()
     {
-        return Queryset::createObject(BaseOrm::getDbConnection(), self::createObject());
+        $queryset = self::getQuerysetClass();
+        return $queryset::createObject(BaseOrm::getDbConnection(), self::createObject());
+    }
+
+    /**
+     * @return mixed
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public static function getQuerysetClass()
+    {
+        return Queryset::class;
     }
 
     public function getDeferredFields()
@@ -1099,4 +1109,14 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         return $filtered->_update($records);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasProperty($name)
+    {
+        return parent::hasProperty($name) || array_key_exists($name , $this->_fieldCache);
+    }
+
+
 }

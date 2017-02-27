@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
@@ -51,7 +52,7 @@ class Queryset implements QuerysetInterface
     /**
      * @var Model
      */
-    private $model;
+    protected $model;
 
     /**
      * @var Query
@@ -67,11 +68,16 @@ class Queryset implements QuerysetInterface
      */
     protected $_resultsCache;
 
-    public function __construct(Connection $connection, Model $model, Query $query = null)
+    public function __construct(Connection $connection = null, Model $model = null, Query $query = null, $kwargs = [])
     {
-        $this->connection = $connection;
+        $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
         $this->query = ($query == null) ? $this->getQueryBuilder() : $query;
+    }
+
+    private function getConnection()
+    {
+        return BaseOrm::getDbConnection();
     }
 
     /**
@@ -84,8 +90,12 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function createObject($connection, $model, $query = null)
-    {
+    public static function createObject(
+        Connection $connection = null,
+        Model $model = null,
+        Query $query = null,
+        $kwargs = []
+    ) {
         return new static($connection, $model, $query);
     }
 
@@ -207,10 +217,10 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-            return (bool) $instance->query->execute($this->connection)->fetch();
+            return (bool)$instance->query->execute($this->connection)->fetch();
         endif;
 
-        return (bool) $this->_resultsCache;
+        return (bool)$this->_resultsCache;
     }
 
     public function limit($start, $end)

@@ -645,7 +645,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function setValue(Model $modelInstance, $value)
     {
-        $modelInstance->{$this->name} = $value;
+        $modelInstance->_fieldCache[$this->name] = $value;
     }
 }
 

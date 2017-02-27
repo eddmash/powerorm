@@ -17,9 +17,12 @@ use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Migration\FormatFileContent;
 use Eddmash\PowerOrm\Model\Delete;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToManyRel;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\M2MQueryset;
+use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
  * Provide a many-to-many relation by using an intermediary model that holds two ForeignKey fields pointed at the two
@@ -47,6 +50,7 @@ class ManyToManyField extends RelatedField
      * @var ManyToManyRel
      */
     public $relation;
+    private $hasNullKwarg;
 
     public function __construct($kwargs)
     {
@@ -90,11 +94,13 @@ class ManyToManyField extends RelatedField
         else:
             $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
         endif;
-        $this->setValue($this->scopeModel, $this->createManager());
+
+        $this->setValue($this->scopeModel, $this->createManyQueryset($this->relation, $this->scopeModel->meta->modelName));
     }
 
-    public function contributeToRelatedClass($relatedModel, $scopeModel)
+    public function createManager(ForeignObjectRel $relation)
     {
+        
     }
 
     /**
@@ -224,14 +230,37 @@ class ManyToManyField extends RelatedField
 
     public function setValue(Model $modelInstance, $value)
     {
-        /**@var $callback Callable*/
-        $manager = $modelInstance->{$this->name};
-        $manager($modelInstance, $this->relation);
+        /**@var $queryset M2MQueryset */
+
+        // on first round we are setting the queryset
+        if (!$modelInstance->hasProperty($this->name)) :
+            $modelInstance->_fieldCache[$this->name] = $value;
+        else:
+            $queryset = $this->getValue($modelInstance);
+            $queryset->add($value);
+        endif;
+
     }
 
+    public function createManyQueryset(ForeignObjectRel $rel, $modelClass)
+    {
+        $querysetClass = $modelClass::getQuerysetClass();
+
+        if (!class_exists('Eddmash\PowerOrm\Model\Query\ParentQueryset')) :
+            eval(sprintf('namespace Eddmash\PowerOrm\Model\Query;class ParentQueryset extends \%s{}',$querysetClass));
+        endif;
+
+        return function (Model $instance)use($rel){
+
+            $queryset = M2MQueryset::createObject(null, null, null,$rel, $instance);
+
+            return $queryset;
+        };
+    }
     public function getValue(Model $modelInstance)
     {
-        return $this->getRelatedQueryset($modelInstance);
+        $callback = $modelInstance->_fieldCache[$this->name];
+        return $callback($modelInstance);
     }
 
     /**
