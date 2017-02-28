@@ -12,6 +12,7 @@ namespace Eddmash\PowerOrm\Model\Query;
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -76,17 +77,55 @@ class M2MQueryset extends ParentQueryset
         $this->relatedValues = $this->fromField->getForeignRelatedFieldsValues($this->instance);
         if (empty($this->relatedValues)):
             throw new ValueError(
-                sprintf('"%s" needs to have a value for field "%s" before this many-to-many relationship can be used.',
+                sprintf(
+                    '"%s" needs to have a value for field "%s" before this many-to-many relationship can be used.',
                     $this->instance->meta->modelName,
-                    $this->fromFieldName));
+                    $this->fromFieldName
+                )
+            );
         endif;
 
         parent::__construct(null, $model);
     }
 
-    public function add()
+    public function add($values = [])
     {
-        func_get_args();
+        $this->addItems($this->fromFieldName, $this->toFieldName, $values);
     }
 
+    public function set($values, $kwargs = [])
+    {
+        $clear = ArrayHelper::getValue($kwargs, "clear", false);
+        if ($clear) :
+        else:
+            $this->add($values);
+        endif;
+    }
+
+    private function addItems($fromFieldName, $toFieldName, $values = [])
+    {
+        /**@var $field RelatedField*/
+        if ($values) :
+            $newIds = [];
+            foreach ($values as $value) :
+                $field = $this->through->meta->getField($this->toFieldName);
+                $newIds[] = $field->getForeignRelatedFieldsValues($this->instance)[0];
+            endforeach;
+            $newIds = array_unique($newIds);
+
+            /**@var $throughClass Model*/
+
+            $throughClass = $this->through->meta->modelName;
+
+
+            $vals = $throughClass::objects()->asArray([$toFieldName], true)->filter([
+                $fromFieldName => $this->relatedValues[0]
+            ]);
+            var_dump($vals->getSql());
+            echo "<pre>";
+            print_r($newIds);
+            echo "</pre>";
+
+        endif;
+    }
 }

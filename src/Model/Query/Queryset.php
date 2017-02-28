@@ -21,6 +21,9 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Results\ArrayMapper;
+use Eddmash\PowerOrm\Model\Query\Results\ArrayValueMapper;
+use Eddmash\PowerOrm\Model\Query\Results\ModelMapper;
 
 const PRIMARY_KEY_ID = 'pk';
 
@@ -47,12 +50,14 @@ class Queryset implements QuerysetInterface
     /**
      * @var Connection
      */
-    private $connection;
+    public $connection;
 
     /**
      * @var Model
      */
     protected $model;
+
+    public $resultMapper;
 
     /**
      * @var Query
@@ -67,12 +72,14 @@ class Queryset implements QuerysetInterface
      * @internal
      */
     protected $_resultsCache;
+    private $_fields;
 
     public function __construct(Connection $connection = null, Model $model = null, Query $query = null, $kwargs = [])
     {
         $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
         $this->query = ($query == null) ? $this->getQueryBuilder() : $query;
+        $this->resultMapper = ArrayHelper::getValue($kwargs, "resultMapper", ModelMapper::class);
     }
 
     private function getConnection()
@@ -120,6 +127,7 @@ class Queryset implements QuerysetInterface
     public function get()
     {
         $queryset = $this->_filterOrExclude(false, func_get_args());
+
         $resultCount = count($queryset);
 
         if ($resultCount == 1):
@@ -246,7 +254,8 @@ class Queryset implements QuerysetInterface
             $params[] = $value;
         endforeach;
 
-        list($sql, $whereParams) = $this->query->getWhereSql($this->connection);
+        list($sql, $whereParams) = $this->query->where->asSql($this->connection);
+
         $qb->where($sql);
         $params = array_merge($params, $whereParams);
         foreach ($params as $index => $param) :
@@ -344,7 +353,7 @@ class Queryset implements QuerysetInterface
     {
         if (false === $this->_evaluated):
 
-            $this->_resultsCache = $this->mapResults();
+            $this->_resultsCache = call_user_func($this->getMapper());
 
             $this->_evaluated = true;
         endif;
@@ -352,20 +361,22 @@ class Queryset implements QuerysetInterface
         return $this->_resultsCache;
     }
 
+    public function getMapper()
+    {
+        return new $this->resultMapper($this);
+    }
     public function _toSql()
     {
 
-        $clone = $this->values([$this->model->meta->primaryKey->getColumnName()]);
+        $clone = $this->asArray([$this->model->meta->primaryKey->getColumnName()]);
 
         return $clone->query->getNestedSql($this->connection);
     }
 
-    public function values()
+    public function asArray($fields=[], $valuesOnly=false)
     {
         $clone = $this->_clone();
-        $fields = func_get_args();
-        $fields = (empty($fields)) ? [] : $fields[0];
-
+        $clone->_fields = $fields;
         if ($fields):
             $clone->query->clearSelectedFields();
             $clone->query->useDefaultCols = false;
@@ -377,6 +388,8 @@ class Queryset implements QuerysetInterface
         endif;
         $clone->query->setValueSelect($fields);
         $clone->query->addFields($fields, true);
+
+        $clone->resultMapper = ($valuesOnly)? ArrayValueMapper::class : ArrayMapper::class;
 
         return $clone;
     }
@@ -400,31 +413,6 @@ class Queryset implements QuerysetInterface
     private function getQueryBuilder()
     {
         return Query::createObject($this->model);
-    }
-
-    /**
-     * @param Model $model
-     * @param array $results
-     *
-     * @return Model
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function mapResults()
-    {
-        $results = $this->query->execute($this->connection)->fetchAll();
-        $klassInfo = $this->query->klassInfo;
-        $modelClass = ArrayHelper::getValue($klassInfo, 'modelClass');
-        /* @var $modelClass Model */
-        $mapped = [];
-        foreach ($results as $result) :
-            $obj = $modelClass::fromDb($result);
-            $mapped[] = $obj;
-        endforeach;
-
-        return $mapped;
     }
 
     // **************************************************************************************************
@@ -518,6 +506,6 @@ class Queryset implements QuerysetInterface
     {
         $qb = clone $this->query;
 
-        return self::createObject($this->connection, $this->model, $qb);
+        return self::createObject($this->connection, $this->model, $qb, ["resultMapper"=>$this->resultMapper]);
     }
 }

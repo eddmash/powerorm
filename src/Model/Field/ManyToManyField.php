@@ -249,7 +249,7 @@ class ManyToManyField extends RelatedField
             $modelInstance->_fieldCache[$this->name] = $value;
         else:
             $queryset = $this->getValue($modelInstance);
-            $queryset->add($value);
+            $queryset->set($value);
         endif;
 
     }

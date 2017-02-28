@@ -482,4 +482,8 @@ class Meta extends DeconstructableObject implements MetaInterface
         return sprintf('%s%s', BaseOrm::getDbPrefix(), str_replace('\\', '_', $this->normalizeKey($this->modelName)));
     }
 
+    public function __toString()
+    {
+        return sprintf('< %s : %s >', get_class($this), $this->modelName);
+    }
 }

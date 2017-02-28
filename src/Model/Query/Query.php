@@ -416,7 +416,10 @@ class Query extends BaseObject
 
             /** @var $field Field */
             $field = null;
-
+            var_dump(array_keys($meta->getFields()));
+            echo "<br>";
+            echo $meta;
+            echo "<br><br><br>";
             try {
                 $field = $meta->getField($name);
             } catch (FieldDoesNotExist $e) {
@@ -425,7 +428,8 @@ class Query extends BaseObject
 
                     throw new FieldError(
                         sprintf(
-                            "Cannot resolve keyword '%s' into field. Choices are: [ %s ]",
+                            "Cannot resolve keyword '%s.%s' into field. Choices are: [ %s ]",
+                            $meta->modelName,
                             $name,
                             implode(', ', $available)
                         )
@@ -720,4 +724,5 @@ class Query extends BaseObject
 
         return $stmt;
     }
+
 }
