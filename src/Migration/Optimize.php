@@ -51,11 +51,11 @@ class Optimize
     public static function run($operations)
     {
         while (true):
-            $results = self::_optimize($operations);
-        if ($results == $operations):
+            $results = self::optimize($operations);
+            if ($results == $operations):
                 return $results;
-        endif;
-        $operations = $results;
+            endif;
+            $operations = $results;
         endwhile;
     }
 
@@ -70,44 +70,40 @@ class Optimize
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function _optimize($operations)
+    public static function optimize($operations)
     {
         $newOperations = [];
         /** @var $outOperation Operation */
         foreach ($operations as $outIndex => $outOperation) :
             $inOperations = array_slice($operations, $outIndex + 1);
 
-        echo PHP_EOL.PHP_EOL;
-        if ($inOperations) :
+            if ($inOperations) :
                 foreach ($inOperations as $inIndex => $inOperation) :
                     // get how many items to fetch
-                    $places = ($outIndex - ($inIndex + 1));
-        if ($places < 0) :
-                        $places = 1;
-        endif;
+                    $length = $inIndex;
 
-        $inBetween = array_slice($operations, $outIndex + 1, $places);
-        $inBetween = array_slice($inBetween, 0, -1);
+                    $inBetween = array_slice($operations, $outIndex + 1, $length);
 
-        $result = $outOperation->reduce($inOperation, $inBetween);
+                    $result = $outOperation->reduce($inOperation, $inBetween);
 
-        if ($result) :
-
+                    if ($result) :
                         // add the result of the two merging
                         $newOperations = array_merge($newOperations, $result);
                         // add points that fell in between those that merged
                         $newOperations = array_merge($newOperations, $inBetween);
                         // add points that come after
-                        $newOperations = array_merge($newOperations, array_slice($operations, $outIndex + $inIndex + 2));
+                        $newOperations = array_merge(
+                            $newOperations,
+                            array_slice($operations, $outIndex + $inIndex + 2)
+                        );
 
-        return $newOperations; else:
-                        $newOperations[] = $outOperation;
-        break;
-        endif;
-
-        endforeach; else:
+                        return $newOperations;
+                    endif;
+                endforeach;
                 $newOperations[] = $outOperation;
-        endif;
+            else:
+                $newOperations[] = $outOperation;
+            endif;
 
         endforeach;
 

@@ -33,13 +33,15 @@ class ForeignKey extends RelatedField
     public function __construct($kwargs)
     {
         if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
-            $kwargs['rel'] = ManyToOneRel::createObject([
-                'fromField' => $this,
-                'to' => ArrayHelper::getValue($kwargs, 'to'),
-                'toField' => ArrayHelper::getValue($kwargs, 'toField'),
-                'parentLink' => ArrayHelper::getValue($kwargs, 'parentLink'),
-                'onDelete' => ArrayHelper::getValue($kwargs, 'onDelete', Delete::CASCADE),
-            ]);
+            $kwargs['rel'] = ManyToOneRel::createObject(
+                [
+                    'fromField' => $this,
+                    'to' => ArrayHelper::getValue($kwargs, 'to'),
+                    'toField' => ArrayHelper::getValue($kwargs, 'toField'),
+                    'parentLink' => ArrayHelper::getValue($kwargs, 'parentLink'),
+                    'onDelete' => ArrayHelper::getValue($kwargs, 'onDelete', Delete::CASCADE),
+                ]
+            );
         endif;
 
         $this->toField = ArrayHelper::getValue($kwargs, 'toField');
@@ -61,15 +63,9 @@ class ForeignKey extends RelatedField
      */
     public function getRelatedField()
     {
-        if (is_string($this->relation->getToModel())):
-            throw new ValueError(sprintf('Related model %s cannot be resolved', $this->relation->getToModel()));
-        endif;
+        $fields = $this->getRelatedFields();
 
-        if (empty($this->toField)):
-            return $this->relation->getToModel()->meta->primaryKey;
-        endif;
-
-        return $this->relation->getToModel()->meta->getField($this->toField);
+        return $fields[1];
     }
 
     /**
@@ -101,4 +97,57 @@ class ForeignKey extends RelatedField
     {
         return sprintf('%s_id', $this->name);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConstructorArgs()
+    {
+        $kwargs = parent::getConstructorArgs();
+
+        if ($this->dbIndex) :
+            unset($kwargs['dbIndex']);
+        else:
+            $kwargs['dbIndex'] = false;
+        endif;
+        if ($this->dbConstraint === false) :
+            $kwargs['dbConstraint'] = $this->dbConstraint;
+        endif;
+
+        return $kwargs;
+    }
+
+    public function getReverseRelatedFields()
+    {
+        list($fromField, $toField) = $this->getRelatedFields();
+
+        return [$toField, $fromField];
+    }
+
+    public function getJoinColumns($reverse = false)
+    {
+        if ($reverse):
+            return $this->getReverseRelatedFields();
+        endif;
+
+        return $this->getRelatedFields();
+    }
+
+    public function getReverseJoinColumns()
+    {
+        return $this->getJoinColumns(true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getColExpression($alias, $outputField = null)
+    {
+        if (is_null($outputField)):
+            $outputField = $this->getRelatedField();
+        endif;
+
+        return parent::getColExpression($alias, $outputField);
+    }
+
 }

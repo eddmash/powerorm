@@ -5,9 +5,9 @@ Change Log
 Version 1.1.0-Pre-Alpha
 
 .. contents::
-    :local:
+:local:
     :depth: 4
-==============================
+                                    ==============================
 
 **Rewrite of the PowerOrm**
 
@@ -90,7 +90,7 @@ Additions
 
 Improvements and Fixes
 -----------------------
-    
+
     - Provides a consistent api for the models meta data, for easier access.
     - A consistent approach to how checks are carried out.
     - Migrations operations
@@ -99,7 +99,7 @@ Improvements and Fixes
 
 Rewrites
 -----------------------
-    
+
     - The whole migration module.
         
         - This module saw the addition of some important class:
@@ -151,8 +151,8 @@ Rewrites
          - Whilst the new Form Module has its own validation technique, it heavily 
            relies of the  Ci_form_validation class. the new validation technique is meant
            to be used when doing validation that is not handle by Ci_form_validation class.
+ 	 
+	 You will mostly use it in the following form methods , i.e. if you have defined a form class :
 
-    You will mostly use it in the following form methods , i.e. if you have defined a form class :
-
-        - the forms clean() method.
-        - the forms clean_{field_name}() method.
+                    - the forms clean() method
+                    - the forms clean_{field_name}() method

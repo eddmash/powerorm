@@ -36,7 +36,7 @@ abstract class FieldOperation extends Operation
 
     public function referencesModel($modelName)
     {
-        return $this->modelName === $modelName;
+        return strtolower($this->modelName) === strtolower($modelName);
     }
 
     public function __debugInfo()

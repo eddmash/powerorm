@@ -37,13 +37,15 @@ class OneToOneField extends ForeignKey
         $kwargs['unique'] = true;
 
         if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
-            $kwargs['rel'] = OneToOneRel::createObject([
-                'fromField' => $this,
-                'to' => ArrayHelper::getValue($kwargs, 'to'),
-                'toField' => ArrayHelper::getValue($kwargs, 'toField'),
-                'parentLink' => ArrayHelper::getValue($kwargs, 'parentLink'),
-                'onDelete' => ArrayHelper::getValue($kwargs, 'onDelete', Delete::CASCADE),
-            ]);
+            $kwargs['rel'] = OneToOneRel::createObject(
+                [
+                    'fromField' => $this,
+                    'to' => ArrayHelper::getValue($kwargs, 'to'),
+                    'toField' => ArrayHelper::getValue($kwargs, 'toField'),
+                    'parentLink' => ArrayHelper::getValue($kwargs, 'parentLink'),
+                    'onDelete' => ArrayHelper::getValue($kwargs, 'onDelete', Delete::CASCADE),
+                ]
+            );
         endif;
 
         parent::__construct($kwargs);
@@ -59,5 +61,19 @@ class OneToOneField extends ForeignKey
         endif;
 
         return parent::formField($kwargs);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConstructorArgs()
+    {
+        $kwargs = parent::getConstructorArgs();
+
+        if (array_key_exists('unique', $kwargs)) :
+            unset($kwargs['unique']);
+        endif;
+
+        return $kwargs;
     }
 }

@@ -20,9 +20,12 @@
 
 namespace Eddmash\PowerOrm;
 
+use Closure;
+
 abstract class DeconstructableObject extends BaseObject implements DeConstructableInterface
 {
     private $constructorArgs;
+    const DEBUG_IGNORE = [];
 
     /**
      * {@inheritdoc}
@@ -55,4 +58,26 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
     {
         $this->constructorArgs = $constructorArgs;
     }
+
+    public function __debugInfo()
+    {
+        $meta = [];
+        foreach (get_object_vars($this) as $name => $value) :
+            if (in_array($name, $this->getIgnored())):
+                continue;
+            endif;
+            if (is_object($value) && !($value instanceof Closure)):
+                $value = (string) $value;
+            endif;
+            $meta[$name] = $value;
+        endforeach;
+
+        return $meta;
+    }
+
+    public function getIgnored()
+    {
+        return array_merge(self::DEBUG_IGNORE, ['constructorArgs']);
+    }
+
 }

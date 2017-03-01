@@ -14,11 +14,11 @@
 
         <p>To start using the orm, load it like any other CODIGNTER library, preferably using autoload, this load the
             orm early enough allowing for better perfomance</p>
-<pre><code>$autoload['libraries'] = array(
-    'powerdispatch/signal',
-    'powerorm/orm', <------------------------------------ the orm
-    'powerauth/auth'
-    );</code></pre>
+        <pre><code>$autoload['libraries'] = array(
+            'powerdispatch/signal',
+            'powerorm/orm', <------------------------------------ the orm
+            'powerauth/auth'
+            );</code></pre>
     </div>
 
 
@@ -49,10 +49,10 @@
     <h4><strong>Extending</strong></h4>
 
     <p>Extend this class on model classes e.g.</p>
-<pre><code>User_model extends PModel{
-    protected $table_name= '';
-    ...
-    }</code></pre>
+    <pre><code>User_model extends PModel{
+        protected $table_name= '';
+        ...
+        }</code></pre>
     <p>The <code>table_name</code> variable is optional, this tells the orm which database table this model represents.
         if
         not set
@@ -71,21 +71,21 @@
         <li>
             <p>The first Queryset method invoked on the model creates that models Queryset.
                 Each of this methods below create a new Queryset instance.</p>
-<pre><code>$this->user_model->get(array('name'=>'john'));
-    $this->user_model->all());</code></pre>
+            <pre><code>$this->user_model->get(array('name'=>'john'));
+                $this->user_model->all());</code></pre>
         </li>
         <li>
             <p>Several Queryset methods can be chained together to refine the query.</p>
-<pre><code>$this->user_model->all()->filter(array('username'=>'admin'));
-    **************************************************
-    SELECT `user`.*
-    FROM `user`
-    *************************************************
-    $this->user_model->all()->filter(array('username'=>'admin'));
-    ----------
-    SELECT `user`.*
-    FROM `user`
-    WHERE `user`.`username` = 'admin'</code></pre>
+            <pre><code>$this->user_model->all()->filter(array('username'=>'admin'));
+                **************************************************
+                SELECT `user`.*
+                FROM `user`
+                *************************************************
+                $this->user_model->all()->filter(array('username'=>'admin'));
+                ----------
+                SELECT `user`.*
+                FROM `user`
+                WHERE `user`.`username` = 'admin'</code></pre>
         </li>
         <li>Queryset is evaluated to get data from the database.</li>
     </ul>
@@ -136,12 +136,12 @@
     <p>e.g count all users</p>
     <pre><code> $this->user_model->all()->size(array('name'=>'john')) </code></pre>
     <p>get all users with the name <code>name=john</code></p>
-<pre><code> $this->user_model->all()->filter(array('name'=>'john'))
+    <pre><code> $this->user_model->all()->filter(array('name'=>'john'))
 
-    // which can also be handle as follows
+        // which can also be handle as follows
 
-    $this->user_model->filter(array('name'=>'john'))
-</code></pre>
+        $this->user_model->filter(array('name'=>'john'))
+    </code></pre>
     <h4><strong>Getting Results</strong> (Lazily Loading and Evaluation)</h4>
 
     <p>To get results from the database, the Queryset object has to be evaluated, the reason for this is to hold
@@ -151,10 +151,10 @@
     <ul>
         <li>
             <p>When looping through the Queryset using foreach.</p>
-<pre><code> $admins = $this->role->all();
-    foreach($admins as $admin){
-    ...
-    } </code></pre>
+            <pre><code> $admins = $this->role->all();
+                foreach($admins as $admin){
+                ...
+                } </code></pre>
         </li>
         <li>
             <p>When using a Queryset like a string e.g. in an echo statement.</p>
@@ -162,10 +162,10 @@
         </li>
         <li>
             <p>When testing or existence of a property e.g. using isset().</p>
-<pre><code>$admin_role = $this->role->get(array('name'=>'admin'));
-    if(isset($admin_role->description)){
-    ...
-    }</code></pre>
+            <pre><code>$admin_role = $this->role->get(array('name'=>'admin'));
+                if(isset($admin_role->description)){
+                ...
+                }</code></pre>
             .
         </li>
         <li>
@@ -196,42 +196,42 @@
     <p>We want to list articles along with their title and author’s name.</p>
 
     <p>This could be achieved using the following</p>
-<pre><code>$articles = $this->article_model->all()
+    <pre><code>$articles = $this->article_model->all()
 
-    foreach($articles as $article){
-    $article->author->name;
-    }
-</code></pre>
+        foreach($articles as $article){
+        $article->author->name;
+        }
+    </code></pre>
     <p>Assuming we have 20 articles in the database, the above code will produce 20+1 queries to the database</p>
-<pre><code> // one to fetch all the articles
+    <pre><code> // one to fetch all the articles
 
-    select * from articles;
+        select * from articles;
 
-    // then based on the value of foreign_key to the author on each article, an author is
-    // fetched resultin in 20 more queries hence the N+1.
+        // then based on the value of foreign_key to the author on each article, an author is
+        // fetched resultin in 20 more queries hence the N+1.
 
-    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
-    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
-    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
-    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
-    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?</code></pre>
+        SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+        SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+        SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+        SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?
+        SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' = ?</code></pre>
     <p>To solve this problem use the \Queryset::with().</p>
 
     <p>The method tells the orm to eagerly load the article and authors in one go when the Queryset is being evaluated.
         which will result in two sql queries as shown below:</p>
-<pre><code>$articles = $this->with(['author'])->article_model->all()
+    <pre><code>$articles = $this->with(['author'])->article_model->all()
 
-    foreach($articles as $article){
-    $article->author->name;
-    }
+        foreach($articles as $article){
+        $article->author->name;
+        }
 
-    // one to fetch all the articles
+        // one to fetch all the articles
 
-    SELECT 'articles'.* FROM 'articles'
+        SELECT 'articles'.* FROM 'articles'
 
-    //one to fetch all authors
+        //one to fetch all authors
 
-    SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' IN (1,2,3,4,5)</code></pre>
+        SELECT 'authors'.* FROM 'authors' WHERE 'authors'.'id' IN (1,2,3,4,5)</code></pre>
     <p>example borrowed from <a href="http://www.sitepoint.com/silver-bullet-n1-problem/"><a
             href="http://www.sitepoint.com/silver-bullet-n1-problem/">http://www.sitepoint.com/silver-bullet-n1-problem/</a></a>
     </p>

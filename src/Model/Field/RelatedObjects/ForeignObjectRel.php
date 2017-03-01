@@ -86,6 +86,16 @@ class ForeignObjectRel extends BaseObject
         return $this->fromField->oneToOne;
     }
 
+    public function getJoinColumns()
+    {
+        return $this->fromField->getReverseJoinColumns();
+    }
+
+    public function getLookup($name)
+    {
+        return $this->fromField->getLookup($name);
+    }
+
     public function __toString()
     {
         return (string) sprintf('<Rel %s>', $this->toModel->meta->modelName);

@@ -10,7 +10,7 @@ cs_fixer*
 #-------------------------
 # # Jetbrains editors (PHPStorm, etc)
 #-------------------------
-.idea
+.idea/
 
-api
-docs/build
+api/
+docs/build/

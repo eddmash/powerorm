@@ -1,4 +1,3 @@
-
 #############################
 Multi-table inheritance
 #############################
@@ -42,7 +41,7 @@ Loading models :
 
 .. code-block:: php
 
- 	$this->load->model('place');
+    $this->load->model('place');
  	$this->load->model('restraurant');
 
 All of the fields of Place will also be available in Restaurant, although the data will reside in a

@@ -22,7 +22,7 @@ class StateRegistry extends Registry
     {
         parent::__construct();
 
-        $this->_populate($modelStates);
+        $this->hydrate($modelStates);
     }
 
     /**
@@ -36,7 +36,7 @@ class StateRegistry extends Registry
     /**
      * {@inheritdoc}
      */
-    protected function _populate($modelStates)
+    protected function hydrate($modelStates)
     {
         /** @var $modelState ModelState */
         foreach ($modelStates as $name => $modelState) :

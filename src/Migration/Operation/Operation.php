@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\DeconstructableObject;
+use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 use Eddmash\PowerOrm\Model\Model;
@@ -70,12 +71,12 @@ abstract class Operation extends DeconstructableObject implements OperationInter
 
         if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Migration\Operation\Model')):
             $alias = 'modelOperation';
-        $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Model as %s', $alias);
+            $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Model as %s', $alias);
         endif;
 
         if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Migration\Operation\Field')):
             $alias = 'fieldOperation';
-        $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Field as %s', $alias);
+            $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Field as %s', $alias);
         endif;
 
         return [
@@ -93,13 +94,15 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @return mixed
      *
+     * @throws NotImplemented
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function updateState($state)
     {
-        // TODO: Implement updateState() method.
+        throw new NotImplemented();
     }
 
     /**
@@ -139,8 +142,8 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * replaced with or a boolean that indicates whether or not the specified
      * operation can be optimized across.
      *
-     * @param Operation $operation
-     * @param array     $inBetween
+     * @param Operation   $operation
+     * @param Operation[] $inBetween
      *
      * @return mixed
      *

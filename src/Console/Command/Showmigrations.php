@@ -30,16 +30,17 @@ class Showmigrations extends BaseCommand
         foreach ($leaves as $leaf) :
             $list = $loader->graph->getAncestryTree($leaf);
 
-        foreach ($list as $item) :
+            foreach ($list as $item) :
                 $migrationName = array_pop(explode('\\', $item));
 
-        if (in_array($item, $loader->appliedMigrations)):
-                    $indicator = '<info>(applied)</info>'; else:
+                if (in_array($item, $loader->appliedMigrations)):
+                    $indicator = '<info>(applied)</info>';
+                else:
                     $indicator = '(pending)';
-        endif;
+                endif;
 
-        $output->writeln(sprintf('%1$s %2$s', $indicator, $migrationName));
-        endforeach;
+                $output->writeln(sprintf('%1$s %2$s', $indicator, $migrationName));
+            endforeach;
         endforeach;
     }
 

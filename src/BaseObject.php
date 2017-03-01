@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm;
 
-use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Helpers\Tools;
 
 /**
@@ -146,32 +145,14 @@ class BaseObject
         $parents = [];
         while ($reflectionClass->getParentClass()):
             $reflectionClass = $reflectionClass->getParentClass();
-        if (in_array($reflectionClass->getName(), $stopAt)):
+            if (in_array($reflectionClass->getName(), $stopAt)):
                 break;
-        endif;
-        $parents[$reflectionClass->getName()] = $reflectionClass;
+            endif;
+            $parents[$reflectionClass->getName()] = $reflectionClass;
         endwhile;
 
         return $parents;
     }
-
-//    /**
-//     * Create an instance of the current class.override this method to match with the class constructor.
-//     *
-//     * @param array $config (optional) The configs to pass to the classes constructor
-//     *
-//     * @return static
-//     *
-//     * @throws NotImplemented
-//     *
-//     * @since 1.1.0
-//     *
-//     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-//     */
-//    public static function createObject()
-//    {
-//        throw new NotImplemented('method not implemented');
-//    }
 
     public function __toString()
     {

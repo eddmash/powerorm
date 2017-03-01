@@ -33,9 +33,16 @@ class Asker
         $this->output = $output;
     }
 
+    /**
+     * @param Question $question
+     *
+     * @throws NotImplemented
+     *
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
     public function ask(Question $question)
     {
-        throw new NotImplemented('ask() method needs to be implemented');
+        return;
     }
 
     public static function createObject(InputInterface $input, OutputInterface $output)

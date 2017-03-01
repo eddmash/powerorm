@@ -203,8 +203,11 @@ class Console
         } else {
             // try stty if available
             $stty = [];
-            if (exec('stty -a 2>&1', $stty) && preg_match('/rows\s+(\d+);\s*columns\s+(\d+);/mi', implode(' ', $stty),
-                    $matches)
+            if (exec('stty -a 2>&1', $stty) && preg_match(
+                    '/rows\s+(\d+);\s*columns\s+(\d+);/mi',
+                    implode(' ', $stty),
+                    $matches
+                )
             ) {
                 return $size = [$matches[2], $matches[1]];
             }

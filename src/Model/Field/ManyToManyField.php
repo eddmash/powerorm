@@ -17,9 +17,11 @@ use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Migration\FormatFileContent;
 use Eddmash\PowerOrm\Model\Delete;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToManyRel;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\M2MQueryset;
 
 /**
  * Provide a many-to-many relation by using an intermediary model that holds two ForeignKey fields pointed at the two
@@ -47,6 +49,9 @@ class ManyToManyField extends RelatedField
      * @var ManyToManyRel
      */
     public $relation;
+    public $m2mField;
+    public $m2mReverseField;
+    private $hasNullKwarg;
 
     public function __construct($kwargs)
     {
@@ -90,10 +95,22 @@ class ManyToManyField extends RelatedField
         else:
             $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
         endif;
+
+        $this->bindValue(
+            $this->scopeModel,
+            $this->createManyQueryset($this->relation, $this->scopeModel->meta->modelName, false),
+            true
+        );
     }
 
-    public function contributeToRelatedClass($relatedModel, $scopeModel)
+    public function contributeToRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
     {
+        $this->m2mField = function () use ($relation) {
+            return $this->getM2MAttr($relation, 'name');
+        };
+        $this->m2mReverseField = function () use ($relation) {
+            return $this->getM2MReverseAttr($relation, 'name');
+        };
     }
 
     /**
@@ -143,29 +160,15 @@ class ManyToManyField extends RelatedField
             ),
         ];
 
-//        $className = '\\'.$className;
 //        /** @var $intermediaryObj Model */
-
-//        $intermediaryObj = new $className();
-
-//        $intermediaryObj->init($fields, ['meta' => $meta, 'registry' => $field->scopeModel->meta->registry]);
-
         $intermediaryClass = FormatFileContent::createObject();
         $intermediaryClass->addItem(sprintf('class %1$s extends \%2$s{', $className, Model::getFullClassName()));
         $intermediaryClass->addItem('public function fields(){');
-//        $intermediaryClass->addItem('return [');
-//        $intermediaryClass->addItem(sprintf(" '%s' =>", $from));
-//        $intermediaryClass->addItem(sprintf("\\PModel::ForeignKey(['to' => %s, 'dbConstraint' => %s, 'onDelete' =>
-//        Delete::CASCADE])", $modelName, $field->relation->dbConstraint));
-//        $intermediaryClass->addItem(', ');
-//        $intermediaryClass->addItem(sprintf(" '%s' =>", $to));
-//        $intermediaryClass->addItem(sprintf("PModel::ForeignKey(['to' => %s,
-//            'dbConstraint' => %s, 'onDelete' => Delete::CASCADE, ])", $toModelName, $field->relation->dbConstraint));
-//        $intermediaryClass->addItem('];');
+
         $intermediaryClass->addItem('}');
         $intermediaryClass->addItem('public function getMetaSettings(){');
         $intermediaryClass->addItem('return [');
-        $intermediaryClass->addItem(sprintf("'dbTable' => '%s',", $field->_getM2MDbTable($model->meta)));
+        $intermediaryClass->addItem(sprintf("'dbTable' => '%s',", $field->getM2MDbTable($model->meta)));
         $intermediaryClass->addItem(sprintf("'verboseName' => '%s',", sprintf('%s-%s relationship', $from, $to)));
         $intermediaryClass->addItem(sprintf("'uniqueTogether' => ['%s','%s'],", $from, $to));
         $intermediaryClass->addItem("'autoCreated' => true");
@@ -196,7 +199,7 @@ class ManyToManyField extends RelatedField
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _getM2MDbTable($meta)
+    private function getM2MDbTable($meta)
     {
         if ($this->relation->through !== null):
             return $this->relation->through->meta->dbTable;
@@ -211,12 +214,12 @@ class ManyToManyField extends RelatedField
     public function checks()
     {
         $checks = parent::checks();
-        $checks = array_merge($checks, $this->_checkIgnoredKwargOptions());
+        $checks = array_merge($checks, $this->checkIgnoredKwargOptions());
 
         return $checks;
     }
 
-    public function _checkIgnoredKwargOptions()
+    private function checkIgnoredKwargOptions()
     {
         $warnings = [];
         if ($this->hasNullKwarg):
@@ -235,13 +238,54 @@ class ManyToManyField extends RelatedField
         return $warnings;
     }
 
-    public function setRelatedValue($value)
+    public function setValue(Model $modelInstance, $value)
     {
-        $queryset = $this->getRelatedQueryset();
-        // apply filter
-        $this->getReverseRelatedFilter($this->relation->getToModel());
+        $this->bindValue($modelInstance, $value);
+    }
 
-        return [$this->getAttrName(), $queryset];
+    private function bindValue(Model $modelInstance, $value, $contribute = false)
+    {
+        /* @var $queryset M2MQueryset */
+
+        if ($contribute) :
+            $modelInstance->_fieldCache[$this->name] = $value;
+        else:
+            $queryset = $this->getValue($modelInstance);
+            $queryset->set($value);
+        endif;
+
+    }
+
+    public function createManyQueryset(ForeignObjectRel $rel, $modelClass, $reverse = false)
+    {
+        $querysetClass = $modelClass::getQuerysetClass();
+
+        if (!class_exists('Eddmash\PowerOrm\Model\Query\ParentQueryset')) :
+            eval(sprintf('namespace Eddmash\PowerOrm\Model\Query;class ParentQueryset extends \%s{}', $querysetClass));
+        endif;
+
+        return function (Model $instance) use ($rel, $reverse) {
+
+            $queryset = M2MQueryset::createObject(
+                null,
+                null,
+                null,
+                [
+                    'rel' => $rel,
+                    'instance' => $instance,
+                    'reverse' => $reverse,
+                ]
+            );
+
+            return $queryset;
+        };
+    }
+
+    public function getValue(Model $modelInstance)
+    {
+        $callback = $modelInstance->_fieldCache[$this->name];
+
+        return $callback($modelInstance);
     }
 
     /**
@@ -252,8 +296,9 @@ class ManyToManyField extends RelatedField
      */
     public function getReverseRelatedFilter(Model $modelInstance)
     {
+        $m2mField = call_user_func($this->m2mField);
         /** @var $field RelatedField */
-        $field = $this->relation->through->meta->getField($this->getM2MAttr($modelInstance, 'name'));
+        $field = $this->relation->through->meta->getField($m2mField);
 
         list($lhs, $rhs) = $field->getRelatedFields();
         $name = sprintf('%s__%s', $lhs->name, $rhs->name);
@@ -261,7 +306,14 @@ class ManyToManyField extends RelatedField
         return [$name => $this->getForeignRelatedFieldsValues($modelInstance)];
     }
 
-    public function getM2MAttr(Model $model, $attr)
+    /***
+     * Gets the m2m relationship field on the through model.
+     * @param Model $model
+     * @param $attr
+     * @return mixed
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getM2MAttr(ForeignObjectRel $relation, $attr)
     {
         $cache_attr = sprintf('_m2m_%s_cache', $attr);
         if ($this->hasProperty($cache_attr)) :
@@ -276,7 +328,39 @@ class ManyToManyField extends RelatedField
         /** @var $field RelatedField */
         foreach ($this->relation->through->meta->getFields() as $field) :
             if ($field->isRelation &&
-                $field->relation->getToModel()->meta->modelName == $model->meta->modelName &&
+                $field->relation->toModel->meta->modelName == $relation->getFromModel()->meta->modelName &&
+                (is_null($linkName) || $linkName == $field->name)
+            ) :
+                $this->{$cache_attr} = $field->{$attr};
+
+                return $this->{$cache_attr};
+            endif;
+        endforeach;
+    }
+
+    /***
+     * Gets the m2m relationship field on the through model.
+     * @param Model $model
+     * @param $attr
+     * @return mixed
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getM2MReverseAttr(ForeignObjectRel $relation, $attr)
+    {
+        $cache_attr = sprintf('_m2m_reverse_%s_cache', $attr);
+        if ($this->hasProperty($cache_attr)) :
+            return $this->{$cache_attr};
+        endif;
+
+        $linkName = null;
+        if ($this->relation->through_fields) :
+            $linkName = $this->relation->through_fields[1];
+        endif;
+
+        /** @var $field RelatedField */
+        foreach ($this->relation->through->meta->getFields() as $field) :
+            if ($field->isRelation &&
+                $field->relation->toModel->meta->modelName == $relation->toModel->meta->modelName &&
                 (is_null($linkName) || $linkName == $field->name)
             ) :
                 $this->{$cache_attr} = $field->{$attr};
@@ -290,4 +374,46 @@ class ManyToManyField extends RelatedField
     {
         return parent::getRelatedQueryset($this->relation->through->meta->modelName);
     }
+
+    /**
+     * Get path from this field to the related model.
+     *
+     * @return array
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    private function pathInfo($direct = false)
+    {
+        $paths = [];
+        $model = $this->relation->through;
+
+        /* @var $field RelatedField */
+        /* @var $reverseField RelatedField */
+
+        $m2mField = call_user_func($this->m2mField);
+        $m2mReverseField = call_user_func($this->m2mReverseField);
+
+        $field = $model->meta->getField($m2mField);
+        $reverseField = $model->meta->getField($m2mReverseField);
+
+        if ($direct):
+            $paths = array_merge($paths, $field->getReversePathInfo());
+            $paths = array_merge($paths, $reverseField->getPathInfo());
+        else:
+            $paths = array_merge($paths, $reverseField->getReversePathInfo());
+            $paths = array_merge($paths, $field->getPathInfo());
+        endif;
+
+        return $paths;
+    }
+
+    public function getPathInfo()
+    {
+        return $this->pathInfo(true);
+    }
+
+    public function getReversePathInfo()
+    {
+        return $this->pathInfo(false);
+    }
+
 }

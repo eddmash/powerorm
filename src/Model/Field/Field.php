@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Doctrine\DBAL\Portability\Connection;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\DeconstructableObject;
@@ -24,6 +25,7 @@ use Eddmash\PowerOrm\Model\Lookup\In;
 use Eddmash\PowerOrm\Model\Lookup\RegisterLookupTrait;
 use Eddmash\PowerOrm\Model\Lookup\StartsWith;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
 class Field extends DeconstructableObject implements FieldInterface
 {
@@ -201,13 +203,18 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public $scopeModel;
 
+    /**
+     * caches value for this field.
+     *
+     * @var
+     */
+    private $cacheName;
+
     public $oneToMany = false;
     public $oneToOne = false;
     public $manyToMany = false;
     public $manyToOne = false;
     public $inverse = false;
-
-    private $constructorArgs;
 
     public function __construct($config = [])
     {
@@ -249,8 +256,12 @@ class Field extends DeconstructableObject implements FieldInterface
     {
         if (!StringHelper::isValidVariableName($fieldName)):
             throw new FieldError(
-                sprintf(' "%s" is not a valid field name on the model "%s" .', $fieldName,
-                    $modelObject->getFullClassName()));
+                sprintf(
+                    ' "%s" is not a valid field name on the model "%s" .',
+                    $fieldName,
+                    $modelObject->getFullClassName()
+                )
+            );
         endif;
 
         $this->scopeModel = $modelObject;
@@ -273,7 +284,7 @@ class Field extends DeconstructableObject implements FieldInterface
             $this->name = $fieldName;
         endif;
         $this->attrName = $this->getAttrName();
-        $this->concrete = empty($this->getColumnName());
+        $this->concrete = empty($this->getColumnName()) === false;
 
         if (empty($this->verboseName)):
             $this->verboseName = ucwords(str_replace('_', ' ', $this->name));
@@ -332,9 +343,9 @@ class Field extends DeconstructableObject implements FieldInterface
         if ($this->hasDefault()):
             if (is_callable($this->default)):
                 return call_user_func($this->default);
-        endif;
+            endif;
 
-        return $this->default;
+            return $this->default;
         endif;
 
         return '';
@@ -354,13 +365,18 @@ class Field extends DeconstructableObject implements FieldInterface
 
         if (!StringHelper::isValidVariableName($this->name)):
             $errors = [
-                CheckError::createObject([
-                    'message' => sprintf(' "%s" is not a valid field name on model %s .',
-                        $this->name, $this->scopeModel->getFullClassName()),
-                    'hint' => null,
-                    'context' => $this,
-                    'id' => 'fields.E001',
-                ]),
+                CheckError::createObject(
+                    [
+                        'message' => sprintf(
+                            ' "%s" is not a valid field name on model %s .',
+                            $this->name,
+                            $this->scopeModel->getFullClassName()
+                        ),
+                        'hint' => null,
+                        'context' => $this,
+                        'id' => 'fields.E001',
+                    ]
+                ),
             ];
         endif;
 
@@ -420,11 +436,11 @@ class Field extends DeconstructableObject implements FieldInterface
         foreach ($defaults as $name => $default) :
             $value = ($this->hasProperty($name)) ? $this->{$name} : $default;
 
-        if ($value != $default):
+            if ($value != $default):
 
                 $constArgs[$name] = $value;
 
-        endif;
+            endif;
         endforeach;
 
         return $constArgs;
@@ -565,22 +581,72 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function __toString()
     {
-        return $this->scopeModel->getFullClassName().'->'.$this->name;
+        $class = (!is_object($this->scopeModel)) ? '' : $this->scopeModel->getFullClassName();
+
+        $name = (is_null($this->name)) ? '' : $this->name;
+
+        return sprintf('< %s : (%s %s)>', self::class, $class, $name);
     }
 
-//    public function __debugInfo()
-//    {
-//        $field = [];
-//        foreach (get_object_vars($this) as $name => $value) :
-//            if (in_array($name, self::DEBUG_IGNORE)):
-//                $meta[$name] = (is_subclass_of($value, BaseObject::getFullClassName())) ?: '** hidden **';
-//                continue;
-//            endif;
-//            $field[$name] = $value;
-//        endforeach;
+    /**
+     * @return mixed
+     */
+    public function getCacheName()
+    {
+        return $this->cacheName;
+    }
 
-//        return $field;
-//    }
+    /**
+     * @param mixed $cacheName
+     */
+    public function setCacheName($cacheName)
+    {
+        $this->cacheName = $cacheName;
+    }
+
+    /**
+     * @param $alias
+     * @param Field|ForeignObjectRel $outputField
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @return Col
+     */
+    public function getColExpression($alias, $outputField = null)
+    {
+        if (is_null($outputField)):
+            $outputField = $this;
+        endif;
+
+        if ($alias !== $this->scopeModel->meta->dbTable && $outputField->name !== $this->name):
+            return Col::createObject($alias, $this, $outputField);
+        endif;
+
+        return Col::createObject($alias, $this);
+    }
+
+    public function selectFormat(Connection $connection, $sql, $params)
+    {
+        return [$sql, $params];
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue(Model $modelInstance)
+    {
+        return $modelInstance->{$this->name};
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function setValue(Model $modelInstance, $value)
+    {
+        $modelInstance->_fieldCache[$this->name] = $value;
+    }
 }
 
 Field::registerLookup(Contains::class);

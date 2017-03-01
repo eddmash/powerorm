@@ -108,8 +108,6 @@ class ClassHelper
      */
     public static function classExists($className, $namespace)
     {
-        $orgClassName = $className;
-
         if (class_exists($className)):
             return $className;
         endif;
