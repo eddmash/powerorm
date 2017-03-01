@@ -1,3 +1,4 @@
+
 #############################
 Proxy models
 #############################
@@ -55,7 +56,7 @@ the `proxy` meta setting of the class to True.
 
 .. code-block:: php
 
-     // load model
+	 // load model
 	 $this->load->model('employee');
 	 $this->load->model('auditor');
 
@@ -64,7 +65,7 @@ In particular, any new instances of Employee will also be accessible through Aud
 
 .. code-block:: php
 
-     $p = $this->employee->create(['name='foobar']);
+	 $p = $this->employee->create(['name='foobar']);
 	 $this->auditor->get(['name'='foobar']);
 
 .. note:: QuerySets still return the model that was requested

@@ -5,9 +5,9 @@ Change Log
 Version 1.1.0-Pre-Alpha
 
 .. contents::
-:local:
+    :local:
     :depth: 4
-                                    ==============================
+==============================
 
 **Rewrite of the PowerOrm**
 
@@ -90,7 +90,7 @@ Additions
 
 Improvements and Fixes
 -----------------------
-
+    
     - Provides a consistent api for the models meta data, for easier access.
     - A consistent approach to how checks are carried out.
     - Migrations operations
@@ -99,7 +99,7 @@ Improvements and Fixes
 
 Rewrites
 -----------------------
-
+    
     - The whole migration module.
         
         - This module saw the addition of some important class:

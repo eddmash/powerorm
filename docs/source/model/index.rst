@@ -3,13 +3,13 @@ Model
 #############################
 
 .. contents::
-:local:
+    :local:
     :depth: 2
 
-                                        A model is the single, definitive source of information about your data. It contains the essential fields and behaviors
-                                        of the data you're storing. Generally, each model maps to a single database table.
+A model is the single, definitive source of information about your data. It contains the essential fields and behaviors
+of the data you're storing. Generally, each model maps to a single database table.
 
-                                        A model is a PHP class that subclasses ``PModel`` or ``Eddmash\PowerOrm\Model\Model``.
+A model is a PHP class that subclasses ``PModel`` or ``Eddmash\PowerOrm\Model\Model``.
 
 Quick example
 ================
@@ -61,7 +61,7 @@ The above Person model would create a database table like this:
     );
 
 .. note::
-- The name of the table, user, is automatically derived from some model metadata but can be overridden.
+    - The name of the table, user, is automatically derived from some model metadata but can be overridden.
       See  :ref:`Table names for more details<table-names>`.
 
     - An id field is added automatically, but this behavior can be overridden.
@@ -286,12 +286,12 @@ A complete list of all possible Meta options can be found in the :doc:`model opt
 
 
 .. toctree::
-:caption: More Model Information
-       :titlesonly:
+   :caption: More Model Information
+   :titlesonly:
 
-                                           inheritance
-                                           multi_table_inheritance
-                                           abstract
-                                           proxy
-                                           meta/index
-                                           field/index
+   inheritance
+   multi_table_inheritance
+   abstract
+   proxy
+   meta/index
+   field/index
