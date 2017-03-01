@@ -44,11 +44,12 @@ class M2MQueryset extends ParentQueryset
 
     public function __construct(Connection $connection = null, Model $model = null, Query $query = null, $kwargs = [])
     {
+
         $this->instance = ArrayHelper::getValue($kwargs, 'instance');
 
         /** @var ForeignObjectRel $rel */
         $rel = ArrayHelper::getValue($kwargs, 'rel');
-        $this->reverse = ArrayHelper::getValue($kwargs, 'reverse');
+        $this->reverse = ArrayHelper::getValue($kwargs, 'reverse', false);
 
         if ($this->reverse === false):
             $model = $rel->toModel;
@@ -85,7 +86,7 @@ class M2MQueryset extends ParentQueryset
             );
         endif;
 
-        parent::__construct(null, $model);
+        parent::__construct(null, $model, null, $kwargs);
     }
 
     public function add($values = [])
@@ -95,7 +96,7 @@ class M2MQueryset extends ParentQueryset
 
     public function set($values, $kwargs = [])
     {
-        $clear = ArrayHelper::getValue($kwargs, "clear", false);
+        $clear = ArrayHelper::getValue($kwargs, 'clear', false);
         if ($clear) :
         else:
             $this->add($values);
@@ -104,7 +105,7 @@ class M2MQueryset extends ParentQueryset
 
     private function addItems($fromFieldName, $toFieldName, $values = [])
     {
-        /**@var $field RelatedField*/
+        /* @var $field RelatedField */
         if ($values) :
             $newIds = [];
             foreach ($values as $value) :
@@ -113,18 +114,12 @@ class M2MQueryset extends ParentQueryset
             endforeach;
             $newIds = array_unique($newIds);
 
-            /**@var $throughClass Model*/
-
+            /** @var $throughClass Model */
             $throughClass = $this->through->meta->modelName;
 
-
             $vals = $throughClass::objects()->asArray([$toFieldName], true)->filter([
-                $fromFieldName => $this->relatedValues[0]
+                $fromFieldName => $this->relatedValues[0],
             ]);
-            var_dump($vals->getSql());
-            echo "<pre>";
-            print_r($newIds);
-            echo "</pre>";
 
         endif;
     }

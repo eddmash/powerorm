@@ -416,10 +416,7 @@ class Query extends BaseObject
 
             /** @var $field Field */
             $field = null;
-            var_dump(array_keys($meta->getFields()));
-            echo "<br>";
-            echo $meta;
-            echo "<br><br><br>";
+
             try {
                 $field = $meta->getField($name);
             } catch (FieldDoesNotExist $e) {

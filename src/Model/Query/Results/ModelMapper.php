@@ -7,20 +7,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-
 namespace Eddmash\PowerOrm\Model\Query\Results;
-
 
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Model;
 
 class ModelMapper extends Mapper
 {
-
-
     /**
      * @return \Eddmash\PowerOrm\Model\Model[]
+     *
      * @internal param Model $model
      * @internal param array $results
      *

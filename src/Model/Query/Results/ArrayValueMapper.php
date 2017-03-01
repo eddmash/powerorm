@@ -7,16 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-
 namespace Eddmash\PowerOrm\Model\Query\Results;
-
 
 class ArrayValueMapper extends Mapper
 {
-
     /**
      * @return \Eddmash\PowerOrm\Model\Model[]
+     *
      * @internal param Model $model
      * @internal param array $results
      *
@@ -26,11 +23,12 @@ class ArrayValueMapper extends Mapper
      */
     public function __invoke()
     {
-        $results =  $this->queryset->query->execute($this->queryset->connection)->fetchAll();
+        $results = $this->queryset->query->execute($this->queryset->connection)->fetchAll();
         $values = [];
         foreach ($results as $result) :
             $values[] = array_values($result);
         endforeach;
+
         return $values;
     }
 }

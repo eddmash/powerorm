@@ -73,13 +73,15 @@ class Queryset implements QuerysetInterface
      */
     protected $_resultsCache;
     private $_fields;
+    protected $kwargs = [];
 
     public function __construct(Connection $connection = null, Model $model = null, Query $query = null, $kwargs = [])
     {
         $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
         $this->query = ($query == null) ? $this->getQueryBuilder() : $query;
-        $this->resultMapper = ArrayHelper::getValue($kwargs, "resultMapper", ModelMapper::class);
+        $this->resultMapper = ArrayHelper::pop($kwargs, 'resultMapper', ModelMapper::class);
+        $this->kwargs = $kwargs;
     }
 
     private function getConnection()
@@ -88,8 +90,10 @@ class Queryset implements QuerysetInterface
     }
 
     /**
-     * @param $connection
-     * @param $model
+     * @param Connection $connection
+     * @param Model      $model
+     * @param Query      $query
+     * @param array      $kwargs
      *
      * @return static
      *
@@ -365,6 +369,7 @@ class Queryset implements QuerysetInterface
     {
         return new $this->resultMapper($this);
     }
+
     public function _toSql()
     {
 
@@ -373,7 +378,7 @@ class Queryset implements QuerysetInterface
         return $clone->query->getNestedSql($this->connection);
     }
 
-    public function asArray($fields=[], $valuesOnly=false)
+    public function asArray($fields = [], $valuesOnly = false)
     {
         $clone = $this->_clone();
         $clone->_fields = $fields;
@@ -389,7 +394,7 @@ class Queryset implements QuerysetInterface
         $clone->query->setValueSelect($fields);
         $clone->query->addFields($fields, true);
 
-        $clone->resultMapper = ($valuesOnly)? ArrayValueMapper::class : ArrayMapper::class;
+        $clone->resultMapper = ($valuesOnly) ? ArrayValueMapper::class : ArrayMapper::class;
 
         return $clone;
     }
@@ -506,6 +511,8 @@ class Queryset implements QuerysetInterface
     {
         $qb = clone $this->query;
 
-        return self::createObject($this->connection, $this->model, $qb, ["resultMapper"=>$this->resultMapper]);
+        $kwargs = array_merge(['resultMapper' => $this->resultMapper], $this->kwargs);
+
+        return self::createObject($this->connection, $this->model, $qb, $kwargs);
     }
 }

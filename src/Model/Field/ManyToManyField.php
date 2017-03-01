@@ -110,11 +110,6 @@ class ManyToManyField extends RelatedField
         };
     }
 
-    public function createManager(ForeignObjectRel $relation)
-    {
-
-    }
-
     /**
      * Creates an intermediary model.
      *
