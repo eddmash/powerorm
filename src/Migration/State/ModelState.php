@@ -38,6 +38,7 @@ use Eddmash\PowerOrm\Model\Model;
 class ModelState extends BaseObject
 {
     public $name;
+    /** @var Field[] */
     public $fields = [];
     public $meta = [];
     public $extends;
@@ -132,7 +133,11 @@ class ModelState extends BaseObject
         $extends = $this->extends;
 
         $model = $this->createInstance($this->name, $extends);
-        $model->init($this->fields, ['meta' => $metaData, 'registry' => $registry]);
+        $fields = [];
+        foreach ($this->fields as $name => $field) :
+            $fields[$name] = $field->deepClone();
+        endforeach;
+        $model->init($fields, ['meta' => $metaData, 'registry' => $registry]);
 
         return $model;
     }

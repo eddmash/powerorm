@@ -961,8 +961,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $forceInsert = false,
         $forceUpdate = false,
         $updateFields = null
-    )
-    {
+    ) {
         $meta = $this->meta;
 
         $nonPkFields = [];

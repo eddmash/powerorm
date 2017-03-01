@@ -551,8 +551,11 @@ class AutoDetector extends BaseObject
 
             // depend on related model being created if primary key is a relationship field
             if ($primaryKeyRel !== null):
-                $opDep[] = ['target' => $primaryKeyRel->meta->modelName,
-                    'type' => self::TYPE_MODEL, 'action' => self::ACTION_CREATED, ];
+                $opDep[] = [
+                    'target' => $primaryKeyRel->meta->modelName,
+                    'type' => self::TYPE_MODEL,
+                    'action' => self::ACTION_CREATED,
+                ];
             endif;
 
             //we need to get the unbound fields
@@ -798,11 +801,13 @@ class AutoDetector extends BaseObject
             $modelState = $this->toState->modelStates[$addedProxy];
             assert($modelState->meta['proxy']);
 
-            $opDep = [[
-                'target' => $addedProxy,
-                'type' => self::TYPE_MODEL,
-                'action' => self::ACTION_DROPPED,
-            ]];
+            $opDep = [
+                [
+                    'target' => $addedProxy,
+                    'type' => self::TYPE_MODEL,
+                    'action' => self::ACTION_DROPPED,
+                ],
+            ];
 
             // create operation
             $this->addOperation(

@@ -96,8 +96,11 @@ class ManyToManyField extends RelatedField
             $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
         endif;
 
-        $this->setValue($this->scopeModel,
-            $this->createManyQueryset($this->relation, $this->scopeModel->meta->modelName, false));
+        $this->bindValue(
+            $this->scopeModel,
+            $this->createManyQueryset($this->relation, $this->scopeModel->meta->modelName, false),
+            true
+        );
     }
 
     public function contributeToRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
@@ -237,10 +240,14 @@ class ManyToManyField extends RelatedField
 
     public function setValue(Model $modelInstance, $value)
     {
+        $this->bindValue($modelInstance, $value);
+    }
+
+    private function bindValue(Model $modelInstance, $value, $contribute = false)
+    {
         /* @var $queryset M2MQueryset */
 
-        // on first round we are setting the queryset
-        if (!$modelInstance->hasProperty($this->name)) :
+        if ($contribute) :
             $modelInstance->_fieldCache[$this->name] = $value;
         else:
             $queryset = $this->getValue($modelInstance);
@@ -259,10 +266,16 @@ class ManyToManyField extends RelatedField
 
         return function (Model $instance) use ($rel, $reverse) {
 
-            $queryset = M2MQueryset::createObject(null, null, null, [
-                'rel' => $rel,
-                'instance' => $instance,
-                'reverse' => $reverse, ]);
+            $queryset = M2MQueryset::createObject(
+                null,
+                null,
+                null,
+                [
+                    'rel' => $rel,
+                    'instance' => $instance,
+                    'reverse' => $reverse,
+                ]
+            );
 
             return $queryset;
         };

@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
@@ -117,9 +118,11 @@ class M2MQueryset extends ParentQueryset
             /** @var $throughClass Model */
             $throughClass = $this->through->meta->modelName;
 
-            $vals = $throughClass::objects()->asArray([$toFieldName], true)->filter([
-                $fromFieldName => $this->relatedValues[0],
-            ]);
+            $vals = $throughClass::objects()->asArray([$toFieldName], true)->filter(
+                [
+                    $fromFieldName => $this->relatedValues[0],
+                ]
+            );
 
         endif;
     }
