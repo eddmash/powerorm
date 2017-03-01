@@ -22,24 +22,24 @@ class MigrationModel extends Model
 
     public static function defineClass($className, $extends = '')
     {
+        //        $namespace = 'Eddmash\PowerOrm\Migration\Model';
         $namespace = '';
         $use = '';
         $extendedClass = '';
         if (empty($extends) || Model::isModelBase($extends)):
-            $extends = Model::getFullClassName();
-        else:
+            $extends = Model::getFullClassName(); else:
             $extendedClass = sprintf('%s%s', ClassHelper::getFormatNamespace($namespace, true), $extends);
 
-            $use = sprintf('use %s;', $extendedClass);
+        $use = sprintf('use %s;', $extendedClass);
 
-            $extends = trim(substr($extends, strripos($extends, '\\')), '\\');
+        $extends = trim(substr($extends, strripos($extends, '\\')), '\\');
         endif;
 
         if (!StringHelper::isEmpty($extendedClass) && !ClassHelper::classExists($extendedClass, $namespace)):
 
             self::$deferedClasses[$extends][] = ['class' => $className, 'extends' => $extends];
 
-            return false;
+        return false;
         endif;
 
         $extends = ClassHelper::getNameFromNs($extends, $namespace);
@@ -52,7 +52,7 @@ class MigrationModel extends Model
             foreach (self::$deferedClasses[$className] as $deferedClass) :
 
                 self::defineClass($deferedClass['class'], $deferedClass['extends']);
-            endforeach;
+        endforeach;
         endif;
 
         if (!ClassHelper::classExists($className, $namespace)):

@@ -166,11 +166,11 @@ You can access the manager object for an model class via the objects() method:
         Role::objects()->filter(["code"=>"admin_role"], ["code"=>"user_role"])
 
 .. toctree::
-:titlesonly:
+   :titlesonly:
 
-       self
-       install
-       configuration
-       dependencies
-       features
-       credits
+   self
+   install
+   configuration
+   dependencies
+   features
+   credits

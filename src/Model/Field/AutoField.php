@@ -25,8 +25,6 @@ use Eddmash\PowerOrm\Checks\CheckError;
  */
 class AutoField extends Field
 {
-    public $primaryKey = true;
-
     public function checks()
     {
         $checks = [];
@@ -41,14 +39,12 @@ class AutoField extends Field
 
         if (!$this->primaryKey):
             $errors = [
-                CheckError::createObject(
-                    [
-                        'message' => 'AutoFields must set primaryKey=true.',
-                        'hint' => null,
-                        'context' => $this,
-                        'id' => 'fields.E100',
-                    ]
-                ),
+                CheckError::createObject([
+                    'message' => 'AutoFields must set primaryKey=true.',
+                    'hint' => null,
+                    'context' => $this,
+                    'id' => 'fields.E100',
+                ]),
             ];
         endif;
 
@@ -67,13 +63,9 @@ class AutoField extends Field
     {
         parent::contributeToClass($field, $model);
 
-        assert(
-            !$model->meta->hasAutoField,
-            sprintf(
-                "The Model '%s' more than one AutoField, which is not allowed.",
-                $this->scopeModel->meta->modelName
-            )
-        );
+        assert(!$model->meta->hasAutoField,
+            sprintf("The Model '%s' more than one AutoField, which is not allowed.",
+                $this->scopeModel->meta->modelName));
 
         $this->scopeModel->meta->hasAutoField = true;
         $this->scopeModel->meta->autoField = $this;

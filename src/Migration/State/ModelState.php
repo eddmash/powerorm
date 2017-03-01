@@ -38,7 +38,6 @@ use Eddmash\PowerOrm\Model\Model;
 class ModelState extends BaseObject
 {
     public $name;
-    /** @var Field[] */
     public $fields = [];
     public $meta = [];
     public $extends;
@@ -82,15 +81,10 @@ class ModelState extends BaseObject
                 try {
                     $fields[$name] = $field->deepClone();
                 } catch (\Exception $e) {
-                    throw new TypeError(
-                        sprintf(
-                            "Couldn't reconstruct field %s on %s: %s",
-                            $name,
-                            $model->meta->modelName
-                        )
-                    );
+                    throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name,
+                        $model->meta->modelName));
                 }
-            endforeach;
+        endforeach;
         endif;
 
         $overrides = $model->meta->getOverrides();
@@ -99,8 +93,8 @@ class ModelState extends BaseObject
         foreach ($overrides as $name => $value) :
             if (in_array($name, $ignore)):
                 continue;
-            endif;
-            $meta[$name] = $value;
+        endif;
+        $meta[$name] = $value;
         endforeach;
 
         $extends = '';
@@ -133,11 +127,7 @@ class ModelState extends BaseObject
         $extends = $this->extends;
 
         $model = $this->createInstance($this->name, $extends);
-        $fields = [];
-        foreach ($this->fields as $name => $field) :
-            $fields[$name] = $field->deepClone();
-        endforeach;
-        $model->init($fields, ['meta' => $metaData, 'registry' => $registry]);
+        $model->init($this->fields, ['meta' => $metaData, 'registry' => $registry]);
 
         return $model;
     }
@@ -183,13 +173,7 @@ class ModelState extends BaseObject
 
     public function deepClone()
     {
-        $fields = [];
-        /** @var $field Field */
-        foreach ($this->fields as $name => $field) :
-            $fields[$name] = $field->deepClone();
-        endforeach;
-
-        return static::createObject($this->name, $fields, ['meta' => $this->meta, 'extends' => $this->extends]);
+        return static::createObject($this->name, $this->fields, ['meta' => $this->meta, 'extends' => $this->extends]);
     }
 
     public function __toString()

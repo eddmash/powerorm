@@ -25,7 +25,7 @@ class MigrationQuestion
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function hasModelRenamed(Asker $asker, $oldModelName, $newModelName)
+    public static function hasModelRenamed($asker, $oldModelName, $newModelName)
     {
         $msg = 'Did you rename the %s model to %s? [y/N]';
 
@@ -47,7 +47,7 @@ class MigrationQuestion
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function hasFieldRenamed(Asker $asker, $modelName, $oldName, $newName, Field $fieldObj)
+    public static function hasFieldRenamed($asker, $modelName, $oldName, $newName, $fieldObj)
     {
         $msg = 'Did you rename %1$s.%2$s to %1$s.%3$s (a %4$s)? [y/N]';
 
@@ -58,16 +58,14 @@ class MigrationQuestion
 
     /**
      * @param Asker $asker
-     * @param $modelName
-     * @param $fieldName
-     *
-     * @return string|void
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @return string|void
      */
-    public static function askNotNullAddition(Asker $asker, $modelName, $fieldName)
+    public static function askNotNullAddition($asker, $modelName, $fieldName)
     {
         $msg = 'You are trying to add a non-nullable field "%s" to %s without a default; '.PHP_EOL.
             'we can\'t do that (the database needs something to populate existing rows).'.PHP_EOL.
@@ -91,24 +89,22 @@ class MigrationQuestion
             return;
         endif;
 
+        $default_val = '';
         $msg = 'Please enter the default value now, as valid PHP'.PHP_EOL;
         while (true):
             $default = $asker->ask(new Question($msg));
 
-            if (empty($default)):
-                $msg = "Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL;
-            elseif ($default == 'exit'):
-                return;
-            elseif ($default === false):
+        if (empty($default)):
+                $msg = "Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL; elseif ($default == 'exit'):
+                return; elseif ($default === false):
                 Console::error(PHP_EOL.' An error occured while trying to set default value');
 
-                return;
-            else:
+        return; else:
                 return $default;
-            endif;
+        endif;
         endwhile;
 
-        return self::getDefault($asker);
+        return self::_getDefault($asker);
     }
 
     /**
@@ -122,7 +118,7 @@ class MigrationQuestion
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function askNotNullAlteration(Asker $asker, $modelName, $fieldName)
+    public static function askNotNullAlteration($asker, $modelName, $fieldName)
     {
         $msg = 'You are trying to add a non-nullable field "%s" to %s without a default; '.PHP_EOL.
             ' we can\'t do that (the database needs something to populate existing rows).'.PHP_EOL.
@@ -144,12 +140,11 @@ class MigrationQuestion
         $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if ($selected == 2):
-            return NOT_PROVIDED;
-        elseif ($selected == 3):
+            return NOT_PROVIDED; elseif ($selected == 3):
             return;
         endif;
 
-        return self::getDefault($asker);
+        return self::_getDefault($asker);
     }
 
     /**
@@ -161,23 +156,20 @@ class MigrationQuestion
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private static function getDefault(Asker $asker)
+    private static function _getDefault($asker)
     {
         $default_val = '';
         $msg = 'Please enter the default value now, as valid PHP '.PHP_EOL;
         while (true):
             $default = $asker->ask(new Question($msg));
-            if (empty($default)):
-                $msg = " Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL;
-            elseif ($default == 'exit'):
-                break;
-            elseif ($default === false):
+        if (empty($default)):
+                $msg = " Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL; elseif ($default == 'exit'):
+                break; elseif ($default === false):
                 Console::error(PHP_EOL.' An error occured while trying to set default value');
-                break;
-            else:
+        break; else:
                 $default_val = $default;
-                break;
-            endif;
+        break;
+        endif;
         endwhile;
 
         return $default_val;

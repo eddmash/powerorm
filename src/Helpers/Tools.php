@@ -260,7 +260,7 @@ class Tools
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function lazyRelatedOperation($callback, Model $scopeModel, $relModel, $kwargs = [])
+    public static function lazyRelatedOperation($callback, $scopeModel, $relModel, $kwargs = [])
     {
         $relModel = self::resolveRelation($scopeModel, $relModel);
 
@@ -270,10 +270,9 @@ class Tools
         foreach ($relModels as $relM) :
             if (is_string($relM)):
 
-                $relatedModels[] = $relM;
-            elseif ($relM instanceof Model):
+                $relatedModels[] = $relM; elseif ($relM instanceof Model):
                 $relatedModels[] = $relM->meta->modelName;
-            endif;
+        endif;
         endforeach;
 
         $kwargs['scopeModel'] = $scopeModel;
@@ -282,13 +281,11 @@ class Tools
 
     public static function resolveRelation($model, $relModel)
     {
-        if (is_string($relModel) && $relModel == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT):
-            return self::resolveRelation($model, $model);
-        elseif ($relModel instanceof Model):
+        if ($relModel == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT):
+            return self::resolveRelation($model, $model); elseif ($relModel instanceof Model):
             return $relModel->meta->modelName;
         endif;
 
         return $relModel;
     }
-
 }

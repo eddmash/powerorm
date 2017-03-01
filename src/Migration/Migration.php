@@ -10,7 +10,6 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
@@ -145,7 +144,7 @@ class Migration implements MigrationInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function apply(ProjectState $state, SchemaEditor $schemaEditor)
+    public function apply($state, $schemaEditor)
     {
 
         /** @var $operation Operation */
@@ -153,13 +152,10 @@ class Migration implements MigrationInterface
             // preserve state before operation
             $oldState = $state->deepClone();
 
-            $operation->updateState($state);
-
-            $forwardCallback = function (Connection $connection) use ($operation, $schemaEditor, $oldState, $state) {
-                $operation->databaseForwards($schemaEditor, $oldState, $state);
-            };
-
-            $schemaEditor->connection->transactional($forwardCallback);
+        $operation->updateState($state);
+        $schemaEditor->connection->transactional(function () use ($operation, $schemaEditor, $oldState, $state) {
+            $operation->databaseForwards($schemaEditor, $oldState, $state);
+        });
         endforeach;
 
         return $state;
@@ -197,8 +193,8 @@ class Migration implements MigrationInterface
         foreach ($this->operations as $operation) :
             //Preserve new state from previous run to not tamper the same state over all operations
             $newState = $newState->deepClone();
-            $oldState = $newState->deepClone();
-            $operation->updateState($newState);
+        $oldState = $newState->deepClone();
+        $operation->updateState($newState);
             /*
              * we insert them in the reverse order so the last operation is run first
              */
@@ -211,13 +207,11 @@ class Migration implements MigrationInterface
 
         foreach ($itemsToRun as $runItem) :
 
-            $schemaEditor->connection->transactional(
-                function () use ($runItem, $schemaEditor) {
-                    /** @var $operation Operation */
-                    $operation = $runItem['operation'];
-                    $operation->databaseBackwards($schemaEditor, $runItem['newState'], $runItem['oldState']);
-                }
-            );
+            $schemaEditor->connection->transactional(function () use ($runItem, $schemaEditor) {
+                /** @var $operation Operation */
+                $operation = $runItem['operation'];
+                $operation->databaseBackwards($schemaEditor, $runItem['newState'], $runItem['oldState']);
+            });
         endforeach;
 
         return $state;

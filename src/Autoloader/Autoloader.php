@@ -106,9 +106,7 @@ class Autoloader
         // We have to have one or the other, though we don't enforce the need
         // to have both present in order to work.
         if (empty($config->psr4) && empty($config->classmap)) {
-            throw new \InvalidArgumentException(
-                'Config array must contain either the \'psr4\' key or the \'classmap\' key.'
-            );
+            throw new \InvalidArgumentException('Config array must contain either the \'psr4\' key or the \'classmap\' key.');
         }
 
         if (isset($config->psr4)) {
@@ -144,14 +142,13 @@ class Autoloader
         // Now prepend another loader for the files in our class map.
         $config = is_array($this->classmap) ? $this->classmap : [];
 
-        spl_autoload_register(
-            function ($class) use ($config) {
-                if (!array_key_exists($class, $config)) {
-                    return false;
-                }
+        spl_autoload_register(function ($class) use ($config) {
+            if (!array_key_exists($class, $config)) {
+                return false;
+            }
 
-                include_once $config[$class];
-            },
+            include_once $config[$class];
+        },
             true,   // Throw exception
             true    // Prepend
         );

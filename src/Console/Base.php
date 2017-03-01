@@ -27,6 +27,11 @@ class Base extends BaseObject
      */
     public $color;
 
+    /**
+     * @var array the options passed during execution
+     */
+    private $option_list = [];
+
     public $help = '';
     public $summary = '';
 

@@ -35,39 +35,30 @@ class CheckCommand extends BaseCommand
         if ($input->getOption('list-tags')):
             $output->writeln(implode(PHP_EOL, $availableTags));
 
-            return;
+        return;
         endif;
 
         $tags = $input->getOption('tag');
         if ($tags):
             $invalidTags = [];
-            foreach ($tags as $tag) :
+        foreach ($tags as $tag) :
                 if (!BaseOrm::getCheckRegistry()->tagExists($tag)):
                     $invalidTags[] = $tag;
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
-            if ($invalidTags):
-                throw new CommandError(
-                    sprintf(
-                        'There is no system check with the "%s" tag(s).',
-                        implode(', ', $invalidTags)
-                    )
-                );
-            endif;
+        if ($invalidTags):
+                throw new CommandError(sprintf('There is no system check with the "%s" tag(s).',
+                    implode(', ', $invalidTags)));
+        endif;
         endif;
 
         $failLevel = $input->getOption('fail-level');
         if ($failLevel):
             if (!in_array(strtoupper($failLevel), ['ERROR', 'WARNING', 'INFO', 'DEBUG', 'CRITICAL'])):
-                throw new CommandError(
-                    sprintf(
-                        "--fail-level: invalid choice: '%s' ".
-                        "(choices are 'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG')",
-                        $failLevel
-                    )
-                );
-            endif;
+                throw new CommandError(sprintf("--fail-level: invalid choice: '%s' ".
+                    "(choices are 'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG')", $failLevel));
+        endif;
 
         endif;
 
@@ -88,19 +79,13 @@ class CheckCommand extends BaseCommand
             ->setDescription($this->help)
             ->setHelp($this->help)
             ->addOption('list-tags', null, InputOption::VALUE_NONE, 'List available tags.')
-            ->addOption(
-                'fail-level',
-                null,
+            ->addOption('fail-level', null,
                 InputOption::VALUE_OPTIONAL,
                 'Message level that will cause the command to exit with a non-zero status.'.
                 '{CRITICAL, ERROR, WARNING, INFO, DEBUG}.',
                 'ERROR'
             )
-            ->addOption(
-                'tag',
-                '-t',
-                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Run only checks labeled with given tag.'
-            );
+            ->addOption('tag', '-t', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Run only checks labeled with given tag.');
     }
 }

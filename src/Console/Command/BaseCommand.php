@@ -26,6 +26,13 @@ abstract class BaseCommand extends Command
      */
     public $systemCheck = true;
 
+    /**
+     * Name of the manager file.
+     *
+     * @var
+     */
+    private $managerName;
+
     public $headerMessage = '
     **********************************************************%4$s****
         *    ___   ___           ___  ___  ___  ___           %3$s*
@@ -71,8 +78,8 @@ abstract class BaseCommand extends Command
 
         $out = $this->handle($input, $output);
 
-        if (!empty($output) && !empty($out)):
-            $output->writeln('success');
+        if (!empty($output)):
+            $output->writeln($out);
         endif;
     }
 
@@ -99,32 +106,31 @@ abstract class BaseCommand extends Command
 
             if ($check->isSerious($failLevel) && !$check->isSilenced()):
                 $serious[] = $check;
-            endif;
+        endif;
 
-            if ($check->level < CheckMessage::INFO && !$check->isSilenced()):
+        if ($check->level < CheckMessage::INFO && !$check->isSilenced()):
                 $debugs[] = $check;
-            endif;
+        endif;
 
             // info
             if ($check->level >= CheckMessage::INFO && $check->level < CheckMessage::WARNING && !$check->isSilenced()):
                 $info[] = $check;
-            endif;
+        endif;
 
             // warning
             if ($check->level >= CheckMessage::WARNING && $check->level < CheckMessage::ERROR && !$check->isSilenced()):
                 $warning[] = $check;
-            endif;
+        endif;
 
             //error
-            if ($check->level >= CheckMessage::ERROR && $check->level < CheckMessage::CRITICAL && !$check->isSilenced()
-            ):
+            if ($check->level >= CheckMessage::ERROR && $check->level < CheckMessage::CRITICAL && !$check->isSilenced()):
                 $errors[] = $check;
-            endif;
+        endif;
 
             //critical
             if ($check->level >= CheckMessage::CRITICAL && !$check->isSilenced()):
                 $critical[] = $check;
-            endif;
+        endif;
         endforeach;
 
         // get the count of visible issues only, hide the silenced ones
@@ -149,40 +155,35 @@ abstract class BaseCommand extends Command
         foreach ($categorisedIssues as $category => $categoryIssues) :
             if (empty($categoryIssues)):
                 continue;
-            endif;
-            $body .= sprintf(PHP_EOL.' %s'.PHP_EOL, strtoupper($category));
+        endif;
+        $body .= sprintf(PHP_EOL.' %s'.PHP_EOL, strtoupper($category));
 
-            foreach ($categoryIssues as $catIssue) :
+        foreach ($categoryIssues as $catIssue) :
 
                 if ($catIssue->isSerious()):
-                    $msg = ' <errorText>%s</errorText>'.PHP_EOL;
-                else:
+                    $msg = ' <errorText>%s</errorText>'.PHP_EOL; else:
                     $msg = ' <warning>%s</warning>'.PHP_EOL;
-                endif;
-                $body .= sprintf($msg, $catIssue);
-            endforeach;
+        endif;
+        $body .= sprintf($msg, $catIssue);
+        endforeach;
 
         endforeach;
 
         if ($showErrorCount):
             $issueText = ($visibleIssues === 1) ? 'issue' : 'issues';
-            $silenced = count($checks) - $visibleIssues;
-            if ($visibleIssues):
+        $silenced = count($checks) - $visibleIssues;
+        if ($visibleIssues):
                 $footer .= PHP_EOL;
-            endif;
-            $footer .= sprintf(
-                ' System check identified %s %s (%s silenced) ',
-                $visibleIssues,
-                $issueText,
-                $silenced
-            );
+        endif;
+        $footer .= sprintf(' System check identified %s %s (%s silenced) ',
+                $visibleIssues, $issueText, $silenced);
         endif;
 
         if (!empty($serious)):
             $header = sprintf('<errorText> SystemCheckError: %s</errorText>', $header);
-            $message = $header.$body.$footer;
-            $output->writeln($message);
-            throw new SystemCheckError();
+        $message = $header.$body.$footer;
+        $output->writeln($message);
+        throw new SystemCheckError();
         endif;
 
         $message = $header.$body.$footer;

@@ -49,25 +49,6 @@ class StringsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $originalString
-     * @param $expectedString
-     * @dataProvider providerSplit
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function testSplit($originalString, $expectedString)
-    {
-        $returnedString = StringHelper::split('/__/', $originalString);
-
-        $this->assertSame(
-            $expectedString,
-            $returnedString
-        );
-    }
-
-    /**
      * @dataProvider providerEmptyStrings
      *
      * @param $original
@@ -98,14 +79,6 @@ class StringsTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function providerSplit()
-    {
-        return [
-            ['name__in', ['name', 'in']],
-            ['name', ['name']],
-        ];
-    }
-
     public function providerValidVariableName()
     {
         return [
@@ -117,5 +90,4 @@ class StringsTest extends \PHPUnit_Framework_TestCase
             ['f45_gsdfg80'],
         ];
     }
-
 }

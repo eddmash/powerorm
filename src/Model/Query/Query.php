@@ -13,27 +13,10 @@ namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseObject;
-use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
-use Eddmash\PowerOrm\Exception\FieldError;
-use Eddmash\PowerOrm\Exception\KeyError;
-use Eddmash\PowerOrm\Helpers\ArrayHelper;
-use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
-use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
-use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Aggregates\BaseAggregate;
-use Eddmash\PowerOrm\Model\Query\Expression\Col;
-use Eddmash\PowerOrm\Model\Query\Expression\Exp;
-use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
-use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
-use Eddmash\PowerOrm\Model\Query\Joinable\Join;
-use Eddmash\PowerOrm\Model\Query\Joinable\Where;
-
-const INNER = 'INNER JOIN';
-const LOUTER = 'LEFT OUTER JOIN';
 
 class Query extends BaseObject
 {
@@ -41,59 +24,37 @@ class Query extends BaseObject
     //  BaseLookup::AND_CONNECTOR => [],
     //  BaseLookup::OR_CONNECTOR => [],
     //];
-    public $offset;
-    public $limit;
+    private $where = [];
+    private $from = [];
 
-    /** @var Where */
-    public $where;
-    public $tables = [];
-    public $tableMap = [];
-    public $selectRelected = false;
-    /**
-     * @var BaseJoin[]
-     */
-    public $tableAlias = [];
-    public $aliasRefCount = [];
-
-    /**
-     * @var array
-     */
-    public $select = [];
-    public $valueSelect = [];
-    public $klassInfo;
-    public $isSubQuery = false;
+    //[
+    //  'local' => [],
+    //  'related' => [],
+    //]
+    private $select = [
+    ];
+    private $isSubQuery = false;
 
     /**
      * @var Model
      */
-    public $model;
+    private $model;
 
     /**
      * if true, get the columns to fetch from the model itself.
      *
      * @var
      */
-    public $useDefaultCols = true;
-
-    /**
-     * @var BaseAggregate[]
-     */
-    public $annotations = [];
+    private $defaultCols = true;
 
     /**
      * Query constructor.
      *
      * @param Model $model
      */
-    public function __construct(Model $model, $where = null)
+    public function __construct(Model $model)
     {
         $this->model = $model;
-        if (is_null($where)) :
-            $this->where = Where::createObject();
-        else:
-            $this->where = $where;
-        endif;
-
     }
 
     public static function createObject(Model $model)
@@ -101,108 +62,78 @@ class Query extends BaseObject
         return new self($model);
     }
 
-    private function preSqlSetup()
-    {
-        if (!$this->tables):
-            $this->getInitialAlias();
-        endif;
-
-        list($select, $klassInfo) = $this->getSelect();
-        $this->select = $select;
-        $this->klassInfo = $klassInfo;
-    }
-
     public function asSql(Connection $connection)
     {
-        $this->preSqlSetup();
         $params = [];
-        list($fromClause, $fromParams) = $this->getFrom($connection);
-
         $results = ['SELECT'];
-
-        // todo DISTINCT
-
-        $cols = [];
-        /* @var $col Col */
-        foreach ($this->select as $colInfo) :
-
-            list($col, $alias) = $colInfo;
-
-            list($colSql, $colParams) = $col->asSql($connection);
-
-            if ($alias):
-                $cols[] = sprintf('%s AS %s', $colSql, $alias);
-            else:
-                $cols[] = $colSql;
-            endif;
-            $params = array_merge($params, $colParams);
-        endforeach;
-
-        $results[] = implode(', ', $cols);
+        $results[] = $this->getSelect();
 
         $results[] = 'FROM';
-
+        list($fromClause, $fromParams) = $this->getFrom();
         $results = array_merge($results, $fromClause);
-        $params = array_merge($params, $fromParams);
-
         if ($this->where):
-            list($sql, $whereParams) = $this->where->asSql($connection);
-            if ($sql) :
-                $results[] = 'WHERE';
-                $results[] = $sql;
-                $params = array_merge($params, $whereParams);
-            endif;
-        endif;
-
-        if ($this->limit) :
-            $results[] = 'LIMIT';
-            $results[] = $this->limit;
-        endif;
-
-        if ($this->offset) :
-            $results[] = 'OFFSET';
-            $results[] = $this->offset;
+            $results[] = 'WHERE';
+        list($sql, $whereParams) = $this->getWhereSql($connection);
+        $results[] = $sql;
+        $params = array_merge($params, $whereParams);
         endif;
 
         return [implode(' ', $results), $params];
     }
 
+    public function getWhereSql(Connection $connection)
+    {
+        $whereSql = [];
+        $whereParams = [];
+        /* @var $lookup BaseLookup */
+        foreach ($this->where as $conditions) :
+
+            foreach ($conditions as $connector => $lookup) :
+                // if we have another condition already added, add the connector
+                if ($whereSql):
+                    $whereSql[] = $connector;
+        endif;
+        list($sql, $parms) = $lookup->asSql($connection);
+        $whereSql[] = $sql;
+        if (!is_array($parms)):
+                    $parms = [$parms];
+        endif;
+        $whereParams = array_merge($whereParams, $parms);
+        endforeach;
+
+        endforeach;
+
+        return [implode(' ', $whereSql), $whereParams];
+    }
+
     public function getNestedSql(Connection $connection)
     {
-        $this->isSubQuery = true;
+        $this->setIsSubQuery(true);
 
         return $this->asSql($connection);
     }
 
-    public function addSelect(Col $col)
+    /**
+     * @param array $where
+     */
+    public function addWhere(LookupInterface $lookup, $connector)
     {
-        $this->useDefaultCols = false;
-        $this->select[] = $col;
+        $this->where[] = [$connector => $lookup];
     }
 
-    public function addFields($fieldNames, $allowM2M = true)
+    /**
+     * @param array $select
+     */
+    public function addSelect($select, $flush = false)
     {
-        $alias = $this->getInitialAlias();
-        $meta = $this->model->meta;
-        foreach ($fieldNames as $fieldName) :
-            $names = StringHelper::split(BaseLookup::$lookupPattern, $fieldName);
-            list($field, $targets, $meta, $joinList, $paths) = $this->setupJoins($names, $meta, $alias);
+        if ($flush):
+            $this->select = [];
+        endif;
+        if (!is_array($select)):
+            $select = [$select];
+        endif;
 
-            /** @var $targets Field[] */
-            list($targets, $finalAlias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
-
-            foreach ($targets as $target) :
-                $this->addSelect($target->getColExpression($finalAlias));
-            endforeach;
-
-        endforeach;
-
-    }
-
-    public function clearSelectedFields()
-    {
-        $this->select = [];
-        $this->valueSelect = [];
+        $this->select = array_merge($this->select, $select);
     }
 
     /**
@@ -210,76 +141,21 @@ class Query extends BaseObject
      */
     public function getSelect()
     {
+        if ($this->defaultCols):
 
-        $klassInfo = [];
-        $select = [];
-        $annotations = [];
-        if ($this->useDefaultCols):
-
-            /* @var $field Field */
-            foreach ($this->getDefaultCols() as $col) :
-                $alias = false;
-                $select[] = [$col, $alias];
-                $klassInfo['modelClass'] = $this->model->getFullClassName();
-
-            endforeach;
-        endif;
-
-        foreach ($this->select as $col) :
-            $alias = false;
-            $select[] = [$col, $alias];
-        endforeach;
-
-        foreach ($this->annotations as $alias => $annotation) :
-            $annotations[$alias] = $annotation;
-            $select[] = [$annotation, $alias];
-        endforeach;
-
-        return [$select, $klassInfo, $annotations];
-    }
-
-    public function getDefaultCols($startAlias = null, Meta $meta = null)
-    {
-
-        $fields = [];
-        if (is_null($meta)):
             $meta = $this->model->meta;
-        endif;
-        if (is_null($startAlias)):
-            $startAlias = $this->getInitialAlias();
-        endif;
-
-        foreach ($meta->getConcreteFields() as $field) :
-            $fields[] = $field->getColExpression($startAlias);
+            /** @var $field Field */
+            foreach ($meta->getLocalConcreteFields() as $name => $field) :
+                $this->select[] = $field->getColumnName();
         endforeach;
+        endif;
 
-        return $fields;
+        return implode(', ', $this->select);
     }
 
-    public function getFrom(Connection $connection)
+    public function getFrom()
     {
-        $result = [];
-        $params = [];
-
-        $refCount = $this->aliasRefCount;
-        foreach ($this->tables as $alias) :
-            if (!ArrayHelper::getValue($refCount, $alias)):
-                continue;
-            endif;
-            try {
-
-                /** @var $from BaseJoin */
-                $from = ArrayHelper::getValue($this->tableMap, $alias, ArrayHelper::STRICT);
-
-                list($fromSql, $fromParams) = $from->asSql($connection);
-                array_push($result, $fromSql);
-                $params = array_merge($params, $fromParams);
-            } catch (KeyError $e) {
-                continue;
-            }
-        endforeach;
-
-        return [$result, []];
+        return [[$this->model->meta->dbTable], []];
     }
 
     /**
@@ -290,436 +166,35 @@ class Query extends BaseObject
         return $this->where;
     }
 
-    public function addConditions($condition, $negate)
+    /**
+     * @return bool
+     */
+    public function isIsSubQuery()
     {
-        $this->buildFilter($condition, $negate);
+        return $this->isSubQuery;
     }
 
     /**
-     * @param $condition
-     *
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @param bool $isSubQuery
      */
-    private function buildFilter($conditions, $negate = false)
+    public function setIsSubQuery($isSubQuery)
     {
-        //todo $negate
-        $alias = $this->getInitialAlias();
-
-        /* @var $targets Field[] */
-        /* @var $field Field */
-        foreach ($conditions as $name => $value) :
-            list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
-
-            list($field, $targets, $meta, $joinList, $paths) = $this->setupJoins(
-                $fieldParts,
-                $this->model->meta,
-                $alias
-            );
-            list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
-            if ($field->isRelation) :
-
-                $lookupClass = $field->getLookup($lookups[0]);
-                $col = $targets[0]->getColExpression($alias, $field);
-                $condition = $lookupClass::createObject($col, $value);
-            else:
-                $col = $targets[0]->getColExpression($alias, $field);
-                $condition = $this->buildCondition($lookups, $col, $value);
-            endif;
-
-            $this->where->setConditions($connector, $condition);
-
-        endforeach;
+        $this->isSubQuery = $isSubQuery;
     }
 
     /**
-     * @param array $valueSelect
+     * @return mixed
      */
-    public function setValueSelect($valueSelect)
+    public function getDefaultCols()
     {
-        $this->valueSelect[] = $valueSelect;
-    }
-
-    private function checkRelatedObjects(Field $field, $value, Meta $meta)
-    {
-        //todo
+        return $this->defaultCols;
     }
 
     /**
-     * @param $lookup
-     * @param $rhs
-     * @param $lhs
-     *
-     * @return LookupInterface
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @param mixed $defaultCols
      */
-    private function buildCondition($lookup, $lhs, $rhs)
+    public function setDefaultCols($defaultCols)
     {
-        $lookup = (array) $lookup;
-        $lookup = $lhs->getLookup($lookup[0]);
-        /* @var $lookup LookupInterface */
-        $lookup = $lookup::createObject($lhs, $rhs);
-
-        return $lookup;
+        $this->defaultCols = $defaultCols;
     }
-
-    private function solveLookupType($name)
-    {
-        list($connector, $names) = $this->getConnector($name);
-        // get lookupand field
-        $split_names = StringHelper::split(BaseLookup::$lookupPattern, $names);
-
-        $paths = $this->getNamesPath($split_names, $this->model->meta);
-        $lookup = $paths['others'];
-
-        $fieldParts = [];
-        foreach ($split_names as $name) :
-            if (in_array($name, $lookup)) :
-                continue;
-            endif;
-            $fieldParts[] = $name;
-        endforeach;
-
-        if (count($lookup) === 0) :
-            $lookup[] = 'exact';
-        elseif (count($fieldParts) > 1):
-            if (!$fieldParts) :
-                throw new FieldError(
-                    sprintf(
-                        'Invalid lookup "%s" for model %s".',
-                        $names,
-                        $this->model->meta->modelName
-                    )
-                );
-            endif;
-        endif;
-
-        return [$connector, $lookup, $fieldParts];
-    }
-
-    public function getNamesPath($names, Meta $meta, $failOnMissing = false)
-    {
-        $paths = $targets = [];
-        $finalField = null;
-        $noneField = [];
-        foreach ($names as $name) :
-            if ($name === PRIMARY_KEY_ID):
-                $name = $meta->primaryKey->name;
-            endif;
-
-            /** @var $field Field */
-            $field = null;
-
-            try {
-                $field = $meta->getField($name);
-            } catch (FieldDoesNotExist $e) {
-                $available = getFieldNamesFromMeta($meta);
-                if ($failOnMissing) :
-
-                    throw new FieldError(
-                        sprintf(
-                            "Cannot resolve keyword '%s.%s' into field. Choices are: [ %s ]",
-                            $meta->modelName,
-                            $name,
-                            implode(', ', $available)
-                        )
-                    );
-                else:
-                    $noneField[] = $name;
-                    break;
-                endif;
-            }
-
-            if ($field->hasMethod('getPathInfo')) :
-                $pathsInfos = $field->getPathInfo();
-
-                $pInfo = end($pathsInfos);
-                $finalField = ArrayHelper::getValue($pInfo, 'joinField');
-                $targets = ArrayHelper::getValue($pInfo, 'targetFields');
-                $paths = array_merge($paths, $pathsInfos);
-            else:
-                $finalField = $field;
-                $targets[] = $field;
-            endif;
-
-        endforeach;
-
-        return ['paths' => $paths, 'finalField' => $finalField, 'targets' => $targets, 'others' => $noneField];
-    }
-
-    /**
-     * Determines the where clause connector to use.
-     *
-     * @param $name
-     *
-     * @return array
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function getConnector($name)
-    {
-        $connector = BaseLookup::AND_CONNECTOR;
-
-        // get the actual key
-        if (preg_match(BaseLookup::$whereConcatPattern, $name)):
-            // determine how to combine where statements
-            list($lookup, $name) = preg_split(BaseLookup::$whereConcatPattern, $name, -1, PREG_SPLIT_DELIM_CAPTURE);
-
-            $connector = BaseLookup::OR_CONNECTOR;
-        endif;
-
-        return [$connector, $name];
-    }
-
-    public function setLimit($offset, $limit)
-    {
-        $this->offset = $offset;
-        $this->limit = $limit;
-    }
-
-    public function getInitialAlias()
-    {
-        if ($this->tables):
-            // get the first one
-            $alias = $this->tables[0];
-        else:
-            $alias = $this->join(new BaseTable($this->model->meta->dbTable, null));
-        endif;
-
-        return $alias;
-    }
-
-    private function setupJoins($names, Meta $meta, $alias)
-    {
-        $joins = [$alias];
-
-        $namesPaths = $this->getNamesPath($names, $meta, true);
-        $pathInfos = $namesPaths['paths'];
-
-        /* @var $meta Meta */
-        foreach ($pathInfos as $pathInfo) :
-            $meta = $pathInfo['toMeta'];
-
-            $join = new Join();
-            $join->setTableName($meta->dbTable);
-            $join->setParentAlias($alias);
-            $join->setJoinType(INNER);
-            $join->setJoinField($pathInfo['joinField']);
-
-            $alias = $this->join($join);
-
-            $joins[] = $alias;
-        endforeach;
-
-        return [$namesPaths['finalField'], $namesPaths['targets'], $meta, $joins, $pathInfos];
-    }
-
-    public function join(BaseJoin $join, $reuse = [])
-    {
-        list($alias) = $this->getTableAlias($join->getTableName(), false);
-        if ($join->getJoinType()):
-            if ($this->tableMap[$join->getParentAlias()]->getJoinType() === LOUTER || $join->getNullable()):
-                $joinType = LOUTER;
-            else:
-                $joinType = INNER;
-            endif;
-            $join->setJoinType($joinType);
-        endif;
-
-        $join->setTableAlias($alias);
-        $this->tableMap[$alias] = $join;
-        $this->tables[] = $alias;
-
-        return $alias;
-    }
-
-    private function trimJoins($targets, $joinList, $path)
-    {
-        /* @var $joinField RelatedField */
-        /* @var $field Field */
-        /* @var $relField Field[] */
-
-        foreach (array_reverse($path) as $info) :
-            if (!$info['direct'] || count($joinList) === 1):
-                break;
-            endif;
-
-            $joinTargets = [];
-            $currentTargets = [];
-            $joinField = $info['joinField'];
-
-            foreach ($joinField->getForeignRelatedFields() as $field) :
-                $joinTargets[] = $field->getColumnName();
-            endforeach;
-
-            foreach ($targets as $field) :
-                $currentTargets[] = $field->getColumnName();
-            endforeach;
-
-            if (!array_intersect($joinTargets, $currentTargets)):
-                break;
-            endif;
-
-            $relFields = [$joinField->getRelatedFields()];
-            $relMap = [];
-            foreach ($relFields as $relField) :
-                if (in_array($relField[1]->getColumnName(), $currentTargets)):
-                    $relMap[$relField[1]->getColumnName()] = $relField[0];
-                endif;
-            endforeach;
-
-            $targetsNew = [];
-            foreach ($targets as $target) :
-                $targetsNew[] = $relMap[$target->getColumnName()];
-            endforeach;
-            $targets = $targetsNew;
-
-            $this->unrefAlias(array_pop($joinList));
-        endforeach;
-
-        $alias = array_slice($joinList, -1)[0];
-
-        return [$targets, $alias, $joinList];
-    }
-
-    private function unrefAlias($alias, $amount = 1)
-    {
-        $this->aliasRefCount[$alias] -= $amount;
-    }
-
-    public function getTableAlias($tableName, $create = false)
-    {
-        if (ArrayHelper::hasKey($this->tableAlias, $tableName) && false === $create):
-            $alias = ArrayHelper::getValue($this->tableAlias, $tableName);
-            $this->aliasRefCount[$alias] += 1;
-
-            return [$alias, false];
-        endif;
-
-        $alias = $tableName;
-        $this->tableAlias[$alias] = $alias;
-        $this->aliasRefCount[$alias] = 1;
-
-        return [$alias, true];
-    }
-
-    public function addAnnotation($kwargs = [])
-    {
-        $annotation = ArrayHelper::getValue($kwargs, 'annotation');
-        $alias = ArrayHelper::getValue($kwargs, 'alias');
-        $isSummary = ArrayHelper::getValue($kwargs, 'isSummary', false);
-
-        $this->annotations[$alias] = $annotation;
-
-    }
-
-    /**Sets up the select_related data structure so that we only select certain related models
-     * (as opposed to all models, when self.select_related=True)
-     *
-     * @param array $fields
-     * @since 1.1.0
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function addSelectRelected($fields = [])
-    {
-        if (is_bool($this->selectRelected)):
-            $relatedFields = [];
-        else:
-            $relatedFields = $this->selectRelected;
-        endif;
-
-        foreach ($fields as $field) :
-
-        endforeach;
-
-    }
-
-    /**
-     * @return array
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function getAggregation(Connection $connection, $addedAggregateNames = [])
-    {
-        if (!$this->annotations):
-            return [];
-        endif;
-        $hasExistingAnnotations = false;
-        if ($hasExistingAnnotations):
-        else:
-            $outQuery = $this;
-            $outQuery->select = [];
-            $outQuery->useDefaultCols = false;
-        endif;
-
-        return $this->execute($connection)->fetch();
-
-    }
-
-    public function getCount(Connection $connection)
-    {
-        $obj = $this->deepClone();
-        $obj->addAnnotation(['annotation' => Exp::Count('*'), 'alias' => '_count', 'isSummary' => true]);
-        $alias = '_count';
-        $result = $obj->getAggregation($connection, ['alias' => $alias]);
-
-        return ArrayHelper::getValue($result, $alias, 0);
-    }
-
-    /**
-     * @return $this
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function deepClone()
-    {
-        $obj = new self($this->model);
-        $obj->aliasRefCount = $this->aliasRefCount;
-        $obj->useDefaultCols = $this->useDefaultCols;
-        $obj->tableAlias = $this->tableAlias;
-        $obj->tableMap = $this->tableMap;
-        $obj->tables = $this->tables;
-        $obj->select = $this->select;
-        $obj->annotations = $this->annotations;
-        $obj->offset = $this->offset;
-        $obj->limit = $this->limit;
-        $obj->where = $this->where->deepClone();
-
-        return $obj;
-    }
-
-    /**
-     * @return \Doctrine\DBAL\Driver\Statement|int
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function execute(Connection $connection)
-    {
-        list($sql, $params) = $this->asSql($connection);
-
-        $stmt = $connection->prepare($sql);
-        foreach ($params as $index => $value) :
-            ++$index; // Columns/Parameters are 1-based, so need to start at 1 instead of zero
-            $stmt->bindValue($index, $value);
-        endforeach;
-
-        $stmt->execute();
-
-        return $stmt;
-    }
-
 }

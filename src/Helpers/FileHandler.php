@@ -61,9 +61,9 @@ class FileHandler extends BaseObject
         $fileHandle = fopen($file, 'w');
         if ($fileHandle):
             fprintf($fileHandle, $content);
-            fclose($fileHandle);
+        fclose($fileHandle);
 
-            chmod($file, 0777);
+        chmod($file, 0777);
 
         endif;
     }
@@ -75,17 +75,17 @@ class FileHandler extends BaseObject
 
     public function getFile($name = '', $ext = 'php')
     {
-        $ext = $this->stableExt($ext);
-        $files = $this->getDirContent($ext, true, true);
+        $ext = $this->_stableExt($ext);
+        $files = $this->_readDir($ext, true, true);
 
         $name = $this->normalizeKey($name);
 
         /** @var $file SplFileInfo */
         foreach ($files as $file) :
             $fileName = $file->getBaseName('.'.$ext);
-            if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext):
+        if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext):
                 return $file;
-            endif;
+        endif;
 
         endforeach;
 
@@ -102,7 +102,7 @@ class FileHandler extends BaseObject
      */
     public function readDir($ext = 'php', $recurse = true)
     {
-        return $this->getDirContent($ext, $recurse);
+        return $this->_readDir($ext, $recurse);
     }
 
     /**
@@ -118,14 +118,14 @@ class FileHandler extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function getDirContent($ext = 'php', $recurse = true, $_fileObj = false)
+    public function _readDir($ext = 'php', $recurse = true, $_fileObj = false)
     {
         $_fileList = [];
 
         // check if some put the extension beginning with the "."
-        $ext = $this->stableExt($ext);
+        $ext = $this->_stableExt($ext);
 
-        $directory = $this->stableDir($this->path);
+        $directory = $this->_stableDir($this->path);
 
         if (!file_exists($directory)):
             return [];
@@ -136,13 +136,12 @@ class FileHandler extends BaseObject
         foreach ($dirIterator as $file) :
             if ($file->isDot()):
                 continue;
-            endif;
+        endif;
 
-            if ($file->isDir() && $recurse):
-                $_fileList = array_merge($_fileList, (new static($file->getRealPath()))->readDir($ext, $recurse));
-            else:
-                $_fileList = $this->addFile($_fileList, $file, $ext, $_fileObj);
-            endif;
+        if ($file->isDir() && $recurse):
+                $_fileList = array_merge($_fileList, (new static($file->getRealPath()))->readDir($ext, $recurse)); else:
+                $_fileList = $this->_addFile($_fileList, $file, $ext, $_fileObj);
+        endif;
         endforeach;
 
         return $_fileList;
@@ -160,37 +159,35 @@ class FileHandler extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function addFile(array $_fileList, \SplFileInfo $file, $ext, $_fileObj)
+    public function _addFile(array $_fileList, \SplFileInfo $file, $ext, $_fileObj)
     {
         if (!empty($ext)):
             if ($ext == $file->getExtension()):
                 if ($_fileObj):
-                    $_fileList[] = clone $file;
-                else:
+                    $_fileList[] = clone $file; else:
                     $_fileList[] = $file->getRealPath();
-                endif;
-            endif;
+        endif;
+        endif;
 
-            return $_fileList;
+        return $_fileList;
         endif;
 
         // add everything
         if ($_fileObj):
-            $_fileList[] = clone $file;
-        else:
+            $_fileList[] = clone $file; else:
             $_fileList[] = $file->getRealPath();
         endif;
 
         return $_fileList;
     }
 
-    private function stableExt($ext)
+    public function _stableExt($ext)
     {
         // does it start with a `.` trim it
         return (preg_match("/^\./", $ext)) ? ltrim($ext, '.') : $ext;
     }
 
-    private function stableDir($name)
+    public function _stableDir($name)
     {
         return (preg_match("/\/$/", $name)) ? $name : $name.'/';
     }

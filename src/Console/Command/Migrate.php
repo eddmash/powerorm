@@ -31,12 +31,10 @@ class Migrate extends BaseCommand
         $this->setName($this->guessCommandName())
             ->setDescription($this->help)
             ->setHelp($this->help)
-            ->addArgument(
-                'migration_name',
+            ->addArgument('migration_name',
                 InputArgument::OPTIONAL,
                 'Database state will be brought to the state after that migration. '.
-                'Use the name "zero" to unapply all migrations.'
-            )
+                'Use the name "zero" to unapply all migrations.')
             ->addOption(
                 'fake',
                 null,
@@ -51,8 +49,7 @@ class Migrate extends BaseCommand
         $name = $input->getArgument('migration_name');
 
         if ($input->getOption('fake')):
-            $fake = true;
-        else:
+            $fake = true; else:
             $fake = false;
         endif;
 
@@ -64,11 +61,9 @@ class Migrate extends BaseCommand
         // target migrations to act on
         if (!empty($name)):
             if ($name == 'zero'):
-                $targets = [$name];
-            else:
+                $targets = [$name]; else:
                 $targets = $executor->loader->getMigrationByPrefix($name);
-            endif;
-        else:
+        endif; else:
             $targets = $executor->loader->graph->getLeafNodes();
         endif;
 
@@ -86,25 +81,19 @@ class Migrate extends BaseCommand
             $auto_detector = new AutoDetector(
                 $executor->loader->getProjectState(),
                 ProjectState::fromApps($registry),
-                NonInteractiveAsker::createObject($input, $output)
-            );
+                NonInteractiveAsker::createObject($input, $output));
 
-            $changes = $auto_detector->getChanges($executor->loader->graph);
+        $changes = $auto_detector->getChanges($executor->loader->graph);
 
-            if (!empty($changes)):
+        if (!empty($changes)):
 
-                $output->writeln(
-                    '<warning>  Your models have changes that are not yet reflected '.
-                    "in a migration, and so won't be applied.</warning>"
-                );
+                $output->writeln('<warning>  Your models have changes that are not yet reflected '.
+                    "in a migration, and so won't be applied.</warning>");
 
-                $output->writeln(
-                    "<warning>  Run 'php pmanager.php makemigrations' to make new ".
-                    "migrations, and then re-run 'php pmanager.php migrate' to apply them.</warning>"
-                );
+        $output->writeln("<warning>  Run 'php pmanager.php makemigrations' to make new ".
+                    "migrations, and then re-run 'php pmanager.php migrate' to apply them.</warning>");
 
-            endif;
-        else:
+        endif; else:
             // migrate
             $executor->migrate($targets, $plan, $fake);
 

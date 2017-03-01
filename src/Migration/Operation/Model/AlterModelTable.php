@@ -56,7 +56,7 @@ class AlterModelTable extends Operation
      */
     public function databaseForwards($schemaEditor, $fromState, $toState)
     {
-        $this->alterModelTable($schemaEditor, $fromState, $toState);
+        $this->_alterModelTable($schemaEditor, $fromState, $toState);
     }
 
     /**
@@ -64,7 +64,7 @@ class AlterModelTable extends Operation
      */
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
-        $this->alterModelTable($schemaEditor, $fromState, $toState);
+        $this->_alterModelTable($schemaEditor, $fromState, $toState);
     }
 
     /**
@@ -78,13 +78,13 @@ class AlterModelTable extends Operation
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function alterModelTable($schemaEditor, $fromState, $toState)
+    private function _alterModelTable($schemaEditor, $fromState, $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->name);
 
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->name);
-            $schemaEditor->alterDbTable($toModel, $fromModel->meta->dbTable, $toModel->meta->dbTable);
+        $schemaEditor->alterDbTable($toModel, $fromModel->meta->dbTable, $toModel->meta->dbTable);
 
             // Rename M2M fields whose name is based on this model's db_table
 
@@ -98,9 +98,9 @@ class AlterModelTable extends Operation
                             $oldField->relation->through->meta->dbTable,
                             $newField->relation->through->meta->dbTable
                         );
-                    endif;
-                endforeach;
-            endforeach;
+        endif;
+        endforeach;
+        endforeach;
 
         endif;
     }

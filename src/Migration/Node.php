@@ -53,13 +53,11 @@ class Node
      *
      * @return array
      */
-    public function getAncestors($ignoreSelf = false)
+    public function getAncestors()
     {
         $ancestors = [];
 
-        if ($ignoreSelf === false):
-            $ancestors[] = $this->name;
-        endif;
+        $ancestors[] = $this->name;
 
         /** @var $parent Node */
         foreach ($this->parent as $parent) :

@@ -43,7 +43,7 @@ interface MetaInterface extends ContributorInterface
     /**
      * Returns a list of all concrete fields on the model and its parents.
      *
-     * @return Field[]
+     * @return mixed
      *
      * @since 1.1.0
      *
@@ -57,7 +57,7 @@ interface MetaInterface extends ContributorInterface
      * As this method is very expensive and is accessed frequently (it looks up every field in a model, in every app),
      * it is computed on first access and then is set as a property on every model.
      *
-     * @return Field[]
+     * @return mixed
      *
      * @since 1.1.0
      *
@@ -76,5 +76,5 @@ interface MetaInterface extends ContributorInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function addField(Field $field);
+    public function addField($field);
 }

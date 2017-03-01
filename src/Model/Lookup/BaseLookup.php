@@ -10,8 +10,8 @@ namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\NotImplemented;
+use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
 /**
  * Class Filter.
@@ -34,7 +34,7 @@ class BaseLookup implements LookupInterface
     protected $operator;
 
     /**
-     * @var Col
+     * @var Field
      */
     protected $lhs;
 
@@ -51,7 +51,7 @@ class BaseLookup implements LookupInterface
 
     public function processLHS(Connection $connection)
     {
-        return $this->lhs->asSql($connection);
+        return $this->lhs->getColumnName();
     }
 
     public function processRHS(Connection $connection)
@@ -59,14 +59,13 @@ class BaseLookup implements LookupInterface
         if ($this->rhs instanceof Model):
             // get pk field
             $pk = $this->rhs->meta->primaryKey->getAttrName();
-            $this->rhs = $this->rhs->{$pk};
-        elseif (method_exists($this->rhs, '_toSql')):
-            list($sql, $params) = $this->rhs->_toSql();
+        $this->rhs = $this->rhs->{$pk}; elseif (method_exists($this->rhs, 'toSql')):
+            list($sql, $params) = $this->rhs->toSql();
 
-            return [sprintf('( %s )', $sql), $params];
+        return [sprintf('( %s )', $sql), $params];
         endif;
 
-        return [' ? ', [$this->rhs]];
+        return [' ? ', $this->rhs];
     }
 
     public function getLookupOperation($rhs)
@@ -81,21 +80,16 @@ class BaseLookup implements LookupInterface
 
     public function asSql(Connection $connection)
     {
-        list($lhs_sql, $params) = $this->processLHS($connection);
+        $lhs_sql = $this->processLHS($connection);
         list($rhs_sql, $rhs_params) = $this->processRHS($connection);
-        $params = array_merge($params, $rhs_params);
+
         $rhs_sql = $this->getLookupOperation($rhs_sql);
 
-        return [sprintf('%s %s', $lhs_sql, $rhs_sql), $params];
+        return [sprintf('%s %s', $lhs_sql, $rhs_sql), $rhs_params];
     }
 
     public function valueIsDirect()
     {
-        return !(method_exists($this->rhs, '_toSql'));
-    }
-
-    public function __toString()
-    {
-        return get_class($this);
+        return !(method_exists($this->rhs, 'toSql'));
     }
 }

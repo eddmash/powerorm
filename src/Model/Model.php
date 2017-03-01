@@ -18,7 +18,6 @@ use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
-use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
@@ -57,7 +56,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @var array
      */
-    public $_fieldCache = [];
+    protected $_fieldCache;
 
     /**
      * Holds the name of the database table that this model represents.
@@ -167,68 +166,47 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function __construct($kwargs = [])
     {
         $this->constructorArgs = $kwargs;
+
         $this->init();
+
         if ($kwargs):
-            // get also related field if we have kwargs
-            $fields = $this->meta->getNonM2MForwardFields();
-        else:
-            // otherwise get only the concrete fields
             $fields = $this->meta->getConcreteFields();
+        else:
+            $fields = $this->meta->getFields();
         endif;
 
-        /* @var $field Field */
+        /** @var $field Field */
         foreach ($fields as $name => $field) :
-            if (!array_key_exists($field->getAttrName(), $kwargs) && is_null($field->getColumnName())):
-                continue;
-            endif;
-
             $val = null;
             $isRelated = false;
-            $relObject = null;
             if ($kwargs):
                 if ($field instanceof RelatedField):
-                    try {
-                        $relObject = ArrayHelper::getValue($kwargs, $field->name, ArrayHelper::STRICT);
-                        $isRelated = true;
-                    } catch (KeyError $e) {
-                        try {
-                            $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), ArrayHelper::STRICT);
-                        } catch (KeyError $e) {
-                            $val = $field->getDefault();
-                        }
-                    }
-
-                    // Object instance was passed in, You can
-                    // pass in null for related objects if it's allowed.
-                    if (is_null($relObject) && $field->null):
-                        $val = null;
-                    endif;
+                    //todo
+                    $isRelated = true;
 
                 else:
-                    try {
-                        $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), ArrayHelper::STRICT);
-                    } catch (KeyError $e) {
-                        $val = $field->getDefault();
-                    }
+                    $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), $field->getDefault());
                 endif;
             else:
                 $val = $field->getDefault();
             endif;
 
             if ($isRelated):
-                $this->{$field->name} = $relObject;
+                //todo
+
             else:
                 $this->{$field->getAttrName()} = $val;
             endif;
         endforeach;
-//        endif;
     }
 
-    public static function fromDb($records = [])
+    public function fromDb($record = [])
     {
-        $newModel = new static($records);
+        foreach ($record as $name => $value) :
 
-        return $newModel;
+            $this->{$name} = $value;
+
+        endforeach;
     }
 
     /**
@@ -323,6 +301,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         foreach ($fields as $name => $fieldObj) :
 
             $this->addToClass($name, $fieldObj);
+
+            // cache it
+            $this->_fieldCache[$name] = $fieldObj;
         endforeach;
     }
 
@@ -349,7 +330,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $attrName = lcfirst(str_replace(' ', '', ucwords(str_replace('\\', ' ', $name))));
             $attrName = sprintf('%sPtr', $attrName);
 
-            if (!ArrayHelper::hasKey($this->meta->getFields(), $attrName)):
+            if ($this->_fieldCache == null || !ArrayHelper::hasKey($this->_fieldCache, $attrName)):
 
                 $field = OneToOneField::createObject(
                     [
@@ -705,33 +686,39 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __get($name)
     {
-        if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
+        if (!array_key_exists($name, $this->_fieldCache)):
             throw new AttributeError(
                 sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->modelName, $name)
             );
         endif;
-
         try {
             /** @var $field RelatedField */
             $field = $this->meta->getField($name);
-
-            return $field->getValue($this);
+            if ($field->isRelation):
+                return $field->getRelatedValue($this);
+            endif;
         } catch (FieldDoesNotExist $e) {
         }
 
-        return $this->{$name};
+        return $this->_fieldCache[$name];
     }
 
     public function __set($name, $value)
     {
+
         /* @var $field RelatedField */
         try {
             $field = $this->meta->getField($name);
-            $field->setValue($this, $value);
+            if ($field->isRelation):
+
+                list($lhs, $rhs) = $field->setRelatedValue($value);
+                // store the values
+                $this->_fieldCache[$lhs] = $rhs;
+            endif;
         } catch (FieldDoesNotExist $e) {
         }
         // we assume this is not a model field being set
-        $this->{$name} = $value;
+        $this->_fieldCache[$name] = $value;
     }
 
     /**
@@ -744,6 +731,20 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         return sprintf('%s object', $this->getFullClassName());
     }
 
+//    public function __debugInfo()
+//    {
+//        $model = [];
+//        foreach (get_object_vars($this) as $name => $value) :
+//            if (in_array($name, self::DEBUG_IGNORE)):
+//                $meta[$name] = (!is_subclass_of($value, BaseObject::getFullClassName())) ? '** hidden **' : (string) $value;
+//                continue;
+//            endif;
+//            $model[$name] = $value;
+//        endforeach;
+
+//        return $model;
+//    }
+
     /**
      * @return Queryset
      *
@@ -751,20 +752,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function objects(Model $modelInstance=null)
+    public static function objects()
     {
-        $queryset = self::getQuerysetClass();
-        $modelInstance = (is_null($modelInstance)) ? self::createObject() : $modelInstance;
-        return $queryset::createObject(BaseOrm::getDbConnection(), $modelInstance);
-    }
-
-    /**
-     * @return mixed
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     */
-    public static function getQuerysetClass()
-    {
-        return Queryset::class;
+        return Queryset::createObject(BaseOrm::getDbConnection(), self::createObject());
     }
 
     public function getDeferredFields()
@@ -839,11 +829,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 endif;
 
                 $relObject = $this->{$field->name};
-
-                if ($relObject && is_null($relObject->meta->primaryKey)):
+                if ($relObject && $relObject->meta->primaryKey !== null):
                     throw new ValueError(
                         sprintf(
-                            "save() prohibited to prevent data loss due to unsaved related object '%s'.",
+                            'save() prohibited to prevent data loss due to '.
+                            "unsaved related object '%s'.",
                             $field->name
                         )
                     );
@@ -965,43 +955,17 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $meta = $this->meta;
 
         $nonPkFields = [];
-        /** @var $field Field */
         foreach ($meta->getConcreteFields() as $name => $field) :
-            if ($field->primaryKey) :
-                continue;
-            endif;
             $nonPkFields[$name] = $field;
         endforeach;
 
-        // if any fields we passed in use those
-        /** @var $nonePkUpdateFields Field[] */
-        $nonePkUpdateFields = [];
-        if ($updateFields) :
-            foreach ($nonPkFields as $name => $nonPkField) :
-                if (in_array($name, $updateFields)) :
-                    $nonePkUpdateFields[$name] = $nonPkField;
-                endif;
-            endforeach;
-        else:
-            $nonePkUpdateFields = $nonPkFields;
-        endif;
-
-        // get pk value
-        $pkValue = $this->getPkValue($meta);
-        $pkSet = (false === empty($pkValue));
-
-        if (!$pkSet && ($forceUpdate || $forceInsert)) :
-            throw new ValueError('Cannot force an update in save() with no primary key.');
-        endif;
+        $pkValue = null;
+//        $pkValue = $this->getPkValue($meta);
 
         $updated = false;
 
-        if ($pkSet && !$forceInsert):
-            $values = [];
-            foreach ($nonePkUpdateFields as $nonePkUpdateField) :
-                $values[$nonePkUpdateField->getColumnName()] = $nonePkUpdateField->preSave($this, false);
-            endforeach;
-            $updated = $this->doUpdate($values, $pkValue, $forceUpdate);
+        if ($pkValue !== null && !$forceInsert):
+
         endif;
 
         if (false === $updated):
@@ -1017,8 +981,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 $fields[$name] = $concreteField;
             endforeach;
 
-            $updatePk = ($meta->hasAutoField && !$pkSet);
-
+            $updatePk = ($meta->hasAutoField && $pkValue === null);
             $result = $this->doInsert($this, $fields, $updatePk);
             if ($updatePk):
                 $this->{$meta->primaryKey->getAttrName()} = $result;
@@ -1040,7 +1003,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         $meta = $model->meta;
         foreach ($meta->parents as $key => $field) :
-            // Make sure the link fields are synced between parent and self.todo
+            // Make sure the link fields are synced between parent and self.
 
         endforeach;
     }
@@ -1060,7 +1023,24 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function doInsert(Model $model, $fields, $returnId)
     {
-        return $model::objects()->_insert($this, $fields, $returnId);
+        $conn = BaseOrm::getDbConnection();
+        $qb = $conn->createQueryBuilder();
+
+        $qb->insert($model->meta->dbTable);
+
+        /** @var $field Field */
+        foreach ($fields as $name => $field) :
+            $qb->setValue($field->getColumnName(), $qb->createNamedParameter($field->preSave($model, true)));
+        endforeach;
+
+        // save to db
+        $qb->execute();
+
+        if ($returnId):
+            return $conn->lastInsertId();
+        endif;
+
+        return;
     }
 
     /**
@@ -1079,7 +1059,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function doUpdate($records, $pkValue, $forceUpdate)
     {
-        $filtered = static::objects()->filter([$this->meta->primaryKey->name => $pkValue]);
+        $filtered = $this->objects()->filter([$this->meta->primaryKey->name => $pkValue]);
 
         // We can end up here when saving a model in inheritance chain where
         // update_fields doesn't target any field in current model. In that
@@ -1099,7 +1079,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // successfully (a row is matched and updated). In order to
             // distinguish these two cases, the object's existence in the
             // database is again checked for if the UPDATE query returns 0.
-
             if ($filtered->exists()):
                 return $filtered->_update($records) || $filtered->exists();
             else:
@@ -1109,13 +1088,4 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         return $filtered->_update($records);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasProperty($name)
-    {
-        return parent::hasProperty($name) || array_key_exists($name, $this->_fieldCache);
-    }
-
 }

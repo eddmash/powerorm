@@ -51,7 +51,7 @@ class Loader extends BaseObject
         if (!empty($this->connection)):
             $recoder = new Recorder($this->connection);
 
-            $this->appliedMigrations = $recoder->getApplied();
+        $this->appliedMigrations = $recoder->getApplied();
         endif;
 
         $migrations = $this->getMigrations();
@@ -71,7 +71,7 @@ class Loader extends BaseObject
 
                 $this->graph->addDependency($name, $parent, $migration);
 
-            endforeach;
+        endforeach;
 
         endforeach;
     }
@@ -96,14 +96,13 @@ class Loader extends BaseObject
 
         foreach ($this->getMigrations() as $name => $migration) :
             $shortName = ClassHelper::getNameFromNs($name, BaseOrm::getMigrationsNamespace());
-            if (StringHelper::startsWith($name, $prefix) || StringHelper::startsWith($shortName, $prefix)):
+        if (StringHelper::startsWith($name, $prefix) || StringHelper::startsWith($shortName, $prefix)):
                 $migrations[] = $name;
-            endif;
+        endif;
         endforeach;
 
         if (count($migrations) > 1):
-            throw new AmbiguityError(sprintf("There is more than one migration with the prefix '%s'", $prefix));
-        elseif (count($migrations) == 0):
+            throw new AmbiguityError(sprintf("There is more than one migration with the prefix '%s'", $prefix)); elseif (count($migrations) == 0):
             throw new KeyError(sprintf("There no migrations with the prefix '%s'", $prefix));
         endif;
 
@@ -137,7 +136,7 @@ class Loader extends BaseObject
         /* @var $migrationName Migration */
         foreach ($this->getMigrationsClasses() as $fileName) :
             $migrationName = $fileName;
-            $migrations[$fileName] = $migrationName::createObject($fileName);
+        $migrations[$fileName] = $migrationName::createObject($fileName);
         endforeach;
 
         return $migrations;
@@ -160,13 +159,12 @@ class Loader extends BaseObject
         $namespace = BaseOrm::getMigrationsNamespace();
         foreach ($migrationFiles as $migrationFile) :
             $className = ClassHelper::getClassNameFromFile($migrationFile, BaseOrm::getMigrationsPath());
-            $foundClass = ClassHelper::classExists($className, $namespace);
-            if (!$className):
+        $foundClass = ClassHelper::classExists($className, $namespace);
+        if (!$className):
                 throw new ClassNotFoundException(
-                    sprintf('The class [ %2$s\\%1$s or \\%1$s ] could not be located', $className, $namespace)
-                );
-            endif;
-            $classes[] = $foundClass;
+                    sprintf('The class [ %2$s\\%1$s or \\%1$s ] could not be located', $className, $namespace));
+        endif;
+        $classes[] = $foundClass;
         endforeach;
 
         return $classes;

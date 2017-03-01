@@ -38,20 +38,15 @@ class HelpCommand extends BaseCommand
 
         $this
             ->setName('help')
-            ->setDefinition(
-                array(
-                    new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
-                    new InputOption(
-                        'format', null, InputOption::VALUE_REQUIRED,
-                        'The output format (txt, xml, json, or md)', 'txt'
-                    ),
-                    new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help'),
-                )
-            )
+            ->setDefinition(array(
+                new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED,
+                    'The output format (txt, xml, json, or md)', 'txt'),
+                new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help'),
+            ))
             ->setDescription('Displays help for a command')
-            ->setHelp(
-                <<<'EOF'
-                The <info>%command.name%</info> command displays help for a given command:
+            ->setHelp(<<<'EOF'
+The <info>%command.name%</info> command displays help for a given command:
 
   <info>php %command.full_name% list</info>
 
@@ -84,14 +79,10 @@ EOF
         }
 
         $helper = new DescriptorHelper();
-        $helper->describe(
-            $output,
-            $this->command,
-            array(
-                'format' => $input->getOption('format'),
-                'raw_text' => $input->getOption('raw'),
-            )
-        );
+        $helper->describe($output, $this->command, array(
+            'format' => $input->getOption('format'),
+            'raw_text' => $input->getOption('raw'),
+        ));
 
         $this->command = null;
     }

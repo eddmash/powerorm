@@ -36,9 +36,8 @@ class ListCommand extends BaseCommand
             ->setName('list')
             ->setDefinition($this->createDefinition())
             ->setDescription('Lists commands')
-            ->setHelp(
-                <<<'EOF'
-                The <info>%command.name%</info> command lists all commands:
+            ->setHelp(<<<'EOF'
+The <info>%command.name%</info> command lists all commands:
 
   <info>php %command.full_name%</info>
 
@@ -71,15 +70,11 @@ EOF
     public function handle(InputInterface $input, OutputInterface $output)
     {
         $helper = new DescriptorHelper();
-        $helper->describe(
-            $output,
-            $this->getApplication(),
-            array(
-                'format' => $input->getOption('format'),
-                'raw_text' => $input->getOption('raw'),
-                'namespace' => $input->getArgument('namespace'),
-            )
-        );
+        $helper->describe($output, $this->getApplication(), array(
+            'format' => $input->getOption('format'),
+            'raw_text' => $input->getOption('raw'),
+            'namespace' => $input->getArgument('namespace'),
+        ));
     }
 
     /**
@@ -87,15 +82,11 @@ EOF
      */
     private function createDefinition()
     {
-        return new InputDefinition(
-            array(
-                new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
-                new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
-                new InputOption(
-                    'format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)',
-                    'txt'
-                ),
-            )
-        );
+        return new InputDefinition(array(
+            new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
+            new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
+            new InputOption('format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)',
+                'txt'),
+        ));
     }
 }

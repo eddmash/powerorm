@@ -29,24 +29,19 @@ class CharField extends Field
 
         if (is_null($this->maxLength)):
             $errors = [
-                CheckError::createObject(
-                    [
-                        'message' => 'CharFields must define a "maxLength" attribute.',
-                        'hint' => null,
-                        'context' => $this,
-                        'id' => 'fields.E120',
-                    ]
-                ),
-            ];
-        elseif ($this->maxLength <= 0 || is_string($this->maxLength)):
+                CheckError::createObject([
+                    'message' => 'CharFields must define a "maxLength" attribute.',
+                    'hint' => null,
+                    'context' => $this,
+                    'id' => 'fields.E120',
+                ]),
+            ]; elseif ($this->maxLength <= 0 || is_string($this->maxLength)):
             $errors = [
-                CheckError::createObject(
-                    [
-                        'message' => '"maxLength" must be a positive integer.',
-                        'context' => $this,
-                        'id' => 'fields.E121',
-                    ]
-                ),
+                CheckError::createObject([
+                    'message' => '"maxLength" must be a positive integer.',
+                    'context' => $this,
+                    'id' => 'fields.E121',
+                ]),
             ];
         endif;
 

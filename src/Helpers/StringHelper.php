@@ -85,9 +85,7 @@ class StringHelper
             return strncmp($string, $with, $bytes) === 0;
         } else {
             return mb_strtolower(
-                mb_substr($string, 0, $bytes, '8bit'),
-                self::getCharset()
-            ) === mb_strtolower($with, self::getCharset());
+                mb_substr($string, 0, $bytes, '8bit'), self::getCharset()) === mb_strtolower($with, self::getCharset());
         }
     }
 
@@ -115,12 +113,8 @@ class StringHelper
             return substr_compare($string, $with, -$bytes, $bytes) === 0;
         } else {
             return mb_strtolower(
-                mb_substr($string, -$bytes, null, '8bit'),
-                self::getCharset()
-            ) === mb_strtolower(
-                $with,
-                self::getCharset()
-            );
+                mb_substr($string, -$bytes, null, '8bit'), self::getCharset()) === mb_strtolower($with,
+                self::getCharset());
         }
     }
 
@@ -153,14 +147,5 @@ class StringHelper
     public static function isEmpty($string)
     {
         return $string === '' || $string === null;
-    }
-
-    public static function split($pattern, $string)
-    {
-        if (preg_match($pattern, $string)):
-            return preg_split($pattern, $string);
-        endif;
-
-        return (array) $string;
     }
 }

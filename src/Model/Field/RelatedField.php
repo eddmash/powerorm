@@ -13,22 +13,14 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
-use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
-use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedExact;
-use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThan;
-use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThanOrEqual;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedIn;
-use Eddmash\PowerOrm\Model\Lookup\Related\RelatedIsNull;
-use Eddmash\PowerOrm\Model\Lookup\Related\RelatedLessThan;
-use Eddmash\PowerOrm\Model\Lookup\Related\RelatedLessThanOrEqual;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
  * Base class that all relational fields inherit from.
@@ -54,23 +46,15 @@ class RelatedField extends Field
      */
     public $fromField;
 
-    public function __construct($kwargs = [])
-    {
-        if (!ArrayHelper::hasKey($kwargs, 'to')):
-            throw new TypeError(sprintf("missing 1 required argument: 'to' for %s", static::class));
-        endif;
-        parent::__construct($kwargs);
-    }
-
     public function checks()
     {
         $checks = parent::checks();
-        $checks = array_merge($checks, $this->checkRelationModelExists());
+        $checks = array_merge($checks, $this->_checkRelationModelExists());
 
         return $checks;
     }
 
-    private function checkRelationModelExists()
+    public function _checkRelationModelExists()
     {
         $relModel = $this->relation->toModel;
         if ($relModel instanceof Model):
@@ -84,7 +68,7 @@ class RelatedField extends Field
         if (!$relMissing) :
             $msg = "Field defines a relation with model '%s', which is either does not exist, or is abstract.";
 
-            $error = [
+        $error = [
                 CheckError::createObject(
                     [
                         'message' => sprintf($msg, $relModel),
@@ -128,7 +112,7 @@ class RelatedField extends Field
             $related = $kwargs['relatedModel'];
             $field = $kwargs['fromField'];
             $field->relation->toModel = $related;
-            $field->doRelatedClass($related, $this->relation);
+            $field->doRelatedClass($related, $kwargs['scopeModel']);
         };
 
         Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->toModel, ['fromField' => $this]);
@@ -142,9 +126,9 @@ class RelatedField extends Field
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function doRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
+    public function doRelatedClass($relatedModel, $scopeModel)
     {
-        $this->contributeToRelatedClass($relatedModel, $relation);
+        $this->contributeToRelatedClass($relatedModel, $scopeModel);
     }
 
     /**
@@ -158,10 +142,9 @@ class RelatedField extends Field
         endif;
 
         if (is_string($this->relation->toModel)):
-            $kwargs['to'] = $this->relation->toModel;
-        else:
+            $kwargs['to'] = $this->relation->toModel; else:
             $name = $this->relation->toModel->getFullClassName();
-            $kwargs['to'] = ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace());
+        $kwargs['to'] = ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace());
         endif;
 
         if ($this->relation->parentLink):
@@ -172,23 +155,20 @@ class RelatedField extends Field
         return $kwargs;
     }
 
+    public function contributeToRelatedClass($relatedModel, $scopeModel)
+    {
+    }
+
     public function getLookup($name)
     {
         if ($name == 'in'):
-            return RelatedIn::class;
-        elseif ($name == 'exact'):
-            return RelatedExact::class;
-        elseif ($name == 'gt'):
-            return RelatedGreaterThan::class;
-        elseif ($name == 'gte'):
-            return RelatedGreaterThanOrEqual::class;
-        elseif ($name == 'lt'):
-            return RelatedLessThan::class;
-        elseif ($name == 'lte'):
-            return RelatedLessThanOrEqual::class;
-        elseif ($name == 'isnull'):
-            return RelatedIsNull::class;
-        else:
+            return RelatedIn::class; elseif ($name == 'exact'):
+            return RelatedExact::class; elseif ($name == 'gt'):
+            return RelatedGreaterThan::class; elseif ($name == 'gte'):
+            return RelatedGreaterThanOrEqual::class; elseif ($name == 'lt'):
+            return RelatedLessThan::class; elseif ($name == 'lte'):
+            return RelatedLessThanOrEqual::class; elseif ($name == 'isnull'):
+            return RelatedIsNull::class; else:
             throw new TypeError(sprintf('Related Field got invalid lookup: %s', $name));
         endif;
     }
@@ -197,29 +177,22 @@ class RelatedField extends Field
      * Returns the fields that are used to create the relation.
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     *
-     * @return Field[]
-     *
-     * @throws ValueError
-     * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
      */
     public function getRelatedFields()
     {
         if (is_string($this->relation->toModel)):
-            throw new ValueError(sprintf('Related model "%s" cannot be resolved', $this->relation->toModel));
+            throw new ValueError(sprintf('Related model %s cannot be resolved', $this->relation->toModel));
         endif;
         // origin of relation
-
+//        $this->fromField = ($this->fromField == 'this') ? $this : ;
         if ($this->fromField == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT) :
-            $this->fromField = $this;
-        elseif (is_string($this->fromField)):
+            $this->fromField = $this; elseif (is_string($this->fromField)):
             $this->fromField = $this->scopeModel->meta->getField($this->fromField);
         endif;
 
         //end point of relation
         if (is_string($this->toField)):
-            $this->toField = $this->relation->toModel->meta->getField($this->toField);
-        else:
+            $this->toField = $this->relation->toModel->meta->getField($this->toField); else:
             $this->toField = $this->relation->toModel->meta->primaryKey;
         endif;
 
@@ -239,25 +212,15 @@ class RelatedField extends Field
     /**
      * @param Model $modelInstance
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     *
-     * @return mixed
      */
-    public function getValue(Model $modelInstance)
+    public function getRelatedValue(Model $modelInstance)
     {
-        $relObj = null;
+        $qs = $this->getRelatedQueryset();
 
-        try {
-            $relObj = $modelInstance->_fieldCach[$this->getAttrName()];
-        } catch (AttributeError $e) {
-            $qs = $this->getRelatedQueryset();
-
-            $relObj = $qs->filter($this->getReverseRelatedFilter($modelInstance))->get();
-        }
-
-        return $relObj;
+        return $qs->filter($this->getReverseRelatedFilter($modelInstance))->get();
     }
 
-    public function setValue(Model $modelInstance, $value)
+    public function setRelatedValue($value)
     {
         if (!$value instanceof $this->relation->toModel):
             throw new ValueError(
@@ -276,10 +239,9 @@ class RelatedField extends Field
 
         /* @var $field RelatedField */
         list($fromField, $toField) = $this->getRelatedFields();
-        $modelInstance->_fieldCache[$fromField->name] = $value;
-        $modelInstance->_fieldCache[$fromField->getAttrName()] = $value->{$toField->getAttrName()};
 
-//        return [$fromField->getAttrName(), $value->{$toField->getAttrName()}];
+        // store the values
+        return [$fromField->getAttrName(), $value->{$toField->getAttrName()}];
     }
 
     /**
@@ -298,15 +260,6 @@ class RelatedField extends Field
         return [$toField->getAttrName() => $value];
     }
 
-    /**
-     * @param null $modelName
-     *
-     * @return Queryset
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
     public function getRelatedQueryset($modelName = null)
     {
         if (is_null($modelName)) :
@@ -321,7 +274,6 @@ class RelatedField extends Field
     {
         return $this->getInstanceValueForFields($modelInstance, $this->getForeignRelatedFields());
     }
-
     /**
      * Returns the value of fields provided from the model instance.
      *
@@ -337,60 +289,9 @@ class RelatedField extends Field
         $values = [];
         /** @var $field Field */
         foreach ($fields as $field) :
-            $val = $modelInstance->{$field->getAttrName()};
-            if (!$val):
-                continue;
-            endif;
-            $values[] = $val;
+            $values[] = $modelInstance->{$field->getAttrName()};
         endforeach;
 
         return $values;
-    }
-
-    /**
-     * Get path from this field to the related model.
-     *
-     * @return array
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     */
-    public function getPathInfo()
-    {
-        return [
-            [
-                'fromMeta' => $this->scopeModel->meta,
-                'toMeta' => $this->relation->toModel->meta,
-                'targetFields' => $this->getForeignRelatedFields(),
-                'joinField' => $this, //field that joins the relationship
-                'm2m' => false,
-                'direct' => true,
-            ],
-        ];
-    }
-
-    /**
-     * Get path from the related model to this field's model.
-     *
-     * @return array
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     */
-    public function getReversePathInfo()
-    {
-        $meta = $this->relation->toModel->meta;
-
-        return [
-            [
-                'fromMeta' => $meta,
-                'toMeta' => $this->scopeModel->meta,
-                'targetFields' => [$meta->primaryKey],
-                'joinField' => $this->relation, //field that joins the relationship
-                'm2m' => false,
-                'direct' => false,
-            ],
-        ];
-    }
-
-    public function getRelatedQueryName()
-    {
-        return strtolower($this->scopeModel->meta->modelName);
     }
 }

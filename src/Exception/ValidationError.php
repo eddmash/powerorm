@@ -19,4 +19,9 @@ class ValidationError extends OrmError
         $this->message = $message;
         $this->validation_code = $code;
     }
+
+    public function get_message()
+    {
+        return $this->message;
+    }
 }
