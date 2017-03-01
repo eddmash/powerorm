@@ -186,7 +186,6 @@ class Query extends BaseObject
         $meta = $this->model->meta;
         foreach ($fieldNames as $fieldName) :
             $names = StringHelper::split(BaseLookup::$lookupPattern, $fieldName);
-
             list($field, $targets, $meta, $joinList, $paths) = $this->setupJoins($names, $meta, $alias);
 
             /** @var $targets Field[] */
@@ -439,7 +438,8 @@ class Query extends BaseObject
 
             if ($field->hasMethod('getPathInfo')) :
                 $pathsInfos = $field->getPathInfo();
-                $pInfo = $pathsInfos[1];
+
+                $pInfo = end($pathsInfos);
                 $finalField = ArrayHelper::getValue($pInfo, 'joinField');
                 $targets = ArrayHelper::getValue($pInfo, 'targetFields');
                 $paths = array_merge($paths, $pathsInfos);

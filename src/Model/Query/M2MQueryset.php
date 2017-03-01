@@ -118,11 +118,13 @@ class M2MQueryset extends ParentQueryset
             /** @var $throughClass Model */
             $throughClass = $this->through->meta->modelName;
 
-            $vals = $throughClass::objects()->asArray([$toFieldName], true)->filter(
+            $vals = $throughClass::objects($this->through)->asArray([$toFieldName], true)->filter(
                 [
                     $fromFieldName => $this->relatedValues[0],
                 ]
             );
+
+            var_dump($vals->getSql());
 
         endif;
     }

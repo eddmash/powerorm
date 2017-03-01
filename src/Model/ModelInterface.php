@@ -26,15 +26,15 @@ interface ModelInterface extends DeConstructableInterface
     /**
      * Creates a Queryset that is used to interaract with the database.
      *
-     * @param array $conditions
-     *
+     * @param Model $modelInstance
      * @return Queryset
+     * @internal param array $conditions
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function objects();
+    public static function objects(Model $modelInstance=null);
 
     /**
      * All the model fields are set on this model.

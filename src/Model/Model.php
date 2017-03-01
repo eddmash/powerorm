@@ -751,11 +751,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function objects()
+    public static function objects(Model $modelInstance=null)
     {
         $queryset = self::getQuerysetClass();
-
-        return $queryset::createObject(BaseOrm::getDbConnection(), self::createObject());
+        $modelInstance = (is_null($modelInstance)) ? self::createObject() : $modelInstance;
+        return $queryset::createObject(BaseOrm::getDbConnection(), $modelInstance);
     }
 
     /**
