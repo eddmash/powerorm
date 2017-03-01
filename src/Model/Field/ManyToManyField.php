@@ -88,7 +88,7 @@ class ManyToManyField extends RelatedField
                 $field = $kwargs['fromField'];
 
                 $field->relation->through = $related;
-                $field->doRelatedClass($related, $kwargs['scopeModel']);
+                $field->doRelatedClass($related, $this->relation);
             };
 
             Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->through, ['fromField' => $this]);
