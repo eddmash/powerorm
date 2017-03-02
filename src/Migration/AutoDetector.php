@@ -661,19 +661,17 @@ class AutoDetector extends BaseObject
             endif;
 
             $localFields = $meta->localFields;
-            $localM2MFields = $meta->localFields;
+            $localM2MFields = $meta->localManyToMany;
 
             $relatedFields = [];
 
             // get all the relationship fields that we initiated since they
-            // will need to be created in there own
-            // operations aside from  the one that creates the model
-            // remember the model needs to exist first before
-            // enforcing the relationships.
+            // will need to be created on there own  operations aside from  the one that creates the model
+            // remember the model needs to exist first before enforcing the relationships.
 
             /** @var $localField Field */
             foreach ($localFields as $localField) :
-                if ($localField->relation != null && $localField->relation->toModel != null):
+                if ($localField->relation && $localField->relation->toModel):
                     $relatedFields[$localField->name] = $localField;
                 endif;
 
@@ -681,7 +679,7 @@ class AutoDetector extends BaseObject
 
             /** @var $localM2MField Field */
             foreach ($localM2MFields as $localM2MField) :
-                if ($localField->relation != null && $localField->relation->toModel != null):
+                if ($localField->relation && $localField->relation->toModel):
                     $relatedFields[$localM2MField->name] = $localM2MField;
                 endif;
 
