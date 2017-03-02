@@ -729,9 +729,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $field = $this->meta->getField($name);
             $field->setValue($this, $value);
         } catch (FieldDoesNotExist $e) {
+            // we assume this is not a model field being set
+            $this->{$name} = $value;
         }
-        // we assume this is not a model field being set
-        $this->{$name} = $value;
     }
 
     /**

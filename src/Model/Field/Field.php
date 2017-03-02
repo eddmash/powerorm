@@ -637,7 +637,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function getValue(Model $modelInstance)
     {
-        return $modelInstance->{$this->name};
+        return $modelInstance->{$this->getAttrName()};
     }
 
     /**
@@ -645,7 +645,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function setValue(Model $modelInstance, $value)
     {
-        $modelInstance->_fieldCache[$this->name] = $value;
+        $modelInstance->{$this->getAttrName()} = $value;
     }
 }
 

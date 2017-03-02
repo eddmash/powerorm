@@ -247,7 +247,7 @@ class RelatedField extends Field
         $relObj = null;
 
         try {
-            $relObj = $modelInstance->_fieldCach[$this->getAttrName()];
+            $relObj = $modelInstance->_fieldCache[$this->name];
         } catch (AttributeError $e) {
             $qs = $this->getRelatedQueryset();
 
@@ -276,8 +276,11 @@ class RelatedField extends Field
 
         /* @var $field RelatedField */
         list($fromField, $toField) = $this->getRelatedFields();
+        // cache the value of the model
         $modelInstance->_fieldCache[$fromField->name] = $value;
-        $modelInstance->_fieldCache[$fromField->getAttrName()] = $value->{$toField->getAttrName()};
+
+        // set the attrib value
+        $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
 
 //        return [$fromField->getAttrName(), $value->{$toField->getAttrName()}];
     }
