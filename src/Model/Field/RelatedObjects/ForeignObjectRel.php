@@ -45,6 +45,7 @@ class ForeignObjectRel extends BaseObject
     public $parentLink;
 
     public $onDelete;
+    public $relatedName;
 
     public function __construct($kwargs = [])
     {
@@ -94,6 +95,18 @@ class ForeignObjectRel extends BaseObject
     public function getLookup($name)
     {
         return $this->fromField->getLookup($name);
+    }
+
+    public function getReverseAccessorName(Model $model=null)
+    {
+        if (is_null($model)) :
+            $model = $this->getFromModel();
+        endif;
+
+        if ($this->relatedName) :
+            return $this->relatedName;
+        endif;
+        return sprintf("%s_set", $model->meta->modelName);
     }
 
     public function __toString()

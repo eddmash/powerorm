@@ -11,6 +11,7 @@
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
@@ -20,10 +21,12 @@ use Eddmash\PowerOrm\Model\Model;
 /**
  * Class M2MQueryset.
  *
+ *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
 class M2MQueryset extends ParentQueryset
 {
+    public $filters=[];
     /**
      * @var Model
      */
@@ -111,20 +114,37 @@ class M2MQueryset extends ParentQueryset
             $newIds = [];
             foreach ($values as $value) :
                 $field = $this->through->meta->getField($this->toFieldName);
-                $newIds[] = $field->getForeignRelatedFieldsValues($this->instance)[0];
+                $newIds[] = $field->getForeignRelatedFieldsValues($value)[0];
             endforeach;
             $newIds = array_unique($newIds);
 
             /** @var $throughClass Model */
             $throughClass = $this->through->meta->modelName;
 
-            $vals = $throughClass::objects($this->through)->asArray([$toFieldName], true)->filter(
+            $oldVals = $throughClass::objects($this->through)->asArray([$toFieldName], true)->filter(
                 [
                     $fromFieldName => $this->relatedValues[0],
                 ]
             );
+            $oldIds =[];
+            foreach ($oldVals as $oldVal) :
+                $oldIds[] = $oldVal;
+            endforeach;
 
-            var_dump($vals->getSql());
+            $newIds = array_diff($newIds, $oldIds);
+
+            /**@var $qb QueryBuilder*/
+            $qb = $this->connection->createQueryBuilder();
+
+            foreach ($newIds as $newId) :
+                $qb->insert($this->through->meta->dbTable);
+
+                $qb->setValue(sprintf("%s_id", $fromFieldName), $qb->createNamedParameter($this->relatedValues[0]));
+                $qb->setValue(sprintf("%s_id", $toFieldName), $qb->createNamedParameter($newId));
+
+                // save to db
+                $qb->execute();
+            endforeach;
 
         endif;
     }

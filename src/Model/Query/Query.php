@@ -283,7 +283,7 @@ class Query extends BaseObject
     }
 
     /**
-     * @return array
+     * @return Where
      */
     public function getWhere()
     {
@@ -312,7 +312,11 @@ class Query extends BaseObject
         /* @var $targets Field[] */
         /* @var $field Field */
         foreach ($conditions as $name => $value) :
+            var_dump($name);
+            echo " -- ";
             list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
+            var_dump($lookups);
+            echo "=========<br>";
 
             list($field, $targets, $meta, $joinList, $paths) = $this->setupJoins(
                 $fieldParts,
@@ -320,8 +324,8 @@ class Query extends BaseObject
                 $alias
             );
             list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
-            if ($field->isRelation) :
 
+            if ($field->isRelation) :
                 $lookupClass = $field->getLookup($lookups[0]);
                 $col = $targets[0]->getColExpression($alias, $field);
                 $condition = $lookupClass::createObject($col, $value);

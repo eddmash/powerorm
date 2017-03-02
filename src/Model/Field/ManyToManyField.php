@@ -105,6 +105,11 @@ class ManyToManyField extends RelatedField
 
     public function contributeToRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
     {
+        $relatedModel->{$relation->getReverseAccessorName()} = $this->createManyQueryset(
+            $relation,
+            $relatedModel->meta->modelName,
+            ['reverse' => true]
+        );
         $this->m2mField = function () use ($relation) {
             return $this->getM2MAttr($relation, 'name');
         };
@@ -117,7 +122,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model           $model
+     * @param Model $model
      *
      * @return Model
      *
@@ -266,10 +271,7 @@ class ManyToManyField extends RelatedField
 
         return function (Model $instance) use ($rel, $reverse) {
 
-            $queryset = M2MQueryset::createObject(
-                null,
-                null,
-                null,
+            $queryset = new M2MQueryset(null, null, null,
                 [
                     'rel' => $rel,
                     'instance' => $instance,

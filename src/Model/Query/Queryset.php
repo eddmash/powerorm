@@ -55,7 +55,7 @@ class Queryset implements QuerysetInterface
     /**
      * @var Model
      */
-    protected $model;
+    public $model;
 
     public $resultMapper;
 
@@ -95,7 +95,7 @@ class Queryset implements QuerysetInterface
      * @param Query      $query
      * @param array      $kwargs
      *
-     * @return static
+     * @return self
      *
      * @since 1.1.0
      *
@@ -508,7 +508,7 @@ class Queryset implements QuerysetInterface
      */
     public function _clone()
     {
-        $qb = clone $this->query;
+        $qb = $this->query->deepClone();
 
         $kwargs = array_merge(['resultMapper' => $this->resultMapper], $this->kwargs);
 
