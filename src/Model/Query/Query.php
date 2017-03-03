@@ -312,17 +312,15 @@ class Query extends BaseObject
         /* @var $targets Field[] */
         /* @var $field Field */
         foreach ($conditions as $name => $value) :
-            var_dump($name);
-            echo " -- ";
             list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
-            var_dump($lookups);
-            echo "=========<br>";
+
 
             list($field, $targets, $meta, $joinList, $paths) = $this->setupJoins(
                 $fieldParts,
                 $this->model->meta,
                 $alias
             );
+            echo "^^ ".$targets[0]."<br>";
             list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
 
             if ($field->isRelation) :
@@ -330,6 +328,7 @@ class Query extends BaseObject
                 $col = $targets[0]->getColExpression($alias, $field);
                 $condition = $lookupClass::createObject($col, $value);
             else:
+                echo $field." = ".$targets[0]."<br>";
                 $col = $targets[0]->getColExpression($alias, $field);
                 $condition = $this->buildCondition($lookups, $col, $value);
             endif;
@@ -412,7 +411,9 @@ class Query extends BaseObject
         $paths = $targets = [];
         $finalField = null;
         $noneField = [];
+
         foreach ($names as $name) :
+
             if ($name === PRIMARY_KEY_ID):
                 $name = $meta->primaryKey->name;
             endif;
@@ -448,8 +449,11 @@ class Query extends BaseObject
                 $targets = ArrayHelper::getValue($pInfo, 'targetFields');
                 $paths = array_merge($paths, $pathsInfos);
             else:
+                $finalField = null;
                 $finalField = $field;
+
                 $targets[] = $field;
+//                break;
             endif;
 
         endforeach;

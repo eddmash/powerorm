@@ -368,7 +368,12 @@ class Meta extends DeconstructableObject implements MetaInterface
         $seen_models = null;
 
         if ($reverse):
-            $fields = array_merge($fields, $this->getReverseRelatedObjects());
+            /**@var $revField RelatedField*/
+            foreach ($this->getReverseRelatedObjects() as $revField) :
+                $fields[$revField->relation->fromField->getRelatedQueryName()] = $revField->relation;
+            endforeach;
+
+//            $fields = array_merge($fields, $);
         endif;
 
         if ($forward):

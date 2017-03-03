@@ -279,7 +279,7 @@ class ManyToManyField extends RelatedField
                 ]
             );
 
-            return $queryset;
+            return $queryset->filter($queryset->filters);
         };
     }
 

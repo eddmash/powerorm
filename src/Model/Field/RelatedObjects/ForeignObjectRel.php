@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
 
 class ForeignObjectRel extends BaseObject
@@ -38,14 +39,17 @@ class ForeignObjectRel extends BaseObject
     public $through;
 
     /**
-     * @var Field
+     * @var RelatedField
      */
     public $fromField;
 
     public $parentLink;
 
     public $onDelete;
+
     public $relatedName;
+
+    public $name;
 
     public function __construct($kwargs = [])
     {
