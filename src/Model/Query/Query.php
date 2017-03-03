@@ -315,12 +315,11 @@ class Query extends BaseObject
             list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
 
 
-            list($field, $targets, $meta, $joinList, $paths) = $this->setupJoins(
+            list($field, $targets, $_, $joinList, $paths) = $this->setupJoins(
                 $fieldParts,
                 $this->model->meta,
                 $alias
             );
-            echo "^^ ".$targets[0]."<br>";
             list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
 
             if ($field->isRelation) :
@@ -328,7 +327,6 @@ class Query extends BaseObject
                 $col = $targets[0]->getColExpression($alias, $field);
                 $condition = $lookupClass::createObject($col, $value);
             else:
-                echo $field." = ".$targets[0]."<br>";
                 $col = $targets[0]->getColExpression($alias, $field);
                 $condition = $this->buildCondition($lookups, $col, $value);
             endif;

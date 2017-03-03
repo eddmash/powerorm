@@ -281,8 +281,6 @@ class RelatedField extends Field
 
         // set the attrib value
         $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
-
-//        return [$fromField->getAttrName(), $value->{$toField->getAttrName()}];
     }
 
     /**

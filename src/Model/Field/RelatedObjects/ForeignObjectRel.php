@@ -113,6 +113,11 @@ class ForeignObjectRel extends BaseObject
         return sprintf("%s_set", $model->meta->modelName);
     }
 
+    public function getPathInfo()
+    {
+        return $this->fromField->getPathInfo();
+    }
+
     public function __toString()
     {
         return (string) sprintf('<Rel %s>', $this->toModel->meta->modelName);

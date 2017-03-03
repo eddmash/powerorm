@@ -12,7 +12,9 @@
 namespace Eddmash\PowerOrm\Model\Manager;
 
 
-class BaseManager
+use Eddmash\PowerOrm\BaseObject;
+
+class BaseManager extends BaseObject
 {
 
 }

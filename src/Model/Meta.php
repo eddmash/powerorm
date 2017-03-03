@@ -12,6 +12,7 @@ use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
+use Eddmash\PowerOrm\Model\Manager\BaseManager;
 
 /**
  * Metadata options that can be given to a mode..
@@ -41,6 +42,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     public $verboseName;
 
     public $managed = true;
+    public $managerClass;
 
     public $proxy = false;
     /**
@@ -148,6 +150,10 @@ class Meta extends DeconstructableObject implements MetaInterface
 
         if ($this->registry == null):
             $this->registry = BaseOrm::getRegistry();
+        endif;
+
+        if ($this->managerClass == null):
+            $this->managerClass = BaseManager::class;
         endif;
     }
 
