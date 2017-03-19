@@ -167,7 +167,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getFields($includeParents = true)
     {
-        return $this->fetchFields(['includeParents' => $includeParents, 'reverse' => false]);
+        return $this->fetchFields(['includeParents' => $includeParents]);
     }
 
     /**
@@ -296,10 +296,11 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getReverseRelatedObjects()
     {
+        /* @var $model Model */
+        /* @var $field RelatedField */
         if (empty($this->_reverseRelationTreeCache)):
             $allRelations = [];
-            /* @var $model Model */
-            /* @var $field RelatedField */
+
             $allModels = $this->registry->getModels(true);
 
             // collect all relation fields for this each model
@@ -309,24 +310,28 @@ class Meta extends DeconstructableObject implements MetaInterface
 
                 foreach ($fields as $field) :
 
-                    if ($field->isRelation && $field->getRelatedModel() !== null):
-
-                        $allRelations[$field->relation->toModel->meta->modelName][$field->name] = $field;
-
+                    if ($field->isRelation && !empty($field->getRelatedModel())):
+                         $allRelations[strtolower($field->relation->toModel->meta->modelName)][] = $field;
                     endif;
+
                 endforeach;
 
             endforeach;
 
             // set cache relation to models
             foreach ($allModels as $name => $model) :
+                $name = strtolower($name);
+
                 // get fields for each model
                 $fields = (isset($allRelations[$name])) ? $allRelations[$name] : [];
+
                 $model->meta->_reverseRelationTreeCache = $fields;
             endforeach;
         endif;
 
-        return $this->_reverseRelationTreeCache;
+        // we get the model from the registry
+        // to ensure we get the same model instance and same meta class for the model.
+        return $this->registry->getModel($this->modelName)->meta->_reverseRelationTreeCache;
     }
 
     /**
@@ -374,7 +379,8 @@ class Meta extends DeconstructableObject implements MetaInterface
         $seen_models = null;
 
         if ($reverse):
-            /**@var $revField RelatedField*/
+
+            /** @var $revField RelatedField */
             foreach ($this->getReverseRelatedObjects() as $revField) :
                 $fields[$revField->relation->fromField->getRelatedQueryName()] = $revField->relation;
             endforeach;

@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
@@ -26,7 +25,7 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class M2MQueryset extends ParentQueryset
 {
-    public $filters=[];
+    public $filters = [];
     /**
      * @var Model
      */
@@ -66,7 +65,7 @@ class M2MQueryset extends ParentQueryset
             $this->fromFieldName = call_user_func($rel->fromField->m2mReverseField);
             $this->toFieldName = call_user_func($rel->fromField->m2mField);
         endif;
-
+        echo $this->fromFieldName.'==='.$this->toFieldName.'<br>';
         $this->through = $rel->through;
 
         $this->fromField = $this->through->meta->getField($this->fromFieldName);
@@ -126,21 +125,21 @@ class M2MQueryset extends ParentQueryset
                     $fromFieldName => $this->relatedValues[0],
                 ]
             );
-            $oldIds =[];
+            $oldIds = [];
             foreach ($oldVals as $oldVal) :
                 $oldIds[] = $oldVal;
             endforeach;
 
             $newIds = array_diff($newIds, $oldIds);
 
-            /**@var $qb QueryBuilder*/
+            /** @var $qb QueryBuilder */
             $qb = $this->connection->createQueryBuilder();
 
             foreach ($newIds as $newId) :
                 $qb->insert($this->through->meta->dbTable);
 
-                $qb->setValue(sprintf("%s_id", $fromFieldName), $qb->createNamedParameter($this->relatedValues[0]));
-                $qb->setValue(sprintf("%s_id", $toFieldName), $qb->createNamedParameter($newId));
+                $qb->setValue(sprintf('%s_id', $fromFieldName), $qb->createNamedParameter($this->relatedValues[0]));
+                $qb->setValue(sprintf('%s_id', $toFieldName), $qb->createNamedParameter($newId));
 
                 // save to db
                 $qb->execute();

@@ -314,7 +314,6 @@ class Query extends BaseObject
         foreach ($conditions as $name => $value) :
             list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
 
-
             list($field, $targets, $_, $joinList, $paths) = $this->setupJoins(
                 $fieldParts,
                 $this->model->meta,
@@ -331,6 +330,7 @@ class Query extends BaseObject
                 $condition = $this->buildCondition($lookups, $col, $value);
             endif;
 
+            echo $condition.'<br>';
             $this->where->setConditions($connector, $condition);
 
         endforeach;
@@ -363,6 +363,7 @@ class Query extends BaseObject
     private function buildCondition($lookup, $lhs, $rhs)
     {
         $lookup = (array) $lookup;
+
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
         $lookup = $lookup::createObject($lhs, $rhs);
@@ -404,13 +405,25 @@ class Query extends BaseObject
         return [$connector, $lookup, $fieldParts];
     }
 
+    /**
+     * @param $names
+     * @param Meta $meta
+     * @param bool $failOnMissing
+     *
+     * @return array
+     *
+     * @throws FieldError
+     */
     public function getNamesPath($names, Meta $meta, $failOnMissing = false)
     {
         $paths = $targets = [];
         $finalField = null;
-        $noneField = [];
 
-        foreach ($names as $name) :
+        $posReached = 0;
+
+        foreach ($names as $pos => $name) :
+
+            $posReached = $pos;
 
             if ($name === PRIMARY_KEY_ID):
                 $name = $meta->primaryKey->name;
@@ -422,6 +435,7 @@ class Query extends BaseObject
             try {
                 $field = $meta->getField($name);
             } catch (FieldDoesNotExist $e) {
+                //todo check in annotations to
                 $available = getFieldNamesFromMeta($meta);
                 if ($failOnMissing) :
 
@@ -434,12 +448,12 @@ class Query extends BaseObject
                         )
                     );
                 else:
-                    $noneField[] = $name;
                     break;
                 endif;
             }
 
             if ($field->hasMethod('getPathInfo')) :
+
                 $pathsInfos = $field->getPathInfo();
 
                 $pInfo = end($pathsInfos);
@@ -447,14 +461,17 @@ class Query extends BaseObject
                 $targets = ArrayHelper::getValue($pInfo, 'targetFields');
                 $paths = array_merge($paths, $pathsInfos);
             else:
+                // none relational field
                 $finalField = null;
                 $finalField = $field;
 
                 $targets[] = $field;
-//                break;
+                // no need to go on since this is a none relation field.
+                break;
             endif;
-
         endforeach;
+
+        $noneField = array_slice($names, $posReached + 1);
 
         return ['paths' => $paths, 'finalField' => $finalField, 'targets' => $targets, 'others' => $noneField];
     }

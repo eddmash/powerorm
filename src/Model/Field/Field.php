@@ -585,7 +585,7 @@ class Field extends DeconstructableObject implements FieldInterface
 
         $name = (is_null($this->name)) ? '' : $this->name;
 
-        return sprintf('< %s : (%s %s)>', self::class, $class, $name);
+        return sprintf('< %s : (%s %s)>', static::class, $class, $name);
     }
 
     /**

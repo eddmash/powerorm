@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -101,7 +100,7 @@ class ForeignObjectRel extends BaseObject
         return $this->fromField->getLookup($name);
     }
 
-    public function getReverseAccessorName(Model $model=null)
+    public function getReverseAccessorName(Model $model = null)
     {
         if (is_null($model)) :
             $model = $this->getFromModel();
@@ -110,7 +109,8 @@ class ForeignObjectRel extends BaseObject
         if ($this->relatedName) :
             return $this->relatedName;
         endif;
-        return sprintf("%s_set", $model->meta->modelName);
+
+        return sprintf('%s_set', $model->meta->modelName);
     }
 
     public function getPathInfo()

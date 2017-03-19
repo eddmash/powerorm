@@ -741,10 +741,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function __toString()
     {
-        $pk = "";
+        $pk = '';
         if ($this->meta->primaryKey) :
             $pk = $this->{$this->meta->primaryKey->getAttrName()};
         endif;
+
         return sprintf(' < %s : ( object %s ) >', $this->getFullClassName(), $pk);
     }
 

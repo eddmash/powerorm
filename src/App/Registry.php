@@ -94,11 +94,7 @@ class Registry extends BaseObject
      */
     public function getModels($includeAutoCreated = false)
     {
-        try {
-            $this->isAppReady();
-        } catch (AppRegistryNotReady $e) {
-            $this->populate();
-        }
+        $this->isAppReady();
 
         if ($includeAutoCreated):
             return $this->allModels;

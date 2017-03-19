@@ -291,6 +291,7 @@ class Queryset implements QuerysetInterface
     {
         $instance = $this->_clone();
         $instance->addConditions($negate, $conditions);
+
         return $instance;
     }
 

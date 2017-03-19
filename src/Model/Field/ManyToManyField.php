@@ -122,7 +122,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model $model
+     * @param Model           $model
      *
      * @return Model
      *
@@ -271,13 +271,15 @@ class ManyToManyField extends RelatedField
 
         return function (Model $instance) use ($rel, $reverse) {
 
-            $queryset = new M2MQueryset(null, null, null,
+            $queryset = M2MQueryset::createObject(null, null, null,
                 [
                     'rel' => $rel,
                     'instance' => $instance,
                     'reverse' => $reverse,
                 ]
             );
+
+            echo 'SQL::( '.$queryset->filter($queryset->filters)->getSql().')<br>';
 
             return $queryset->filter($queryset->filters);
         };
