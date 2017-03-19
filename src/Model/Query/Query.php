@@ -20,6 +20,7 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
@@ -79,6 +80,10 @@ class Query extends BaseObject
      * @var BaseAggregate[]
      */
     public $annotations = [];
+    public $distict;
+    public $distictFields = [];
+    public $orderBy;
+    public $defaultOrdering = [];
 
     /**
      * Query constructor.
@@ -112,8 +117,21 @@ class Query extends BaseObject
         $this->klassInfo = $klassInfo;
     }
 
-    public function asSql(Connection $connection)
+    /**
+     * Creates the SQL for this query. Returns the SQL string and list of parameters.
+     *
+     * @param Connection $connection
+     * @param bool       $isSubQuery
+     *
+     * @return array
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function asSql(Connection $connection, $isSubQuery = false)
     {
+        $this->isSubQuery = $isSubQuery;
         $this->preSqlSetup();
         $params = [];
         list($fromClause, $fromParams) = $this->getFrom($connection);
@@ -169,9 +187,8 @@ class Query extends BaseObject
 
     public function getNestedSql(Connection $connection)
     {
-        $this->isSubQuery = true;
 
-        return $this->asSql($connection);
+        return $this->asSql($connection, true);
     }
 
     public function addSelect(Col $col)
@@ -319,6 +336,7 @@ class Query extends BaseObject
                 $this->model->meta,
                 $alias
             );
+
             list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
 
             if ($field->isRelation) :
@@ -330,7 +348,6 @@ class Query extends BaseObject
                 $condition = $this->buildCondition($lookups, $col, $value);
             endif;
 
-            echo $condition.'<br>';
             $this->where->setConditions($connector, $condition);
 
         endforeach;
@@ -421,6 +438,7 @@ class Query extends BaseObject
 
         $posReached = 0;
 
+        /* @var $field Field|RelatedField|ForeignObjectRel */
         foreach ($names as $pos => $name) :
 
             $posReached = $pos;
@@ -429,7 +447,6 @@ class Query extends BaseObject
                 $name = $meta->primaryKey->name;
             endif;
 
-            /** @var $field Field */
             $field = null;
 
             try {
@@ -456,9 +473,10 @@ class Query extends BaseObject
 
                 $pathsInfos = $field->getPathInfo();
 
-                $pInfo = end($pathsInfos);
+                $pInfo = $pathsInfos[count($pathsInfos) - 1];
                 $finalField = ArrayHelper::getValue($pInfo, 'joinField');
                 $targets = ArrayHelper::getValue($pInfo, 'targetFields');
+
                 $paths = array_merge($paths, $pathsInfos);
             else:
                 // none relational field
@@ -471,9 +489,12 @@ class Query extends BaseObject
             endif;
         endforeach;
 
-        $noneField = array_slice($names, $posReached + 1);
-
-        return ['paths' => $paths, 'finalField' => $finalField, 'targets' => $targets, 'others' => $noneField];
+        return [
+            'paths' => $paths,
+            'finalField' => $finalField,
+            'targets' => $targets,
+            'others' => array_slice($names, $posReached + 1),
+        ];
     }
 
     /**
@@ -677,16 +698,96 @@ class Query extends BaseObject
         if (!$this->annotations):
             return [];
         endif;
+        $hasLimit = ($this->offset || $this->limit);
         $hasExistingAnnotations = false;
-        if ($hasExistingAnnotations):
+
+        // we have of this we need to make the core query a subquery and aggregate over it.
+        if ($hasExistingAnnotations || $hasLimit || $this->distict):
+            $outQuery = new AggregateQuery($this->model);
+            $innerQuery = $this->deepClone();
+
+            $innerQuery->selectRelected = false;
+
+            if (!$hasLimit && !$this->distictFields):
+                // Queries with distinct_fields need ordering and when a limit
+                // is applied we must take the slice from the ordered query.
+                // Otherwise no need for ordering, so clear.
+                $innerQuery->clearOrdering(true);
+            endif;
+
+            if(!$innerQuery->distict):
+                // if we are using default columns and we already have aggregate annotations existing
+                // then we must make sure the inner
+                // query is grouped by the main model's primary key. However,
+                // clearing the select clause can alter results if distinct is
+                // used.
+                if($innerQuery->useDefaultCols && $hasExistingAnnotations):
+                  $innerQuery->groupBy = [
+                      $this->model->meta->primaryKey->getColExpression($innerQuery->getInitialAlias()),
+                  ];
+                endif;
+                $innerQuery->useDefaultCols = false;
+            endif;
+
+            // add annotations to the outerquery todo
+            foreach ($this->annotations as $alias => $annotation) :
+                $outQuery->annotations[$alias] = $annotation;
+                unset($innerQuery->annotations[$alias]);
+            endforeach;
+
+            if($innerQuery->select == [] && !$innerQuery->useDefaultCols):
+                $innerQuery->select = [$this->model->meta->primaryKey->getColExpression($innerQuery->getInitialAlias())];
+            endif;
+
+            $outQuery->addSubQuery($innerQuery, $connection);
         else:
             $outQuery = $this;
             $outQuery->select = [];
             $outQuery->useDefaultCols = false;
         endif;
 
-        return $this->execute($connection)->fetch();
+        $outQuery->clearOrdering(true);
+        $outQuery->clearLimits();
+        $outQuery->selectRelected = false;
 
+        $results = $outQuery->execute($connection)->fetch();
+
+        $result = [];
+        foreach (array_combine(array_keys($this->annotations), array_values($results)) as $key => $item) {
+            $result[$key] = $item;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Removes any ordering settings. If 'force_empty' is True, there will be no
+     * ordering in the resulting query (not even the model's default).
+     *
+     * @param bool $forceEmpty
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function clearOrdering($forceEmpty = false)
+    {
+        $this->orderBy = false;
+        if ($forceEmpty):
+            $this->defaultOrdering = false;
+        endif;
+    }
+
+    /**
+     * Clears any existing limits.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function clearLimits()
+    {
+        $this->limit = $this->offset = null;
     }
 
     public function getCount(Connection $connection)
@@ -708,7 +809,7 @@ class Query extends BaseObject
      */
     public function deepClone()
     {
-        $obj = new self($this->model);
+        $obj = new static($this->model);
         $obj->aliasRefCount = $this->aliasRefCount;
         $obj->useDefaultCols = $this->useDefaultCols;
         $obj->tableAlias = $this->tableAlias;

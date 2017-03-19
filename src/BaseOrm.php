@@ -274,9 +274,15 @@ class BaseOrm extends BaseObject
         return $orm->registryCache;
     }
 
-    public static function loadRegistry()
+    public static function instantiate($config = [])
     {
-        $instance = self::getInstance();
+        $orm = new static($config);
+        self::loadRegistry($orm);
+    }
+
+    public static function loadRegistry($ormInstance = null)
+    {
+        $instance = ($ormInstance) ? $ormInstance : self::getInstance();
 
         try {
             $instance->registryCache->isAppReady();
@@ -294,7 +300,7 @@ class BaseOrm extends BaseObject
     {
         $instance = null;
 
-        if (ENVIRONMENT == 'POWERORM_DEV'):
+        if (ENVIRONMENT == 'POWERORM_DEV') :
             $instance = static::standAloneEnvironment($config);
         else:
             $instance = static::getOrmFromContext();
@@ -411,6 +417,7 @@ class BaseOrm extends BaseObject
     public static function consoleRunner($config = [])
     {
         // register model checks
+        self::loadRegistry();
         self::registerModelChecks();
         Manager::run();
     }

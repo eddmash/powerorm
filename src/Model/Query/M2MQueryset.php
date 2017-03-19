@@ -65,7 +65,7 @@ class M2MQueryset extends ParentQueryset
             $this->fromFieldName = call_user_func($rel->fromField->m2mReverseField);
             $this->toFieldName = call_user_func($rel->fromField->m2mField);
         endif;
-        echo $this->fromFieldName.'==='.$this->toFieldName.'<br>';
+
         $this->through = $rel->through;
 
         $this->fromField = $this->through->meta->getField($this->fromFieldName);

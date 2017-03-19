@@ -165,7 +165,7 @@ class ManyToManyField extends RelatedField
             ),
         ];
 
-//        /** @var $intermediaryObj Model */
+        /* @var $intermediaryObj Model */
         $intermediaryClass = FormatFileContent::createObject();
         $intermediaryClass->addItem(sprintf('class %1$s extends \%2$s{', $className, Model::getFullClassName()));
         $intermediaryClass->addItem('public function fields(){');
@@ -278,10 +278,11 @@ class ManyToManyField extends RelatedField
                     'reverse' => $reverse,
                 ]
             );
+            $cond = $queryset->filters;
 
-            echo 'SQL::( '.$queryset->filter($queryset->filters)->getSql().')<br>';
+            $queryset = $queryset->filter($cond);
 
-            return $queryset->filter($queryset->filters);
+            return $queryset;
         };
     }
 

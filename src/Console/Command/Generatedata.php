@@ -75,22 +75,7 @@ class Generatedata extends BaseCommand
             $populator->addModel($model, $number);
         endforeach;
 
-        list($insertedPKs, $failed) = $populator->execute($output);
-
-        if ($failed):
-            foreach ($failed as $model => $related) :
-                $output->writeln(
-                    sprintf(
-                        '<error>Failed for model "%s", could not locate related model(s) [%s]</error>',
-                        $model,
-                        implode(', ', $related)
-                    )
-                );
-            endforeach;
-
-        endif;
-
-        return $insertedPKs;
+        return $populator->execute($output);
     }
 
     protected function configure()

@@ -20,6 +20,7 @@ class ForeignObjectRel extends BaseObject
 {
     public $autoCreated = true;
     public $isRelation = true;
+    public $concrete = false;
     public $multiple = true;
 
     // Reverse relations are always nullable (PowerOrm can't enforce that a
@@ -115,11 +116,11 @@ class ForeignObjectRel extends BaseObject
 
     public function getPathInfo()
     {
-        return $this->fromField->getPathInfo();
+        return $this->fromField->getReversePathInfo();
     }
 
     public function __toString()
     {
-        return (string) sprintf('<Rel %s>', $this->toModel->meta->modelName);
+        return sprintf('<%s %s>', static::class, $this->toModel->meta->modelName);
     }
 }

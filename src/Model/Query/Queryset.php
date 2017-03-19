@@ -342,7 +342,7 @@ class Queryset implements QuerysetInterface
 
         $sql = str_replace('?', '%s', $sql);
 
-        return sprintf($sql, implode(', ', $params));
+        return vsprintf($sql, $params);
     }
 
     /**

@@ -189,6 +189,11 @@ abstract class BaseCommand extends Command
         $output->writeln($message);
     }
 
+    /**
+     * Returns the name of the current class in lower case and strips off the "Command".
+     *
+     * @return string
+     */
     public function guessCommandName()
     {
         $name = get_class($this);
