@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Exception\AttributeError;
+use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -134,6 +135,20 @@ class RelatedField extends Field
         Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->toModel, ['fromField' => $this]);
     }
 
+    public function contributeToRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
+    {
+        $relatedModel->{$relation->getAccessorName()} = $this->createManyQueryset(
+            $relation,
+            $relatedModel->meta->modelName,
+            ['reverse' => true]
+        );
+    }
+
+    public function createManyQueryset(ForeignObjectRel $rel, $modelClass, $reverse = false)
+    {
+        
+    }
+
     /**
      * @param Model $relatedModel
      * @param Model $scopeModel
@@ -247,8 +262,8 @@ class RelatedField extends Field
         $relObj = null;
 
         try {
-            $relObj = $modelInstance->_fieldCache[$this->name];
-        } catch (AttributeError $e) {
+            $relObj = ArrayHelper::getValue($modelInstance->_fieldCache, $this->name, ArrayHelper::STRICT);
+        } catch (KeyError $e) {
             $qs = $this->getRelatedQueryset();
 
             $relObj = $qs->filter($this->getReverseRelatedFilter($modelInstance))->get();
@@ -390,8 +405,22 @@ class RelatedField extends Field
         ];
     }
 
+    /**
+     * Define the name that can be used to identify this related object in a table-spanning query.
+     *
+     * @return string
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
     public function getRelatedQueryName()
     {
-        return strtolower($this->scopeModel->meta->modelName);
+        // we check if the queryname/ relatedName is set other use we use the name of the model.
+        if ($this->relation->relatedQueryName) :
+            $name = $this->relation->relatedQueryName;
+        elseif($this->relation->relatedName):
+            $name = $this->relation->relatedName;
+        else:
+            $name = $this->scopeModel->meta->modelName;
+        endif;
+        return strtolower($name);
     }
 }

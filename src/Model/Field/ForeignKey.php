@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Delete;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToOneRel;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -37,6 +38,8 @@ class ForeignKey extends RelatedField
                 [
                     'fromField' => $this,
                     'to' => ArrayHelper::getValue($kwargs, 'to'),
+                    'relatedName' => ArrayHelper::getValue($kwargs, 'relatedName'),
+                    'relatedQueryName' => ArrayHelper::getValue($kwargs, 'relatedQueryName'),
                     'toField' => ArrayHelper::getValue($kwargs, 'toField'),
                     'parentLink' => ArrayHelper::getValue($kwargs, 'parentLink'),
                     'onDelete' => ArrayHelper::getValue($kwargs, 'onDelete', Delete::CASCADE),
@@ -75,10 +78,11 @@ class ForeignKey extends RelatedField
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function contributeToRelatedClass($related, $scopeModel)
+    public function contributeToRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
     {
+        parent::contributeToRelatedClass($relatedModel, $relation);
         if ($this->relation->fieldName == null):
-            $this->relation->fieldName = $related->meta->primaryKey->name;
+            $this->relation->fieldName = $relatedModel->meta->primaryKey->name;
         endif;
     }
 

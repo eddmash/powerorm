@@ -47,13 +47,42 @@ class ForeignObjectRel extends BaseObject
 
     public $onDelete;
 
+    /**
+     * The name to use for the relation from the related object back to this one.
+     * It’s also the default value for related_query_name
+     * (the name to use for the reverse filter name from the target model).
+     *
+     * If you’d prefer Django not to create a backwards relation, set related_name to '+' or end it with '+'.
+     *
+     * @var
+     */
     public $relatedName;
+
+    /**
+     * The name to use for the reverse filter name from the target model.
+     * It defaults to the value of related_name or default_related_name if set,
+     * otherwise it defaults to the name of the model.
+     *
+     * @var
+     */
+    public $relatedQueryName;
 
     public $name;
 
     public function __construct($kwargs = [])
     {
         BaseOrm::configure($this, $kwargs, ['to' => 'toModel']);
+    }
+
+
+    /**
+     * Name of the field.
+     * @return string
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getName()
+    {
+        return $this->fromField->getRelatedQueryName();
     }
 
     public static function createObject($kwargs = [])
@@ -101,7 +130,7 @@ class ForeignObjectRel extends BaseObject
         return $this->fromField->getLookup($name);
     }
 
-    public function getReverseAccessorName(Model $model = null)
+    public function getAccessorName(Model $model = null)
     {
         if (is_null($model)) :
             $model = $this->getFromModel();
@@ -111,7 +140,7 @@ class ForeignObjectRel extends BaseObject
             return $this->relatedName;
         endif;
 
-        return sprintf('%s_set', $model->meta->modelName);
+        return sprintf('%s_set', strtolower($model->meta->modelName));
     }
 
     public function getPathInfo()

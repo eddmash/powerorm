@@ -705,11 +705,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __get($name)
     {
-        if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
-            throw new AttributeError(
-                sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->modelName, $name)
-            );
-        endif;
 
         try {
             /** @var $field RelatedField */
@@ -717,6 +712,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             return $field->getValue($this);
         } catch (FieldDoesNotExist $e) {
+
+            if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
+                throw new AttributeError(
+                    sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->modelName, $name)
+                );
+            endif;
         }
 
         return $this->{$name};

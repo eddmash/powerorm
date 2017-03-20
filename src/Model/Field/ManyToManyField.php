@@ -60,6 +60,8 @@ class ManyToManyField extends RelatedField
                 [
                     'fromField' => $this,
                     'to' => ArrayHelper::getValue($kwargs, 'to'),
+                    'relatedName' => ArrayHelper::getValue($kwargs, 'relatedName'),
+                    'relatedQueryName' => ArrayHelper::getValue($kwargs, 'relatedQueryName'),
                     'through' => ArrayHelper::getValue($kwargs, 'through'),
                     'throughFields' => ArrayHelper::getValue($kwargs, 'throughFields'),
                     'dbConstraint' => ArrayHelper::getValue($kwargs, 'dbConstraint', true),
@@ -105,7 +107,7 @@ class ManyToManyField extends RelatedField
 
     public function contributeToRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        $relatedModel->{$relation->getReverseAccessorName()} = $this->createManyQueryset(
+        $relatedModel->{$relation->getAccessorName()} = $this->createManyQueryset(
             $relation,
             $relatedModel->meta->modelName,
             ['reverse' => true]
@@ -261,6 +263,13 @@ class ManyToManyField extends RelatedField
 
     }
 
+    /**
+     * @param ForeignObjectRel $rel
+     * @param Model $modelClass
+     * @param bool $reverse
+     * @return \Closure
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
     public function createManyQueryset(ForeignObjectRel $rel, $modelClass, $reverse = false)
     {
         $querysetClass = $modelClass::getQuerysetClass();

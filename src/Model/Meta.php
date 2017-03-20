@@ -12,6 +12,7 @@ use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
 
 /**
@@ -382,10 +383,9 @@ class Meta extends DeconstructableObject implements MetaInterface
 
             /** @var $revField RelatedField */
             foreach ($this->getReverseRelatedObjects() as $revField) :
-                $fields[$revField->relation->fromField->getRelatedQueryName()] = $revField->relation;
+                $fields[$revField->relation->getName()] = $revField->relation;
             endforeach;
 
-//            $fields = array_merge($fields, $);
         endif;
 
         if ($forward):

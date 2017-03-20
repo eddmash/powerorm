@@ -700,6 +700,10 @@ class Query extends BaseObject
         endif;
         $hasLimit = ($this->offset || $this->limit);
         $hasExistingAnnotations = false;
+        foreach ($this->annotations as $alias=>$annotation) :
+
+            $hasExistingAnnotations = ($hasExistingAnnotations || !in_array($alias, $addedAggregateNames));
+        endforeach;
 
         // we have of this we need to make the core query a subquery and aggregate over it.
         if ($hasExistingAnnotations || $hasLimit || $this->distict):
@@ -795,7 +799,7 @@ class Query extends BaseObject
         $obj = $this->deepClone();
         $obj->addAnnotation(['annotation' => Exp::Count('*'), 'alias' => '_count', 'isSummary' => true]);
         $alias = '_count';
-        $result = $obj->getAggregation($connection, ['alias' => $alias]);
+        $result = $obj->getAggregation($connection, [$alias]);
 
         return ArrayHelper::getValue($result, $alias, 0);
     }
@@ -834,7 +838,6 @@ class Query extends BaseObject
     public function execute(Connection $connection)
     {
         list($sql, $params) = $this->asSql($connection);
-
         $stmt = $connection->prepare($sql);
         foreach ($params as $index => $value) :
             ++$index; // Columns/Parameters are 1-based, so need to start at 1 instead of zero

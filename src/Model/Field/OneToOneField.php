@@ -41,6 +41,8 @@ class OneToOneField extends ForeignKey
                 [
                     'fromField' => $this,
                     'to' => ArrayHelper::getValue($kwargs, 'to'),
+                    'relatedName' => ArrayHelper::getValue($kwargs, 'relatedName'),
+                    'relatedQueryName' => ArrayHelper::getValue($kwargs, 'relatedQueryName'),
                     'toField' => ArrayHelper::getValue($kwargs, 'toField'),
                     'parentLink' => ArrayHelper::getValue($kwargs, 'parentLink'),
                     'onDelete' => ArrayHelper::getValue($kwargs, 'onDelete', Delete::CASCADE),
