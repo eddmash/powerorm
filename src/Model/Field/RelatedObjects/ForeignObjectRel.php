@@ -74,9 +74,9 @@ class ForeignObjectRel extends BaseObject
         BaseOrm::configure($this, $kwargs, ['to' => 'toModel']);
     }
 
-
     /**
      * Name of the field.
+     *
      * @return string
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */

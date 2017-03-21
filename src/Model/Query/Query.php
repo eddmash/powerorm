@@ -700,7 +700,7 @@ class Query extends BaseObject
         endif;
         $hasLimit = ($this->offset || $this->limit);
         $hasExistingAnnotations = false;
-        foreach ($this->annotations as $alias=>$annotation) :
+        foreach ($this->annotations as $alias => $annotation) :
 
             $hasExistingAnnotations = ($hasExistingAnnotations || !in_array($alias, $addedAggregateNames));
         endforeach;

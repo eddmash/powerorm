@@ -265,8 +265,9 @@ class ManyToManyField extends RelatedField
 
     /**
      * @param ForeignObjectRel $rel
-     * @param Model $modelClass
-     * @param bool $reverse
+     * @param Model            $modelClass
+     * @param bool             $reverse
+     *
      * @return \Closure
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */

@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
-use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
@@ -144,9 +143,40 @@ class RelatedField extends Field
         );
     }
 
+    /**
+     * @param ForeignObjectRel $rel
+     * @param Model            $modelClass
+     * @param bool             $reverse
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @return \Closure
+     */
     public function createManyQueryset(ForeignObjectRel $rel, $modelClass, $reverse = false)
     {
-        
+        $querysetClass = $modelClass::getQuerysetClass();
+
+        if (!class_exists('Eddmash\PowerOrm\Model\Query\ParentQueryset')) :
+            eval(sprintf('namespace Eddmash\PowerOrm\Model\Query;class ParentQueryset extends \%s{}', $querysetClass));
+        endif;
+
+        return function (Model $instance) use ($rel, $reverse) {
+
+            $queryset = M2OQueryset::createObject(null, null, null,
+                [
+                    'rel' => $rel,
+                    'instance' => $instance,
+                    'reverse' => $reverse,
+                ]
+            );
+            $cond = $queryset->filters;
+
+            $queryset = $queryset->filter($cond);
+
+            return $queryset;
+        };
     }
 
     /**
@@ -421,6 +451,7 @@ class RelatedField extends Field
         else:
             $name = $this->scopeModel->meta->modelName;
         endif;
+
         return strtolower($name);
     }
 }
