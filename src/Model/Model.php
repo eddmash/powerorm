@@ -30,6 +30,7 @@ use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
@@ -244,47 +245,61 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function init($fields = [], $kwargs = [])
     {
-        // get meta settings for this model
-        $metaSettings = $this->getMetaSettings();
-
-        if (!empty($kwargs)):
-
-            if (ArrayHelper::hasKey($kwargs, 'meta')):
-                $metaSettings = $kwargs['meta'];
-            endif;
-            if (ArrayHelper::hasKey($kwargs, 'registry')):
-
-                $metaSettings['registry'] = $kwargs['registry'];
-            endif;
-        endif;
-
-        $meta = Meta::createObject($metaSettings);
-
-        $this->addToClass('meta', $meta);
-
-        list($concreteParentName, $immediateParent, $fieldsList) = $this->getHierarchyMeta();
-
-        $this->setupFields($fields, $fieldsList);
-
-        // proxy model setup
-        if ($this->meta->proxy):
-            try {
-                $concreteParent = $meta->registry->getModel($concreteParentName);
-            } catch (LookupError $e) {
-                $concreteParent = $concreteParentName::createObject();
-            }
-            $this->proxySetup($concreteParent);
+        if (ArrayHelper::hasKey($kwargs, 'registry')):
+            $registry = $kwargs['registry'];
         else:
-            $this->meta->concreteModel = $this;
-            // setup for multiple inheritance
-            $this->prepareMultiInheritance($immediateParent);
+            $registry = BaseOrm::getRegistry(false);
         endif;
 
-        // ensure the model is ready for use.
-        $this->prepare();
+        if ($registry->hasModel(get_class($this)) && $registry->ready) :
 
-        // register the model
-        $meta->registry->registerModel($this);
+            $this->meta = $registry->getModel(get_class($this))->meta;
+
+        else:
+            // get meta settings for this model
+            $metaSettings = $this->getMetaSettings();
+
+            if (!empty($kwargs)):
+
+                if (ArrayHelper::hasKey($kwargs, 'meta')):
+                    $metaSettings = $kwargs['meta'];
+                endif;
+                // we only add registry if come in as an argument
+                // don't add the default registry meta class takes care of this.
+                if (ArrayHelper::hasKey($kwargs, 'registry')):
+
+                    $metaSettings['registry'] = $kwargs['registry'];
+                endif;
+            endif;
+
+            $meta = Meta::createObject($metaSettings);
+
+            $this->addToClass('meta', $meta);
+
+            list($concreteParentName, $immediateParent, $fieldsList) = $this->getHierarchyMeta();
+
+            $this->setupFields($fields, $fieldsList);
+
+            // proxy model setup
+            if ($this->meta->proxy):
+                try {
+                    $concreteParent = $meta->registry->getModel($concreteParentName);
+                } catch (LookupError $e) {
+                    $concreteParent = $concreteParentName::createObject();
+                }
+                $this->proxySetup($concreteParent);
+            else:
+                $this->meta->concreteModel = $this;
+                // setup for multiple inheritance
+                $this->prepareMultiInheritance($immediateParent);
+            endif;
+
+            // ensure the model is ready for use.
+            $this->prepare();
+
+            // register the model
+            $meta->registry->registerModel($this);
+        endif;
     }
 
     public static function isModelBase($className)
@@ -709,6 +724,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         try {
             /** @var $field RelatedField */
             $field = $this->meta->getField($name);
+            if ($field instanceof ForeignObjectRel) :
+                throw new FieldDoesNotExist();
+            endif;
 
             return $field->getValue($this);
         } catch (FieldDoesNotExist $e) {
@@ -731,6 +749,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $field->setValue($this, $value);
         } catch (FieldDoesNotExist $e) {
             // we assume this is not a model field being set
+            // or its a completely new property we are attaching to the model dynamicaklly
             $this->{$name} = $value;
         }
     }

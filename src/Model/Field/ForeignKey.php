@@ -72,15 +72,11 @@ class ForeignKey extends RelatedField
     }
 
     /**
-     * @param Model $related
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
-    public function contributeToRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
+    public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        parent::contributeToRelatedClass($relatedModel, $relation);
+        parent::contributeToInverseClass($relatedModel, $relation);
         if ($this->relation->fieldName == null):
             $this->relation->fieldName = $relatedModel->meta->primaryKey->name;
         endif;

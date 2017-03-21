@@ -105,11 +105,14 @@ class ManyToManyField extends RelatedField
         );
     }
 
-    public function contributeToRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
+    /**
+     * {@inheritdoc}
+     */
+    public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        $relatedModel->{$relation->getAccessorName()} = $this->createManyQueryset(
+        $relatedModel->meta->{$relation->getAccessorName()} = $this->createManyQueryset(
             $relation,
-            $relatedModel->meta->modelName,
+            $relatedModel,
             ['reverse' => true]
         );
         $this->m2mField = function () use ($relation) {
@@ -264,12 +267,7 @@ class ManyToManyField extends RelatedField
     }
 
     /**
-     * @param ForeignObjectRel $rel
-     * @param Model            $modelClass
-     * @param bool             $reverse
-     *
-     * @return \Closure
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
     public function createManyQueryset(ForeignObjectRel $rel, $modelClass, $reverse = false)
     {

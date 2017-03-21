@@ -38,6 +38,7 @@ class StateRegistry extends Registry
      */
     protected function hydrate($modelStates)
     {
+
         /** @var $modelState ModelState */
         foreach ($modelStates as $name => $modelState) :
             $modelState->toModel($this);

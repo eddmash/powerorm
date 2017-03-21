@@ -133,8 +133,17 @@ class RelatedField extends Field
 
         Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->toModel, ['fromField' => $this]);
     }
-
-    public function contributeToRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
+    /**
+     * We add some properties to the related model class i.e. the inverse model of the relationship initiated by this
+     * field.
+     *
+     * e.g. we add the inverse field to use to query when starting on the inverse side.
+     *
+     * @param Model|string $relatedModel
+     * @param ForeignObjectRel $relation
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
         $relatedModel->{$relation->getAccessorName()} = $this->createManyQueryset(
             $relation,
@@ -189,7 +198,7 @@ class RelatedField extends Field
      */
     public function doRelatedClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        $this->contributeToRelatedClass($relatedModel, $relation);
+        $this->contributeToInverseClass($relatedModel, $relation);
     }
 
     /**
