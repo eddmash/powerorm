@@ -11,12 +11,49 @@
 
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
+use Eddmash\PowerOrm\Model\Field\RelatedObjects\OneToManyRel;
+use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\ManyReverseQueryset;
 
-use Eddmash\PowerOrm\Model\Field\Field;
-
-class HasManyField extends Field
+class HasManyField extends InverseField
 {
+    public function __construct(array $kwargs)
+    {
+        $kwargs['rel']= OneToManyRel::createObject([
+            'fromField' => $this,
+            'to' => ArrayHelper::getValue($kwargs, 'to'),
+        ]);
+        parent::__construct($kwargs);
+        $this->toField = ArrayHelper::getValue($kwargs, 'toField');
+        $this->fromField = 'this';
+    }
 
-    public $inverse = true;
+    /**
+     * {@inheritdoc}
+     */
+    public function createManyQueryset(ForeignObjectRel $rel, $modelClass, $reverse = false)
+    {
+        $querysetClass = $modelClass::getQuerysetClass();
+        if (!class_exists('Eddmash\PowerOrm\Model\Query\BaseManyReverseQueryset')) :
+            eval(sprintf('namespace Eddmash\PowerOrm\Model\Query;class BaseManyReverseQueryset extends \%s{}', $querysetClass));
+        endif;
+
+        return function (Model $instance) use ($rel, $reverse) {
+
+            $queryset = ManyReverseQueryset::createObject(null, null, null,
+                [
+                    'rel' => $rel,
+                    'instance' => $instance,
+                ]
+            );
+//            $cond = $queryset->filters;
+//
+//            $queryset = $queryset->filter($cond);
+
+            return $queryset;
+        };
+    }
 
 }

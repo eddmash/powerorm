@@ -307,17 +307,17 @@ class ManyToManyField extends RelatedField
      * @return array
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function getReverseRelatedFilter(Model $modelInstance)
-    {
-        $m2mField = call_user_func($this->m2mField);
-        /** @var $field RelatedField */
-        $field = $this->relation->through->meta->getField($m2mField);
-
-        list($lhs, $rhs) = $field->getRelatedFields();
-        $name = sprintf('%s__%s', $lhs->name, $rhs->name);
-
-        return [$name => $this->getForeignRelatedFieldsValues($modelInstance)];
-    }
+//    public function getRelatedFilter(Model $modelInstance)
+//    {
+//        $m2mField = call_user_func($this->m2mField);
+//        /** @var $field RelatedField */
+//        $field = $this->relation->through->meta->getField($m2mField);
+//
+//        list($lhs, $rhs) = $field->getRelatedFields();
+//        $name = sprintf('%s__%s', $lhs->name, $rhs->name);
+//
+//        return [$name => $this->getForeignRelatedFieldsValues($modelInstance)];
+//    }
 
     /***
      * Gets the m2m relationship field on the through model.

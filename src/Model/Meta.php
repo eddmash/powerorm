@@ -165,9 +165,9 @@ class Meta extends DeconstructableObject implements MetaInterface
     /**
      * {@inheritdoc}
      */
-    public function getFields($includeParents = true)
+    public function getFields($includeParents = true, $inverse = true)
     {
-        return $this->fetchFields(['includeParents' => $includeParents]);
+        return $this->fetchFields(['includeParents' => $includeParents, "inverse"=>$inverse]);
     }
 
     /**
@@ -372,7 +372,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     private function fetchFields($kwargs = [])
     {
-        $forward = $reverse = $includeParents = true;
+        $forward =$inverse = $reverse = $includeParents = true;
         extract($kwargs);
 
         $fields = [];
@@ -389,6 +389,10 @@ class Meta extends DeconstructableObject implements MetaInterface
 
         if ($forward):
             $fields = array_merge($fields, array_merge($this->localFields, $this->localManyToMany));
+        endif;
+
+        if ($inverse) :
+            $fields = array_merge($fields, $this->inverseFields);
         endif;
 
         return $fields;

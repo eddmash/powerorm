@@ -267,6 +267,8 @@ class Query extends BaseObject
         endif;
 
         foreach ($meta->getConcreteFields() as $field) :
+            var_dump($field->concrete);
+            echo $field."<br>";
             $fields[] = $field->getColExpression($startAlias);
         endforeach;
 

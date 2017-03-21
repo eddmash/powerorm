@@ -19,6 +19,7 @@ use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
+use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedExact;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThan;
@@ -133,6 +134,7 @@ class RelatedField extends Field
 
         Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->toModel, ['fromField' => $this]);
     }
+
     /**
      * We add some properties to the related model class i.e. the inverse model of the relationship initiated by this
      * field.
@@ -145,11 +147,13 @@ class RelatedField extends Field
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        $relatedModel->{$relation->getAccessorName()} = $this->createManyQueryset(
-            $relation,
-            $relatedModel->meta->modelName,
-            ['reverse' => true]
-        );
+        echo "*********** ".$relation->fromField."<br>";
+        $hasMany = HasManyField::createObject([
+            "to"=>get_class($this->scopeModel),
+            "toField"=>$relation->fromField,
+        ]);
+
+        $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
     }
 
     /**
@@ -165,27 +169,7 @@ class RelatedField extends Field
      */
     public function createManyQueryset(ForeignObjectRel $rel, $modelClass, $reverse = false)
     {
-        $querysetClass = $modelClass::getQuerysetClass();
 
-        if (!class_exists('Eddmash\PowerOrm\Model\Query\ParentQueryset')) :
-            eval(sprintf('namespace Eddmash\PowerOrm\Model\Query;class ParentQueryset extends \%s{}', $querysetClass));
-        endif;
-
-        return function (Model $instance) use ($rel, $reverse) {
-
-            $queryset = M2OQueryset::createObject(null, null, null,
-                [
-                    'rel' => $rel,
-                    'instance' => $instance,
-                    'reverse' => $reverse,
-                ]
-            );
-            $cond = $queryset->filters;
-
-            $queryset = $queryset->filter($cond);
-
-            return $queryset;
-        };
     }
 
     /**
@@ -301,11 +285,14 @@ class RelatedField extends Field
         $relObj = null;
 
         try {
+            // incase the value has been set
             $relObj = ArrayHelper::getValue($modelInstance->_fieldCache, $this->name, ArrayHelper::STRICT);
         } catch (KeyError $e) {
             $qs = $this->getRelatedQueryset();
 
-            $relObj = $qs->filter($this->getReverseRelatedFilter($modelInstance))->get();
+            echo "<br>-----------> ".$qs->filter($this->getRelatedFilter($modelInstance))->getSql()." <----<br>";
+
+            $relObj = $qs->filter($this->getRelatedFilter($modelInstance))->get();
         }
 
         return $relObj;
@@ -343,11 +330,14 @@ class RelatedField extends Field
      * @return array
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function getReverseRelatedFilter(Model $modelInstance)
+    public function getRelatedFilter(Model $modelInstance)
     {
         /** @var $fromField Field */
         /** @var $toField Field */
         list($fromField, $toField) = $this->getRelatedFields();
+
+        echo $fromField."<br>";
+        echo $toField."<br>";
         $value = $modelInstance->{$fromField->getAttrName()};
 
         return [$toField->getAttrName() => $value];
