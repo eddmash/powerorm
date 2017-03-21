@@ -7,8 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -21,7 +19,7 @@ class HasManyField extends InverseField
 {
     public function __construct(array $kwargs)
     {
-        $kwargs['rel']= OneToManyRel::createObject([
+        $kwargs['rel'] = OneToManyRel::createObject([
             'fromField' => $this,
             'to' => ArrayHelper::getValue($kwargs, 'to'),
         ]);
@@ -49,7 +47,7 @@ class HasManyField extends InverseField
                 ]
             );
 //            $cond = $queryset->filters;
-//
+
 //            $queryset = $queryset->filter($cond);
 
             return $queryset;

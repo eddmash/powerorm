@@ -141,16 +141,15 @@ class RelatedField extends Field
      *
      * e.g. we add the inverse field to use to query when starting on the inverse side.
      *
-     * @param Model|string $relatedModel
+     * @param Model|string     $relatedModel
      * @param ForeignObjectRel $relation
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        echo "*********** ".$relation->fromField."<br>";
         $hasMany = HasManyField::createObject([
-            "to"=>get_class($this->scopeModel),
-            "toField"=>$relation->fromField,
+            'to' => get_class($this->scopeModel),
+            'toField' => $relation->fromField->getName(),
         ]);
 
         $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
@@ -282,20 +281,16 @@ class RelatedField extends Field
      */
     public function getValue(Model $modelInstance)
     {
-        $relObj = null;
+        $result = null;
 
         try {
             // incase the value has been set
-            $relObj = ArrayHelper::getValue($modelInstance->_fieldCache, $this->name, ArrayHelper::STRICT);
+            $result = ArrayHelper::getValue($modelInstance->_fieldCache, $this->getName(), ArrayHelper::STRICT);
         } catch (KeyError $e) {
-            $qs = $this->getRelatedQueryset();
-
-            echo "<br>-----------> ".$qs->filter($this->getRelatedFilter($modelInstance))->getSql()." <----<br>";
-
-            $relObj = $qs->filter($this->getRelatedFilter($modelInstance))->get();
+            $result = $this->queryset(null, $modelInstance);
         }
 
-        return $relObj;
+        return $result;
     }
 
     public function setValue(Model $modelInstance, $value)
@@ -306,7 +301,7 @@ class RelatedField extends Field
                     'Cannot assign "%s": "%s.%s" must be a "%s" instance.',
                     $value,
                     $this->scopeModel->meta->modelName,
-                    $this->name,
+                    $this->getName(),
                     $this->relation->toModel->meta->modelName
                 )
             );
@@ -318,7 +313,7 @@ class RelatedField extends Field
         /* @var $field RelatedField */
         list($fromField, $toField) = $this->getRelatedFields();
         // cache the value of the model
-        $modelInstance->_fieldCache[$fromField->name] = $value;
+        $modelInstance->_fieldCache[$fromField->getName()] = $value;
 
         // set the attrib value
         $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
@@ -336,8 +331,6 @@ class RelatedField extends Field
         /** @var $toField Field */
         list($fromField, $toField) = $this->getRelatedFields();
 
-        echo $fromField."<br>";
-        echo $toField."<br>";
         $value = $modelInstance->{$fromField->getAttrName()};
 
         return [$toField->getAttrName() => $value];
@@ -352,14 +345,16 @@ class RelatedField extends Field
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getRelatedQueryset($modelName = null)
+    public function queryset($modelName, $modelInstance)
     {
         if (is_null($modelName)) :
             $modelName = $this->getRelatedModel()->meta->modelName;
         endif;
 
         /* @var $modelName Model */
-        return $modelName::objects()->all();
+        $qs = $modelName::objects()->all();
+
+        return $qs->filter($this->getRelatedFilter($modelInstance))->get();
     }
 
     public function getForeignRelatedFieldsValues(Model $modelInstance)

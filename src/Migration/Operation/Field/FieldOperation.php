@@ -42,7 +42,7 @@ abstract class FieldOperation extends Operation
     {
         return [
             'name' => $this->name,
-            'field' => $this->field->name,
+            'field' => $this->field->getName(),
             'modelName' => $this->modelName,
         ];
     }

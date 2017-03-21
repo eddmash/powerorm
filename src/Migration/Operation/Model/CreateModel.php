@@ -137,7 +137,7 @@ class CreateModel extends ModelOperation
                 endif;
 
                 $fields = $this->fields;
-                $fields[$operation->field->name] = $operation->field;
+                $fields[$operation->field->getName()] = $operation->field;
 
                 return [
                     static::createObject(

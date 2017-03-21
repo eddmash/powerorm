@@ -145,7 +145,7 @@ class ManyToManyField extends RelatedField
             $toModelName = $field->relation->toModel->meta->modelName;
         endif;
 
-        $className = sprintf('%1$s_%2$s', $modelName, $field->name);
+        $className = sprintf('%1$s_%2$s', $modelName, $field->getName());
 
         $from = strtolower($modelName);
         $to = strtolower($toModelName);
@@ -217,7 +217,7 @@ class ManyToManyField extends RelatedField
             return $this->dbTable;
         else:
             // oracle allows identifier of 30 chars max
-            return StringHelper::truncate(sprintf('%s_%s', $meta->dbTable, $this->name), 30);
+            return StringHelper::truncate(sprintf('%s_%s', $meta->dbTable, $this->getName()), 30);
         endif;
     }
 
@@ -258,7 +258,7 @@ class ManyToManyField extends RelatedField
         /* @var $queryset M2MQueryset */
 
         if ($contribute) :
-            $modelInstance->_fieldCache[$this->name] = $value;
+            $modelInstance->_fieldCache[$this->getName()] = $value;
         else:
             $queryset = $this->getValue($modelInstance);
             $queryset->set($value);
@@ -296,7 +296,7 @@ class ManyToManyField extends RelatedField
 
     public function getValue(Model $modelInstance)
     {
-        $callback = $modelInstance->_fieldCache[$this->name];
+        $callback = $modelInstance->_fieldCache[$this->getName()];
 
         return $callback($modelInstance);
     }
@@ -312,10 +312,10 @@ class ManyToManyField extends RelatedField
 //        $m2mField = call_user_func($this->m2mField);
 //        /** @var $field RelatedField */
 //        $field = $this->relation->through->meta->getField($m2mField);
-//
+
 //        list($lhs, $rhs) = $field->getRelatedFields();
 //        $name = sprintf('%s__%s', $lhs->name, $rhs->name);
-//
+
 //        return [$name => $this->getForeignRelatedFieldsValues($modelInstance)];
 //    }
 
@@ -342,7 +342,7 @@ class ManyToManyField extends RelatedField
         foreach ($this->relation->through->meta->getFields() as $field) :
             if ($field->isRelation &&
                 $field->relation->toModel->meta->modelName == $relation->getFromModel()->meta->modelName &&
-                (is_null($linkName) || $linkName == $field->name)
+                (is_null($linkName) || $linkName == $field->getName())
             ) :
                 $this->{$cache_attr} = $field->{$attr};
 
@@ -374,7 +374,7 @@ class ManyToManyField extends RelatedField
         foreach ($this->relation->through->meta->getFields() as $field) :
             if ($field->isRelation &&
                 $field->relation->toModel->meta->modelName == $relation->toModel->meta->modelName &&
-                (is_null($linkName) || $linkName == $field->name)
+                (is_null($linkName) || $linkName == $field->getName())
             ) :
                 $this->{$cache_attr} = $field->{$attr};
 

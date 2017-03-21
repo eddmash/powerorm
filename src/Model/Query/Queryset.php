@@ -32,7 +32,7 @@ function getFieldNamesFromMeta(Meta $meta)
     $fieldNames = [];
     /** @var $field Field */
     foreach ($meta->getFields() as $field) :
-        $fieldNames[] = $field->name;
+        $fieldNames[] = $field->getName();
     endforeach;
 
     return $fieldNames;

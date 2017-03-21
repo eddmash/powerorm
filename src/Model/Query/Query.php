@@ -267,8 +267,6 @@ class Query extends BaseObject
         endif;
 
         foreach ($meta->getConcreteFields() as $field) :
-            var_dump($field->concrete);
-            echo $field."<br>";
             $fields[] = $field->getColExpression($startAlias);
         endforeach;
 
@@ -330,6 +328,7 @@ class Query extends BaseObject
 
         /* @var $targets Field[] */
         /* @var $field Field */
+
         foreach ($conditions as $name => $value) :
             list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
 
@@ -446,7 +445,7 @@ class Query extends BaseObject
             $posReached = $pos;
 
             if ($name === PRIMARY_KEY_ID):
-                $name = $meta->primaryKey->name;
+                $name = $meta->primaryKey->getName();
             endif;
 
             $field = null;

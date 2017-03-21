@@ -189,7 +189,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             if ($kwargs):
                 if ($field instanceof RelatedField):
                     try {
-                        $relObject = ArrayHelper::getValue($kwargs, $field->name, ArrayHelper::STRICT);
+                        $relObject = ArrayHelper::getValue($kwargs, $field->getName(), ArrayHelper::STRICT);
                         $isRelated = true;
                     } catch (KeyError $e) {
                         try {
@@ -217,7 +217,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             endif;
 
             if ($isRelated):
-                $this->{$field->name} = $relObject;
+                $this->{$field->getName()} = $relObject;
             else:
                 $this->{$field->getAttrName()} = $val;
             endif;
@@ -801,8 +801,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $deferedFields = [];
         /** @var $concreteField Field */
         foreach ($concreteFields as $concreteField) :
-            if (!array_key_exists($concreteField->name, $objectProperties)):
-                $deferedFields[] = $concreteField->name;
+            if (!array_key_exists($concreteField->getName(), $objectProperties)):
+                $deferedFields[] = $concreteField->getName();
             endif;
 
         endforeach;
@@ -864,13 +864,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                     continue;
                 endif;
 
-                $relObject = $this->{$field->name};
+                $relObject = $this->{$field->getName()};
 
                 if ($relObject && is_null($relObject->meta->primaryKey)):
                     throw new ValueError(
                         sprintf(
                             "save() prohibited to prevent data loss due to unsaved related object '%s'.",
-                            $field->name
+                            $field->getName()
                         )
                     );
                 endif;
@@ -893,11 +893,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 if ($modelField->primaryKey):
                     continue;
                 endif;
-                $fieldsNames[] = $modelField->name;
+                $fieldsNames[] = $modelField->getName();
 
                 // if attribute name and the field name provided arent the same,
                 // add also add the attribute name.e.g. in related fields
-                if ($modelField->name !== $modelField->getAttrName()):
+                if ($modelField->getName() !== $modelField->getAttrName()):
                     $fieldsNames[] = $modelField->getAttrName();
                 endif;
             endforeach;
@@ -919,7 +919,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             /** @var $concreteField Field */
             foreach ($concreteFields as $name => $concreteField) :
                 if (!$concreteField->primaryKey && !$concreteField->hasProperty('through')):
-                    $fieldsNames[] = $concreteField->name;
+                    $fieldsNames[] = $concreteField->getName();
                 endif;
             endforeach;
             $loadedFields = array_diff($fieldsNames, $deferedFields);
@@ -1105,7 +1105,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function doUpdate($records, $pkValue, $forceUpdate)
     {
-        $filtered = static::objects()->filter([$this->meta->primaryKey->name => $pkValue]);
+        $filtered = static::objects()->filter([$this->meta->primaryKey->getName() => $pkValue]);
 
         // We can end up here when saving a model in inheritance chain where
         // update_fields doesn't target any field in current model. In that

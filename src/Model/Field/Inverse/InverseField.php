@@ -7,19 +7,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
-
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\ValueError;
-use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
-use Eddmash\PowerOrm\Model\Field\RelatedObjects\OneToManyRel;
 use Eddmash\PowerOrm\Model\Model;
 
 //todo ensure the owning side actually exists
@@ -46,7 +40,6 @@ class InverseField extends RelatedField
             $this->toField = $this->relation->toModel->meta->getField($this->toField);
         endif;
 
-
         return [$this->fromField, $this->toField];
     }
 
@@ -62,15 +55,13 @@ class InverseField extends RelatedField
         /** @var $toField Field */
         list($fromField, $toField) = $this->getRelatedFields();
 
-        echo $fromField."<br>";
-        echo $toField."<br>";
         $value = $modelInstance->{$fromField->getAttrName()};
 
-        return [$toField->getAttrName() => $value];
+        return [$toField->getName() => $value];
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getColumnName()
     {
@@ -78,20 +69,30 @@ class InverseField extends RelatedField
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function dbType($connection)
     {
         return;
     }
 
-
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
 
     }
 
+    public function queryset($modelName, $modelInstance)
+    {
+        if (is_null($modelName)) :
+            $modelName = $this->getRelatedModel()->meta->modelName;
+        endif;
+
+        /* @var $modelName Model */
+        $qs = $modelName::objects()->all();
+
+        return $qs->filter($this->getRelatedFilter($modelInstance));
+    }
 }

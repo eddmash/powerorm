@@ -167,7 +167,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getFields($includeParents = true, $inverse = true)
     {
-        return $this->fetchFields(['includeParents' => $includeParents, "inverse"=>$inverse]);
+        return $this->fetchFields(['includeParents' => $includeParents, 'inverse' => $inverse]);
     }
 
     /**
@@ -372,7 +372,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     private function fetchFields($kwargs = [])
     {
-        $forward =$inverse = $reverse = $includeParents = true;
+        $forward = $inverse = $reverse = $includeParents = true;
         extract($kwargs);
 
         $fields = [];
@@ -404,11 +404,11 @@ class Meta extends DeconstructableObject implements MetaInterface
     public function addField(Field $field)
     {
         if ($field->relation != null && $field->manyToMany):
-            $this->localManyToMany[$field->name] = $field;
+            $this->localManyToMany[$field->getName()] = $field;
         elseif ($field->relation != null && $field->inverse):
-            $this->inverseFields[$field->name] = $field;
+            $this->inverseFields[$field->getName()] = $field;
         else:
-            $this->localFields[$field->name] = $field;
+            $this->localFields[$field->getName()] = $field;
             $this->setupPrimaryKey($field);
         endif;
     }

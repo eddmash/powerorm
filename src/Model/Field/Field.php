@@ -33,7 +33,7 @@ class Field extends DeconstructableObject implements FieldInterface
 
     const DEBUG_IGNORE = ['scopeModel', 'relation'];
 
-    public $name;
+    private $name;
 
     /**
      * The column comment. Supported by MySQL, PostgreSQL, Oracle, SQL Server, SQL Anywhere and Drizzle. Defaults to null.
@@ -317,6 +317,11 @@ class Field extends DeconstructableObject implements FieldInterface
     public function getAttrName()
     {
         return $this->name;
+    }
+
+    public function getName()
+    {
+       return $this->name;
     }
 
     /**
