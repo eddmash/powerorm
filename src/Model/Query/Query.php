@@ -720,16 +720,16 @@ class Query extends BaseObject
                 $innerQuery->clearOrdering(true);
             endif;
 
-            if(!$innerQuery->distict):
+            if (!$innerQuery->distict):
                 // if we are using default columns and we already have aggregate annotations existing
                 // then we must make sure the inner
                 // query is grouped by the main model's primary key. However,
                 // clearing the select clause can alter results if distinct is
                 // used.
-                if($innerQuery->useDefaultCols && $hasExistingAnnotations):
-                  $innerQuery->groupBy = [
-                      $this->model->meta->primaryKey->getColExpression($innerQuery->getInitialAlias()),
-                  ];
+                if ($innerQuery->useDefaultCols && $hasExistingAnnotations):
+                    $innerQuery->groupBy = [
+                        $this->model->meta->primaryKey->getColExpression($innerQuery->getInitialAlias()),
+                    ];
                 endif;
                 $innerQuery->useDefaultCols = false;
             endif;
@@ -740,8 +740,12 @@ class Query extends BaseObject
                 unset($innerQuery->annotations[$alias]);
             endforeach;
 
-            if($innerQuery->select == [] && !$innerQuery->useDefaultCols):
-                $innerQuery->select = [$this->model->meta->primaryKey->getColExpression($innerQuery->getInitialAlias())];
+            if ($innerQuery->select == [] && !$innerQuery->useDefaultCols):
+                $innerQuery->select = [
+                    $this->model->meta->primaryKey->getColExpression(
+                        $innerQuery->getInitialAlias()
+                    ),
+                ];
             endif;
 
             $outQuery->addSubQuery($innerQuery, $connection);

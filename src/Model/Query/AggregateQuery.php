@@ -26,7 +26,7 @@ class AggregateQuery extends Query
      */
     public function asSql(Connection $connection, $isSubQuery = false)
     {
-        if(is_null($this->isSubQuery)):
+        if (is_null($this->isSubQuery)):
             throw new EmptyResultSet();
         endif;
         $sql = $params = [];

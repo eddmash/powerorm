@@ -311,7 +311,7 @@ class Meta extends DeconstructableObject implements MetaInterface
                 foreach ($fields as $field) :
 
                     if ($field->isRelation && !empty($field->getRelatedModel())):
-                         $allRelations[strtolower($field->relation->toModel->meta->modelName)][] = $field;
+                        $allRelations[strtolower($field->relation->toModel->meta->modelName)][] = $field;
                     endif;
 
                 endforeach;

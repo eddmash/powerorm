@@ -31,7 +31,8 @@ class M2OQueryset extends ParentQueryset
     /**
      * {@inheritdoc}
      */
-    public function __construct(Connection $connection = null, Model $model = null, Query $query = null, $kwargs = []) {
+    public function __construct(Connection $connection = null, Model $model = null, Query $query = null, $kwargs = [])
+    {
 
         $this->instance = ArrayHelper::getValue($kwargs, 'instance');
 

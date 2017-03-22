@@ -25,10 +25,12 @@ class HasManyField extends InverseField
 {
     public function __construct(array $kwargs)
     {
-        $kwargs['rel'] = OneToManyRel::createObject([
-            'fromField' => $this,
-            'to' => ArrayHelper::getValue($kwargs, 'to'),
-        ]);
+        $kwargs['rel'] = OneToManyRel::createObject(
+            [
+                'fromField' => $this,
+                'to' => ArrayHelper::getValue($kwargs, 'to'),
+            ]
+        );
         parent::__construct($kwargs);
         $this->toField = ArrayHelper::getValue($kwargs, 'toField');
         $this->fromField = ArrayHelper::getValue($kwargs, 'fromField');

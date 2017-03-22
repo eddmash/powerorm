@@ -12,10 +12,9 @@
 namespace Eddmash\PowerOrm\Model\Query\Aggregates;
 
 use Eddmash\PowerOrm\Model\Field\IntegerField;
-use Eddmash\PowerOrm\Model\Query\Expression\Func;
 use Eddmash\PowerOrm\Model\Query\Expression\Star;
 
-class Count extends Func
+class Count extends BaseAggregate
 {
     protected $function = 'COUNT';
     protected $name = 'COUNT';

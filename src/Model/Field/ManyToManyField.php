@@ -105,11 +105,13 @@ class ManyToManyField extends RelatedField
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
 
-        $hasMany = HasManyField::createObject([
-            'to' => get_class($this->scopeModel),
-            'toField' => $relation->fromField->getName(),
-            'fromField' => $this,
-        ]);
+        $hasMany = HasManyField::createObject(
+            [
+                'to' => get_class($this->scopeModel),
+                'toField' => $relation->fromField->getName(),
+                'fromField' => $this,
+            ]
+        );
 
         $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
 

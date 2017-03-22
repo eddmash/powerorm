@@ -28,14 +28,14 @@ class InverseField extends RelatedField
 
     public function getRelatedFields()
     {
-         if (is_string($this->relation->toModel)):
+        if (is_string($this->relation->toModel)):
             throw new ValueError(sprintf('Related model "%s" cannot be resolved', $this->relation->toModel));
         endif;
 
         if ($this->fromField == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT) :
             // we need this field to point to the primary key of the model which is an actual column on the database
             $this->fromField = $this->scopeModel->meta->primaryKey;
-        elseif(is_string($this->fromField)):
+        elseif (is_string($this->fromField)):
             $this->fromField = $this->relation->toModel->meta->getField($this->fromField);
         endif;
 

@@ -145,11 +145,13 @@ class RelatedField extends Field
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        $hasMany = HasManyField::createObject([
-            'to' => get_class($this->scopeModel),
-            'toField' => $relation->fromField->getName(),
-            'fromField' => $this,
-        ]);
+        $hasMany = HasManyField::createObject(
+            [
+                'to' => get_class($this->scopeModel),
+                'toField' => $relation->fromField->getName(),
+                'fromField' => $this,
+            ]
+        );
 
         $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
     }
@@ -364,7 +366,7 @@ class RelatedField extends Field
         // we check if the queryname/ relatedName is set other use we use the name of the model.
         if ($this->relation->relatedQueryName) :
             $name = $this->relation->relatedQueryName;
-        elseif($this->relation->relatedName):
+        elseif ($this->relation->relatedName):
             $name = $this->relation->relatedName;
         else:
             $name = $this->scopeModel->meta->modelName;
@@ -380,7 +382,8 @@ class RelatedField extends Field
      * @param $modelInstance
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function queryset($modelName, $modelInstance) {
+    public function queryset($modelName, $modelInstance)
+    {
 
     }
 }

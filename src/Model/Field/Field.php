@@ -321,7 +321,7 @@ class Field extends DeconstructableObject implements FieldInterface
 
     public function getName()
     {
-       return $this->name;
+        return $this->name;
     }
 
     /**
