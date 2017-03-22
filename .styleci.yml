@@ -6,3 +6,4 @@ disabled:
   - phpdoc_link_to_see
   - no_extra_block_blank_lines
   - single_blank_line_before_namespace
+  - no_blank_lines_after_phpdoc
