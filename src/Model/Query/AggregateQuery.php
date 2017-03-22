@@ -39,6 +39,7 @@ class AggregateQuery extends Query
         $sql = implode(', ', $sql);
 
         $sql = sprintf('SELECT %s FROM (%s) subquery', $sql, $this->subQuery);
+        $params = array_merge($params, $this->subQueryParams);
 
         return [$sql, $params];
     }
