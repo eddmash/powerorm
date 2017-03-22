@@ -7,16 +7,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\ValueError;
-use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
 
-//todo ensure the owning side actually exists
+/**
+ * THis fields are used to perform queryies in that move from the inverse side to the owning side.
+ *
+ * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+ */
 class InverseField extends RelatedField
 {
     public $inverse = true;
@@ -24,15 +28,15 @@ class InverseField extends RelatedField
 
     public function getRelatedFields()
     {
-
-        if (is_string($this->relation->toModel)):
+         if (is_string($this->relation->toModel)):
             throw new ValueError(sprintf('Related model "%s" cannot be resolved', $this->relation->toModel));
         endif;
 
         if ($this->fromField == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT) :
             // we need this field to point to the primary key of the model which is an actual column on the database
             $this->fromField = $this->scopeModel->meta->primaryKey;
-
+        elseif(is_string($this->fromField)):
+            $this->fromField = $this->relation->toModel->meta->getField($this->fromField);
         endif;
 
         //end point of relation
@@ -49,15 +53,13 @@ class InverseField extends RelatedField
      * @return array
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function getRelatedFilter(Model $modelInstance)
+    public function getRelatedFilter(Model $modelInstance, $reverse = false)
     {
-        /** @var $fromField Field */
-        /** @var $toField Field */
-        list($fromField, $toField) = $this->getRelatedFields();
 
-        $value = $modelInstance->{$fromField->getAttrName()};
+        /** @var $toField RelatedField */
+        $toField = $this->getRelatedFields()[1];
 
-        return [$toField->getName() => $value];
+        return $toField->getRelatedFilter($modelInstance, $reverse);
     }
 
     /**
@@ -93,6 +95,6 @@ class InverseField extends RelatedField
         /* @var $modelName Model */
         $qs = $modelName::objects()->all();
 
-        return $qs->filter($this->getRelatedFilter($modelInstance));
+        return $qs->filter($this->getRelatedFilter($modelInstance, true));
     }
 }

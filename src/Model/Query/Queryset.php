@@ -514,4 +514,13 @@ class Queryset implements QuerysetInterface
 
         return self::createObject($this->connection, $this->model, $qb, $kwargs);
     }
+
+    public function __toString()
+    {
+        $results = $this->_clone()->limit(1, 6)->getResults();
+
+        $ellipse = count($results) > 5 ? ', ... ' : '';
+
+        return sprintf('< %s (%s %s) >', get_class($this), implode(', ', $results), $ellipse);
+    }
 }

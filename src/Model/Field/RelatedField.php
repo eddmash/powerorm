@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
-use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -29,7 +28,6 @@ use Eddmash\PowerOrm\Model\Lookup\Related\RelatedIsNull;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedLessThan;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedLessThanOrEqual;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
  * Base class that all relational fields inherit from.
@@ -150,25 +148,10 @@ class RelatedField extends Field
         $hasMany = HasManyField::createObject([
             'to' => get_class($this->scopeModel),
             'toField' => $relation->fromField->getName(),
+            'fromField' => $this,
         ]);
 
         $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
-    }
-
-    /**
-     * @param ForeignObjectRel $rel
-     * @param Model            $modelClass
-     * @param bool             $reverse
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     *
-     * @return \Closure
-     */
-    public function createManyQueryset(ForeignObjectRel $rel, $modelClass, $reverse = false)
-    {
-
     }
 
     /**
@@ -275,86 +258,27 @@ class RelatedField extends Field
 
     /**
      * @param Model $modelInstance
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     *
-     * @return mixed
-     */
-    public function getValue(Model $modelInstance)
-    {
-        $result = null;
-
-        try {
-            // incase the value has been set
-            $result = ArrayHelper::getValue($modelInstance->_fieldCache, $this->getName(), ArrayHelper::STRICT);
-        } catch (KeyError $e) {
-            $result = $this->queryset(null, $modelInstance);
-        }
-
-        return $result;
-    }
-
-    public function setValue(Model $modelInstance, $value)
-    {
-        if (!$value instanceof $this->relation->toModel):
-            throw new ValueError(
-                sprintf(
-                    'Cannot assign "%s": "%s.%s" must be a "%s" instance.',
-                    $value,
-                    $this->scopeModel->meta->modelName,
-                    $this->getName(),
-                    $this->relation->toModel->meta->modelName
-                )
-            );
-        endif;
-        /** @var $fromField RelatedField */
-
-        /** @var $toField RelatedField */
-
-        /* @var $field RelatedField */
-        list($fromField, $toField) = $this->getRelatedFields();
-        // cache the value of the model
-        $modelInstance->_fieldCache[$fromField->getName()] = $value;
-
-        // set the attrib value
-        $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
-    }
-
-    /**
-     * @param Model $modelInstance
      *
      * @return array
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function getRelatedFilter(Model $modelInstance)
+    public function getRelatedFilter(Model $modelInstance, $reverse = false)
     {
         /** @var $fromField Field */
         /** @var $toField Field */
-        list($fromField, $toField) = $this->getRelatedFields();
+        $filter = [];
+        if ($reverse === false) :
+            list($fromField, $toField) = $this->getRelatedFields();
+            $value = $modelInstance->{$fromField->getAttrName()};
+            $filter[$toField->getAttrName()] = $value;
+        else:
 
-        $value = $modelInstance->{$fromField->getAttrName()};
-
-        return [$toField->getAttrName() => $value];
-    }
-
-    /**
-     * @param null $modelName
-     *
-     * @return Queryset
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function queryset($modelName, $modelInstance)
-    {
-        if (is_null($modelName)) :
-            $modelName = $this->getRelatedModel()->meta->modelName;
+            list($toField, $fromField) = $this->getRelatedFields();
+            $value = $modelInstance->{$fromField->getAttrName()};
+            $filter[$toField->getName()] = $value;
         endif;
 
-        /* @var $modelName Model */
-        $qs = $modelName::objects()->all();
-
-        return $qs->filter($this->getRelatedFilter($modelInstance))->get();
+        return $filter;
     }
 
     public function getForeignRelatedFieldsValues(Model $modelInstance)
@@ -447,5 +371,16 @@ class RelatedField extends Field
         endif;
 
         return strtolower($name);
+    }
+
+    /**
+     * Creates the queryset to retrieve data for the relationship that relates to this field.
+     *
+     * @param $modelName
+     * @param $modelInstance
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function queryset($modelName, $modelInstance) {
+
     }
 }

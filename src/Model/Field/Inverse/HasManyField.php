@@ -7,14 +7,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
-use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\OneToManyRel;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\ManyReverseQueryset;
 
+/**
+ * {@inheritdoc}
+ *
+ * This field specifically deals with query relations that return multiple objects.
+ *
+ * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+ */
 class HasManyField extends InverseField
 {
     public function __construct(array $kwargs)
@@ -25,33 +31,24 @@ class HasManyField extends InverseField
         ]);
         parent::__construct($kwargs);
         $this->toField = ArrayHelper::getValue($kwargs, 'toField');
-        $this->fromField = 'this';
+        $this->fromField = ArrayHelper::getValue($kwargs, 'fromField');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createManyQueryset(ForeignObjectRel $rel, $modelClass, $reverse = false)
+    public function getValue(Model $modelInstance)
     {
-        $querysetClass = $modelClass::getQuerysetClass();
-        if (!class_exists('Eddmash\PowerOrm\Model\Query\BaseManyReverseQueryset')) :
-            eval(sprintf('namespace Eddmash\PowerOrm\Model\Query;class BaseManyReverseQueryset extends \%s{}', $querysetClass));
-        endif;
+        return $this->queryset(null, $modelInstance);
+    }
 
-        return function (Model $instance) use ($rel, $reverse) {
-
-            $queryset = ManyReverseQueryset::createObject(null, null, null,
-                [
-                    'rel' => $rel,
-                    'instance' => $instance,
-                ]
-            );
-//            $cond = $queryset->filters;
-
-//            $queryset = $queryset->filter($cond);
-
-            return $queryset;
-        };
+    /**
+     * {@inheritdoc}
+     */
+    public function setValue(Model $modelInstance, $value)
+    {
+        $queryset = $this->getValue($modelInstance);
+        $queryset->set($value);
     }
 
 }

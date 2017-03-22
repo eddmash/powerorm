@@ -17,11 +17,11 @@ use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Migration\FormatFileContent;
 use Eddmash\PowerOrm\Model\Delete;
+use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToManyRel;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\M2MQueryset;
 
 /**
  * Provide a many-to-many relation by using an intermediary model that holds two ForeignKey fields pointed at the two
@@ -97,12 +97,6 @@ class ManyToManyField extends RelatedField
         else:
             $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
         endif;
-
-        $this->bindValue(
-            $this->scopeModel,
-            $this->createManyQueryset($this->relation, $this->scopeModel->meta->modelName, false),
-            true
-        );
     }
 
     /**
@@ -110,11 +104,15 @@ class ManyToManyField extends RelatedField
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        $relatedModel->meta->{$relation->getAccessorName()} = $this->createManyQueryset(
-            $relation,
-            $relatedModel,
-            ['reverse' => true]
-        );
+
+        $hasMany = HasManyField::createObject([
+            'to' => get_class($this->scopeModel),
+            'toField' => $relation->fromField->getName(),
+            'fromField' => $this,
+        ]);
+
+        $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
+
         $this->m2mField = function () use ($relation) {
             return $this->getM2MAttr($relation, 'name');
         };
@@ -250,74 +248,63 @@ class ManyToManyField extends RelatedField
 
     public function setValue(Model $modelInstance, $value)
     {
-        $this->bindValue($modelInstance, $value);
-    }
-
-    private function bindValue(Model $modelInstance, $value, $contribute = false)
-    {
-        /* @var $queryset M2MQueryset */
-
-        if ($contribute) :
-            $modelInstance->_fieldCache[$this->getName()] = $value;
-        else:
-            $queryset = $this->getValue($modelInstance);
-            $queryset->set($value);
-        endif;
-
+        $queryset = $this->getValue($modelInstance);
+        $queryset->set($value);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createManyQueryset(ForeignObjectRel $rel, $modelClass, $reverse = false)
+    public function queryset($modelName, $modelInstance)
     {
-        $querysetClass = $modelClass::getQuerysetClass();
-
-        if (!class_exists('Eddmash\PowerOrm\Model\Query\ParentQueryset')) :
-            eval(sprintf('namespace Eddmash\PowerOrm\Model\Query;class ParentQueryset extends \%s{}', $querysetClass));
+        if (is_null($modelName)) :
+            $modelName = $this->getRelatedModel()->meta->modelName;
         endif;
 
-        return function (Model $instance) use ($rel, $reverse) {
+        /* @var $modelName Model */
+        $qs = $modelName::objects()->all();
 
-            $queryset = M2MQueryset::createObject(null, null, null,
-                [
-                    'rel' => $rel,
-                    'instance' => $instance,
-                    'reverse' => $reverse,
-                ]
-            );
-            $cond = $queryset->filters;
-
-            $queryset = $queryset->filter($cond);
-
-            return $queryset;
-        };
+        return $qs->filter($this->getRelatedFilter($modelInstance));
     }
 
     public function getValue(Model $modelInstance)
     {
-        $callback = $modelInstance->_fieldCache[$this->getName()];
-
-        return $callback($modelInstance);
+        return $this->queryset(null, $modelInstance);
     }
 
     /**
-     * @param Model $modelInstance
-     *
-     * @return array
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
-//    public function getRelatedFilter(Model $modelInstance)
-//    {
-//        $m2mField = call_user_func($this->m2mField);
-//        /** @var $field RelatedField */
-//        $field = $this->relation->through->meta->getField($m2mField);
+    public function getRelatedFilter(Model $modelInstance, $reverse = false)
+    {
+        $filters = [];
 
-//        list($lhs, $rhs) = $field->getRelatedFields();
-//        $name = sprintf('%s__%s', $lhs->name, $rhs->name);
+        if ($reverse === false):
+            $model = $this->relation->toModel;
+            $queryName = $this->relation->fromField->getRelatedQueryName();
+            $fromFieldName = call_user_func($this->relation->fromField->m2mField);
+            $toFieldName = call_user_func($this->relation->fromField->m2mReverseField);
+        else:
+            $model = $this->relation->getFromModel();
+            $queryName = $this->relation->fromField->getName();
+            $fromFieldName = call_user_func($this->relation->fromField->m2mReverseField);
+            $toFieldName = call_user_func($this->relation->fromField->m2mField);
+        endif;
 
-//        return [$name => $this->getForeignRelatedFieldsValues($modelInstance)];
-//    }
+        $through = $this->relation->through;
+
+        $fromField = $through->meta->getField($fromFieldName);
+        $toField = $through->meta->getField($toFieldName);
+        $this->filters = [];
+
+        foreach ([$fromField->getRelatedFields()] as $fields) :
+            $rhsField = $fields[1];
+            $key = sprintf('%s__%s', $queryName, $rhsField->getName());
+            $filters[$key] = $modelInstance->{$rhsField->getAttrName()};
+        endforeach;
+
+        return $filters;
+    }
 
     /***
      * Gets the m2m relationship field on the through model.
@@ -344,7 +331,8 @@ class ManyToManyField extends RelatedField
                 $field->relation->toModel->meta->modelName == $relation->getFromModel()->meta->modelName &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
-                $this->{$cache_attr} = $field->{$attr};
+
+                $this->{$cache_attr} = ($attr == 'name') ? call_user_func([$field, 'getName']) : $field->{$attr};
 
                 return $this->{$cache_attr};
             endif;
@@ -376,7 +364,7 @@ class ManyToManyField extends RelatedField
                 $field->relation->toModel->meta->modelName == $relation->toModel->meta->modelName &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
-                $this->{$cache_attr} = $field->{$attr};
+                $this->{$cache_attr} = ($attr == 'name') ? call_user_func([$field, 'getName']) : $field->{$attr};
 
                 return $this->{$cache_attr};
             endif;
