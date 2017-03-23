@@ -91,11 +91,9 @@ class BaseConfig
          *   `];
          */
         $this->psr4 = [
-//			'CodeIgniter' => realpath(BASEPATH)
         ];
 
         if (ENVIRONMENT == 'testing') {
-            //			$this->psr4['Tests\Support'] = BASEPATH.'../tests/_support/';
         }
 
         /*

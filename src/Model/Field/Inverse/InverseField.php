@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
 use Eddmash\PowerOrm\BaseOrm;
@@ -25,6 +26,9 @@ class InverseField extends RelatedField
     public $inverse = true;
     public $concrete = false;
 
+    /**
+     * {@inheritdoc}
+     */
     public function getRelatedFields()
     {
         if (is_string($this->relation->toModel)):
@@ -44,21 +48,6 @@ class InverseField extends RelatedField
         endif;
 
         return [$this->fromField, $this->toField];
-    }
-
-    /**
-     * @param Model $modelInstance
-     *
-     * @return array
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     */
-    public function getRelatedFilter(Model $modelInstance, $reverse = false)
-    {
-
-        /** @var $toField RelatedField */
-        $toField = $this->getRelatedFields()[1];
-
-        return $toField->getRelatedFilter($modelInstance, $reverse);
     }
 
     /**
@@ -85,15 +74,14 @@ class InverseField extends RelatedField
 
     }
 
-    public function queryset($modelName, $modelInstance)
+    /**
+     * {@inheritdoc}
+     */
+    public function queryset($modelInstance, $reverse = false)
     {
-        if (is_null($modelName)) :
-            $modelName = $this->getRelatedModel()->meta->modelName;
-        endif;
+        /** @var $toField RelatedField */
+        $toField = $this->getRelatedFields()[1];
 
-        /* @var $modelName Model */
-        $qs = $modelName::objects()->all();
-
-        return $qs->filter($this->getRelatedFilter($modelInstance, true));
+        return $toField->queryset($modelInstance, $reverse);
     }
 }

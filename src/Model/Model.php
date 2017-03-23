@@ -31,6 +31,7 @@ use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
+use Eddmash\PowerOrm\Model\Manager\BaseManager;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
@@ -45,6 +46,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 {
     const DEBUG_IGNORE = ['_fieldCache'];
     const MODELBASE = '\Eddmash\PowerOrm\Model\Model';
+    public static $managerClass;
 
     /**
      * Holds the arguments passed to the constructor.
@@ -778,19 +780,23 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public static function objects(Model $modelInstance = null)
     {
-        $queryset = self::getQuerysetClass();
+        $manager = self::getManagerClass();
         $modelInstance = (is_null($modelInstance)) ? self::createObject() : $modelInstance;
 
-        return $queryset::createObject(BaseOrm::getDbConnection(), $modelInstance);
+        return new $manager($modelInstance);
     }
 
     /**
      * @return mixed
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public static function getQuerysetClass()
+    public static function getManagerClass()
     {
-        return Queryset::class;
+        if (is_null(static::$managerClass)) :
+            static::$managerClass = BaseManager::class;
+        endif;
+
+        return static::$managerClass;
     }
 
     public function getDeferredFields()

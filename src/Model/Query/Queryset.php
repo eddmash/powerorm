@@ -517,7 +517,12 @@ class Queryset implements QuerysetInterface
 
     public function __toString()
     {
-        $results = $this->_clone()->limit(1, 6)->getResults();
+        $results = $this->_clone();
+        if (!$results->query->limit && !$results->query->offset) :
+            $results = $results->limit(1, 6);
+        endif;
+
+        $results = $results->getResults();
 
         $ellipse = count($results) > 5 ? ', ... ' : '';
 

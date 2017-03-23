@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Delete;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToOneRel;
+use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Model;
 
 class ForeignKey extends RelatedField
@@ -165,7 +166,7 @@ class ForeignKey extends RelatedField
             // incase the value has been set
             $result = ArrayHelper::getValue($modelInstance->_fieldCache, $this->getName(), ArrayHelper::STRICT);
         } catch (KeyError $e) {
-            $result = $this->queryset(null, $modelInstance);
+            $result = $this->queryset($modelInstance);
 
             /* @var $fromField RelatedField */
             $fromField = $this->getRelatedFields()[0];
@@ -206,16 +207,32 @@ class ForeignKey extends RelatedField
     /**
      * {@inheritdoc}
      */
-    public function queryset($modelName, $modelInstance)
+    public function queryset($modelInstance, $reverse = false)
     {
-        if (is_null($modelName)) :
-            $modelName = $this->getRelatedModel()->meta->modelName;
+        if ($reverse) :
+            $model = $this->getRelatedModel();
+        else:
+            $model = $this->scopeModel;
         endif;
 
-        /* @var $modelName Model */
-        $qs = $modelName::objects()->all();
+        // define BaseM2MQueryset
+        if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)):
+            $baseClass = $model::getManagerClass();
+            $class = sprintf('namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}', $baseClass);
+            eval($class);
+        endif;
 
-        return $qs->filter($this->getRelatedFilter($modelInstance))->get();
+        $manager = M2OManager::createObject(
+            [
+                'model' => $model,
+                'rel' => $this->relation,
+                'instance' => $modelInstance,
+                'reverse' => $reverse,
+            ]
+        );
+
+        return $manager;
+
     }
 
 }

@@ -130,7 +130,7 @@ class ArrayHelper
             unset($haystack[$key]);
 
             return $value;
-        elseif (!is_null($default)):
+        elseif (self::STRICT != $default):
             return $default;
         endif;
 

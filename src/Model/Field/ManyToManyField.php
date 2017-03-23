@@ -20,6 +20,7 @@ use Eddmash\PowerOrm\Model\Delete;
 use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToManyRel;
+use Eddmash\PowerOrm\Model\Manager\M2MManager;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -254,58 +255,39 @@ class ManyToManyField extends RelatedField
         $queryset->set($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function queryset($modelName, $modelInstance)
-    {
-        if (is_null($modelName)) :
-            $modelName = $this->getRelatedModel()->meta->modelName;
-        endif;
-
-        /* @var $modelName Model */
-        $qs = $modelName::objects()->all();
-
-        return $qs->filter($this->getRelatedFilter($modelInstance));
-    }
-
     public function getValue(Model $modelInstance)
     {
-        return $this->queryset(null, $modelInstance);
+        return $this->queryset($modelInstance);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getRelatedFilter(Model $modelInstance, $reverse = false)
+    public function queryset($modelInstance, $reverse = false)
     {
-        $filters = [];
-
-        if ($reverse === false):
-            $model = $this->relation->toModel;
-            $queryName = $this->relation->fromField->getRelatedQueryName();
-            $fromFieldName = call_user_func($this->relation->fromField->m2mField);
-            $toFieldName = call_user_func($this->relation->fromField->m2mReverseField);
+        if ($reverse) :
+            $model = $this->getRelatedModel();
         else:
-            $model = $this->relation->getFromModel();
-            $queryName = $this->relation->fromField->getName();
-            $fromFieldName = call_user_func($this->relation->fromField->m2mReverseField);
-            $toFieldName = call_user_func($this->relation->fromField->m2mField);
+            $model = $this->scopeModel;
         endif;
 
-        $through = $this->relation->through;
+        // define BaseM2MQueryset
+        if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2MManager', false)):
+            $baseClass = $model::getManagerClass();
+            $class = sprintf('namespace Eddmash\PowerOrm\Model\Manager;class BaseM2MManager extends \%s{}', $baseClass);
+            eval($class);
+        endif;
 
-        $fromField = $through->meta->getField($fromFieldName);
-        $toField = $through->meta->getField($toFieldName);
-        $this->filters = [];
+        $manager = M2MManager::createObject(
+            [
+                'model' => $model,
+                'rel' => $this->relation,
+                'instance' => $modelInstance,
+                'reverse' => $reverse,
+            ]
+        );
 
-        foreach ([$fromField->getRelatedFields()] as $fields) :
-            $rhsField = $fields[1];
-            $key = sprintf('%s__%s', $queryName, $rhsField->getName());
-            $filters[$key] = $modelInstance->{$rhsField->getAttrName()};
-        endforeach;
-
-        return $filters;
+        return $manager;
     }
 
     /***

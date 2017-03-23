@@ -7,15 +7,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Eddmash\PowerOrm\Model\Query;
 
-use Doctrine\DBAL\Connection;
+namespace Eddmash\PowerOrm\Model\Manager;
+
 use Doctrine\DBAL\Query\QueryBuilder;
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
  * Class M2MQueryset.
@@ -23,7 +25,7 @@ use Eddmash\PowerOrm\Model\Model;
  *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
-class M2MQueryset extends ParentQueryset
+class M2MManager extends BaseM2MManager
 {
     public $filters = [];
     /**
@@ -45,9 +47,27 @@ class M2MQueryset extends ParentQueryset
      */
     private $reverse;
 
-    public function __construct(Connection $connection = null, Model $model = null, Query $query = null, $kwargs = [])
+    /**
+     * @param array $kwargs
+     *
+     * @return static
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public static function createObject($kwargs = [])
     {
+        return new static($kwargs);
+    }
 
+    public function getQueryset()
+    {
+        /** @var $qs Queryset */
+        $qs = parent::getQueryset();
+
+        return $qs->filter($this->filters);
+    }
+
+    public function __construct($kwargs = [])
+    {
         $this->instance = ArrayHelper::getValue($kwargs, 'instance');
 
         /** @var ForeignObjectRel $rel */
@@ -61,7 +81,7 @@ class M2MQueryset extends ParentQueryset
             $this->toFieldName = call_user_func($rel->fromField->m2mReverseField);
         else:
             $model = $rel->getFromModel();
-            $this->queryName = $rel->fromField->name;
+            $this->queryName = $rel->fromField->getName();
             $this->fromFieldName = call_user_func($rel->fromField->m2mReverseField);
             $this->toFieldName = call_user_func($rel->fromField->m2mField);
         endif;
@@ -74,7 +94,8 @@ class M2MQueryset extends ParentQueryset
 
         foreach ([$this->fromField->getRelatedFields()] as $fields) :
             $rhsField = $fields[1];
-            $key = sprintf('%s__%s', $this->queryName, $rhsField->name);
+
+            $key = sprintf('%s__%s', $this->queryName, $rhsField->getName());
             $this->filters[$key] = $this->instance->{$rhsField->getAttrName()};
         endforeach;
 
@@ -89,7 +110,7 @@ class M2MQueryset extends ParentQueryset
             );
         endif;
 
-        parent::__construct(null, $model, null, $kwargs);
+        parent::__construct($model);
     }
 
     public function add($values = [])
@@ -133,7 +154,7 @@ class M2MQueryset extends ParentQueryset
             $newIds = array_diff($newIds, $oldIds);
 
             /** @var $qb QueryBuilder */
-            $qb = $this->connection->createQueryBuilder();
+            $qb = BaseOrm::getDbConnection()->createQueryBuilder();
 
             foreach ($newIds as $newId) :
                 $qb->insert($this->through->meta->dbTable);

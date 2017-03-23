@@ -258,31 +258,6 @@ class RelatedField extends Field
         return isset($this->getRelatedFields()[1]) ? [$this->getRelatedFields()[1]] : [];
     }
 
-    /**
-     * @param Model $modelInstance
-     *
-     * @return array
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     */
-    public function getRelatedFilter(Model $modelInstance, $reverse = false)
-    {
-        /* @var $fromField Field */
-        /* @var $toField Field */
-        $filter = [];
-        if ($reverse === false) :
-            list($fromField, $toField) = $this->getRelatedFields();
-            $value = $modelInstance->{$fromField->getAttrName()};
-            $filter[$toField->getAttrName()] = $value;
-        else:
-
-            list($toField, $fromField) = $this->getRelatedFields();
-            $value = $modelInstance->{$fromField->getAttrName()};
-            $filter[$toField->getName()] = $value;
-        endif;
-
-        return $filter;
-    }
-
     public function getForeignRelatedFieldsValues(Model $modelInstance)
     {
         return $this->getInstanceValueForFields($modelInstance, $this->getForeignRelatedFields());
@@ -382,7 +357,7 @@ class RelatedField extends Field
      * @param $modelInstance
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function queryset($modelName, $modelInstance)
+    public function queryset($modelInstance, $reverse = false)
     {
 
     }
