@@ -168,7 +168,7 @@ class ForeignKey extends RelatedField
             $result = $this->queryset(null, $modelInstance);
 
             /* @var $fromField RelatedField */
-            list($fromField, $toField) = $this->getRelatedFields();
+            $fromField = $this->getRelatedFields()[0];
             // cache the value of the model
             $modelInstance->_fieldCache[$fromField->getName()] = $result;
         }

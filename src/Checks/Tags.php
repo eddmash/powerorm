@@ -12,5 +12,5 @@ namespace Eddmash\PowerOrm\Checks;
 
 class Tags
 {
-    const Model = 'model';
+    const Model = 'MODEL';
 }

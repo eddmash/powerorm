@@ -9,7 +9,6 @@
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;

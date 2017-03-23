@@ -31,6 +31,7 @@ class Executor extends BaseObject
      * @var Loader
      */
     public $loader;
+
     /**
      * @var Connection
      */
@@ -54,9 +55,9 @@ class Executor extends BaseObject
     public function __construct($connection)
     {
         $this->connection = $connection;
-        $this->schemaEditor = SchemaEditor::createObject($connection);
-        $this->loader = Loader::createObject($connection);
-        $this->recorder = Recorder::createObject($connection);
+        $this->schemaEditor = SchemaEditor::createObject($this->connection);
+        $this->loader = Loader::createObject($this->connection);
+        $this->recorder = Recorder::createObject($this->connection);
     }
 
     /**

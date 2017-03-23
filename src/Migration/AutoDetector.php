@@ -272,7 +272,6 @@ class AutoDetector extends BaseObject
                 $migrationName = $this->suggestName();
             else:
                 // first set previous as dependency of this
-                // $migration->requires = [$leaf];
                 $migration->setDependency($leaf);
 
                 $migrationNo = str_pad($migrationNo, 4, '0', STR_PAD_LEFT);
@@ -520,7 +519,7 @@ class AutoDetector extends BaseObject
                     if ($localField->primaryKey):
                         $primaryKeyRel = $localField->relation->toModel;
                     elseif (!$localField->relation->parentLink):
-                        $relatedFields[$localField->name] = $localField;
+                        $relatedFields[$localField->getName()] = $localField;
                     endif;
 
                 endif;
@@ -531,7 +530,7 @@ class AutoDetector extends BaseObject
             foreach ($meta->localManyToMany as $name => $localM2MField) :
 
                 if ($localM2MField->relation->toModel != null):
-                    $relatedFields[$localM2MField->name] = $localM2MField;
+                    $relatedFields[$localM2MField->getName()] = $localM2MField;
                 endif;
 
                 // if field has a through model and it was not auto created, add it as a related field
@@ -539,7 +538,7 @@ class AutoDetector extends BaseObject
                     !$localM2MField->relation->through->meta->autoCreated
                 ):
 
-                    $relatedFields[$localM2MField->name] = $localM2MField;
+                    $relatedFields[$localM2MField->getName()] = $localM2MField;
                 endif;
 
             endforeach;
@@ -672,7 +671,7 @@ class AutoDetector extends BaseObject
             /** @var $localField Field */
             foreach ($localFields as $localField) :
                 if ($localField->relation && $localField->relation->toModel):
-                    $relatedFields[$localField->name] = $localField;
+                    $relatedFields[$localField->getName()] = $localField;
                 endif;
 
             endforeach;
@@ -680,7 +679,7 @@ class AutoDetector extends BaseObject
             /** @var $localM2MField Field */
             foreach ($localM2MFields as $localM2MField) :
                 if ($localField->relation && $localField->relation->toModel):
-                    $relatedFields[$localM2MField->name] = $localM2MField;
+                    $relatedFields[$localM2MField->getName()] = $localM2MField;
                 endif;
 
             endforeach;
@@ -706,7 +705,7 @@ class AutoDetector extends BaseObject
             /** @var $reverseRelatedField RelatedField */
             foreach ($reverseRelatedFields as $reverseRelatedField) :
                 $modelName = $reverseRelatedField->relation->toModel->meta->modelName;
-                $fieldName = $reverseRelatedField->relation->fromField->name;
+                $fieldName = $reverseRelatedField->relation->fromField->getName();
                 $opDep[] = [
                     'target' => $fieldName,
                     'model' => $modelName,

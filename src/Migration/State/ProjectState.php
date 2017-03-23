@@ -17,7 +17,6 @@ use Eddmash\PowerOrm\DeconstructableObject;
 class ProjectState extends DeconstructableObject
 {
     public $modelStates;
-    private static $registry;
 
     public function __construct($modelStates = [])
     {

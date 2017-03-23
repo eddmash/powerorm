@@ -18,10 +18,6 @@ class Count extends BaseAggregate
 {
     protected $function = 'COUNT';
     protected $name = 'COUNT';
-    /**
-     * @var bool
-     */
-    private $distinct;
 
     /**
      * {@inheritdoc}

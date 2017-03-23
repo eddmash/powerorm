@@ -266,8 +266,8 @@ class RelatedField extends Field
      */
     public function getRelatedFilter(Model $modelInstance, $reverse = false)
     {
-        /** @var $fromField Field */
-        /** @var $toField Field */
+        /* @var $fromField Field */
+        /* @var $toField Field */
         $filter = [];
         if ($reverse === false) :
             list($fromField, $toField) = $this->getRelatedFields();
