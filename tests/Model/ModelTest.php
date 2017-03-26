@@ -81,7 +81,8 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
 abstract class AbstractModel extends \Eddmash\PowerOrm\Model\Model
 {
-    private function unboundFields() {
+    private function unboundFields()
+    {
         return [
             'country' => PModel::CharField(['maxLength' => 40, 'dbIndex' => true]),
             'school' => PModel::CharField(['maxLength' => 40, 'dbIndex' => true]),
@@ -91,8 +92,8 @@ abstract class AbstractModel extends \Eddmash\PowerOrm\Model\Model
 
 class FieldCrashModel extends AbstractModel
 {
-    private function unboundFields() {
-
+    private function unboundFields()
+    {
         return [
             'school' => PModel::CharField(['maxLength' => 40, 'dbIndex' => true]),
         ];
@@ -129,16 +130,18 @@ class PublicFieldMethodModel extends Model
     }
 }
 
-class ConcreteModel extends AbstractModel{
-    private function unboundFields() {
-
+class ConcreteModel extends AbstractModel
+{
+    private function unboundFields()
+    {
         return [
             'town' => PModel::CharField(['maxLength' => 40, 'dbIndex' => true]),
         ];
     }
 }
 
-class DirectConcreateBaseProxy extends ConcreteModel{
+class DirectConcreateBaseProxy extends ConcreteModel
+{
     public function getMetaSettings()
     {
         return [
@@ -147,10 +150,12 @@ class DirectConcreateBaseProxy extends ConcreteModel{
     }
 }
 
-abstract class InnerAbstractClass extends ConcreteModel{
+abstract class InnerAbstractClass extends ConcreteModel
+{
 }
 
-class InDirectConcreateBaseProxy extends InnerAbstractClass {
+class InDirectConcreateBaseProxy extends InnerAbstractClass
+{
     public function getMetaSettings()
     {
         return [

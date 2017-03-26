@@ -57,6 +57,9 @@ Load the library like any other Codeigniter library.
  - All fields visible on the model, no need to look at the database table when you want to interact with the database.
  - Provides database interaction methods
 
+# supports
+php 5.6+ and 7+
+
  # Credits
  I have used the following frameworks as a guiding hand, and in most cases i have replicated how Django framework has
  approached a problem, and in some cases i have borrowed some source code :
