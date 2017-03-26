@@ -19,25 +19,25 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testFieldMethodIsNotPublic()
     {
-        $this->expectException(\Eddmash\PowerOrm\Exception\MethodNotExtendableException::class);
+        $this->setExpectedException(\Eddmash\PowerOrm\Exception\MethodNotExtendableException::class);
         new PublicFieldMethodModel();
     }
 
     public function testFieldCrashInChildModel()
     {
-        $this->expectException(\Eddmash\PowerOrm\Exception\FieldError::class);
+        $this->setExpectedException(\Eddmash\PowerOrm\Exception\FieldError::class);
         new FieldCrashModel();
     }
 
     public function testNoFieldsInParentAbstracClassForProxyClass()
     {
-        $this->expectException(\Eddmash\PowerOrm\Exception\TypeError::class);
+        $this->setExpectedException(\Eddmash\PowerOrm\Exception\TypeError::class);
         new AbstractWithFieldsBaseProxyModel();
     }
 
     public function testProxyHasConcreteBase()
     {
-        $this->expectException(\Eddmash\PowerOrm\Exception\TypeError::class);
+        $this->setExpectedException(\Eddmash\PowerOrm\Exception\TypeError::class);
         new AbstractBaseProxyModel();
     }
 
