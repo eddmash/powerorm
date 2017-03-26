@@ -7,7 +7,7 @@ use Eddmash\PowerOrm\BaseObject;
  * User: eddmash
  * Date: 9/5/16.
  */
-class ObjectTest extends \PHPUnit_Framework_TestCase
+class BaseObjectTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var object

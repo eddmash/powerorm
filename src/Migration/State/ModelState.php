@@ -173,6 +173,7 @@ class ModelState extends BaseObject
      */
     private static function createInstance($className, $extends = '')
     {
+        echo '%%%%%%%%%%%'.$className.PHP_EOL;
         if (!ClassHelper::classExists($className, BaseOrm::getModelsNamespace())):
             MigrationModel::defineClass($className, $extends);
 

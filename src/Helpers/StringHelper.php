@@ -4,7 +4,6 @@
  * User: eddmash
  * Date: 6/18/16.
  */
-
 namespace Eddmash\PowerOrm\Helpers;
 
 /*
@@ -60,9 +59,15 @@ class StringHelper
      * @param string $string the string being measured for length
      *
      * @return int the number of bytes in the given string
+     *
+     * @throws \Exception
      */
     public static function byteLength($string)
     {
+        if(!function_exists('mb_strlen')):
+            throw new \Exception("function 'mb_strlen' does not exist ");
+        endif;
+
         return mb_strlen($string, '8bit');
     }
 

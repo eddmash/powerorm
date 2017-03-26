@@ -149,7 +149,7 @@ class Registry extends BaseObject
     }
 
     /**
-     * @param $name
+     * @param string $name
      *
      * @return Model
      *
@@ -212,6 +212,7 @@ class Registry extends BaseObject
 
     public function registerModel(Model $model)
     {
+
         $name = ClassHelper::getNameFromNs($model->meta->modelName, BaseOrm::getModelsNamespace());
         if (!ArrayHelper::hasKey($this->allModels, $name)) {
             $this->allModels[$name] = $model;

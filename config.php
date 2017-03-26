@@ -16,3 +16,4 @@ $config['databaseConfigs'] = [
 $config['migrationPath'] = '';
 $config['modelsPath'] = '';
 $config['dbPrefix'] = 'testing_';
+//$config['appNamespace'] = '';

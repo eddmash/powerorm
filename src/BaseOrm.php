@@ -300,7 +300,7 @@ class BaseOrm extends BaseObject
     {
         $instance = null;
 
-        if (ENVIRONMENT == 'POWERORM_DEV') :
+        if (in_array(ENVIRONMENT, ['POWERORM_DEV', 'POWERORM_TESTING'])) :
             $instance = static::standAloneEnvironment($config);
         else:
             $instance = static::getOrmFromContext();

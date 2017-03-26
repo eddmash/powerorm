@@ -128,32 +128,6 @@ class BaseObject
         return (new \ReflectionObject($this))->getParentClass();
     }
 
-    /**
-     * Returns all the parents for this object static with the youngest to the oldest
-     * The resolution order to follow when going up a inheritance hierarchy.
-     *
-     * @return array this an array of ReflectionClass
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function getParents($stopAt = [])
-    {
-        $reflectionClass = new \ReflectionObject($this);
-
-        $parents = [];
-        while ($reflectionClass->getParentClass()):
-            $reflectionClass = $reflectionClass->getParentClass();
-            if (in_array($reflectionClass->getName(), $stopAt)):
-                break;
-            endif;
-            $parents[$reflectionClass->getName()] = $reflectionClass;
-        endwhile;
-
-        return $parents;
-    }
-
     public function __toString()
     {
         return sprintf('%s Object', get_class($this));

@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Helpers;
 
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
+use Eddmash\PowerOrm\Model\Model;
 
 /**
  * A Helper class for dealing with common class related tasks.
@@ -120,5 +121,44 @@ class ClassHelper
         endif;
 
         return false;
+    }
+
+    /**
+     * Returns all the parents for the instance from the youngest to the oldest
+     * The resolution order to follow when going up a inheritance hierarchy.
+     *
+     * @return array this an array of ReflectionClass
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function getParents($instance, $stopAt = [])
+    {
+        $reflectionClass = new \ReflectionObject($instance);
+
+        $parents = [];
+        while ($reflectionClass->getParentClass()):
+            $reflectionClass = $reflectionClass->getParentClass();
+            if (in_array($reflectionClass->getName(), $stopAt)):
+                break;
+            endif;
+            $parents[$reflectionClass->getName()] = $reflectionClass;
+        endwhile;
+
+        return $parents;
+    }
+
+    public static function getNamespaceNamePair($name)
+    {
+        $namespace = '';
+
+        $name = rtrim($name, '\\');
+        if ($pos = strrpos($name, '\\')) :
+            $namespace = substr($name, 0, $pos);
+            $name = substr($name, $pos + 1);
+        endif;
+
+        return [$namespace, $name];
     }
 }

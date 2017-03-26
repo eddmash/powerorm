@@ -438,17 +438,22 @@ class AutoDetector extends BaseObject
             /** @var $op Operation */
             $op = $operations[0];
             if ($op instanceof CreateModel):
-                return sprintf('%s%s_%s', $prefix, $id, ucwords($op->name));
+                return sprintf('%s%s_%s', $prefix, $id, $this->formatName($op->name));
             elseif ($op instanceof DeleteModel):
-                return sprintf('%s%s_Delete_%s', $prefix, $id, ucwords($op->name));
+                return sprintf('%s%s_Delete_%s', $prefix, $id, $this->formatName($op->name));
             elseif ($op instanceof AddField):
-                return sprintf('%s%s_%s_%s', $prefix, $id, ucwords($op->modelName), ucwords($op->name));
+                return sprintf('%s%s_%s_%s', $prefix, $id, $this->formatName($op->modelName), $this->formatName($op->name));
             elseif ($op instanceof RemoveField):
-                return sprintf('%s%s_Remove_%s_%s', $prefix, $id, ucwords($op->modelName), ucwords($op->name));
+                return sprintf('%s%s_Remove_%s_%s', $prefix, $id, $this->formatName($op->modelName), $this->formatName($op->name));
             endif;
         endif;
 
         return sprintf('%s%s_Auto_%s', $prefix, $id, date('Ymd_hm'));
+    }
+
+    public function formatName($name)
+    {
+        return ucwords(str_replace('\\', '_', $name));
     }
 
     public function getMigrationNumber($name)

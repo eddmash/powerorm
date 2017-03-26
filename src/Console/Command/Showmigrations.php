@@ -31,7 +31,8 @@ class Showmigrations extends BaseCommand
             $list = $loader->graph->getAncestryTree($leaf);
 
             foreach ($list as $item) :
-                $migrationName = array_pop(explode('\\', $item));
+                $itemArr = explode('\\', $item);
+                $migrationName = array_pop($itemArr);
 
                 if (in_array($item, $loader->appliedMigrations)):
                     $indicator = '<info>(applied)</info>';

@@ -3,7 +3,6 @@
  * Created by eddmash <http://eddmash.com>
  * Date: 9/29/16.
  */
-
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
 class RenameModel extends ModelOperation

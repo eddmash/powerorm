@@ -20,6 +20,7 @@ use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\LookupError;
+use Eddmash\PowerOrm\Exception\MethodNotExtendableException;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -171,6 +172,99 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         $this->constructorArgs = $kwargs;
         $this->init();
+        $this->setFieldValues($kwargs);
+
+    }
+
+    public static function fromDb($records = [])
+    {
+        return new static($records);
+    }
+
+    /**
+     * This method is for internal use only and should not be overriden.
+     *
+     * @ignore
+     *
+     * @internal
+     *
+     * @param array $fields
+     * @param array $kwargs
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function init($fields = [], $kwargs = [])
+    {
+        if (ArrayHelper::hasKey($kwargs, 'registry')):
+            $registry = $kwargs['registry'];
+        else:
+            $registry = BaseOrm::getRegistry(false);
+        endif;
+
+        // if the registry is already ready and an
+        // instance of this class has already been registered with the registry
+        // there is no need to register again, just re-use the meta information of the already registered instance
+        // remember meta only holds information that related to the class as a whole and not the instances.
+        if ($registry->hasModel(get_class($this)) && $registry->ready) :
+
+            $this->meta = $registry->getModel(get_class($this))->meta;
+
+        else:
+            // get meta settings for this model
+            $metaSettings = $this->getMetaSettings();
+
+            if (!empty($kwargs)):
+
+                if (ArrayHelper::hasKey($kwargs, 'meta')):
+                    $metaSettings = $kwargs['meta'];
+                endif;
+                // we only add registry if it came in as an argument
+                // don't add the default registry, meta class takes care of this.
+                if (ArrayHelper::hasKey($kwargs, 'registry')):
+
+                    $metaSettings['registry'] = $kwargs['registry'];
+                endif;
+            endif;
+
+            $meta = Meta::createObject($metaSettings);
+
+            $this->addToClass('meta', $meta);
+
+            list($concreteParentName, $immediateParent, $parentIsAbstract, $classFields) = self::getHierarchyMeta($this);
+
+            $this->setupFields($fields, $classFields);
+
+            // proxy model setup
+            if ($this->meta->proxy):
+                try {
+                    $concreteParent = $meta->registry->getModel($concreteParentName);
+                } catch (LookupError $e) {
+                    $concreteParent = $concreteParentName::createObject();
+                }
+                $this->proxySetup($concreteParent);
+            else:
+                $this->meta->concreteModel = $this;
+
+                if (!$parentIsAbstract):;
+                    // setup for multiple inheritance
+                    $this->prepareMultiInheritance($immediateParent);
+                endif;
+            endif;
+
+            // ensure the model is ready for use.
+            $this->prepare();
+
+            // register the model
+            $meta->registry->registerModel($this);
+        endif;
+    }
+
+    public function setFieldValues($kwargs)
+    {
+        // we need meta to exists
+        if (is_null($this->meta)):
+            return;
+        endif;
+
         if ($kwargs):
             // get also related field if we have kwargs
             $fields = $this->meta->getNonM2MForwardFields();
@@ -224,84 +318,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 $this->{$field->getAttrName()} = $val;
             endif;
         endforeach;
-//        endif;
-    }
-
-    public static function fromDb($records = [])
-    {
-        $newModel = new static($records);
-
-        return $newModel;
-    }
-
-    /**
-     * This method is for internal use only and should not be overriden.
-     *
-     * @ignore
-     *
-     * @internal
-     *
-     * @param array $fields
-     * @param array $kwargs
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     */
-    public function init($fields = [], $kwargs = [])
-    {
-        if (ArrayHelper::hasKey($kwargs, 'registry')):
-            $registry = $kwargs['registry'];
-        else:
-            $registry = BaseOrm::getRegistry(false);
-        endif;
-
-        if ($registry->hasModel(get_class($this)) && $registry->ready) :
-
-            $this->meta = $registry->getModel(get_class($this))->meta;
-
-        else:
-            // get meta settings for this model
-            $metaSettings = $this->getMetaSettings();
-
-            if (!empty($kwargs)):
-
-                if (ArrayHelper::hasKey($kwargs, 'meta')):
-                    $metaSettings = $kwargs['meta'];
-                endif;
-                // we only add registry if come in as an argument
-                // don't add the default registry meta class takes care of this.
-                if (ArrayHelper::hasKey($kwargs, 'registry')):
-
-                    $metaSettings['registry'] = $kwargs['registry'];
-                endif;
-            endif;
-
-            $meta = Meta::createObject($metaSettings);
-
-            $this->addToClass('meta', $meta);
-
-            list($concreteParentName, $immediateParent, $fieldsList) = $this->getHierarchyMeta();
-
-            $this->setupFields($fields, $fieldsList);
-
-            // proxy model setup
-            if ($this->meta->proxy):
-                try {
-                    $concreteParent = $meta->registry->getModel($concreteParentName);
-                } catch (LookupError $e) {
-                    $concreteParent = $concreteParentName::createObject();
-                }
-                $this->proxySetup($concreteParent);
-            else:
-                $this->meta->concreteModel = $this;
-                // setup for multiple inheritance
-                $this->prepareMultiInheritance($immediateParent);
-            endif;
-
-            // ensure the model is ready for use.
-            $this->prepare();
-
-            // register the model
-            $meta->registry->registerModel($this);
-        endif;
     }
 
     public static function isModelBase($className)
@@ -326,14 +342,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
     }
 
-    public function setupFields($fields, $hierarchyFields)
+    public function setupFields($fields, $classFields)
     {
         if (empty($fields)):
 
-            $fields = $hierarchyFields[ClassHelper::getNameFromNs(
-                $this->getFullClassName(),
-                BaseOrm::getModelsNamespace()
-            )];
+            $fields = $classFields;
 
         endif;
 
@@ -399,26 +412,29 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
+     * @param Model     $model
      * @param string    $method     the method to invoke
      * @param null      $args       the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
      *
-     * @throws TypeError
      * @throws FieldError
+     * @throws MethodNotExtendableException
+     * @throws TypeError
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function getHierarchyMeta($method = 'unboundFields', $args = null, $fromOldest = true)
+    public static function getHierarchyMeta(Model $model, $method = 'unboundFields', $args = null, $fromOldest = true)
     {
         $modelNamespace = BaseOrm::getModelsNamespace();
-        $isProxy = $this->meta->proxy;
+        $isProxy = $model->meta->proxy;
         // start from oldest parent e.g BaseObject to the last child model
-        $parents = $this->getParents([\PModel::getFullClassName(), self::getFullClassName()]);
-        $parents = array_merge([$this->getFullClassName() => new \ReflectionObject($this)], $parents);
+        $parents = ClassHelper::getParents($model, [\PModel::getFullClassName(), self::getFullClassName()]);
+        // append the current model to the begining
+        $parents = array_merge([$model->getFullClassName() => new \ReflectionObject($model)], $parents);
         if ($fromOldest):
             $parents = array_reverse($parents);
         endif;
@@ -429,13 +445,19 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         $immediateParent = null;
         $previousAbstractParent = null;
-
+        $parentIsAbstract = false;
         /** @var $reflectionParent \ReflectionClass */
         /* @var $concreteParent \ReflectionClass */
         foreach ($parents as $index => $reflectionParent) :
             $parentName = $reflectionParent->getName();
 
-            $isOnCurrentModel = ($this->getFullClassName() === $parentName);
+            $parentIsAbstract = (
+                !is_null($previousAbstractParent) &&
+                !is_null($immediateParent) &&
+                $previousAbstractParent === $immediateParent
+            );
+
+            $isOnCurrentModel = ($model->getFullClassName() === $parentName);
 
             if (!$reflectionParent->hasMethod($method) || $reflectionParent->getMethod($method)->isAbstract()):
                 continue;
@@ -451,53 +473,39 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             // ************ get the fields *******************
             // we need to call the parent version of the method for each class to get its fields
-            // this is how we bypass the overriding functionality of php, otherwise if we don't do this the $method will
-            // always provide the fields defined in the last child class.
-            $parentMethodCall = sprintf('%1$s::%2$s', $parentName, $method);
-            if ($args != null):
-                if (is_array($args)):
-                    $fields = call_user_func_array([$this, $parentMethodCall], $args);
-                else:
-
-                    $fields = call_user_func([$this, $parentMethodCall], $args);
+            // because "$method" is private, this way we don't have any chance of
+            // inheriting fields from parent.
+            $methodReflection = $reflectionParent->getMethod($method);
+            if (strtolower($methodReflection->getDeclaringClass()->getName()) === strtolower($parentName)):
+                //ensure it private to avoid method inheritance
+                if (!$methodReflection->isPrivate()):
+                    throw new MethodNotExtendableException(
+                        sprintf("The method '%s::%s' should be implemented as private", $parentName, $method));
                 endif;
+                $parentMethodCall = sprintf('%1$s::%2$s', $parentName, $method);
+
+                if ($args != null):
+                    if (is_array($args)):
+                        $fields = call_user_func_array([$model, $parentMethodCall], $args);
+                    else:
+
+                        $fields = call_user_func([$model, $parentMethodCall], $args);
+                    endif;
+                else:
+                    $fields = call_user_func([$model, $parentMethodCall]);
+                endif;
+
             else:
-                $fields = call_user_func([$this, $parentMethodCall]);
+                $fields = [];
             endif;
 
             // =========================== Some Validations ========================
-
-            /*
-             * confirm fields with same name don't exist on the parents and current model.
-             * i choose to through an exception of overriding for consistence sake. that is on the $method no overriding
-             * takes place.
-             *
-             */
-            if ($immediateParent != null && $immediateParent != $previousAbstractParent):
-
-                $fieldKeys = array_keys($fields);
-                $parentKeys = (isset($modelFields[$immediateParent])) ? array_keys($modelFields[$immediateParent]) : [];
-                $commonFields = array_intersect($parentKeys, $fieldKeys);
-
-                if (!empty($commonFields)):
-                    throw new FieldError(
-                        sprintf(
-                            'Local field [ %s ] in class "%s" clashes with field of similar name from base class "%s" ',
-                            implode(', ', $commonFields),
-                            $parentName,
-                            $immediateParent
-                        )
-                    );
-
-                endif;
-
-            endif;
 
             // if the parent is an abstract model and the current model is a proxy model
             // the parent should not have any fields. abstract models cant have fields
             // incases where the child is a proxy model
 
-            if (($isOnCurrentModel && $isProxy) && $immediateParent === $previousAbstractParent):
+            if (($isOnCurrentModel && $isProxy) && $parentIsAbstract):
                 $parentFields = $modelFields[$previousAbstractParent];
 
                 if (!empty($parentFields)):
@@ -511,11 +519,30 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 endif;
             endif;
 
+            // check for field clashes
+            if (isset($modelFields[$immediateParent])):
+                $parentFields = $modelFields[$immediateParent];
+                $commonFields = array_intersect(array_keys($parentFields), array_keys($fields));
+
+                if (!empty($commonFields)):
+                    throw new FieldError(
+                        sprintf(
+                            'Local field [ %s ] in class "%s" clashes with field of similar name from base class "%s" ',
+                            implode(', ', $commonFields),
+                            $parentName,
+                            $immediateParent
+                        )
+                    );
+
+                endif;
+            endif;
+
             // ****************** Import fields from Abstract ***************
-            // get fields of immediate parent fields if it was an abstract model add them to child model.
-            if (!$isProxy && $previousAbstractParent != null):
-                $parentFields = (isset($modelFields[$previousAbstractParent])) ? $modelFields[$previousAbstractParent] : [];
-                $fields = array_merge($parentFields, $fields);
+            if ($parentIsAbstract):
+                if (isset($modelFields[$immediateParent])):
+                    $parentFields = $modelFields[$immediateParent];
+                    $fields = array_merge($parentFields, $fields);
+                endif;
             endif;
 
             if ($reflectionParent->isAbstract()):
@@ -526,8 +553,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             if (!$isOnCurrentModel):
 
-                $immediateParent = ($parentName == $previousAbstractParent) ? '' : $parentName;
-
+                $immediateParent = $parentName;
             endif;
 
             $modelFields[ClassHelper::getNameFromNs($parentName, $modelNamespace)] = $fields;
@@ -539,7 +565,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 sprintf(
                     "Proxy model '%s' has no non-abstract".
                     ' model base class.',
-                    $this->getShortClassName()
+                    $model->getShortClassName()
                 )
             );
         endif;
@@ -547,7 +573,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         return [
             ($concreteParent == null) ?: ClassHelper::getNameFromNs($concreteParent->getName(), $modelNamespace),
             $immediateParent,
-            $modelFields,
+            $parentIsAbstract,
+            $modelFields[$model->meta->modelName],
         ];
     }
 
@@ -615,7 +642,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function unboundFields()
+    private function unboundFields()
     {
         return [];
     }
@@ -993,7 +1020,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $forceInsert = false,
         $forceUpdate = false,
         $updateFields = null
-    ) {
+    )
+    {
         $meta = $this->meta;
 
         $nonPkFields = [];

@@ -22,11 +22,15 @@ class MigrationModel extends Model
 
     public static function defineClass($className, $extends = '')
     {
-        $namespace = '';
         $use = '';
         $extendedClass = '';
+
+        list($namespace, $className) = ClassHelper::getNamespaceNamePair($className);
+        if($namespace):
+            $namespace = sprintf('namespace %s;', $namespace);
+        endif;
         if (empty($extends) || Model::isModelBase($extends)):
-            $extends = Model::getFullClassName();
+            $extends = ClassHelper::getFormatNamespace(Model::getFullClassName(), true, false);
         else:
             $extendedClass = sprintf('%s%s', ClassHelper::getFormatNamespace($namespace, true), $extends);
 
@@ -42,7 +46,6 @@ class MigrationModel extends Model
             return false;
         endif;
 
-        $extends = ClassHelper::getNameFromNs($extends, $namespace);
         $class = sprintf(self::getTemplate(), $namespace, $use, $className, $extends);
 
         $className = sprintf('%s%s', ClassHelper::getFormatNamespace($namespace, true), $className);
@@ -55,6 +58,7 @@ class MigrationModel extends Model
             endforeach;
         endif;
 
+        echo $class.PHP_EOL;
         if (!ClassHelper::classExists($className, $namespace)):
             eval($class);
         endif;
@@ -64,11 +68,10 @@ class MigrationModel extends Model
 
     public static function getTemplate()
     {
-        return '%1$s;
+        return '%1$s
             %2$s
             class %3$s extends %4$s{
 
-                 public function unboundFields(){return [];}
             }';
     }
 }

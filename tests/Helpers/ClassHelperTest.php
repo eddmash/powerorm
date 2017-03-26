@@ -13,12 +13,39 @@ use Eddmash\PowerOrm\Helpers\ClassHelper;
 
 class ClassHelperTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @dataProvider namespaceProvider
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function testNamespanceNamePair($originalValue, $expectedNamespace, $expectedName)
+    {
+        list($namespace, $name) = ClassHelper::getNamespaceNamePair($originalValue);
+        $this->assertEquals($expectedNamespace, $namespace);
+        $this->assertEquals($expectedName, $name);
+    }
+
     public function testGettingClassNameFromFile()
     {
         $classDir = '/var/www/public/ci306/application/migrations';
         $file = $classDir.'/m0001_Initial.php';
 
         $this->assertEquals('m0001_Initial', ClassHelper::getClassNameFromFile($file, $classDir));
+    }
+
+    public function testClassParents()
+    {
+        $expected = [
+            'PModel',
+            'Eddmash\PowerOrm\Model\Model',
+            'Eddmash\PowerOrm\DeconstructableObject',
+            'Eddmash\PowerOrm\BaseObject',
+        ];
+        $mock = $this->getMockBuilder(PModel::class)->getMock();
+//        $this->assertInstanceOf(PModel::class, $mock->get);
+        $this->assertEquals($expected, array_keys(ClassHelper::getParents($mock)), 'Failed to assert expected order of parents');
     }
 
     /**
@@ -67,6 +94,14 @@ class ClassHelperTest extends PHPUnit_Framework_TestCase
     public function testGettingNameFromNamespace($originalValue, $expectedValue)
     {
         $this->assertEquals($expectedValue, ClassHelper::getNameFromNs($originalValue, '\app\model'));
+    }
+
+    public function namespaceProvider()
+    {
+        return [
+            ['app\model\farmers\Farmer', 'app\model\farmers', 'Farmer'],
+            ['app\model\User\\', 'app\model', 'User'],
+        ];
     }
 
     public function nameFromNamespaceProvider()

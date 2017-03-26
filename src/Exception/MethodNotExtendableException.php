@@ -1,16 +1,17 @@
 <?php
+
 /**
- * This file is part of the ci304 package.
+ * This file is part of the ci306 package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace Eddmash\PowerOrm\Model\Lookup\Related;
+namespace Eddmash\PowerOrm\Exception;
 
-use Eddmash\PowerOrm\Model\Lookup\LessThanOrEqual;
+use Exception;
 
-class RelatedLessThanOrEqual extends LessThanOrEqual
+class MethodNotExtendableException extends Exception
 {
 }
