@@ -10,7 +10,7 @@
 */
 
 /*
-* This file is part of the ci306 package.
+* This file is part of the powerorm package.
 *
 * (c) Eddilbert Macharia <edd.cowan@gmail.com>
 *

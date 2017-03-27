@@ -17,7 +17,7 @@ define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'developm
 
 $system_path = $base_dir.'/system';
 $application_folder = $base_dir.'/application';
-$doc_root = 'public';
+$doc_root = $base_dir;
 if (realpath($system_path) !== false) {
     $system_path = realpath($system_path).'/';
 }
