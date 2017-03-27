@@ -30,7 +30,7 @@ The data-model syntax offers many rich ways of representing your models – so f
 
     class Role extends PModel
     {
-        public function unboundFields() {
+        private function unboundFields() {
             return [
                 'name' => PModel::CharField(['maxLength' => 40, 'dbIndex' => true]),
                 'code' => PModel::CharField(['maxLength' => 10, 'dbIndex' => true]),

@@ -14,7 +14,7 @@ For example:
 
     class Place extends PModel
     {
-        public function unboundFields()
+        private function unboundFields()
         {
             return [
                 'name' => PModel::CharField(['maxLength' => 100]),
@@ -25,7 +25,7 @@ For example:
 
     class Restaurant extends Place
     {
-        public function unboundFields()
+        private function unboundFields()
         {
             return [
                 'serves_hot_dogs' => PModel::BooleanField(['default' => false]),

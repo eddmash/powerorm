@@ -31,7 +31,7 @@ abstract class BaseCommand extends Command
         *    ___   ___           ___  ___  ___  ___           %3$s*
         *   /___/ /  / \  /\  / /__  /__/ /  / /__/ /\  /\    %3$s*
         *  /     /__/   \/  \/ /__  /  \ /__/ /  \ /  \/  \(%1$s) %2$s*
-        * /     by Eddilbert Macharia (www.eddmash.com)    \  %3$s*
+        * / by Eddilbert Macharia (http://www.eddmash.com) \  %3$s*
         *                                                     %3$s*
     **********************************************************%4$s****
 

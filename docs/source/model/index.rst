@@ -21,7 +21,7 @@ This example model defines a User, which has a firstName and lastName:
      class User extends PModel
      {
 
-         public function unboundFields(){
+         private function unboundFields(){
              return [
                  'firstName'=>PModel::CharField(['maxLength'=>30]),
                  'lastName'=>PModel::CharField(['maxLength'=>30]),
@@ -129,7 +129,7 @@ a Manufacturer makes multiple cars but each Car only has one Manufacturer – us
 .. code-block:: php
 
     class Car extends PModel{
-        public function unboundFields()
+        private function unboundFields()
         {
             return [
                 'manufacturer' => PModel::ForeignKey(['to' => 'Manufacturer'])
@@ -140,7 +140,7 @@ a Manufacturer makes multiple cars but each Car only has one Manufacturer – us
     class Manufacturer extends PModel
     {
 
-        public function unboundFields(){
+        private function unboundFields(){
             return [];
         }
     }
@@ -164,7 +164,7 @@ multiple toppings – here's how you'd represent that:
     class Topping extends PModel
     {
 
-        public function unboundFields(){
+        private function unboundFields(){
             return [
                 'name'=> PModel::CharField(['maxLength'=>50])
             ];
@@ -172,7 +172,7 @@ multiple toppings – here's how you'd represent that:
     }
 
     class Pizza extends PModel{
-        public function unboundFields()
+        private function unboundFields()
         {
             return [
                 'toppings' => PModel::ManyToManyField(['to' => 'Topping'])
@@ -211,7 +211,7 @@ For our musician example, the code would look something like this:
     class Person extends PModel
     {
 
-        public function unboundFields(){
+        private function unboundFields(){
             return [
                 'name'=> PModel::CharField(['maxLength'=>50])
             ];
@@ -219,7 +219,7 @@ For our musician example, the code would look something like this:
     }
 
     class Group extends PModel{
-        public function unboundFields()
+        private function unboundFields()
         {
             return [
                 'name'=> PModel::CharField(['maxLength'=>50]),
@@ -229,7 +229,7 @@ For our musician example, the code would look something like this:
     }
 
     class Membership extends PModel{
-        public function unboundFields()
+        private function unboundFields()
         {
             return [
                 'person' => PModel::ForeignKey(['to' => 'Person']),
@@ -264,7 +264,7 @@ Give your model metadata by return an array of model meta setting from the metho
      class User extends PModel
      {
 
-        public function unboundFields(){
+        private function unboundFields(){
             return [
                 'firstName'=>PModel::CharField(['maxLength'=>30]),
                 'lastName'=>PModel::CharField(['maxLength'=>30]),

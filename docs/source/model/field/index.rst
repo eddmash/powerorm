@@ -158,7 +158,7 @@ use
 .. code-block:: php
 
     class Car extends PModel{
-        public function unboundFields()
+        private function unboundFields()
         {
             return [
                 'manufacturer' => PModel::ForeignKey(['to' => 'Manufacturer'])
@@ -169,7 +169,7 @@ use
     class Manufacturer extends PModel
     {
 
-        public function unboundFields(){
+        private function unboundFields(){
             return [];
         }
     }

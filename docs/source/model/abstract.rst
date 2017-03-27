@@ -21,7 +21,7 @@ child class.:
 
     abstract class CommonInfo extends PModel
     {
-        public function unboundFields()
+        private function unboundFields()
         {
             return [
                 'name' => PModel::CharField(['maxLength' => 100]),
@@ -32,7 +32,7 @@ child class.:
 
     class Student extends CommonInfo
     {
-        public function unboundFields()
+        private function unboundFields()
         {
             return [
                 'home_group' => PModel::CharField(['maxLength' => 5])

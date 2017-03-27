@@ -25,7 +25,7 @@ the `proxy` meta setting of the class to True.
 
     class Employee extends PModel
     {
-        public function unboundFields()
+        private function unboundFields()
         {
             return [
                 'name' => PModel::CharField(['maxLength' => 100]),
