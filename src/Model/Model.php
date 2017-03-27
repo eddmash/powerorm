@@ -171,6 +171,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function __construct($kwargs = [])
     {
         $this->constructorArgs = $kwargs;
+//        $this->checkRegistryState();
         $this->init();
         $this->setFieldValues($kwargs);
 
@@ -179,6 +180,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public static function fromDb($records = [])
     {
         return new static($records);
+    }
+
+    private function checkRegistryState()
+    {
+         BaseOrm::loadRegistry();
     }
 
     /**
