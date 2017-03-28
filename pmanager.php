@@ -1,9 +1,14 @@
 <?php
 
-if (strtolower(basename(__DIR__)) === 'powerorm'):
-    require 'Application.php';
+//if (strtolower(basename(__DIR__)) === 'powerorm'):
+use Eddmash\PowerOrm\Application;
 
-else:
-    require __DIR__.'/application/libraries/powerorm/Application.php';
+$composerPath = dirname(dirname(dirname(__FILE__))).'/autoload.php';
+
+if (file_exists($composerPath)):
+    require_once $composerPath;
 endif;
-Application::consoleRun(['baseDir' => __DIR__]);
+
+// bootstrap the orm.
+require_once 'bootstrap.php';
+Application::consoleRun();

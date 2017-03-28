@@ -241,6 +241,7 @@ class Registry extends BaseObject
         }
 
         try {
+
             $model = $this->getRegisteredModel($modelName);
             $kwargs['relatedModel'] = $model;
             $callback($kwargs);
@@ -251,7 +252,7 @@ class Registry extends BaseObject
 
     public function getRegisteredModel($name)
     {
-        $model = ArrayHelper::getValue($this->allModels, $name);
+        $model = ArrayHelper::getValue($this->allModels, ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace()));
         if ($model == null):
             throw new LookupError(sprintf("Model '%s' not registered.", $name));
         endif;

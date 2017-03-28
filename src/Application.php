@@ -9,8 +9,9 @@
 * file that was distributed with this source code.
 */
 
-use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Helpers\StringHelper;
+namespace Eddmash\PowerOrm;
+
+use Eddmash\PowerOrm\Console\Manager;
 use Symfony\Component\Debug\ErrorHandler;
 
 /**
@@ -29,28 +30,25 @@ class Application
 
     public static function run($config)
     {
-        $baseDir = $config['baseDir'];
+//        $baseDir = $config['baseDir'];
 
-        if (strtolower(basename($baseDir)) === 'powerorm'):
-            define('ENVIRONMENT', 'POWERORM_DEV');
-        endif;
+//        if (strtolower(basename($baseDir)) === 'powerorm'):
+//            define('ENVIRONMENT', 'POWERORM_DEV');
+//        endif;
 
-        // bootstrap the orm.
-        require_once 'bootstrap.php';
+//        // bootstrap the orm.
+//        require_once 'bootstrap.php';
 
         // load doctrine DBAL
         self::loadThirdParty();
-
-        if (!StringHelper::startsWith(ENVIRONMENT, 'POWERORM_') && is_cli()):
-            new CI_Controller();
-        endif;
     }
 
-    public static function consoleRun($config)
+    public static function consoleRun($config = [])
     {
         static::run($config);
-
-        BaseOrm::consoleRunner();
+        $orm = BaseOrm::setup($config);
+        $orm->registerModelChecks();
+        Manager::run();
     }
 
     /**

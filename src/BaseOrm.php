@@ -97,7 +97,7 @@ class BaseOrm extends BaseObject
     /**
      * @var
      */
-    public $charset='utf-8';
+    public $charset = 'utf-8';
 
     /**
      * path from where to get and put migration files.
@@ -176,6 +176,7 @@ class BaseOrm extends BaseObject
         // setup the registry
         $this->registryCache = Registry::createObject();
 
+        dump($config);
         if (empty($this->migrationPath)):
             $this->migrationPath = sprintf('%smigrations%s', APPPATH, DIRECTORY_SEPARATOR);
         endif;
@@ -201,10 +202,19 @@ class BaseOrm extends BaseObject
 
     //********************************** ORM Registry*********************************
 
-    public static function setup($configs=[])
+    /**
+     * @param array $configs
+     *
+     * @return BaseOrm
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public static function setup($configs = [])
     {
+
         static::createObject($configs);
         static::loadRegistry();
+
+        return static::$instance;
     }
 
     /**
@@ -321,7 +331,7 @@ class BaseOrm extends BaseObject
 //        if (!isset($ci->orm)):
 //            $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the '.
 //                '$autoload[\'libraries\'] = array(\'powerorm/orm\'). On the autoload.php';
-//
+
 //            throw new OrmException($message);
 //        endif;
 //        $orm = &$ci->orm;
@@ -489,7 +499,7 @@ class BaseOrm extends BaseObject
     {
         $namespace = ClassHelper::getFormatNamespace(self::getInstance()->appNamespace, true);
 
-        return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'models'), true, false);
+        return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'Models'), true, false);
     }
 
     public static function getMigrationsNamespace()

@@ -122,6 +122,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     // todo
     public $uniqueTogether = [];
+    public $namspacedModelName;
 
     /**
      * This will hold items that will be overridden in the current meta instance.
@@ -349,6 +350,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         $classObject->{$propertyName} = $this;
 
         $this->modelName = $this->getName($classObject->getFullClassName());
+        $this->namspacedModelName = $classObject->getFullClassName();
 
         $this->scopeModel = $classObject;
 

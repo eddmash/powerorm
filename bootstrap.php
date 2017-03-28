@@ -2,8 +2,6 @@
 /**
  * Bootstrap the application.
  */
-use Eddmash\PowerOrm\Autoloader\Autoloader;
-use Eddmash\PowerOrm\Config\OrmConfig;
 
 define('POWERORM_VERSION', '1.1.0-pre-alpha');
 
@@ -31,19 +29,3 @@ else :
     define('POWERORM_BASEPATH', APPPATH.'libraries/powerorm'.DIRECTORY_SEPARATOR);
     define('POWERORM_SRCPATH', APPPATH.'libraries/powerorm/src'.DIRECTORY_SEPARATOR);
 endif;
-
-$autoLoadFile = HOMEPATH.DIRECTORY_SEPARATOR.'vendor/autoload.php';
-
-if (file_exists($autoLoadFile)):
-    require $autoLoadFile;
-
-endif;
-
-require_once POWERORM_SRCPATH.'Autoloader/Autoloader.php';
-require POWERORM_SRCPATH.'Autoloader/Config/BaseConfig.php';
-require_once POWERORM_SRCPATH.'Autoloader/Config/OrmConfig.php';
-
-// setup Autoloader
-$loader = new Autoloader();
-$loader->initialize(new OrmConfig());
-$loader->register();

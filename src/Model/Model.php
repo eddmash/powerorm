@@ -45,6 +45,8 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
  */
 abstract class Model extends DeconstructableObject implements ModelInterface, ArrayObjectInterface
 {
+    use ModelFieldsShortcut;
+
     const DEBUG_IGNORE = ['_fieldCache'];
     const MODELBASE = '\Eddmash\PowerOrm\Model\Model';
     public static $managerClass;
@@ -180,7 +182,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         return new static($records);
     }
-
 
     /**
      * This method is for internal use only and should not be overriden.
@@ -323,7 +324,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public static function isModelBase($className)
     {
-        return in_array($className, [\PModel::getFullClassName(), self::getFullClassName()]);
+        return in_array($className, [self::getFullClassName()]);
     }
 
     /**
@@ -433,7 +434,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $modelNamespace = BaseOrm::getModelsNamespace();
         $isProxy = $model->meta->proxy;
         // start from oldest parent e.g BaseObject to the last child model
-        $parents = ClassHelper::getParents($model, [\PModel::getFullClassName(), self::getFullClassName()]);
+        $parents = ClassHelper::getParents($model, [self::getFullClassName()]);
         // append the current model to the begining
         $parents = array_merge([$model->getFullClassName() => new \ReflectionObject($model)], $parents);
         if ($fromOldest):
@@ -789,15 +790,15 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @return string
      */
-    public function __toString()
-    {
-        $pk = '';
-        if ($this->meta->primaryKey) :
-            $pk = $this->{$this->meta->primaryKey->getAttrName()};
-        endif;
+//    public function __toString()
+//    {
+//        $pk = '';
+//        if ($this->meta->primaryKey) :
+//            $pk = $this->{$this->meta->primaryKey->getAttrName()};
+//        endif;
 
-        return sprintf(' < %s : ( object %s ) >', $this->getFullClassName(), $pk);
-    }
+//        return sprintf(' < %s : ( object %s ) >', $this->getFullClassName(), $pk);
+//    }
 
     /**
      * @return Queryset

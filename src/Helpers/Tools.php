@@ -253,7 +253,7 @@ class Tools
      *
      * @param callback $callback   will be called with the newly-loaded model classes as its any optional keyword arguments
      * @param Model    $scopeModel the model on which the method was invoked
-     * @param mixed    $relModel   the related models that need to be resolved
+     * @param mixed    $relModel   the related models that needs to be resolved
      * @param array    $kwargs
      *
      * @since 1.1.0

@@ -66,9 +66,9 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
             if (in_array($name, $this->getIgnored())):
                 continue;
             endif;
-            if (is_object($value) && !($value instanceof Closure)):
-                $value = (string) $value;
-            endif;
+//            if (is_object($value) && !($value instanceof Closure)):
+//                $value =  $value;
+//            endif;
             $meta[$name] = $value;
         endforeach;
 
