@@ -39,7 +39,6 @@ class Registry extends BaseObject
 
     protected $modelsReady;
     public $ready;
-    protected $registryState;
 
     public function __construct()
     {

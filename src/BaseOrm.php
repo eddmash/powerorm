@@ -97,7 +97,7 @@ class BaseOrm extends BaseObject
     /**
      * @var
      */
-    public $charset;
+    public $charset='utf-8';
 
     /**
      * path from where to get and put migration files.
@@ -201,6 +201,12 @@ class BaseOrm extends BaseObject
 
     //********************************** ORM Registry*********************************
 
+    public static function setup($configs=[])
+    {
+        static::createObject($configs);
+        static::loadRegistry();
+    }
+
     /**
      * Returns the numeric version of the orm.
      *
@@ -300,27 +306,27 @@ class BaseOrm extends BaseObject
     {
         $instance = null;
 
-        if (in_array(ENVIRONMENT, ['POWERORM_DEV', 'POWERORM_TESTING'])) :
+//        if (in_array(ENVIRONMENT, ['POWERORM_DEV', 'POWERORM_TESTING'])) :
             $instance = static::standAloneEnvironment($config);
-        else:
-            $instance = static::getOrmFromContext();
-        endif;
-
+//        else:
+//            $instance = static::getOrmFromContext();
+//        endif;
         return $instance;
     }
 
     public static function &getOrmFromContext()
     {
         $ci = static::getCiObject();
-        if (!isset($ci->orm)):
-            $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the '.
-                '$autoload[\'libraries\'] = array(\'powerorm/orm\'). On the autoload.php';
 
-            throw new OrmException($message);
-        endif;
-        $orm = &$ci->orm;
+//        if (!isset($ci->orm)):
+//            $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the '.
+//                '$autoload[\'libraries\'] = array(\'powerorm/orm\'). On the autoload.php';
+//
+//            throw new OrmException($message);
+//        endif;
+//        $orm = &$ci->orm;
 
-        return $orm;
+//        return $orm;
     }
 
     private static function &standAloneEnvironment($config)
