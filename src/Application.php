@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm;
 
 use Eddmash\PowerOrm\Console\Manager;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Symfony\Component\Debug\ErrorHandler;
 
 /**
@@ -30,14 +31,14 @@ class Application
 
     public static function run($config)
     {
-//        $baseDir = $config['baseDir'];
+        $baseDir = ArrayHelper::pop($config, 'baseDir');
 
 //        if (strtolower(basename($baseDir)) === 'powerorm'):
 //            define('ENVIRONMENT', 'POWERORM_DEV');
 //        endif;
 
 //        // bootstrap the orm.
-//        require_once 'bootstrap.php';
+        require_once 'bootstrap.php';
 
         // load doctrine DBAL
         self::loadThirdParty();
@@ -62,32 +63,32 @@ class Application
     {
         $ds = DIRECTORY_SEPARATOR;
 
-        $vendorDir = sprintf('%1$s%2$svendor%2$s', HOMEPATH, $ds);
+//        $vendorDir = sprintf('%1$s%2$svendor%2$s', HOMEPATH, $ds);
 
-        if (file_exists($vendorDir.'doctrine')):
+//        if (file_exists($vendorDir.'doctrine')):
+//
+//            $path = '%1$sdoctrine%2$scommon%2$slib%2$sDoctrine%2$sCommon%2$sClassLoader.php';
+//
+//            require sprintf($path, $vendorDir, $ds);
 
-            $path = '%1$sdoctrine%2$scommon%2$slib%2$sDoctrine%2$sCommon%2$sClassLoader.php';
-
-            require sprintf($path, $vendorDir, $ds);
-
-            $commonLoader = new \Doctrine\Common\ClassLoader(
-                'Doctrine',
-                $vendorDir.'doctrine'.$ds.'common'.$ds.'lib'
-            );
-
-            $commonLoader->register();
-
-            $dbalLoader = new \Doctrine\Common\ClassLoader(
-                'Doctrine',
-                $vendorDir.'doctrine'.$ds.'dbal'.$ds.'lib'
-            );
-
-            $dbalLoader->register();
-
-        endif;
-
-        if (file_exists($vendorDir.$ds.'symfony'.$ds.'debug')):
-            ErrorHandler::register();
-        endif;
+//            $commonLoader = new \Doctrine\Common\ClassLoader(
+//                'Doctrine',
+//                $vendorDir.'doctrine'.$ds.'common'.$ds.'lib'
+//            );
+//
+//            $commonLoader->register();
+//
+//            $dbalLoader = new \Doctrine\Common\ClassLoader(
+//                'Doctrine',
+//                $vendorDir.'doctrine'.$ds.'dbal'.$ds.'lib'
+//            );
+//
+//            $dbalLoader->register();
+//
+////        endif;
+//
+//        if (file_exists($vendorDir.$ds.'symfony'.$ds.'debug')):
+//            ErrorHandler::register();
+//        endif;
     }
 }

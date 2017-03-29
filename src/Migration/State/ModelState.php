@@ -132,14 +132,14 @@ class ModelState extends BaseObject
         $metaData = $this->meta;
         $extends = $this->extends;
 
-        $model = $this->createInstance($this->name, $extends);
-        $fields = [];
-        foreach ($this->fields as $name => $field) :
-            $fields[$name] = $field->deepClone();
-        endforeach;
-        $model->init($fields, ['meta' => $metaData, 'registry' => $registry]);
+//        $model = $this->createInstance($this->name, $extends);
+//        $fields = [];
+//        foreach ($this->fields as $name => $field) :
+//            $fields[$name] = $field->deepClone();
+//        endforeach;
+//        $model->init($fields, ['meta' => $metaData, 'registry' => $registry]);
 
-        return $model;
+//        return $model;
     }
 
     public static function createObject($name, $field, $kwargs)
@@ -173,12 +173,12 @@ class ModelState extends BaseObject
      */
     private static function createInstance($className, $extends = '')
     {
-        echo '%%%%%%%%%%%'.$className.PHP_EOL;
         if (!ClassHelper::classExists($className, BaseOrm::getModelsNamespace())):
-            MigrationModel::defineClass($className, $extends);
+//            MigrationModel::defineClass($className, $extends);
 
         endif;
 
+        echo '%%%%%%%%%%%'.$className.PHP_EOL;
         return new $className();
     }
 

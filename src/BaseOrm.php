@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm;
 
+use Doctrine\Common\ClassLoader;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
@@ -35,6 +36,8 @@ class BaseOrm extends BaseObject
 {
     const RECURSIVE_RELATIONSHIP_CONSTANT = 'this';
     private static $checkRegistry;
+    public $modelsNamespace;
+    public $migrationNamespace;
     /**
      * The configurations to use to connect to the database.
      *
@@ -171,18 +174,16 @@ class BaseOrm extends BaseObject
      */
     public function __construct($config = [])
     {
-        self::configure($this, $config);
+        $models = ArrayHelper::pop($config, 'models');
+        $migrations = ArrayHelper::pop($config, 'migrations');
+        $this->modelsPath = ArrayHelper::getValue($models, "path");
+        $this->modelsNamespace = ArrayHelper::getValue($models, "namespace");
+        $this->migrationPath = ArrayHelper::getValue($migrations, "path");
+        $this->migrationNamespace = ArrayHelper::getValue($migrations, "namespace");
 
+        self::configure($this, $config);
         // setup the registry
         $this->registryCache = Registry::createObject();
-
-        dump($config);
-        if (empty($this->migrationPath)):
-            $this->migrationPath = sprintf('%smigrations%s', APPPATH, DIRECTORY_SEPARATOR);
-        endif;
-        if (empty($this->modelsPath)):
-            $this->modelsPath = sprintf('%smodels%s', APPPATH, DIRECTORY_SEPARATOR);
-        endif;
     }
 
     public static function getModelsPath()
@@ -212,6 +213,14 @@ class BaseOrm extends BaseObject
     {
 
         static::createObject($configs);
+
+        $commonLoader = new ClassLoader(
+            null,
+            static::getInstance()->modelsPath
+        );
+
+        $commonLoader->register();
+
         static::loadRegistry();
 
         return static::$instance;
@@ -317,7 +326,7 @@ class BaseOrm extends BaseObject
         $instance = null;
 
 //        if (in_array(ENVIRONMENT, ['POWERORM_DEV', 'POWERORM_TESTING'])) :
-            $instance = static::standAloneEnvironment($config);
+        $instance = static::standAloneEnvironment($config);
 //        else:
 //            $instance = static::getOrmFromContext();
 //        endif;
@@ -387,9 +396,9 @@ class BaseOrm extends BaseObject
     /**
      * Configures an object with the initial property values.
      *
-     * @param object $object     the object to be configured
-     * @param array  $properties the property initial values given in terms of name-value pairs
-     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object the object to be configured
+     * @param array $properties the property initial values given in terms of name-value pairs
+     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
@@ -419,10 +428,6 @@ class BaseOrm extends BaseObject
     public static function createObject($config = [])
     {
         if (static::$instance == null):
-
-            if (ENVIRONMENT == 'POWERORM_DEV'):
-                require POWERORM_BASEPATH.DIRECTORY_SEPARATOR.'config.php';
-            endif;
 
             static::$instance = new static($config);
         endif;
@@ -497,16 +502,12 @@ class BaseOrm extends BaseObject
 
     public static function getModelsNamespace()
     {
-        $namespace = ClassHelper::getFormatNamespace(self::getInstance()->appNamespace, true);
-
-        return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'Models'), true, false);
+        return ClassHelper::getFormatNamespace(self::getInstance()->modelsNamespace, true, false);
     }
 
     public static function getMigrationsNamespace()
     {
-        $namespace = ClassHelper::getFormatNamespace(self::getInstance()->appNamespace, true);
-
-        return ClassHelper::getFormatNamespace(sprintf('%s%s', $namespace, 'Migrations'), true, false);
+        return ClassHelper::getFormatNamespace(self::getInstance()->migrationNamespace, true, false);
     }
 
     public static function getQueryBuilder()

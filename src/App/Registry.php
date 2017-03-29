@@ -198,10 +198,11 @@ class Registry extends BaseObject
         $namespace = BaseOrm::getModelsNamespace();
         foreach ($this->getModelFiles() as $file) :
             $className = ClassHelper::getClassNameFromFile($file, BaseOrm::getModelsPath());
+
             $foundClass = ClassHelper::classExists($className, $namespace);
             if (!$foundClass):
                 throw new ClassNotFoundException(
-                    sprintf('The class [ %1$s\\%2$s or \\%1$s ] could not be located', $className, $namespace)
+                    sprintf('The class [ %2$s\\%1$s or \\%1$s ] could not be located', $className, $namespace)
                 );
             endif;
             $models[] = $foundClass;

@@ -28,6 +28,7 @@ use Eddmash\PowerOrm\Model\Lookup\Related\RelatedIsNull;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedLessThan;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedLessThanOrEqual;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
  * Base class that all relational fields inherit from.
@@ -353,8 +354,10 @@ class RelatedField extends Field
     /**
      * Creates the queryset to retrieve data for the relationship that relates to this field.
      *
-     * @param $modelName
      * @param $modelInstance
+     * @param bool $reverse
+     * @internal param $modelName
+     * @return Queryset
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function queryset($modelInstance, $reverse = false)

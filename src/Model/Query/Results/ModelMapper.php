@@ -28,6 +28,7 @@ class ModelMapper extends Mapper
     public function __invoke()
     {
         $results = $this->queryset->query->execute($this->queryset->connection)->fetchAll();
+
         $klassInfo = $this->queryset->query->klassInfo;
         $modelClass = ArrayHelper::getValue($klassInfo, 'modelClass');
         /* @var $modelClass Model */
