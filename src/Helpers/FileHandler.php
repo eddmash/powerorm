@@ -56,14 +56,16 @@ class FileHandler extends BaseObject
         endif;
 
         // absolute path to file
-        $file = $this->path.$this->fileName;
+        $file = $this->path.DIRECTORY_SEPARATOR.$this->fileName;
 
         $fileHandle = fopen($file, 'w');
+
         if ($fileHandle):
             fprintf($fileHandle, $content);
-            fclose($fileHandle);
 
+            fclose($fileHandle);
             chmod($file, 0777);
+            dump($file);
 
         endif;
     }
@@ -194,4 +196,6 @@ class FileHandler extends BaseObject
     {
         return (preg_match("/\/$/", $name)) ? $name : $name.'/';
     }
+
+
 }

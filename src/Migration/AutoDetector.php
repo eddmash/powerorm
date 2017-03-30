@@ -159,7 +159,6 @@ class AutoDetector extends BaseObject
         $this->generatedOperations = [];
         $this->oldRegistry = $this->fromState->getRegistry();
         $this->newRegistry = $this->toState->getRegistry();
-
         $this->oldModelKeys = [];
         $this->oldProxyKeys = [];
         $this->oldUnmanagedKeys = [];

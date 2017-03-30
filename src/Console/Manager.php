@@ -142,6 +142,7 @@ class Manager extends Base
 
     public static function run()
     {
+        (new BaseOrm())->registerModelChecks();
         (new static())->execute();
     }
 

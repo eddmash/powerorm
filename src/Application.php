@@ -11,9 +11,10 @@
 
 namespace Eddmash\PowerOrm;
 
+use Composer\Autoload\ClassLoader;
 use Eddmash\PowerOrm\Console\Manager;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
-use Symfony\Component\Debug\ErrorHandler;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
 
 /**
  * Class Application.
@@ -44,11 +45,23 @@ class Application
         self::loadThirdParty();
     }
 
-    public static function consoleRun($config = [])
+    /**
+     * @param ClassLoader $composerLoader
+     * @param array $config
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public static function consoleRun($composerLoader, $config = [])
     {
         static::run($config);
-        $orm = BaseOrm::setup($config);
-        $orm->registerModelChecks();
+        $orm = BaseOrm::createObject($config);
+
+        $modelsNamespace = ClassHelper::getFormatNamespace($orm->modelsNamespace, false, true);
+        $migrationsNamespace = ClassHelper::getFormatNamespace($orm->migrationNamespace, false, true);
+        $composerLoader->setPsr4($modelsNamespace, $orm->modelsPath);
+        $composerLoader->setPsr4($migrationsNamespace, $orm->migrationPath);
+
+        BaseOrm::loadRegistry($orm);
+
         Manager::run();
     }
 

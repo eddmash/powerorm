@@ -188,12 +188,12 @@ class BaseOrm extends BaseObject
 
     public static function getModelsPath()
     {
-        return self::getInstance()->modelsPath;
+        return realpath(self::getInstance()->modelsPath);
     }
 
     public static function getMigrationsPath()
     {
-        return self::getInstance()->migrationPath;
+        return realpath(self::getInstance()->migrationPath);
     }
 
     public static function getCharset()
@@ -214,12 +214,12 @@ class BaseOrm extends BaseObject
 
         static::createObject($configs);
 
-        $commonLoader = new ClassLoader(
-            null,
-            static::getInstance()->modelsPath
-        );
-
-        $commonLoader->register();
+//        $commonLoader = new ClassLoader(
+//            null,
+//            static::getInstance()->modelsPath
+//        );
+//
+//        $commonLoader->register();
 
         static::loadRegistry();
 
@@ -305,14 +305,16 @@ class BaseOrm extends BaseObject
         self::loadRegistry($orm);
     }
 
-    public static function loadRegistry($ormInstance = null)
+    public static function loadRegistry(&$ormInstance = null)
     {
-        $instance = ($ormInstance) ? $ormInstance : self::getInstance();
+        if (!is_null($ormInstance)) :
+            $ormInstance = self::getInstance();
+        endif;
 
         try {
-            $instance->registryCache->isAppReady();
+            $ormInstance->registryCache->isAppReady();
         } catch (AppRegistryNotReady $e) {
-            $instance->registryCache->populate();
+            $ormInstance->registryCache->populate();
         }
     }
 
@@ -425,6 +427,11 @@ class BaseOrm extends BaseObject
         return $object;
     }
 
+    /**
+     * @param array $config
+     * @return static
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
     public static function createObject($config = [])
     {
         if (static::$instance == null):

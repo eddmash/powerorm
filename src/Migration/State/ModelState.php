@@ -53,7 +53,7 @@ class ModelState extends BaseObject
     /**
      * Takes a model returns a ModelState representing it.
      *
-     * @param Model      $model
+     * @param Model $model
      * @param bool|false $excludeRels
      *
      * @return static
@@ -73,7 +73,9 @@ class ModelState extends BaseObject
             try {
                 $fields[$name] = $field->deepClone();
             } catch (\Exception $e) {
-                throw new TypeError(sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->modelName));
+                throw new TypeError(
+                    sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->namspacedModelName)
+                );
             }
         endforeach;
 
@@ -86,7 +88,7 @@ class ModelState extends BaseObject
                         sprintf(
                             "Couldn't reconstruct field %s on %s: %s",
                             $name,
-                            $model->meta->modelName
+                            $model->meta->namspacedModelName
                         )
                     );
                 }
@@ -113,7 +115,7 @@ class ModelState extends BaseObject
             'extends' => $extends,
         ];
 
-        return new static($model->meta->modelName, $fields, $kwargs);
+        return new static($model->meta->namspacedModelName, $fields, $kwargs);
     }
 
     /**
@@ -127,19 +129,19 @@ class ModelState extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function toModel($registry)
+    public function toModel(&$registry)
     {
         $metaData = $this->meta;
         $extends = $this->extends;
 
-//        $model = $this->createInstance($this->name, $extends);
-//        $fields = [];
-//        foreach ($this->fields as $name => $field) :
-//            $fields[$name] = $field->deepClone();
-//        endforeach;
-//        $model->init($fields, ['meta' => $metaData, 'registry' => $registry]);
+        $model = $this->createInstance($this->name, $extends);
+        $fields = [];
+        foreach ($this->fields as $name => $field) :
+            $fields[$name] = $field->deepClone();
+        endforeach;
+        $model->init($fields, ['meta' => $metaData, 'registry' => $registry]);
 
-//        return $model;
+        return $model;
     }
 
     public static function createObject($name, $field, $kwargs)
@@ -174,11 +176,9 @@ class ModelState extends BaseObject
     private static function createInstance($className, $extends = '')
     {
         if (!ClassHelper::classExists($className, BaseOrm::getModelsNamespace())):
-//            MigrationModel::defineClass($className, $extends);
-
+            $className = MigrationModel::defineClass($className, $extends);
         endif;
 
-        echo '%%%%%%%%%%%'.$className.PHP_EOL;
         return new $className();
     }
 
@@ -195,6 +195,6 @@ class ModelState extends BaseObject
 
     public function __toString()
     {
-        return (string) sprintf("<ModelState: '%s'>", $this->name);
+        return (string)sprintf("<ModelState: '%s'>", $this->name);
     }
 }

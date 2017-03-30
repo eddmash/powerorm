@@ -58,7 +58,6 @@ class MigrationModel extends Model
             endforeach;
         endif;
 
-        echo $class.PHP_EOL;
         if (!ClassHelper::classExists($className, $namespace)):
             eval($class);
         endif;

@@ -200,6 +200,7 @@ class Registry extends BaseObject
             $className = ClassHelper::getClassNameFromFile($file, BaseOrm::getModelsPath());
 
             $foundClass = ClassHelper::classExists($className, $namespace);
+
             if (!$foundClass):
                 throw new ClassNotFoundException(
                     sprintf('The class [ %2$s\\%1$s or \\%1$s ] could not be located', $className, $namespace)
