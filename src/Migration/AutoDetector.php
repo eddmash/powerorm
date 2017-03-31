@@ -419,7 +419,7 @@ class AutoDetector extends BaseObject
     /**
      * Try to guess a name for the migration that is to be created.
      *
-     * @param array $operations
+     * @param Operation[] $operations
      *
      * @return string
      *
@@ -434,7 +434,7 @@ class AutoDetector extends BaseObject
             return sprintf('%s0001_Initial', $prefix);
         endif;
         if (count($operations) == 1):
-            /** @var $op Operation */
+
             $op = $operations[0];
             if ($op instanceof CreateModel):
                 return sprintf('%s%s_%s', $prefix, $id, $this->formatName($op->name));
@@ -537,7 +537,7 @@ class AutoDetector extends BaseObject
                     $relatedFields[$localM2MField->getName()] = $localM2MField;
                 endif;
 
-                // if field has a through model and it was not auto created, add it as a related field
+                // if related field has a through model and it was not auto created
                 if ($localM2MField->relation->hasProperty('through') &&
                     !$localM2MField->relation->through->meta->autoCreated
                 ):
@@ -547,7 +547,7 @@ class AutoDetector extends BaseObject
 
             endforeach;
 
-            // we need to keep track of which operation need to run before us
+            // we need to keep track of which operation need to run the create one i.e us
 
             // first, check for operations that drops a proxy version of us has been dropped
             $opDep = [['target' => $addedModelName, 'type' => self::TYPE_MODEL, 'action' => self::ACTION_DROPPED]];
@@ -555,7 +555,7 @@ class AutoDetector extends BaseObject
             // depend on related model being created if primary key is a relationship field
             if ($primaryKeyRel !== null):
                 $opDep[] = [
-                    'target' => $primaryKeyRel->meta->modelName,
+                    'target' => $primaryKeyRel->meta->getNamespacedModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];
@@ -603,7 +603,7 @@ class AutoDetector extends BaseObject
 
                 // depend on the related model also
                 $opDep[] = [
-                    'target' => $relationField->relation->toModel->meta->modelName,
+                    'target' => $relationField->relation->toModel->meta->getNamespacedModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];
@@ -614,7 +614,7 @@ class AutoDetector extends BaseObject
                 ):
 
                     $opDep[] = [
-                        'target' => $relationField->relation->through->meta->modelName,
+                        'target' => $relationField->relation->through->meta->getNamespacedModelName(),
                         'type' => self::TYPE_MODEL,
                         'action' => self::ACTION_CREATED,
                     ];
@@ -708,7 +708,7 @@ class AutoDetector extends BaseObject
 
             /** @var $reverseRelatedField RelatedField */
             foreach ($reverseRelatedFields as $reverseRelatedField) :
-                $modelName = $reverseRelatedField->relation->toModel->meta->modelName;
+                $modelName = $reverseRelatedField->relation->toModel->meta->getNamespacedModelName();
                 $fieldName = $reverseRelatedField->relation->fromField->getName();
                 $opDep[] = [
                     'target' => $fieldName,
@@ -1147,7 +1147,7 @@ class AutoDetector extends BaseObject
 
             // depend on related model being created
             $opDep[] = [
-                'target' => $field->relation->toModel->meta->modelName,
+                'target' => $field->relation->toModel->meta->getNamespacedModelName(),
                 'type' => self::TYPE_MODEL,
                 'action' => self::ACTION_CREATED,
             ];
@@ -1159,7 +1159,7 @@ class AutoDetector extends BaseObject
             ):
 
                 $opDep[] = [
-                    'target' => $field->relation->through->meta->modelName,
+                    'target' => $field->relation->through->meta->getNamespacedModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];

@@ -120,7 +120,7 @@ class CreateModel extends ModelOperation
                 // check if there is an operation in between that references the same model if so, don't merge
                 if ($operation->field->relation) :
                     foreach ($inBetween as $between) :
-                        $modelName = $operation->field->relation->toModel->meta->modelName;
+                        $modelName = $operation->field->relation->toModel->meta->getNamespacedModelName();
                         if ($between->referencesModel($modelName)) :
                             return false;
                         endif;
@@ -128,7 +128,7 @@ class CreateModel extends ModelOperation
                         if ($operation->field->relation->hasProperty('through') &&
                             $operation->field->relation->through
                         ) :
-                            $modelName = $operation->field->relation->through->meta->modelName;
+                            $modelName = $operation->field->relation->through->meta->getNamespacedModelName();
                             if ($between->referencesModel($modelName)) :
                                 return false;
                             endif;

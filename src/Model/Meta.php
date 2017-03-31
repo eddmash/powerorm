@@ -31,13 +31,14 @@ class Meta extends DeconstructableObject implements MetaInterface
     ];
 
     public static $DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy', 'autoCreated'];
+    public $modelNamespace;
 
     /**
      * Th name of the model this meta holds information for.
      *
      * @var string
      */
-    public $modelName;
+    private $modelName;
 
     public $verboseName;
 
@@ -122,7 +123,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     // todo
     public $uniqueTogether = [];
-    public $namspacedModelName;
+    private $namspacedModelName;
 
     /**
      * This will hold items that will be overridden in the current meta instance.
@@ -200,7 +201,7 @@ class Meta extends DeconstructableObject implements MetaInterface
                 sprintf(
                     "%s has no field named %s. The App registry isn't ready yet, so if this is an autoCreated ".
                     "related field, it won't  be available yet.",
-                    $this->modelName,
+                    $this->getNamespacedModelName(),
                     $name
                 )
             );
@@ -214,7 +215,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         endif;
 
         // if we get here we didn't get the field.
-        throw new FieldDoesNotExist(sprintf('%s has no field named %s', $this->modelName, $name));
+        throw new FieldDoesNotExist(sprintf('%s has no field named %s', $this->namspacedModelName, $name));
     }
 
     public function getNonM2MForwardFields()
@@ -306,13 +307,14 @@ class Meta extends DeconstructableObject implements MetaInterface
 
             // collect all relation fields for this each model
             foreach ($allModels as $name => $model) :
+
                 // just get the forward fields
                 $fields = $model->meta->fetchFields(['includeParents' => false, 'reverse' => false]);
 
                 foreach ($fields as $field) :
 
                     if ($field->isRelation && !empty($field->getRelatedModel())):
-                        $allRelations[strtolower($field->relation->toModel->meta->modelName)][] = $field;
+                        $allRelations[$field->relation->toModel->meta->getNamespacedModelName()][] = $field;
                     endif;
 
                 endforeach;
@@ -321,8 +323,6 @@ class Meta extends DeconstructableObject implements MetaInterface
 
             // set cache relation to models
             foreach ($allModels as $name => $model) :
-                $name = strtolower($name);
-
                 // get fields for each model
                 $fields = (isset($allRelations[$name])) ? $allRelations[$name] : [];
 
@@ -332,14 +332,14 @@ class Meta extends DeconstructableObject implements MetaInterface
 
         // we get the model from the registry
         // to ensure we get the same model instance and same meta class for the model.
-        return $this->registry->getModel($this->modelName)->meta->_reverseRelationTreeCache;
+        return $this->registry->getModel($this->getNamespacedModelName())->meta->_reverseRelationTreeCache;
     }
 
     /**
      * Add the current object to the passed in object.
      *
      * @param string $propertyName the name map the current object to, in the class object passed in
-     * @param Model  $classObject  the object to attach the current object to
+     * @param Model $classObject the object to attach the current object to
      *
      * @since 1.1.0
      *
@@ -349,8 +349,10 @@ class Meta extends DeconstructableObject implements MetaInterface
     {
         $classObject->{$propertyName} = $this;
 
-        $this->modelName = $this->getName($classObject->getFullClassName());
-        $this->namspacedModelName = $classObject->getFullClassName();
+        $modelClass = $this->modelClassInfo($classObject);
+        $this->modelName = $modelClass->getShortName();
+        $this->modelNamespace = $modelClass->getNamespaceName();
+        $this->namspacedModelName = $modelClass->getName();
 
         $this->scopeModel = $classObject;
 
@@ -499,6 +501,21 @@ class Meta extends DeconstructableObject implements MetaInterface
         // TODO: Implement deconstruct() method.
     }
 
+    public function getModelName()
+    {
+        return $this->modelName;
+    }
+
+    public function getNamespacedModelName()
+    {
+        return $this->namspacedModelName;
+    }
+
+    public function getModelNamespace()
+    {
+        return $this->modelNamespace;
+    }
+
     private function getTableName()
     {
         return sprintf('%s%s', BaseOrm::getDbPrefix(), str_replace('\\', '_', $this->normalizeKey($this->modelName)));
@@ -507,5 +524,11 @@ class Meta extends DeconstructableObject implements MetaInterface
     public function __toString()
     {
         return sprintf('< %s : %s >', get_class($this), $this->modelName);
+    }
+
+
+    private function modelClassInfo(Model $model)
+    {
+       return new \ReflectionObject($model);
     }
 }

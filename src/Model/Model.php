@@ -231,7 +231,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             $this->addToClass('meta', $meta);
 
-            list($concreteParentName, $immediateParent, $parentIsAbstract, $classFields) = self::getHierarchyMeta($this);
+            list($concreteParentName, $immediateParent, $parentIsAbstract, $classFields) = self::getHierarchyMeta(
+                $this
+            );
 
             $this->setupFields($fields, $classFields);
 
@@ -328,7 +330,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string       $name
+     * @param string $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -414,9 +416,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param Model     $model
-     * @param string    $method     the method to invoke
-     * @param null      $args       the arguments to pass to the method
+     * @param Model $model
+     * @param string $method the method to invoke
+     * @param null $args the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -431,7 +433,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public static function getHierarchyMeta(Model $model, $method = 'unboundFields', $args = null, $fromOldest = true)
     {
-        $modelNamespace = BaseOrm::getModelsNamespace();
         $isProxy = $model->meta->proxy;
         // start from oldest parent e.g BaseObject to the last child model
         $parents = ClassHelper::getParents($model, [self::getFullClassName()]);
@@ -482,7 +483,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 //ensure it private to avoid method inheritance
                 if (!$methodReflection->isPrivate()):
                     throw new MethodNotExtendableException(
-                        sprintf("The method '%s::%s' should be implemented as private", $parentName, $method));
+                        sprintf("The method '%s::%s' should be implemented as private", $parentName, $method)
+                    );
                 endif;
                 $parentMethodCall = sprintf('%1$s::%2$s', $parentName, $method);
 
@@ -558,7 +560,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 $immediateParent = $parentName;
             endif;
 
-            $modelFields[ClassHelper::getNameFromNs($parentName, $modelNamespace)] = $fields;
+            $modelFields[$parentName] = $fields;
 
         endforeach;
 
@@ -573,10 +575,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
 
         return [
-            ($concreteParent == null) ?: ClassHelper::getNameFromNs($concreteParent->getName(), $modelNamespace),
+            ($concreteParent == null) ?: $concreteParent->getName(),
             $immediateParent,
             $parentIsAbstract,
-            $modelFields[$model->meta->modelName],
+            $modelFields[$model->meta->getNamespacedModelName()],
         ];
     }
 
@@ -722,7 +724,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function getIterator()
     {
-        throw new TypeError(sprintf("TypeError: '%s' object is not iterable", $this->meta->modelName));
+        throw new TypeError(sprintf("TypeError: '%s' object is not iterable", $this->meta->getNamespacedModelName()));
     }
 
     /**
@@ -730,7 +732,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function count()
     {
-        throw new TypeError(sprintf("TypeError: object of type '%s' is not countable)", $this->meta->modelName));
+        throw new TypeError(
+            sprintf("TypeError: object of type '%s' is not countable)", $this->meta->getNamespacedModelName())
+        );
     }
 
     /**
@@ -746,7 +750,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array) unserialize((string) $serialized);
+        $this->_fieldCache = (array)unserialize((string)$serialized);
     }
 
     public function __get($name)
@@ -764,7 +768,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
                 throw new AttributeError(
-                    sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->modelName, $name)
+                    sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->getNamespacedModelName(), $name)
                 );
             endif;
         }
@@ -873,8 +877,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $connection
-     * @param null       $updateField
+     * @param null $connection
+     * @param null $updateField
      *
      * @throws ValueError
      *
@@ -976,7 +980,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $updateFields
+     * @param null $updateFields
      *
      * @since 1.1.0
      *
@@ -1022,8 +1026,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $forceInsert = false,
         $forceUpdate = false,
         $updateFields = null
-    )
-    {
+    ) {
         $meta = $this->meta;
 
         $nonPkFields = [];

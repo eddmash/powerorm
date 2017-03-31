@@ -104,7 +104,7 @@ class M2MManager extends BaseM2MManager
             throw new ValueError(
                 sprintf(
                     '"%s" needs to have a value for field "%s" before this many-to-many relationship can be used.',
-                    $this->instance->meta->modelName,
+                    $this->instance->meta->getNamespacedModelName(),
                     $this->fromFieldName
                 )
             );
@@ -139,7 +139,7 @@ class M2MManager extends BaseM2MManager
             $newIds = array_unique($newIds);
 
             /** @var $throughClass Model */
-            $throughClass = $this->through->meta->modelName;
+            $throughClass = $this->through->meta->getNamespacedModelName();
 
             $oldVals = $throughClass::objects($this->through)->asArray([$toFieldName], true)->filter(
                 [

@@ -311,8 +311,8 @@ class SchemaEditor extends BaseObject
                 sprintf(
                     'Cannot alter field %s into %s - they do not properly define '.
                     'db_type (are you using a badly-written custom field?)',
-                    $newField->name,
-                    $oldField->name
+                    $newField->getName(),
+                    $oldField->getName()
                 )
             );
         elseif (is_null($oldType) && is_null($newType) &&
@@ -338,8 +338,8 @@ class SchemaEditor extends BaseObject
                 sprintf(
                     'Cannot alter field %s into %s - they are not compatible types '.
                     '(you cannot alter to or from M2M fields, or add or remove through= on M2M fields)',
-                    $oldField->name,
-                    $newField->name
+                    $oldField->getName(),
+                    $newField->getName()
                 )
             );
         endif;
@@ -387,7 +387,7 @@ class SchemaEditor extends BaseObject
                 ['foreignKey' => true]
             ) as $fkConstraint) :
                 $diff->removedForeignKeys[] = $fkConstraint;
-                $droppedFks[] = $oldField->name;
+                $droppedFks[] = $oldField->getName();
             endforeach;
             if ($diff !== false):
                 $this->schemaManager->alterTable($diff);

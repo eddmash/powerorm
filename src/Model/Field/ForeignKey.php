@@ -19,6 +19,7 @@ use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToOneRel;
 use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Model;
+use PHPUnit\Runner\Exception;
 
 class ForeignKey extends RelatedField
 {
@@ -187,9 +188,9 @@ class ForeignKey extends RelatedField
                 sprintf(
                     'Cannot assign "%s": "%s.%s" must be a "%s" instance.',
                     $value,
-                    $this->scopeModel->meta->modelName,
+                    $this->scopeModel->meta->getNamespacedModelName(),
                     $this->getName(),
-                    $this->relation->toModel->meta->modelName
+                    $this->relation->toModel->meta->getNamespacedModelName()
                 )
             );
         endif;

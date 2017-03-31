@@ -139,7 +139,7 @@ class Queryset implements QuerysetInterface
             throw new ObjectDoesNotExist(
                 sprintf(
                     '%s matching query does not exist.',
-                    $this->model->meta->modelName
+                    $this->model->meta->getNamespacedModelName()
                 )
             );
         endif;
@@ -147,7 +147,7 @@ class Queryset implements QuerysetInterface
         throw new MultipleObjectsReturned(
             sprintf(
                 '"get() returned more than one %s -- it returned %s!"',
-                $this->model->meta->modelName,
+                $this->model->meta->getNamespacedModelName(),
                 $resultCount
             )
         );

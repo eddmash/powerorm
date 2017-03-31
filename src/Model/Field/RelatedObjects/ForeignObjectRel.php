@@ -141,7 +141,7 @@ class ForeignObjectRel extends BaseObject
             return $this->relatedName;
         endif;
 
-        return sprintf('%s_set', strtolower(ClassHelper::getNameFromNs($model->meta->modelName, BaseOrm::getModelsNamespace())));
+        return sprintf('%s_set', strtolower($model->meta->getModelName()));
     }
 
     public function getPathInfo()

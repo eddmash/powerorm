@@ -71,7 +71,7 @@ class AutoField extends Field
             !$model->meta->hasAutoField,
             sprintf(
                 "The Model '%s' more than one AutoField, which is not allowed.",
-                $this->scopeModel->meta->modelName
+                $this->scopeModel->meta->getNamespacedModelName()
             )
         );
 
