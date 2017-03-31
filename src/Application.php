@@ -40,19 +40,23 @@ class Application
      * @param ClassLoader $composerLoader
      * @param array       $config
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     *
+     * @return \Symfony\Component\Console\Application
      */
-    public static function consoleRun($composerLoader, $config = [])
+    public static function consoleRun($config, $composerLoader, $autoRun = true)
     {
         $orm = static::run($config);
 
         $modelsNamespace = ClassHelper::getFormatNamespace($orm->modelsNamespace, false, true);
         $migrationsNamespace = ClassHelper::getFormatNamespace($orm->migrationNamespace, false, true);
-        $composerLoader->setPsr4($modelsNamespace, $orm->modelsPath);
-        $composerLoader->setPsr4($migrationsNamespace, $orm->migrationPath);
+        if ($composerLoader) :
+            $composerLoader->setPsr4($modelsNamespace, $orm->modelsPath);
+            $composerLoader->setPsr4($migrationsNamespace, $orm->migrationPath);
+        endif;
 
         BaseOrm::loadRegistry($orm);
 
-        Manager::run();
+        return Manager::run($autoRun);
     }
 
 }

@@ -1,14 +1,29 @@
 <?php
 
-//if (strtolower(basename(__DIR__)) === 'powerorm'):
 use Eddmash\PowerOrm\Application;
 
-$composerPath = dirname(dirname(dirname(__FILE__))).'/autoload.php';
+// ensure the classes are auto loaded
+$composerLoader = require_once 'vendor/autoload.php';
 
-if (file_exists($composerPath)):
-    require_once $composerPath;
-endif;
+// create in the database config
+$config = [
+    'database' => [
+        'host' => '127.0.0.1',
+        'dbname' => 'tester',
+        'user' => 'admin',
+        'password' => 'ivamers_ktr_2016',
+        'driver' => 'pdo_pgsql',
+    ],
+    'migrations' => [
+        'namespace' => 'App\Migrations',
+        'path' => dirname(__FILE__).'/application/Migrations',
+    ],
+    'models' => [
+        'path' => dirname(__FILE__).'/application/Models',
+        'namespace' => 'App\Models',
+    ],
+    'dbPrefix' => 'demo_',
+    'charset' => 'utf-8',
+];
 
-// bootstrap the orm.
-require_once 'bootstrap.php';
-Application::consoleRun();
+Application::consoleRun($config, $composerLoader);

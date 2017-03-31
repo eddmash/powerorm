@@ -94,7 +94,7 @@ class BaseOrm extends BaseObject
      *
      * @var array
      */
-    private $databaseConfigs;
+    private $database;
 
     /**
      * @var
@@ -210,7 +210,7 @@ class BaseOrm extends BaseObject
     public static function setup($configs = [])
     {
 
-        static::createObject($configs);
+        static::getInstance($configs);
 
         static::loadRegistry();
 
@@ -253,16 +253,15 @@ class BaseOrm extends BaseObject
      */
     public function getDatabaseConnection()
     {
-        if (empty($this->databaseConfigs)):
+        if (empty($this->database)):
 
-            $message = 'The database configuration have no been provided, On Codeigniter 3 create orm.php and '.
-                'add configuration, consult documentation for options';
+            $message = 'The database configuration have no been provided, consult documentation for options';
             throw new OrmException($message);
         endif;
         if (static::$connection == null):
             $config = new Configuration();
 
-            static::$connection = DriverManager::getConnection($this->databaseConfigs, $config);
+            static::$connection = DriverManager::getConnection($this->database, $config);
         endif;
 
         return static::$connection;
@@ -299,7 +298,7 @@ class BaseOrm extends BaseObject
     public static function loadRegistry(&$ormInstance = null)
     {
         if (is_null($ormInstance)) :
-            $ormInstance = self::standAloneEnvironment([]);
+            $ormInstance = self::getInstance([]);
         endif;
 
         try {
@@ -316,48 +315,9 @@ class BaseOrm extends BaseObject
      */
     public static function &getInstance($config = null)
     {
-        $instance = null;
+        $instance = self::createObject($config);
 
-//        if (in_array(ENVIRONMENT, ['POWERORM_DEV', 'POWERORM_TESTING'])) :
-        $instance = static::standAloneEnvironment($config);
-//        else:
-//            $instance = static::getOrmFromContext();
-//        endif;
         return $instance;
-    }
-
-    public static function &getOrmFromContext()
-    {
-        $ci = static::getCiObject();
-
-//        if (!isset($ci->orm)):
-//            $message = 'The ORM has not been loaded yet. On Codeigniter 3, ensure to add the '.
-//                '$autoload[\'libraries\'] = array(\'powerorm/orm\'). On the autoload.php';
-
-//            throw new OrmException($message);
-//        endif;
-//        $orm = &$ci->orm;
-
-//        return $orm;
-    }
-
-    private static function &standAloneEnvironment($config)
-    {
-        $env = static::createObject($config);
-
-        return $env;
-    }
-
-    /**
-     * @return \CI_Controller
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public static function &getCiObject()
-    {
-        return \get_instance();
     }
 
     /**

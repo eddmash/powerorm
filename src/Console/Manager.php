@@ -66,13 +66,9 @@ class Manager extends Base
         return $paths;
     }
 
-    public function execute()
+    public function getDefaultCommands()
     {
-        $console = new Application('');
-        $def = new ListCommand();
-        $console->add($def);
-        $console->setDefaultCommand($def->getName());
-
+        $commands = [];
         foreach ($this->path as $path) :
             $files = (new FileHandler($path))->readDir();
             foreach ($files as $file) :
@@ -80,17 +76,17 @@ class Manager extends Base
                 if ('BaseCommand' === $command):
                     continue;
                 endif;
-                $console->add($this->fetchCommand($command));
+                $commands[] = $this->fetchCommand($command);
             endforeach;
 
         endforeach;
 
-        $output = new ConsoleOutput();
+        return $commands;
+    }
 
-        self::warningText($output);
-        self::errorText($output);
-
-        $console->run(null, $output);
+    public static function getCoreCommands()
+    {
+        return (new static())->getDefaultCommands();
     }
 
     /**
@@ -140,10 +136,34 @@ class Manager extends Base
         return new $className();
     }
 
-    public static function run()
+    /**
+     * @param bool $autoRun
+     *
+     * @return Application
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public static function run($autoRun = true)
     {
-        (new BaseOrm())->registerModelChecks();
-        (new static())->execute();
+        BaseOrm::getInstance()->registerModelChecks();
+        $console = new Application('');
+        $def = new ListCommand();
+        $console->add($def);
+        $console->setDefaultCommand($def->getName());
+
+        $console->addCommands(self::getCoreCommands());
+
+        $output = new ConsoleOutput();
+
+        self::warningText($output);
+        self::errorText($output);
+
+        if ($autoRun) :
+
+            $console->run(null, $output);
+        endif;
+
+        return $console;
+
     }
 
     public static function warningText(OutputInterface $output)
