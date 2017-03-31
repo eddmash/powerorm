@@ -2,13 +2,11 @@
   "name": "eddmash/powerorm",
   "type": "library",
   "keywords": [
-    "codeigniter",
     "orm",
-    "form",
     "php",
     "migrations"
   ],
-  "description": "A very simple but effective codeignter orm",
+  "description": "A very simple but effective orm",
   "homepage": "https://github.com/eddmash/powerorm",
   "license": "MIT",
   "authors": [

@@ -3,7 +3,6 @@
  * Created by eddmash <http://eddmash.com>
  * Date: 9/30/16.
  */
-
 namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\Console\Console;

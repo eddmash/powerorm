@@ -17,7 +17,7 @@ Configuration
 ========================
 The ORM takes several configurations
 
-- **databaseConfigs**
+- **database**
     This are the database configurations the ORM will use to connect to a database.
 
     The orm uses `Doctrine Dbal <http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/index.html>`_ to
@@ -31,15 +31,30 @@ The ORM takes several configurations
 
     An example of database configuration for mysql is presented below.
 
-- **migrationPath**
+- **migrations**
 
     This is location where the ORM will use to store migrations files. in Codeigniter 3, this
     defaults to the ``APPPATH/migrations`` folder.
 
-- **modelsPath**
+- **models**
 
-    This is location where the ORM will exptect to find the model files. in Codeigniter 3, this
-    defaults to the ``APPPATH/models`` folder.
+    This are configarations that relate to the models the orm will interact with.
+
+    - path (*required*)
+
+        This is location where the ORM will expect to find the model files.
+
+    - namespace (*optional*)
+
+        The namespace for the models in the path provided,
+        if the models don't make use of namespace this optional is not needed.
+
+    - autoload (*optional*)
+
+        Tells the orm to autoload the models, if on projects that already
+        take care of autoloading the models, set this option to false.
+
+        **default:** true
 
 - **dbPrefix**
 
@@ -59,19 +74,25 @@ The ORM takes several configurations
 Sample Configuration file.
 ============================
 
-A sample configuration file. ``config/orm.php``
+A sample configurations.
 
 .. code-block:: php
 
-    $config['databaseConfigs']= [
-        'dbname' => 'tester',
-        'user' => 'root',
-        'password' => '',
-        'host' => 'localhost',
-        'driver' => 'pdo_mysql',
+    $config = [
+        'database' => [
+            'host' => '127.0.0.1',
+            'dbname' => 'tester',
+            'user' => 'admin',
+            'password' => 'admin',
+            'driver' => 'pdo_pgsql',
+        ],
+        'migrations' => [
+            'path' => dirname(__FILE__) . '/application/Migrations',
+        ],
+        'models' => [
+            'path' => dirname(__FILE__) . '/application/Models',
+            'namespace' => 'App\Models',
+        ],
+        'dbPrefix' => 'demo_',
+        'charset' => 'utf-8',
     ];
-
-    $config['migrationPath']= sprintf("%smigrations%s", APPPATH, DIRECTORY_SEPARATOR);;
-    $config['modelsPath']= sprintf("%smodels%s", APPPATH, DIRECTORY_SEPARATOR);
-    $config['dbPrefix']= 'testing_';
-    $config['charset']= config_item('charset');

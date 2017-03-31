@@ -11,11 +11,10 @@ $config = [
         'host' => '127.0.0.1',
         'dbname' => 'tester',
         'user' => 'admin',
-        'password' => 'ivamers_ktr_2016',
+        'password' => 'admin',
         'driver' => 'pdo_pgsql',
     ],
     'migrations' => [
-        'namespace' => 'App\Migrations',
         'path' => dirname(__FILE__).'/application/Migrations',
     ],
     'models' => [

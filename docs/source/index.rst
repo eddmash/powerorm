@@ -63,6 +63,7 @@ Extra Information
 .. toctree::
     :titlesonly:
 
+    integrating-with-frameworks
     license
     changelog
 

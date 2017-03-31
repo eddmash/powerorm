@@ -47,6 +47,7 @@ class Application
      */
     public static function run($config, &$composerLoader)
     {
+
         $orm = BaseOrm::createObject($config);
         $modelsNamespace = $orm->modelsNamespace;
         $migrationsNamespace = $orm->migrationNamespace;
@@ -59,7 +60,7 @@ class Application
             $migrationsNamespace = ClassHelper::getFormatNamespace($orm->migrationNamespace, false, true);
         endif;
 
-        if ($composerLoader) :
+        if ($composerLoader && $orm->autoloadModels) :
             $composerLoader->setPsr4($modelsNamespace, $orm->modelsPath);
             $composerLoader->setPsr4($migrationsNamespace, $orm->migrationPath);
         endif;
