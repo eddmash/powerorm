@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm;
 
-use Doctrine\Common\ClassLoader;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
@@ -176,11 +175,10 @@ class BaseOrm extends BaseObject
     {
         $models = ArrayHelper::pop($config, 'models');
         $migrations = ArrayHelper::pop($config, 'migrations');
-        $this->modelsPath = ArrayHelper::getValue($models, "path");
-        $this->modelsNamespace = ArrayHelper::getValue($models, "namespace");
-        $this->migrationPath = ArrayHelper::getValue($migrations, "path");
-        $this->migrationNamespace = ArrayHelper::getValue($migrations, "namespace");
-
+        $this->modelsPath = ArrayHelper::getValue($models, 'path', null);
+        $this->modelsNamespace = ArrayHelper::getValue($models, 'namespace');
+        $this->migrationPath = ArrayHelper::getValue($migrations, 'path');
+        $this->migrationNamespace = ArrayHelper::getValue($migrations, 'namespace');
         self::configure($this, $config);
         // setup the registry
         $this->registryCache = Registry::createObject();
@@ -188,7 +186,7 @@ class BaseOrm extends BaseObject
 
     public static function getModelsPath()
     {
-        return realpath(self::getInstance()->modelsPath);
+        return self::getInstance()->modelsPath ? realpath(self::getInstance()->modelsPath) : null;
     }
 
     public static function getMigrationsPath()
@@ -213,13 +211,6 @@ class BaseOrm extends BaseObject
     {
 
         static::createObject($configs);
-
-//        $commonLoader = new ClassLoader(
-//            null,
-//            static::getInstance()->modelsPath
-//        );
-//
-//        $commonLoader->register();
 
         static::loadRegistry();
 
@@ -307,8 +298,8 @@ class BaseOrm extends BaseObject
 
     public static function loadRegistry(&$ormInstance = null)
     {
-        if (!is_null($ormInstance)) :
-            $ormInstance = self::getInstance();
+        if (is_null($ormInstance)) :
+            $ormInstance = self::standAloneEnvironment([]);
         endif;
 
         try {
@@ -398,9 +389,9 @@ class BaseOrm extends BaseObject
     /**
      * Configures an object with the initial property values.
      *
-     * @param object $object the object to be configured
-     * @param array $properties the property initial values given in terms of name-value pairs
-     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object     the object to be configured
+     * @param array  $properties the property initial values given in terms of name-value pairs
+     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
@@ -429,6 +420,7 @@ class BaseOrm extends BaseObject
 
     /**
      * @param array $config
+     *
      * @return static
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */

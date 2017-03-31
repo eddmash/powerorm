@@ -2,7 +2,7 @@
 #-------------------------
 # Composer
 #-------------------------
-vendor/doctrine/dbal/lib/vendor/
+vendor
 composer.lock
 cs_fixer*
 

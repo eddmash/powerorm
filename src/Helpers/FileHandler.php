@@ -34,6 +34,7 @@ class FileHandler extends BaseObject
     public function __construct($folder, $fileName = '')
     {
         $this->path = $folder;
+
         $this->fileName = $fileName;
     }
 
@@ -128,7 +129,6 @@ class FileHandler extends BaseObject
         $ext = $this->stableExt($ext);
 
         $directory = $this->stableDir($this->path);
-
         if (!file_exists($directory)):
             return [];
         endif;
@@ -196,6 +196,5 @@ class FileHandler extends BaseObject
     {
         return (preg_match("/\/$/", $name)) ? $name : $name.'/';
     }
-
 
 }

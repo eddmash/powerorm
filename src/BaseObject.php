@@ -35,7 +35,7 @@ class BaseObject
      */
     public static function getFullClassName()
     {
-        return get_called_class();
+        return static::class;
     }
 
     public function getShortClassName()

@@ -38,13 +38,12 @@ class ClassHelperTest extends PHPUnit_Framework_TestCase
     public function testClassParents()
     {
         $expected = [
-            'PModel',
             'Eddmash\PowerOrm\Model\Model',
             'Eddmash\PowerOrm\DeconstructableObject',
             'Eddmash\PowerOrm\BaseObject',
         ];
-        $mock = $this->getMockBuilder(PModel::class)->getMock();
-//        $this->assertInstanceOf(PModel::class, $mock->get);
+        $mock = $this->getMockBuilder(\Eddmash\PowerOrm\Model\Model::class)->getMock();
+
         $this->assertEquals($expected, array_keys(ClassHelper::getParents($mock)), 'Failed to assert expected order of parents');
     }
 

@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -141,7 +140,7 @@ class ForeignObjectRel extends BaseObject
             return $this->relatedName;
         endif;
 
-        return sprintf('%s_set', strtolower(ClassHelper::getNameFromNs($model->meta->modelName, BaseOrm::getModelsNamespace())));
+        return sprintf('%s_set', strtolower($model->meta->getModelName()));
     }
 
     public function getPathInfo()

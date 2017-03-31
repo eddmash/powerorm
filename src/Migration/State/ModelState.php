@@ -53,7 +53,7 @@ class ModelState extends BaseObject
     /**
      * Takes a model returns a ModelState representing it.
      *
-     * @param Model $model
+     * @param Model      $model
      * @param bool|false $excludeRels
      *
      * @return static
@@ -74,7 +74,7 @@ class ModelState extends BaseObject
                 $fields[$name] = $field->deepClone();
             } catch (\Exception $e) {
                 throw new TypeError(
-                    sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->namspacedModelName)
+                    sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->getNamespacedModelName())
                 );
             }
         endforeach;
@@ -88,7 +88,7 @@ class ModelState extends BaseObject
                         sprintf(
                             "Couldn't reconstruct field %s on %s: %s",
                             $name,
-                            $model->meta->namspacedModelName
+                            $model->meta->getNamespacedModelName()
                         )
                     );
                 }
@@ -108,14 +108,14 @@ class ModelState extends BaseObject
         $extends = '';
         $parent = $model->getParent();
         if (!$parent->isAbstract() && !Model::isModelBase($parent->getName())):
-            $extends = ClassHelper::getNameFromNs($parent->getName(), BaseOrm::getModelsNamespace());
+            $extends = $parent->getName();
         endif;
         $kwargs = [
             'meta' => $meta,
             'extends' => $extends,
         ];
 
-        return new static($model->meta->namspacedModelName, $fields, $kwargs);
+        return new static($model->meta->getNamespacedModelName(), $fields, $kwargs);
     }
 
     /**
@@ -195,6 +195,6 @@ class ModelState extends BaseObject
 
     public function __toString()
     {
-        return (string)sprintf("<ModelState: '%s'>", $this->name);
+        return (string) sprintf("<ModelState: '%s'>", $this->name);
     }
 }

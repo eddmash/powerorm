@@ -33,21 +33,7 @@ This ORM is heavily inspired by Django ORM. Because i personally love how there 
 
 `composer require eddmash/powerorm:@dev`
 
-- Download or Clone package from github.
-
-# Load the Library
-
-Load the library like any other Codeigniter library.
-
-`$autoload['libraries'] = array('session', 'powerorm/orm', 'powerauth/auth')`
-
-
-# How It works
-
- - [Powerorm v1.1.0-pre-alpha](readme/1_1_0.md)
-
- - [Powerorm v1.0.1](readme/1_0_1.md)
-
+- Download or Clone package from github. 
 
 # Features
  - Allows to fully think of the database and its table in an object oriented manner i.e. 
@@ -56,6 +42,18 @@ Load the library like any other Codeigniter library.
  - Create forms automatically based on models.
  - All fields visible on the model, no need to look at the database table when you want to interact with the database.
  - Provides database interaction methods
+ 
+# Dependencies
+
+The ORM has the following dependencies:
+
+- [Doctrine dbal Library](http://www.doctrine-project.org/projects/dbal.html). 
+- [Symfony console component](http://symfony.com/doc/current/components/console.html). 
+- [Symfony polyfill-mbstring component](http://symfony.com/blog/new-in-symfony-2-8-polyfill-components). 
+ 
+# How It works
+
+Learn from here [Documentation](http://powerorm.readthedocs.io/).
 
 # supports
 php 5.6+ and 7+

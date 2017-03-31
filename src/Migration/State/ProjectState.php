@@ -55,6 +55,7 @@ class ProjectState extends DeconstructableObject
         foreach ($registry->getModels() as $modelName => $modelObj) :
             $modelStates[$modelName] = ModelState::fromModel($modelObj);
         endforeach;
+
         return static::createObject($modelStates);
     }
 

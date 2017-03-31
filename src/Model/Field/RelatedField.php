@@ -16,7 +16,6 @@ use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
-use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
@@ -74,7 +73,7 @@ class RelatedField extends Field
     {
         $relModel = $this->relation->toModel;
         if ($relModel instanceof Model):
-            $relModel = $relModel->meta->modelName;
+            $relModel = $relModel->meta->getNamespacedModelName();
         endif;
 
         $relMissing = $this->scopeModel->meta->registry->hasModel($relModel);
@@ -148,7 +147,7 @@ class RelatedField extends Field
     {
         $hasMany = HasManyField::createObject(
             [
-                'to' => get_class($this->scopeModel),
+                'to' => $this->scopeModel->meta->getNamespacedModelName(),
                 'toField' => $relation->fromField->getName(),
                 'fromField' => $this,
             ]
@@ -183,8 +182,8 @@ class RelatedField extends Field
         if (is_string($this->relation->toModel)):
             $kwargs['to'] = $this->relation->toModel;
         else:
-            $name = $this->relation->toModel->getFullClassName();
-            $kwargs['to'] = ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace());
+            $name = $this->relation->toModel->meta->getNamespacedModelName();
+            $kwargs['to'] = $name;
         endif;
 
         if ($this->relation->parentLink):
@@ -345,7 +344,7 @@ class RelatedField extends Field
         elseif ($this->relation->relatedName):
             $name = $this->relation->relatedName;
         else:
-            $name = $this->scopeModel->meta->modelName;
+            $name = $this->scopeModel->meta->getModelName();
         endif;
 
         return strtolower($name);
@@ -356,7 +355,9 @@ class RelatedField extends Field
      *
      * @param $modelInstance
      * @param bool $reverse
+     *
      * @internal param $modelName
+     *
      * @return Queryset
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */

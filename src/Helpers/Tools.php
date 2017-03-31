@@ -272,7 +272,7 @@ class Tools
 
                 $relatedModels[] = $relM;
             elseif ($relM instanceof Model):
-                $relatedModels[] = $relM->meta->modelName;
+                $relatedModels[] = $relM->meta->getNamespacedModelName();
             endif;
         endforeach;
 
@@ -285,7 +285,7 @@ class Tools
         if (is_string($relModel) && $relModel == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT):
             return self::resolveRelation($model, $model);
         elseif ($relModel instanceof Model):
-            return $relModel->meta->modelName;
+            return $relModel->meta->getNamespacedModelName();
         endif;
 
         return $relModel;

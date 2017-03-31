@@ -1,14 +1,12 @@
 <?php
-/**
+/*
  * Bootstrap the application.
  */
 
-define('POWERORM_VERSION', '1.1.0-pre-alpha');
-
 //$baseDir = isset($baseDir) ? $baseDir : __DIR__;
-//
+
 //define('HOMEPATH', $baseDir);
-//
+
 //// if ENVIRONMENT is not set and our base dir is 'powerorm' we might be running test
 //// otherwise we migh be on a codeigniter environmnent so create a codeigniter instance
 //if (!defined('ENVIRONMENT')):
@@ -19,7 +17,7 @@ define('POWERORM_VERSION', '1.1.0-pre-alpha');
 //        require 'CiSetup.php';
 //    endif;
 //endif;
-//
+
 //if (!defined('BASEPATH')) :
 //    define('BASEPATH', __DIR__.DIRECTORY_SEPARATOR);
 //    define('APPPATH', BASEPATH);

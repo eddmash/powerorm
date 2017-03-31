@@ -82,9 +82,14 @@ class Registry extends BaseObject
      */
     public function getModelFiles()
     {
-        $fileHandler = new FileHandler(BaseOrm::getModelsPath());
+        if (BaseOrm::getModelsPath()):
 
-        return $fileHandler->readDir('php');
+            $fileHandler = new FileHandler(BaseOrm::getModelsPath());
+
+            return $fileHandler->readDir('php');
+        endif;
+
+        return [];
     }
 
     /**
@@ -191,7 +196,6 @@ class Registry extends BaseObject
         $models = [];
 
         $modelFiles = $this->getModelFiles();
-
         if (empty($modelFiles)) {
             return false;
         }
@@ -215,7 +219,7 @@ class Registry extends BaseObject
     public function registerModel(Model $model)
     {
 
-        $name = ClassHelper::getNameFromNs($model->meta->modelName, BaseOrm::getModelsNamespace());
+        $name = $model->meta->getNamespacedModelName();
         if (!ArrayHelper::hasKey($this->allModels, $name)) {
             $this->allModels[$name] = $model;
         }
@@ -254,7 +258,7 @@ class Registry extends BaseObject
 
     public function getRegisteredModel($name)
     {
-        $model = ArrayHelper::getValue($this->allModels, ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace()));
+        $model = ArrayHelper::getValue($this->allModels, $name);
         if ($model == null):
             throw new LookupError(sprintf("Model '%s' not registered.", $name));
         endif;
@@ -271,8 +275,8 @@ class Registry extends BaseObject
      */
     public function resolvePendingOps($model)
     {
-        if (isset($this->_pendingOps[$model->meta->modelName])) {
-            $todoActions = $this->_pendingOps[$model->meta->modelName];
+        if (isset($this->_pendingOps[$model->meta->getNamespacedModelName()])) {
+            $todoActions = $this->_pendingOps[$model->meta->getNamespacedModelName()];
             foreach ($todoActions as $todoAction) {
                 list($callback, $kwargs) = $todoAction;
                 $kwargs['relatedModel'] = $model;

@@ -414,7 +414,7 @@ class Query extends BaseObject
                     sprintf(
                         'Invalid lookup "%s" for model %s".',
                         $names,
-                        $this->model->meta->modelName
+                        $this->model->meta->getNamespacedModelName()
                     )
                 );
             endif;
@@ -460,7 +460,7 @@ class Query extends BaseObject
                     throw new FieldError(
                         sprintf(
                             "Cannot resolve keyword '%s.%s' into field. Choices are: [ %s ]",
-                            $meta->modelName,
+                            $meta->getNamespacedModelName(),
                             $name,
                             implode(', ', $available)
                         )

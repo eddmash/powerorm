@@ -14,7 +14,7 @@ class ModelTest extends PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        \Eddmash\PowerOrm\BaseOrm::loadRegistry();
+        \Eddmash\PowerOrm\BaseOrm::setup();
     }
 
     public function testFieldMethodIsNotPublic()
@@ -84,8 +84,8 @@ abstract class AbstractModel extends \Eddmash\PowerOrm\Model\Model
     private function unboundFields()
     {
         return [
-            'country' => PModel::CharField(['maxLength' => 40, 'dbIndex' => true]),
-            'school' => PModel::CharField(['maxLength' => 40, 'dbIndex' => true]),
+            'country' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
+            'school' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
         ];
     }
 }
@@ -95,7 +95,7 @@ class FieldCrashModel extends AbstractModel
     private function unboundFields()
     {
         return [
-            'school' => PModel::CharField(['maxLength' => 40, 'dbIndex' => true]),
+            'school' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
         ];
     }
 }
@@ -135,7 +135,7 @@ class ConcreteModel extends AbstractModel
     private function unboundFields()
     {
         return [
-            'town' => PModel::CharField(['maxLength' => 40, 'dbIndex' => true]),
+            'town' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
         ];
     }
 }

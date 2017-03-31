@@ -187,9 +187,9 @@ class ForeignKey extends RelatedField
                 sprintf(
                     'Cannot assign "%s": "%s.%s" must be a "%s" instance.',
                     $value,
-                    $this->scopeModel->meta->modelName,
+                    $this->scopeModel->meta->getNamespacedModelName(),
                     $this->getName(),
-                    $this->relation->toModel->meta->modelName
+                    $this->relation->toModel->meta->getNamespacedModelName()
                 )
             );
         endif;
