@@ -177,6 +177,9 @@ class Loader extends BaseObject
 
     public function getMigrationsFiles()
     {
+        if (!BaseOrm::getMigrationsPath()) :
+            return [];
+        endif;
         $fileHandler = FileHandler::createObject(['path' => BaseOrm::getMigrationsPath()]);
 
         return $fileHandler->getPathFiles();

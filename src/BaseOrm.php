@@ -36,7 +36,7 @@ class BaseOrm extends BaseObject
     const RECURSIVE_RELATIONSHIP_CONSTANT = 'this';
     private static $checkRegistry;
     public $modelsNamespace;
-    public $migrationNamespace;
+    public $migrationNamespace = 'App\Migrations';
     /**
      * The configurations to use to connect to the database.
      *
@@ -178,7 +178,6 @@ class BaseOrm extends BaseObject
         $this->modelsPath = ArrayHelper::getValue($models, 'path', null);
         $this->modelsNamespace = ArrayHelper::getValue($models, 'namespace');
         $this->migrationPath = ArrayHelper::getValue($migrations, 'path');
-        $this->migrationNamespace = ArrayHelper::getValue($migrations, 'namespace');
         self::configure($this, $config);
         // setup the registry
         $this->registryCache = Registry::createObject();

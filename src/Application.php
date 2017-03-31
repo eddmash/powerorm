@@ -26,14 +26,47 @@ define('POWERORM_VERSION', '1.1.0-pre-alpha');
  */
 class Application
 {
-    public static function webRun($config = [])
+    /**
+     * @param array $config
+     * @param $composerLoader
+     *
+     * @return BaseOrm
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public static function webRun($config = [], &$composerLoader = null)
     {
-        static::run($config);
+        return static::run($config, $composerLoader);
     }
 
-    public static function run($config)
+    /**
+     * @param $config
+     * @param ClassLoader $composerLoader
+     *
+     * @return BaseOrm
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public static function run($config, &$composerLoader)
     {
-        return BaseOrm::createObject($config);
+        $orm = BaseOrm::createObject($config);
+        $modelsNamespace = $orm->modelsNamespace;
+        $migrationsNamespace = $orm->migrationNamespace;
+
+        if ($modelsNamespace):
+            $modelsNamespace = ClassHelper::getFormatNamespace($orm->modelsNamespace, false, true);
+        endif;
+
+        if ($migrationsNamespace) :
+            $migrationsNamespace = ClassHelper::getFormatNamespace($orm->migrationNamespace, false, true);
+        endif;
+
+        if ($composerLoader) :
+            $composerLoader->setPsr4($modelsNamespace, $orm->modelsPath);
+            $composerLoader->setPsr4($migrationsNamespace, $orm->migrationPath);
+        endif;
+
+        BaseOrm::loadRegistry($orm);
+
+        return $orm;
     }
 
     /**
@@ -43,18 +76,10 @@ class Application
      *
      * @return \Symfony\Component\Console\Application
      */
-    public static function consoleRun($config, $composerLoader, $autoRun = true)
+    public static function consoleRun($config, &$composerLoader = null, $autoRun = true)
     {
-        $orm = static::run($config);
 
-        $modelsNamespace = ClassHelper::getFormatNamespace($orm->modelsNamespace, false, true);
-        $migrationsNamespace = ClassHelper::getFormatNamespace($orm->migrationNamespace, false, true);
-        if ($composerLoader) :
-            $composerLoader->setPsr4($modelsNamespace, $orm->modelsPath);
-            $composerLoader->setPsr4($migrationsNamespace, $orm->migrationPath);
-        endif;
-
-        BaseOrm::loadRegistry($orm);
+        static::run($config, $composerLoader);
 
         return Manager::run($autoRun);
     }
