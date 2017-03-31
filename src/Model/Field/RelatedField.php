@@ -183,6 +183,7 @@ class RelatedField extends Field
             $kwargs['to'] = $this->relation->toModel;
         else:
             $name = $this->relation->toModel->meta->getNamespacedModelName();
+
             $kwargs['to'] = $name;
         endif;
 
