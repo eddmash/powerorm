@@ -160,9 +160,7 @@ class Loader extends BaseObject
 
         $namespace = BaseOrm::getMigrationsNamespace();
         foreach ($migrationFiles as $migrationFile) :
-
-            $className = ClassHelper::getClassNameFromFile($migrationFile, BaseOrm::getMigrationsPath());
-
+            $className = ClassHelper::getClassFromFile($migrationFile);
             $foundClass = ClassHelper::classExists($className, $namespace);
             if (!$className):
                 throw new ClassNotFoundException(
