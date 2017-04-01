@@ -23,13 +23,15 @@ the `proxy` meta setting of the class to True.
 
 .. code-block:: php
 
-    class Employee extends PModel
+	use Eddmash\PowerOrm\Model\Model;
+
+    class Employee extends Model
     {
         private function unboundFields()
         {
             return [
-                'name' => PModel::CharField(['maxLength' => 100]),
-                'age' => PModel::IntegerField()
+                'name' => Model::CharField(['maxLength' => 100]),
+                'age' => Model::IntegerField()
             ];
         }
     }

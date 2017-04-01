@@ -9,7 +9,7 @@ Model
 A model is the single, definitive source of information about your data. It contains the essential fields and behaviors
 of the data you're storing. Generally, each model maps to a single database table.
 
-A model is a PHP class that subclasses ``PModel`` or ``Eddmash\PowerOrm\Model\Model``.
+A model is a PHP class that subclasses ``Eddmash\PowerOrm\Model\Model``.
 
 Quick example
 ================
@@ -18,13 +18,15 @@ This example model defines a User, which has a firstName and lastName:
 
 .. code-block:: php
 
-     class User extends PModel
+     use Eddmash\PowerOrm\Model\Model;
+
+     class User extends Model
      {
 
          private function unboundFields(){
              return [
-                 'firstName'=>PModel::CharField(['maxLength'=>30]),
-                 'lastName'=>PModel::CharField(['maxLength'=>30]),
+                 'firstName'=>Model::CharField(['maxLength'=>30]),
+                 'lastName'=>Model::CharField(['maxLength'=>30]),
              ];
          }
      }
@@ -42,8 +44,10 @@ Model fields are defined on ``unboundFields`` method which should return an asso
 
 - **values** are instances of one of the subclass of the ``Eddmash\PowerOrm\Model\Field`` class.
 
-All the field subclasses can be accessed from the PModel, via static methods whose name matches that of the subclass.
-e.g to access the ``Eddmash\PowerOrm\Model\Field\CharField`` subclass from the PModel use the ``PModel::CharField()``.
+All the field subclasses can be accessed from the Eddmash\PowerOrm\Model\Model, via static methods whose name matches
+that of the subclass. e.g
+to access the ``Eddmash\PowerOrm\Model\Field\CharField`` subclass from the Eddmash\PowerOrm\Model\Model;
+use the ``Eddmash\PowerOrm\Model\Model;::CharField()``.
 
 PowerOrm uses the models fields to determine the database column type (e.g. INTEGER, VARCHAR).
 
@@ -78,7 +82,7 @@ By default, PowerOrm gives each model the following field:
 
 .. code-block:: php
 
-   id = PModel::AutoField(['primaryKey'=>true])
+   id =  Eddmash\PowerOrm\Model\Model::AutoField(['primaryKey'=>true])
 
 This is an auto-incrementing primary key.
 
@@ -100,13 +104,13 @@ In this example, the verbose name is "person's first name":
 
 .. code-block:: php
 
-    first_name = PModel::CharField(['verboseName'=>"person's first name", 'maxLength'=30])
+    first_name = Eddmash\PowerOrm\Model\Model::CharField(['verboseName'=>"person's first name", 'maxLength'=30])
 
 In this example, the verbose name is "first name":
 
 .. code-block:: php
 
-    first_name = PModel::CharField(['maxLength'=30])
+    first_name = Eddmash\PowerOrm\Model\Model::CharField(['maxLength'=30])
 
 Relationships
 =================
@@ -117,7 +121,8 @@ In all the relationships types a :ref:`recursive relationship <recursive_relatio
 
 Many-to-one relationships
 ----------------------------
-To define a many-to-one relationship, use PModel::ForeignKey. You use it just like any other Field type: by including
+To define a many-to-one relationship, use Eddmash\PowerOrm\Model\Model::ForeignKey. You use it just like any
+other Field type: by including
 it on the ``unboundFields`` method of your model.
 
 ForeignKey requires a 'to' argument: the class to which the model is related.
@@ -128,16 +133,18 @@ a Manufacturer makes multiple cars but each Car only has one Manufacturer – us
 
 .. code-block:: php
 
-    class Car extends PModel{
+    use Eddmash\PowerOrm\Model\Model;
+
+    class Car extends Model{
         private function unboundFields()
         {
             return [
-                'manufacturer' => PModel::ForeignKey(['to' => 'Manufacturer'])
+                'manufacturer' => Model::ForeignKey(['to' => 'Manufacturer'])
             ];
         }
     }
 
-    class Manufacturer extends PModel
+    class Manufacturer extends Model
     {
 
         private function unboundFields(){
@@ -161,21 +168,23 @@ multiple toppings – here's how you'd represent that:
 
 .. code-block:: php
 
-    class Topping extends PModel
+    use Eddmash\PowerOrm\Model\Model;
+
+    class Topping extends Model
     {
 
         private function unboundFields(){
             return [
-                'name'=> PModel::CharField(['maxLength'=>50])
+                'name'=> Model::CharField(['maxLength'=>50])
             ];
         }
     }
 
-    class Pizza extends PModel{
+    class Pizza extends Model{
         private function unboundFields()
         {
             return [
-                'toppings' => PModel::ManyToManyField(['to' => 'Topping'])
+                'toppings' => Model::ManyToManyField(['to' => 'Topping'])
             ];
         }
     }
@@ -208,33 +217,35 @@ For our musician example, the code would look something like this:
 
 .. code-block:: php
 
-    class Person extends PModel
+    use Eddmash\PowerOrm\Model\Model;
+
+    class Person extends Model
     {
 
         private function unboundFields(){
             return [
-                'name'=> PModel::CharField(['maxLength'=>50])
+                'name'=> Model::CharField(['maxLength'=>50])
             ];
         }
     }
 
-    class Group extends PModel{
+    class Group extends Model{
         private function unboundFields()
         {
             return [
-                'name'=> PModel::CharField(['maxLength'=>50]),
-                'members' => PModel::ManyToManyField(['to' => 'Person', 'through'=>'Membership'])
+                'name'=> Model::CharField(['maxLength'=>50]),
+                'members' => Model::ManyToManyField(['to' => 'Person', 'through'=>'Membership'])
             ];
         }
     }
 
-    class Membership extends PModel{
+    class Membership extends Model{
         private function unboundFields()
         {
             return [
-                'person' => PModel::ForeignKey(['to' => 'Person']),
-                'group' => PModel::ForeignKey(['to' => 'Group']),
-                'invite_reason'=>PModel::CharField(['maxLength'=>65])
+                'person' => Model::ForeignKey(['to' => 'Person']),
+                'group' => Model::ForeignKey(['to' => 'Group']),
+                'invite_reason'=>Model::CharField(['maxLength'=>65])
             ];
         }
     }
@@ -261,13 +272,15 @@ Give your model metadata by return an array of model meta setting from the metho
 
 .. code-block:: php
 
-     class User extends PModel
+    use Eddmash\PowerOrm\Model\Model;
+
+     class User extends Model
      {
 
         private function unboundFields(){
             return [
-                'firstName'=>PModel::CharField(['maxLength'=>30]),
-                'lastName'=>PModel::CharField(['maxLength'=>30]),
+                'firstName'=>Model::CharField(['maxLength'=>30]),
+                'lastName'=>Model::CharField(['maxLength'=>30]),
             ];
         }
 

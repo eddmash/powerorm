@@ -12,13 +12,15 @@ For example:
 
 .. code-block:: php
 
-    class Place extends PModel
+    use Eddmash\PowerOrm\Model\Model;
+
+    class Place extends Model
     {
         private function unboundFields()
         {
             return [
-                'name' => PModel::CharField(['maxLength' => 100]),
-                'address' => PModel::CharField(['maxLength' => 80])
+                'name' => Model::CharField(['maxLength' => 100]),
+                'address' => Model::CharField(['maxLength' => 80])
             ];
         }
     }
@@ -28,8 +30,8 @@ For example:
         private function unboundFields()
         {
             return [
-                'serves_hot_dogs' => PModel::BooleanField(['default' => false]),
-                'serves_pizza' => PModel::BooleanField(['default' => false])
+                'serves_hot_dogs' => Model::BooleanField(['default' => false]),
+                'serves_pizza' => Model::BooleanField(['default' => false])
             ];
         }
     }
