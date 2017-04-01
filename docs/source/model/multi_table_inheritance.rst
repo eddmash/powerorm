@@ -36,24 +36,14 @@ For example:
         }
     }
 
-.. note::
-	Because codeigniter does not autoload classes you need to load the base class first before
-	the child. when using e.g. load the models defined above as show :
-
-Loading models :
-
-.. code-block:: php
-
- 	$this->load->model('place');
- 	$this->load->model('restraurant');
 
 All of the fields of Place will also be available in Restaurant, although the data will reside in a
 different database table. So these are both possible:
 
 .. code-block:: php
 
-	$this->place->filter([name="Bob's Cafe"]);
- 	$this->restaurant->filter([name="Bob's Cafe"]);
+	Restaurant::objects()->filter([name=>"Bob's Cafe"]);
+ 	Place::objects()->filter([name=>"Bob's Cafe"]);
 
 
 If you have a Place that is also a Restaurant, you can get from the Place object to the Restaurant
@@ -61,11 +51,11 @@ object by using the lower-case version of the model name:
 
 .. code-block:: php
 
-	$p = $this->place->get(['id'=12]);
+	$p = Place::objects()->get(['id'=>12]);
  	// If p is a Restaurant object, this will give the child class:
- 	$p.restaurant
+ 	$p->restaurant
 
-However, if p in the above example was not a Restaurant (it had been created directly as a Place
+However, if `$p` in the above example was not a Restaurant (it had been created directly as a Place
 object or was the parent of some other class), referring to p.restaurant would raise a exception.
 
 In reality the orm creates the base model table as expected in the database i.e with all the field the model

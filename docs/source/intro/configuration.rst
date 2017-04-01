@@ -20,8 +20,9 @@ The ORM takes several configurations
 
 - **migrations**
 
-    This is location where the ORM will use to store migrations files. in Codeigniter 3, this
-    defaults to the ``APPPATH/migrations`` folder.
+    - path (*required*)
+
+        This is location where the ORM will use to store migrations files.
 
 - **models**
 

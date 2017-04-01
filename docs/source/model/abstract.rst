@@ -3,10 +3,6 @@
 Abstract base classes
 #############################
 
-.. note::
-	Because Codeigniter does not autoload classes you need to require the file with the abstract class in your model
-	file.
-
 Abstract base classes are useful when you want to put some common information into a number of other models.
 You create an Abstract base class by simply creating a normal php abstract base class.
 
