@@ -201,8 +201,9 @@ class Registry extends BaseObject
         }
         $namespace = BaseOrm::getModelsNamespace();
         foreach ($this->getModelFiles() as $file) :
-            $className = ClassHelper::getClassNameFromFile($file, BaseOrm::getModelsPath());
-            var_dump($className);
+
+            $className = ClassHelper::getClassFromFile($file);
+
             $foundClass = ClassHelper::classExists($className, $namespace);
 
             if (!$foundClass):
