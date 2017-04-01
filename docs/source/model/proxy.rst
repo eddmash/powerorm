@@ -53,6 +53,7 @@ the `proxy` meta setting of the class to True.
     }
 
 The Auditor class operates on the same database table as its parent Person class.
+
 In particular, any new instances of Employee will also be accessible through Auditor, and vice-versa:
 
 .. code-block:: php
