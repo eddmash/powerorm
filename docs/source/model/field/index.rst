@@ -45,7 +45,7 @@ human-readable name. For example:
        'f'=>'Female',
     ];
 
-    $gender =  PModel::CharField(['maxLength'=>2, 'choices'=>$gender_choices])
+    $gender = Eddmash\PowerOrm\Model\Model;::CharField(['maxLength'=>2, 'choices'=>$gender_choices])
 
 dbColumn
 -----------
@@ -153,20 +153,22 @@ A many-to-one relationship. Requires a 'to' argument: the class to which the mod
 To create a recursive relationship – an object that has a many-to-one relationship with itself –
 use
 
-``PModel::ForeignKey(['to'=>'this'])``.
+``Eddmash\PowerOrm\Model\Model;Model::ForeignKey(['to'=>'this'])``.
 
 .. code-block:: php
 
-    class Car extends PModel{
+    use Eddmash\PowerOrm\Model\Model;
+
+    class Car extends Model{
         private function unboundFields()
         {
             return [
-                'manufacturer' => PModel::ForeignKey(['to' => 'Manufacturer'])
+                'manufacturer' => Model::ForeignKey(['to' => 'Manufacturer'])
             ];
         }
     }
 
-    class Manufacturer extends PModel
+    class Manufacturer extends Model
     {
 
         private function unboundFields(){

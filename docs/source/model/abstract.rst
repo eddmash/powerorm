@@ -19,13 +19,15 @@ child class.:
 
 .. code-block:: php
 
-    abstract class CommonInfo extends PModel
+    use Eddmash\PowerOrm\Model\Model;
+
+    abstract class CommonInfo extends Model
     {
         private function unboundFields()
         {
             return [
-                'name' => PModel::CharField(['maxLength' => 100]),
-                'age' => PModel::IntegerField()
+                'name' => Model::CharField(['maxLength' => 100]),
+                'age' => Model::IntegerField()
             ];
         }
     }
@@ -35,7 +37,7 @@ child class.:
         private function unboundFields()
         {
             return [
-                'home_group' => PModel::CharField(['maxLength' => 5])
+                'home_group' => Model::CharField(['maxLength' => 5])
             ];
         }
     }

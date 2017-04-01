@@ -28,12 +28,14 @@ The data-model syntax offers many rich ways of representing your models – so f
 
     // application/models/Role.php
 
-    class Role extends PModel
+    use Eddmash\PowerOrm\Model\Model;
+
+    class Role extends Model
     {
         private function unboundFields() {
             return [
-                'name' => PModel::CharField(['maxLength' => 40, 'dbIndex' => true]),
-                'code' => PModel::CharField(['maxLength' => 10, 'dbIndex' => true]),
+                'name' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
+                'code' => Model::CharField(['maxLength' => 10, 'dbIndex' => true]),
             ];
         }
 

@@ -4,7 +4,7 @@ Model inheritance
 #############################
 
 Model inheritance in Powerorm works almost identically to the way normal class inheritance works in PHP,
-That means the base class should subclass PModel.
+That means the base class should subclass Eddmash\PowerOrm\Model\Model;.
 
 The only decision you have to make is whether you want the parent models to be models in their own right
 (with their own database tables), or if the parents are just holders of common information that will only
