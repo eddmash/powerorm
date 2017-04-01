@@ -7,7 +7,6 @@ Version 1.1.0-Pre-Alpha
 .. contents::
     :local:
     :depth: 4
-==============================
 
 **Rewrite of the PowerOrm**
 

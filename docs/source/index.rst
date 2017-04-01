@@ -56,6 +56,16 @@ Form
     form/index
 
 
+**************
+Integrations
+**************
+
+.. toctree::
+    :titlesonly:
+
+    integrations/index
+
+
 ************************
 Extra Information
 ************************
@@ -63,7 +73,6 @@ Extra Information
 .. toctree::
     :titlesonly:
 
-    integrating-with-frameworks
     license
     changelog
 

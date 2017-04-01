@@ -1,7 +1,6 @@
-
-#######################
+#######
 Install
-#######################
+#######
 
 Via composer **(recommended)**::
     
@@ -13,11 +12,7 @@ Or add this to the composer.json file::
 
 You could also Download or Clone package from github.
 
-
-Command Line
-=============
-From the powerorm directory copy the file **pmanager.php** into the projects base folder.
-
-In codeigniter 3, this will be the directory that houses *index.php*.
-
-
+Usage
+-----
+Based on the kind of project you have see :doc:`Integrations <../integrations/index>` to
+learn how to make the orm work with your specific project.

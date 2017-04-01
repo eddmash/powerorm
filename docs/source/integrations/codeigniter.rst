@@ -1,7 +1,7 @@
-Integrating with Projects
-=========================
+Integrating with Codeigniter
+============================
 
-This is recipe for using Powerorm projects
+This is recipe for using Powerorm with codeigniter.
 
 
 
@@ -56,27 +56,22 @@ Customize it to your needs.
     }
 
 
-Codeigniter  4 and others projects
-----------------------------------
+Codeigniter  4
+--------------
 
-For codeigniter 4 and any other projects that use namespace do the following:
+For codeigniter 4 and any other projects that use namespace(see :doc:`Laravel <laravel>`)
+you just need to ensure the orm is loaded early enough.
 
-- ensure the orm is set early enough :
+In Codeigniter 4 *(i'm still exploring codeigniter 4, but as of now)*
+powerorm can be loaded at any one of the environment files under **application/Config/Boot/** .
 
-  e.g In Codeigniter 4 (as of now) i have not found a better location than in
-  the **application/Config/Boot/** files dependening on the environment in use add the following line.
+Depending on the environment in use add the following line at the bottom.
 
 .. code-block:: php
 
     // create a config file for the orm, the orm expects configs
-    // to be an array you could create the method as array the returns the configs in array format.
+    // to be an array you could create the method as
+    // array the returns the configs in array format.
+
     $config = (new \Config\Orm())->asArray();
     \Eddmash\PowerOrm\Application::webRun($configs);
-
-see :doc:`Configs <intro/configuration>` for options.
-
-Running migrations
-==================
-
-Copy the **pmanager.php** on the powerorm base directory to you projects base directory i.e
-on the same level as index.php.

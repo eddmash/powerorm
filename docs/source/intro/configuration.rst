@@ -1,20 +1,7 @@
-
-##################################
- Powerorm On Codeigniter 3
-##################################
-
-Loading
-==================
-
-Load the PowerOrm library. preferable on autoload.::
-
-
-$autoload['libraries'] = array('powerorm/orm',);
-
-on the ``APPPATH/config/autoload.php``.
-
+#############
 Configuration
-========================
+#############
+
 The ORM takes several configurations
 
 - **database**

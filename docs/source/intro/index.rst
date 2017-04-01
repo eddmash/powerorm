@@ -62,7 +62,7 @@ Add the following method to the Welcome Controller:
 
 .. code-block:: php
 
-    // application/controllers/Welcome.php
+    // controllers/Welcome.php
 
     public function saverole()
     {
@@ -88,7 +88,7 @@ You can access the manager object for an model class via the objects() method:
 
 .. code-block:: php
 
-    // application/controllers/Welcome.php
+    // controllers/Welcome.php
 
 
     public function filterExamples()
