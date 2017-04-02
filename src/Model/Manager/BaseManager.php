@@ -11,6 +11,7 @@
 namespace Eddmash\PowerOrm\Model\Manager;
 
 use Eddmash\PowerOrm\BaseObject;
+use Eddmash\PowerOrm\Exception\MethodNotFoundException;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
@@ -44,9 +45,11 @@ class BaseManager extends BaseObject
      */
     public function __call($name, $arguments)
     {
-        if (method_exists($this->getQueryset(), $name)) :
+        if (!method_exists($this, $name)) :
             return call_user_func_array([$this->getQueryset(), $name], $arguments);
         endif;
+
+//        throw new MethodNotFoundException($name);
     }
 
     public function __toString()

@@ -115,6 +115,10 @@ class M2MManager extends BaseM2MManager
 
     public function add($values = [])
     {
+        if(!is_array($values)):
+            throw new \TypeError('TypeError: add() expects an iterable');
+        endif;
+
         $this->addItems($this->fromFieldName, $this->toFieldName, $values);
     }
 

@@ -45,7 +45,7 @@ human-readable name. For example:
        'f'=>'Female',
     ];
 
-    $gender = Eddmash\PowerOrm\Model\Model;::CharField(['maxLength'=>2, 'choices'=>$gender_choices])
+    $gender = Eddmash\PowerOrm\Model\Model::CharField(['maxLength'=>2, 'choices'=>$gender_choices])
 
 dbColumn
 -----------
@@ -139,34 +139,32 @@ Like all CharField subclasses, URLField takes the optional maxLength argument.
 If you don't specify maxLength, a default of 200 is used.
 
 Relationship fields
-======================
+===================
 
 PowerOrm also defines a set of fields that represent relations.
 
 ForeignKey
--------------
+----------
 
-A many-to-one relationship. Requires a 'to' argument: the class to which the model is related.
+A many-to-one relationship. Requires a ``to`` argument: the class to which the model is related.
 
-.. _recursive_relation:
-
-To create a recursive relationship – an object that has a many-to-one relationship with itself –
-use
-
-``Eddmash\PowerOrm\Model\Model;Model::ForeignKey(['to'=>'this'])``.
 
 .. code-block:: php
 
+    // model/Car.php
     use Eddmash\PowerOrm\Model\Model;
 
     class Car extends Model{
         private function unboundFields()
         {
             return [
-                'manufacturer' => Model::ForeignKey(['to' => 'Manufacturer'])
+                'manufacturer' => Model::ForeignKey(['to' => Manufacturer::class])
             ];
         }
     }
+
+    // model/Manufacturer.php
+    use Eddmash\PowerOrm\Model\Model;
 
     class Manufacturer extends Model
     {
@@ -176,10 +174,29 @@ use
         }
     }
 
+.. _recursive_relation:
+
+Recursive relationship
+**********************
+
+Recursive relationship is when an object that has a many-to-one relationship with itself.
+
+To create a recursive relationship set the ``to`` argument to the constant ``Model::SELF`` or the name of the model
+like we have done in for foreign keys.
+
+.. code-block:: php
+
+    Eddmash\PowerOrm\Model\Model::ForeignKey(['to'=>Model::SELF])
+
 ManyToManyField
-------------------
+---------------
 A many-to-many relationship. Requires a 'to' argument: the class to which the model is related, which works exactly
 the same as it does for ForeignKey.
+
+.. _through_model:
+
+Through Model
+*************
 
 OneToOneField
 -----------------

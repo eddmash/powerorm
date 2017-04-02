@@ -65,10 +65,8 @@ class M2OManager extends BaseM2OManager
             $toField = $rel->fromField;
             $value = $this->instance->{$fromField->getAttrName()};
             $filter[$toField->getName()] = $value;
-            var_dump($filter);
-            echo '<br>';
         endif;
-        echo 'Theee model ==> '.$model.'<br>';
+
         $this->filters = $filter;
 
         parent::__construct($model);
@@ -78,7 +76,7 @@ class M2OManager extends BaseM2OManager
     {
         /** @var $qs Queryset */
         $qs = parent::getQueryset()->filter($this->filters);
-        echo '<br>'.$qs->getSql().'<br>';
+
         if ($this->reverse == false) :
 
             $qs = $qs->get();

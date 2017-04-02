@@ -19,6 +19,7 @@ use Eddmash\PowerOrm\Checks\ChecksRegistry;
 use Eddmash\PowerOrm\Checks\Tags;
 use Eddmash\PowerOrm\Console\Manager;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
+use Eddmash\PowerOrm\Exception\FileHandlerException;
 use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
@@ -181,18 +182,39 @@ class BaseOrm extends BaseObject
         $this->modelsNamespace = ArrayHelper::getValue($models, 'namespace');
         $this->migrationPath = ArrayHelper::getValue($migrations, 'path');
         self::configure($this, $config);
+
         // setup the registry
         $this->registryCache = Registry::createObject();
     }
 
     public static function getModelsPath()
     {
-        return self::getInstance()->modelsPath ? realpath(self::getInstance()->modelsPath) : null;
+        $path = null;
+        if (self::getInstance()->modelsPath):
+            $path = realpath(self::getInstance()->modelsPath);
+            if (!$path && !file_exists(self::getInstance()->modelsPath)):
+                throw new FileHandlerException(
+                    sprintf("The path '%s' does not exist please check the path is correct",
+                        self::getInstance()->modelsPath));
+            endif;
+        endif;
+
+        return $path;
     }
 
     public static function getMigrationsPath()
     {
-        return realpath(self::getInstance()->migrationPath);
+        $path = null;
+        if (self::getInstance()->migrationPath):
+            $path = realpath(self::getInstance()->migrationPath);
+            if (!$path && !file_exists(self::getInstance()->migrationPath)):
+                throw new FileHandlerException(
+                    sprintf("The path '%s' does not exist please check the path is correct",
+                        self::getInstance()->migrationPath));
+            endif;
+        endif;
+
+        return $path;
     }
 
     public static function getCharset()

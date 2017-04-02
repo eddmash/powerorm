@@ -172,7 +172,7 @@ class ClassHelper
     public static function get_php_classes($php_code) {
         $classes = array();
         $tokens = token_get_all($php_code);
-        dump($tokens);
+
         $count = count($tokens);
         for ($i = 2; $i < $count; ++$i) {
             if ($tokens[$i - 2][0] == T_CLASS

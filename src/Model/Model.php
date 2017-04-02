@@ -47,6 +47,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 {
     use ModelFieldsShortcut;
 
+    const SELF = 'this';
     const DEBUG_IGNORE = ['_fieldCache'];
     const MODELBASE = '\Eddmash\PowerOrm\Model\Model';
     public static $managerClass;
@@ -724,7 +725,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function getIterator()
     {
-        throw new TypeError(sprintf("TypeError: '%s' object is not iterable", $this->meta->getNamespacedModelName()));
+        throw new TypeError(sprintf("TypeError: '%s' object is not iterable", static::class));
     }
 
     /**
@@ -733,7 +734,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function count()
     {
         throw new TypeError(
-            sprintf("TypeError: object of type '%s' is not countable)", $this->meta->getNamespacedModelName())
+            sprintf("TypeError: object of type '%s' is not countable)", static::class)
         );
     }
 

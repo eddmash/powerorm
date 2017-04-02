@@ -16,6 +16,7 @@ use Eddmash\PowerOrm\Console\Manager;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 
 define('POWERORM_VERSION', '1.1.0-pre-alpha');
+define('POWERORM_HOME', dirname(dirname(__FILE__)));
 
 /**
  * Class Application.
@@ -65,7 +66,7 @@ class Application
             $composerLoader->setPsr4($migrationsNamespace, $orm->migrationPath);
         endif;
 
-        BaseOrm::loadRegistry($orm);
+        BaseOrm::loadRegistry();
 
         return $orm;
     }

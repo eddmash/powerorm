@@ -66,8 +66,6 @@ class FileHandler extends BaseObject
 
             fclose($fileHandle);
             chmod($file, 0777);
-            dump($file);
-
         endif;
     }
 
