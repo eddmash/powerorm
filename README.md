@@ -8,7 +8,7 @@
 [![License](https://poser.pugx.org/eddmash/powerorm/license)](https://packagist.org/packages/eddmash/powerorm)
 
 # PowerOrm
-A light weight easy to use CodeIgniter ORM.
+A light weight easy to use PHP ORM.
 
 # Help and Documentation
 Get the ORM documentation here [PowerOrm Documentation !](http://powerorm.readthedocs.io/).
