@@ -48,7 +48,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     use ModelFieldsShortcut;
 
     const SELF = 'this';
-    const DEBUG_IGNORE = ['_fieldCache'];
+    const DEBUG_IGNORE = ['_fieldCache', 'tableName', 'managed', 'verboseName', 'isNew', 'proxy'];
     const MODELBASE = '\Eddmash\PowerOrm\Model\Model';
     public static $managerClass;
 

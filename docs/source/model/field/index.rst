@@ -70,13 +70,13 @@ unique
 If True, this field must be unique throughout the table.
 
 verboseName
----------------
+-----------
 A human-readable name for the field. If the verbose name isn't given, PowerOrm will
 automatically create it using the field's attribute name, converting underscores to spaces. See
 :ref:`Verbose field names <verbose-field-names>`
 
 helpText
----------
+--------
 Extra "help" text to be displayed with the form widget. It's useful for documentation even if your field isn't used on
 a form.
 
@@ -190,6 +190,8 @@ like we have done in for foreign keys.
 
 ManyToManyField
 ---------------
+.. _many_to_many_field:
+
 A many-to-many relationship. Requires a 'to' argument: the class to which the model is related, which works exactly
 the same as it does for ForeignKey.
 

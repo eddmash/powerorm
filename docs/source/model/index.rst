@@ -324,3 +324,4 @@ A complete list of all possible Meta options can be found in the :doc:`model opt
    proxy
    meta/index
    field/index
+   instance/index

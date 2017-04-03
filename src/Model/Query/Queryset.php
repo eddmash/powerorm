@@ -352,7 +352,7 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function getResults()
+    public function getResults()
     {
         if (false === $this->_evaluated):
 
@@ -527,5 +527,10 @@ class Queryset implements QuerysetInterface
         $ellipse = count($results) > 5 ? ', ... ' : '';
 
         return sprintf('< %s (%s %s) >', get_class($this), implode(', ', $results), $ellipse);
+    }
+
+    public function __debugInfo()
+    {
+        return $this->_clone()->getResults();
     }
 }

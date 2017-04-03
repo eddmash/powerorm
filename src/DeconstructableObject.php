@@ -77,7 +77,7 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
 
     public function getIgnored()
     {
-        return array_merge(self::DEBUG_IGNORE, ['constructorArgs']);
+        return array_merge(static::DEBUG_IGNORE, ['constructorArgs']);
     }
 
 }
