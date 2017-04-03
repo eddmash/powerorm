@@ -67,6 +67,8 @@ class FileHandler extends BaseObject
             fclose($fileHandle);
             chmod($file, 0777);
         endif;
+
+        return file_exists($file);
     }
 
     public function getPathFiles($ext = 'php', $recurse = true)

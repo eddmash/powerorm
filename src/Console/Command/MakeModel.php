@@ -55,7 +55,7 @@ class MakeModel extends BaseCommand
     {
         $vendorHome = dirname(dirname(dirname(POWERORM_HOME)));
 
-        $modelName = $input->getArgument('model_name');
+        $orginalModelName = $modelName = $input->getArgument('model_name');
         list($namespace, $modelName) = ClassHelper::getNamespaceNamePair($modelName);
         $modelName = ucfirst($modelName);
         $modelPath = $input->getOption('path');
@@ -80,7 +80,9 @@ class MakeModel extends BaseCommand
 
         $handler = new FileHandler($path, $fileName);
 
-        $handler->write($modelFile);
+        if ($handler->write($modelFile)) :
+            $output->write(sprintf("Model '%s' created at '%s' ".PHP_EOL, $orginalModelName, $path));
+        endif;
     }
 
     private function getModelFile($namespace, $modelName)
