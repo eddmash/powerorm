@@ -15,7 +15,7 @@ use Eddmash\PowerOrm\Exception\MethodNotFoundException;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
-class BaseManager extends BaseObject
+class BaseManager extends BaseObject implements \IteratorAggregate
 {
     /**
      * @var Model
@@ -56,6 +56,10 @@ class BaseManager extends BaseObject
     {
         return (string) $this->getQueryset();
 
+    }
+
+    public function getIterator() {
+        throw new TypeError("'Manager' object is not iterable");
     }
 
 }

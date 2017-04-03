@@ -77,11 +77,6 @@ class M2OManager extends BaseM2OManager
         /** @var $qs Queryset */
         $qs = parent::getQueryset()->filter($this->filters);
 
-        if ($this->reverse == false) :
-
-            $qs = $qs->get();
-        endif;
-
         return $qs;
     }
 

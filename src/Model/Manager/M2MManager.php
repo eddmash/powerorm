@@ -115,7 +115,7 @@ class M2MManager extends BaseM2MManager
 
     public function add($values = [])
     {
-        if(!is_array($values)):
+        if(!is_iterable($values)):
             throw new \TypeError('TypeError: add() expects an iterable');
         endif;
 

@@ -166,12 +166,12 @@ class ForeignKey extends RelatedField
             // incase the value has been set
             $result = ArrayHelper::getValue($modelInstance->_fieldCache, $this->getName(), ArrayHelper::STRICT);
         } catch (KeyError $e) {
-            $result = $this->queryset($modelInstance);
+            $result = $this->queryset($modelInstance)->get();
 
             /* @var $fromField RelatedField */
             $fromField = $this->getRelatedFields()[0];
             // cache the value of the model
-            $modelInstance->_fieldCache[$fromField->getName()] = $result->get();
+            $modelInstance->_fieldCache[$fromField->getName()] = $result;
         }
 
         return $result;
