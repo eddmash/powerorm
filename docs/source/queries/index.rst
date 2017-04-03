@@ -278,6 +278,54 @@ When you do, the :doc:`QuerySet <queryset>` is evaluated by accessing the databa
 
 For more details on exactly when evaluation takes place, see :ref:`When QuerySets are evaluated <querset_evaluation>`.
 
+Retrieving a single object with get()
+.....................................
+
+
+:ref:`filter() <queryset_filter>` will always give you a :doc:`QuerySet <queryset>`, even if only a single object
+matches the query - in this case, it will be a :doc:`QuerySet <queryset>` containing a single element.
+
+If you know there is only one object that matches your query, you can use the :ref:`get() <queryset_get>` method on a
+Manager which returns the object directly:
+
+.. code-block:: php
+
+    $autor = \App\Models\Author::objects()->get(['pk' => 1]);
+
+You can use any query expression with :ref:`get() <queryset_get>`, just like with :ref:`filter() <queryset_filter>` -
+again, see Field lookups below.
+
+.. note::
+
+    There is a difference between using :ref:`get() <queryset_get>`, and using :ref:`filter() <queryset_filter>` with a
+    :ref:`limit() <queryset_limit>`.
+    If there are no results that match the query, :ref:`filter() <queryset_filter>` will raise a **DoesNotExist**
+    exception. so in the code above, if there is no Author object with a primary key of 1, Powerorm will
+    raise **DoesNotExist**.
+
+    Similarly, Powerorm will complain if more than one item matches the :ref:`filter() <queryset_filter>` query.
+    In this case, it will raise **MultipleObjectsReturned**.
+
+Limiting QuerySets
+..................
+
+To :ref:`limit() <queryset_limit>` your QuerySet to a certain number of results. This is the equivalent of
+SQL’s LIMIT and OFFSET clauses.
+
+For example, this returns the first 5 objects (LIMIT 5):
+
+.. code-block:: php
+
+    var_dump(\App\Models\Entry::objects()->all()->limit(null,5));
+
+This returns the sixth through tenth objects (OFFSET 5 LIMIT 5):
+
+.. code-block:: php
+
+    var_dump(\App\Models\Entry::objects()->all()->limit(5,5));
+
+Limitin a QuerySet returns a new QuerySet.
+
 .. toctree::
     :caption: More Queries Information
     :titlesonly:

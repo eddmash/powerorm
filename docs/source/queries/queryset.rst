@@ -14,10 +14,11 @@ When QuerySets are evaluated
 Internally, a QuerySet can be constructed, filtered, and generally passed around without actually hitting the database.
 No database activity actually occurs until you do something to evaluate the queryset.
 
+.. _querset_evaluation:
+
 You can evaluate a QuerySet in the following ways:
 ..................................................
 
-.. _querset_evaluation:
 
 - Iteration.
     A QuerySet is iterable, and it executes its database query the first time you iterate over it.
@@ -53,22 +54,27 @@ Methods that return new QuerySets
 Powerorm provides a range of QuerySet refinement methods that modify either the types of results returned by the
 QuerySet or the way its SQL query is executed.
 
+
+.. _queryset_filter:
+
 filter()
 ........
-.. _queryset_filter:
 
 Returns a new QuerySet containing objects that match the given lookup parameters.
 Multiple parameters are joined via AND in the underlying SQL statement.
 
+
+.. _queryset_exclude:
+
 exclude()
 .........
-.. _queryset_exclude:
 
 Returns a new QuerySet containing objects that do not match the given lookup parameters.
 
+.. _queryset_all:
+
 all()
 .....
-.. _queryset_all:
 
 Returns a copy of the current QuerySet (or QuerySet subclass). This can be useful in situations where you might want
 to pass in either a model manager or a QuerySet and do further filtering on the result.
@@ -78,15 +84,24 @@ When a QuerySet is :ref:`evaluated<querset_evaluation>`, it typically caches its
 If the data in the database might have changed since a QuerySet was evaluated, you can get updated results for the same
 query by calling all() on a previously evaluated QuerySet.
 
+
+
+.. _queryset_limit:
+
+limit()
+.......
+
+
 Methods that do not return QuerySets
 ------------------------------------
 
 The following QuerySet methods evaluate the QuerySet and return something other than a QuerySet. 
 
+.. _queryset_get:
+
 get()
 .....
 
-.. _queryset_get:
 
 Returns the object matching the given lookup parameters, which should be in the format described in Field lookups.
 
@@ -95,9 +110,10 @@ get() raises **MultipleObjectsReturned** if more than one object was found.
 get() raises a **DoesNotExist exception** if an object wasn't found for the given parameters.
 
 
+.. _queryset_count:
+
 count()
 .......
-.. _queryset_count:
 
 Returns an integer representing the number of objects in the database matching the QuerySet.
 The count() method never raises exceptions.
@@ -123,9 +139,10 @@ Note that if you want the number of items in a QuerySet and are also retrieving 
 (for example, by iterating over it), it's probably more efficient to use count(queryset)
 which won't cause an extra database query like Queryset::count() would.
 
+.. _queryset_exists:
+
 exists()
 ........
-.. _queryset_exists:
 
 Returns True if the QuerySet contains any results, and False if not.
 
