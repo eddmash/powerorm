@@ -63,24 +63,15 @@ class Makemigrations extends BaseCommand
 
             return;
         endif;
-        if ($input->getOption('dry-run')):
-
-            $output->writeln('<info>Migrations :</info>');
-
-            /** @var $migration Migration */
-            foreach ($changes as $migration) :
-                $output->writeln('  -- '.$migration->getName());
-            endforeach;
-
-            return;
-        endif;
 
         $this->writeMigrations($changes, $input, $output);
     }
 
     private function writeMigrations($migrationChanges, InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Creating Migrations :');
+        if ($output->getVerbosity() === OutputInterface::VERBOSITY_NORMAL && !$input->getOption('dry-run')) :
+            $output->writeln('Creating Migrations :');
+        endif;
 
         /** @var $migration Migration */
         /* @var $op Operation */
@@ -89,8 +80,21 @@ class Makemigrations extends BaseCommand
             $migrationFile = MigrationFile::createObject($migration);
 
             $fileName = $migrationFile->getFileName();
+            if ($output->getVerbosity() === OutputInterface::VERBOSITY_NORMAL && !$input->getOption('dry-run')) :
+                $output->writeln('  '.$fileName);
+            endif;
 
-            $output->writeln('  '.$fileName);
+            if ($input->getOption('dry-run')):
+
+                $output->writeln('<info>Migrations :</info>');
+
+                $output->writeln('  -- '.$migration->getName());
+
+                if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) :
+                    $output->writeln($migrationFile->getContent());
+                endif;
+                continue;
+            endif;
 
             $operations = $migration->getOperations();
             foreach ($operations as $op) :
@@ -115,7 +119,7 @@ class Makemigrations extends BaseCommand
             ->addOption(
                 'dry-run',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_NONE,
                 'Just show what migrations would be made; don\'t actually write them.',
                 null
             );

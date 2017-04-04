@@ -9,6 +9,7 @@ use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -142,7 +143,7 @@ class Manager extends Base
      * @return Application
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public static function run($autoRun = true)
+    public static function run($autoRun = true, InputInterface $input = null, OutputInterface $output = null)
     {
         BaseOrm::getInstance()->registerModelChecks();
         $console = new Application('');
@@ -151,15 +152,15 @@ class Manager extends Base
         $console->setDefaultCommand($def->getName());
 
         $console->addCommands(self::getCoreCommands());
-
-        $output = new ConsoleOutput();
-
+        if (null === $output) {
+            $output = new ConsoleOutput();
+        }
         self::warningText($output);
         self::errorText($output);
 
         if ($autoRun) :
 
-            $console->run(null, $output);
+            $console->run($input, $output);
         endif;
 
         return $console;
