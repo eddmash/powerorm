@@ -75,5 +75,6 @@ Extra Information
 
     license
     changelog
+    ref/index
 
 

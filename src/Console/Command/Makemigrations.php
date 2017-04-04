@@ -63,6 +63,7 @@ class Makemigrations extends BaseCommand
 
             return;
         endif;
+
         if ($input->getOption('dry-run')):
 
             $output->writeln('<info>Migrations :</info>');
