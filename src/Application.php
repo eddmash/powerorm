@@ -46,7 +46,7 @@ class Application
      * @return BaseOrm
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public static function run($config, &$composerLoader)
+    public static function run($config, &$composerLoader = null)
     {
 
         $orm = BaseOrm::createObject($config);

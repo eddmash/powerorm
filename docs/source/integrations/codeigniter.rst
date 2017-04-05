@@ -105,11 +105,22 @@ you just need to ensure the orm is loaded early enough.
 In Codeigniter 4 *(i'm still exploring codeigniter 4, but as of now)*
 powerorm can be loaded at any one of the environment files under **application/Config/Boot/** .
 
+    application/Config/Boot/development.php
+    application/Config/Boot/production.php
+    application/Config/Boot/testing.php
+
 Depending on the environment in use add the following line at the bottom.
 
 .. code-block:: php
 
+    require_once APPPATH.'../vendor/autoload.php';
     \Eddmash\PowerOrm\Application::webRun(\Config\Powerorm::asArray());
+
+.. note::
+
+    As of now, for some reason composer autoloader is not required when codeiniter 4 is running on console, thats why
+    we have the line ``require_once APPPATH.'../vendor/autoload.php';`` once this issue is resolved there will be no
+    need for this line any more.
 
 Create config file
 ..................
@@ -171,18 +182,12 @@ create the file ``application/Commands/Powerorm.php`` and add the following cont
     class Powerorm extends BaseCommand
     {
         protected $group = 'Powerorm';
-        protected $name  = 'orm';
+        protected $name  = 'powerorm';
         protected $description = 'Displays powerorm commands.';
 
 
         public function run(array $params)
         {
-            // load composer autoloader for some reason ci4 is get the path to composer wrong.
-            $composer = require_once APPPATH.'../vendor/autoload.php';
-
-            // lauch the orm
-            \Eddmash\PowerOrm\Application::run(\Config\Powerorm::asArray(), $composer);
-
             // remove the 'ci4.php' from the arguments
             $input = new ArgvInput(array_slice($_SERVER['argv'], 1));
 

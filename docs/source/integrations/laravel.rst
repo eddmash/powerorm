@@ -12,7 +12,7 @@ Make a Powerorm service provider that is both a wrapper and a bootstrapfor Power
 
     php artisan make:provider PowerormServiceProvider
 
-Adjust the ``register`` method to look as shown below.
+Make sure it looks like the one below.
 
 .. code-block:: php
 
