@@ -81,7 +81,7 @@ command that will enable us interact with powerorm.
 
 Create a powerom command using artisan this will be placed at ``app/Console/Commands`` as show below.
 
-.. code-block::php
+.. code-block:: php
 
     php artisan make:command Powerorm
 
