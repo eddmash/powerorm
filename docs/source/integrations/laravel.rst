@@ -79,7 +79,7 @@ Create Laravel Command
 To be able to run :doc:`commands <../ref/commands>` provided by powerorm, we need to create a laravel
 command that will enable us interact with powerorm.
 
-Create a powerom command using artisan as show below this will be placed at ``app/Console/Commands``.
+Create a powerom command using artisan this will be placed at ``app/Console/Commands`` as show below.
 
 .. code-block::php
 
