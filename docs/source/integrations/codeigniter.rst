@@ -195,11 +195,13 @@ With that you can run all the :doc:`commands <../ref/commands>` that powerorm pr
 
 .. code-block:: php
 
-    php ci.php orm
-    php ci.php orm makemigrations
-    php ci.php orm makemigrations -h
-    php ci.php orm migrate
-    php ci.php orm migrate zero
-    php ci.php orm robot
+    php ci.php powerorm
+    php ci.php powerorm makemigrations
+    php ci.php powerorm makemigrations --dry-run
+    php ci.php powerorm makemigrations --dry-run -vvv
+    php ci.php powerorm makemigrations -h
+    php ci.php powerorm migrate
+    php ci.php powerorm migrate zero
+    php ci.php powerorm robot
 
 See :doc:`commands <../ref/commands>` for all the availabel commands.
