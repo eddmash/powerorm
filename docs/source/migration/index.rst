@@ -17,7 +17,8 @@ The Commands
 
 There are several commands which you will use to interact with migrations and PowerOrm's handling of database schema:
 
-- **migrate**, which is responsible for applying migrations, as well as unapplying and listing their status.
+- :ref:`migrate<migrations_migrate>`, which is responsible for applying migrations, as well as unapplying and listing
+  their status.
 - :ref:`makemigrations<migrations_makemigrations>`, which is responsible for creating new migrations based on the
   changes you have made to your models.
 

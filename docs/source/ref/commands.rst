@@ -68,6 +68,8 @@ For example, to perform only models and compatibility checks, run:
 
 Specifies the message level that will cause the command to exit with a non-zero status. Default is ERROR.
 
+.. _migrations_migrate:
+
 migrate
 -------
 
