@@ -182,7 +182,7 @@ create the file ``application/Commands/Powerorm.php`` and add the following cont
     class Powerorm extends BaseCommand
     {
         protected $group = 'Powerorm';
-        protected $name  = 'powerorm';
+        protected $name  = 'pmanager';
         protected $description = 'Displays powerorm commands.';
 
 
@@ -200,13 +200,13 @@ With that you can run all the :doc:`commands <../ref/commands>` that powerorm pr
 
 .. code-block:: php
 
-    php ci.php powerorm
-    php ci.php powerorm makemigrations
-    php ci.php powerorm makemigrations --dry-run
-    php ci.php powerorm makemigrations --dry-run -vvv
-    php ci.php powerorm makemigrations -h
-    php ci.php powerorm migrate
-    php ci.php powerorm migrate zero
-    php ci.php powerorm robot
+    php ci.php pmanager
+    php ci.php pmanager makemigrations
+    php ci.php pmanager makemigrations --dry-run
+    php ci.php pmanager makemigrations --dry-run -vvv
+    php ci.php pmanager makemigrations -h
+    php ci.php pmanager migrate
+    php ci.php pmanager migrate zero
+    php ci.php pmanager robot
 
 See :doc:`commands <../ref/commands>` for all the availabel commands.

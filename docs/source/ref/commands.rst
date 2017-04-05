@@ -1,6 +1,19 @@
 Powerorm Management Commands
 ############################
 
+pmanager.php
+------------
+
+Is Powerorm's command-line utility for administrative tasks. This document outlines all it can do.
+
+Usage::
+
+    php pmanager.php <command> [options]
+
+
+Available Commands
+------------------
+
 .. _migrations_makemigrations:
 
 makemigrations

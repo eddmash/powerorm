@@ -12,6 +12,19 @@ Make a Powerorm service provider that is both a wrapper and a bootstrapfor Power
 
     php artisan make:provider PowerormServiceProvider
 
+Register the service provider in the ``config/app.php`` configuration file. This file contains a ``providers`` array
+where you can list the class names of your service providers.
+
+To register ``PowerormServiceProvider``, simply add it to the array:
+
+.. code-block:: php
+
+    'providers' => [
+        // Other Service Providers
+
+        App\Providers\ComposerServiceProvider::class,
+    ],
+
 Make sure it looks like the one below.
 
 .. code-block:: php
