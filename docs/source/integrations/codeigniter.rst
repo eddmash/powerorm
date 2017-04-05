@@ -90,7 +90,7 @@ models and the related database.
 
 Since Codeigniter 3 does not have a CLI module like Codeigniter 4 does.
 
-Copy the ``vendor/eddmash/powerorm/pmanager.php`` file to you projects base directory
+Copy the ``vendor/eddmash/powerorm/powerorm:pmanager.php`` file to you projects base directory
 i.e. on the same level as vendor directory and index.php.
 
 Then adjust the settings on the copied to those of your project.
@@ -182,7 +182,7 @@ create the file ``application/Commands/Powerorm.php`` and add the following cont
     class Powerorm extends BaseCommand
     {
         protected $group = 'Powerorm';
-        protected $name  = 'pmanager';
+        protected $name  = 'powerorm:pmanager';
         protected $description = 'Displays powerorm commands.';
 
 
@@ -200,13 +200,13 @@ With that you can run all the :doc:`commands <../ref/commands>` that powerorm pr
 
 .. code-block:: php
 
-    php ci.php pmanager
-    php ci.php pmanager makemigrations
-    php ci.php pmanager makemigrations --dry-run
-    php ci.php pmanager makemigrations --dry-run -vvv
-    php ci.php pmanager makemigrations -h
-    php ci.php pmanager migrate
-    php ci.php pmanager migrate zero
-    php ci.php pmanager robot
+    php ci.php powerorm:pmanager
+    php ci.php powerorm:pmanager makemigrations
+    php ci.php powerorm:pmanager makemigrations --dry-run
+    php ci.php powerorm:pmanager makemigrations --dry-run -vvv
+    php ci.php powerorm:pmanager makemigrations -h
+    php ci.php powerorm:pmanager migrate
+    php ci.php powerorm:pmanager migrate zero
+    php ci.php powerorm:pmanager robot
 
 See :doc:`commands <../ref/commands>` for all the availabel commands.

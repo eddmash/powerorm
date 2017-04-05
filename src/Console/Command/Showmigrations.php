@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Showmigrations extends BaseCommand
 {
-    public $help = 'Provides help information about console commands.';
+    public $help = 'Shows all migrations in a project.';
 
     public function handle(InputInterface $input, OutputInterface $output)
     {

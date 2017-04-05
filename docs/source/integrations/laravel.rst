@@ -126,7 +126,7 @@ Make powerorm command look like the one below ``app/Console/Commands/Powerorm.ph
          *
          * @var string
          */
-        protected $signature = 'powerorm';
+        protected $signature = 'powerorm:pmanager';
 
         /**
          * The console command description.
@@ -154,13 +154,13 @@ With that you can run all the :doc:`commands <../ref/commands>` that powerorm pr
 
 .. code-block:: php
 
-    php artisan powerorm
-    php artisan powerorm makemigrations
-    php artisan powerorm makemigrations --dry-run
-    php artisan powerorm makemigrations --dry-run -vvv
-    php artisan powerorm makemigrations -h
-    php artisan powerorm migrate
-    php artisan powerorm migrate zero
-    php artisan powerorm robot
+    php artisan powerorm:pmanager
+    php artisan powerorm:pmanager makemigrations
+    php artisan powerorm:pmanager makemigrations --dry-run
+    php artisan powerorm:pmanager makemigrations --dry-run -vvv
+    php artisan powerorm:pmanager makemigrations -h
+    php artisan powerorm:pmanager migrate
+    php artisan powerorm:pmanager migrate zero
+    php artisan powerorm:pmanager robot
 
 See :doc:`commands <../ref/commands>` for all the availabel commands.
