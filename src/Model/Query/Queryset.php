@@ -276,7 +276,8 @@ class Queryset implements QuerysetInterface
 
         /** @var $field Field */
         foreach ($fields as $name => $field) :
-            $qb->setValue($field->getColumnName(), $qb->createNamedParameter($field->preSave($model, true)));
+            $value = $this->prepareValueForDatabaseSave($field, $field->preSave($model, true));
+            $qb->setValue($field->getColumnName(), $qb->createNamedParameter($value));
         endforeach;
 
         // save to db
@@ -285,6 +286,18 @@ class Queryset implements QuerysetInterface
         if ($returnId):
             return $this->connection->lastInsertId();
         endif;
+    }
+
+
+    /**
+     * @param Field $field
+     * @param $preSave
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     * @return mixed
+     */
+    private function prepareValueForDatabaseSave(Field $field, $value)
+    {
+        return $field->prepareValueBeforeSave($value, $this->connection);
     }
 
     public function _filterOrExclude($negate, $conditions)

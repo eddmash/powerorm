@@ -22,4 +22,5 @@ class BooleanField extends Field
     {
         return Type::BOOLEAN;
     }
+
 }

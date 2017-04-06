@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Portability\Connection;
+use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\DeconstructableObject;
@@ -244,7 +245,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model  $modelObject
+     * @param Model $modelObject
      *
      * @throws FieldError
      *
@@ -460,7 +461,15 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Convert the value to a php value.
+     *
+     * @param $value
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function toPhp($value)
     {
@@ -476,7 +485,7 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * Method called prior to prepare_value_for_db() to prepare the value before being saved
+     * Method called prior to prepareValueForDb() to prepare the value before being saved
      * (e.g. for DateField.auto_now).
      *
      * model is the instance this field belongs to and add is whether the instance is being saved to the
@@ -487,7 +496,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool  $add   is whether the instance is being saved to the database for the first time
+     * @param bool $add is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *
@@ -519,10 +528,11 @@ class Field extends DeconstructableObject implements FieldInterface
 
     /**
      * Converts value to a backend-specific value.
-     * By default it returns value if prepared=True and prepare_value() if is False.
      *
-     * @param $value
-     * @param $connection
+     * By default it returns value if prepared=true and prepareValue() if is False.
+     *
+     * @param mixed $value
+     * @param \Doctrine\DBAL\Connection $connection
      *
      * @return mixed
      *
@@ -530,13 +540,16 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function prepareValueForDb($value, $connection, $prepared = false)
+    public function prepareValueForDatabase($value, $connection, $prepared = false)
     {
-        // TODO: Implement prepareValueForDb() method.
+        return Type::getType($this->dbType($connection))->convertToDatabaseValue(
+            $value,
+            $connection->getDatabasePlatform()
+        );
     }
 
     /**
-     * Same as the prepare_value_for_db(), but called when the field value must be saved to the database.
+     * Same as the prepareValueForDatabase(), but called when the field value must be saved to the database.
      *
      * By default returns prepare_value_for_db().
      *
@@ -551,7 +564,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function prepareValueBeforeSave($value, $connection)
     {
-        // TODO: Implement prepareValueBeforeSave() method.
+        return $this->prepareValueForDatabase($value, $connection, false);
     }
 
     /**

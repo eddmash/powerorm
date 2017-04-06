@@ -108,7 +108,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function prepareValueForDb($value, $connection, $prepared = false);
+    public function prepareValueForDatabase($value, $connection, $prepared = false);
 
     /**
      * Same as the prepare_value_for_db(), but called when the field value must be saved to the database.
