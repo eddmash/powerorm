@@ -25,7 +25,6 @@ class DateField extends Field
         return Type::DATE;
     }
 
-
     public function toPhp($value)
     {
         if (is_null($value)):

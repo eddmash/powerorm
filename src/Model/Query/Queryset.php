@@ -288,11 +288,11 @@ class Queryset implements QuerysetInterface
         endif;
     }
 
-
     /**
      * @param Field $field
      * @param $preSave
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     *
      * @return mixed
      */
     private function prepareValueForDatabaseSave(Field $field, $value)

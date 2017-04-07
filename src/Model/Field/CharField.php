@@ -53,8 +53,24 @@ class CharField extends Field
         return $errors;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function dbType($connection)
     {
         return Type::STRING;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toPhp($value)
+    {
+        if(is_string($value) || is_null($value)):
+            return $value;
+        endif;
+
+        return (string) $value;
+    }
+
 }

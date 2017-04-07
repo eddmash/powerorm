@@ -136,7 +136,7 @@ to add a record to the relation. This example adds the Author instance joe to th
 .. code-block:: php
 
     $en = \App\Models\Entry::objects()->get(['pk' => 1]);
-    $en->authors->add([\App\Models\Author::objects()->get(['name'=>'joe'])]);
+    $en->authors->add(\App\Models\Author::objects()->get(['name'=>'joe']));
 
 To add multiple records to a  :ref:`ManyToManyField <many_to_many_field>` in one go, include multiple arguments in
 the call to add(), like this:
@@ -145,12 +145,12 @@ the call to add(), like this:
 .. code-block:: php
 
     $en = \App\Models\Entry::objects()->get(['pk' => 1]);
-    $authors = [];
-    $authors[] = \App\Models\Author::objects()->get(['name'=>'paul']);
-    $authors[] = \App\Models\Author::objects()->get(['name'=>'john']);
-    $authors[] = \App\Models\Author::objects()->get(['name'=>'george']);
-    $authors[] = \App\Models\Author::objects()->get(['name'=>'joe']);
-    $en->authors->add($authors);
+
+    $paul = \App\Models\Author::objects()->get(['name'=>'paul']);
+    $john = \App\Models\Author::objects()->get(['name'=>'john']);
+    $george = \App\Models\Author::objects()->get(['name'=>'george']);
+    $joe = \App\Models\Author::objects()->get(['name'=>'joe']);
+    $en->authors->add($paul, $john, $george, $joe);
 
 .. note::
 

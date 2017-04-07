@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
-use Doctrine\DBAL\Portability\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
@@ -245,7 +244,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model $modelObject
+     * @param Model  $modelObject
      *
      * @throws FieldError
      *
@@ -496,7 +495,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool $add is whether the instance is being saved to the database for the first time
+     * @param bool  $add   is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *
@@ -527,11 +526,11 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * Converts value to a backend-specific value.
+     * Converts value to a backend-specific value. this will be used also when creating lookups.
      *
      * By default it returns value if prepared=true and prepareValue() if is False.
      *
-     * @param mixed $value
+     * @param mixed                     $value
      * @param \Doctrine\DBAL\Connection $connection
      *
      * @return mixed
@@ -643,11 +642,6 @@ class Field extends DeconstructableObject implements FieldInterface
         endif;
 
         return Col::createObject($alias, $this);
-    }
-
-    public function selectFormat(Connection $connection, $sql, $params)
-    {
-        return [$sql, $params];
     }
 
     /**

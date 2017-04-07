@@ -12,6 +12,8 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
+use Eddmash\PowerOrm\Exception\ValueError;
+use PHPUnit\Runner\Exception;
 
 /**
  * An IntegerField that automatically increments according to available IDs.
@@ -85,5 +87,26 @@ class AutoField extends Field
     public function formField($kwargs = [])
     {
         return;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toPhp($value)
+    {
+        if (is_null($value)):
+            return $value;
+        endif;
+
+        try{
+            $value = intval($value);
+            if($value):
+                return $value;
+            endif;
+
+            throw new ValueError(sprintf("'%s' value must be an integer.", $value));
+        }catch (Exception $exception){
+            throw new ValueError(sprintf("'%s' value must be an integer.", $value));
+        }
     }
 }

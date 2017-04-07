@@ -113,13 +113,9 @@ class M2MManager extends BaseM2MManager
         parent::__construct($model);
     }
 
-    public function add($values = [])
+    public function add()
     {
-        if(!is_iterable($values)):
-            throw new \TypeError('TypeError: add() expects an iterable');
-        endif;
-
-        $this->addItems($this->fromFieldName, $this->toFieldName, $values);
+        $this->addItems($this->fromFieldName, $this->toFieldName, func_get_args());
     }
 
     public function set($values, $kwargs = [])
