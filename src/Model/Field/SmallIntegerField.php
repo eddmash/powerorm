@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Connection;
 
 /**
  * Like an IntegerField, but only allows values under a certain (database-dependent) point.
@@ -27,7 +28,7 @@ class SmallIntegerField extends IntegerField
     /**
      * {@inheritdoc}
      */
-    public function dbType($connection)
+    public function dbType(Connection $connection)
     {
         return Type::SMALLINT;
     }

@@ -10,6 +10,7 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
 
@@ -56,7 +57,7 @@ class CharField extends Field
     /**
      * {@inheritdoc}
      */
-    public function dbType($connection)
+    public function dbType(Connection $connection)
     {
         return Type::STRING;
     }
@@ -64,8 +65,9 @@ class CharField extends Field
     /**
      * {@inheritdoc}
      */
-    public function toPhp($value)
+    public function convertToPHPValue($value)
     {
+        $value = parent::convertToPHPValue($value);
         if(is_string($value) || is_null($value)):
             return $value;
         endif;

@@ -12,44 +12,35 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use DateTime;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\ValidationError;
+use Eddmash\PowerOrm\Model\Model;
 
 class DateField extends Field
 {
+    public $autoNow;
+    public $autoAddNow;
+
     /**
      * {@inheritdoc}
      */
-    public function dbType($connection)
+    public function dbType(Connection $connection)
     {
         return Type::DATE;
     }
 
-    public function toPhp($value)
+    /**
+     * @inheritDoc
+     */
+    public function preSave(Model $model, $add)
     {
-        if (is_null($value)):
-            return $value;
+        if($this->autoNow || ($this->autoAddNow && $add)):
+            return new DateTime('now', new \DateTimeZone(BaseOrm::getInstance()->getTimezone()));
         endif;
-
-        $format = 'Y-m-d';
-        if ($value instanceof \DateTime) :
-            return $value->format($format);
-        endif;
-
-        if (is_string($value)) :
-            $date = DateTime::createFromFormat('!'.$format, $value);
-            if ($date):
-                return $date;
-            endif;
-
-            throw new ValidationError(
-                sprintf("'%s' value has an invalid date format. It must be in Y-m-d format.", $value)
-            );
-
-        endif;
-
-        throw new ValidationError(
-            sprintf("'%s' value has the correct format (Y-m-d)but it is an invalid date.", $value)
-        );
+        return parent::preSave($model, $add);
     }
+
+
 }

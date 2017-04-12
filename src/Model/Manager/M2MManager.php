@@ -38,7 +38,7 @@ class M2MManager extends BaseM2MManager
     private $through;
 
     /**
-     * @var \Eddmash\PowerOrm\Model\Field\Field
+     * @var \Eddmash\PowerOrm\Model\Field\RelatedField
      */
     private $fromField;
 

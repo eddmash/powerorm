@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Connection;
 
 /**
  * A 64 bit integer, much like an IntegerField except that it is guaranteed to fit numbers from
@@ -28,7 +29,7 @@ class BigIntegerField extends IntegerField
     /**
      * {@inheritdoc}
      */
-    public function dbType($connection)
+    public function dbType(Connection $connection)
     {
         return Type::BIGINT;
     }

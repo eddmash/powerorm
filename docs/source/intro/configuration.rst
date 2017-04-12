@@ -57,7 +57,13 @@ The ORM takes several configurations
 
 - **charset**
 
-    The charset used when connecting to the database.
+    The charset used when working with strings.
+
+- **timezone**
+
+    Default: uses timezone of the current php installation.
+
+    A string representing the time zone .
 
 Sample Configuration file.
 ============================

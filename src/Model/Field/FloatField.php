@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Connection;
 
 /**
  * Class FloatField.
@@ -25,7 +26,7 @@ class FloatField extends Field
     /**
      * {@inheritdoc}
      */
-    public function dbType($connection)
+    public function dbType(Connection $connection)
     {
         return Type::FLOAT;
     }

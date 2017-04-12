@@ -11,7 +11,9 @@
 
 namespace Eddmash\PowerOrm;
 
+use App\Models\Type\JsonType;
 use Composer\Autoload\ClassLoader;
+use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Console\Manager;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 
@@ -66,6 +68,7 @@ class Application
             $composerLoader->setPsr4($migrationsNamespace, $orm->migrationPath);
         endif;
 
+        BaseOrm::presetup();
         BaseOrm::loadRegistry();
 
         return $orm;

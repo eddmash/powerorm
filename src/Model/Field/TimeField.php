@@ -11,14 +11,15 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 
-class TimeField extends Field
+class TimeField extends DateField
 {
     /**
      * {@inheritdoc}
      */
-    public function dbType($connection)
+    public function dbType(Connection $connection)
     {
         return Type::TIME;
     }

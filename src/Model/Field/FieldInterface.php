@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\ContributorInterface;
 use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Model\Model;
@@ -27,13 +28,13 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface
     /**
      * Returns the database column data type for the Field, taking into account the connection.
      *
+     * @param Connection $connection
      * @return string
-     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function dbType($connection);
+    public function dbType(Connection $connection);
 
     /**
      * Convert the value to a php value.
@@ -46,7 +47,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function toPhp($value);
+    public function convertToPHPValue($value);
 
     /**
      * Returns a powerorm.form.Field instance for this database Field.
@@ -108,7 +109,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function prepareValueForDatabase($value, $connection, $prepared = false);
+    public function convertToDatabaseValue($value, $connection, $prepared = false);
 
     /**
      * Same as the prepare_value_for_db(), but called when the field value must be saved to the database.

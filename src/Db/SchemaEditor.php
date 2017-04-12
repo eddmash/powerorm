@@ -16,15 +16,20 @@ use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\TableDiff;
+use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseObject;
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\AutoField;
+use Eddmash\PowerOrm\Model\Field\DateField;
+use Eddmash\PowerOrm\Model\Field\DateTimeField;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
+use Eddmash\PowerOrm\Model\Field\TimeField;
 use Eddmash\PowerOrm\Model\Model;
 
 class SchemaEditor extends BaseObject
@@ -148,7 +153,7 @@ class SchemaEditor extends BaseObject
     /**
      * Renames the table a model points to.
      *
-     * @param Model  $model
+     * @param Model $model
      * @param string $oldDbTableName
      * @param string $newDbTableName
      *
@@ -220,6 +225,11 @@ class SchemaEditor extends BaseObject
         $diff = $comparator->diffTable($schema->getTable($model->meta->dbTable), $tableDef);
         if ($diff !== false):
             $this->schemaManager->alterTable($diff);
+
+            // we need to drop in-database defaults
+            if ($this->effectiveDefault($field)):
+
+            endif;
         endif;
     }
 
@@ -291,9 +301,9 @@ class SchemaEditor extends BaseObject
      * Requires a copy of the old field as well so we can only perform changes that are required.
      * If strict is true, raises errors if the old column does not match old_field precisely.
      *
-     * @param Model      $model
-     * @param Field      $oldField
-     * @param Field      $newField
+     * @param Model $model
+     * @param Field $oldField
+     * @param Field $newField
      * @param bool|false $strict
      *
      * @throws ValueError
@@ -309,7 +319,7 @@ class SchemaEditor extends BaseObject
         if ((is_null($oldType) && is_null($oldField->relation)) || (is_null($newType) && is_null($newField->relation))):
             throw new ValueError(
                 sprintf(
-                    'Cannot alter field %s into %s - they do not properly define '.
+                    'Cannot alter field %s into %s - they do not properly define ' .
                     'db_type (are you using a badly-written custom field?)',
                     $newField->getName(),
                     $oldField->getName()
@@ -336,7 +346,7 @@ class SchemaEditor extends BaseObject
         elseif (is_null($oldType) && is_null($newType)):
             throw new  ValueError(
                 sprintf(
-                    'Cannot alter field %s into %s - they are not compatible types '.
+                    'Cannot alter field %s into %s - they are not compatible types ' .
                     '(you cannot alter to or from M2M fields, or add or remove through= on M2M fields)',
                     $oldField->getName(),
                     $newField->getName()
@@ -349,9 +359,9 @@ class SchemaEditor extends BaseObject
     /**
      * Alters M2Ms to repoint their to= endpoints.
      *
-     * @param Model      $model
-     * @param Field      $oldField
-     * @param Field      $newField
+     * @param Model $model
+     * @param Field $oldField
+     * @param Field $newField
      * @param bool|false $strict
      *
      * @since 1.1.0
@@ -537,7 +547,7 @@ class SchemaEditor extends BaseObject
     }
 
     /**
-     * @param Field      $field
+     * @param Field $field
      * @param bool|false $includeDefault
      *
      * @return array
@@ -633,12 +643,12 @@ class SchemaEditor extends BaseObject
         elseif (($field->hasProperty('autoNow') && $field->autoNow) ||
             ($field->hasProperty('addAutoNow') && $field->addAutoNow)
         ):
-            throw new NotImplemented('Please implement the date defaults');
+            $default = new \DateTime('now', BaseOrm::getInstance()->getTimezone());
         else:
             $default = null;
         endif;
         if (is_callable($default)):
-            $default = $default();
+            $default = call_user_func($default);
         endif;
 
         return $default;
@@ -646,7 +656,7 @@ class SchemaEditor extends BaseObject
 
     /**
      * @param string $table
-     * @param string $type  accepts (unique, primary_key, index) as values
+     * @param string $type accepts (unique, primary_key, index) as values
      *
      * @return Index[]
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>

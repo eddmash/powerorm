@@ -14,6 +14,7 @@ use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use PHPUnit\Runner\Exception;
+use Doctrine\DBAL\Connection;
 
 /**
  * An IntegerField that automatically increments according to available IDs.
@@ -60,7 +61,7 @@ class AutoField extends Field
     /**
      * {@inheritdoc}
      */
-    public function dbType($connection)
+    public function dbType(Connection $connection)
     {
         return Type::INTEGER;
     }
@@ -92,7 +93,7 @@ class AutoField extends Field
     /**
      * {@inheritdoc}
      */
-    public function toPhp($value)
+    public function convertToPHPValue($value)
     {
         if (is_null($value)):
             return $value;

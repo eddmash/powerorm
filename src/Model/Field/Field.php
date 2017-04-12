@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
@@ -244,7 +245,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model  $modelObject
+     * @param Model $modelObject
      *
      * @throws FieldError
      *
@@ -403,18 +404,20 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function deconstruct()
     {
-        $path = '';
-        $alias = 'modelField';
+        $path = static::class;
+        $name = $this->getShortClassName();
 
-        if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Model\Field')):
+        if (StringHelper::startsWith(static::class, 'Eddmash\PowerOrm\Model\Field')):
+            $alias = 'modelField';
             $path = sprintf('Eddmash\PowerOrm\Model\Field as %s', $alias);
+            $name = sprintf('%s\%s', $alias, $this->getShortClassName());
         endif;
 
         return [
             'constructorArgs' => $this->getConstructorArgs(),
             'path' => $path,
-            'fullName' => $this->getFullClassName(),
-            'name' => sprintf('%s\%s', $alias, $this->getShortClassName()),
+            'fullName' => static::class,
+            'name' => $name,
         ];
     }
 
@@ -452,15 +455,26 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the database column data type for the Field, taking into account the connection.
+     *
+     * @param Connection $connection
+     * @return string
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function dbType($connection)
+    public function dbType(Connection $connection)
     {
         return;
     }
 
     /**
      * Convert the value to a php value.
+     *
+     * As a general rule, convertToPHPValue() should deal gracefully with any of the following arguments:
+     *  - An instance of the correct type.
+     *  - A string
+     *  - None (if the field allows null=True)
      *
      * @param $value
      *
@@ -470,9 +484,12 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function toPhp($value)
+    public function convertToPHPValue($value)
     {
-        return $value;
+        return Type::getType($this->dbType(BaseOrm::getDbConnection()))->convertToPHPValue(
+            $value,
+            BaseOrm::getDbConnection()->getDatabasePlatform()
+        );
     }
 
     /**
@@ -495,7 +512,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool  $add   is whether the instance is being saved to the database for the first time
+     * @param bool $add is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *
@@ -509,10 +526,15 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * value is the current value of the model’s attribute, and the method should return data in a format that has been
-     * prepared for use as a parameter in a query.ie. in the database.
+     * The method should return data in a format that has been prepared for use as a parameter in a query.
+     * ie. in the database.
      *
-     * @param $value
+     * e.g. a date string 12-12-12 is converted into a date object
+     *
+     * most times it will return the same thing as convertToPHPValue() but depending on the field this might change e.g.
+     * FileField convertToPHPValue() will return a File object but this method will return the path to be stored/queried in the db.
+     *
+     * @param mixed $value the current value of the model’s attribute
      *
      * @return mixed
      *
@@ -522,15 +544,15 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function prepareValue($value)
     {
-        // TODO: Implement prepareValue() method.
+        return $this->convertToPHPValue($value);
     }
 
     /**
      * Converts value to a backend-specific value. this will be used also when creating lookups.
      *
-     * By default it returns value if prepared=true and prepareValue() if is False.
+     * By default it returns value passed in if prepared=true and prepareValue() if is False.
      *
-     * @param mixed                     $value
+     * @param mixed $value
      * @param \Doctrine\DBAL\Connection $connection
      *
      * @return mixed
@@ -539,8 +561,11 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function prepareValueForDatabase($value, $connection, $prepared = false)
+    public function convertToDatabaseValue($value, $connection, $prepared = false)
     {
+        if ($prepared === false):
+            $value = $this->prepareValue($value);
+        endif;
         return Type::getType($this->dbType($connection))->convertToDatabaseValue(
             $value,
             $connection->getDatabasePlatform()
@@ -563,7 +588,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function prepareValueBeforeSave($value, $connection)
     {
-        return $this->prepareValueForDatabase($value, $connection, false);
+        return $this->convertToDatabaseValue($value, $connection, false);
     }
 
     /**

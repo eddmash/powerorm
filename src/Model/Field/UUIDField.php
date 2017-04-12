@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 
 class UUIDField extends Field
@@ -24,7 +25,7 @@ class UUIDField extends Field
     /**
      * {@inheritdoc}
      */
-    public function dbType($connection)
+    public function dbType(Connection $connection)
     {
         return Type::GUID;
     }

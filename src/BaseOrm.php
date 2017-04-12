@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\Checks\ChecksRegistry;
 use Eddmash\PowerOrm\Checks\Tags;
@@ -38,6 +39,9 @@ class BaseOrm extends BaseObject
     private static $checkRegistry;
     public $modelsNamespace;
     public $migrationNamespace = 'App\Migrations';
+    public $dbMappingTypes=[];
+    public $dbTypes=[];
+    private $timezone='';
     /**
      * The configurations to use to connect to the database.
      *
@@ -372,9 +376,9 @@ class BaseOrm extends BaseObject
     /**
      * Configures an object with the initial property values.
      *
-     * @param object $object     the object to be configured
-     * @param array  $properties the property initial values given in terms of name-value pairs
-     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object the object to be configured
+     * @param array $properties the property initial values given in terms of name-value pairs
+     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
@@ -500,5 +504,29 @@ class BaseOrm extends BaseObject
     public static function signalDispatch($signal, $object)
     {
         self::getInstance()->dispatchSignal($signal, $object);
+    }
+
+    public static function presetup()
+    {
+
+        $orm = self::getInstance();
+
+        foreach ($orm->dbTypes as $name => $type) {
+            Type::addType($name, $type);
+        }
+
+        foreach ($orm->dbMappingTypes as $name => $mappingType) {
+            static::getDbConnection()->getDatabasePlatform()->registerDoctrineTypeMapping($name, $mappingType);
+        }
+
+
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimezone()
+    {
+        return ($this->timezone)? $this->timezone : date_default_timezone_get();
     }
 }

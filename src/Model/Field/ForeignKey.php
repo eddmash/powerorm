@@ -19,6 +19,7 @@ use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToOneRel;
 use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Model;
+use Doctrine\DBAL\Connection;
 
 class ForeignKey extends RelatedField
 {
@@ -87,7 +88,7 @@ class ForeignKey extends RelatedField
     /**
      * {@inheritdoc}
      */
-    public function dbType($connection)
+    public function dbType(Connection $connection)
     {
 
         // The database column type of a ForeignKey is the column type
