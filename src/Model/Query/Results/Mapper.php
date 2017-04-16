@@ -43,7 +43,7 @@ class Mapper
     public function populateColumnCache()
     {
         $selectColumns = $this->queryset->query->select;
-        /** @var $col Col */
+        /* @var $col Col */
         foreach ($selectColumns as $selectColumn) :
             $col = $selectColumn[0];
             $this->columnInfoCache[$col->getOutputField()->getAttrName()] = $col->getOutputField();
