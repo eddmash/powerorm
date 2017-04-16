@@ -245,7 +245,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model $modelObject
+     * @param Model  $modelObject
      *
      * @throws FieldError
      *
@@ -458,7 +458,9 @@ class Field extends DeconstructableObject implements FieldInterface
      * Returns the database column data type for the Field, taking into account the connection.
      *
      * @param Connection $connection
+     *
      * @return string
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -512,7 +514,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool $add is whether the instance is being saved to the database for the first time
+     * @param bool  $add   is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *
@@ -552,7 +554,7 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * By default it returns value passed in if prepared=true and prepareValue() if is False.
      *
-     * @param mixed $value
+     * @param mixed                     $value
      * @param \Doctrine\DBAL\Connection $connection
      *
      * @return mixed
@@ -566,6 +568,7 @@ class Field extends DeconstructableObject implements FieldInterface
         if ($prepared === false):
             $value = $this->prepareValue($value);
         endif;
+
         return Type::getType($this->dbType($connection))->convertToDatabaseValue(
             $value,
             $connection->getDatabasePlatform()

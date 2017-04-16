@@ -15,7 +15,6 @@ use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Exception\ValidationError;
 use Eddmash\PowerOrm\Model\Model;
 
 class DateField extends Field
@@ -32,15 +31,15 @@ class DateField extends Field
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function preSave(Model $model, $add)
     {
         if($this->autoNow || ($this->autoAddNow && $add)):
             return new DateTime('now', new \DateTimeZone(BaseOrm::getInstance()->getTimezone()));
         endif;
+
         return parent::preSave($model, $add);
     }
-
 
 }

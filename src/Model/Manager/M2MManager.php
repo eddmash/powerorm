@@ -123,7 +123,7 @@ class M2MManager extends BaseM2MManager
         $clear = ArrayHelper::getValue($kwargs, 'clear', false);
         if ($clear) :
         else:
-            $this->add($values);
+            $this->addItems($this->fromFieldName, $this->toFieldName, $values);
         endif;
     }
 
@@ -132,6 +132,7 @@ class M2MManager extends BaseM2MManager
         /* @var $field RelatedField */
         if ($values) :
             $newIds = [];
+
             foreach ($values as $value) :
                 $field = $this->through->meta->getField($this->toFieldName);
                 $newIds[] = $field->getForeignRelatedFieldsValues($value)[0];

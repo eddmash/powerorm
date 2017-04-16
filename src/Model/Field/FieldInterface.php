@@ -29,7 +29,9 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface
      * Returns the database column data type for the Field, taking into account the connection.
      *
      * @param Connection $connection
+     *
      * @return string
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

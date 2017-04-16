@@ -41,4 +41,12 @@ class BaseExpression
         return $this->outputField->getLookup($lookup);
     }
 
+    /**
+     * @return Field
+     */
+    public function getOutputField()
+    {
+        return $this->outputField;
+    }
+
 }

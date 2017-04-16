@@ -39,9 +39,9 @@ class BaseOrm extends BaseObject
     private static $checkRegistry;
     public $modelsNamespace;
     public $migrationNamespace = 'App\Migrations';
-    public $dbMappingTypes=[];
-    public $dbTypes=[];
-    private $timezone='';
+    public $dbMappingTypes = [];
+    public $dbTypes = [];
+    private $timezone = '';
     /**
      * The configurations to use to connect to the database.
      *
@@ -376,9 +376,9 @@ class BaseOrm extends BaseObject
     /**
      * Configures an object with the initial property values.
      *
-     * @param object $object the object to be configured
-     * @param array $properties the property initial values given in terms of name-value pairs
-     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object     the object to be configured
+     * @param array  $properties the property initial values given in terms of name-value pairs
+     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
@@ -506,6 +506,13 @@ class BaseOrm extends BaseObject
         self::getInstance()->dispatchSignal($signal, $object);
     }
 
+    /**
+     * Register custom Doctrine dbal types.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public static function presetup()
     {
 
@@ -519,7 +526,6 @@ class BaseOrm extends BaseObject
             static::getDbConnection()->getDatabasePlatform()->registerDoctrineTypeMapping($name, $mappingType);
         }
 
-
     }
 
     /**
@@ -527,6 +533,6 @@ class BaseOrm extends BaseObject
      */
     public function getTimezone()
     {
-        return ($this->timezone)? $this->timezone : date_default_timezone_get();
+        return ($this->timezone) ? $this->timezone : date_default_timezone_get();
     }
 }

@@ -99,7 +99,11 @@ Then adjust the settings on the copied to those of your project.
 Codeigniter  4
 --------------
 
-For codeigniter 4 and any other projects that use namespace(see :doc:`Laravel <laravel>`)
+.. note::
+
+    Before its officially released ensure you have latest version as per github commits
+
+For Codeigniter 4 and any other projects that use namespace(see :doc:`Laravel <laravel>`)
 you just need to ensure the orm is loaded early enough.
 
 In Codeigniter 4 *(i'm still exploring codeigniter 4, but as of now)*
@@ -113,14 +117,7 @@ Depending on the environment in use add the following line at the bottom.
 
 .. code-block:: php
 
-    require_once APPPATH.'../vendor/autoload.php';
     \Eddmash\PowerOrm\Application::webRun(\Config\Powerorm::asArray());
-
-.. note::
-
-    As of now, for some reason composer autoloader is not required when codeiniter 4 is running on console, thats why
-    we have the line ``require_once APPPATH.'../vendor/autoload.php';`` once this issue is resolved there will be no
-    need for this line any more.
 
 Create config file
 ..................

@@ -843,6 +843,7 @@ class Query extends BaseObject
     public function execute(Connection $connection)
     {
         list($sql, $params) = $this->asSql($connection);
+
         $stmt = $connection->prepare($sql);
         foreach ($params as $index => $value) :
             ++$index; // Columns/Parameters are 1-based, so need to start at 1 instead of zero

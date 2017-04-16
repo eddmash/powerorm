@@ -89,4 +89,5 @@ A sample configurations.
         ],
         'dbPrefix' => 'demo_',
         'charset' => 'utf-8',
+        'timezone'=>'Africa/Nairobi'
     ];

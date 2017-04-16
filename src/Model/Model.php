@@ -181,6 +181,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public static function fromDb($records = [])
     {
+
+        $attrs = array_keys($records);
+
         return new static($records);
     }
 

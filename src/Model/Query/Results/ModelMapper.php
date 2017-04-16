@@ -10,6 +10,7 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Results;
 
+use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -34,11 +35,35 @@ class ModelMapper extends Mapper
         /* @var $modelClass Model */
         $mapped = [];
         foreach ($results as $result) :
-            $obj = $modelClass::fromDb($result);
+            $obj = $modelClass::fromDb($this->preparedResults($result));
             $mapped[] = $obj;
         endforeach;
 
         return $mapped;
+    }
+
+    /**
+     * Ensure results are converted back to there respective php types.
+     *
+     * @param $row
+     * @param Connection $connection
+     *
+     * @return array
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function preparedResults($row)
+    {
+        $preparedValues = [];
+
+        foreach ($row as $column => $value) :
+            $field = $this->getField($column);
+            $preparedValues[$field->getAttrName()] = $field->convertToPHPValue($value);
+        endforeach;
+
+        return $preparedValues;
     }
 
 }
