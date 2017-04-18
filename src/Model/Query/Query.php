@@ -434,11 +434,13 @@ class Query extends BaseObject
         // Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         // uses of null as a query value.
         if(is_null($value)):
-            if(!in_array(array_pop($lookups),['exact'])):
-                throw new ValueError("Cannot use None as a query value");
+            if(!in_array(array_pop($lookups), ['exact'])):
+                throw new ValueError('Cannot use None as a query value');
             endif;
+
             return [true, ['isnull']];
         endif;
+
         return [$value, $lookups];
     }
 

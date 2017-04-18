@@ -29,6 +29,7 @@ class BaseLookup implements LookupInterface
 
     public static $lookupPattern = '/(?<=\w)__[!?.]*/';
     public static $whereConcatPattern = '/(?<=^~)/';
+    public $prepareRhs = true;
     protected $rhs;
 
     protected $operator;
@@ -42,6 +43,7 @@ class BaseLookup implements LookupInterface
     {
         $this->rhs = $rhs;
         $this->lhs = $lhs;
+        $this->rhs = $this->prepareLookup();
     }
 
     public static function createObject($rhs, $lhs)
@@ -52,6 +54,15 @@ class BaseLookup implements LookupInterface
     public function processLHS(Connection $connection)
     {
         return $this->lhs->asSql($connection);
+    }
+
+    public function prepareLookup()
+    {
+        if($this->prepareRhs && method_exists($this->lhs, 'prepareValue')):
+            return $this->lhs->getOutputField()->prepareValue($this->rhs);
+        endif;
+
+        return $this->rhs;
     }
 
     public function processRHS(Connection $connection)

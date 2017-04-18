@@ -15,12 +15,21 @@ use Doctrine\DBAL\Connection;
 class IsNull extends BaseLookup
 {
     public static $lookupName = 'isnull';
-    public $operator = ' is null';
+    public $prepareRhs = false;
 
+    /**
+     * {@inheritdoc}
+     */
     public function asSql(Connection $connection)
     {
-        if($this->rhs):
-            return [sprintf("%s IS NULL", $params)];
+        list($lhs_sql, $params) = $this->processLHS($connection);
+
+        $rhs_sql = 'IS NULL';
+
+        if (!$this->rhs):
+            $rhs_sql = 'IS NOT NULL';
         endif;
+
+        return [sprintf('%s %s', $lhs_sql, $rhs_sql), $params];
     }
 }
