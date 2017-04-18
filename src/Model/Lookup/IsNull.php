@@ -10,6 +10,17 @@
 
 namespace Eddmash\PowerOrm\Model\Lookup;
 
+use Doctrine\DBAL\Connection;
+
 class IsNull extends BaseLookup
 {
+    public static $lookupName = 'isnull';
+    public $operator = ' is null';
+
+    public function asSql(Connection $connection)
+    {
+        if($this->rhs):
+            return [sprintf("%s IS NULL", $params)];
+        endif;
+    }
 }

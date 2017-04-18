@@ -18,7 +18,7 @@ trait RegisterLookupTrait
     private static $lookups = [];
 
     /**
-     * @param LookupInterface $class
+     * @param string $class
      * @param null            $name
      *
      * @since 1.1.0

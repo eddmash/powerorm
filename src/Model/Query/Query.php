@@ -16,6 +16,7 @@ use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\KeyError;
+use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
@@ -331,6 +332,7 @@ class Query extends BaseObject
 
         foreach ($conditions as $name => $value) :
             list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
+            list($value, $lookups) = $this->prepareLookupValue($value, $lookups);
 
             list($field, $targets, $_, $joinList, $paths) = $this->setupJoins(
                 $fieldParts,
@@ -421,6 +423,23 @@ class Query extends BaseObject
         endif;
 
         return [$connector, $lookup, $fieldParts];
+    }
+
+    private function prepareLookupValue($value, $lookups)
+    {
+        if(empty($lookups)):
+            $lookups = ['exact'];
+        endif;
+
+        // Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
+        // uses of null as a query value.
+        if(is_null($value)):
+            if(!in_array(array_pop($lookups),['exact'])):
+                throw new ValueError("Cannot use None as a query value");
+            endif;
+            return [true, ['isnull']];
+        endif;
+        return [$value, $lookups];
     }
 
     /**

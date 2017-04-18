@@ -6,7 +6,11 @@ This document describes the details of the QuerySet API.
 It builds on the material presented in the model and database query guides,
 so you’'ll probably want to read and understand those documents before reading this one.
 
-Throughout this reference we'll use the example Weblog models presented in the database query guide.
+Throughout this reference we'll use the example Weblog models presented in the :doc:`database query guide <index>`.
+
+.. contents::
+    :local:
+    :depth: 2
 
 When QuerySets are evaluated
 ----------------------------
@@ -17,8 +21,6 @@ No database activity actually occurs until you do something to evaluate the quer
 .. _querset_evaluation:
 
 You can evaluate a QuerySet in the following ways:
-..................................................
-
 
 - Iteration.
     A QuerySet is iterable, and it executes its database query the first time you iterate over it.
@@ -153,3 +155,45 @@ exists() is useful for searches relating to both object membership in a QuerySet
 a QuerySet, particularly in the context of a large QuerySet.
 
 The most efficient method of finding whether a model with a unique field (e.g. primary_key) is a member of a QuerySet is:
+
+.. code-block:: php
+
+    if(Entry::objects()->filter(['pk'=>123])->exists()):
+        ... code
+    endif;
+
+Field lookups
+-------------
+
+Field lookups are how you specify the meat of an SQL WHERE clause. They're specified as keyword arguments to the
+QuerySet methods :ref:`filter()<queryset_filter>`, :ref:`exclude()<queryset_exclude>` and :ref:`get()<queryset_get>`.
+
+For an introduction, see :doc:`models and database queries documentation <index>`.
+
+Powerorms' built-in lookups are listed below. It is also possible to write :doc:`custom lookups <custom_lokup>` for
+model fields.
+
+As a convenience when no lookup type is provided (like in ``Entry::objects()->get(['id'=>14])``) the lookup type is assumed
+to be :ref:`exact<lookup_exact>`.
+
+.. _lookup_exact:
+
+exact
+.....
+
+Exact match. If the value provided for comparison is **null**, it will be interpreted as an SQL NULL
+(see :ref:`isnull <isnull>` for more details).
+
+Examples:
+
+.. code-block:: php
+
+    Entry::objects()->filter(['pk__exact'=>14])
+    Entry::objects()->filter(['pk__exact'=>null])
+
+SQL equivalents:
+
+.. code-block:: php
+
+    SELECT ... WHERE id = 14;
+    SELECT ... WHERE id IS NULL;
