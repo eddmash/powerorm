@@ -13,9 +13,9 @@ namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
 
-class StartsWith extends PatternLookup
+class IStartsWith extends PatternLookup
 {
-    public static $lookupName = 'startswith';
+    public static $lookupName = 'istartswith';
 
     public function processRHS(Connection $connection)
     {

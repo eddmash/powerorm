@@ -13,6 +13,6 @@ namespace Eddmash\PowerOrm\Model\Lookup;
 
 class LessThanOrEqual extends BaseLookup
 {
-    public $operator = '>';
-    public static $lookupName = 'gt';
+    public $operator = '<=';
+    public static $lookupName = 'lte';
 }

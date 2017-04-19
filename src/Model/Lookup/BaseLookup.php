@@ -58,7 +58,7 @@ class BaseLookup implements LookupInterface
 
     public function prepareLookup()
     {
-        if($this->prepareRhs && method_exists($this->lhs, 'prepareValue')):
+        if($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
             return $this->lhs->getOutputField()->prepareValue($this->rhs);
         endif;
 
@@ -94,9 +94,10 @@ class BaseLookup implements LookupInterface
     {
         list($lhs_sql, $params) = $this->processLHS($connection);
         list($rhs_sql, $rhs_params) = $this->processRHS($connection);
+
         $params = array_merge($params, $rhs_params);
         $rhs_sql = $this->getLookupOperation($rhs_sql);
-
+        dump($rhs_sql);
         return [sprintf('%s %s', $lhs_sql, $rhs_sql), $params];
     }
 

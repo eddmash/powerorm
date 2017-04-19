@@ -182,7 +182,7 @@ exact
 .....
 
 Exact match. If the value provided for comparison is **null**, it will be interpreted as an SQL NULL
-(see :ref:`isnull <isnull>` for more details).
+(see :ref:`isnull <lookup_isnull>` for more details).
 
 Examples:
 
@@ -197,3 +197,181 @@ SQL equivalents:
 
     SELECT ... WHERE id = 14;
     SELECT ... WHERE id IS NULL;
+
+
+.. _lookup_isnull:
+
+isnull
+......
+
+Takes either **true** or **false**, which correspond to SQL queries of **IS NULL** and **IS NOT NULL**, respectively.
+
+Example:
+
+.. code-block:: php
+
+    Entry::objects()->filter(['pk__isnull'=>true])
+
+SQL equivalent:
+
+.. code-block:: sql
+
+    SELECT ... WHERE id IS NULL;
+
+
+.. _lookup_contains:
+
+icontains
+.........
+
+Case-insensitive containment test.
+
+Example:
+
+.. code-block:: php
+
+    Entry::objects()->get(['blog_text__icontains'=>'sequi']);
+
+SQL equivalent:
+
+.. code-block:: sql
+
+    SELECT ... WHERE blog_text LIKE '%sequi%';
+
+Note this will match the blog_text 'Sequi honored today' and 'sequi honored today'.
+
+.. _lookup_in:
+
+in
+...
+
+In a given list.
+
+Example:
+
+.. code-block:: php
+
+    Entry::objects()->filter(['pk__in'=>[2,5,3]]);
+
+SQL equivalent:
+
+.. code-block:: sql
+
+    SELECT ... WHERE id IN (2,5,3);
+
+You can also use a queryset to dynamically evaluate the list of values instead of providing a list of literal values:
+
+.. code-block:: php
+
+    inner_qs = Blog::objects()->filter(['name__icontains'=>'dolor']);
+    entries = Entry::objects()->filter(['blog__in'=>inner_qs)
+
+This queryset will be evaluated as subselect statement:
+
+.. code-block:: sql
+
+    SELECT ... WHERE blog.id IN (SELECT id FROM ... WHERE NAME LIKE '%dolor%')
+
+.. _lookup_gt:
+
+gt
+...
+
+Greater than.
+
+Example:
+
+.. code-block:: php
+
+    Entry::objects()->filter(['pk__gt'=>1])
+
+SQL equivalent:
+
+
+.. code-block:: sql
+
+    SELECT ... WHERE id > 4;
+
+
+.. _lookup_gte:
+
+gte
+...
+
+Greater than or equal to.
+
+
+.. _lookup_lt:
+
+lt
+..
+
+Less than.
+
+.. _lookup_lte:
+
+lte
+...
+
+Less than or equal to.
+
+
+.. _lookup_istartswith:
+
+istartswith
+...........
+
+Case-insensitive starts-with.
+
+Example:
+
+.. code-block:: php
+
+    Entry::objects()->filter(['headline__iendswith'=>'Will'])
+
+SQL equivalent:
+
+.. code-block:: sql
+
+    SELECT ... WHERE headline ILIKE 'Will%';
+
+
+.. _lookup_iendswith:
+
+iendswith
+.........
+
+Case-insensitive ends-with.
+
+Example:
+
+.. code-block:: php
+
+    Entry::objects()->filter(['headline__iendswith'=>'Will'])
+
+SQL equivalent:
+
+.. code-block:: sql
+
+    SELECT ... WHERE headline ILIKE '%will'
+
+
+range
+.....
+
+Range test (inclusive).
+
+Example:
+
+.. code-block:: php
+
+    $date = new \DateTime('2005-01-01');
+    $date2 = new \DateTime('2005-05-01');
+    Entry::objects()->filter(['pub_date__range'=>[$date, $date2]]);
+
+SQL equivalent:
+
+.. code-block:: sql
+
+    SELECT ... WHERE pub_date BETWEEN '2005-01-01' and '2005-03-31';
+

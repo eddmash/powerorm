@@ -13,13 +13,13 @@ namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
 
-class EndsWith extends PatternLookup
+class IContains extends PatternLookup
 {
-    public static $lookupName = 'endswith';
+    public static $lookupName = 'icontains';
 
     public function processRHS(Connection $connection)
     {
-        $this->rhs = sprintf('%%%s', $this->rhs);
+        $this->rhs = sprintf('%%%s%%', $this->rhs);
 
         return parent::processRHS($connection);
     }
