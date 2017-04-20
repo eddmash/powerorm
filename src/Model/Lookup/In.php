@@ -17,6 +17,7 @@ class In extends BaseLookup
 {
     public static $lookupName = 'in';
     public $operator = 'IN';
+    protected $rhsValueIsIterable = true;
 
     public function getLookupOperation($rhs)
     {
@@ -29,7 +30,7 @@ class In extends BaseLookup
             $element = count($this->rhs);
             $placeholders = implode(', ', array_fill(null, $element, '?'));
 
-            return [sprintf('(%s)', $placeholders), $this->rhs];
+            return [sprintf('(%s)', $placeholders), $this->prepareLookupForDb($this->rhs, $connection)];
         else:
             return parent::processRHS($connection);
         endif;

@@ -16,23 +16,23 @@ use Doctrine\DBAL\Connection;
 class Range extends BaseLookup
 {
     public static $lookupName = 'range';
-    protected $operator = "BETWEEN %s AND %s";
+    protected $operator = 'BETWEEN %s AND %s';
+    protected $rhsValueIsIterable = true;
 
     public function getLookupOperation($rhs)
     {
-        return sprintf('%s %s', $this->operator, $rhs);
+        return sprintf($this->operator, $rhs[0], $rhs[1]);
     }
 
-    public function prepareLookup()
+    public function processRHS(Connection $connection)
     {
-        $preparedValues = [];
-        foreach ($this->rhs as $rh) :
-            if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
+        if ($this->valueIsDirect()):
+            $element = count($this->rhs);
+            $placeholders = array_fill(null, $element, '?');
 
-                $preparedValues[] = $this->lhs->getOutputField()->prepareValue($rh);
-            endif;
-        endforeach;
+            return [$placeholders, $this->prepareLookupForDb($this->rhs, $connection)];
+        endif;
 
-        return $preparedValues;
+        return parent::processRHS($connection);
     }
 }

@@ -38,12 +38,15 @@ class BaseLookup implements LookupInterface
      * @var Col
      */
     protected $lhs;
+    protected $rhsValueIsIterable = false;
 
     public function __construct($lhs, $rhs)
     {
         $this->rhs = $rhs;
         $this->lhs = $lhs;
+
         $this->rhs = $this->prepareLookup();
+
     }
 
     public static function createObject($rhs, $lhs)
@@ -56,13 +59,54 @@ class BaseLookup implements LookupInterface
         return $this->lhs->asSql($connection);
     }
 
+    /**
+     * Preperes the rhs for use in the lookup.
+     *
+     * @return mixed
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
     public function prepareLookup()
     {
-        if($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
-            return $this->lhs->getOutputField()->prepareValue($this->rhs);
+        if ($this->rhsValueIsIterable) :
+
+            $preparedValues = [];
+            foreach ($this->rhs as $rh) :
+                if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
+
+                    $preparedValues[] = $this->lhs->getOutputField()->prepareValue($rh);
+                endif;
+            endforeach;
+
+            return $preparedValues;
+        else:
+            if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
+                return $this->lhs->getOutputField()->prepareValue($this->rhs);
+            endif;
         endif;
 
         return $this->rhs;
+
+    }
+
+    /**
+     * Prepare the rhs for use on database queries.
+     *
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function prepareLookupForDb($values, Connection $connection)
+    {
+        $preparedValues = [];
+        if ($this->rhsValueIsIterable) :
+
+            foreach ($values as $value) :
+                $preparedValues[] = $this->lhs->getOutputField()->convertToDatabaseValue($value, $connection);
+            endforeach;
+        else:
+            $preparedValues[] = $this->lhs->getOutputField()->convertToDatabaseValue($values, $connection);
+        endif;
+
+        return $preparedValues;
+
     }
 
     public function processRHS(Connection $connection)
@@ -77,7 +121,7 @@ class BaseLookup implements LookupInterface
             return [sprintf('( %s )', $sql), $params];
         endif;
 
-        return [' ? ', [$this->rhs]];
+        return ['?', $this->prepareLookupForDb($this->rhs, $connection)];
     }
 
     public function getLookupOperation($rhs)
@@ -97,7 +141,7 @@ class BaseLookup implements LookupInterface
 
         $params = array_merge($params, $rhs_params);
         $rhs_sql = $this->getLookupOperation($rhs_sql);
-        dump($rhs_sql);
+
         return [sprintf('%s %s', $lhs_sql, $rhs_sql), $params];
     }
 
