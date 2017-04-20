@@ -373,5 +373,5 @@ SQL equivalent:
 
 .. code-block:: sql
 
-    SELECT ... WHERE pub_date BETWEEN '2005-01-01' and '2005-03-31';
+    SELECT ... WHERE pub_date BETWEEN '2005-01-01' and '2005-05-01';
 
