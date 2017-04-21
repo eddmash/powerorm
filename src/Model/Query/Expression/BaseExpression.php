@@ -49,4 +49,20 @@ class BaseExpression
         return $this->outputField;
     }
 
+    /**
+     * Provides the chance to do any preprocessing or validation before being added to the query.e.g.
+     * in Exp::Count('username') we need the username to converted to an actual model field.
+     *
+     * @param null $query
+     * @param bool $allowJoins
+     * @param null $reuse
+     * @param bool $summarize
+     * @param bool $forSave
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function resolveExpression($query=null, $allowJoins=true, $reuse=null, $summarize=false, $forSave=false)
+    {
+        
+    }
+
 }

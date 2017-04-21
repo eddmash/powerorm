@@ -193,9 +193,11 @@ class Queryset implements QuerysetInterface
 
     public function aggregate($kwargs = [])
     {
+        //todo accept non associative items
         $query = $this->query->deepClone();
         foreach ($kwargs as $alias => $annotation) :
             $query->addAnnotation(['annotation' => $annotation, 'alias' => $alias, 'isSummary' => true]);
+            // ensure we have an aggrated function
             if (!$query->annotations[$alias]->containsAggregate) :
                 throw new TypeError(sprintf('%s is not an aggregate expression', $alias));
             endif;

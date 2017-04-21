@@ -27,6 +27,7 @@ use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Aggregates\BaseAggregate;
+use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 use Eddmash\PowerOrm\Model\Query\Expression\Exp;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
@@ -679,10 +680,12 @@ class Query extends BaseObject
 
     public function addAnnotation($kwargs = [])
     {
+        /**@var $annotation BaseExpression*/
         $annotation = ArrayHelper::getValue($kwargs, 'annotation');
         $alias = ArrayHelper::getValue($kwargs, 'alias');
         $isSummary = ArrayHelper::getValue($kwargs, 'isSummary', false);
 
+        $annotation = $annotation->resolveExpression();
         $this->annotations[$alias] = $annotation;
 
     }
