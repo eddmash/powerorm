@@ -45,7 +45,7 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
  */
 abstract class Model extends DeconstructableObject implements ModelInterface, ArrayObjectInterface
 {
-    use ModelFieldsShortcut;
+    use ModelFieldsTrait;
 
     const SELF = 'this';
     const DEBUG_IGNORE = ['_fieldCache', 'tableName', 'managed', 'verboseName', 'isNew', 'proxy'];

@@ -25,7 +25,7 @@ use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Field\TextField;
 use Eddmash\PowerOrm\Model\Field\TimeField;
 
-trait ModelFieldsShortcut
+trait ModelFieldsTrait
 {
 // ********************* Model Fields ************************************
 
