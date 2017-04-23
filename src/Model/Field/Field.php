@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
+use Eddmash\PowerOrm\Form\Fields\TypedChoiceField;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\GreaterThan;
@@ -39,6 +40,7 @@ class Field extends DeconstructableObject implements FieldInterface
     use RegisterLookupTrait;
 
     const DEBUG_IGNORE = ['scopeModel', 'relation'];
+    const BLANK_CHOICE_DASH = ["" => "---------"];
 
     private $name;
 
@@ -217,6 +219,21 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     private $cacheName;
 
+    /**
+     * If True, the field is allowed to be blank on form. Default is False.
+     *
+     * Note that this is different than null. null is purely database-related,
+     *
+     * whereas form_blank is validation-related.
+     *
+     * If a field has form_blank=True, form validation will allow entry of an empty value.
+     *
+     * If a field has form_blank=False, the field will be required.
+     *
+     * @var bool
+     */
+    public $formBlank = false;
+
     public $oneToMany = false;
     public $oneToOne = false;
     public $manyToMany = false;
@@ -251,7 +268,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model  $modelObject
+     * @param Model $modelObject
      *
      * @throws FieldError
      *
@@ -505,8 +522,70 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function formField($kwargs = [])
     {
-        // TODO: Implement formField() method.
+        $field_class = \Eddmash\PowerOrm\Form\Fields\CharField::class;
+
+        $kwargs = array_change_key_case($kwargs, CASE_LOWER);
+
+        $defaults = [
+            'required' => !$this->formBlank,
+            'label' => $this->verboseName,
+            'helpText' => $this->helpText,
+        ];
+
+        if ($this->hasDefault()):
+            $defaults['initial'] = $this->getDefault();
+        endif;
+
+
+        if ($this->choices):
+            $include_blank = true;
+
+            if ($this->formBlank || empty($this->hasDefault()) || !in_array('initial', $kwargs)):
+                $include_blank = false;
+            endif;
+
+            $defaults['choices'] = $this->getChoices(['include_blank' => $include_blank]);
+            $defaults['coerce'] = [$this, 'to_php'];
+
+            if (array_key_exists('form_choices_class', $kwargs)):
+                $field_class = $kwargs['form_choices_class'];
+            else:
+                $field_class = TypedChoiceField::class;
+            endif;
+
+        endif;
+
+        if (array_key_exists('field_class', $kwargs)):
+            $field_class = $kwargs['field_class'];
+            unset($kwargs['field_class']);
+        endif;
+
+        $defaults = array_merge($defaults, $kwargs);
+
+        return new $field_class($defaults);
     }
+
+    /**
+     * Returns choices with a default blank choices included, for use as SelectField choices for this field.
+     * @since 1.1.0
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getChoices($opts = [])
+    {
+        $include_blank_dash = (array_key_exists('include_blank', $opts)) ? $opts['include_blank'] == false : true;
+
+        $first_choice = [];
+        if ($include_blank_dash):
+            $first_choice = self::BLANK_CHOICE_DASH;
+        endif;
+
+        if (!empty($this->choices)):
+            return array_merge($first_choice, $this->choices);
+        endif;
+
+        // load from relationships todo
+    }
+
 
     /**
      * Method called prior to prepareValueForDb() to prepare the value before being saved
@@ -520,7 +599,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool  $add   is whether the instance is being saved to the database for the first time
+     * @param bool $add is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *
@@ -560,7 +639,7 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * By default it returns value passed in if prepared=true and prepareValue() if is False.
      *
-     * @param mixed                     $value
+     * @param mixed $value
      * @param \Doctrine\DBAL\Connection $connection
      *
      * @return mixed

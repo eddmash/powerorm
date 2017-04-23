@@ -82,13 +82,6 @@ class AutoField extends Field
         $this->scopeModel->meta->autoField = $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function formField($kwargs = [])
-    {
-        return;
-    }
 
     /**
      * {@inheritdoc}
