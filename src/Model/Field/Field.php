@@ -522,7 +522,12 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function formField($kwargs = [])
     {
-        $field_class = \Eddmash\PowerOrm\Form\Fields\CharField::class;
+        $fieldClass = \Eddmash\PowerOrm\Form\Fields\CharField::class;
+
+        if (array_key_exists('fieldClass', $kwargs)):
+            $fieldClass = $kwargs['fieldClass'];
+            unset($kwargs['fieldClass']);
+        endif;
 
         $kwargs = array_change_key_case($kwargs, CASE_LOWER);
 
@@ -548,21 +553,16 @@ class Field extends DeconstructableObject implements FieldInterface
             $defaults['coerce'] = [$this, 'to_php'];
 
             if (array_key_exists('form_choices_class', $kwargs)):
-                $field_class = $kwargs['form_choices_class'];
+                $fieldClass = $kwargs['form_choices_class'];
             else:
-                $field_class = TypedChoiceField::class;
+                $fieldClass = TypedChoiceField::class;
             endif;
 
         endif;
 
-        if (array_key_exists('field_class', $kwargs)):
-            $field_class = $kwargs['field_class'];
-            unset($kwargs['field_class']);
-        endif;
-
         $defaults = array_merge($defaults, $kwargs);
 
-        return new $field_class($defaults);
+        return new $fieldClass($defaults);
     }
 
     /**
