@@ -28,4 +28,15 @@ class EmailField extends CharField
         $config['maxLength'] = ArrayHelper::getValue($config, 'maxLength', 254);
         parent::__construct($config);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function formField($kwargs = [])
+    {
+        $kwargs['fieldClass'] = \Eddmash\PowerOrm\Form\Fields\EmailField::class;
+        return parent::formField($kwargs);
+    }
+
+
 }

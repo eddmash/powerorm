@@ -562,7 +562,7 @@ class Field extends DeconstructableObject implements FieldInterface
 
         $defaults = array_merge($defaults, $kwargs);
 
-        return new $fieldClass($defaults);
+        return $fieldClass::instance($defaults);
     }
 
     /**

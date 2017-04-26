@@ -82,7 +82,6 @@ class AutoField extends Field
         $this->scopeModel->meta->autoField = $this;
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -103,4 +102,14 @@ class AutoField extends Field
             throw new ValueError(sprintf("'%s' value must be an integer.", $value));
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function formField($kwargs = [])
+    {
+        return null;
+    }
+
+
 }

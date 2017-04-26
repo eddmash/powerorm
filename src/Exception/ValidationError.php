@@ -13,10 +13,14 @@ class ValidationError extends OrmError
 {
     public function __construct($message, $code = '')
     {
-        parent::__construct($message);
 
-        //todo handle if message is array
+        if(is_array($message)):
+            foreach ( as $item) :
+
+            endforeach;
+        endif;
         $this->message = $message;
-        $this->validation_code = $code;
+        $this->validationCode = $code;
+        parent::__construct($message);
     }
 }
