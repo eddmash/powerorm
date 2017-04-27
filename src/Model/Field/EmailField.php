@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Eddmash\PowerOrm\Form\Validations\EmailValidator;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 
 /**
@@ -38,5 +39,15 @@ class EmailField extends CharField
         return parent::formField($kwargs);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getDefaultValidators()
+    {
+
+        $validators = parent::getDefaultValidators();
+        $validators[] = EmailValidator::instance();
+        return $validators;
+    }
 
 }

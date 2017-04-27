@@ -13,9 +13,16 @@ namespace Eddmash\PowerOrm\Model\Field;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
+use Eddmash\PowerOrm\Form\Validations\MaxLengthValidator;
 
 class CharField extends Field
 {
+    public function __construct(array $config = [])
+    {
+        parent::__construct($config);
+        $this->validators[] = MaxLengthValidator::instance(['maxLength'=>$this->maxLength]);
+    }
+
     public function checks()
     {
         $checks = [];

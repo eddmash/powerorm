@@ -123,6 +123,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     // todo
     public $uniqueTogether = [];
+
     private $namspacedModelName;
 
     /**

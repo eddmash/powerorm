@@ -51,16 +51,6 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface
      */
     public function convertToPHPValue($value);
 
-    /**
-     * Returns a powerorm.form.Field instance for this database Field.
-     *
-     * @return string
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function formField($kwargs = []);
 
     /**
      * Method called prior to prepare_value_for_db() to prepare the value before being saved

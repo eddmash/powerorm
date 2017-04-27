@@ -38,8 +38,10 @@ use Eddmash\PowerOrm\Model\Query\Expression\Col;
 class Field extends DeconstructableObject implements FieldInterface
 {
     use RegisterLookupTrait;
+    use FormFieldReadyTrait;
 
     const DEBUG_IGNORE = ['scopeModel', 'relation'];
+
     const BLANK_CHOICE_DASH = ["" => "---------"];
 
     private $name;
@@ -515,54 +517,6 @@ class Field extends DeconstructableObject implements FieldInterface
             $value,
             BaseOrm::getDbConnection()->getDatabasePlatform()
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function formField($kwargs = [])
-    {
-        $fieldClass = \Eddmash\PowerOrm\Form\Fields\CharField::class;
-
-        if (array_key_exists('fieldClass', $kwargs)):
-            $fieldClass = $kwargs['fieldClass'];
-            unset($kwargs['fieldClass']);
-        endif;
-
-        $kwargs = array_change_key_case($kwargs, CASE_LOWER);
-
-        $defaults = [
-            'required' => !$this->formBlank,
-            'label' => $this->verboseName,
-            'helpText' => $this->helpText,
-        ];
-
-        if ($this->hasDefault()):
-            $defaults['initial'] = $this->getDefault();
-        endif;
-
-
-        if ($this->choices):
-            $include_blank = true;
-
-            if ($this->formBlank || empty($this->hasDefault()) || !in_array('initial', $kwargs)):
-                $include_blank = false;
-            endif;
-
-            $defaults['choices'] = $this->getChoices(['include_blank' => $include_blank]);
-            $defaults['coerce'] = [$this, 'to_php'];
-
-            if (array_key_exists('form_choices_class', $kwargs)):
-                $fieldClass = $kwargs['form_choices_class'];
-            else:
-                $fieldClass = TypedChoiceField::class;
-            endif;
-
-        endif;
-
-        $defaults = array_merge($defaults, $kwargs);
-
-        return $fieldClass::instance($defaults);
     }
 
     /**
