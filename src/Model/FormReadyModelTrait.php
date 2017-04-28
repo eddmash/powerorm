@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model;
 
-use Eddmash\PowerOrm\Form\Exception\ValidationError;
+use Eddmash\PowerOrm\Exception\ValidationError;
 use Eddmash\PowerOrm\Model\Field\Field;
 
 

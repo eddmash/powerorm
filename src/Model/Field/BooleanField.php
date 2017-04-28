@@ -16,6 +16,12 @@ use Doctrine\DBAL\Connection;
 
 class BooleanField extends Field
 {
+    public function __construct(array $config = [])
+    {
+        $config['formBlank'] = true;
+        parent::__construct($config);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -23,5 +29,25 @@ class BooleanField extends Field
     {
         return Type::BOOLEAN;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function formField($kwargs = [])
+    {
+        $kwargs['fieldClass'] = \Eddmash\PowerOrm\Form\Fields\BooleanField::class;
+        return parent::formField($kwargs);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getConstructorArgs()
+    {
+        $kwargs = parent::getConstructorArgs();
+        unset($kwargs['formBlank']);
+        return $kwargs;
+    }
+
 
 }

@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
+use Eddmash\PowerOrm\Exception\ValidationError;
 use Eddmash\PowerOrm\Form\Fields\TypedChoiceField;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
@@ -513,10 +514,14 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function convertToPHPValue($value)
     {
-        return Type::getType($this->dbType(BaseOrm::getDbConnection()))->convertToPHPValue(
-            $value,
-            BaseOrm::getDbConnection()->getDatabasePlatform()
-        );
+        try{
+            return Type::getType($this->dbType(BaseOrm::getDbConnection()))->convertToPHPValue(
+                $value,
+                BaseOrm::getDbConnection()->getDatabasePlatform()
+            );
+        }catch (\Exception $exception){
+            throw new ValidationError($exception->getMessage(), 'invalid');
+        }
     }
 
     /**

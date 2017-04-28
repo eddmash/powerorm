@@ -166,7 +166,13 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns a list of all forward fields on the model and its parents,excluding ManyToManyFields.
+     *
+     * @return Field[]
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getFields($includeParents = true, $inverse = true)
     {

@@ -41,6 +41,7 @@ class BaseOrm extends BaseObject
     public $migrationNamespace = 'App\Migrations';
     public $dbMappingTypes = [];
     public $dbTypes = [];
+    public $dateFormats;
     private $timezone = '';
     /**
      * The configurations to use to connect to the database.
