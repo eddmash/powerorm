@@ -1,54 +1,24 @@
-#######################
+###################
 PowerOrm User Guide
-#######################
+###################
 
 .. include:: top_notices.rst
 
 - :doc:`License Agreement <license>`
 - :doc:`Change Log <changelog>`
 
-
-**************
-Overview
-**************
-
-.. toctree::
-   :titlesonly:
-
-   intro/index
-
-
-**************
-Model
-**************
+*******
+The Orm
+*******
 
 .. toctree::
     :titlesonly:
 
-    model/index
+    orm/index
 
-**************
-Queries
-**************
-
-.. toctree::
-    :titlesonly:
-
-    queries/index
-
-
-**************
-Migration
-**************
-
-.. toctree::
-    :titlesonly:
-
-    migration/index
-
-**************
+****
 Form
-**************
+****
 
 .. toctree::
     :titlesonly:
@@ -56,19 +26,9 @@ Form
     form/index
 
 
-**************
-Integrations
-**************
-
-.. toctree::
-    :titlesonly:
-
-    integrations/index
-
-
-************************
+*****************
 Extra Information
-************************
+*****************
 
 .. toctree::
     :titlesonly:

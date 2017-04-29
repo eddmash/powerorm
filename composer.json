@@ -6,7 +6,7 @@
     "php",
     "migrations"
   ],
-  "description": "A very simple but effective orm",
+  "description": "A very simple but effective php orm",
   "homepage": "https://github.com/eddmash/powerorm",
   "license": "MIT",
   "authors": [
@@ -35,7 +35,8 @@
     }
   },
   "suggest": {
-    "eddmash/powerormfaker": "powerormfake generates dummy data when using PowerOrm. An extension of Faker library"
+    "eddmash/powerormfaker": "powerormfake generates dummy data when using PowerOrm. An extension of Faker library",
+    "eddmash/powerform": "makes it easy to create and process forms and easily integrate with powerorm models"
   },
   "support": {
     "issues": "https://github.com/eddmash/powerorm/issues"

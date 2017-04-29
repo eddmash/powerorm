@@ -143,12 +143,12 @@ features.
 Using validators
 ................
 
-PowerormForm's form (and model) fields support use of simple utility classes known as validators. A validator is merely
+Powerform's form (and model) fields support use of simple utility classes known as validators. A validator is merely
 a callable object that takes a value and simply returns nothing if the value is valid or throws a **ValidationError** if
 not. These can be passed to a field's constructor, via the field's validators argument, or defined on the Field class
 itself with the **getDefaultValidators()** method.
 
-Simple validators can be used to validate values inside the field, let's have a look at PowerormForm's SlugField:
+Simple validators can be used to validate values inside the field, let's have a look at Powerform's SlugField:
 
 .. code-block:: php
 
