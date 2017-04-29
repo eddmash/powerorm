@@ -10,7 +10,7 @@ see example below
    :depth: 1
 
 dbTable
-=================
+=======
 
 The name of the database table to use for the model::
 
@@ -51,13 +51,13 @@ This includes:
   use your custom model. See  :ref:`Through model <through_model>`
 
 If you are interested in changing the PHP-level behavior of a model class, you could set managed=false and create a copy
-of an existing model. However, there's a better approach for that situation: :doc:`Proxy models </model/proxy>`.
+of an existing model. However, there's a better approach for that situation: :doc:`Proxy models <../proxy>`.
 
 proxy
 =====
 **default false**
 
-If proxy = true, a model which subclasses another model will be treated as a :doc:`Proxy models </model/proxy>`.
+If proxy = true, a model which subclasses another model will be treated as a :doc:`Proxy models <../proxy>`.
 
 verboseName
 ===========

@@ -1,7 +1,7 @@
 Working with forms
 ##################
 
-Powerorm's form functionality can simplify and automate vast portions of this work, and can also do it more securely
+Powerform functionality can simplify and automate vast portions of this work, and can also do it more securely
 than most programmers would be able to do in code they wrote themselves.
 
 Powerform handle three distinct parts of the work involved in forms:
@@ -15,7 +15,7 @@ It is possible to write code that does all of this manually, but Powerform can t
 Form class
 ----------
 
-At the heart of this system of components is Powerorm's :ref:`Form<form_class>` class. In much the same way that a
+At the heart of this system of components is Powerforms' :ref:`Form<form_class>` class. In much the same way that a
 Powerorm model describes the logical structure of an object, its behavior, and the way its parts are represented to us,
 a :ref:`Form<form_class>` class describes a form and determines how it works and appears.
 

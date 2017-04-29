@@ -4,10 +4,6 @@ PowerOrm User Guide
 
 .. include:: top_notices.rst
 
-- :doc:`License Agreement <license>`
-- :doc:`Change Log <changelog>`
-
-
 **************
 Overview
 **************
@@ -46,19 +42,9 @@ Migration
 
     migration/index
 
-**************
-Form
-**************
-
-.. toctree::
-    :titlesonly:
-
-    form/index
-
-
-**************
+************
 Integrations
-**************
+************
 
 .. toctree::
     :titlesonly:
@@ -66,15 +52,13 @@ Integrations
     integrations/index
 
 
-************************
+*****************
 Extra Information
-************************
+*****************
 
 .. toctree::
     :titlesonly:
 
-    license
-    changelog
     ref/index
 
 

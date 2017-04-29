@@ -332,3 +332,4 @@ Limitin a QuerySet returns a new QuerySet.
 
     self
     queryset
+    custom_lokup

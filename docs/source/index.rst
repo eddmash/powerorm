@@ -1,30 +1,15 @@
-###################
-PowerOrm User Guide
-###################
-
-.. include:: top_notices.rst
-
-- :doc:`License Agreement <license>`
-- :doc:`Change Log <changelog>`
-
 *******
 The Orm
 *******
 
-.. toctree::
-    :titlesonly:
-
-    orm/index
+Powerorm is an object-relational mapper in which you describe your database layout in PHP code.
 
 ****
 Form
 ****
 
-.. toctree::
-    :titlesonly:
-
-    form/index
-
+Dealing with HTML forms is one of the most common - and challenging - tasks for a web developer. Powerform component
+makes dealing with forms easy.
 
 *****************
 Extra Information
@@ -32,9 +17,14 @@ Extra Information
 
 .. toctree::
     :titlesonly:
+    :maxdepth: 1
 
+    orm/index
+    form/index
     license
     changelog
-    ref/index
 
+
+- :doc:`License Agreement <license>`
+- :doc:`Change Log <changelog>`
 

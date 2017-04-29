@@ -11,7 +11,7 @@ instance, you might have a BlogComment model, and you want to create a form that
 In this case, it would be redundant to define the field types in your form, because you've already defined the fields
 in your model. we will be using the :ref:`Author model<author_model_example>`.
 
-For this reason, Powerorm provides a helper class that lets you create a Form class from a Powerorm model.
+For this reason, Powerform provides a helper class that lets you create a Form class from a Powerorm model.
 
 For example:
 
