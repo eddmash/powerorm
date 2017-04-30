@@ -15,6 +15,10 @@ attributes such as **checked** rather than the XHTML style of **checked='checked
     However, widgets do need to be :ref:`assigned<assign_widget_to_form_fields>` to form fields.
 
 
+.. contents::
+    :local:
+    :depth: 2
+
 .. _assign_widget_to_form_fields:
 
 Specifying widgets

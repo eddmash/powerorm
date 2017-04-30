@@ -27,8 +27,10 @@ Note that this is different than null. null is purely database-related, whereas 
 If a field has blank=True, form validation will allow entry of an empty value. If a field has blank=False,
 the field will be required.
 
+.. _field_choices:
+
 choices
------------
+-------
 
 An array consisting itself of associative arrays (e.g. ``[['f'=>'female'], ['m'=>'male', ...]]``) to use as choices
 for this field.
@@ -79,6 +81,11 @@ helpText
 --------
 Extra "help" text to be displayed with the form widget. It's useful for documentation even if your field isn't used on
 a form.
+
+validators
+----------
+
+A list of validators to run for this field. See the :doc:`validators documentation</form/validators>` for more information.
 
 Field types
 ================

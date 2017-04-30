@@ -1,6 +1,10 @@
 Form and field validation
 #########################
 
+.. contents::
+    :local:
+    :depth: 2
+
 Form validation happens when the data is cleaned. If you want to customize this process, there are various places to
 make changes, each one serving a different purpose. Three types of cleaning methods are run during form processing.
 These are normally executed when you call the **isValid()** method on a form.

@@ -30,4 +30,5 @@ application won't be able to find the classes of Powerform.
    widgets
    modelform
    validations
+   validators
    example

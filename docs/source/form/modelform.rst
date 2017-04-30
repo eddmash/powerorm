@@ -1,6 +1,10 @@
 Creating forms from models
 ##########################
 
+.. contents::
+    :local:
+    :depth: 2
+
 .. _model_form_class:
 
 ModelForm
