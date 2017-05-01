@@ -311,9 +311,9 @@ class Tools
     public static function convertExceptionToString($exception)
     {
         if ($exception instanceof \Exception) {
-            $message = "Exception ({$exception->getMessage()})";
+            $message = "Exception ({$exception->getTraceAsString()})";
         } elseif ($exception instanceof \ErrorException) {
-            $message = "{$exception->getMessage()}";
+            $message = "{$exception->getTraceAsString()}";
         } else {
             $message = 'Exception';
         }

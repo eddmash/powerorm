@@ -91,14 +91,16 @@ Field types
 ================
 
 AutoField
-------------
+---------
 An IntegerField that automatically increments according to available IDs. You usually won't need to use this directly;
 a primary key field will automatically be added to your model if you don't specify otherwise.
 See
 :ref:`Automatic primary key fields <automatic-primary-key-fields>`
 
+.. _model_charfield:
+
 CharField
------------------
+---------
 A string field, for small- to large-sized strings.
 
 For large amounts of text, use TextField.
@@ -111,21 +113,27 @@ CharField has one extra required argument:
   The maximum length (in characters) of the field. The maxLength is enforced at the database level and in PowerOrm's
   validation.
 
+.. _model_emailfield:
+
 EmailField
-------------
+----------
 
 **maxLength** default is 254.
 
 A CharField that checks that the value is a valid email address. It uses EmailValidator to validate the input.
 
+.. _model_integerfield:
+
 IntegerField
-----------------
+------------
 An integer.
 
 The default form widget for this field is a TextInput.
 
+.. _model_textfield:
+
 TextField
--------------------
+---------
 A large text field.
 
 The default form widget for this field is a Textarea.
@@ -133,8 +141,10 @@ The default form widget for this field is a Textarea.
 If you specify a **maxLength** attribute, it will be reflected in the Textarea widget of the auto-generated form field.
 However it is not enforced at the model or database level. Use a CharField for that.
 
+.. _model_urlfield:
+
 URLField
------------
+--------
 A CharField for a URL.
 
 **maxLength** default is 200.
@@ -149,6 +159,8 @@ Relationship fields
 ===================
 
 PowerOrm also defines a set of fields that represent relations.
+
+.. _model_foreignkey:
 
 ForeignKey
 ----------
@@ -207,7 +219,9 @@ the same as it does for ForeignKey.
 Through Model
 *************
 
+.. _model_onetoonefield:
+
 OneToOneField
------------------
+-------------
 A one-to-one relationship. Conceptually, this is similar to a ForeignKey with unique=True, but the "reverse" side of the
 relation will directly return a single object.

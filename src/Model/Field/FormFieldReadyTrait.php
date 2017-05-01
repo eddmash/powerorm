@@ -12,6 +12,8 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\Exception\ValidationError;
+use Eddmash\PowerOrm\Form\Fields\TypedChoiceField;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Model;
 
 
@@ -23,6 +25,7 @@ use Eddmash\PowerOrm\Model\Model;
 trait FormFieldReadyTrait
 {
     public $validators = [];
+
     /**
      * Returns an Eddmash\PowerOrm\Form\Fields\Field instance that represents this database field.
      * @param array $kwargs
@@ -31,14 +34,11 @@ trait FormFieldReadyTrait
      */
     public function formField($kwargs = [])
     {
-        $fieldClass = \Eddmash\PowerOrm\Form\Fields\CharField::class;
-
-        if (array_key_exists('fieldClass', $kwargs)):
-            $fieldClass = $kwargs['fieldClass'];
-            unset($kwargs['fieldClass']);
-        endif;
-
-        $kwargs = array_change_key_case($kwargs, CASE_LOWER);
+        $fieldClass = ArrayHelper::pop(
+            $kwargs,
+            'fieldClass',
+            \Eddmash\PowerOrm\Form\Fields\CharField::class
+        );
 
         $defaults = [
             'required' => !$this->formBlank,
@@ -59,13 +59,13 @@ trait FormFieldReadyTrait
             endif;
 
             $defaults['choices'] = $this->getChoices(['include_blank' => $include_blank]);
-            $defaults['coerce'] = [$this, 'to_php'];
+            $defaults['coerce'] = [$this, 'toPhp'];
 
-            if (array_key_exists('form_choices_class', $kwargs)):
-                $fieldClass = $kwargs['form_choices_class'];
-            else:
-                $fieldClass = TypedChoiceField::class;
-            endif;
+            $fieldClass = ArrayHelper::getValue(
+                $kwargs,
+                'formChoicesClass',
+                TypedChoiceField::class
+            );
 
         endif;
 
