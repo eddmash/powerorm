@@ -143,11 +143,11 @@ class Query extends BaseObject
         // todo DISTINCT
 
         $cols = [];
+
         /* @var $col Col */
         foreach ($this->select as $colInfo) :
 
             list($col, $alias) = $colInfo;
-
             list($colSql, $colParams) = $col->asSql($connection);
 
             if ($alias):
@@ -684,8 +684,7 @@ class Query extends BaseObject
         $annotation = ArrayHelper::getValue($kwargs, 'annotation');
         $alias = ArrayHelper::getValue($kwargs, 'alias');
         $isSummary = ArrayHelper::getValue($kwargs, 'isSummary', false);
-
-        $annotation = $annotation->resolveExpression();
+//        $annotation = $annotation->resolveExpression();
         $this->annotations[$alias] = $annotation;
 
     }

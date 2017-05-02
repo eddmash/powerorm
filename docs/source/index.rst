@@ -1,15 +1,20 @@
+PHP Components
+##############
+
+A set of Components that easily integrate to you php project.
+
 *******
 The Orm
 *******
 
-Powerorm is an object-relational mapper in which you describe your database layout in PHP code.
+:doc:`Powerorm</orm/index>` is an object-relational mapper in which you describe your database layout in PHP code.
 
 ****
 Form
 ****
 
-Dealing with HTML forms is one of the most common - and challenging - tasks for a web developer. Powerform component
-makes dealing with forms easy.
+Dealing with HTML forms is one of the most common - and challenging - tasks for a web developer.
+:doc:`Powerform</form/index>` component makes dealing with forms easy.
 
 *****************
 Extra Information

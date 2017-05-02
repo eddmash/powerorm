@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Form\Widgets\TextArea;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 
 class TextField extends Field
 {
