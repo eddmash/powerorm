@@ -5,10 +5,18 @@ Working with forms
     :local:
     :depth: 2
 
+Handling forms is a complex business. where numerous items of data of several different types may need to be:
+
+- prepared for display in a form,
+- rendered as HTML,
+- edited using a convenient interface,
+- returned to the server,
+- validated and cleaned up, and then saved or passed on for further processing.
+
 Powerform functionality can simplify and automate vast portions of this work, and can also do it more securely
 than most programmers would be able to do in code they wrote themselves.
 
-Powerform handle three distinct parts of the work involved in forms:
+Powerform handles three distinct parts of the work involved in forms:
 
 - preparing and restructuring data to make it ready for rendering.
 - creating HTML forms for the data
@@ -99,14 +107,16 @@ We already know what we want our HTML form to look like. Our starting point for 
 
     }
 
-This defines a :ref:`Form<form_class>` class with a two fields (your_name). We've applied a human-friendly label to the
+This defines a :ref:`Form<form_class>` class with a field (your_name). We've applied a human-friendly label to the
 field, which will appear in the <label> when it's rendered (although in this case, the label we specified is actually
 the same one that would be generated automatically if we had omitted it).
 
-The field's maximum allowable length is defined by :ref:`maxLength<form_charfield_maxlength>`. This does two things.
-It puts a **maxlength="100"** on the HTML **<input>** (so the browser should prevent the user from entering more than
-that number of characters in the first place). It also means that when Powerform receives the form back from the browser,
-it will validate the length of the data.
+The field's maximum allowable length is defined by :ref:`maxLength<form_charfield_maxlength>`. This does two things.:
+
+- It puts a **maxlength="100"** on the HTML **<input>** (so the browser should prevent the user from entering more than
+  that number of characters in the first place).
+- It also means that when Powerform receives the form back from the browser,
+  it will validate the length of the data.
 
 A :ref:`Form<form_class>` instance has an :ref:`isValid()<form_is_valid>` method, which runs validation routines for
 all its fields. When this method is called, if all fields contain valid data, it will:
@@ -150,11 +160,11 @@ To handle the form we need to instantiate it in the controller for the URL where
         return render('create.html', ['form' => $form]);
     }
 
-If we arrive at this controller with a **GET** request, it will create an empty form instance and place it in the
-template context to be rendered. This is what we can expect to happen the first time we visit the URL.
+If we arrive at this controller with a **GET** request, it will create an empty form instance and pass it in to the
+template for rendering. This is what we can expect to happen the first time we visit the URL.
 
-If the form is submitted using a **POST** request, the view will once again create a form instance and populate it with
-data from the request: **$form = new CommentForm(['data' => $_POST])**.
+If the form is submitted using a **POST** request, the controller will once again create a form instance and populate
+it with data from the request: ``$form = new CommentForm(['data' => $_POST])``.
 This is called "binding data to the form" (it is now a bound form).
 
 We call the form's :ref:`isValid()<form_is_valid>` method; if it's not **true**, we go back to the template with the
@@ -177,23 +187,24 @@ We don't need to do much in our **create.html** template. The simplest example i
         <input type="submit" value="Send" name="Send">
     </form>
 
-All the form's fields and their attributes will be unpacked into HTML markup from that **<?php echo $form;?>**
+All the form's fields and their attributes will be unpacked into HTML markup from that ``echo $form;``
 
 .. note:: HTML5 input types and browser validation
 
     If your form includes a :ref:`URLField<form_urlfield>`, an :ref:`EmailField<form_emailfield>` or any integer field
     type, Powerform will use the url, email and number HTML5 input types. By default, browsers may apply their own
     validation on these fields, which may be stricter than Powerforms's validation. If you would like to disable this
-    behavior, set the novalidate attribute on the form tag, or specify a different widget on the field, like TextInput.
+    behavior, set the **novalidate** attribute on the form tag, or specify a different widget on the field, like
+    TextInput.
 
 That's all you need to get started, but the forms puts a lot more at your fingertips. Once you understand the basics of
 the process described above, you should be prepared to understand other features of the forms system and ready to learn
 a bit more about the underlying machinery.
 
-More about Django Form classes
-------------------------------
+More about Powerform classes
+----------------------------
 
-All form classes are created as subclasses of **\Eddmash\PowerOrm\Form\Form**, including the
+All form classes are created as subclasses of ``\Eddmash\PowerOrm\Form\Form``, including the
 :doc:`ModelForm<modelform>`.
 
 .. note:: **Models and Forms**
@@ -251,8 +262,8 @@ types; a full list can be found in :doc:`Form fields<fields>`.
 Widgets
 -------
 
-Each :doc:`Form fields<fields>` has a corresponding Widget class, which in turn corresponds to an HTML form widget
-such as **<input type="text">**.
+Each :doc:`Form fields<fields>` has a corresponding :doc:`Widget class<widgets>`, which in turn corresponds to an HTML
+form widget such as **<input type="text">**.
 
 In most cases, the field will have a sensible default widget. For example, by default,
 a :ref:`CharField<form_charfield>` will have a :ref:`TextInput<textinput_widget>` widget, that produces an 
@@ -267,6 +278,15 @@ Whatever the data submitted with a form, once it has been successfully validated
 associative array.
 
 This data will have been nicely converted into Php types for you.
+
+.. note::
+
+    You can still access the unvalidated data directly from **$_POST** at this point, but the validated data is better.
+
+In the contact form example above, cc_myself will be a **boolean** value. Likewise, fields such as **IntegerField** and
+**DecimalField** convert values to a Php **int** and **float** respectively.
+
+Here's how the form data could be processed in the view that handles this form:
 
 .. code-block:: php
 
@@ -318,9 +338,9 @@ Form rendering options
 
 There are other output options though for the **<label>/<input>** pairs:
 
-- **asTable() ?>** will render them as table cells wrapped in **<tr>** tags
-- **asParagraph() ?>** will render them wrapped in **<p>** tags
-- **asUl() ?>** will render them wrapped in **<li>** tags
+- **asTable()** will render them as table cells wrapped in **<tr>** tags
+- **asParagraph()** will render them wrapped in **<p>** tags
+- **asUl()** will render them wrapped in **<li>** tags
 
 Note that you'll have to provide the surrounding **<table>** or **<ul>** elements yourself.
 
@@ -555,5 +575,5 @@ Here's a modification of an earlier example that uses these two methods:
     <?php endforeach; ?>
 
 This example does not handle any errors in the hidden fields. Usually, an error in a hidden field is a sign of form
-tampering, since normal form interaction won’t alter them. However, you could easily insert some error displays for
+tampering, since normal form interaction won't alter them. However, you could easily insert some error displays for
 those form errors, as well.

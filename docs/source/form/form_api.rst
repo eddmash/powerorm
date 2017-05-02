@@ -29,7 +29,9 @@ To create an unbound Form instance, simply instantiate the class:
 
     $form = new AuthorForm();
 
-To bind data to a form, pass the data as a associative array as the first parameter to your Form class constructor:
+The form constructor accepts an associative as argument.
+
+To bind data to a form, pass the data as a associative array with the key data to your Form class constructor:
 
 .. code-block:: php
 
@@ -45,26 +47,26 @@ be strings; the type of data you pass depends on the Field, as we'll see in a mo
 
 .. _form_is_bound:
 
-Form.isBound()
---------------
+Form.isBound
+------------
 
-If you need to distinguish between bound and unbound form instances at runtime, check the value of the form's is_bound
+If you need to distinguish between bound and unbound form instances at runtime, check the value of the form's isBound
 attribute:
 
 .. code-block:: php
 
     $form = new AuthorForm();
-    var_dump($form->isBound()); // false
+    var_dump($form->isBound); // false
 
     $form = new AuthorForm(['data'=>$data]);
-    var_dump($form->isBound()); // true
+    var_dump($form->isBound); // true
 
 Note that passing an empty associative array creates a bound form with empty data:
 
 .. code-block:: php
 
     $form = new AuthorForm([]);
-    var_dump($form->isBound()); // true
+    var_dump($form->isBound); // true
 
 If you have a bound Form instance and want to change the data somehow, or if you want to bind an unbound Form instance
 to some data, create another Form instance. There is no way to change data in a Form instance.
@@ -87,7 +89,7 @@ See :ref:`Cleaning and validating fields that depend on each other <validating_f
 Form.isValid()
 ..............
 
-The primary task of a Form object is to validate data. With a bound Form instance, call the is_valid() method to run
+The primary task of a Form object is to validate data. With a bound Form instance, call the isValid() method to run
 validation and return a boolean designating whether the data was valid:
 
 
@@ -101,7 +103,7 @@ validation and return a boolean designating whether the data was valid:
     var_dump($form->isValid()); // true
 
 Let's try with some invalid data. In this case, subject is blank (an error, because all fields are required by default)
-and sender is not a valid email address:
+and email is not a valid email address:
 
 .. code-block:: php
 
@@ -132,6 +134,34 @@ Access the errors method to get a associative array of error messages:
       ]
     ]
 
+In this associative array, the keys are the field names, and the values are an array of strings representing the error
+messages. The error messages are stored in an array because a field can have multiple error messages.
+
+You can access errors without having to call :ref:`isValid()<form_is_valid>` first. The form's data will be validated
+the first time either you call :ref:`isValid()<form_is_valid>` or access errors.
+
+The validation routines will only get called once, regardless of how many times you access errors or call
+:ref:`isValid()<form_is_valid>`. This means that if validation has side effects, those side effects will only be
+triggered once.
+
+Form.errors()->asData()
+.......................
+
+Access the errors method to get a associative array of error messages:
+
+.. code-block:: php
+
+    var_dump($form->errors());
+
+    [
+      "name" => [
+        ValidationError { }
+      ]
+      "email" => [
+        ValidationError { }
+      ]
+    ]
+
 Returns an associative array of fields to their original ValidationError instances.
 
 .. _form_add_error:
@@ -140,7 +170,7 @@ Form.addError($field, $error)
 .............................
 
 This method allows adding errors to specific fields from within the **Form.clean()** method, or from outside the form
-altogether; for instance from a view.
+altogether; for instance from a controller.
 
 The **field** argument is the name of the field to which the errors should be added. If its value is None the error
 will be treated as a non-field error as returned by :ref:`Form.nonFieldErrors() <non_field_errors>`.

@@ -18,6 +18,7 @@ Or add this to the composer.json file::
 
 You could also Download or Clone package from github.
 
+
 Then, require the vendor/autoload.php file to enable the autoloading mechanism provided by Composer. Otherwise, your
 application won't be able to find the classes of Powerform.
 
