@@ -254,6 +254,7 @@ class Queryset implements QuerysetInterface
 
         $qb->update($this->model->meta->dbTable);
         $params = [];
+        // todo prepare the value dude.
         foreach ($records as $name => $value) :
             $qb->set($name, '?');
             $params[] = $value;

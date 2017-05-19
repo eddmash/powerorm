@@ -11,15 +11,16 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\ValueError;
+use Eddmash\PowerOrm\Form\Fields\ModelChoiceField;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Delete;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToOneRel;
 use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Model;
-use Doctrine\DBAL\Connection;
 
 class ForeignKey extends RelatedField
 {
@@ -162,7 +163,7 @@ class ForeignKey extends RelatedField
     public function getValue(Model $modelInstance)
     {
         $result = null;
-
+        dump($modelInstance->_fieldCache);
         try {
             // incase the value has been set
             $result = ArrayHelper::getValue($modelInstance->_fieldCache, $this->getName(), ArrayHelper::STRICT);
@@ -183,7 +184,7 @@ class ForeignKey extends RelatedField
         if (!$value instanceof $this->relation->toModel):
             throw new ValueError(
                 sprintf(
-                    'Cannot assign "%s": "%s.%s" must be a "%s" instance.',
+                    'Cannot assign "%s": "%s->%s" must be a "%s" instance.',
                     $value,
                     $this->scopeModel->meta->getNamespacedModelName(),
                     $this->getName(),
@@ -235,5 +236,26 @@ class ForeignKey extends RelatedField
         return $manager;
 
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function formField($kwargs = [])
+    {
+        $kwargs['fieldClass'] = ArrayHelper::getValue(
+            $kwargs,
+            'fieldClass',
+            ModelChoiceField::class
+        );
+        if (!ArrayHelper::hasKey($kwargs, 'queryset')) :
+            $model = $this->relation->getToModel();
+            $kwargs['queryset'] = $model::objects();
+        endif;
+
+        $kwargs['valueField'] = $this->relation->fieldName;
+
+        return parent::formField($kwargs);
+    }
+
 
 }

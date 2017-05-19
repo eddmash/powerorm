@@ -660,7 +660,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function valueFromObject($obj)
     {
-        return $obj->{$this->attrName};
+        return $obj->{$this->getName()};
     }
 
     /**
