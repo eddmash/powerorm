@@ -123,7 +123,7 @@ class Query extends BaseObject
      * Creates the SQL for this query. Returns the SQL string and list of parameters.
      *
      * @param Connection $connection
-     * @param bool $isSubQuery
+     * @param bool       $isSubQuery
      *
      * @return array
      *
@@ -383,7 +383,7 @@ class Query extends BaseObject
      */
     private function buildCondition($lookup, $lhs, $rhs)
     {
-        $lookup = (array)$lookup;
+        $lookup = (array) $lookup;
 
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
@@ -680,7 +680,7 @@ class Query extends BaseObject
 
     public function addAnnotation($kwargs = [])
     {
-        /**@var $annotation BaseExpression */
+        /** @var $annotation BaseExpression */
         $annotation = ArrayHelper::getValue($kwargs, 'annotation');
         $alias = ArrayHelper::getValue($kwargs, 'alias');
         $isSummary = ArrayHelper::getValue($kwargs, 'isSummary', false);
@@ -834,7 +834,9 @@ class Query extends BaseObject
 
     /**
      * @param string $class
+     *
      * @return $this
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

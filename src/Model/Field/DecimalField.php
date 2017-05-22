@@ -16,7 +16,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Checks\CheckError;
 
 /**
- * A fixed-precision decimal number. SQl column DECIMAL(M,D)
+ * A fixed-precision decimal number. SQl column DECIMAL(M,D).
  *
  * Has two required arguments:
  *
@@ -38,7 +38,6 @@ use Eddmash\PowerOrm\Checks\CheckError;
  *
  * The default form widget for this field is a 'text'.
  *
- * @package Eddmash\PowerOrm\Model\Field
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -57,16 +56,16 @@ class DecimalField extends Field
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function formField($kwargs = [])
     {
         $kwargs['maxDigits'] = $this->maxDigits;
         $kwargs['decimalPlaces'] = $this->decimalPlaces;
         $kwargs['fieldClass'] = \Eddmash\PowerOrm\Form\Fields\DecimalField::class;
+
         return parent::formField($kwargs);
     }
-
 
     /**
      * {@inheritdoc}
@@ -76,11 +75,13 @@ class DecimalField extends Field
         $checks = parent::checks();
         $checks = array_merge($checks, $this->decimalPlacesCheck());
         $checks = array_merge($checks, $this->checkMaxDigits());
+
         return $checks;
     }
 
     /**
      * @ignore
+     *
      * @return array
      */
     private function decimalPlacesCheck()
@@ -88,29 +89,31 @@ class DecimalField extends Field
         if (empty($this->decimalPlaces)):
             return [
                 CheckError::createObject([
-                    "message" => sprintf("%s expects 'decimalPlaces' attribute to be set.", get_class($this)),
-                    'hint' => NULL,
+                    'message' => sprintf("%s expects 'decimalPlaces' attribute to be set.", get_class($this)),
+                    'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E130'
-                ])
+                    'id' => 'fields.E130',
+                ]),
             ];
         endif;
         if (!is_numeric($this->decimalPlaces) || $this->decimalPlaces < 0):
             return [
                 CheckError::createObject([
-                    "message" => sprintf("%s expects 'decimalPlaces' attribute to be a positive integer.",
+                    'message' => sprintf("%s expects 'decimalPlaces' attribute to be a positive integer.",
                         static::class),
-                    'hint' => NULL,
+                    'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E131'
-                ])
+                    'id' => 'fields.E131',
+                ]),
             ];
         endif;
+
         return [];
     }
 
     /**
      * @ignore
+     *
      * @return array
      */
     private function checkMaxDigits()
@@ -118,36 +121,37 @@ class DecimalField extends Field
         if (empty($this->maxDigits)):
             return [
                 CheckError::createObject([
-                    "message" => sprintf("%s expects 'maxDigits' attribute to be set.", static::class),
-                    'hint' => NULL,
+                    'message' => sprintf("%s expects 'maxDigits' attribute to be set.", static::class),
+                    'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E132'
-                ])
+                    'id' => 'fields.E132',
+                ]),
             ];
         endif;
 
         if (!is_numeric($this->maxDigits) || $this->maxDigits < 0):
             return [
                 CheckError::createObject([
-                    "message" => sprintf("%s expects 'maxDigits' attribute to be a positive integer",
+                    'message' => sprintf("%s expects 'maxDigits' attribute to be a positive integer",
                         static::class),
-                    'hint' => NULL,
+                    'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E133'
-                ])];
+                    'id' => 'fields.E133',
+                ]), ];
         endif;
 
         // ensure max_digits is greater than decimal_places
         if ($this->maxDigits < $this->decimalPlaces):
             return [
                 CheckError::createObject([
-                    "message" => sprintf("%s expects 'maxDigits' to be greater than 'decimalPlaces'",
+                    'message' => sprintf("%s expects 'maxDigits' to be greater than 'decimalPlaces'",
                         static::class),
-                    'hint' => NULL,
+                    'hint' => null,
                     'context' => $this,
-                    'id' => 'fields.E134'
-                ])];
+                    'id' => 'fields.E134',
+                ]), ];
         endif;
+
         return [];
     }
 

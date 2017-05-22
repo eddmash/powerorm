@@ -250,9 +250,10 @@ class Queryset implements QuerysetInterface
 
     public function _update($records)
     {
-        /**@var $clone UpdateQuery*/
+        /** @var $clone UpdateQuery */
         $clone = $this->query->deepClone(UpdateQuery::class);
         $clone->addUpdateFields($records);
+
         return $clone->execute($this->connection);
     }
 

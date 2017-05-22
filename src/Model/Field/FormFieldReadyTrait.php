@@ -8,7 +8,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\Exception\ValidationError;
@@ -16,10 +15,9 @@ use Eddmash\PowerOrm\Form\Fields\TypedChoiceField;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Model;
 
-
 /**
  * This trait makes it possible for model fields to easily be used on model forms.
- * @package Eddmash\PowerOrm\Model\Field
+ *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
 trait FormFieldReadyTrait
@@ -28,7 +26,9 @@ trait FormFieldReadyTrait
 
     /**
      * Returns an Eddmash\PowerOrm\Form\Fields\Field instance that represents this database field.
+     *
      * @param array $kwargs
+     *
      * @return mixed
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
@@ -49,7 +49,6 @@ trait FormFieldReadyTrait
         if ($this->hasDefault()):
             $defaults['initial'] = $this->getDefault();
         endif;
-
 
         if ($this->choices):
             $include_blank = true;
@@ -76,6 +75,7 @@ trait FormFieldReadyTrait
 
     /**
      * Set value of the field on the from as received from the form.
+     *
      * @param Model $model
      * @param $value
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
@@ -99,6 +99,7 @@ trait FormFieldReadyTrait
      * throws ValidationError of conversion is not possible.
      *
      * @param $value
+     *
      * @return mixed
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
@@ -112,6 +113,7 @@ trait FormFieldReadyTrait
      *
      * @param Model $model
      * @param $value
+     *
      * @throws ValidationError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
@@ -148,7 +150,8 @@ trait FormFieldReadyTrait
     }
 
     /**
-     * Returns the validators to be applied on this field. this returns both getDefaultValidators() and getValidators()
+     * Returns the validators to be applied on this field. this returns both getDefaultValidators() and getValidators().
+     *
      * @return array
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
@@ -159,6 +162,7 @@ trait FormFieldReadyTrait
 
     /**
      * Returns the default validators to be applied on this field.
+     *
      * @return array
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
@@ -169,6 +173,7 @@ trait FormFieldReadyTrait
 
     /**
      * Returns the default validators to be applied on this field.
+     *
      * @return array
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
@@ -179,7 +184,9 @@ trait FormFieldReadyTrait
 
     /**
      * Passes the value through all the validators for this field.
+     *
      * @param $value
+     *
      * @throws ValidationError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */

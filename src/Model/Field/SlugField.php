@@ -8,9 +8,7 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Eddmash\PowerOrm\Model\Field;
-
 
 use Eddmash\PowerOrm\Form\Validations\SlugValidator;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -25,37 +23,38 @@ class SlugField extends CharField
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getDefaultValidators()
     {
         $validators = parent::getDefaultValidators();
         $validators[] = SlugValidator::instance();
+
         return $validators;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getConstructorArgs()
     {
         $kwargs = parent::getConstructorArgs();
         $maxLength = ArrayHelper::getValue($kwargs, 'maxLength');
-        if ($maxLength===50) :
+        if ($maxLength === 50) :
             unset($kwargs['maxLength']);
         endif;
+
         return $kwargs;
     }
 
-
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function formField($kwargs = [])
     {
         $kwargs['fieldClass'] = \Eddmash\PowerOrm\Form\Fields\SlugField::class;
+
         return parent::formField($kwargs);
     }
-
 
 }

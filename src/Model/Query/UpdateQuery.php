@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query;
 
-
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\TypeError;
@@ -20,7 +19,7 @@ use Eddmash\PowerOrm\Model\Model;
 
 /**
  * Represents an "update" SQL query.
- * @package Eddmash\PowerOrm\Model\Query
+ *
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -28,7 +27,6 @@ use Eddmash\PowerOrm\Model\Model;
 class UpdateQuery extends Query
 {
     protected $values = [];
-
 
     /**
      * @return array
@@ -40,6 +38,7 @@ class UpdateQuery extends Query
 
     /**
      * @param array $values
+     *
      * @throws FieldError
      */
     public function addUpdateValues($values)
@@ -51,7 +50,7 @@ class UpdateQuery extends Query
             $isDirect = (!($field->autoCreated && !$field->concrete) || !$field->concrete);
             if (!$isDirect || ($field->isRelation && $field->manyToMany)):
                 throw new  FieldError(
-                    sprintf('Cannot update model field %r (only non-relations and ' .
+                    sprintf('Cannot update model field %r (only non-relations and '.
                         'foreign keys permitted).', $field)
                 );
             endif;
@@ -82,7 +81,7 @@ class UpdateQuery extends Query
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function asSql(Connection $connection, $isSubQuery = false)
     {
@@ -90,8 +89,8 @@ class UpdateQuery extends Query
         $qb->update($this->tables[0]);
         $params = [];
 
-        /**@var $field Field */
-        /**@var $model Model */
+        /** @var $field Field */
+        /** @var $model Model */
         foreach ($this->values as $valItem) :
             $field = $valItem[0];
             $model = $valItem[1];
@@ -109,8 +108,7 @@ class UpdateQuery extends Query
                     );
                 else:
                     throw new TypeError(
-                        "Tried to update field '%s' with a model instance, '%s'. Use a value compatible with '%s'."
-                        , $field->getName(), $value, get_class($field));
+                        "Tried to update field '%s' with a model instance, '%s'. Use a value compatible with '%s'.", $field->getName(), $value, get_class($field));
 
                 endif;
 
@@ -133,13 +131,13 @@ class UpdateQuery extends Query
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function execute(Connection $connection)
     {
         $qb = $this->asSql($connection);
-        return (boolean)$qb->execute();
-    }
 
+        return (bool) $qb->execute();
+    }
 
 }

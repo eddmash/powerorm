@@ -8,11 +8,8 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Eddmash\PowerOrm\Exception;
-
 
 class ImproperlyConfigured extends \Exception
 {
-
 }

@@ -20,7 +20,6 @@ class CharField extends Field
     public function __construct(array $config = [])
     {
         parent::__construct($config);
-        $this->validators[] = MaxLengthValidator::instance(['maxLength'=>$this->maxLength]);
     }
 
     public function checks()
@@ -82,4 +81,14 @@ class CharField extends Field
         return (string) $value;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultValidators()
+    {
+        $validators = parent::getDefaultValidators();
+        $validators[] = MaxLengthValidator::instance(['maxLength' => $this->maxLength]);
+
+        return $validators;
+    }
 }

@@ -18,7 +18,6 @@ use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\ValidationError;
-use Eddmash\PowerOrm\Form\Fields\TypedChoiceField;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\GreaterThan;
@@ -43,7 +42,7 @@ class Field extends DeconstructableObject implements FieldInterface
 
     const DEBUG_IGNORE = ['scopeModel', 'relation'];
 
-    const BLANK_CHOICE_DASH = ["" => "---------"];
+    const BLANK_CHOICE_DASH = ['' => '---------'];
 
     private $name;
 
@@ -271,7 +270,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model $modelObject
+     * @param Model  $modelObject
      *
      * @throws FieldError
      *
@@ -526,7 +525,9 @@ class Field extends DeconstructableObject implements FieldInterface
 
     /**
      * Returns choices with a default blank choices included, for use as SelectField choices for this field.
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getChoices($opts = [])
@@ -545,7 +546,6 @@ class Field extends DeconstructableObject implements FieldInterface
         // load from relationships todo
     }
 
-
     /**
      * Method called prior to prepareValueForDatabaseSave() to prepare the value before being saved
      * (e.g. for DateField.auto_now).
@@ -558,7 +558,7 @@ class Field extends DeconstructableObject implements FieldInterface
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool $add is whether the instance is being saved to the database for the first time
+     * @param bool  $add   is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *
@@ -598,7 +598,7 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * By default it returns value passed in if prepared=true and prepareValue() if is False.
      *
-     * @param mixed $value
+     * @param mixed                     $value
      * @param \Doctrine\DBAL\Connection $connection
      *
      * @return mixed

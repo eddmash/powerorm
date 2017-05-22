@@ -104,12 +104,11 @@ class AutoField extends Field
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function formField($kwargs = [])
     {
-        return null;
+        return;
     }
-
 
 }

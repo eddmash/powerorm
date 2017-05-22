@@ -335,7 +335,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string $name
+     * @param string       $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -421,9 +421,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param Model $model
-     * @param string $method the method to invoke
-     * @param null $args the arguments to pass to the method
+     * @param Model     $model
+     * @param string    $method     the method to invoke
+     * @param null      $args       the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -520,7 +520,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 if (!empty($parentFields)):
                     throw new TypeError(
                         sprintf(
-                            'Abstract base class containing model fields not ' .
+                            'Abstract base class containing model fields not '.
                             "permitted for proxy model '%s'.",
                             $parentName
                         )
@@ -572,7 +572,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if ($isProxy && $concreteParent == null):
             throw new TypeError(
                 sprintf(
-                    "Proxy model '%s' has no non-abstract" .
+                    "Proxy model '%s' has no non-abstract".
                     ' model base class.',
                     $model->getShortClassName()
                 )
@@ -755,7 +755,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array)unserialize((string)$serialized);
+        $this->_fieldCache = (array) unserialize((string) $serialized);
     }
 
     public function __get($name)
@@ -763,6 +763,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         // pk has a special meaning to the orm.
         if ($name === 'pk'):
             $pkName = $this->meta->primaryKey->getAttrName();
+
             return $this->{$pkName};
         endif;
         try {
@@ -791,6 +792,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if ($name === 'pk'):
             $pkName = $this->meta->primaryKey->getAttrName();
             $this->{$pkName} = $value;
+
             return;
         endif;
 
@@ -892,8 +894,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null $connection
-     * @param null $updateField
+     * @param null       $connection
+     * @param null       $updateField
      *
      * @throws ValueError
      *
@@ -960,8 +962,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             if ($nonModelFields):
                 throw new ValueError(
                     sprintf(
-                        'The following fields do not exist in this ' .
-                        'model or are m2m fields: %s' . implode(', ', $nonModelFields)
+                        'The following fields do not exist in this '.
+                        'model or are m2m fields: %s'.implode(', ', $nonModelFields)
                     )
                 );
             endif;
@@ -996,7 +998,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null $updateFields
+     * @param null       $updateFields
      *
      * @since 1.1.0
      *
@@ -1090,8 +1092,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             foreach ($nonePkUpdateFields as $nonePkUpdateField) :
                 $values[] = [
                     $nonePkUpdateField,
-                    null,//model should go here
-                    $nonePkUpdateField->preSave($this, false)
+                    null, //model should go here
+                    $nonePkUpdateField->preSave($this, false),
                 ];
             endforeach;
 
@@ -1200,6 +1202,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 return false;
             endif;
         endif;
+
         return $filtered->_update($records);
     }
 
@@ -1215,8 +1218,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * Used during save.its usually invoked when saving related fields.
      *
      * @param RelatedField $field
+     *
      * @return mixed
+     *
      * @throws ValueError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -1224,9 +1230,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function prepareDatabaseSave(RelatedField $field)
     {
         if ($this->pk):
-            throw new  ValueError("Unsaved model instance %s cannot be used in an ORM query.", $this);
+            throw new  ValueError('Unsaved model instance %s cannot be used in an ORM query.', $this);
         endif;
         $name = $field->relation->getRelatedField()->getAttrName();
+
         return $this->{$name};
     }
 
@@ -1236,8 +1243,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         foreach ($this->_fieldCache as $name => $item) :
             $meta[$name] = $item;
         endforeach;
+
         return $meta;
     }
-
 
 }

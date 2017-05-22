@@ -31,23 +31,24 @@ class BooleanField extends Field
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function formField($kwargs = [])
     {
         $kwargs['fieldClass'] = \Eddmash\PowerOrm\Form\Fields\BooleanField::class;
+
         return parent::formField($kwargs);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getConstructorArgs()
     {
         $kwargs = parent::getConstructorArgs();
         unset($kwargs['formBlank']);
+
         return $kwargs;
     }
-
 
 }

@@ -31,22 +31,24 @@ class EmailField extends CharField
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function formField($kwargs = [])
     {
         $kwargs['fieldClass'] = \Eddmash\PowerOrm\Form\Fields\EmailField::class;
+
         return parent::formField($kwargs);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getDefaultValidators()
     {
 
         $validators = parent::getDefaultValidators();
         $validators[] = EmailValidator::instance();
+
         return $validators;
     }
 

@@ -25,13 +25,13 @@ class DateTimeField extends DateField
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function formField($kwargs = [])
     {
         $kwargs['fieldClass'] = \Eddmash\PowerOrm\Form\Fields\DateTimeField::class;
+
         return parent::formField($kwargs);
     }
-
 
 }

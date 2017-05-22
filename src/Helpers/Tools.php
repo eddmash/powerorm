@@ -23,11 +23,11 @@ class Tools
     /**
      * Takes an array and turns it into a string .
      *
-     * @param mixed $data the array to be converted to string
-     * @param int $indent how to indent the items in the array
-     * @param string $close item to come at the after of the arrays closing braces
-     * @param string $start item to come at the before of the arrays opening braces
-     * @param int $level at what level we are operating at, level=0 is the encasing level,just unifies the different
+     * @param mixed  $data   the array to be converted to string
+     * @param int    $indent how to indent the items in the array
+     * @param string $close  item to come at the after of the arrays closing braces
+     * @param string $start  item to come at the before of the arrays opening braces
+     * @param int    $level  at what level we are operating at, level=0 is the encasing level,just unifies the different
      *                       forms of data
      *
      * @return string
@@ -49,7 +49,7 @@ class Tools
         }
 
         if (!empty($start)) {
-            $stringState .= str_repeat($indentCharacter, $indent) . "$start";
+            $stringState .= str_repeat($indentCharacter, $indent)."$start";
         }
 
         $totalCount = (is_array($data)) ? count($data) : 1;
@@ -68,7 +68,7 @@ class Tools
             if (is_array($value)) {
                 // HANDLE VALUE IF ARRAY
 
-                $stringState .= '[' . $linebreak;
+                $stringState .= '['.$linebreak;
 
                 if (!is_numeric($key)) {
                     $stringState .= "'$key'=>";
@@ -114,7 +114,7 @@ class Tools
             }
 
             if ($counter != $totalCount && $level > 1) {
-                $stringState .= ', ' . $linebreak;
+                $stringState .= ', '.$linebreak;
             }
 
             ++$counter;
@@ -131,8 +131,8 @@ class Tools
     /**
      * Reads a json file and return the files data converted to there respective php types.
      *
-     * @param string $full_file_path path to the json file to read
-     * @param bool|false $ass_array [optional]  When <b>TRUE</b>, returned objects will be converted into
+     * @param string     $full_file_path path to the json file to read
+     * @param bool|false $ass_array      [optional]  When <b>TRUE</b>, returned objects will be converted into
      *                                   associative arrays
      *
      * @return mixed
@@ -149,7 +149,7 @@ class Tools
      */
     public static function countriesList()
     {
-        $path = dirname(realpath(__FILE__)) . DIRECTORY_SEPARATOR . 'data/countries.json';
+        $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/countries.json';
         $countries = self::readJson($path, true);
 
         $listCountries = array();
@@ -182,7 +182,7 @@ class Tools
      */
     public static function phoneCodesList()
     {
-        $path = dirname(realpath(__FILE__)) . DIRECTORY_SEPARATOR . 'data/phone.json';
+        $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/phone.json';
         $phone_codes = self::readJson($path, true);
 
         $listCodes = array();
@@ -197,7 +197,7 @@ class Tools
     /**
      * Fetches the country based on the phone code passed in.
      *
-     * @param string $code the phone code to search for
+     * @param string     $code              the phone code to search for
      * @param bool|false $show_country_code if to show the country code or its full name
      *
      * @return mixed
@@ -221,7 +221,7 @@ class Tools
      */
     public static function currencyList()
     {
-        $path = dirname(realpath(__FILE__)) . DIRECTORY_SEPARATOR . 'data/currency.json';
+        $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/currency.json';
         $currency = self::readJson($path, true);
 
         $listCurrency = array();
@@ -251,10 +251,10 @@ class Tools
      * Schedule `callback` to be called once `model` and all `related_models` have been imported and registered with
      * the app registry.
      *
-     * @param callback $callback will be called with the newly-loaded model classes as its any optional keyword arguments
-     * @param Model $scopeModel the model on which the method was invoked
-     * @param mixed $relModel the related models that needs to be resolved
-     * @param array $kwargs
+     * @param callback $callback   will be called with the newly-loaded model classes as its any optional keyword arguments
+     * @param Model    $scopeModel the model on which the method was invoked
+     * @param mixed    $relModel   the related models that needs to be resolved
+     * @param array    $kwargs
      *
      * @since 1.1.0
      *
@@ -296,7 +296,8 @@ class Tools
      *
      * This method can be used to convert exceptions inside of methods like `__toString()`
      * to PHP errors because exceptions cannot be thrown inside of them.
-     * @param \Exception $exception the exception to convert to a PHP error.
+     *
+     * @param \Exception $exception the exception to convert to a PHP error
      */
     public static function convertExceptionToError($exception)
     {
@@ -305,8 +306,10 @@ class Tools
 
     /**
      * Converts an exception into a simple string.
+     *
      * @param \Exception $exception the exception being converted
-     * @return string the string representation of the exception.
+     *
+     * @return string the string representation of the exception
      */
     public static function convertExceptionToString($exception)
     {
@@ -317,9 +320,9 @@ class Tools
         } else {
             $message = 'Exception';
         }
-        $message .= " '" . get_class($exception) . "' with message '{$exception->getMessage()}' \n\nin "
-            . $exception->getFile() . ':' . $exception->getLine() . "\n\n"
-            . "Stack trace:\n" . $exception->getTraceAsString();
+        $message .= " '".get_class($exception)."' with message '{$exception->getMessage()}' \n\nin "
+            .$exception->getFile().':'.$exception->getLine()."\n\n"
+            ."Stack trace:\n".$exception->getTraceAsString();
 
         return $message;
     }

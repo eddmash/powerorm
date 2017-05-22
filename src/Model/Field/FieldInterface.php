@@ -51,7 +51,6 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface
      */
     public function convertToPHPValue($value);
 
-
     /**
      * Method called prior to prepare_value_for_db() to prepare the value before being saved
      * (e.g. for DateField.auto_now).

@@ -238,7 +238,7 @@ class ForeignKey extends RelatedField
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function formField($kwargs = [])
     {
@@ -256,6 +256,5 @@ class ForeignKey extends RelatedField
 
         return parent::formField($kwargs);
     }
-
 
 }

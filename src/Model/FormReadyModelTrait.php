@@ -8,29 +8,27 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Eddmash\PowerOrm\Model;
 
 use Eddmash\PowerOrm\Exception\ValidationError;
 use Eddmash\PowerOrm\Model\Field\Field;
 
-
 /**
  * Ensures the model is ready for use with powerorm forms.
- * @package Eddmash\PowerOrm\Model
+ *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
 trait FormReadyModelTrait
 {
-
     /**
      * Calls cleanFields, clean on the model and throws a ``ValidationError`` for any errors that occurred.
      *
      * @param array $exclude
+     *
      * @throws ValidationError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function fullClean($exclude=[])
+    public function fullClean($exclude = [])
     {
         $errors = [];
 
@@ -52,22 +50,23 @@ trait FormReadyModelTrait
 
     public function clean()
     {
-        
+
     }
 
     /**
      * Cleans all fields and throw a ValidationError containing an associtive array of all validation errors if any
-     * occur
+     * occur.
      *
      * @param array $exclude
+     *
      * @throws ValidationError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function cleanFields($exclude =[])
+    public function cleanFields($exclude = [])
     {
         $errors = [];
 
-        /**@var $field Field*/
+        /** @var $field Field */
         foreach ($this->meta->getConcreteFields() as $field) :
             if (in_array($field->getName(), $exclude)) :
                 continue;
