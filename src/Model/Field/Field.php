@@ -547,7 +547,7 @@ class Field extends DeconstructableObject implements FieldInterface
 
 
     /**
-     * Method called prior to prepareValueForDb() to prepare the value before being saved
+     * Method called prior to prepareValueForDatabaseSave() to prepare the value before being saved
      * (e.g. for DateField.auto_now).
      *
      * model is the instance this field belongs to and add is whether the instance is being saved to the
@@ -620,9 +620,8 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * Same as the prepareValueForDatabase(), but called when the field value must be saved to the database.
+     * Called when the field value must be saved to the database.
      *
-     * By default returns prepare_value_for_db().
      *
      * @param $value
      * @param $connection
@@ -721,7 +720,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function getValue(Model $modelInstance)
     {
-        return $modelInstance->{$this->getAttrName()};
+        return $modelInstance->_fieldCache[$this->getAttrName()];
     }
 
     /**
@@ -729,7 +728,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function setValue(Model $modelInstance, $value)
     {
-        $modelInstance->{$this->getAttrName()} = $value;
+        $modelInstance->_fieldCache[$this->getAttrName()] = $value;
     }
 }
 

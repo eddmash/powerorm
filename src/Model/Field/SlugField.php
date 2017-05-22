@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the ci4 package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *

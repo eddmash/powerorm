@@ -250,25 +250,10 @@ class Queryset implements QuerysetInterface
 
     public function _update($records)
     {
-        $qb = $this->connection->createQueryBuilder();
-
-        $qb->update($this->model->meta->dbTable);
-        $params = [];
-        // todo prepare the value dude.
-        foreach ($records as $name => $value) :
-            $qb->set($name, '?');
-            $params[] = $value;
-        endforeach;
-
-        list($sql, $whereParams) = $this->query->where->asSql($this->connection);
-
-        $qb->where($sql);
-        $params = array_merge($params, $whereParams);
-        foreach ($params as $index => $param) :
-            $qb->setParameter($index, $param);
-        endforeach;
-
-        return $qb->execute() > 0;
+        /**@var $clone UpdateQuery*/
+        $clone = $this->query->deepClone(UpdateQuery::class);
+        $clone->addUpdateFields($records);
+        return $clone->execute($this->connection);
     }
 
     public function _insert($model, $fields, $returnId)

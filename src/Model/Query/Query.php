@@ -123,7 +123,7 @@ class Query extends BaseObject
      * Creates the SQL for this query. Returns the SQL string and list of parameters.
      *
      * @param Connection $connection
-     * @param bool       $isSubQuery
+     * @param bool $isSubQuery
      *
      * @return array
      *
@@ -383,7 +383,7 @@ class Query extends BaseObject
      */
     private function buildCondition($lookup, $lhs, $rhs)
     {
-        $lookup = (array) $lookup;
+        $lookup = (array)$lookup;
 
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
@@ -428,14 +428,14 @@ class Query extends BaseObject
 
     private function prepareLookupValue($value, $lookups)
     {
-        if(empty($lookups)):
+        if (empty($lookups)):
             $lookups = ['exact'];
         endif;
 
         // Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         // uses of null as a query value.
-        if(is_null($value)):
-            if(!in_array(array_pop($lookups), ['exact'])):
+        if (is_null($value)):
+            if (!in_array(array_pop($lookups), ['exact'])):
                 throw new ValueError('Cannot use None as a query value');
             endif;
 
@@ -680,7 +680,7 @@ class Query extends BaseObject
 
     public function addAnnotation($kwargs = [])
     {
-        /**@var $annotation BaseExpression*/
+        /**@var $annotation BaseExpression */
         $annotation = ArrayHelper::getValue($kwargs, 'annotation');
         $alias = ArrayHelper::getValue($kwargs, 'alias');
         $isSummary = ArrayHelper::getValue($kwargs, 'isSummary', false);
@@ -833,15 +833,17 @@ class Query extends BaseObject
     }
 
     /**
+     * @param string $class
      * @return $this
-     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function deepClone()
+    public function deepClone($class = null)
     {
-        $obj = new static($this->model);
+
+        $class = (is_null($class)) ? static::class : $class;
+        $obj = new $class($this->model);
         $obj->aliasRefCount = $this->aliasRefCount;
         $obj->useDefaultCols = $this->useDefaultCols;
         $obj->tableAlias = $this->tableAlias;

@@ -12,6 +12,7 @@ namespace Eddmash\PowerOrm\Model\Manager;
 
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Exception\MethodNotFoundException;
+use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 

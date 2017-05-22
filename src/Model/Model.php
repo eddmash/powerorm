@@ -335,7 +335,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string       $name
+     * @param string $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -421,9 +421,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param Model     $model
-     * @param string    $method     the method to invoke
-     * @param null      $args       the arguments to pass to the method
+     * @param Model $model
+     * @param string $method the method to invoke
+     * @param null $args the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -520,7 +520,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 if (!empty($parentFields)):
                     throw new TypeError(
                         sprintf(
-                            'Abstract base class containing model fields not '.
+                            'Abstract base class containing model fields not ' .
                             "permitted for proxy model '%s'.",
                             $parentName
                         )
@@ -572,7 +572,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if ($isProxy && $concreteParent == null):
             throw new TypeError(
                 sprintf(
-                    "Proxy model '%s' has no non-abstract".
+                    "Proxy model '%s' has no non-abstract" .
                     ' model base class.',
                     $model->getShortClassName()
                 )
@@ -755,12 +755,16 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array) unserialize((string) $serialized);
+        $this->_fieldCache = (array)unserialize((string)$serialized);
     }
 
     public function __get($name)
     {
-
+        // pk has a special meaning to the orm.
+        if ($name === 'pk'):
+            $pkName = $this->meta->primaryKey->getAttrName();
+            return $this->{$pkName};
+        endif;
         try {
             /** @var $field RelatedField */
             $field = $this->meta->getField($name);
@@ -783,6 +787,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __set($name, $value)
     {
+        // pk has a special meaning to the orm.
+        if ($name === 'pk'):
+            $pkName = $this->meta->primaryKey->getAttrName();
+            $this->{$pkName} = $value;
+            return;
+        endif;
+
         /* @var $field RelatedField */
         try {
             $field = $this->meta->getField($name);
@@ -839,13 +850,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function getDeferredFields()
     {
-        $objectProperties = get_object_vars($this);
         $concreteFields = $this->meta->getConcreteFields();
 
         $deferedFields = [];
         /** @var $concreteField Field */
         foreach ($concreteFields as $concreteField) :
-            if (!array_key_exists($concreteField->getName(), $objectProperties)):
+            if (!array_key_exists($concreteField->getName(), $this->_fieldCache)):
                 $deferedFields[] = $concreteField->getName();
             endif;
 
@@ -882,8 +892,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $connection
-     * @param null       $updateField
+     * @param null $connection
+     * @param null $updateField
      *
      * @throws ValueError
      *
@@ -950,8 +960,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             if ($nonModelFields):
                 throw new ValueError(
                     sprintf(
-                        'The following fields do not exist in this '.
-                        'model or are m2m fields: %s'.implode(', ', $nonModelFields)
+                        'The following fields do not exist in this ' .
+                        'model or are m2m fields: %s' . implode(', ', $nonModelFields)
                     )
                 );
             endif;
@@ -967,6 +977,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 endif;
             endforeach;
             $loadedFields = array_diff($fieldsNames, $deferedFields);
+
             if ($loadedFields):
                 $updateFields = $loadedFields;
             endif;
@@ -985,7 +996,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $updateFields
+     * @param null $updateFields
      *
      * @since 1.1.0
      *
@@ -1031,12 +1042,16 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $forceInsert = false,
         $forceUpdate = false,
         $updateFields = null
-    ) {
+    )
+    {
         $meta = $this->meta;
 
+        /** @var $nonPkFields Field[] */
         $nonPkFields = [];
+
         /** @var $field Field */
         foreach ($meta->getConcreteFields() as $name => $field) :
+
             if ($field->primaryKey) :
                 continue;
             endif;
@@ -1046,10 +1061,14 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         // if any fields we passed in use those
         /** @var $nonePkUpdateFields Field[] */
         $nonePkUpdateFields = [];
+
         if ($updateFields) :
-            foreach ($nonPkFields as $name => $nonPkField) :
-                if (in_array($name, $updateFields)) :
-                    $nonePkUpdateFields[$name] = $nonPkField;
+            foreach ($nonPkFields as $nonPkField) :
+
+                if (in_array($nonPkField->getName(), $updateFields)) :
+                    $nonePkUpdateFields[$nonPkField->getName()] = $nonPkField;
+                elseif (in_array($nonPkField->getAttrName(), $updateFields)):
+                    $nonePkUpdateFields[$nonPkField->getAttrName()] = $nonPkField;
                 endif;
             endforeach;
         else:
@@ -1069,8 +1088,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if ($pkSet && !$forceInsert):
             $values = [];
             foreach ($nonePkUpdateFields as $nonePkUpdateField) :
-                $values[$nonePkUpdateField->getColumnName()] = $nonePkUpdateField->preSave($this, false);
+                $values[] = [
+                    $nonePkUpdateField,
+                    null,//model should go here
+                    $nonePkUpdateField->preSave($this, false)
+                ];
             endforeach;
+
             $updated = $this->doUpdate($values, $pkValue, $forceUpdate);
         endif;
 
@@ -1176,7 +1200,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 return false;
             endif;
         endif;
-
         return $filtered->_update($records);
     }
 
@@ -1187,5 +1210,34 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         return parent::hasProperty($name) || array_key_exists($name, $this->_fieldCache);
     }
+
+    /**
+     * Used during save.its usually invoked when saving related fields.
+     *
+     * @param RelatedField $field
+     * @return mixed
+     * @throws ValueError
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function prepareDatabaseSave(RelatedField $field)
+    {
+        if ($this->pk):
+            throw new  ValueError("Unsaved model instance %s cannot be used in an ORM query.", $this);
+        endif;
+        $name = $field->relation->getRelatedField()->getAttrName();
+        return $this->{$name};
+    }
+
+    public function __debugInfo()
+    {
+        $meta = parent::__debugInfo();
+        foreach ($this->_fieldCache as $name => $item) :
+            $meta[$name] = $item;
+        endforeach;
+        return $meta;
+    }
+
 
 }

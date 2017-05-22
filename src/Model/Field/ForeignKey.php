@@ -163,7 +163,7 @@ class ForeignKey extends RelatedField
     public function getValue(Model $modelInstance)
     {
         $result = null;
-        dump($modelInstance->_fieldCache);
+
         try {
             // incase the value has been set
             $result = ArrayHelper::getValue($modelInstance->_fieldCache, $this->getName(), ArrayHelper::STRICT);
