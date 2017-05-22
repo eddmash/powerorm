@@ -434,8 +434,7 @@ class ManyToManyField extends RelatedField
      */
     public function saveFromForm(Model $model, $value)
     {
-
-        dump($value);
+        $model->{$this->getName()}->set($value);
     }
 
 

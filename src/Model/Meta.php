@@ -11,6 +11,7 @@ use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
 
@@ -84,7 +85,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     /**
      * Holds many to many relationship that the model initiated.
      *
-     * @var array
+     * @var ManyToManyField[]
      */
     public $localManyToMany = [];
 
@@ -225,6 +226,10 @@ class Meta extends DeconstructableObject implements MetaInterface
         throw new FieldDoesNotExist(sprintf('%s has no field named %s', $this->namspacedModelName, $name));
     }
 
+    /**
+     * @return Field[]
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
     public function getNonM2MForwardFields()
     {
         $forwardFields = [];
@@ -273,23 +278,6 @@ class Meta extends DeconstructableObject implements MetaInterface
         return $concreteFields;
     }
 
-    /**
-     * Returns all the localFields that are concrete.
-     *
-     * @since 1.1.0
-     * @deprecated use {@see getConcreteFields}
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function getLocalConcreteFields()
-    {
-        $concrete = [];
-        foreach ($this->localFields as $name => $field) :
-            $concrete[$name] = $field;
-        endforeach;
-
-        return $concrete;
-    }
 
     /**
      *  Returns all related objects pointing to the current model. The related objects can come from a one-to-one,

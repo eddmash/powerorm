@@ -12,6 +12,7 @@ namespace Eddmash\PowerOrm\Model\Manager;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
@@ -115,13 +116,36 @@ class M2MManager extends BaseM2MManager
 
     public function add()
     {
+        if (!$this->through->meta->autoCreated) :
+            throw new AttributeError(
+                sprintf(
+                    "Cannot set values on a ManyToManyField which specifies an intermediary model. 
+                Use %s's Manager instead.",
+                    $this->through->meta->getModelName()
+                )
+            );
+        endif;
+
         $this->addItems($this->fromFieldName, $this->toFieldName, func_get_args());
     }
 
     public function set($values, $kwargs = [])
     {
+        if (!$this->through->meta->autoCreated) :
+            throw new AttributeError(
+                sprintf(
+                    "Cannot set values on a ManyToManyField which specifies an intermediary model. 
+                Use %s's Manager instead.",
+                    $this->through->meta->getModelName()
+                )
+            );
+        endif;
+
         $clear = ArrayHelper::getValue($kwargs, 'clear', false);
+
         if ($clear) :
+            $this->clear();
+            $this->addItems($this->fromFieldName, $this->toFieldName, $values);
         else:
             $this->addItems($this->fromFieldName, $this->toFieldName, $values);
         endif;
