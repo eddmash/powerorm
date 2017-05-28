@@ -193,4 +193,22 @@ class M2MManager extends BaseM2MManager
 
         endif;
     }
+
+    public function removeItems($fromFieldName, $toFieldName, $values = [])
+    {
+        if (empty($values)):
+            return;
+        endif;
+        $oldIds = [];
+
+        foreach ($values as $value) :
+            if ($value instanceof Model):
+
+                $field = $this->through->meta->getField($this->toFieldName);
+                $oldIds[] = $field->getForeignRelatedFieldsValues($value)[0];
+            else:
+                $oldIds[] = $value;
+            endif;
+        endforeach;
+    }
 }

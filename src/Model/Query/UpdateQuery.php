@@ -89,8 +89,8 @@ class UpdateQuery extends Query
         $qb->update($this->tables[0]);
         $params = [];
 
-        /** @var $field Field */
-        /** @var $model Model */
+        /* @var $field Field */
+        /* @var $model Model */
         foreach ($this->values as $valItem) :
             $field = $valItem[0];
             $model = $valItem[1];

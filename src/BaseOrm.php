@@ -47,9 +47,9 @@ class BaseOrm extends BaseObject
         'm/d/y',     // '10/25/06'
     ];
     public $timeFormats = [
-        'H:M:i',     # '14:30:59'
-        'H:M:i.u',  # '14:30:59.000200'
-        'H:M',        # '14:30'
+        'H:i:s',     // '14:30:59'
+        'H:i:s.u',  // '14:30:59.000200'
+        'H:i',        // '14:30'
     ];
     private $timezone = '';
     /**
