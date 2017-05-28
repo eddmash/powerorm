@@ -188,9 +188,9 @@ class BaseOrm extends BaseObject
      */
     public function __construct($config = [])
     {
-        $models = ArrayHelper::pop($config, 'models');
+        $models = ArrayHelper::pop($config, 'models', null);
+        $migrations = ArrayHelper::pop($config, 'migrations', null);
 
-        $migrations = ArrayHelper::pop($config, 'migrations');
         $this->modelsPath = ArrayHelper::getValue($models, 'path', null);
         $this->autoloadModels = ArrayHelper::getValue($models, 'autoload', true);
         $this->modelsNamespace = ArrayHelper::getValue($models, 'namespace');

@@ -12,18 +12,18 @@
 namespace Eddmash\PowerOrm\Helpers;
 
 /*
-                     * some method borrowed from Yii\helpers\BaseArrayHelper
-                     * Part of the Yii framework.
-                     *
-                     * @version    2.0
-                     *
-                     * @author Qiang Xue <qiang.xue@gmail.com>
-                     *
-                     * @link http://www.yiiframework.com/
-                     *
-                     * @copyright Copyright (c) 2008 Yii Software LLC
-                     * @license http://www.yiiframework.com/license/
-                     */
+ * some method borrowed from Yii\helpers\BaseArrayHelper
+ * Part of the Yii framework.
+ *
+ * @version    2.0
+ *
+ * @author Qiang Xue <qiang.xue@gmail.com>
+ *
+ * @link http://www.yiiframework.com/
+ *
+ * @copyright Copyright (c) 2008 Yii Software LLC
+ * @license http://www.yiiframework.com/license/
+ */
 use Eddmash\PowerOrm\Exception\KeyError;
 
 /**
