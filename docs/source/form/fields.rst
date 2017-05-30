@@ -231,7 +231,7 @@ Takes one optional argument:
 
 **input_formats**
 
-    A list of formats used to attempt to convert a string to a valid datetime.date object.
+    A list of formats used to attempt to convert a string to a valid **DateTime** object.
 
 If no input_formats argument is provided, the default input formats are:
 
@@ -242,6 +242,37 @@ If no input_formats argument is provided, the default input formats are:
        'm/d/Y',      // '10/25/2006'
        'm/d/y'     // '10/25/06'
     ]
+
+.. _form_timefield:
+
+TimeField
+.........
+
+- Default widget: :ref:`TextInput<textinput_widget>`
+- Empty value: None
+- Normalizes to: A PHP **DateTime** object.
+- Validates that the given value is either a **DateTime** or string formatted in a particular time format.
+- Error message keys: **required**, **invalid**.
+
+Takes one optional argument:
+
+.. _form_timefield_input_format:
+
+**input_formats**
+
+   A list of formats used to attempt to convert a string to a valid **DateTime** object.
+
+If no input_formats argument is provided, the default input formats are:
+
+.. code-block:: php
+
+    [
+        'H:i:s',     // '14:30:59'
+        'H:i:s.u',  // '14:30:59.000200'
+        'H:i',        // '14:30'
+    ];
+
+
 
 .. _form_choicefield:
 
@@ -279,6 +310,20 @@ MultipleChoiceField
 The **invalid_choice** error message may contain **%(value)s**, which will be replaced with the selected choice.
 
 Takes one extra required argument, **choices**, as for :ref:`ChoiceField<form_choicefield>`.
+
+.. _form_multivaluedfield:
+
+MultipleChoiceField
+...................
+
+to be added
+
+.. _form_splitdatetimefield:
+
+SplitDateTimeField
+..................
+
+to be added
 
 .. _form_filefield:
 
