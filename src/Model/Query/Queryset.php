@@ -187,7 +187,7 @@ class Queryset implements QuerysetInterface
     public function annotate()
     {
         $args = func_get_args();
-
+        //todo
         return $this;
     }
 
@@ -206,9 +206,23 @@ class Queryset implements QuerysetInterface
         return $query->getAggregation($this->connection, array_keys($kwargs));
     }
 
+    /**
+     * Returns a new QuerySet instance that will select related objects.
+     *
+     * If fields are specified, they must be ForeignKey fields and only those related objects are included in the
+     * selection.
+     *
+     * If select_related(None) is called, the list is cleared.
+     *
+     * @param array $fields
+     * @return Queryset
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
     public function selectRelated($fields = [])
     {
-        //todo if we implement values/values_list check we dont call this after it
+        if ($this->_fields) :
+            throw new TypeError("Cannot call select_related() after .values() or .values_list()");
+        endif;
         $obj = $this->_clone();
         if (empty($fields)):
             $obj->query->addSelectRelected($fields);
@@ -388,10 +402,11 @@ class Queryset implements QuerysetInterface
             $clone->query->useDefaultCols = false;
         else:
             foreach ($this->model->meta->getConcreteFields() as $field) :
-                $fields[] = $field->getAttrName();
+                $fields[] = $field->getName();
             endforeach;
 
         endif;
+
         $clone->query->setValueSelect($fields);
         $clone->query->addFields($fields, true);
 

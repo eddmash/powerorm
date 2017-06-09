@@ -49,6 +49,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     use FormReadyModelTrait;
 
     const SELF = 'this';
+    const CASCADE = 'cascade';
     const DEBUG_IGNORE = ['_fieldCache', 'tableName', 'managed', 'verboseName', 'isNew', 'proxy'];
     const MODELBASE = '\Eddmash\PowerOrm\Model\Model';
     public static $managerClass;
@@ -1103,7 +1104,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if (false === $updated):
 
             /* @var $field $concreteField */
-            $concreteFields = $meta->getLocalConcreteFields();
+            $concreteFields = $meta->getConcreteFields();
             $fields = [];
             foreach ($concreteFields as $name => $concreteField) :
                 // skip AutoFields their value is auto created by the database.

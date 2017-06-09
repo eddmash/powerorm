@@ -27,7 +27,11 @@ class ArrayValueMapper extends Mapper
         $results = $this->queryset->query->execute($this->queryset->connection)->fetchAll();
         $values = [];
         foreach ($results as $result) :
-            $values[] = end($result);
+            $vals = [];
+            foreach ($result as $name=>$item) :
+                $vals[] = $item;
+            endforeach;
+            $values[] = $vals;
         endforeach;
 
         return $values;
