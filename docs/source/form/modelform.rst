@@ -107,8 +107,8 @@ The default field types, as described in the Field types table above, are sensib
 in your model, chances are you'd want that to be represented as a **DateField** in your form. But **ModelForm** gives
 you the flexibility of changing the form field for a given model.
 
-To specify a custom widget for a field, use the **widgets()** method of **ModelForm**class. This should be a associative
-array mapping field names to widget classes or instances.
+To specify a custom widget for a field, use the **widgets()** method of **ModelForm** class. This should be a
+associative array mapping field names to widget classes or instances.
 
 For example, if you want the **CharField** for the name attribute of Author to be represented by a **<textarea>**
 instead of its default **<input type="text">**, you can override the field's widget:

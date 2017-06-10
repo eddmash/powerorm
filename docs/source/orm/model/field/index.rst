@@ -88,7 +88,9 @@ validators
 A list of validators to run for this field. See the :doc:`validators documentation</form/validators>` for more information.
 
 Field types
-================
+===========
+
+.. _model_autofield:
 
 AutoField
 ---------
@@ -122,6 +124,15 @@ EmailField
 
 A CharField that checks that the value is a valid email address. It uses EmailValidator to validate the input.
 
+.. _model_booleanfield:
+
+BooleanField
+------------
+
+A true/false field.
+
+The default form widget for this field is a CheckboxInput.
+
 .. _model_integerfield:
 
 IntegerField
@@ -154,6 +165,19 @@ The default form widget for this field is a TextInput.
 Like all CharField subclasses, URLField takes the optional maxLength argument.
 
 If you don't specify maxLength, a default of 200 is used.
+
+.. _model_slugfield:
+
+SlugField
+---------
+
+Slug is a newspaper term. A slug is a short label for something, containing only letters, numbers, underscores or
+hyphens. They're generally used in URLs.
+
+Like a :ref:`CharField<model_charfield>`, you can specify **maxLength**. If **maxLength** is not specified, Powerorm
+will use a default length of 50.
+
+Implies setting Field.dbIndex to **true**.
 
 Relationship fields
 ===================
