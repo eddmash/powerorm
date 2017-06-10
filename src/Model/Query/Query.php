@@ -203,9 +203,10 @@ class Query extends BaseObject
     {
         $alias = $this->getInitialAlias();
         $meta = $this->model->meta;
+
         foreach ($fieldNames as $fieldName) :
             $names = StringHelper::split(BaseLookup::$lookupPattern, $fieldName);
-            list($field, $targets, $meta, $joinList, $paths) = $this->setupJoins($names, $meta, $alias);
+            list($field, $targets, $joinList, $paths) = $this->setupJoins($names, $meta, $alias);
 
             /** @var $targets Field[] */
             list($targets, $finalAlias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
@@ -335,7 +336,7 @@ class Query extends BaseObject
             list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
             list($value, $lookups) = $this->prepareLookupValue($value, $lookups);
 
-            list($field, $targets, $_, $joinList, $paths) = $this->setupJoins(
+            list($field, $targets, $joinList, $paths) = $this->setupJoins(
                 $fieldParts,
                 $this->model->meta,
                 $alias
@@ -586,7 +587,7 @@ class Query extends BaseObject
             $joins[] = $alias;
         endforeach;
 
-        return [$namesPaths['finalField'], $namesPaths['targets'], $meta, $joins, $pathInfos];
+        return [$namesPaths['finalField'], $namesPaths['targets'], $joins, $pathInfos];
     }
 
     public function join(BaseJoin $join, $reuse = [])
