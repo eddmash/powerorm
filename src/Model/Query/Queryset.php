@@ -212,22 +212,25 @@ class Queryset implements QuerysetInterface
      * If fields are specified, they must be ForeignKey fields and only those related objects are included in the
      * selection.
      *
-     * If select_related(None) is called, the list is cleared.
+     * If select_related(null) is called, the list is cleared.
      *
      * @param array $fields
+     *
      * @return Queryset
+     *
+     * @throws TypeError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function selectRelated($fields = [])
     {
         if ($this->_fields) :
-            throw new TypeError("Cannot call select_related() after .values() or .values_list()");
+            throw new TypeError('Cannot call select_related() after .values() or .values_list()');
         endif;
         $obj = $this->_clone();
-        if (empty($fields)):
-            $obj->query->addSelectRelected($fields);
-        elseif ($fields):
+        if (is_null($fields)):
             $obj->query->selectRelected = false;
+        elseif ($fields):
+            $obj->query->addSelectRelected($fields);
         else:
             $obj->query->selectRelected = true;
         endif;

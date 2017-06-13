@@ -705,10 +705,21 @@ class Query extends BaseObject
             $relatedFields = $this->selectRelected;
         endif;
 
+        // we need the fields as array
+        $fields = func_get_args();
+
         foreach ($fields as $field) :
-
+            $names = StringHelper::split(BaseLookup::$lookupPattern, $field);
+            // we use by reference so that we assigned the values back to the original array
+            $d = &$relatedFields;
+            foreach ($names as $name) :
+                $d = &$d[$name];
+                if(empty($d)):
+                    $d = [];
+                endif;
+            endforeach;
         endforeach;
-
+        $this->selectRelected = $relatedFields;
     }
 
     /**

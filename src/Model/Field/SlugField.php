@@ -50,6 +50,7 @@ class SlugField extends CharField
         if(!ArrayHelper::hasKey($kwargs, 'dbIndex')):
             $config['dbIndex'] = true;
         endif;
+
         return $kwargs;
     }
 

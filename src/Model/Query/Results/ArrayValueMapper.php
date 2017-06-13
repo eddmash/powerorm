@@ -28,7 +28,7 @@ class ArrayValueMapper extends Mapper
         $values = [];
         foreach ($results as $result) :
             $vals = [];
-            foreach ($result as $name=>$item) :
+            foreach ($result as $name => $item) :
                 $vals[] = $item;
             endforeach;
             $values[] = $vals;
