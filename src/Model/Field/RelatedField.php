@@ -150,6 +150,7 @@ class RelatedField extends Field
                 'to' => $this->scopeModel->meta->getNamespacedModelName(),
                 'toField' => $relation->fromField->getName(),
                 'fromField' => $this,
+                'autoCreated' => true,
             ]
         );
 

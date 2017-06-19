@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Exception\InvalidArgumentException;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
@@ -106,7 +107,8 @@ class Queryset implements QuerysetInterface
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    ) {
+    )
+    {
         return new static($connection, $model, $query, $kwargs);
     }
 
@@ -214,20 +216,28 @@ class Queryset implements QuerysetInterface
      *
      * If select_related(null) is called, the list is cleared.
      *
+     *
      * @param array $fields
      *
      * @return Queryset
      *
+     * @throws InvalidArgumentException
      * @throws TypeError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function selectRelated($fields = [])
     {
+        if (!is_array($fields)):
+            throw new InvalidArgumentException(
+                sprintf("method '%s()' expects paramanets to be an array", __FUNCTION__));
+        endif;
+
         if ($this->_fields) :
             throw new TypeError('Cannot call select_related() after .values() or .values_list()');
         endif;
         $obj = $this->_clone();
-        if (is_null($fields)):
+
+        if (empty($fields)):
             $obj->query->selectRelected = false;
         elseif ($fields):
             $obj->query->addSelectRelected($fields);

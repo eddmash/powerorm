@@ -11,6 +11,7 @@ use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
@@ -93,10 +94,13 @@ class Meta extends DeconstructableObject implements MetaInterface
      * This holds fields that belong to the model, i.e when we create the table to represent the model,
      * this field will be represented on that table.
      *
-     * @var array
+     * @var Field[]
      */
     public $localFields = [];
 
+    /**
+     * @var InverseField[]
+     */
     public $inverseFields = [];
 
     /**
@@ -168,6 +172,9 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     /**
      * Returns a list of all forward fields on the model and its parents,excluding ManyToManyFields.
+     *
+     * @param bool $includeParents
+     * @param bool $inverse
      *
      * @return Field[]
      *
@@ -390,7 +397,12 @@ class Meta extends DeconstructableObject implements MetaInterface
         endif;
 
         if ($inverse) :
-            $fields = array_merge($fields, $this->inverseFields);
+            foreach ($this->inverseFields as $inverseField) :
+                if($inverseField->autoCreated):
+                    continue;
+                endif;
+                $fields[] = $inverseField;
+            endforeach;
         endif;
 
         return $fields;

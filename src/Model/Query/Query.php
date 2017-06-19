@@ -250,12 +250,96 @@ class Query extends BaseObject
             $select[] = [$col, $alias];
         endforeach;
 
+        // handle annotations
         foreach ($this->annotations as $alias => $annotation) :
             $annotations[$alias] = $annotation;
             $select[] = [$annotation, $alias];
         endforeach;
 
+        // handle select related
+
+        if ($this->selectRelected):
+            $klassInfo['related_klass_infos'] = $this->getRelatedSelections($select);
+        endif;
+
         return [$select, $klassInfo, $annotations];
+    }
+
+    /**
+     * Used to get information needed when we are doing selectRelated(),.
+     *
+     * @param $select
+     * @param Meta|null $meta
+     * @param null      $rootAlias
+     * @param int       $curDepth
+     * @param null      $restricted
+     * @param null      $requested
+     *
+     * @throws FieldError
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function getRelatedSelections(&$select, Meta $meta = null, $rootAlias = null,
+                                          $curDepth = 1, $restricted = null, $requested = null)
+    {
+        $relatedKlassInfo = [];
+        $foundFields = [];
+        if (is_null($meta)):
+            $meta = $this->model->meta;
+            $rootAlias = $this->getInitialAlias();
+        endif;
+
+        if (is_null($requested)):
+            if (is_array($this->selectRelected)):
+                $requested = $this->selectRelected;
+                $restricted = true;
+            else:
+                $restricted = false;
+            endif;
+        endif;
+
+        foreach ($meta->getFields(true, false) as $field) :
+            $fieldModel = $field->scopeModel->meta->concreteModel;
+            $foundFields[] = $field->getName();
+            if (!$field->isRelation):
+                // first ensure the requested fields are relational
+                // and that we are not trying to use a non-relational field
+                $nextField = ArrayHelper::getValue($requested, $field->getName(), []);
+                if ($nextField && !in_array($field->getName(), $requested)):
+                    throw new FieldError(
+                        sprintf("Non-relational field given in select_related: '%s'. ".
+                            'Choices are: %s', $field->getName(), implode(', ', $this->getFieldChoices())));
+                endif;
+
+            endif;
+        endforeach;
+    }
+
+    /**
+     * For each related klass, if the klass extends the model whose info we get, we need to add the models class to
+     * the select_fields of the related class.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function getSelectFromParent(&$klassInfo)
+    {
+        foreach ($klassInfo['related_klass_infos'] as &$relatedKlassInfo) :
+            // get fields from parent and add them to the related class.
+            if ($relatedKlassInfo['from_parent']):
+
+                $relatedKlassInfo['select_fields'] = array_merge(
+                    $klassInfo['select_fields'],
+                    $relatedKlassInfo['select_fields']
+                );
+            endif;
+
+            // do the same for the related class fields incase it has own children.
+            $this->getSelectFromParent($relatedKlassInfo);
+        endforeach;
     }
 
     public function getDefaultCols($startAlias = null, Meta $meta = null)
@@ -705,16 +789,13 @@ class Query extends BaseObject
             $relatedFields = $this->selectRelected;
         endif;
 
-        // we need the fields as array
-        $fields = func_get_args();
-
         foreach ($fields as $field) :
             $names = StringHelper::split(BaseLookup::$lookupPattern, $field);
             // we use by reference so that we assigned the values back to the original array
             $d = &$relatedFields;
             foreach ($names as $name) :
                 $d = &$d[$name];
-                if(empty($d)):
+                if (empty($d)):
                     $d = [];
                 endif;
             endforeach;
@@ -892,6 +973,32 @@ class Query extends BaseObject
         $stmt->execute();
 
         return $stmt;
+    }
+
+    /**
+     * Gets all names for the fields in the query model, inclusing reverse fields.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function getFieldChoices()
+    {
+        $fields = [];
+        foreach ($this->model->meta->getFields() as $field) :
+            if(!$field->isRelation):
+                continue;
+            endif;
+            $fields[] = $field;
+        endforeach;
+
+        foreach ($this->model->meta->getReverseRelatedObjects() as $reverseRelatedObject) :
+            if($reverseRelatedObject->relation->fromField->isUnique()):
+                $fields[] = $reverseRelatedObject->relation->fromField->getRelatedQueryName();
+            endif;
+        endforeach;
+
+        return $fields;
     }
 
 }
