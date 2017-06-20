@@ -53,7 +53,126 @@ The ORM has the following dependencies:
  
 # How It works
 
-Learn from here [Documentation](http://powerorm.readthedocs.io/).
+Setup
+
+To load powerorm use the following code and pass the Configs needed for powerorm to work.
+ensure the orm is loaded early enough in you application.
+
+``````
+\Eddmash\PowerOrm\Application::webRun($config);
+``````
+
+see also [integration](http://powerorm.readthedocs.io/en/master/orm/integrations/index.html) with your
+framework of choice
+
+[configaration](http://powerorm.readthedocs.io/en/master/orm/intro/configuration.html) takes 
+the following form
+
+``````
+$config = [
+    'database' => [
+        'host' => '127.0.0.1',
+        'dbname' => 'tester',
+        'user' => 'admin',
+        'password' => 'admin',
+        'driver' => 'pdo_pgsql',
+    ],
+    'migrations' => [
+        'path' => dirname(__FILE__) . '/application/Migrations',
+    ],
+    'models' => [
+        'path' => dirname(__FILE__) . '/application/Models',
+        'namespace' => 'App\Models',
+    ],
+    'dbPrefix' => 'demo_',
+    'charset' => 'utf-8',
+    'timezone'=>'Africa/Nairobi'
+];
+``````
+
+Once the orm is loaded, now create Models,[The Model](http://powerorm.readthedocs.io/en/master/orm/model/index.html)
+
+Create and author model which represents the author database table
+
+``````
+use Eddmash\PowerOrm\Model\Model;
+
+class Author extends Model
+{
+
+
+    private function unboundFields()
+    {
+        return [
+            'name'=>Model::CharField(['maxLength'=>200]),
+            'email'=>Model::EmailField()
+        ];
+    }
+
+
+}
+``````
+
+[Migrations](http://powerorm.readthedocs.io/en/master/orm/migration/index.html)
+
+Now we create the table that represents the author model on the database.
+
+Copy the vendor/eddmash/powerorm/pmanager.php file to you projects base directory e.g. on the same 
+level as vendor directory.
+
+``````
+php pmanager.php makemigrations // generate the database agonistic migration file
+``````
+
+``````
+php pmanager.php  migrate // creates the actual tables represented by the model on the database
+``````
+
+See [integration](http://powerorm.readthedocs.io/en/master/orm/integrations/index.html) on how to 
+access the command line tools from the choosen framework.
+
+In CI4 once integrated, you have access to  powerorm:pmanager from ci.php script
+
+``````
+php ci.php powerorm:pmanager makemigrations // generate the database agonistic migration file
+``````
+
+``````
+php ci.php powerorm:pmanager  migrate // creates the actual tables represented by the model on the database
+``````
+Apart fron the migrations commands the orm has other [commands](http://powerorm.readthedocs.io/en/master/orm/ref/commands.html) that assit you in developing an application.
+
+e.g. if you want to generate dummy data you can use the 
+
+[generatedata](http://powerorm.readthedocs.io/en/master/orm/ref/commands.html#generatedata) command
+to use this command you need to install the powerfaker component.
+``````
+composer require eddmash\powerormfaker:@dev
+``````
+Once installed you can use the command as shown
+
+``````
+php pmanager.php generatedata -o 'App\Models\Author'
+``````
+
+Now we can perform [Queries](http://powerorm.readthedocs.io/en/master/orm/queries/index.html) as follows
+
+``````
+Author::objects->get(['pk'=>1]) // retrieves the user id primary key of 1
+Author::objects->all(); // retrieves all users
+Author::object->filter(['name'=>'ken']); // where name is ken
+Author::objects->filter(['name__startwith'=>"p"]) // where name like p%
+``````
+or perform saves
+
+``````
+$author = new Author();
+$author->name="example"
+$author->email="example@example.com"
+$author->save();
+``````
+
+Visit the  [Documentation](http://powerorm.readthedocs.io/) to learn more.
 
 # supports
 php 5.6+ and 7+

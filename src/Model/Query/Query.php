@@ -300,17 +300,20 @@ class Query extends BaseObject
             endif;
         endif;
 
-        foreach ($meta->getFields(true, false) as $field) :
+        foreach ($meta->getNonM2MForwardFields() as $field) :
             $fieldModel = $field->scopeModel->meta->concreteModel;
             $foundFields[] = $field->getName();
+
             if (!$field->isRelation):
                 // first ensure the requested fields are relational
                 // and that we are not trying to use a non-relational field
                 $nextField = ArrayHelper::getValue($requested, $field->getName(), []);
-                if ($nextField && !in_array($field->getName(), $requested)):
+                if ($nextField || !in_array($field->getName(), $requested)):
                     throw new FieldError(
-                        sprintf("Non-relational field given in select_related: '%s'. ".
+                        sprintf("Non-relational field given in selectRelated: '%s'. ".
                             'Choices are: %s', $field->getName(), implode(', ', $this->getFieldChoices())));
+                else:
+                    $nextField = false;
                 endif;
 
             endif;
@@ -945,6 +948,7 @@ class Query extends BaseObject
         $obj->tableMap = $this->tableMap;
         $obj->tables = $this->tables;
         $obj->select = $this->select;
+        $obj->selectRelected = $this->selectRelected;
         $obj->annotations = $this->annotations;
         $obj->offset = $this->offset;
         $obj->limit = $this->limit;
@@ -989,7 +993,7 @@ class Query extends BaseObject
             if(!$field->isRelation):
                 continue;
             endif;
-            $fields[] = $field;
+            $fields[] = $field->getName();
         endforeach;
 
         foreach ($this->model->meta->getReverseRelatedObjects() as $reverseRelatedObject) :
