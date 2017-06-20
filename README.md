@@ -35,22 +35,6 @@ This ORM is heavily inspired by Django ORM. Because i personally love how there 
 
 - Download or Clone package from github. 
 
-# Features
- - Allows to fully think of the database and its table in an object oriented manner i.e. 
-    table are represented by model and columns are represented by fields.
- - Create automatic migrations.
- - Create forms automatically based on models.
- - All fields visible on the model, no need to look at the database table when you want to interact with the database.
- - Provides database interaction methods
- 
-# Dependencies
-
-The ORM has the following dependencies:
-
-- [Doctrine dbal Library](http://www.doctrine-project.org/projects/dbal.html). 
-- [Symfony console component](http://symfony.com/doc/current/components/console.html). 
-- [Symfony polyfill-mbstring component](http://symfony.com/blog/new-in-symfony-2-8-polyfill-components). 
- 
 # How It works
 
 Setup
@@ -174,6 +158,22 @@ $author->save();
 
 Visit the  [Documentation](http://powerorm.readthedocs.io/) to learn more.
 
+# Features
+ - Allows to fully think of the database and its table in an object oriented manner i.e. 
+    table are represented by model and columns are represented by fields.
+ - Create automatic migrations.
+ - Create forms automatically based on models.
+ - All fields visible on the model, no need to look at the database table when you want to interact with the database.
+ - Provides database interaction methods
+ 
+# Dependencies
+
+The ORM has the following dependencies:
+
+- [Doctrine dbal Library](http://www.doctrine-project.org/projects/dbal.html). 
+- [Symfony console component](http://symfony.com/doc/current/components/console.html). 
+- [Symfony polyfill-mbstring component](http://symfony.com/blog/new-in-symfony-2-8-polyfill-components). 
+ 
 # supports
 php 5.6+ and 7+
 
