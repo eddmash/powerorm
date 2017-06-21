@@ -43,6 +43,13 @@ class ForeignObjectRel extends BaseObject
      */
     public $fromField;
 
+    /**
+     * When True and used in a model which inherits from another concrete model, indicates that this field should be
+     * used as the link back to the parent class, rather than the extra OneToOneField which would normally be
+     * implicitly created by subclassing.
+     *
+     * @var
+     */
     public $parentLink;
 
     public $onDelete;

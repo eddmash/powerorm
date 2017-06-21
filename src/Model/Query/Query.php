@@ -990,19 +990,59 @@ class Query extends BaseObject
     {
         $fields = [];
         foreach ($this->model->meta->getFields() as $field) :
-            if(!$field->isRelation):
+            if (!$field->isRelation):
                 continue;
             endif;
             $fields[] = $field->getName();
         endforeach;
 
         foreach ($this->model->meta->getReverseRelatedObjects() as $reverseRelatedObject) :
-            if($reverseRelatedObject->relation->fromField->isUnique()):
+            if ($reverseRelatedObject->relation->fromField->isUnique()):
                 $fields[] = $reverseRelatedObject->relation->fromField->getRelatedQueryName();
             endif;
         endforeach;
 
         return $fields;
+    }
+
+    /**
+     * Returns True if this field should be used to descend deeper for selectRelated() purposes.
+     *
+     * @param Field $field      the field to be checked
+     * @param bool  $restricted indicating if the field list has been manually restricted using a requested clause
+     * @param array $requested  The selectRelated() array
+     * @param bool  $reverse    True if we are checking a reverse select related
+     *
+     * @return bool
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function selectRelatedDescend(Field $field, $restricted, $requested, $reverse = false)
+    {
+        if (!$field->relation):
+            return false;
+        endif;
+
+        if ($field->relation->parentLink && !$reverse):
+            return false;
+        endif;
+
+        if($requested):
+            if($reverse && !in_array($field->getRelatedQueryName(), $requested)):
+                return false;
+            endif;
+            if(!$reverse && !in_array($field->getName(), $requested)):
+                return false;
+            endif;
+        endif;
+
+        if(!$restricted && $field->null):
+            return false;
+        endif;
+
+        return true;
     }
 
 }

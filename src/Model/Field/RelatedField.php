@@ -340,7 +340,7 @@ class RelatedField extends Field
      */
     public function getRelatedQueryName()
     {
-        // we check if the queryname/ relatedName is set other use we use the name of the model.
+        // we check if the queryname/ relatedName is set otherwise use we use the name of the model.
         if ($this->relation->relatedQueryName) :
             $name = $this->relation->relatedQueryName;
         elseif ($this->relation->relatedName):
