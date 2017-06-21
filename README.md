@@ -8,24 +8,11 @@
 [![License](https://poser.pugx.org/eddmash/powerorm/license)](https://packagist.org/packages/eddmash/powerorm)
 
 # PowerOrm
-A light weight easy to use PHP ORM.
+A powerful php orm with automatic migrations.
 
 # Help and Documentation
 Get the ORM documentation here [PowerOrm Documentation !](http://powerorm.readthedocs.io/).
 Get assistance on the ORM here [PowerOrm Help !](https://groups.google.com/d/forum/powerorm-users).
-
-# Introduction
-I created this project because i required a lightweight easy to use orm that i could use in my Codeigniter projects 
-with the least amount of configuration .
-
-Sort of `plug and play` if you will. While at the same time reducing repetition and providing a consistent way to deal
-with databases.
-
-That is, i wanted to avoid the repetitive actions of creating migration files, creating query method to query the 
-database and also wanted to be able to see all my database table fields on my models without me going to the database 
-tables themselves and use this fields to interact with the database.
-
-This ORM is heavily inspired by Django ORM. Because i personally love how there orm works.
 
 # Install
 
@@ -157,6 +144,20 @@ $author->save();
 ``````
 
 Visit the  [Documentation](http://powerorm.readthedocs.io/) to learn more.
+
+# Background
+I created this project because i required a lightweight easy to use orm that i could use in my Codeigniter projects 
+with the least amount of configuration .
+
+Sort of `plug and play` if you will. While at the same time reducing repetition and providing a consistent way to deal
+with databases.
+
+That is, i wanted to avoid the repetitive actions of creating migration files, creating query method to query the 
+database and also wanted to be able to see all my database table fields on my models without me going to the database 
+tables themselves and use this fields to interact with the database.
+
+This ORM is heavily inspired by Django ORM. Because i personally love how there orm works.
+If you have worked with django orm you will right at home.
 
 # Features
  - Allows to fully think of the database and its table in an object oriented manner i.e. 

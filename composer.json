@@ -3,10 +3,15 @@
   "type": "library",
   "keywords": [
     "orm",
+    "model",
+    "query",
     "php",
+    "database",
+    "dbal",
+    "django",
     "migrations"
   ],
-  "description": "A very simple but effective php orm",
+  "description": "A powerful php orm with automatic migrations",
   "homepage": "https://github.com/eddmash/powerorm",
   "license": "MIT",
   "authors": [
