@@ -251,6 +251,13 @@ class Meta extends DeconstructableObject implements MetaInterface
         return $forwardFields;
     }
 
+    /**
+     * @return Field[]
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     private function getForwardOnlyField()
     {
         return $this->fetchFields(['reverse' => false]);

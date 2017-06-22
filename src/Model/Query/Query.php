@@ -308,7 +308,8 @@ class Query extends BaseObject
                 // first ensure the requested fields are relational
                 // and that we are not trying to use a non-relational field
                 $nextField = ArrayHelper::getValue($requested, $field->getName(), []);
-                if ($nextField || !in_array($field->getName(), $requested)):
+
+                if ($nextField || in_array($field->getName(), $requested)):
                     throw new FieldError(
                         sprintf("Non-relational field given in selectRelated: '%s'. ".
                             'Choices are: %s', $field->getName(), implode(', ', $this->getFieldChoices())));
@@ -317,7 +318,33 @@ class Query extends BaseObject
                 endif;
 
             endif;
+
+            if (!$this->selectRelatedDescend($field, $restricted, $requested)):
+                continue;
+            endif;
+            $klassInfo = [
+                'model' => $field->relation->getFromModel(),
+                'field' => $field,
+                'reverse' => false,
+                'from_parent' => false,
+            ];
+            $relatedKlassInfo[] = $klassInfo;
+
         endforeach;
+
+        if ($restricted):
+
+            //todo act on reverse objects
+
+            $fieldsNotFound = array_diff(array_keys($requested), $foundFields);
+
+            if ($fieldsNotFound):
+                throw new FieldError(
+                    sprintf('Invalid field name(s) given in select_related: %s. Choices are: %s',
+                        implode(', ', $fieldsNotFound), implode(', ', $this->getFieldChoices())));
+
+            endif;
+        endif;
     }
 
     /**
@@ -1029,16 +1056,16 @@ class Query extends BaseObject
             return false;
         endif;
 
-        if($requested):
-            if($reverse && !in_array($field->getRelatedQueryName(), $requested)):
+        if ($restricted):
+            if ($reverse && !array_key_exists($field->getRelatedQueryName(), $requested)):
                 return false;
             endif;
-            if(!$reverse && !in_array($field->getName(), $requested)):
+            if (!$reverse && !array_key_exists($field->getName(), $requested)):
                 return false;
             endif;
         endif;
 
-        if(!$restricted && $field->null):
+        if (!$restricted && $field->null):
             return false;
         endif;
 
