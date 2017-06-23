@@ -269,11 +269,11 @@ class Query extends BaseObject
      * Used to get information needed when we are doing selectRelated(),.
      *
      * @param $select
-     * @param Meta|null $meta
+     * @param Meta|null $meta       the from which we expect to find the related fields
      * @param null      $rootAlias
      * @param int       $curDepth
-     * @param null      $restricted
-     * @param null      $requested
+     * @param null      $requested  the set of fields to use in selectRelated
+     * @param null      $restricted true when we are to use just a set of relationship fields
      *
      * @throws FieldError
      *
@@ -282,7 +282,7 @@ class Query extends BaseObject
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     private function getRelatedSelections(&$select, Meta $meta = null, $rootAlias = null,
-                                          $curDepth = 1, $restricted = null, $requested = null)
+                                          $curDepth = 1, $requested = null, $restricted = null)
     {
         $relatedKlassInfo = [];
         $foundFields = [];
@@ -304,30 +304,51 @@ class Query extends BaseObject
             $fieldModel = $field->scopeModel->meta->concreteModel;
             $foundFields[] = $field->getName();
 
-            if (!$field->isRelation):
+            if ($restricted):
                 // first ensure the requested fields are relational
                 // and that we are not trying to use a non-relational field
-                $nextField = ArrayHelper::getValue($requested, $field->getName(), []);
+                // we are getting the next field in the spanning relationship i.e author__user so we are getting user.
+                // if not a spanning relationship we return an empty array.
+                $nextSpanField = ArrayHelper::getValue($requested, $field->getName(), []);
+                if (!$field->isRelation):
 
-                if ($nextField || in_array($field->getName(), $requested)):
-                    throw new FieldError(
-                        sprintf("Non-relational field given in selectRelated: '%s'. ".
-                            'Choices are: %s', $field->getName(), implode(', ', $this->getFieldChoices())));
-                else:
-                    $nextField = false;
+                    if ($nextSpanField || in_array($field->getName(), $requested)):
+                        throw new FieldError(
+                            sprintf("Non-relational field given in selectRelated: '%s'. ".
+                                'Choices are: %s', $field->getName(), implode(', ', $this->getFieldChoices())));
+
+                    endif;
                 endif;
-
+            else:
+                $nextSpanField = false;
             endif;
 
             if (!$this->selectRelatedDescend($field, $restricted, $requested)):
                 continue;
             endif;
             $klassInfo = [
-                'model' => $field->relation->getFromModel(),
+                'model' => $field->relation->getToModel(),
                 'field' => $field,
                 'reverse' => false,
                 'from_parent' => false,
             ];
+
+            list($_, $_, $joinList, $_) = $this->setupJoins([$field->getName()], $meta, $rootAlias);
+            $alias = end($joinList);
+            $columns = $this->getDefaultCols($alias, $field->relation->getToModel()->meta);
+
+            $selectFields = [];
+            foreach ($columns as $column) :
+                $select[] = [$column, false];
+                $selectFields[] = $column;
+            endforeach;
+            $klassInfo['select_fields'] = $selectFields;
+
+            // now go the next field in the spanning relationship i.e. if we have author__user, we just did author
+            // so no we do user and so in
+            $nextKlassInfo = $this->getRelatedSelections($select, $field->relation->getToModel()->meta, $alias,
+                $curDepth + 1, $nextSpanField, $restricted);
+            $klassInfo['related_klass_infos'] = $nextKlassInfo;
             $relatedKlassInfo[] = $klassInfo;
 
         endforeach;
@@ -345,6 +366,9 @@ class Query extends BaseObject
 
             endif;
         endif;
+
+//        dump($relatedKlassInfo);
+        return $relatedKlassInfo;
     }
 
     /**
@@ -372,6 +396,19 @@ class Query extends BaseObject
         endforeach;
     }
 
+    /**
+     * Returns the fields in the current models/those represented by the alias as Col expression, which know how to be
+     * used in a query.
+     *
+     * @param null      $startAlias
+     * @param Meta|null $meta
+     *
+     * @return Col[]
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function getDefaultCols($startAlias = null, Meta $meta = null)
     {
 
@@ -384,6 +421,11 @@ class Query extends BaseObject
         endif;
 
         foreach ($meta->getConcreteFields() as $field) :
+//            $model = $field->scopeModel->meta->concreteModel;
+//            if($meta->getNamespacedModelName() == $model->meta->getNamespacedModelName()):
+//                $model=null;
+//            endif;
+            //todo need to handle joining parent
             $fields[] = $field->getColExpression($startAlias);
         endforeach;
 
