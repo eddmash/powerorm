@@ -21,6 +21,10 @@ class ForeignObjectRel extends BaseObject
     public $autoCreated = true;
     public $isRelation = true;
     public $concrete = false;
+
+    /**
+     * @var bool Indicates if this field holds more than value i.e. in onetonefield this is false
+     */
     public $multiple = true;
 
     // Reverse relations are always nullable (PowerOrm can't enforce that a
@@ -137,6 +141,19 @@ class ForeignObjectRel extends BaseObject
         return $this->fromField->getLookup($name);
     }
 
+    /**
+     * This method encapsulates the logic that decides what name to give an accessor descriptor that retrieves
+     * related many-to-one or many-to-many objects. It uses the lower-cased object_name + "_set",
+     * but this can be overridden with the "related_name" option.
+     *
+     * @param Model|null $model
+     *
+     * @return string
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function getAccessorName(Model $model = null)
     {
         if (is_null($model)) :
@@ -147,12 +164,29 @@ class ForeignObjectRel extends BaseObject
             return $this->relatedName;
         endif;
 
-        return sprintf('%s_set', strtolower($model->meta->getModelName()));
+        $name = strtolower($model->meta->getModelName());
+
+        return ($this->multiple) ? sprintf('%s_set', $name) : $name;
+    }
+
+    /**
+     * The name we use to cache the value of this field on a scope model ones it has been fetched from the database.
+     *
+     * @return mixed
+     */
+    public function getCacheName()
+    {
+        return sprintf('_%s_cache', $this->getAccessorName());
     }
 
     public function getPathInfo()
     {
         return $this->fromField->getReversePathInfo();
+    }
+
+    public function isHidden()
+    {
+        return !empty($this->relatedName) && substr($this->relatedName, -1) === '+';
     }
 
 //    public function __toString()

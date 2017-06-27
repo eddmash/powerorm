@@ -454,11 +454,14 @@ class SchemaEditor extends BaseObject
             );
             $tableClone->dropColumn($oldField->getColumnName());
         else:
-            $tableClone->changeColumn($oldField->getColumnName(), $this->getDoctrineColumnOptions($newField, true));
+            dump($this->getDoctrineColumnOptions($newField, true));
+            $tableClone->changeColumn($oldField->getColumnName(),
+                $this->getDoctrineColumnOptions($newField, true));
         endif;
 
         $comparator = new Comparator();
         $diff = $comparator->diffTable($schema->getTable($table), $tableClone);
+
         if ($diff !== false):
             $this->schemaManager->alterTable($diff);
         endif;
@@ -580,7 +583,7 @@ class SchemaEditor extends BaseObject
         endif;
         // the null option
         if ($field->null):
-            $options['notnull'] = $field->null;
+            $options['notnull'] = false;
         endif;
         // the comment option
         if ($field->comment):

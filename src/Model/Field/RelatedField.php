@@ -65,6 +65,7 @@ class RelatedField extends Field
     {
         $checks = parent::checks();
         $checks = array_merge($checks, $this->checkRelationModelExists());
+        $checks = array_merge($checks, $this->checkClashes());
 
         return $checks;
     }
@@ -96,6 +97,46 @@ class RelatedField extends Field
         endif;
 
         return $error;
+    }
+
+    /**
+     * Check accessor and reverse query name clashes.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function checkClashes()
+    {
+        // Skip if model name is not resolved.
+        if (is_string($this->relation->getToModel())):
+            return [];
+        endif;
+
+        $relMeta = $this->relation->getToModel()->meta;
+        $relName = $this->relation->getAccessorName();
+        $relQueryName = $this->getRelatedQueryName();
+        $isHidden = $this->relation->isHidden();
+        $fieldName = sprintf('%s.%s', $this->scopeModel->meta->getNamespacedModelName(), $this->getName());
+
+        foreach ($relMeta->getFields() as $clashField) :
+            if ($isHidden && $clashField->getName() == $relName):
+                $clashName = sprintf('%s.%s', $relMeta->getNamespacedModelName(), $clashField->getName());
+                $msg = "Reverse accessor for '%s' clashes with field name '%s'.";
+                $hint = sprintf("Rename field '%s', or add/change a related_name argument to the definition ".
+                    "for field '%s'.", $clashName, $fieldName);
+                $error = [
+                    CheckError::createObject(
+                        [
+                            'message' => sprintf($msg, $fieldName, $clashName),
+                            'hint' => $hint,
+                            'context' => $this,
+                            'id' => 'fields.E302',
+                        ]
+                    ),
+                ];
+            endif;
+        endforeach;
     }
 
     /**
@@ -260,9 +301,24 @@ class RelatedField extends Field
         return isset($this->getRelatedFields()[1]) ? [$this->getRelatedFields()[1]] : [];
     }
 
+    /**
+     * Fetches only fields that are local to a relationship i.e. on the fromModel.
+     *
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getLocalRelatedFields()
+    {
+        return isset($this->getRelatedFields()[0]) ? [$this->getRelatedFields()[0]] : [];
+    }
+
     public function getForeignRelatedFieldsValues(Model $modelInstance)
     {
         return $this->getInstanceValueForFields($modelInstance, $this->getForeignRelatedFields());
+    }
+
+    public function getLocalRelatedFieldsValues(Model $modelInstance)
+    {
+        return $this->getInstanceValueForFields($modelInstance, $this->getLocalRelatedFields());
     }
 
     /**
@@ -367,4 +423,5 @@ class RelatedField extends Field
     {
 
     }
+
 }

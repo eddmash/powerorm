@@ -355,7 +355,25 @@ class Query extends BaseObject
 
         if ($restricted):
 
-            //todo act on reverse objects
+            $reverseFields = [];
+            // we follow back relationship that represent single valuse this most will be relation field that are
+            // unique e.g. OneToOneField or ForeignKey with unique set to true.
+            // this meas we don't consider m2m fields even if they are unique
+            foreach ($meta->getReverseRelatedObjects() as $field) :
+
+                if ($field->unique && !$field->manyToMany):
+                    $reverseFields[] = [$field, $field->relation->getToModel()];
+                endif;
+            endforeach;
+
+            /** @var $reverseField[0] RelatedField */
+            foreach ($reverseFields as $reverseField) :
+                if (!$this->selectRelatedDescend($reverseField[0], $restricted, $requested, true)):
+                    continue;
+                endif;
+                $relatedFieldName = $reverseField[0]->getRelatedQueryName();
+                $foundFields[] = $relatedFieldName;
+            endforeach;
 
             $fieldsNotFound = array_diff(array_keys($requested), $foundFields);
 

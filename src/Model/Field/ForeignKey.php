@@ -13,8 +13,8 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\KeyError;
+use Eddmash\PowerOrm\Exception\RelatedObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\ValueError;
-use Eddmash\PowerOrm\Form\Fields\ModelChoiceField;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Delete;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
@@ -155,10 +155,7 @@ class ForeignKey extends RelatedField
     }
 
     /**
-     * @param Model $modelInstance
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function getValue(Model $modelInstance)
     {
@@ -166,22 +163,44 @@ class ForeignKey extends RelatedField
 
         try {
             // incase the value has been set
-            $result = ArrayHelper::getValue($modelInstance->_fieldCache, $this->getName(), ArrayHelper::STRICT);
+            $result = ArrayHelper::getValue($modelInstance->_fieldCache, $this->getCacheName(), ArrayHelper::STRICT);
         } catch (KeyError $e) {
+            $relObj = $this->getLocalRelatedFieldsValues($modelInstance);
+            if (empty($relObj)):
+                return;
+            endif;
+
             $result = $this->queryset($modelInstance)->get();
 
             /* @var $fromField RelatedField */
             $fromField = $this->getRelatedFields()[0];
             // cache the value of the model
-            $modelInstance->_fieldCache[$fromField->getName()] = $result;
+            $modelInstance->_fieldCache[$fromField->getCacheName()] = $result;
+
+            // if we are dealing with fields that only supports one field e.g. OneToOneField
+            // If this is a one-to-one relation, set the reverse accessor cache on
+            // the related object to the current instance to avoid an extra SQL
+            // query if it's accessed later on.
+            if (!is_null($result) && !$this->relation->multiple):
+                $result->{$this->relation->getCacheName()} = $modelInstance;
+            endif;
         }
+
+        if (is_null($result) && $this->null !== false):
+            throw new RelatedObjectDoesNotExist(
+                sprintf('%s has no %s.', $this->scopeModel->meta->getNamespacedModelName(), $this->getName())
+            );
+        endif;
 
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setValue(Model $modelInstance, $value)
     {
-        if (!$value instanceof $this->relation->toModel):
+        if ($value !== null && !$value instanceof $this->relation->toModel):
             throw new ValueError(
                 sprintf(
                     'Cannot assign "%s": "%s->%s" must be a "%s" instance.',
@@ -197,13 +216,34 @@ class ForeignKey extends RelatedField
         /** @var $toField RelatedField */
 
         /* @var $field RelatedField */
+
         list($fromField, $toField) = $this->getRelatedFields();
+        if (is_null($value)):
 
-        // cache the value of the model
-        $modelInstance->_fieldCache[$fromField->getName()] = $value;
+            // if we have a previosly set related object on for the inverse side of this relationship
+            // we need to clear it on that related object to since we will be setting it to null on this side
+            $relObj = ArrayHelper::getValue($modelInstance->_fieldCache, $this->getCacheName(), null);
 
-        // set the attrib value
-        $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
+            if ($relObj):
+                $relObj->{$this->relation->getCacheName()} = null;
+            endif;
+            // set the attrib value e.g *_id
+            $modelInstance->{$fromField->getAttrName()} = null;
+        else:
+            // cache the value of the model
+            $modelInstance->_fieldCache[$fromField->getCacheName()] = $value;
+
+            // set the attrib value e.g *_id
+            $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
+        endif;
+
+        // if we are dealing with fields that only supports one field e.g. OneToOneField
+        // If this is a one-to-one relation, set the reverse accessor cache on
+        // the related object to the current instance to avoid an extra SQL
+        // query if it's accessed later on.
+        if ($value !== null && !$this->relation->multiple):
+            $value->{$this->relation->getCacheName()} = $modelInstance;
+        endif;
     }
 
     /**

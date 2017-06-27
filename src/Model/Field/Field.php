@@ -215,13 +215,6 @@ class Field extends DeconstructableObject implements FieldInterface
     public $scopeModel;
 
     /**
-     * caches value for this field.
-     *
-     * @var
-     */
-    private $cacheName;
-
-    /**
      * If True, the field is allowed to be blank on form. Default is False.
      *
      * Note that this is different than null. null is purely database-related,
@@ -677,19 +670,13 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
+     * The name we use to cache the value of this field on a scope model ones it has been fetched from the database.
+     *
      * @return mixed
      */
     public function getCacheName()
     {
-        return $this->cacheName;
-    }
-
-    /**
-     * @param mixed $cacheName
-     */
-    public function setCacheName($cacheName)
-    {
-        $this->cacheName = $cacheName;
+        return $this->getName();
     }
 
     /**

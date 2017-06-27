@@ -171,7 +171,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
-     * Returns a list of all forward fields on the model and its parents,excluding ManyToManyFields.
+     * Returns a list of all forward fields on the model and its parents,including ManyToManyFields.
      *
      * @param bool $includeParents
      * @param bool $inverse
@@ -298,7 +298,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      * As this method is very expensive and is accessed frequently (it looks up every field in a model, in every app),
      * it is computed on first access and then is set as a property on every model.
      *
-     * @return Field[]
+     * @return RelatedField[]
      *
      * @since 1.1.0
      *
