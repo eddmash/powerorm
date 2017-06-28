@@ -112,7 +112,7 @@ class RelatedField extends Field
         if (is_string($this->relation->getToModel())):
             return [];
         endif;
-
+        $error = [];
         $relMeta = $this->relation->getToModel()->meta;
         $relName = $this->relation->getAccessorName();
         $relQueryName = $this->getRelatedQueryName();
@@ -120,23 +120,72 @@ class RelatedField extends Field
         $fieldName = sprintf('%s.%s', $this->scopeModel->meta->getNamespacedModelName(), $this->getName());
 
         foreach ($relMeta->getFields() as $clashField) :
+            $clashName = sprintf('%s.%s', $relMeta->getNamespacedModelName(), $clashField->getName());
             if ($isHidden && $clashField->getName() == $relName):
-                $clashName = sprintf('%s.%s', $relMeta->getNamespacedModelName(), $clashField->getName());
                 $msg = "Reverse accessor for '%s' clashes with field name '%s'.";
-                $hint = sprintf("Rename field '%s', or add/change a related_name argument to the definition ".
+                $hint = sprintf("Rename field '%s', or add/change a related_name argument to the definition " .
                     "for field '%s'.", $clashName, $fieldName);
-                $error = [
-                    CheckError::createObject(
-                        [
-                            'message' => sprintf($msg, $fieldName, $clashName),
-                            'hint' => $hint,
-                            'context' => $this,
-                            'id' => 'fields.E302',
-                        ]
-                    ),
-                ];
+                $error[] = CheckError::createObject(
+                    [
+                        'message' => sprintf($msg, $fieldName, $clashName),
+                        'hint' => $hint,
+                        'context' => $this,
+                        'id' => 'fields.E302',
+                    ]
+                );
+
+            endif;
+
+            if ($clashField->getName() === $relQueryName):
+                dump($clashField->getName() ."==". $relQueryName);
+                $msg = "Reverse query name for '%s' clashes with field name '%s'.";
+                $hint = sprintf("Rename field '%s', or add/change a related_name argument to the " .
+                    "definition for field '%s'.", $clashName, $fieldName);
+                $error[] = CheckError::createObject(
+                    [
+                        'message' => sprintf($msg, $fieldName, $clashName),
+                        'hint' => $hint,
+                        'context' => $this,
+                        'id' => 'fields.E303',
+                    ]
+                );
             endif;
         endforeach;
+        foreach ($relMeta->getReverseRelatedObjects() as $reverseRelatedObject) :
+            if ($reverseRelatedObject->getName() === $this->getName()):
+                continue;
+            endif;
+            $clashName = sprintf("%s.%s",
+                $reverseRelatedObject->scopeModel->meta->getNamespacedModelName(), $reverseRelatedObject->getName());
+
+            if (!$isHidden && $reverseRelatedObject->relation->getAccessorName() === $relName):
+                $msg = "Reverse accessor for '%s' clashes with reverse accessor for '%s'.";
+                $hint = "Add or change a related_name argument to the definition for '%s' or '%s'.";
+                $error[] = CheckError::createObject(
+                    [
+                        'message' => sprintf($msg, $fieldName, $clashName),
+                        'hint' => sprintf($hint, $fieldName, $clashName),
+                        'context' => $this,
+                        'id' => 'fields.E304',
+                    ]
+                );
+            endif;
+
+            if($reverseRelatedObject->relation->getAccessorName() === $relQueryName):
+                $msg ="Reverse query name for '%s' clashes with reverse query name for '%s'.";
+                $hint = "Add or change a related_name argument to the definition for '%s' or '%s'.";
+                $error[] = CheckError::createObject(
+                    [
+                        'message' => sprintf($msg, $fieldName, $clashName),
+                        'hint' => sprintf($hint, $fieldName, $clashName),
+                        'context' => $this,
+                        'id' => 'fields.E305',
+                    ]
+                );
+            endif;
+        endforeach;
+
+        return $error;
     }
 
     /**
@@ -180,7 +229,7 @@ class RelatedField extends Field
      *
      * e.g. we add the inverse field to use to query when starting on the inverse side.
      *
-     * @param Model|string     $relatedModel
+     * @param Model|string $relatedModel
      * @param ForeignObjectRel $relation
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
