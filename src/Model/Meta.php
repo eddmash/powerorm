@@ -182,9 +182,9 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getFields($includeParents = true, $inverse = true)
+    public function getFields($includeParents = true, $inverse = true, $reverse = true)
     {
-        return $this->fetchFields(['includeParents' => $includeParents, 'inverse' => $inverse]);
+        return $this->fetchFields(['includeParents' => $includeParents, 'inverse' => $inverse, 'reverse' => $reverse]);
     }
 
     /**
