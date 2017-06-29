@@ -11,6 +11,8 @@
 
 namespace Eddmash\PowerOrm;
 
+use DebugBar\JavascriptRenderer;
+use DebugBar\StandardDebugBar;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
@@ -36,6 +38,11 @@ define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
 class BaseOrm extends BaseObject
 {
     const RECURSIVE_RELATIONSHIP_CONSTANT = 'this';
+
+    /**
+     * @var JavascriptRenderer
+     */
+    public static $debugbarRenderer;
     private static $checkRegistry;
     public $modelsNamespace;
     public $migrationNamespace = 'App\Migrations';
@@ -52,6 +59,13 @@ class BaseOrm extends BaseObject
         'H:i',        // '14:30'
     ];
     private $timezone = '';
+
+    /**
+     * Url to use to load css/js/image used by ORM resource e.g. debugtoolbar.
+     *
+     * @var string
+     */
+    private $staticBaseUrl = '';
     /**
      * The configurations to use to connect to the database.
      *
@@ -252,6 +266,42 @@ class BaseOrm extends BaseObject
         static::loadRegistry();
 
         return static::$instance;
+    }
+
+    public static function showDebugToolBar()
+    {
+        static::$debugbarRenderer = self::getInstance()->loadToolbar();
+    }
+
+    /**
+     * @return \DebugBar\JavascriptRenderer
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function loadToolbar()
+    {
+        $debugbar = new StandardDebugBar();
+        $debugbarRenderer = $debugbar->getJavascriptRenderer('/');
+
+        $debugbar['messages']->addMessage('hello world!');
+        $debugStack = new \Doctrine\DBAL\Logging\DebugStack();
+        $connection = \Eddmash\PowerOrm\BaseOrm::getDbConnection();
+
+        $connection->getConfiguration()->setSQLLogger($debugStack);
+
+        $debugbar->addCollector(new \DebugBar\Bridge\DoctrineCollector($debugStack));
+
+        return $debugbarRenderer;
+    }
+
+    /**
+     * @return JavascriptRenderer
+     */
+    public static function getDebugbarRenderer()
+    {
+        return self::$debugbarRenderer;
     }
 
     /**
@@ -527,6 +577,7 @@ class BaseOrm extends BaseObject
     {
 
         $orm = self::getInstance();
+        static::showDebugToolBar();
 
         foreach ($orm->dbTypes as $name => $type) {
             Type::addType($name, $type);
