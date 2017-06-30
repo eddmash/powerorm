@@ -385,7 +385,6 @@ class Query extends BaseObject
             endif;
         endif;
 
-//        dump($relatedKlassInfo);
         return $relatedKlassInfo;
     }
 
@@ -750,11 +749,17 @@ class Query extends BaseObject
         foreach ($pathInfos as $pathInfo) :
             $meta = $pathInfo['toMeta'];
 
+            if($pathInfo['direct']):
+                $nullable = $this->isNullable($pathInfo['joinField']);
+            else:
+                $nullable = true;
+            endif;
             $join = new Join();
             $join->setTableName($meta->dbTable);
             $join->setParentAlias($alias);
             $join->setJoinType(INNER);
             $join->setJoinField($pathInfo['joinField']);
+            $join->setNullable($nullable);
 
             $alias = $this->join($join);
 
@@ -769,6 +774,7 @@ class Query extends BaseObject
         list($alias) = $this->getTableAlias($join->getTableName(), false);
         if ($join->getJoinType()):
             if ($this->tableMap[$join->getParentAlias()]->getJoinType() === LOUTER || $join->getNullable()):
+
                 $joinType = LOUTER;
             else:
                 $joinType = INNER;
@@ -1130,6 +1136,20 @@ class Query extends BaseObject
         endif;
 
         return true;
+    }
+
+    /**
+     * We check if a field is nullable.
+     *
+     * @param Field $joinField
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function isNullable($joinField)
+    {
+        return $joinField->null;
     }
 
 }

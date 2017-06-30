@@ -923,6 +923,7 @@ class AutoDetector extends BaseObject
         /* @var $field Field */
         foreach ($this->keptModelKeys as $modelName) :
             $oldModelName = $this->getOldModelName($modelName);
+
             $oldModelState = $this->fromState->modelStates[$oldModelName];
 
             $newModel = $this->newRegistry->getModel($modelName);
@@ -940,8 +941,13 @@ class AutoDetector extends BaseObject
                 foreach ($removedFields as $remField) :
                     $oldFieldDef = $this->deepDeconstruct($oldModelState->getFieldByName($remField));
 
-                    if ($field->relation !== null && $field->relation->toModel !== null):
-                        unset($oldFieldDef['constructorArgs']['to']);
+                    if ($field->relation !== null && $field->relation->toModel !== null &&
+                        isset($oldFieldDef['constructorArgs']['to'])
+                    ):
+                        $oldRelTo = $oldFieldDef['constructorArgs']['to'];
+                        if (in_array($oldRelTo, $this->renamedModels)):
+                            $oldFieldDef['constructorArgs']['to'] = $this->getOldModelName($oldRelTo);
+                        endif;
                     endif;
 
                     if ($fieldDef === $oldFieldDef):
