@@ -11,7 +11,6 @@
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
-use Eddmash\PowerOrm\Model\Field\RelatedObjects\OneToManyRel;
 use Eddmash\PowerOrm\Model\Model;
 
 /**
@@ -23,34 +22,44 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class HasManyField extends InverseField
 {
+    protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ReverseManyToOneDescriptor';
+
     public function __construct(array $kwargs)
     {
-        $kwargs['rel'] = OneToManyRel::createObject(
-            [
-                'fromField' => $this,
-                'to' => ArrayHelper::getValue($kwargs, 'to'),
-            ]
-        );
-        parent::__construct($kwargs);
         $this->toField = ArrayHelper::getValue($kwargs, 'toField');
         $this->fromField = ArrayHelper::getValue($kwargs, 'fromField');
+        $kwargs['rel'] = $this->fromField->relation;
+        parent::__construct($kwargs);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getValue(Model $modelInstance)
+    public function getCacheName()
     {
-        return $this->queryset($modelInstance, true);
+        return $this->relation->getCacheName();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setValue(Model $modelInstance, $value)
+    public function getForwardRelatedFilter(Model $model)
     {
-        $queryset = $this->getValue($modelInstance);
-        $queryset->set($value);
+        return $this->relation->fromField->getForwardRelatedFilter($model);
     }
 
+    public function getReverseRelatedFilter(Model $model)
+    {
+        return $this->fromField->getForwardRelatedFilter($model);
+    }
+
+    public function getPathInfo()
+    {
+        $meta = $this->scopeModel->meta;
+
+        return [
+            [
+                'fromMeta' => $meta,
+                'toMeta' => $this->fromField->scopeModel->meta,
+                'targetFields' => [$this->fromField->scopeModel->meta->primaryKey],
+                'joinField' => $this->relation, //field that joins the relationship
+                'm2m' => false,
+                'direct' => false,
+            ],
+        ];
+    }
 }

@@ -48,7 +48,6 @@ class Application
      */
     public static function run($config, &$composerLoader = null)
     {
-
         $orm = BaseOrm::createObject($config);
         $modelsNamespace = $orm->modelsNamespace;
         $migrationsNamespace = $orm->migrationNamespace;

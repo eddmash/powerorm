@@ -13,7 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Exception\ValueError;
-use PHPUnit\Runner\Exception;
+use Exception;
 use Doctrine\DBAL\Connection;
 
 /**

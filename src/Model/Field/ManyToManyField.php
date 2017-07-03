@@ -21,7 +21,6 @@ use Eddmash\PowerOrm\Model\Delete;
 use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToManyRel;
-use Eddmash\PowerOrm\Model\Manager\M2MManager;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -252,47 +251,6 @@ class ManyToManyField extends RelatedField
         endif;
 
         return $warnings;
-    }
-
-    public function setValue(Model $modelInstance, $value)
-    {
-        $queryset = $this->getValue($modelInstance);
-        $queryset->set($value);
-    }
-
-    public function getValue(Model $modelInstance)
-    {
-        return $this->queryset($modelInstance);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function queryset($modelInstance, $reverse = false)
-    {
-        if ($reverse) :
-            $model = $this->getRelatedModel();
-        else:
-            $model = $this->scopeModel;
-        endif;
-
-        // define BaseM2MQueryset
-        if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2MManager', false)):
-            $baseClass = $model::getManagerClass();
-            $class = sprintf('namespace Eddmash\PowerOrm\Model\Manager;class BaseM2MManager extends \%s{}', $baseClass);
-            eval($class);
-        endif;
-
-        $manager = M2MManager::createObject(
-            [
-                'model' => $model,
-                'rel' => $this->relation,
-                'instance' => $modelInstance,
-                'reverse' => $reverse,
-            ]
-        );
-
-        return $manager;
     }
 
     /***

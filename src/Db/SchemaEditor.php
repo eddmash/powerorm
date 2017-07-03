@@ -454,7 +454,6 @@ class SchemaEditor extends BaseObject
             );
             $tableClone->dropColumn($oldField->getColumnName());
         else:
-            dump($this->getDoctrineColumnOptions($newField, true));
             $tableClone->changeColumn($oldField->getColumnName(),
                 $this->getDoctrineColumnOptions($newField, true));
         endif;

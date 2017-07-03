@@ -19,6 +19,7 @@ use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
@@ -227,10 +228,7 @@ class Queryset implements QuerysetInterface
      */
     public function selectRelated($fields = [])
     {
-        if (!is_array($fields)):
-            throw new InvalidArgumentException(
-                sprintf("method '%s()' expects paramanets to be an array", __FUNCTION__));
-        endif;
+        Tools::ensureParamIsArray($fields);
 
         if ($this->_fields) :
             throw new TypeError('Cannot call select_related() after .values() or .values_list()');
@@ -246,6 +244,11 @@ class Queryset implements QuerysetInterface
         endif;
 
         return $obj;
+    }
+
+    public function prefetchRelated()
+    {
+
     }
 
     public function exclude()

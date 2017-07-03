@@ -10,6 +10,8 @@
 
 namespace Eddmash\PowerOrm\Model;
 
+use App\Models\Author;
+use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\ArrayObjectInterface;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
@@ -50,7 +52,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     const SELF = 'this';
     const CASCADE = 'cascade';
-    const DEBUG_IGNORE = ['_fieldCache', 'tableName', 'managed', 'verboseName', 'isNew', 'proxy'];
+    const DEBUG_IGNORE = ['tableName', 'managed', 'verboseName', 'isNew', 'proxy'];
     const MODELBASE = '\Eddmash\PowerOrm\Model\Model';
     public static $managerClass;
 
@@ -181,12 +183,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     }
 
-    public static function fromDb($records = [])
+    public static function fromDb(Connection $connection, $fieldNames, $values)
     {
+        $vals = array_combine($fieldNames, $values);
 
-        $attrs = array_keys($records);
-
-        return new static($records);
+        return new static($vals);
     }
 
     /**
@@ -297,6 +298,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                     try {
                         $relObject = ArrayHelper::getValue($kwargs, $field->getName(), ArrayHelper::STRICT);
                         $isRelated = true;
+                        // Object instance was passed in, You can
+                        // pass in null for related objects if it's allowed.
+                        if (is_null($relObject) && $field->null):
+                            $val = null;
+                        endif;
                     } catch (KeyError $e) {
                         try {
                             $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), ArrayHelper::STRICT);
@@ -304,12 +310,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                             $val = $field->getDefault();
                         }
                     }
-
-                    // Object instance was passed in, You can
-                    // pass in null for related objects if it's allowed.
-                    if (is_null($relObject) && $field->null):
-                        $val = null;
-                    endif;
 
                 else:
                     try {
@@ -389,21 +389,21 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $attrName = lcfirst(str_replace(' ', '', ucwords(str_replace('\\', ' ', $name))));
             $attrName = sprintf('%sPtr', $attrName);
 
-            if (!ArrayHelper::hasKey($this->meta->getFields(), $attrName)):
+//            if (!ArrayHelper::hasKey($this->meta->getFields(), $attrName)):
+            //todo find a way to avoid name clash
+            $field = OneToOneField::createObject(
+                [
+                    'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
+                    'onDelete' => Delete::CASCADE,
+                    'name' => $attrName,
+                    'autoCreated' => true,
+                    'parentLink' => true,
+                ]
+            );
 
-                $field = OneToOneField::createObject(
-                    [
-                        'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
-                        'onDelete' => Delete::CASCADE,
-                        'name' => $attrName,
-                        'autoCreated' => true,
-                        'parentLink' => true,
-                    ]
-                );
-
-                $this->addToClass($attrName, $field);
-                $this->meta->parents[$name] = $field;
-            endif;
+            $this->addToClass($attrName, $field);
+            $this->meta->parents[$name] = $field;
+//            endif;
 
         endif;
     }
@@ -765,24 +765,29 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if ($name === 'pk'):
             $pkName = $this->meta->primaryKey->getAttrName();
 
-            return $this->{$pkName};
+            return ArrayHelper::getValue($this->_fieldCache, $pkName);
         endif;
         try {
             /** @var $field RelatedField */
             $field = $this->meta->getField($name);
+
             if ($field instanceof ForeignObjectRel) :
                 throw new FieldDoesNotExist();
             endif;
 
             return $field->getValue($this);
-        } catch (FieldDoesNotExist $e) {
-
+        } catch (\Exception $e) {
             if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
                 throw new AttributeError(
-                    sprintf("AttributeError: '%s' object has no attribute '%s'", $this->meta->getNamespacedModelName(), $name)
+                    sprintf("AttributeError: '%s' object has no attribute '%s'",
+                        $this->meta->getNamespacedModelName(), $e->getMessage())
                 );
             endif;
         }
+
+        if(ArrayHelper::hasKey($this->_fieldCache, $name)):
+            return ArrayHelper::getValue($this->_fieldCache, $name);
+        endif;
 
         return $this->{$name};
     }
@@ -878,7 +883,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function getPkValue(Meta $meta = null)
+    public function getPkValue(Meta $meta = null)
     {
         if ($meta === null):
             $meta = $this->meta;

@@ -43,4 +43,24 @@ class Col extends BaseExpression
         return [sprintf('%s.%s', $this->alias, $this->targetField->getColumnName()), []];
     }
 
+    /**
+     * @return Field
+     */
+    public function getTargetField()
+    {
+        return $this->targetField;
+    }
+
+    public function getDbConverters(Connection $connection)
+    {
+        if ($this->getTargetField()->getName() === $this->getOutputField()->getName()):
+            return $this->getOutputField()->getDbConverters($connection);
+        else:
+            return array_merge(
+                $this->getOutputField()->getDbConverters($connection),
+                $this->getTargetField()->getDbConverters($connection)
+            );
+        endif;
+    }
+
 }

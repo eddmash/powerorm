@@ -283,7 +283,7 @@ class BaseOrm extends BaseObject
     public function loadToolbar()
     {
         $debugbar = new StandardDebugBar();
-        $debugbarRenderer = $debugbar->getJavascriptRenderer('/');
+        $debugbarRenderer = $debugbar->getJavascriptRenderer($this->staticBaseUrl);
 
         $debugbar['messages']->addMessage('hello world!');
         $debugStack = new \Doctrine\DBAL\Logging\DebugStack();

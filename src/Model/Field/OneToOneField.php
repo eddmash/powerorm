@@ -32,6 +32,11 @@ class OneToOneField extends ForeignKey
     public $manyToOne = false;
     public $oneToOne = true;
 
+    /**{inheritdoc}*/
+    protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ForwardOneToOneDescriptor';
+
+    public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasOneField';
+
     public function __construct($kwargs)
     {
         $kwargs['unique'] = true;

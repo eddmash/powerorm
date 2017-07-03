@@ -17,7 +17,6 @@ use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
-use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedExact;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThan;
@@ -27,7 +26,6 @@ use Eddmash\PowerOrm\Model\Lookup\Related\RelatedIsNull;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedLessThan;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedLessThanOrEqual;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
  * Base class that all relational fields inherit from.
@@ -42,16 +40,21 @@ class RelatedField extends Field
      * The field on the related object that the relation is to.
      * By default, The Orm uses the primary key of the related object.
      *
-     * @var
+     * @var RelatedField
      */
     public $toField;
 
     /**
      * points to the current field instance.
      *
-     * @var string
+     * @var RelatedField
      */
     public $fromField;
+
+    /**
+     * @var string The inversefield to use to get value from the inverse side
+     */
+    public $inverseField = '';
 
     public function __construct($kwargs = [])
     {
@@ -176,7 +179,7 @@ class RelatedField extends Field
                 );
             endif;
 
-            if($reverseRelatedObject->relation->getAccessorName() === $relQueryName):
+            if ($reverseRelatedObject->relation->getAccessorName() === $relQueryName):
                 $msg = "Reverse query name for '%s' clashes with reverse query name for '%s'.";
                 $hint = "Add or change a related_name argument to the definition for '%s' or '%s'.";
                 $error[] = CheckError::createObject(
@@ -240,7 +243,8 @@ class RelatedField extends Field
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        $hasMany = HasManyField::createObject(
+        $inverseField = $this->inverseField;
+        $hasMany = $inverseField::createObject(
             [
                 'to' => $this->scopeModel->meta->getNamespacedModelName(),
                 'toField' => $relation->fromField->getName(),
@@ -348,6 +352,7 @@ class RelatedField extends Field
     /**
      * Fetches only fields that are foreign in a relationship i.e. on the toModel.
      *
+     * @return Field[]
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function getForeignRelatedFields()
@@ -358,6 +363,7 @@ class RelatedField extends Field
     /**
      * Fetches only fields that are local to a relationship i.e. on the fromModel.
      *
+     * @return Field[]
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function getLocalRelatedFields()
@@ -462,18 +468,16 @@ class RelatedField extends Field
         return strtolower($name);
     }
 
-    /**
-     * Creates the queryset to retrieve data for the relationship that relates to this field.
-     *
-     * @param $modelInstance
-     * @param bool $reverse
-     *
-     * @internal param $modelName
-     *
-     * @return Queryset
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     */
-    public function queryset($modelInstance, $reverse = false)
+    public function getForwardRelatedFilter(Model $model)
+    {
+        $toField = $this->getRelatedFields() [1];
+        $val = $model->{$toField->getAttrName()};
+        $lookup = sprintf('%s__%s', $this->getName(), $toField->getName());
+
+        return [$lookup => $val];
+    }
+
+    public function getReverseRelatedFilter(Model $model)
     {
 
     }

@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Query\Results;
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
 class ModelMapper extends Mapper
 {
@@ -28,14 +29,42 @@ class ModelMapper extends Mapper
      */
     public function __invoke()
     {
-        $results = $this->queryset->query->execute($this->queryset->connection)->fetchAll();
+        $connection = $this->queryset->connection;
+
+        $results = $this->queryset->query->getResultsIterator($connection);
 
         $klassInfo = $this->queryset->query->klassInfo;
-        $modelClass = ArrayHelper::getValue($klassInfo, 'modelClass');
+
+        $selectedFields = $klassInfo['select_fields'];
+        $select = $this->queryset->query->select;
+
+        $initList = [];
+
+        $modelFieldsStart = reset($selectedFields);
+        $modelFieldsEnd = count($selectedFields);
+
+        /* @var $col Col */
+        foreach (array_slice($select, $modelFieldsStart, $modelFieldsEnd) as $colInfo) :
+            $col = $colInfo[0];
+            $initList[] = $col->getTargetField()->getAttrName();
+        endforeach;
+
         /* @var $modelClass Model */
+        $modelClass = ArrayHelper::getValue($klassInfo, 'model');
         $mapped = [];
+        $relatedPopulators = static::getRelatedMapper($klassInfo, $select, $this->queryset->connection);
+
         foreach ($results as $result) :
-            $obj = $modelClass::fromDb($this->preparedResults($result));
+
+            $vals = array_slice($result, $modelFieldsStart, $modelFieldsEnd);
+
+            $obj = $modelClass::fromDb($connection, $initList, $vals);
+
+            if ($relatedPopulators):
+                foreach ($relatedPopulators as $relatedPopulator) :
+                    $relatedPopulator->populate($result, $obj);
+                endforeach;
+            endif;
             $mapped[] = $obj;
         endforeach;
 
@@ -43,27 +72,25 @@ class ModelMapper extends Mapper
     }
 
     /**
-     * Ensure results are converted back to there respective php types.
+     * Creates mappers to use for related model.
      *
-     * @param $row
+     * @param $klassInfo
      * @param Connection $connection
      *
-     * @return array
+     * @return RelatedMappers[]
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function preparedResults($row)
+    public static function getRelatedMapper($klassInfo, $select, Connection $connection)
     {
-        $preparedValues = [];
-
-        foreach ($row as $column => $value) :
-            $field = $this->getField($column);
-            $preparedValues[$field->getAttrName()] = $field->convertToPHPValue($value);
+        $mappers = [];
+        $relatedKlassInfo = ArrayHelper::getValue($klassInfo, 'related_klass_infos', []);
+        foreach ($relatedKlassInfo as $klassInfo):
+            $mappers[] = new RelatedMappers($klassInfo, $select, $connection);
         endforeach;
 
-        return $preparedValues;
+        return $mappers;
     }
-
 }

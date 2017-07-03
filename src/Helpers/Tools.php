@@ -4,6 +4,7 @@ namespace Eddmash\PowerOrm\Helpers;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeConstructableInterface;
+use Eddmash\PowerOrm\Exception\InvalidArgumentException;
 use Eddmash\PowerOrm\Model\Model;
 
 /**
@@ -325,5 +326,15 @@ class Tools
             ."Stack trace:\n".$exception->getTraceAsString();
 
         return $message;
+    }
+
+    public static function ensureParamIsArray($fields, $messg = null)
+    {
+        if (!is_array($fields)):
+            if(is_null($messg)):
+                $messg = sprintf("method '%s()' expects parameters to be an array", __FUNCTION__);
+            endif;
+            throw new InvalidArgumentException($messg);
+        endif;
     }
 }

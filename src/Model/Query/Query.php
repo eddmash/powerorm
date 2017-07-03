@@ -12,6 +12,8 @@
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
@@ -19,6 +21,7 @@ use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
@@ -59,7 +62,7 @@ class Query extends BaseObject
     public $aliasRefCount = [];
 
     /**
-     * @var array
+     * @var Col[]
      */
     public $select = [];
     public $valueSelect = [];
@@ -86,6 +89,10 @@ class Query extends BaseObject
     public $distictFields = [];
     public $orderBy;
     public $defaultOrdering = [];
+
+    // Arbitrary limit for select_related to prevents infinite recursion.
+    public $maxDepth = 5;
+    public $columnInfoCache;
 
     /**
      * Query constructor.
@@ -146,10 +153,9 @@ class Query extends BaseObject
 
         /* @var $col Col */
         foreach ($this->select as $colInfo) :
-
             list($col, $alias) = $colInfo;
-            list($colSql, $colParams) = $col->asSql($connection);
 
+            list($colSql, $colParams) = $col->asSql($connection);
             if ($alias):
                 $cols[] = sprintf('%s AS %s', $colSql, $alias);
             else:
@@ -234,32 +240,42 @@ class Query extends BaseObject
         $klassInfo = [];
         $select = [];
         $annotations = [];
+        //keeps track of what position the column is at helpful because of we perform a join we might a column name
+        // thats repeated a cross multiple tables, we can use the colmn names to map back to model since it will cause
+        // issues
+        $selectIDX = 0;
         if ($this->useDefaultCols):
-
+            $selectList = [];
             /* @var $field Field */
             foreach ($this->getDefaultCols() as $col) :
                 $alias = false;
                 $select[] = [$col, $alias];
-                $klassInfo['modelClass'] = $this->model->getFullClassName();
-
+                $selectList[] = $selectIDX;
+                $selectIDX += 1;
             endforeach;
+            $klassInfo['model'] = $this->model;
+            $klassInfo['select_fields'] = $selectList;
         endif;
 
+        // this are used when return the result as array so they are not populated to any model
         foreach ($this->select as $col) :
             $alias = false;
             $select[] = [$col, $alias];
+            $selectIDX += 1;
         endforeach;
 
         // handle annotations
         foreach ($this->annotations as $alias => $annotation) :
-            $annotations[$alias] = $annotation;
+            $annotations[$alias] = $selectIDX;
             $select[] = [$annotation, $alias];
+            $selectIDX += 1;
         endforeach;
 
         // handle select related
 
         if ($this->selectRelected):
             $klassInfo['related_klass_infos'] = $this->getRelatedSelections($select);
+            $this->getSelectFromParent($klassInfo);
         endif;
 
         return [$select, $klassInfo, $annotations];
@@ -275,16 +291,26 @@ class Query extends BaseObject
      * @param null      $requested  the set of fields to use in selectRelated
      * @param null      $restricted true when we are to use just a set of relationship fields
      *
+     * @return array
+     *
      * @throws FieldError
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function getRelatedSelections(&$select, Meta $meta = null, $rootAlias = null,
-                                          $curDepth = 1, $requested = null, $restricted = null)
+    private function getRelatedSelections(&$select, Meta $meta = null,
+                                          $rootAlias = null,
+                                          $curDepth = 1,
+                                          $requested = null,
+                                          $restricted = null)
     {
         $relatedKlassInfo = [];
+
+        if (!$restricted && $this->maxDepth && $curDepth > $this->maxDepth):
+            //We've recursed far enough; bail out.
+            return $relatedKlassInfo;
+        endif;
         $foundFields = [];
         if (is_null($meta)):
             $meta = $this->model->meta;
@@ -336,18 +362,23 @@ class Query extends BaseObject
             list($_, $_, $joinList, $_) = $this->setupJoins([$field->getName()], $meta, $rootAlias);
             $alias = end($joinList);
             $columns = $this->getDefaultCols($alias, $field->relation->getToModel()->meta);
-
             $selectFields = [];
             foreach ($columns as $column) :
+                $selectFields[] = count($select);
                 $select[] = [$column, false];
-                $selectFields[] = $column;
             endforeach;
             $klassInfo['select_fields'] = $selectFields;
 
             // now go the next field in the spanning relationship i.e. if we have author__user, we just did author
             // so no we do user and so in
-            $nextKlassInfo = $this->getRelatedSelections($select, $field->relation->getToModel()->meta, $alias,
-                $curDepth + 1, $nextSpanField, $restricted);
+            $nextKlassInfo = $this->getRelatedSelections(
+                $select,
+                $field->relation->getToModel()->meta,
+                $alias,
+                $curDepth + 1,
+                $nextSpanField,
+                $restricted
+            );
             $klassInfo['related_klass_infos'] = $nextKlassInfo;
             $relatedKlassInfo[] = $klassInfo;
 
@@ -359,20 +390,67 @@ class Query extends BaseObject
             // we follow back relationship that represent single valuse this most will be relation field that are
             // unique e.g. OneToOneField or ForeignKey with unique set to true.
             // this meas we don't consider m2m fields even if they are unique
+
             foreach ($meta->getReverseRelatedObjects() as $field) :
 
                 if ($field->unique && !$field->manyToMany):
-                    $reverseFields[] = [$field, $field->relation->getToModel()];
+                    $model = $field->relation->getFromModel();
+                    $reverseFields[] = [$field, $model];
                 endif;
             endforeach;
 
-            /** @var $reverseField[0] RelatedField */
+            /* @var $rField RelatedField */
+            /* @var $rModel Model */
             foreach ($reverseFields as $reverseField) :
-                if (!$this->selectRelatedDescend($reverseField[0], $restricted, $requested, true)):
+                $rField = $reverseField[0];
+                $rModel = $reverseField[1];
+
+                if (!$this->selectRelatedDescend($rField, $restricted, $requested, true)):
                     continue;
                 endif;
-                $relatedFieldName = $reverseField[0]->getRelatedQueryName();
+                $relatedFieldName = $rField->getRelatedQueryName();
+
                 $foundFields[] = $relatedFieldName;
+
+                list($_, $_, $joinList, $_) = $this->setupJoins([$relatedFieldName], $meta, $rootAlias);
+                $alias = end($joinList);
+                $fromParent = false;
+                if (
+                    is_subclass_of($rModel, $meta->getNamespacedModelName()) &&
+                    $rModel->meta->getNamespacedModelName() === $meta->getNamespacedModelName()
+                ):
+                    $fromParent = true;
+                endif;
+
+                $rKlassInfo = [
+                    'model' => $rModel,
+                    'field' => $rField,
+                    'reverse' => true,
+                    'from_parent' => $fromParent,
+                ];
+
+                $rColumns = $this->getDefaultCols($alias, $rModel->meta, $this->model);
+
+                $rSelectFields = [];
+                foreach ($rColumns as $column) :
+                    $selectFields[] = count($select);
+                    $select[] = [$column, false];
+                endforeach;
+                $rKlassInfo['select_fields'] = $rSelectFields;
+
+                $rNextSpanField = ArrayHelper::getValue($requested, $rField->getRelatedQueryName(), []);
+
+                $rNextKlassInfo = $this->getRelatedSelections(
+                    $select,
+                    $rModel->meta,
+                    $alias,
+                    $curDepth + 1,
+                    $rNextSpanField,
+                    $restricted
+                );
+                $rKlassInfo['related_klass_infos'] = $rNextKlassInfo;
+
+                $relatedKlassInfo[] = $rKlassInfo;
             endforeach;
 
             $fieldsNotFound = array_diff(array_keys($requested), $foundFields);
@@ -413,12 +491,13 @@ class Query extends BaseObject
         endforeach;
     }
 
-    /**
+    /**     *
      * Returns the fields in the current models/those represented by the alias as Col expression, which know how to be
      * used in a query.
      *
-     * @param null      $startAlias
-     * @param Meta|null $meta
+     * @param null       $startAlias
+     * @param Meta|null  $meta
+     * @param Model|null $fromParent
      *
      * @return Col[]
      *
@@ -426,7 +505,7 @@ class Query extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getDefaultCols($startAlias = null, Meta $meta = null)
+    public function getDefaultCols($startAlias = null, Meta $meta = null, $fromParent = null)
     {
 
         $fields = [];
@@ -438,11 +517,22 @@ class Query extends BaseObject
         endif;
 
         foreach ($meta->getConcreteFields() as $field) :
-//            $model = $field->scopeModel->meta->concreteModel;
-//            if($meta->getNamespacedModelName() == $model->meta->getNamespacedModelName()):
-//                $model=null;
-//            endif;
-            //todo need to handle joining parent
+            $model = $field->scopeModel->meta->concreteModel;
+            if ($meta->getNamespacedModelName() == $model->meta->getNamespacedModelName()):
+                $model = null;
+            endif;
+            if ($fromParent && !is_null($model) &&
+                is_subclass_of($fromParent->meta->concreteModel,
+                    $model->meta->concreteModel->meta->getNamespacedModelName())
+            ):
+                // Avoid loading data for already loaded parents.
+                // We end up here in the case selectRelated() resolution
+                // proceeds from parent model to child model. In that case the
+                // parent model data is already present in the SELECT clause,
+                // and we want to avoid reloading the same data again.
+                continue;
+            endif;
+            //todo if we ever do defer
             $fields[] = $field->getColExpression($startAlias);
         endforeach;
 
@@ -455,6 +545,7 @@ class Query extends BaseObject
         $params = [];
 
         $refCount = $this->aliasRefCount;
+
         foreach ($this->tables as $alias) :
             if (!ArrayHelper::getValue($refCount, $alias)):
                 continue;
@@ -749,7 +840,7 @@ class Query extends BaseObject
         foreach ($pathInfos as $pathInfo) :
             $meta = $pathInfo['toMeta'];
 
-            if($pathInfo['direct']):
+            if ($pathInfo['direct']):
                 $nullable = $this->isNullable($pathInfo['joinField']);
             else:
                 $nullable = true;
@@ -1072,6 +1163,21 @@ class Query extends BaseObject
         return $stmt;
     }
 
+    public function getResultsIterator(Connection $connection)
+    {
+        $preparedResults = [];
+
+        // since php pdo normally returns an assoc array, we ask it return the values in form an array indexed
+        // by column number as returned in the corresponding result set, starting at column 0.
+        // this to avoid issues where joins result in columns with the same name e.g. user.id joined by blog.id
+        $results = $this->execute($connection)->fetchAll(\PDO::FETCH_NUM);
+        foreach ($results as $row) :
+            $preparedResults[] = $this->preparedResults($connection, $row);
+        endforeach;
+
+        return $preparedResults;
+    }
+
     /**
      * Gets all names for the fields in the query model, inclusing reverse fields.
      *
@@ -1146,10 +1252,146 @@ class Query extends BaseObject
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @return bool
      */
     private function isNullable($joinField)
     {
         return $joinField->null;
     }
 
+    /**
+     * Ensure results are converted back to there respective php types.
+     *
+     * @param $values
+     *
+     * @return array
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function preparedResults(Connection $connection, $values)
+    {
+        $preparedValues = [];
+
+        /* @var $col Col */
+        /* @var $field Field */
+        foreach ($this->select as $pos => $selectColumn) :
+            $col = $selectColumn[0];
+            $field = $col->getOutputField();
+            $val = ArrayHelper::getValue($values, $pos);
+            // first use the inbuilt converters
+            try {
+                $val = Type::getType(
+                    $field->dbType($connection))->convertToPHPValue($val, $connection->getDatabasePlatform());
+            } catch (DBALException $exception) {
+            }
+
+            // use the field converters if any were provided by the user.
+            $converters = $field->getDbConverters($connection);
+
+            if ($converters):
+                foreach ($converters as $converter) :
+                    $val = call_user_func($converter, $connection, $val, $field);
+                endforeach;
+            endif;
+            $preparedValues[] = $val;
+
+        endforeach;
+
+        return $preparedValues;
+    }
+
+}
+
+/**
+ * @param Model[]        $instances
+ * @param Prefetch|array $lookups
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+function prefetchRelatedObjects($instances, $lookups)
+{
+    if (!$lookups instanceof Prefetch):
+        $msg = sprintf("method '%s()' expects parameter 'lookup' to be an array", __FUNCTION__);
+        Tools::ensureParamIsArray($lookups, $msg);
+    endif;
+
+    if (count($instances) == 0):
+        return;
+    endif;
+
+    //We need to be able to dynamically add to the list of prefetch_related
+    //lookups that we look up (see below).  So we need some book keeping to
+    //ensure we don't do duplicate work.
+    $doneQueries = [];  // assoc_array of things like 'foo__bar': [results]
+    $lookups = normalizePrefetchLookup($lookups);
+
+    /* @var $lookup Prefetch */
+    while ($lookups):
+        $lookup = array_shift($lookups);
+
+        // have already worked on a lookup that has similar name
+        if (array_key_exists($lookup->prefetchTo, $doneQueries)):
+
+            // does this lookup contain a queryset
+            // this means its not a duplication but a different request just containing the same name
+            if ($lookup->queryset):
+                throw new ValueError(sprintf("'%s' lookup was already seen with a different queryset. ".
+                    'You may need to adjust the ordering of your lookups.'.$lookup->prefetchTo));
+            endif;
+
+            // just pass this is just a duplication
+            continue;
+        endif;
+
+        $objList = $instances;
+
+        $throughtAttrs = StringHelper::split(BaseLookup::$lookupPattern, $lookup->prefetchThrough);
+        foreach ($throughtAttrs as $level => $throughtAttr) :
+            if (count($objList) == 0):
+                break;
+            endif;
+
+            $prefetchTo = $lookup->getCurrentPrefetchTo($level);
+
+            if (array_key_exists($prefetchTo, $doneQueries)):
+                $objList = ArrayHelper::getValue($doneQueries, $prefetchTo);
+                continue; //if its already fetched skip it
+            endif;
+        endforeach;
+    endwhile;
+
+}
+
+/**
+ * Enusures all prefetch looks are of the same form i.e. instance of Prefetch.
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ *
+ * @param $lookups
+ * @param null $prefix
+ *
+ * @return Prefetch[]
+ */
+function normalizePrefetchLookup($lookups, $prefix = null)
+{
+
+    $results = [];
+    foreach ($lookups as $lookup) :
+        if (!$lookup instanceof Prefetch):
+            $lookup = new Prefetch($lookup);
+        endif;
+        if ($prefix):
+            $lookup->addPrefix($prefix);
+        endif;
+        $results[] = $lookup;
+    endforeach;
+
+    return $results;
 }

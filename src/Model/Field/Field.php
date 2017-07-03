@@ -19,6 +19,7 @@ use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\ValidationError;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Model\Field\Descriptors\DescriptorInterface;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\GreaterThan;
 use Eddmash\PowerOrm\Model\Lookup\GreaterThanOrEqual;
@@ -35,7 +36,7 @@ use Eddmash\PowerOrm\Model\Lookup\IStartsWith;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
-class Field extends DeconstructableObject implements FieldInterface
+class Field extends DeconstructableObject implements FieldInterface, DescriptorInterface
 {
     use RegisterLookupTrait;
     use FormFieldReadyTrait;
@@ -45,6 +46,13 @@ class Field extends DeconstructableObject implements FieldInterface
     const BLANK_CHOICE_DASH = ['' => '---------'];
 
     private $name;
+    /**
+     * @var DescriptorInterface use to return value of the field
+     */
+    protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\BaseDescriptor';
+
+    /** @var DescriptorInterface an instance of the field descriptor */
+    public $descriptorInstance;
 
     /**
      * The column comment. Supported by MySQL, PostgreSQL, Oracle, SQL Server, SQL Anywhere and Drizzle. Defaults to null.
@@ -243,6 +251,7 @@ class Field extends DeconstructableObject implements FieldInterface
 
             $this->isRelation = true;
         endif;
+
     }
 
     /**
@@ -500,18 +509,20 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * @return mixed
      *
+     * @throws ValidationError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function convertToPHPValue($value)
     {
-        try{
+        try {
             return Type::getType($this->dbType(BaseOrm::getDbConnection()))->convertToPHPValue(
                 $value,
                 BaseOrm::getDbConnection()->getDatabasePlatform()
             );
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             throw new ValidationError($exception->getMessage(), 'invalid');
         }
     }
@@ -631,10 +642,17 @@ class Field extends DeconstructableObject implements FieldInterface
     }
 
     /**
-     * Converts a value as returned by the database to a PHP object. It is the reverse of prepare_value().
+     * Converts a value as returned by the database to a PHP object.
      *
-     * This method is not used for most built-in fields as the database backend already returns the correct PHP type,
-     * or the backend itself does the conversion.
+     * This method is not used for most built-in fields as they are returned in the correct PHP type,
+     * or the orm does the conversion itself.
+     *
+     * If present for the field subclass, fromDbValue() will be called in all circumstances when the data is loaded
+     * from the database, including in aggregates and asArray() calls.
+     *
+     * @param Connection $connection
+     * @param $value
+     * @param $expression
      *
      * @return mixed
      *
@@ -642,9 +660,9 @@ class Field extends DeconstructableObject implements FieldInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function fromDbValue()
+    public function fromDbValue(Connection $connection, $value, $expression)
     {
-        // TODO: Implement fromDbValue() method.
+        return $value;
     }
 
     /**
@@ -676,7 +694,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function getCacheName()
     {
-        return $this->getName();
+        return sprintf('_%s_cache', $this->getName());
     }
 
     /**
@@ -707,7 +725,7 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function getValue(Model $modelInstance)
     {
-        return $modelInstance->_fieldCache[$this->getAttrName()];
+        return $this->getDescriptor()->getValue($modelInstance);
     }
 
     /**
@@ -715,7 +733,48 @@ class Field extends DeconstructableObject implements FieldInterface
      */
     public function setValue(Model $modelInstance, $value)
     {
-        $modelInstance->_fieldCache[$this->getAttrName()] = $value;
+        $this->getDescriptor()->setValue($modelInstance, $value);
+    }
+
+    /**
+     * @return DescriptorInterface
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getDescriptor()
+    {
+        $descriptor = $this->descriptor;
+        if (is_null($this->descriptorInstance)):
+            $this->descriptorInstance = new $descriptor($this);
+        endif;
+
+        return $this->descriptorInstance;
+    }
+
+    /**
+     * Returns a list of callbacks to use to covert database results into there equivalent php values.
+     *
+     * @param $connection
+     *
+     * @return array
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getDbConverters($connection)
+    {
+        return [[$this, 'fromDbValue']];
+    }
+
+    public function __debugInfo()
+    {
+        $meta = parent::__debugInfo();
+        $meta['scopeModel'] = $this->scopeModel->meta->getNamespacedModelName();
+
+        return $meta;
     }
 }
 

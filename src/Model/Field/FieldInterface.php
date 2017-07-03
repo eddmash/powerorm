@@ -124,13 +124,20 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface
      * This method is not used for most built-in fields as the database backend already returns the correct PHP type,
      * or the backend itself does the conversion.
      *
+     * If present for the field subclass, fromDbValue() will be called in all circumstances when the data is loaded
+     * from the database, including in aggregates and asArray() calls.
+     *
+     * @param Connection $connection
+     * @param $value
+     * @param $expression
+     *
      * @return mixed
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function fromDbValue();
+    public function fromDbValue(Connection $connection, $value, $expression);
 
     /**
      * Returns the value of this field in the given model instance.

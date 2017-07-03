@@ -203,6 +203,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getField($name)
     {
+
         // first look in the forward fields only
         $fields = $this->getForwardOnlyField();
 
@@ -260,7 +261,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     private function getForwardOnlyField()
     {
-        return $this->fetchFields(['reverse' => false]);
+        return $this->fetchFields(['reverse' => false, 'inverse' => false]);
     }
 
     private function getReverseOnlyField()
@@ -405,11 +406,12 @@ class Meta extends DeconstructableObject implements MetaInterface
 
         if ($inverse) :
             foreach ($this->inverseFields as $inverseField) :
-                if($inverseField->autoCreated):
-                    continue;
-                endif;
-                $fields[] = $inverseField;
+//                if($inverseField->autoCreated):
+//                    continue;
+//                endif;
+                $fields[$inverseField->getName()] = $inverseField;
             endforeach;
+
         endif;
 
         return $fields;

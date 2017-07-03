@@ -45,7 +45,7 @@ class InverseField extends RelatedField
 
         //end point of relation
         if (is_string($this->toField)):
-            $this->toField = $this->relation->toModel->meta->getField($this->toField);
+            $this->toField = $this->relation->getFromModel()->meta->getField($this->toField);
         endif;
 
         return [$this->fromField, $this->toField];
@@ -75,14 +75,8 @@ class InverseField extends RelatedField
 
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function queryset($modelInstance, $reverse = false)
+    public function getJoinColumns()
     {
-        /** @var $toField RelatedField */
-        $toField = $this->getRelatedFields()[1];
-
-        return $toField->queryset($modelInstance, $reverse);
+        return [$this->fromField, $this];
     }
 }
