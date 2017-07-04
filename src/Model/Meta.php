@@ -318,7 +318,9 @@ class Meta extends DeconstructableObject implements MetaInterface
             foreach ($allModels as $name => $model) :
 
                 // just get the forward fields
-                $fields = $model->meta->fetchFields(['includeParents' => false, 'reverse' => false]);
+                $fields = $model->meta->fetchFields(['includeParents' => false,
+                    'inverse' => false,
+                    'reverse' => false, ]);
 
                 foreach ($fields as $field) :
 
@@ -543,6 +545,6 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     private function modelClassInfo(Model $model)
     {
-       return new \ReflectionObject($model);
+        return new \ReflectionObject($model);
     }
 }

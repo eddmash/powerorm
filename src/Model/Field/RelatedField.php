@@ -109,7 +109,7 @@ class RelatedField extends Field
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function checkClashes()
+    protected function checkClashes()
     {
         // Skip if model name is not resolved.
         if (is_string($this->relation->getToModel())):
@@ -122,7 +122,7 @@ class RelatedField extends Field
         $isHidden = $this->relation->isHidden();
         $fieldName = sprintf('%s.%s', $this->scopeModel->meta->getNamespacedModelName(), $this->getName());
 
-        foreach ($relMeta->getFields(true, true, false) as $clashField) :
+        foreach ($relMeta->getFields(true, false, false) as $clashField) :
             $clashName = sprintf('%s.%s', $relMeta->getNamespacedModelName(), $clashField->getName());
             if ($isHidden && $clashField->getName() == $relName):
                 $msg = "Reverse accessor for '%s' clashes with field name '%s'.";
@@ -140,7 +140,7 @@ class RelatedField extends Field
             endif;
 
             if ($clashField->getName() === $relQueryName):
-                echo $clashField.PHP_EOL;
+
                 $msg = "Reverse query name for '%s' clashes with field name '%s'.";
 
                 $hint = sprintf("Rename field '%s', or add/change a related_name argument to the ".
@@ -167,6 +167,7 @@ class RelatedField extends Field
                 $reverseRelatedObject->scopeModel->meta->getNamespacedModelName(), $reverseRelatedObject->getName());
 
             if (!$isHidden && $reverseRelatedObject->relation->getAccessorName() === $relName):
+
                 $msg = "Reverse accessor for '%s' clashes with reverse accessor for '%s'.";
                 $hint = "Add or change a related_name argument to the definition for '%s' or '%s'.";
                 $error[] = CheckError::createObject(

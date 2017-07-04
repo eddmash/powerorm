@@ -296,6 +296,7 @@ class Queryset implements QuerysetInterface
         /** @var $field Field */
         foreach ($fields as $name => $field) :
             $value = $this->prepareValueForDatabaseSave($field, $field->preSave($model, true));
+
             $qb->setValue($field->getColumnName(), $qb->createNamedParameter($value));
         endforeach;
 

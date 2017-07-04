@@ -92,7 +92,7 @@ class AutoField extends Field
         endif;
 
         try{
-            $value = intval($value);
+            $value = (int) $value;
             if($value):
                 return $value;
             endif;

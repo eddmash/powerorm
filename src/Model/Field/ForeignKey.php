@@ -175,4 +175,15 @@ class ForeignKey extends RelatedField
         return parent::formField($kwargs);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function prepareValueBeforeSave($value, $connection)
+    {
+        if(is_null($value) || $value === ''):
+           return;
+        endif;
+
+        return $this->getRelatedField()->prepareValueBeforeSave($value, $connection, false);
+    }
 }
