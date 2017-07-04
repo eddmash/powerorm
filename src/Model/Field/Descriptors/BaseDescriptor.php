@@ -31,7 +31,7 @@ class BaseDescriptor implements DescriptorInterface
      */
     public function getValue(Model $modelInstance)
     {
-        return $modelInstance->{$this->field->getAttrName()};
+        return $modelInstance->_fieldCache[$this->field->getAttrName()];
     }
 
     /**
