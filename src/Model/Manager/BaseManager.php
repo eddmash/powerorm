@@ -55,7 +55,7 @@ class BaseManager extends BaseObject implements \IteratorAggregate
 
     public function __toString()
     {
-        return (string) $this->getQueryset();
+        return sprintf('%s object', get_class($this));
 
     }
 

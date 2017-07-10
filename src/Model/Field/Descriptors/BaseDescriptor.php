@@ -12,12 +12,13 @@
 namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Field\ForeignKey;
 use Eddmash\PowerOrm\Model\Model;
 
 class BaseDescriptor implements DescriptorInterface
 {
     /**
-     * @var Field
+     * @var ForeignKey
      */
     protected $field;
 

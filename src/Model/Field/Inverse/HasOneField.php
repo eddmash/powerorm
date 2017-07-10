@@ -11,10 +11,19 @@
 
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
+use Eddmash\PowerOrm\Model\Model;
+
 class HasOneField extends HasManyField
 {
     public $unique = true;
     /**{inheritdoc}*/
     protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ReverseOneToOneDescriptor';
 
+    /**
+     * {@inheritdoc}
+     */
+    public function setValue(Model $modelInstance, $value)
+    {
+        $modelInstance->_fieldCache[$this->relation->getAccessorName()] = $this->getDescriptor();
+    }
 }

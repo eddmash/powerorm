@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
+use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedExact;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThan;
@@ -230,6 +231,11 @@ class RelatedField extends Field
         };
 
         Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->toModel, ['fromField' => $this]);
+
+        // this allows anyone who var_dumps or any form of dump to see this related fields as part of the model
+        // attributes, mostly this is for cases where the instance has been instantiated using new cls() and not
+        // values for fields have been set
+        $this->scopeModel->_fieldCache[$this->getName()] = $this->getDescriptor();
     }
 
     /**
@@ -244,8 +250,9 @@ class RelatedField extends Field
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
+        /** @var $inverseField InverseField */
         $inverseField = $this->inverseField;
-        $hasMany = $inverseField::createObject(
+        $inverse = $inverseField::createObject(
             [
                 'to' => $this->scopeModel->meta->getNamespacedModelName(),
                 'toField' => $relation->fromField->getName(),
@@ -253,8 +260,12 @@ class RelatedField extends Field
                 'autoCreated' => true,
             ]
         );
+        $relatedModel->addToClass($relation->getAccessorName(), $inverse);
 
-        $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
+        // this allows anyone who var_dumps or any form of dump to see this related fields as part of the model
+        // attributes, mostly this is for cases where the instance has been instantiated using new cls() and not
+        // values for fields have been set
+        $relatedModel->_fieldCache[$relation->getAccessorName()] = $inverse->getDescriptor();
     }
 
     /**
@@ -397,6 +408,7 @@ class RelatedField extends Field
         $values = [];
         /** @var $field Field */
         foreach ($fields as $field) :
+
             $val = $modelInstance->{$field->getAttrName()};
             if (!$val):
                 continue;

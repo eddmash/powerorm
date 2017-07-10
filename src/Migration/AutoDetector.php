@@ -1066,7 +1066,7 @@ class AutoDetector extends BaseObject
                     if ($bothM2M || $neitherM2M):
                         $preserveDefault = true;
 
-                        if ($oldField->null && !$newField->null &&
+                        if ($oldField->isNull() && !$newField->isNull() &&
                             !$newField->hasDefault() && !$newField instanceof ManyToManyField
                         ):
                             $field = $newField->deepClone();
@@ -1174,7 +1174,7 @@ class AutoDetector extends BaseObject
 
         endif;
 
-        if (!$field->null && !$field->hasDefault() && !$field instanceof ManyToManyField):
+        if (!$field->isNull() && !$field->hasDefault() && !$field instanceof ManyToManyField):
             $def = MigrationQuestion::askNotNullAddition($this->asker, $modelName, $fieldName);
 
             $field = $field->deepClone();

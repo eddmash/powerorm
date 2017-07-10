@@ -45,7 +45,8 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
     const BLANK_CHOICE_DASH = ['' => '---------'];
 
-    private $name;
+    protected $name;
+
     /**
      * @var DescriptorInterface use to return value of the field
      */
@@ -73,7 +74,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      *
      * @var bool
      */
-    public $null = false;
+    protected $null = false;
 
     /**
      * If True, this field must be unique throughout the table.
@@ -295,6 +296,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         $this->scopeModel = $modelObject;
         $this->setFromName($fieldName);
         $this->scopeModel->meta->addField($this);
+        $this->scopeModel->_fieldCache[$this->getAttrName()] = $this->getDefault();
     }
 
     /**
@@ -746,6 +748,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     public function getDescriptor()
     {
         $descriptor = $this->descriptor;
+
         if (is_null($this->descriptorInstance)):
             $this->descriptorInstance = new $descriptor($this);
         endif;
@@ -775,6 +778,26 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         $meta['scopeModel'] = $this->scopeModel->meta->getNamespacedModelName();
 
         return $meta;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNull()
+    {
+        return $this->null;
+    }
+
+    /**
+     * @param bool $null
+     *
+     * @return Field
+     */
+    public function setNull($null)
+    {
+        $this->null = $null;
+
+        return $this;
     }
 }
 

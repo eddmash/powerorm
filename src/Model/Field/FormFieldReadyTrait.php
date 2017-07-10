@@ -139,7 +139,7 @@ trait FormFieldReadyTrait
             );
         endif;
 
-        if (is_null($value) && !$this->null) :
+        if (is_null($value) && !$this->isNull()) :
             throw new ValidationError('This field cannot be null.', 'null');
         endif;
 

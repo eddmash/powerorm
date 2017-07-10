@@ -456,8 +456,12 @@ class BaseOrm extends BaseObject
                 $name = $map[$name];
             endif;
 
-            if (property_exists($object, $name)):
-                $object->$name = $value;
+            $setterMethod = sprintf('set%s', ucfirst($name));
+            if (method_exists($object, $setterMethod)):
+                call_user_func([$object, $setterMethod], $value);
+            elseif (property_exists($object, $name)):
+
+                $object->{$name} = $value;
             endif;
 
         endforeach;

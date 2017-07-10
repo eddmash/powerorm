@@ -1237,7 +1237,7 @@ class Query extends BaseObject
             endif;
         endif;
 
-        if (!$restricted && $field->null):
+        if (!$restricted && $field->isNull()):
             return false;
         endif;
 
@@ -1257,7 +1257,7 @@ class Query extends BaseObject
      */
     private function isNullable($joinField)
     {
-        return $joinField->null;
+        return $joinField->isNull();
     }
 
     /**

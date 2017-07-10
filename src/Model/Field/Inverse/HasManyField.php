@@ -62,4 +62,12 @@ class HasManyField extends InverseField
             ],
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isNull()
+    {
+        return $this->fromField->isNull();
+    }
 }

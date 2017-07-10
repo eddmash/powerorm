@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\ValueError;
+use Eddmash\PowerOrm\Form\Fields\ModelChoiceField;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Delete;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
@@ -82,6 +83,7 @@ class ForeignKey extends RelatedField
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
         parent::contributeToInverseClass($relatedModel, $relation);
+
         if ($this->relation->fieldName == null):
             $this->relation->fieldName = $relatedModel->meta->primaryKey->getName();
         endif;

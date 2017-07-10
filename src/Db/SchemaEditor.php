@@ -581,7 +581,7 @@ class SchemaEditor extends BaseObject
             endif;
         endif;
         // the null option
-        if ($field->null):
+        if ($field->isNull()):
             $options['notnull'] = false;
         endif;
         // the comment option

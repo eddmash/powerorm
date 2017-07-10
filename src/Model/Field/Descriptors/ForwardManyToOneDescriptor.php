@@ -24,6 +24,7 @@ class ForwardManyToOneDescriptor extends BaseDescriptor
 {
     /** @var RelatedField */
     protected $field;
+
     /**
      * {@inheritdoc}
      */
@@ -35,29 +36,32 @@ class ForwardManyToOneDescriptor extends BaseDescriptor
             // incase the value has been set
             $result = $modelInstance->{$this->field->getCacheName()};
         } catch (AttributeError $e) {
+
             $relObj = $this->field->getLocalRelatedFieldsValues($modelInstance);
+
             if (empty($relObj)):
-                return;
-            endif;
+                $relObj = null;
+            else:
 
-            $result = $this->queryset($modelInstance)->get();
+                $result = $this->queryset($modelInstance)->get();
 
-            /* @var $fromField RelatedField */
-            $fromField = $this->field->getRelatedFields()[0];
-            // cache the value of the model
-            $modelInstance->{$fromField->getCacheName()} = $result;
+                /* @var $fromField RelatedField */
+                $fromField = $this->field->getRelatedFields()[0];
+                // cache the value of the model
+                $modelInstance->{$fromField->getCacheName()} = $result;
 
-            // if we are dealing with fields that only supports one field e.g. OneToOneField
-            // If this is a one-to-one relation, set the reverse accessor cache on
-            // the related object to the current instance to avoid an extra SQL
-            // query if it's accessed later on.
+                // if we are dealing with fields that only supports one field e.g. OneToOneField
+                // If this is a one-to-one relation, set the reverse accessor cache on
+                // the related object to the current instance to avoid an extra SQL
+                // query if it's accessed later on.
 
-            if (!is_null($result) && !$this->field->relation->multiple):
-                $result->{$this->field->relation->getCacheName()} = $modelInstance;
+                if (!is_null($result) && !$this->field->relation->multiple):
+                    $result->{$this->field->relation->getCacheName()} = $modelInstance;
+                endif;
             endif;
         }
-
-        if (is_null($result) && $this->field->null !== false):
+        // if this field does not allow null values
+        if (is_null($result) && !$this->field->isNull()):
             throw new RelatedObjectDoesNotExist(
                 sprintf('%s has no %s.', $this->field->scopeModel->meta->getNamespacedModelName(),
                     $this->field->getName())

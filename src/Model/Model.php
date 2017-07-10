@@ -10,7 +10,6 @@
 
 namespace Eddmash\PowerOrm\Model;
 
-use App\Models\Author;
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\ArrayObjectInterface;
 use Eddmash\PowerOrm\BaseOrm;
@@ -215,7 +214,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         // remember meta only holds information that related to the class as a whole and not the instances.
         if ($registry->hasModel(get_class($this)) && $registry->ready) :
 
-            $this->meta = $registry->getModel(get_class($this))->meta;
+            $model = $registry->getModel(get_class($this));
+            $this->meta = $model->meta; //todo do a deep clone to be sure all is copied or do a by ref assignment ie.
+            // instance references the same meta instance
+
+            $this->_fieldCache = $model->_fieldCache;
 
         else:
             // get meta settings for this model
@@ -272,7 +275,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function setFieldValues($kwargs)
     {
         // we need meta to exists
-        if (is_null($this->meta)):
+        if (is_null($this->meta) || empty($kwargs)):
             return;
         endif;
 
@@ -300,7 +303,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                         $isRelated = true;
                         // Object instance was passed in, You can
                         // pass in null for related objects if it's allowed.
-                        if (is_null($relObject) && $field->null):
+                        if (is_null($relObject) && $field->isNull()):
                             $val = null;
                         endif;
                     } catch (KeyError $e) {
@@ -346,6 +349,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function addToClass($name, $value)
     {
         if ($value instanceof ContributorInterface):
+
             $value->contributeToClass($name, $this);
         else:
             $this->{$name} = $value;
@@ -361,7 +365,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
 
         foreach ($fields as $name => $fieldObj) :
-
             $this->addToClass($name, $fieldObj);
         endforeach;
     }
@@ -770,26 +773,30 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         try {
             /** @var $field RelatedField */
             $field = $this->meta->getField($name);
-
             if ($field instanceof ForeignObjectRel) :
+
                 throw new FieldDoesNotExist();
             endif;
 
             return $field->getValue($this);
-        } catch (\Exception $e) {
-            if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
+        } catch (FieldDoesNotExist $e) {
+
+            if (!ArrayHelper::hasKey(get_object_vars($this), $name) &&
+                !ArrayHelper::hasKey($this->_fieldCache, $name)
+            ):
                 throw new AttributeError(
                     sprintf("AttributeError: '%s' object has no attribute '%s'",
-                        $this->meta->getNamespacedModelName(), $e->getMessage())
+                        $this->meta->getNamespacedModelName(), $name)
                 );
             endif;
         }
 
-        if(ArrayHelper::hasKey($this->_fieldCache, $name)):
+        if (ArrayHelper::hasKey($this->_fieldCache, $name)):
             return ArrayHelper::getValue($this->_fieldCache, $name);
         endif;
 
         return $this->{$name};
+
     }
 
     public function __set($name, $value)
