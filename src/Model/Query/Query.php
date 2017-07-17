@@ -608,16 +608,16 @@ class Query extends BaseObject
 
             list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
 
-            if ($field->isRelation) :
-                $lookupClass = $field->getLookup($lookups[0]);
-                $col = $targets[0]->getColExpression($alias, $field);
-                $condition = $lookupClass::createObject($col, $value);
-            else:
-                $col = $targets[0]->getColExpression($alias, $field);
-                $condition = $this->buildCondition($lookups, $col, $value);
-            endif;
+//            if ($field->isRelation) :
+//                $lookupClass = $field->getLookup($lookups[0]);
+//                $col = $targets[0]->getColExpression($alias, $field);
+//                $condition = $lookupClass::createObject($col, $value);
+//            else:
+//                $col = $targets[0]->getColExpression($alias, $field);
+//                $condition = $this->buildCondition($lookups, $col, $value);
+//            endif;
 
-            $this->where->setConditions($connector, $condition);
+//            $this->where->setConditions($connector, $condition);
 
         endforeach;
     }
@@ -757,14 +757,18 @@ class Query extends BaseObject
                 endif;
             }
 
+            // todo Check if we need any joins for concrete inheritance cases (the
+            // field lives in parent, but we are currently in one of its
+            // children)
+
             if ($field->hasMethod('getPathInfo')) :
 
                 $pathsInfos = $field->getPathInfo();
 
-                $pInfo = $pathsInfos[count($pathsInfos) - 1];
-                $finalField = ArrayHelper::getValue($pInfo, 'joinField');
-                $targets = ArrayHelper::getValue($pInfo, 'targetFields');
-
+                $last = $pathsInfos[count($pathsInfos) - 1];
+                $finalField = ArrayHelper::getValue($last, 'joinField');
+                $targets = ArrayHelper::getValue($last, 'targetFields');
+                $meta = ArrayHelper::getValue($last, 'toMeta');
                 $paths = array_merge($paths, $pathsInfos);
             else:
                 // none relational field
@@ -915,9 +919,12 @@ class Query extends BaseObject
                 endif;
             endforeach;
 
+            dump($targets);
+            dump($relMap);
+            dump($currentTargets);
             $targetsNew = [];
             foreach ($targets as $target) :
-                $targetsNew[] = $relMap[$target->getColumnName()];
+//                $targetsNew[] = $relMap[$target->getColumnName()];
             endforeach;
             $targets = $targetsNew;
 

@@ -159,41 +159,45 @@ the call to add(), like this:
 Retrieving objects
 ------------------
 
-To retrieve objects from your database, construct a :doc:`QuerySet <queryset>` via a Manager on your model class.
+To retrieve objects from your database, construct a :doc:`QuerySet<queryset>` via a :doc:`Manager<manager>` on your
+model class.
 
 A :doc:`QuerySet <queryset>` represents a collection of objects from your database. It can have zero, one or many filters.
 Filters narrow down the query results based on the given parameters.
-In SQL terms, a :doc:`QuerySet <queryset>` equates to a SELECT statement, and a filter is a limiting clause such as WHERE or LIMIT.
 
-You get a :doc:`QuerySet <queryset>` by using your model's Manager. Each model has at least one Manager,
-which is created by the static method object(). Access it directly via the model class, like so:
+In SQL terms, a :doc:`QuerySet <queryset>` equates to a SELECT statement, and a filter is a limiting clause such as
+WHERE or LIMIT.
+
+You get a :doc:`QuerySet<queryset>` by using your model's :doc:`Manager<manager>`. Each model has at least one Manager,
+which is accessed via the static method object(). Access it directly via the model class, like so:
 
 .. code-block:: php
 
     \App\Models\Blog::objects()
 
-The Manager is the main source of a :doc:`QuerySet <queryset>` for a model.
+The :doc:`Manager<manager>` is the main source of a :doc:`QuerySet <queryset>` for a model.
 
-For example, ``App\Models\Blog->objects->all()`` returns a:doc:`QuerySet <queryset>` that contains all Blog objects in
+For example, ``App\Models\Blog->objects->all()`` returns a :doc:`QuerySet<queryset>` that contains all Blog objects in
 the database.
 
 Retrieving all objects
 ----------------------
 
-The simplest way to retrieve objects from a table is to get all of them. To do this, use the all() method on a Manager:
+The simplest way to retrieve objects from a table is to get all of them. To do this, use the :ref:`all()<queryset_all>`
+method on a :doc:`Manager<manager>`:
 
 .. code-block:: php
 
     \App\Models\Blog::objects()->all()
 
-The all() method returns a :doc:`QuerySet <queryset>` of all the objects in the database.
+The :ref:`all()<queryset_all>` method returns a :doc:`QuerySet <queryset>` of all the objects in the database.
 
 
 Retrieving specific objects with filters
 ----------------------------------------
 
-The :doc:`QuerySet <queryset>` returned by all() describes all objects in the database table. Usually, though, you'll need to select
-only a subset of the complete set of objects.
+The :doc:`QuerySet <queryset>` returned by :ref:`all()<queryset_all>` describes all objects in the database table.
+Usually, though, you'll need to select only a subset of the complete set of objects.
 
 To create such a subset, you refine the initial :doc:`QuerySet <queryset>`, adding filter conditions.
 The two most common ways to refine a :doc:`QuerySet <queryset>` are:
@@ -210,17 +214,25 @@ Returns a new :doc:`QuerySet <queryset>` containing objects that do not match th
 
 This method take an associative array of parameters.
 
-For example, to get a :doc:`QuerySet <queryset>` of Authors who have the letter 'joe' in there name, use filter() like so:
+For example, to get a :doc:`QuerySet <queryset>` of Authors who have the letter 'joe' in there name,
+use :ref:`filter()<queryset_filter>` like so:
 
 
 .. code-block:: php
 
     \App\Models\Author::objects()->filter(['name__contains'=>'joe'])
 
+With the default manager class, it is the same as:
+
+.. code-block:: php
+
+    \App\Models\Author::objects()->all()->filter(['name__contains'=>'joe'])
+
 Chaining filters
 ----------------
 
-The result of refining a :doc:`QuerySet <queryset>` is itself a :doc:`QuerySet <queryset>`, so it's possible to chain refinements together. For example:
+The result of refining a :doc:`QuerySet <queryset>` is itself a :doc:`QuerySet <queryset>`, so it's possible to chain
+refinements together. For example:
 
 .. code-block:: php
         
@@ -237,8 +249,10 @@ excluding any entries with a rating of 3 or less and the blog_text contains the 
 Filtered QuerySets are unique
 -----------------------------
 
-Each time you refine a QuerySet, you get a brand-new QuerySet that is in no way bound to the previous QuerySet.
-Each refinement creates a separate and distinct QuerySet that can be stored, used and reused.
+Each time you refine a :doc:`QuerySet <queryset>`, you get a brand-new :doc:`QuerySet <queryset>` that is in no way
+bound to the previous :doc:`QuerySet <queryset>`.
+
+Each refinement creates a separate and distinct :doc:`QuerySet <queryset>` that can be stored, used and reused.
 
 Example:
 
@@ -248,11 +262,12 @@ Example:
      $qs2 = $qs1->exclude(['rating__gte' => 3]);
      $qs3 = $qs1->filter(['blog_text__contains' => 'kenya']);
 
-These three :doc:`QuerySet <queryset>` are separate. The first is a base :doc:`QuerySet <queryset>` containing all
-entries that contain a headline starting with “What”.
-The second is a subset of the first, with an additional criteria that excludes any entries with a rating of 3 or less.
-The third is a subset of the first, with an additional criteria that selects only the records
-whose the blog_text contains the word 'kenya'.
+These three :doc:`QuerySet <queryset>` are separate.
+
+- The first is a base :doc:`QuerySet <queryset>` containing all entries that contain a headline starting with "What".
+- The second is a subset of the first, with an additional criteria that excludes any entries with a rating of 3 or less.
+- The third is a subset of the first, with an additional criteria that selects only the records whose the blog_text
+  contains the word 'kenya'.
 
 The initial :doc:`QuerySet <queryset>` ($q1) is unaffected by the refinement process.
 
@@ -286,7 +301,7 @@ Retrieving a single object with get()
 matches the query - in this case, it will be a :doc:`QuerySet <queryset>` containing a single element.
 
 If you know there is only one object that matches your query, you can use the :ref:`get() <queryset_get>` method on a
-Manager which returns the object directly:
+:doc:`Manager<manager>` which returns the object directly:
 
 .. code-block:: php
 
@@ -306,6 +321,16 @@ again, see Field lookups below.
     Similarly, Powerorm will complain if more than one item matches the :ref:`filter() <queryset_filter>` query.
     In this case, it will raise **MultipleObjectsReturned**.
 
+Other QuerySet methods
+......................
+
+Most of the time you'll use :ref:`all()<queryset_all>`, :ref:`get()<queryset_get>`, :ref:`filter()<queryset_filter>`
+and :ref:`exclude()<queryset_exclude>` when you need to look up objects from the database.
+However, that's far from all there is; see the :doc:`QuerySet API Reference<queryset>` for a complete list of all the
+various QuerySet methods.
+
+.. _limit_querysets:
+
 Limiting QuerySets
 ..................
 
@@ -324,7 +349,35 @@ This returns the sixth through tenth objects (OFFSET 5 LIMIT 5):
 
     var_dump(\App\Models\Entry::objects()->all()->limit(5,5));
 
-Limitin a QuerySet returns a new QuerySet.
+Limiting a :doc:`QuerySet <queryset>` returns a new :doc:`QuerySet <queryset>`.
+
+Field lookups
+-------------
+
+Field lookups are how you specify the meat of an SQL **WHERE** clause. They're specified as an associative array to the
+:doc:`QuerySet <queryset>` methods :ref:`filter()<queryset_filter>`, :ref:`exclude()<queryset_exclude>`
+and :ref:`get()<queryset_get>`.
+
+Basic lookups keyword arguments take the form **[field__lookuptype=> value]**. (That's a double-underscore). For
+example:
+
+.. code-block:: php
+
+    \App\Models\Blog::objects()->filter(['name__istartswith'=>"a"])
+
+translates (roughly) into the following SQL:
+
+.. code-block:: sql
+
+    SELECT * FROM blog  WHERE name LIKE 'a%'
+
+The field specified in a lookup has to be the name of a model field. There's one exception though, in case of a
+:ref:`ForeignKey<model_foreignkey>` you can specify the field name suffixed with _id. In this case, the value parameter
+is expected to contain the raw value of the foreign model's primary key. For example:
+
+.. code-block:: php
+
+    \App\Models\Entry::objects()->filter(['blog_id'=>1]);
 
 .. toctree::
     :caption: More Queries Information
@@ -332,4 +385,5 @@ Limitin a QuerySet returns a new QuerySet.
 
     self
     queryset
+    manager
     custom_lokup

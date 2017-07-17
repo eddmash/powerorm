@@ -16,9 +16,11 @@ use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
+use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedExact;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThan;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedGreaterThanOrEqual;
@@ -69,6 +71,8 @@ class RelatedField extends Field
     {
         $checks = parent::checks();
         $checks = array_merge($checks, $this->checkRelationModelExists());
+        $checks = array_merge($checks, $this->checkRelatedNameIsValid());
+        $checks = array_merge($checks, $this->checkRelatedQueryNameIsValid());
         $checks = array_merge($checks, $this->checkClashes());
 
         return $checks;
@@ -103,6 +107,61 @@ class RelatedField extends Field
         return $error;
     }
 
+    private function checkRelatedQueryNameIsValid()
+    {
+        $errors = [];
+        $relatedQueryName = $this->relation->relatedQueryName;
+
+        if (StringHelper::endsWith($relatedQueryName, '_')):
+            $errors[] = CheckError::createObject([
+                'message' => sprintf("Reverse query name '%s' must not end with an underscore.",
+                    $relatedQueryName),
+                'hint' => 'Add or change a related_name or related_query_name argument for this field.',
+                'context' => $this,
+                'id' => 'fields.E308',
+            ]);
+        endif;
+        if (StringHelper::contains($relatedQueryName, BaseLookup::LOOKUP_SEPARATOR)):
+            $errors[] = CheckError::createObject([
+                'message' => sprintf("Reverse query name '%s' must not contain '%s'.", $relatedQueryName,
+                    BaseLookup::LOOKUP_SEPARATOR),
+                'hint' => 'Add or change a related_name or related_query_name argument for this field.',
+                'context' => $this,
+                'id' => 'fields.E309',
+            ]);
+        endif;
+
+        return $errors;
+    }
+
+    private function checkRelatedNameIsValid()
+    {
+        $relatedName = $this->relation->relatedName;
+        if (empty($relatedName)):
+            return [];
+        endif;
+        $isValid = true;
+        if (!StringHelper::isValidVariableName($relatedName)):
+            $isValid = false;
+        endif;
+        // if its not a valid name and it doesnt end with '+'
+        if (!($isValid || StringHelper::endsWith($relatedName, '+'))):
+            $msg = sprintf("The name '%s' is invalid related_name for field %s.%s", $relatedName,
+                $this->scopeModel->meta->getNamespacedModelName(), $this->getName());
+
+            return [
+                CheckError::createObject([
+                    'message' => $msg,
+                    'hint' => "Related name must be a valid php identifier or end with a '+'",
+                    'context' => $this,
+                    'id' => 'fields.E306',
+                ]),
+            ];
+        endif;
+
+        return [];
+    }
+
     /**
      * Check accessor and reverse query name clashes.
      *
@@ -125,7 +184,7 @@ class RelatedField extends Field
 
         foreach ($relMeta->getFields(true, false, false) as $clashField) :
             $clashName = sprintf('%s.%s', $relMeta->getNamespacedModelName(), $clashField->getName());
-            if ($isHidden && $clashField->getName() == $relName):
+            if (!$isHidden && $clashField->getName() == $relName):
                 $msg = "Reverse accessor for '%s' clashes with field name '%s'.";
                 $hint = sprintf("Rename field '%s', or add/change a related_name argument to the definition ".
                     "for field '%s'.", $clashName, $fieldName);
@@ -220,6 +279,18 @@ class RelatedField extends Field
     public function contributeToClass($fieldName, $modelObject)
     {
         parent::contributeToClass($fieldName, $modelObject);
+        $namespace = str_replace('\\', '_',
+            rtrim($this->scopeModel->meta->getNamespacedModelName(), '\\'));
+        if ($this->relation->relatedName):
+            $this->relation->relatedName = sprintf($this->relation->relatedName, $namespace);
+        elseif ($this->scopeModel->meta->defaultRelatedName):
+
+            $this->relation->relatedName = sprintf($this->scopeModel->meta->defaultRelatedName, $namespace);
+        endif;
+
+        if ($this->relation->relatedQueryName):
+            $this->relation->relatedQueryName = sprintf($this->relation->relatedQueryName, $namespace);
+        endif;
 
         $callback = function ($kwargs) {
             /* @var $field RelatedField */

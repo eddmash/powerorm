@@ -32,8 +32,10 @@ class Meta extends DeconstructableObject implements MetaInterface
         'overrides',
     ];
 
-    public static $DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy', 'autoCreated'];
+    public static $DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy', 'autoCreated',
+        'defaultRelatedName', ];
     public $modelNamespace;
+    public $defaultRelatedName;
 
     /**
      * Th name of the model this meta holds information for.
@@ -261,7 +263,18 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     private function getForwardOnlyField()
     {
-        return $this->fetchFields(['reverse' => false, 'inverse' => false]);
+        $fFields = [];
+        $fields = $this->fetchFields(['reverse' => false, 'inverse' => false]);
+        foreach ($fields as $field) :
+            $fFields[$field->getName()] = $field;
+
+            // Due to the way powerorm's internals work, getField() should also
+            // be able to fetch a field by attname. In the case of a concrete
+            // field with relation, includes the *_id name too
+            $fFields[$field->getAttrName()] = $field;
+        endforeach;
+
+        return $fFields;
     }
 
     private function getReverseOnlyField()
@@ -385,6 +398,15 @@ class Meta extends DeconstructableObject implements MetaInterface
         $this->verboseName = (empty($vName)) ? ucwords(StringHelper::camelToSpace($this->modelName)) : $vName;
     }
 
+    /**
+     * @param array $kwargs
+     *
+     * @return Field[]
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     private function fetchFields($kwargs = [])
     {
         $forward = $inverse = $reverse = $includeParents = true;

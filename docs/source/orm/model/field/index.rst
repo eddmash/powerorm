@@ -54,8 +54,9 @@ dbColumn
 The name of the database column to use for this field. If this isn't given, PowerOrm will use the field's name.
 
 
+.. _model_field_db_index:
 dbIndex
----------
+-------
 If True, this field will be indexed.
 
 default
@@ -217,6 +218,35 @@ A many-to-one relationship. Requires a ``to`` argument: the class to which the m
         }
     }
 
+A database index is automatically created on the ``ForeignKey``. You can disable this by
+setting :ref:`dbIndex<model_field_db_index>` to ``false``.
+You may want to avoid the overhead of an index if you are creating a foreign key for consistency rather than joins,
+or if you will be creating an alternative index like a partial or multiple column index.
+
+.. _related_name:
+
+relatedName
+***********
+The name to use for the relation from the related object back to this one. It's also the default value for
+:ref:`<_related_query_name>relatedQueryName` (the name to use for the reverse filter name from the target model).
+See the :ref:`<backwards_related_objects>related objects documentation` for a full explanation and example. Note that
+you must set this value when defining relations on :doc:`abstract models</orm/model/abstract>` and when you do so some
+:ref:`<abstract_related_name>special syntax` is available.
+
+If you'd prefer powerorm not to create a backwards relation, set related_name to '+' or end it with '+'. For example, 
+this will ensure that the User model won't have a backwards relation to this model:
+
+.. _related_query_name:
+
+relatedQueryName
+****************
+The name to use for the reverse filter name from the target model. It defaults to the value of
+:ref:`<_related_name>relatedName` or :ref:`<default_related_name>defaultRelatedName` if set, otherwise it defaults to
+ the name of the model:
+
+Like :ref:`<_related_name>relatedName`, :ref:`<default_related_name>defaultRelatedName` supports app label and class
+interpolation via some :ref:`<abstract_related_name>special syntax`.
+
 .. _recursive_relation:
 
 Recursive relationship
@@ -231,9 +261,11 @@ like we have done in for foreign keys.
 
     Eddmash\PowerOrm\Model\Model::ForeignKey(['to'=>Model::SELF])
 
+
+.. _many_to_many_field:
+
 ManyToManyField
 ---------------
-.. _many_to_many_field:
 
 A many-to-many relationship. Requires a 'to' argument: the class to which the model is related, which works exactly
 the same as it does for ForeignKey.

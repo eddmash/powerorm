@@ -812,7 +812,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         /* @var $field RelatedField */
         try {
             $field = $this->meta->getField($name);
-            $field->setValue($this, $value);
+            if($field->getAttrName() !== $field->getName() && $field->getAttrName() === $name):
+                $this->{$name} = $value;
+            else:
+                $field->setValue($this, $value);
+            endif;
         } catch (FieldDoesNotExist $e) {
             // we assume this is not a model field being set
             // or its a completely new property we are attaching to the model dynamicaklly

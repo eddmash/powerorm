@@ -67,6 +67,19 @@ A human-readable name for the object, singular::
 
 If this is not given, PowerOrm will use a munged version of the class name: CamelCase becomes camel case.
 
+defaultRelatedName
+==================
+
+The name that will be used by default for the relation from a related object back to this one.
+The default is `<model_name>_set`.
+
+This option also sets :ref:`<related_query_name>relatedQueryQame`.
+
+As the reverse name for a field should be unique, be careful if you intend to subclass your model.
+To work around name collisions, part of the name should contain '%s', which are replaced respectively by
+the name of the model it defined in, both lowercased and any '\' in namespace replaced with '_'.
+See the paragraph on related names for abstract models.
+
 Example
 =======
 

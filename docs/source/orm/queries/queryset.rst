@@ -90,8 +90,30 @@ query by calling all() on a previously evaluated QuerySet.
 
 .. _queryset_limit:
 
-limit()
-.......
+limit(offset, limit)
+....................
+
+``options``
+
+    - offset - the position to start fetching the record from, if `null` start fetching for the first record in the
+      table.
+    - limit - the number of records to fetch
+
+To limit QuerySet to a certain number of results. This is the equivalent of SQL’s LIMIT and OFFSET clauses.
+
+For example, this returns the first 5 objects (LIMIT 5):
+
+.. code-block:: php
+
+    var_dump(\App\Models\Entry::objects()->all()->limit(null,5));
+
+This returns the sixth through tenth objects (OFFSET 5 LIMIT 5):
+
+.. code-block:: php
+
+    var_dump(\App\Models\Entry::objects()->all()->limit(5,5));
+
+Limiting a QuerySet returns a new QuerySet.
 
 
 Methods that do not return QuerySets

@@ -130,6 +130,16 @@ class StringHelper
         }
     }
 
+    public static function contains($string, $subString, $caseSensitive = true)
+    {
+        if($caseSensitive):
+            $string = strtolower($string);
+            $subString = strtolower($subString);
+        endif;
+
+        return strpos($string, $subString) !== false;
+    }
+
     public static function getCharset()
     {
         //todo make character set independent of framework
