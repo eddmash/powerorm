@@ -379,6 +379,25 @@ is expected to contain the raw value of the foreign model's primary key. For exa
 
     \App\Models\Entry::objects()->filter(['blog_id'=>1]);
 
+Lookups that span relationships
+-------------------------------
+
+Powerorm offers a powerful and intuitive way to "follow" relationships in lookups, taking care of the SQL **JOINs** for
+you automatically, behind the scenes. To span a relationship, just use the field name of related fields across
+models, separated by double underscores, until you get to the field you want.
+
+This example retrieves all **Entry** objects with a **Blog** whose name is **'Beatles Blog'**:
+
+.. code-block:: php
+
+    \App\Models\Entry::objects()->filter(['blog__name'=>"Beatles Blog"]);
+
+This spanning can be as deep as you’d like.
+
+It works backwards, too. To refer to a "reverse" relationship, just use the lowercase name of the model.
+
+This example retrieves all Blog objects which have at least one Entry whose headline contains 'Lennon':
+
 .. toctree::
     :caption: More Queries Information
     :titlesonly:

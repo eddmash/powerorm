@@ -608,16 +608,16 @@ class Query extends BaseObject
 
             list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
 
-//            if ($field->isRelation) :
-//                $lookupClass = $field->getLookup($lookups[0]);
-//                $col = $targets[0]->getColExpression($alias, $field);
-//                $condition = $lookupClass::createObject($col, $value);
-//            else:
-//                $col = $targets[0]->getColExpression($alias, $field);
-//                $condition = $this->buildCondition($lookups, $col, $value);
-//            endif;
+            if ($field->isRelation) :
+                $lookupClass = $field->getLookup($lookups[0]);
+                $col = $targets[0]->getColExpression($alias, $field);
+                $condition = $lookupClass::createObject($col, $value);
+            else:
+                $col = $targets[0]->getColExpression($alias, $field);
+                $condition = $this->buildCondition($lookups, $col, $value);
+            endif;
 
-//            $this->where->setConditions($connector, $condition);
+            $this->where->setConditions($connector, $condition);
 
         endforeach;
     }
@@ -739,6 +739,7 @@ class Query extends BaseObject
 
             try {
                 $field = $meta->getField($name);
+
             } catch (FieldDoesNotExist $e) {
                 //todo check in annotations to
                 $available = getFieldNamesFromMeta($meta);
@@ -764,8 +765,8 @@ class Query extends BaseObject
             if ($field->hasMethod('getPathInfo')) :
 
                 $pathsInfos = $field->getPathInfo();
-
                 $last = $pathsInfos[count($pathsInfos) - 1];
+
                 $finalField = ArrayHelper::getValue($last, 'joinField');
                 $targets = ArrayHelper::getValue($last, 'targetFields');
                 $meta = ArrayHelper::getValue($last, 'toMeta');
@@ -775,7 +776,7 @@ class Query extends BaseObject
                 $finalField = null;
                 $finalField = $field;
 
-                $targets[] = $field;
+                $targets = [$field];
                 // no need to go on since this is a none relation field.
                 break;
             endif;
@@ -838,6 +839,7 @@ class Query extends BaseObject
         $joins = [$alias];
 
         $namesPaths = $this->getNamesPath($names, $meta, true);
+
         $pathInfos = $namesPaths['paths'];
 
         /* @var $meta Meta */
@@ -919,12 +921,9 @@ class Query extends BaseObject
                 endif;
             endforeach;
 
-            dump($targets);
-            dump($relMap);
-            dump($currentTargets);
             $targetsNew = [];
             foreach ($targets as $target) :
-//                $targetsNew[] = $relMap[$target->getColumnName()];
+                $targetsNew[] = $relMap[$target->getColumnName()];
             endforeach;
             $targets = $targetsNew;
 

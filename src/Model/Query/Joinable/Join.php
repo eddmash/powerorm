@@ -12,8 +12,11 @@
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
+use const Eddmash\PowerOrm\Model\Query\INNER;
+use const Eddmash\PowerOrm\Model\Query\LOUTER;
 
 class Join extends BaseJoin
 {
@@ -62,4 +65,54 @@ class Join extends BaseJoin
         $this->joinField = $joinField;
     }
 
+    /**
+     * Change join to inner join
+     *
+     * @return Join
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function demote()
+    {
+        $join = $this->relabeledClone();
+        $join->setJoinType(INNER);
+        return $join;
+    }
+
+    /**
+     * Change join to left outer join
+     * @return Join
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function promote()
+    {
+        $join = $this->relabeledClone();
+        $join->setJoinType(LOUTER);
+        return $join;
+    }
+
+    /**
+     * Clone join with the option of relabeling the aliases
+     * @param array $changeMap
+     * @return static
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function relabeledClone($changeMap = [])
+    {
+        $newParentAlias = ArrayHelper::getValue($changeMap, $this->parentAlias, $this->parentAlias);
+        $tableAlias = ArrayHelper::getValue($changeMap, $this->tableAlias, $this->tableAlias);
+        $join = new static();
+        $join->setTableName($this->getTableName());
+        $join->setParentAlias($newParentAlias);
+        $join->setTableAlias($tableAlias);
+        $join->setJoinType($this->getJoinType());
+        $join->setJoinField($this->getJoinField());
+        $join->setNullable($this->getNullable());
+        return $join;
+    }
 }
