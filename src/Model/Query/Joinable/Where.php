@@ -11,16 +11,17 @@
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 
-class Where
-{
-    private $conditions = [];
+const AND_CONNECTOR = 'AND';
+const OR_CONNECTOR = 'OR';
 
-    public static function createObject($kwargs = [])
-    {
-        return new self();
-    }
+class Where extends Node
+{
+    protected $defaultConnector = AND_CONNECTOR;
+
+    private $conditions = [];
 
     public function asSql(Connection $connection)
     {

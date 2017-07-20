@@ -20,6 +20,7 @@ use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Field;
@@ -32,11 +33,11 @@ use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Aggregates\BaseAggregate;
 use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
-use Eddmash\PowerOrm\Model\Query\Expression\Exp;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
 use Eddmash\PowerOrm\Model\Query\Joinable\Join;
 use Eddmash\PowerOrm\Model\Query\Joinable\Where;
+use function Eddmash\PowerOrm\Model\Query\Expression\count_;
 
 const INNER = 'INNER JOIN';
 const LOUTER = 'LEFT OUTER JOIN';
@@ -93,21 +94,23 @@ class Query extends BaseObject
     // Arbitrary limit for select_related to prevents infinite recursion.
     public $maxDepth = 5;
     public $columnInfoCache;
+    /**
+     * @var string
+     */
+    private $whereClass;
 
     /**
      * Query constructor.
      *
      * @param Model $model
+     * @param Where $whereClass
+     * @internal param string $where
      */
-    public function __construct(Model $model, $where = null)
+    public function __construct(Model $model, $whereClass = Where::class)
     {
         $this->model = $model;
-        if (is_null($where)) :
-            $this->where = Where::createObject();
-        else:
-            $this->where = $where;
-        endif;
-
+        $this->where = $whereClass::createObject();
+        $this->whereClass = $whereClass;
     }
 
     public static function createObject(Model $model)
@@ -130,7 +133,7 @@ class Query extends BaseObject
      * Creates the SQL for this query. Returns the SQL string and list of parameters.
      *
      * @param Connection $connection
-     * @param bool       $isSubQuery
+     * @param bool $isSubQuery
      *
      * @return array
      *
@@ -285,11 +288,11 @@ class Query extends BaseObject
      * Used to get information needed when we are doing selectRelated(),.
      *
      * @param $select
-     * @param Meta|null $meta       the from which we expect to find the related fields
-     * @param null      $rootAlias
-     * @param int       $curDepth
-     * @param null      $requested  the set of fields to use in selectRelated
-     * @param null      $restricted true when we are to use just a set of relationship fields
+     * @param Meta|null $meta the from which we expect to find the related fields
+     * @param null $rootAlias
+     * @param int $curDepth
+     * @param null $requested the set of fields to use in selectRelated
+     * @param null $restricted true when we are to use just a set of relationship fields
      *
      * @return array
      *
@@ -340,7 +343,7 @@ class Query extends BaseObject
 
                     if ($nextSpanField || in_array($field->getName(), $requested)):
                         throw new FieldError(
-                            sprintf("Non-relational field given in selectRelated: '%s'. ".
+                            sprintf("Non-relational field given in selectRelated: '%s'. " .
                                 'Choices are: %s', $field->getName(), implode(', ', $this->getFieldChoices())));
 
                     endif;
@@ -495,8 +498,8 @@ class Query extends BaseObject
      * Returns the fields in the current models/those represented by the alias as Col expression, which know how to be
      * used in a query.
      *
-     * @param null       $startAlias
-     * @param Meta|null  $meta
+     * @param null $startAlias
+     * @param Meta|null $meta
      * @param Model|null $fromParent
      *
      * @return Col[]
@@ -580,6 +583,9 @@ class Query extends BaseObject
     }
 
     /**
+     * Builds a WhereNode for a single filter clause, but doesn't add it to this Query. Query.add_q() will then add
+     * this filter to the where Node.
+     *
      * @param $condition
      *
      * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
@@ -590,36 +596,37 @@ class Query extends BaseObject
      */
     private function buildFilter($conditions, $negate = false)
     {
+        dump($conditions);
         //todo $negate
-        $alias = $this->getInitialAlias();
+//        $alias = $this->getInitialAlias();
 
         /* @var $targets Field[] */
         /* @var $field Field */
 
-        foreach ($conditions as $name => $value) :
-            list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
-            list($value, $lookups) = $this->prepareLookupValue($value, $lookups);
+//        foreach ($conditions as $name => $value) :
+//            list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
+//            list($value, $lookups) = $this->prepareLookupValue($value, $lookups);
+//
+//            list($field, $targets, $joinList, $paths) = $this->setupJoins(
+//                $fieldParts,
+//                $this->model->meta,
+//                $alias
+//            );
+//
+//            list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
+//
+//            if ($field->isRelation) :
+//                $lookupClass = $field->getLookup($lookups[0]);
+//                $col = $targets[0]->getColExpression($alias, $field);
+//                $condition = $lookupClass::createObject($col, $value);
+//            else:
+//                $col = $targets[0]->getColExpression($alias, $field);
+//                $condition = $this->buildCondition($lookups, $col, $value);
+//            endif;
 
-            list($field, $targets, $joinList, $paths) = $this->setupJoins(
-                $fieldParts,
-                $this->model->meta,
-                $alias
-            );
+//            $this->where->setConditions($connector, $condition);
 
-            list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
-
-            if ($field->isRelation) :
-                $lookupClass = $field->getLookup($lookups[0]);
-                $col = $targets[0]->getColExpression($alias, $field);
-                $condition = $lookupClass::createObject($col, $value);
-            else:
-                $col = $targets[0]->getColExpression($alias, $field);
-                $condition = $this->buildCondition($lookups, $col, $value);
-            endif;
-
-            $this->where->setConditions($connector, $condition);
-
-        endforeach;
+//        endforeach;
     }
 
     /**
@@ -628,6 +635,39 @@ class Query extends BaseObject
     public function setValueSelect($valueSelect)
     {
         $this->valueSelect[] = $valueSelect;
+    }
+
+    public function addQ(Q $q)
+    {
+        dump($q);
+        $clause = $this->_addQ($q)[0];
+        if ($clause):
+            $this->where->add($clause);
+        endif;
+        //todo work on joins
+    }
+
+
+    private function _addQ(Q $q)
+    {
+        $connector = $q->getConnector();
+
+        $targetClause = ($this->whereClass)::createObject(null, $connector, $q->isNegated());
+
+        foreach ($q->getChildren() as $child) :
+            if ($child instanceof Node):
+                list($childClause, $neededInner) = $this->_addQ($child);
+            else:
+
+                list($childClause, $neededInner) = $this->buildFilter($child);
+            endif;
+            if($childClause):
+                $targetClause->add($childClause);
+            endif;
+        endforeach;
+        //todo join
+        $neededInner="";
+        return [$targetClause, $neededInner];
     }
 
     private function checkRelatedObjects(Field $field, $value, Meta $meta)
@@ -648,7 +688,7 @@ class Query extends BaseObject
      */
     private function buildCondition($lookup, $lhs, $rhs)
     {
-        $lookup = (array) $lookup;
+        $lookup = (array)$lookup;
 
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
@@ -808,7 +848,8 @@ class Query extends BaseObject
         // get the actual key
         if (preg_match(BaseLookup::$whereConcatPattern, $name)):
             // determine how to combine where statements
-            list($lookup, $name) = preg_split(BaseLookup::$whereConcatPattern, $name, -1, PREG_SPLIT_DELIM_CAPTURE);
+            list($lookup, $name) = preg_split(BaseLookup::$whereConcatPattern,
+                $name, -1, PREG_SPLIT_DELIM_CAPTURE);
 
             $connector = BaseLookup::OR_CONNECTOR;
         endif;
@@ -1111,7 +1152,7 @@ class Query extends BaseObject
     public function getCount(Connection $connection)
     {
         $obj = $this->deepClone();
-        $obj->addAnnotation(['annotation' => Exp::Count('*'), 'alias' => '_count', 'isSummary' => true]);
+        $obj->addAnnotation(['annotation' => count_('*'), 'alias' => '_count', 'isSummary' => true]);
         $alias = '_count';
         $result = $obj->getAggregation($connection, [$alias]);
 
@@ -1213,10 +1254,10 @@ class Query extends BaseObject
     /**
      * Returns True if this field should be used to descend deeper for selectRelated() purposes.
      *
-     * @param Field $field      the field to be checked
-     * @param bool  $restricted indicating if the field list has been manually restricted using a requested clause
-     * @param array $requested  The selectRelated() array
-     * @param bool  $reverse    True if we are checking a reverse select related
+     * @param Field $field the field to be checked
+     * @param bool $restricted indicating if the field list has been manually restricted using a requested clause
+     * @param array $requested The selectRelated() array
+     * @param bool $reverse True if we are checking a reverse select related
      *
      * @return bool
      *
@@ -1312,7 +1353,7 @@ class Query extends BaseObject
 }
 
 /**
- * @param Model[]        $instances
+ * @param Model[] $instances
  * @param Prefetch|array $lookups
  *
  * @since 1.1.0
@@ -1346,8 +1387,8 @@ function prefetchRelatedObjects($instances, $lookups)
             // does this lookup contain a queryset
             // this means its not a duplication but a different request just containing the same name
             if ($lookup->queryset):
-                throw new ValueError(sprintf("'%s' lookup was already seen with a different queryset. ".
-                    'You may need to adjust the ordering of your lookups.'.$lookup->prefetchTo));
+                throw new ValueError(sprintf("'%s' lookup was already seen with a different queryset. " .
+                    'You may need to adjust the ordering of your lookups.' . $lookup->prefetchTo));
             endif;
 
             // just pass this is just a duplication

@@ -37,7 +37,8 @@
   "autoload": {
     "psr-4": {
       "Eddmash\\PowerOrm\\": "src/"
-    }
+    },
+    "files": ["src/Model/Query/Expression/Util.php"]
   },
   "extra": {
     "branch-alias": {

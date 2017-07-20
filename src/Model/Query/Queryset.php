@@ -23,6 +23,7 @@ use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
+use function Eddmash\PowerOrm\Model\Query\Expression\not_;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayValueMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ModelMapper;
@@ -177,7 +178,7 @@ class Queryset implements QuerysetInterface
      */
     public function filter()
     {
-        return $this->_filterOrExclude(false, func_get_args());
+        return $this->_filterOrExclude(false, $this->prepareConditions(__METHOD__, func_get_args()));
     }
 
     /**
@@ -323,16 +324,22 @@ class Queryset implements QuerysetInterface
     public function _filterOrExclude($negate, $conditions)
     {
         $instance = $this->_clone();
-        $instance->addConditions($negate, $conditions);
-
+//        $instance->addConditions($negate, $conditions);
+        if($negate):
+            $instance->query->addQ(not_($conditions));
+        else:
+            $instance->query->addQ(new Q($conditions));
+        endif;
         return $instance;
     }
 
-    public function validateConditions($conditions)
+    public function prepareConditions($methondname, $conditions)
     {
-        foreach ($conditions as $condition) :
-
-        endforeach;
+        if(count($conditions) > 1):
+            throw new InvalidArgumentException(
+                sprintf("Method '%s' supports a single array input", $methondname));
+        endif;
+        return call_user_func_array('array_merge', $conditions);
     }
 
     /**
