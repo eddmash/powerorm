@@ -31,12 +31,13 @@ use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Aggregates\BaseAggregate;
+use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
 use Eddmash\PowerOrm\Model\Query\Joinable\Join;
-use Eddmash\PowerOrm\Model\Query\Joinable\Where;
+use Eddmash\PowerOrm\Model\Query\Joinable\WhereNode;
 use function Eddmash\PowerOrm\Model\Query\Expression\count_;
 
 const INNER = 'INNER JOIN';
@@ -51,7 +52,7 @@ class Query extends BaseObject
     public $offset;
     public $limit;
 
-    /** @var Where */
+    /** @var WhereNode */
     public $where;
     public $tables = [];
     public $tableMap = [];
@@ -103,10 +104,10 @@ class Query extends BaseObject
      * Query constructor.
      *
      * @param Model $model
-     * @param Where $whereClass
+     * @param WhereNode $whereClass
      * @internal param string $where
      */
-    public function __construct(Model $model, $whereClass = Where::class)
+    public function __construct(Model $model, $whereClass = WhereNode::class)
     {
         $this->model = $model;
         $this->where = $whereClass::createObject();
@@ -570,7 +571,7 @@ class Query extends BaseObject
     }
 
     /**
-     * @return Where
+     * @return WhereNode
      */
     public function getWhere()
     {
@@ -588,45 +589,47 @@ class Query extends BaseObject
      *
      * @param $condition
      *
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression
+     * @return array
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function buildFilter($conditions, $negate = false)
+    private function buildFilter($conditions, $connector = AND_CONNECTOR, $negate = false)
     {
-        dump($conditions);
-        //todo $negate
-//        $alias = $this->getInitialAlias();
+        reset($conditions);
+        $name = key($conditions);
+        $value = current($conditions);
+        list($lookups, $fieldParts) = $this->solveLookupType($name);
+        list($value, $lookups) = $this->prepareLookupValue($value, $lookups);
+        //todo joins
+        $clause = ($this->whereClass)::createObject();
+        $meta = $this->model->meta;
+        $alias = $this->getInitialAlias();
+
+        list($field, $targets, $joinList, $paths) = $this->setupJoins(
+            $fieldParts,
+            $meta,
+            $alias
+        );
 
         /* @var $targets Field[] */
         /* @var $field Field */
 
-//        foreach ($conditions as $name => $value) :
-//            list($connector, $lookups, $fieldParts) = $this->solveLookupType($name);
-//            list($value, $lookups) = $this->prepareLookupValue($value, $lookups);
-//
-//            list($field, $targets, $joinList, $paths) = $this->setupJoins(
-//                $fieldParts,
-//                $this->model->meta,
-//                $alias
-//            );
-//
-//            list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
-//
-//            if ($field->isRelation) :
-//                $lookupClass = $field->getLookup($lookups[0]);
-//                $col = $targets[0]->getColExpression($alias, $field);
-//                $condition = $lookupClass::createObject($col, $value);
-//            else:
-//                $col = $targets[0]->getColExpression($alias, $field);
-//                $condition = $this->buildCondition($lookups, $col, $value);
-//            endif;
+        list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
 
-//            $this->where->setConditions($connector, $condition);
+        if ($field->isRelation) :
+            $lookupClass = $field->getLookup($lookups[0]);
+            $col = $targets[0]->getColExpression($alias, $field);
+            $condition = $lookupClass::createObject($col, $value);
+        else:
+            $col = $targets[0]->getColExpression($alias, $field);
+            $condition = $this->buildCondition($lookups, $col, $value);
+        endif;
 
-//        endforeach;
+        $clause->add($condition, AND_CONNECTOR);
+        //todo joins
+        return [$clause, ""];
     }
 
     /**
@@ -637,13 +640,29 @@ class Query extends BaseObject
         $this->valueSelect[] = $valueSelect;
     }
 
+
+// where (
+//      blog_text='men are' and (
+//                              headline='matt' or
+//                              name = 'adsd' or
+//                              not (pub_date=2012)
+//                              )
+// )
+//$users = \App\Models\Entry::objects()->filter([
+//    "blog_text" => "men are",
+//    or_([
+//        'headline' => 'matt',
+//        "n_comments" => "adsd"
+//    ])
+//]);
     public function addQ(Q $q)
     {
-        dump($q);
         $clause = $this->_addQ($q)[0];
+
         if ($clause):
-            $this->where->add($clause);
+            $this->where->add($clause, AND_CONNECTOR);
         endif;
+        dump($this->where);
         //todo work on joins
     }
 
@@ -651,22 +670,23 @@ class Query extends BaseObject
     private function _addQ(Q $q)
     {
         $connector = $q->getConnector();
-
+        dump($connector);
         $targetClause = ($this->whereClass)::createObject(null, $connector, $q->isNegated());
 
         foreach ($q->getChildren() as $child) :
             if ($child instanceof Node):
                 list($childClause, $neededInner) = $this->_addQ($child);
             else:
-
-                list($childClause, $neededInner) = $this->buildFilter($child);
+                list($childClause, $neededInner) = $this->buildFilter($child, $connector);
             endif;
-            if($childClause):
-                $targetClause->add($childClause);
+
+            if ($childClause):
+                $targetClause->add($childClause, $connector);
             endif;
         endforeach;
         //todo join
-        $neededInner="";
+        $neededInner = "";
+
         return [$targetClause, $neededInner];
     }
 
@@ -699,9 +719,8 @@ class Query extends BaseObject
 
     private function solveLookupType($name)
     {
-        list($connector, $names) = $this->getConnector($name);
         // get lookupand field
-        $split_names = StringHelper::split(BaseLookup::$lookupPattern, $names);
+        $split_names = StringHelper::split(BaseLookup::$lookupPattern, $name);
 
         $paths = $this->getNamesPath($split_names, $this->model->meta);
         $lookup = $paths['others'];
@@ -721,14 +740,14 @@ class Query extends BaseObject
                 throw new FieldError(
                     sprintf(
                         'Invalid lookup "%s" for model %s".',
-                        $names,
+                        $name,
                         $this->model->meta->getNamespacedModelName()
                     )
                 );
             endif;
         endif;
 
-        return [$connector, $lookup, $fieldParts];
+        return [$lookup, $fieldParts];
     }
 
     private function prepareLookupValue($value, $lookups)
@@ -747,6 +766,7 @@ class Query extends BaseObject
             return [true, ['isnull']];
         endif;
 
+        //todo if value has resolve_expression method
         return [$value, $lookups];
     }
 

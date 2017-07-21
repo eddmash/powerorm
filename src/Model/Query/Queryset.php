@@ -24,6 +24,7 @@ use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 use function Eddmash\PowerOrm\Model\Query\Expression\not_;
+use function Eddmash\PowerOrm\Model\Query\Expression\q_;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayValueMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ModelMapper;
@@ -324,11 +325,11 @@ class Queryset implements QuerysetInterface
     public function _filterOrExclude($negate, $conditions)
     {
         $instance = $this->_clone();
-//        $instance->addConditions($negate, $conditions);
+
         if($negate):
             $instance->query->addQ(not_($conditions));
         else:
-            $instance->query->addQ(new Q($conditions));
+            $instance->query->addQ(q_($conditions));
         endif;
         return $instance;
     }
@@ -339,6 +340,7 @@ class Queryset implements QuerysetInterface
             throw new InvalidArgumentException(
                 sprintf("Method '%s' supports a single array input", $methondname));
         endif;
+
         return call_user_func_array('array_merge', $conditions);
     }
 

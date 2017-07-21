@@ -14,6 +14,10 @@ namespace Eddmash\PowerOrm\Model\Query\Expression;
 use Eddmash\PowerOrm\Model\Query\Aggregates\Count;
 use Eddmash\PowerOrm\Model\Query\Q;
 
+
+const AND_CONNECTOR = 'AND';
+const OR_CONNECTOR = 'OR';
+
 /**
  * @return Count
  *
@@ -35,7 +39,7 @@ function count_($expression, $distinct = false)
  */
 function or_($conditions)
 {
-    return new Q($conditions);
+    return new Q($conditions, OR_CONNECTOR);
 }
 /**
  * @return Q
@@ -47,4 +51,14 @@ function or_($conditions)
 function not_($conditions)
 {
     return (new Q($conditions))->negate();
+}/**
+ * @return Q
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+function q_($conditions)
+{
+    return new Q($conditions);
 }
