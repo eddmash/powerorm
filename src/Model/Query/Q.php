@@ -11,20 +11,20 @@
 
 namespace Eddmash\PowerOrm\Model\Query;
 
-
 use Eddmash\PowerOrm\Helpers\Node;
 use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 use const Eddmash\PowerOrm\Model\Query\Expression\OR_CONNECTOR;
-
+use function Eddmash\PowerOrm\Model\Query\Expression\or_;
+use function Eddmash\PowerOrm\Model\Query\Expression\not_;
 
 class Q extends Node
 {
     protected $defaultConnector = AND_CONNECTOR;
 
-    private $negated = false;
+    protected $negated = false;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function __construct($children = [], $connector = null, $negated = false)
     {
@@ -36,30 +36,24 @@ class Q extends Node
                 $items[] = [$name => $child];
             endif;
         endforeach;
+
         parent::__construct($items, $connector, $negated);
     }
-
 
     public function negate()
     {
         $this->negated = !$this->negated;
+
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isNegated()
-    {
-        return $this->negated;
-    }
-
-    protected function combine(Q $other, $connector)
+    protected function combine($other, $connector)
     {
         $obj = new static();
         $obj->connector = $connector;
         $obj->add($other, $connector);
         $obj->add($this, $connector);
+
         return $obj;
     }
 
@@ -73,11 +67,10 @@ class Q extends Node
         return $this->combine($other, AND_CONNECTOR);
     }
 
-    protected function _negate_()
+    public function not_($other)
     {
-        $obj = new static();
-        $obj->add($this, AND_CONNECTOR);
-        $obj->negate();
+        $obj = $this->combine(not_($other), $this->connector);
+
         return $obj;
     }
 }

@@ -19,6 +19,7 @@ use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Meta;
@@ -179,7 +180,8 @@ class Queryset implements QuerysetInterface
      */
     public function filter()
     {
-        return $this->_filterOrExclude(false, $this->prepareConditions(__METHOD__, func_get_args()));
+        return $this->_filterOrExclude(false,
+            static::formatFilterConditions(__METHOD__, func_get_args()));
     }
 
     /**
@@ -326,19 +328,40 @@ class Queryset implements QuerysetInterface
     {
         $instance = $this->_clone();
 
-        if($negate):
+        if ($negate):
             $instance->query->addQ(not_($conditions));
         else:
             $instance->query->addQ(q_($conditions));
         endif;
+
         return $instance;
     }
 
-    public function prepareConditions($methondname, $conditions)
+    /**
+     * Ensure the conditions passed in are ready to used to perform query operations.
+     *
+     * @param $methondname
+     * @param $conditions
+     *
+     * @return mixed
+     *
+     * @throws InvalidArgumentException
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function formatFilterConditions($methondname, $conditions)
     {
-        if(count($conditions) > 1):
+        if (count($conditions) > 1):
             throw new InvalidArgumentException(
                 sprintf("Method '%s' supports a single array input", $methondname));
+        endif;
+
+        if (count($conditions) == 1):
+            if ($conditions[0] instanceof Node):
+                return $conditions;
+            endif;
         endif;
 
         return call_user_func_array('array_merge', $conditions);

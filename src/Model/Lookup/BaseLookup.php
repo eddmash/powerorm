@@ -12,6 +12,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
+use Eddmash\PowerOrm\Model\ToSqlInterface;
 
 /**
  * Class Filter.
@@ -79,11 +80,15 @@ class BaseLookup implements LookupInterface
 
             return $preparedValues;
         else:
+            if(method_exists($this->rhs, '_prepare')):
+                return $this->rhs->_prepare($this->lhs->getOutputField());
+            endif;
             if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
                 return $this->lhs->getOutputField()->prepareValue($this->rhs);
             endif;
         endif;
 
+        // it might be this is just a pure php value
         return $this->rhs;
 
     }
@@ -117,6 +122,10 @@ class BaseLookup implements LookupInterface
             $this->rhs = $this->rhs->{$pk};
         elseif (method_exists($this->rhs, '_toSql')):
             list($sql, $params) = $this->rhs->_toSql();
+
+            return [sprintf('( %s )', $sql), $params];
+        elseif ($this->rhs instanceof ToSqlInterface):
+            list($sql, $params) = $this->rhs->asSql($connection);
 
             return [sprintf('( %s )', $sql), $params];
         endif;

@@ -21,26 +21,32 @@ class WhereNode extends Node
 
     public function asSql(Connection $connection)
     {
-
         $whereSql = [];
         $whereParams = [];
 
         /* @var $lookup BaseLookup */
         foreach ($this->getChildren() as $child) :
-
-
             list($sql, $parms) = $child->asSql($connection);
+
             $whereSql[] = $sql;
-//            if (!is_array($parms)):
-//                $parms = [$parms];
-//            endif;
-//            $whereParams = array_merge($whereParams, $parms);
+            if (!is_array($parms)):
+                $parms = [$parms];
+            endif;
+            $whereParams = array_merge($whereParams, $parms);
 
         endforeach;
 
-        $whereSql = sprintf( "%s %s", $this->connector, implode(' ', $whereSql));
-        dump($whereSql);
-        return ['', $whereParams];
+        $conn = sprintf(' %s ', $this->connector);
+        $whereSqlString = implode($conn, $whereSql);
+        if ($whereSqlString):
+            if ($this->isNegated()):
+                $whereSqlString = sprintf('NOT (%s)', $whereSqlString);
+            elseif (count($whereSql) > 1):
+                $whereSqlString = sprintf('(%s)', $whereSqlString);
+            endif;
+        endif;
+
+        return [$whereSqlString, $whereParams];
     }
 
 //    public function setConditions($connector, $conditions)
@@ -51,7 +57,7 @@ class WhereNode extends Node
     public function deepClone()
     {
         $obj = new self();
-//        foreach ($this->conditions as $conditionInfo) :
+//        foreach ($this->conditions as $conditionInfo) :$whereSql
 //            list($conector, $condition) = $conditionInfo;
 //            if (method_exists($condition, 'deepClone')) :
 //                $obj->setConditions($conector, $condition->deepClone());

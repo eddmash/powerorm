@@ -13,7 +13,7 @@ namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 use Eddmash\PowerOrm\Model\Query\Aggregates\Count;
 use Eddmash\PowerOrm\Model\Query\Q;
-
+use Eddmash\PowerOrm\Model\Query\Queryset;
 
 const AND_CONNECTOR = 'AND';
 const OR_CONNECTOR = 'OR';
@@ -37,9 +37,9 @@ function count_($expression, $distinct = false)
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-function or_($conditions)
+function or_()
 {
-    return new Q($conditions, OR_CONNECTOR);
+    return new Q(Queryset::formatFilterConditions(__FUNCTION__, func_get_args()), OR_CONNECTOR);
 }
 /**
  * @return Q
@@ -48,17 +48,42 @@ function or_($conditions)
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-function not_($conditions)
+function not_()
 {
-    return (new Q($conditions))->negate();
-}/**
+    return (new Q(Queryset::formatFilterConditions(__FUNCTION__, func_get_args())))->negate();
+}
+
+/**
  * @return Q
  *
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-function q_($conditions)
+function q_()
 {
-    return new Q($conditions);
+    return new Q(Queryset::formatFilterConditions(__FUNCTION__, func_get_args()));
+}
+
+/**
+ * @return F
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+function f_($name)
+{
+    return new F($name);
+}
+/**
+ * @return F
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+function func_($name)
+{
+    return new Func($name);
 }

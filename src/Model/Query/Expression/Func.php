@@ -15,6 +15,14 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
 
+/**
+ * Base type of all expressions that involve database functions like COALESCE and LOWER, or aggregates like SUM
+ * Class Func.
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
 class Func extends BaseExpression
 {
     protected $function;
@@ -41,7 +49,7 @@ class Func extends BaseExpression
         $this->extra = $kwargs;
     }
 
-    public function asSql(Connection $connection)
+    public function asSql(Connection $connection, $r)
     {
         $expressions = (is_array($this->expression)) ? $this->expression : [$this->expression];
         $sqlParts = [];

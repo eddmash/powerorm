@@ -34,6 +34,8 @@ use Eddmash\PowerOrm\Model\Query\Aggregates\BaseAggregate;
 use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
+use Eddmash\PowerOrm\Model\Query\Expression\ExpResolverInterface;
+use Eddmash\PowerOrm\Model\Query\Expression\ResolvableExpInterface;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
 use Eddmash\PowerOrm\Model\Query\Joinable\Join;
@@ -43,7 +45,7 @@ use function Eddmash\PowerOrm\Model\Query\Expression\count_;
 const INNER = 'INNER JOIN';
 const LOUTER = 'LEFT OUTER JOIN';
 
-class Query extends BaseObject
+class Query extends BaseObject implements ExpResolverInterface
 {
     //[
     //  BaseLookup::AND_CONNECTOR => [],
@@ -54,8 +56,8 @@ class Query extends BaseObject
 
     /** @var WhereNode */
     public $where;
-    public $tables = [];
-    public $tableMap = [];
+    public $tablesAlias = [];
+    public $tableAliasMap = [];
     public $selectRelected = false;
     /**
      * @var BaseJoin[]
@@ -95,6 +97,7 @@ class Query extends BaseObject
     // Arbitrary limit for select_related to prevents infinite recursion.
     public $maxDepth = 5;
     public $columnInfoCache;
+    public $usedTableAlias = [];
     /**
      * @var string
      */
@@ -103,8 +106,9 @@ class Query extends BaseObject
     /**
      * Query constructor.
      *
-     * @param Model $model
+     * @param Model     $model
      * @param WhereNode $whereClass
+     *
      * @internal param string $where
      */
     public function __construct(Model $model, $whereClass = WhereNode::class)
@@ -121,7 +125,7 @@ class Query extends BaseObject
 
     private function preSqlSetup()
     {
-        if (!$this->tables):
+        if (!$this->tablesAlias):
             $this->getInitialAlias();
         endif;
 
@@ -134,7 +138,7 @@ class Query extends BaseObject
      * Creates the SQL for this query. Returns the SQL string and list of parameters.
      *
      * @param Connection $connection
-     * @param bool $isSubQuery
+     * @param bool       $isSubQuery
      *
      * @return array
      *
@@ -289,11 +293,11 @@ class Query extends BaseObject
      * Used to get information needed when we are doing selectRelated(),.
      *
      * @param $select
-     * @param Meta|null $meta the from which we expect to find the related fields
-     * @param null $rootAlias
-     * @param int $curDepth
-     * @param null $requested the set of fields to use in selectRelated
-     * @param null $restricted true when we are to use just a set of relationship fields
+     * @param Meta|null $meta       the from which we expect to find the related fields
+     * @param null      $rootAlias
+     * @param int       $curDepth
+     * @param null      $requested  the set of fields to use in selectRelated
+     * @param null      $restricted true when we are to use just a set of relationship fields
      *
      * @return array
      *
@@ -344,7 +348,7 @@ class Query extends BaseObject
 
                     if ($nextSpanField || in_array($field->getName(), $requested)):
                         throw new FieldError(
-                            sprintf("Non-relational field given in selectRelated: '%s'. " .
+                            sprintf("Non-relational field given in selectRelated: '%s'. ".
                                 'Choices are: %s', $field->getName(), implode(', ', $this->getFieldChoices())));
 
                     endif;
@@ -499,8 +503,8 @@ class Query extends BaseObject
      * Returns the fields in the current models/those represented by the alias as Col expression, which know how to be
      * used in a query.
      *
-     * @param null $startAlias
-     * @param Meta|null $meta
+     * @param null       $startAlias
+     * @param Meta|null  $meta
      * @param Model|null $fromParent
      *
      * @return Col[]
@@ -550,14 +554,14 @@ class Query extends BaseObject
 
         $refCount = $this->aliasRefCount;
 
-        foreach ($this->tables as $alias) :
+        foreach ($this->tablesAlias as $alias) :
             if (!ArrayHelper::getValue($refCount, $alias)):
                 continue;
             endif;
             try {
 
                 /** @var $from BaseJoin */
-                $from = ArrayHelper::getValue($this->tableMap, $alias, ArrayHelper::STRICT);
+                $from = ArrayHelper::getValue($this->tableAliasMap, $alias, ArrayHelper::STRICT);
 
                 list($fromSql, $fromParams) = $from->asSql($connection);
                 array_push($result, $fromSql);
@@ -578,9 +582,25 @@ class Query extends BaseObject
         return $this->where;
     }
 
-    public function addConditions($condition, $negate)
+    /**
+     * @param $lookup
+     * @param $rhs
+     * @param $lhs Col
+     *
+     * @return LookupInterface
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function buildCondition($lookup, $lhs, $rhs)
     {
-        $this->buildFilter($condition, $negate);
+        $lookup = (array) $lookup;
+        $lookup = $lhs->getLookup($lookup[0]);
+        /* @var $lookup LookupInterface */
+        $lookup = $lookup::createObject($lhs, $rhs);
+
+        return $lookup;
     }
 
     /**
@@ -595,14 +615,14 @@ class Query extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function buildFilter($conditions, $connector = AND_CONNECTOR, $negate = false)
+    private function buildFilter($conditions, $connector = AND_CONNECTOR, $allowJoins = true, &$canReuse = null)
     {
         reset($conditions);
         $name = key($conditions);
         $value = current($conditions);
         list($lookups, $fieldParts) = $this->solveLookupType($name);
-        list($value, $lookups) = $this->prepareLookupValue($value, $lookups);
-        //todo joins
+        list($value, $lookups, $usedJoins) = $this->prepareLookupValue($value, $lookups, $canReuse, $allowJoins);
+//        //todo joins
         $clause = ($this->whereClass)::createObject();
         $meta = $this->model->meta;
         $alias = $this->getInitialAlias();
@@ -612,6 +632,13 @@ class Query extends BaseObject
             $meta,
             $alias
         );
+
+        if (!is_null($canReuse)):
+            foreach ($joinList as $list):
+                $canReuse[] = $list;
+            endforeach;
+        endif;
+        $usedJoins = array_merge(array_unique($usedJoins), array_unique($joinList));
 
         /* @var $targets Field[] */
         /* @var $field Field */
@@ -629,7 +656,7 @@ class Query extends BaseObject
 
         $clause->add($condition, AND_CONNECTOR);
         //todo joins
-        return [$clause, ""];
+        return [$clause, $usedJoins];
     }
 
     /**
@@ -639,7 +666,6 @@ class Query extends BaseObject
     {
         $this->valueSelect[] = $valueSelect;
     }
-
 
 // where (
 //      blog_text='men are' and (
@@ -657,64 +683,45 @@ class Query extends BaseObject
 //]);
     public function addQ(Q $q)
     {
-        $clause = $this->_addQ($q)[0];
+        $clause = $this->_addQ($q, $this->usedTableAlias)[0];
 
         if ($clause):
             $this->where->add($clause, AND_CONNECTOR);
         endif;
-        dump($this->where);
         //todo work on joins
+
     }
 
-
-    private function _addQ(Q $q)
+    private function _addQ(Q $q, &$usedAliases, $allowJoins = true, $currentNegated = false)
     {
         $connector = $q->getConnector();
-        dump($connector);
+
+        // current is true only if one and only is true.
+        $currentNegated = $currentNegated ^ $q->isNegated();
         $targetClause = ($this->whereClass)::createObject(null, $connector, $q->isNegated());
 
+        $joinpromoter = new JoinPromoter($connector, count($q->getChildren()), $currentNegated);
         foreach ($q->getChildren() as $child) :
             if ($child instanceof Node):
-                list($childClause, $neededInner) = $this->_addQ($child);
+                list($childClause, $neededInner) = $this->_addQ($child, $usedAliases, $allowJoins);
             else:
-                list($childClause, $neededInner) = $this->buildFilter($child, $connector);
+                list($childClause, $neededInner) = $this->buildFilter($child, $connector, $allowJoins, $usedAliases);
             endif;
 
             if ($childClause):
                 $targetClause->add($childClause, $connector);
             endif;
+            $joinpromoter->addVotes($neededInner);
         endforeach;
         //todo join
-        $neededInner = "";
+//        $neededInner = $joinpromoter->updateJoinType($this);
 
-        return [$targetClause, $neededInner];
+        return [$targetClause, null];
     }
 
     private function checkRelatedObjects(Field $field, $value, Meta $meta)
     {
         //todo
-    }
-
-    /**
-     * @param $lookup
-     * @param $rhs
-     * @param $lhs
-     *
-     * @return LookupInterface
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function buildCondition($lookup, $lhs, $rhs)
-    {
-        $lookup = (array)$lookup;
-
-        $lookup = $lhs->getLookup($lookup[0]);
-        /* @var $lookup LookupInterface */
-        $lookup = $lookup::createObject($lhs, $rhs);
-
-        return $lookup;
     }
 
     private function solveLookupType($name)
@@ -750,8 +757,9 @@ class Query extends BaseObject
         return [$lookup, $fieldParts];
     }
 
-    private function prepareLookupValue($value, $lookups)
+    private function prepareLookupValue($value, $lookups, &$canReuse, $allowJoins = true)
     {
+        $usedJoins = [];
         if (empty($lookups)):
             $lookups = ['exact'];
         endif;
@@ -760,14 +768,21 @@ class Query extends BaseObject
         // uses of null as a query value.
         if (is_null($value)):
             if (!in_array(array_pop($lookups), ['exact'])):
-                throw new ValueError('Cannot use None as a query value');
+                throw new ValueError('Cannot use "null" as a query value');
             endif;
 
             return [true, ['isnull']];
+        elseif ($value instanceof ResolvableExpInterface):
+            $preJoins = $this->aliasRefCount;
+            $value = $value->resolveExpression($this, $allowJoins, $canReuse);
+            foreach ($this->aliasRefCount as $key => $count) :
+                if ($count > ArrayHelper::getValue($preJoins, $key, 0)):
+                    $usedJoins[] = $key;
+                endif;
+            endforeach;
         endif;
-
-        //todo if value has resolve_expression method
-        return [$value, $lookups];
+        //todo if value is array
+        return [$value, $lookups, $usedJoins];
     }
 
     /**
@@ -885,9 +900,9 @@ class Query extends BaseObject
 
     public function getInitialAlias()
     {
-        if ($this->tables):
+        if ($this->tablesAlias):
             // get the first one
-            $alias = $this->tables[0];
+            $alias = $this->tablesAlias[0];
         else:
             $alias = $this->join(new BaseTable($this->model->meta->dbTable, null));
         endif;
@@ -931,7 +946,7 @@ class Query extends BaseObject
     {
         list($alias) = $this->getTableAlias($join->getTableName(), false);
         if ($join->getJoinType()):
-            if ($this->tableMap[$join->getParentAlias()]->getJoinType() === LOUTER || $join->getNullable()):
+            if ($this->tableAliasMap[$join->getParentAlias()]->getJoinType() === LOUTER || $join->getNullable()):
 
                 $joinType = LOUTER;
             else:
@@ -941,12 +956,59 @@ class Query extends BaseObject
         endif;
 
         $join->setTableAlias($alias);
-        $this->tableMap[$alias] = $join;
-        $this->tables[] = $alias;
+        $this->tableAliasMap[$alias] = $join;
+        $this->tablesAlias[] = $alias;
 
         return $alias;
     }
 
+    /**
+     * Change join type from LOUTER to INNER for all joins in aliases.
+     *
+     * Similarly to promoteJoins(), this method must ensure no join chains containing first an outer, then an inner
+     * join are generated.
+     * If we are demoting {A->C} join in chain {A LOUTER B LOUTER C} then we must demote {A->B} automatically, or
+     * otherwise the demotion of {A->B} doesn't actually change anything in the query results. .
+     *
+     * @param array $aliases
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function demoteJoins($aliases = [])
+    {
+        /* @var $join Join */
+        /* @var $parent Join */
+        while ($aliases):
+            $alias = array_pop($aliases);
+            $join = $this->tableAliasMap[$alias];
+            if ($join->getJoinType() == LOUTER):
+                $this->tableAliasMap[$alias] = $join->demote();
+                $parent = $this->tableAliasMap[$join->getParentAlias()];
+                if($parent->getJoinType() == INNER):
+                    $aliases[] = $join->getParentAlias();
+                endif;
+            endif;
+        endwhile;
+    }
+
+    public function prmoteJoins($aliases)
+    {
+
+    }
+
+    /**
+     * @param $targets
+     * @param $joinList
+     * @param $path
+     *
+     * @return array
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     private function trimJoins($targets, $joinList, $path)
     {
         /* @var $joinField RelatedField */
@@ -1196,8 +1258,8 @@ class Query extends BaseObject
         $obj->aliasRefCount = $this->aliasRefCount;
         $obj->useDefaultCols = $this->useDefaultCols;
         $obj->tableAlias = $this->tableAlias;
-        $obj->tableMap = $this->tableMap;
-        $obj->tables = $this->tables;
+        $obj->tableMap = $this->tableAliasMap;
+        $obj->tables = $this->tablesAlias;
         $obj->select = $this->select;
         $obj->selectRelected = $this->selectRelected;
         $obj->annotations = $this->annotations;
@@ -1274,10 +1336,10 @@ class Query extends BaseObject
     /**
      * Returns True if this field should be used to descend deeper for selectRelated() purposes.
      *
-     * @param Field $field the field to be checked
-     * @param bool $restricted indicating if the field list has been manually restricted using a requested clause
-     * @param array $requested The selectRelated() array
-     * @param bool $reverse True if we are checking a reverse select related
+     * @param Field $field      the field to be checked
+     * @param bool  $restricted indicating if the field list has been manually restricted using a requested clause
+     * @param array $requested  The selectRelated() array
+     * @param bool  $reverse    True if we are checking a reverse select related
      *
      * @return bool
      *
@@ -1370,10 +1432,51 @@ class Query extends BaseObject
         return $preparedValues;
     }
 
+    public function resolveExpression($name, $allowJoins = true, &$reuse = null, $summarize = false)
+    {
+        if (!$allowJoins && StringHelper::contains($name, BaseLookup::LOOKUP_SEPARATOR)):
+            throw new FieldError('Joined field references are not permitted in this query');
+        endif;
+
+        if (ArrayHelper::hasKey($this->annotations, $name)):
+            if ($summarize):
+                //todo
+            else:
+                return ArrayHelper::getValue($this->annotations, $name);
+            endif;
+        else:
+            $splitNames = StringHelper::split(BaseLookup::$lookupPattern, $name);
+
+            list($field, $sources, $joinList, $paths) = $this->setupJoins(
+                $splitNames,
+                $this->model->meta,
+                $this->getInitialAlias()
+            );
+
+            /* @var $targets Field[] */
+            /* @var $field Field */
+
+            list($targets, $finalAlias, $joinList) = $this->trimJoins($sources, $joinList, $paths);
+            if (count($targets) > 1):
+                throw new FieldError("Referencing multicolumn fields with F() objects isn't supported");
+            endif;
+
+            if (!is_null($reuse)):
+                foreach ($joinList as $item) :
+                    $reuse[] = $item;
+                endforeach;
+            endif;
+
+            $col = $targets[0]->getColExpression(array_pop($joinList), $sources[0]);
+
+            return $col;
+        endif;
+
+    }
 }
 
 /**
- * @param Model[] $instances
+ * @param Model[]        $instances
  * @param Prefetch|array $lookups
  *
  * @since 1.1.0
@@ -1407,8 +1510,8 @@ function prefetchRelatedObjects($instances, $lookups)
             // does this lookup contain a queryset
             // this means its not a duplication but a different request just containing the same name
             if ($lookup->queryset):
-                throw new ValueError(sprintf("'%s' lookup was already seen with a different queryset. " .
-                    'You may need to adjust the ordering of your lookups.' . $lookup->prefetchTo));
+                throw new ValueError(sprintf("'%s' lookup was already seen with a different queryset. ".
+                    'You may need to adjust the ordering of your lookups.'.$lookup->prefetchTo));
             endif;
 
             // just pass this is just a duplication

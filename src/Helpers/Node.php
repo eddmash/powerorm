@@ -11,10 +11,8 @@
 
 namespace Eddmash\PowerOrm\Helpers;
 
-
 class Node implements \Countable
 {
-
     protected $connector;
     protected $defaultConnector;
 
@@ -22,10 +20,10 @@ class Node implements \Countable
     /**
      * @var bool
      */
-    private $negated;
+    protected $negated;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function __construct($children = [], $connector = null, $negated = false)
     {
@@ -34,33 +32,33 @@ class Node implements \Countable
         $this->negated = $negated;
     }
 
-
     public static function createObject($children = null, $connector = null, $negated = false)
     {
         return new static($children, $connector, $negated);
     }
 
-
-    public function add($node, $connector, $squash = true)
+    public function add($node, $connectorType, $squash = true)
     {
         if (array_search($node, $this->children)):
             return $node;
         endif;
         if (!$squash):
             $this->children[] = $node;
+
             return $node;
         endif;
 
-        if ($connector == $this->connector):
-            dump("in");
-            if ($node instanceof Node && !$this->negated &&
-                ($connector == $this->connector || count($node) == 1)
+        if ($connectorType == $this->connector):
+
+            if ($node instanceof self && !$node->isNegated() &&
+                ($connectorType == $node->connector || count($node) == 1)
             ):
-                dump("inner");
                 $this->children = array_merge($this->getChildren(), $node->getChildren());
+
                 return $this;
             else:
                 $this->children[] = $node;
+
                 return $node;
             endif;
         else:
@@ -68,10 +66,11 @@ class Node implements \Countable
             $obj = new static($this->children, $this->connector, $this->negated);
 
             // update the connector to use btwn the current node and the passed in node
-            $this->connector = $connector;
+            $this->connector = $connectorType;
 
             // update the children
             $this->children = [$obj, $node];
+
             return $node;
         endif;
     }
@@ -93,16 +92,37 @@ class Node implements \Countable
     }
 
     /**
-     * Count elements of an object
+     * Count elements of an object.
+     *
      * @link http://php.net/manual/en/countable.count.php
+     *
      * @return int The custom count as an integer.
-     * </p>
-     * <p>
-     * The return value is cast to an integer.
+     *             </p>
+     *             <p>
+     *             The return value is cast to an integer
+     *
      * @since 5.1.0
      */
     public function count()
     {
         return count($this->children);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNegated()
+    {
+        return $this->negated;
+    }
+
+    public function __toString()
+    {
+        $children = Tools::stringify($this->children, false);
+        $children = rtrim($children, ']');
+        $children = ltrim($children, '[');
+        $children = trim($children);
+//        $children = trim($children, ",");
+        return sprintf('(%s : %s)', $this->connector, $children);
     }
 }

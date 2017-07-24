@@ -102,4 +102,5 @@ abstract class BaseJoin
     }
 
     abstract public function asSql(Connection $connection);
+
 }

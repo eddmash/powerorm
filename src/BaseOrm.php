@@ -27,7 +27,6 @@ use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Q;
 
 define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
 

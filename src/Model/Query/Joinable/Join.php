@@ -66,9 +66,10 @@ class Join extends BaseJoin
     }
 
     /**
-     * Change join to inner join
+     * Change join to inner join.
      *
      * @return Join
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -77,12 +78,15 @@ class Join extends BaseJoin
     {
         $join = $this->relabeledClone();
         $join->setJoinType(INNER);
+
         return $join;
     }
 
     /**
-     * Change join to left outer join
+     * Change join to left outer join.
+     *
      * @return Join
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -91,13 +95,17 @@ class Join extends BaseJoin
     {
         $join = $this->relabeledClone();
         $join->setJoinType(LOUTER);
+
         return $join;
     }
 
     /**
-     * Clone join with the option of relabeling the aliases
+     * Clone join with the option of relabeling the aliases.
+     *
      * @param array $changeMap
+     *
      * @return static
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -113,6 +121,7 @@ class Join extends BaseJoin
         $join->setJoinType($this->getJoinType());
         $join->setJoinField($this->getJoinField());
         $join->setNullable($this->getNullable());
+
         return $join;
     }
 }

@@ -69,7 +69,7 @@ class Tools
             if (is_array($value)) {
                 // HANDLE VALUE IF ARRAY
 
-                $stringState .= '['.$linebreak;
+                $stringState .= '[ '.$linebreak;
 
                 if (!is_numeric($key)) {
                     $stringState .= "'$key'=>";
@@ -79,7 +79,7 @@ class Tools
 
                 $stringState .= $linebreak;
                 $stringState .= ($indent != false) ? str_repeat($indentCharacter, $indent - 1) : '';
-                $stringState .= ']';
+                $stringState .= ' ]';
             } elseif (is_object($value)) {
 
                 // HANDLE VALUE THAT ARE OBJECTS THAT IMPLEMENT DeConstructableInterface interface
@@ -94,6 +94,8 @@ class Tools
                     $string = self::stringify(reset($constructorArgs), $nextIndent, $close, $start, ++$level);
 
                     $stringState .= sprintf('%1$s(%2$s)', $class, $string);
+                }else{
+                    $stringState .= sprintf('%s', $value);
                 }
             } else {
 
