@@ -11,6 +11,8 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
+use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Model\Field\Field;
 
 class CombinedExpression extends BaseExpression
@@ -29,5 +31,80 @@ class CombinedExpression extends BaseExpression
         $this->connector = $connector;
         $this->rhs = $rhs;
     }
+
+    public function getSourceExpressions()
+    {
+        return [$this->lhs, $this->rhs];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setSourceExpressions($expression)
+    {
+        $this->lhs= $expression[0];
+        $this->rhs= $expression[1];
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function asSql(Connection $connection)
+    {
+        try {
+            $lhsOutputField = $this->lhs->getOutputField();
+        }catch(FieldError $error){
+            $lhsOutputField = null;
+        }
+
+        try {
+            $rhsOutputField = $this->rhs->getOutputField();
+        }catch (FieldError $error){
+            $rhsOutputField = null;
+        }
+
+        //todo handle time fields
+
+        $expression = [];
+        $expressionParams = [];
+
+        list($sql, $params) = $this->lhs->asSql($connection);
+        $expression[] = $sql;
+        $expressionParams = array_merge($expressionParams, $params);
+        list($sql, $params) =  $this->rhs->asSql($connection);
+        $expression[] = $sql;
+        $expressionParams = array_merge($expressionParams, $params);
+
+        $sql = implode($this->connector, $expression);
+
+        return [$sql, $expressionParams];
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function resolveExpression(
+        ExpResolverInterface $resolver,
+        $allowJoins = true,
+        $reuse = null,
+        $summarize = false,
+        $forSave = false
+    ) {
+        $obj =  parent::resolveExpression(
+            $resolver,
+            $allowJoins,
+            $reuse,
+            $summarize,
+            $forSave
+        );
+
+        $obj->summarize = $summarize;
+        $obj->lhs = $obj->lhs->resolveExpression($resolver, $allowJoins, $reuse, $summarize, $forSave);
+        $obj->rhs = $obj->rhs->resolveExpression($resolver, $allowJoins, $reuse, $summarize, $forSave);
+        return $obj;
+    }
+
 
 }

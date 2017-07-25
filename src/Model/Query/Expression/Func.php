@@ -38,27 +38,44 @@ class Func extends BaseExpression
     /**
      * Func constructor.
      *
-     * @param Field $outputField
+     * @param array $kwargs
+     * @internal param Field $outputField
      */
-    public function __construct($expression, $kwargs = [])
+    public function __construct($kwargs = [])
     {
+        $expression = ArrayHelper::pop($kwargs, 'expression');
         $outputField = ArrayHelper::pop($kwargs, 'outputField');
 
         parent::__construct($outputField);
-        $this->expression = $expression;
+        $this->expression = $this->parseExpression($expression);
         $this->extra = $kwargs;
     }
 
-    public function asSql(Connection $connection, $r)
+    /**
+     * @return BaseExpression[]
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public function getSourceExpressions()
     {
-        $expressions = (is_array($this->expression)) ? $this->expression : [$this->expression];
+        return $this->expression;
+    }
+
+    public function setSourceExpressions($expression)
+    {
+        return $this->expression = $expression;
+    }
+
+
+    public function asSql(Connection $connection)
+    {
+//        $expressions = (is_array($this->expression)) ? $this->expression : [$this->expression];
         $sqlParts = [];
         if ($this->extra) :
             $sqlParts[] = implode('', $this->extra);
         endif;
         $params = [];
-        /** @var $expression BaseExpression */
-        foreach ($expressions as $expression) :
+
+        foreach ($this->getSourceExpressions() as $expression) :
             list($sql, $param) = $expression->asSql($connection);
             $sqlParts[] = $sql;
             $params = array_merge($params, $param);

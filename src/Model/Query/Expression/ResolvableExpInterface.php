@@ -22,11 +22,11 @@ interface ResolvableExpInterface
      *
      *
      * @param ExpResolverInterface $resolver
-     * @param bool                 $allowJoins
-     * @param null                 $reuse
-     * @param bool                 $summarize  s a boolean that, when True, signals that the query being computed is a terminal
+     * @param bool                 $allowJoins boolean allowing or denying use of joins in this query
+     * @param null                 $reuse a set of reusable joins for multijoins
+     * @param bool                 $summarize  a boolean that, when True, signals that the query being computed is a terminal
      *                                         aggregate query
-     * @param bool                 $forSave
+     * @param bool                 $forSave tells if this item is allowed in insert/update queries
      *
      * @return
      *

@@ -622,8 +622,9 @@ class Query extends BaseObject implements ExpResolverInterface
         $value = current($conditions);
         list($lookups, $fieldParts) = $this->solveLookupType($name);
         list($value, $lookups, $usedJoins) = $this->prepareLookupValue($value, $lookups, $canReuse, $allowJoins);
-//        //todo joins
-        $clause = ($this->whereClass)::createObject();
+        //todo joins
+        $whereClass = ($this->whereClass);
+        $clause = $whereClass::createObject();
         $meta = $this->model->meta;
         $alias = $this->getInitialAlias();
 
@@ -698,7 +699,9 @@ class Query extends BaseObject implements ExpResolverInterface
 
         // current is true only if one and only is true.
         $currentNegated = $currentNegated ^ $q->isNegated();
-        $targetClause = ($this->whereClass)::createObject(null, $connector, $q->isNegated());
+
+        $whereClass = ($this->whereClass);
+        $targetClause = $whereClass::createObject(null, $connector, $q->isNegated());
 
         $joinpromoter = new JoinPromoter($connector, count($q->getChildren()), $currentNegated);
         foreach ($q->getChildren() as $child) :

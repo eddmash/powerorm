@@ -12,7 +12,6 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
-use Eddmash\PowerOrm\Model\ToSqlInterface;
 
 /**
  * Class Filter.
@@ -124,7 +123,7 @@ class BaseLookup implements LookupInterface
             list($sql, $params) = $this->rhs->_toSql();
 
             return [sprintf('( %s )', $sql), $params];
-        elseif ($this->rhs instanceof ToSqlInterface):
+        elseif (method_exists($this->rhs,  "asSql")):
             list($sql, $params) = $this->rhs->asSql($connection);
 
             return [sprintf('( %s )', $sql), $params];

@@ -77,7 +77,7 @@ function f_($name)
     return new F($name);
 }
 /**
- * @return F
+ * @return Func
  *
  * @since 1.1.0
  *
@@ -86,4 +86,16 @@ function f_($name)
 function func_($name)
 {
     return new Func($name);
+}
+
+/**
+ * @return Value
+ *
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+function value_($name)
+{
+    return new Value($name);
 }
