@@ -20,7 +20,7 @@ class BaseAggregate extends Func
     protected $name;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function __construct($expression, array $kwargs = [])
     {
@@ -29,7 +29,7 @@ class BaseAggregate extends Func
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function resolveExpression(
         ExpResolverInterface $resolver,
@@ -39,10 +39,9 @@ class BaseAggregate extends Func
         $forSave = false
     ) {
         // Aggregates are not allowed in UPDATE queries, so ignore forSave
-        $obj =  parent::resolveExpression($resolver,$allowJoins,$reuse,$summarize);
+        $obj = parent::resolveExpression($resolver, $allowJoins, $reuse, $summarize);
 
         return $obj;
     }
-
 
 }

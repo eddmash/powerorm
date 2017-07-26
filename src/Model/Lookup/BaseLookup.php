@@ -123,7 +123,7 @@ class BaseLookup implements LookupInterface
             list($sql, $params) = $this->rhs->_toSql();
 
             return [sprintf('( %s )', $sql), $params];
-        elseif (method_exists($this->rhs,  "asSql")):
+        elseif (method_exists($this->rhs,  'asSql')):
             list($sql, $params) = $this->rhs->asSql($connection);
 
             return [sprintf('( %s )', $sql), $params];

@@ -1088,7 +1088,10 @@ class Query extends BaseObject implements ExpResolverInterface
         $annotation = ArrayHelper::getValue($kwargs, 'annotation');
         $alias = ArrayHelper::getValue($kwargs, 'alias');
         $isSummary = ArrayHelper::getValue($kwargs, 'isSummary', false);
-//        $annotation = $annotation->resolveExpression();
+
+        $annotation = $annotation->resolveExpression($this, true, null, $isSummary);
+
+        var_dump($annotation);
         $this->annotations[$alias] = $annotation;
 
     }

@@ -18,6 +18,7 @@ use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\TypeError;
+use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Helpers\Tools;
@@ -185,6 +186,8 @@ class Queryset implements QuerysetInterface
     }
 
     /**
+     * Return a query set in which the returned objects have been annotated with extra data or aggregations.
+     *
      * @return Queryset
      *
      * @since 1.1.0
@@ -193,9 +196,25 @@ class Queryset implements QuerysetInterface
      */
     public function annotate()
     {
-        $args = func_get_args();
-        //todo
-        return $this;
+        $args = static::formatFilterConditions(__METHOD__, func_get_args());
+        $names = $this->_fields;
+        if(is_null($this->_fields)):
+            $names = [];
+            foreach ($this->model->meta->getFields() as $field) :
+                $names[] = $field->getName();
+            endforeach;
+        endif;
+        $obj = $this->_clone();
+        foreach ($args as $alias => $arg) :
+            if(in_array($alias, $names)):
+                throw new ValueError(
+                    sprintf("The annotation '%s' conflicts with a field on the model.", $alias));
+            endif;
+            $obj->query->addAnnotation(['annotation' => $arg, 'alias' => $alias, 'isSummary' => false]);
+        endforeach;
+
+        //todo group by
+        return $obj;
     }
 
     public function aggregate($kwargs = [])

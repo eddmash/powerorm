@@ -43,4 +43,16 @@ class F extends Combinable implements ResolvableExpInterface
     {
         return $resolver->resolveExpression($this->name, $allowJoins, $reuse, $summarize);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __debugInfo()
+    {
+        $data = parent::__debugInfo();
+        $data['name'] = $this->name;
+
+        return $data;
+    }
+
 }

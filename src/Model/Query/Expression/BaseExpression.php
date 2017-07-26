@@ -48,19 +48,22 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
      * Item this expression resolves.
      *
      * @param $expression
+     *
      * @return bool
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function setSourceExpressions($expression)
     {
-        return assert(count($expression)==0, "Setting empty expression");
+        return assert(count($expression) == 0, 'Setting empty expression');
     }
     /**
      * Ensure $expressions is converted into an instances of BaseExpression i.e if we get a string like "age" convert
      * to new F() object or if we get somethin else convert to a new Value() expression.
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     *
      * @param $expressions
+     *
      * @return array
      */
     protected function parseExpression($expressions)
@@ -82,7 +85,7 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function asSql(Connection $connection)
     {
@@ -96,13 +99,15 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
 
     /**
      * @return Field
+     *
      * @throws FieldError
      */
     public function getOutputField()
     {
         if (is_null($this->outputFieldOrNull())) :
-            throw new FieldError("Cannot resolve expression type, unknown output_field");
+            throw new FieldError('Cannot resolve expression type, unknown output_field');
         endif;
+
         return $this->outputFieldOrNull();
     }
 
@@ -111,6 +116,7 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
         if (is_null($this->resolveOutputField())) :
             $this->resolveOutputField();
         endif;
+
         return $this->outputField;
     }
 
@@ -130,7 +136,7 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
     {
         if (is_null($this->outputField)) :
             $sourceFields = $this->getSourceFields();
-            if (count($sourceFields)==0) :
+            if (count($sourceFields) == 0) :
                 $this->outputField = null;
             else:
                 foreach ($sourceFields as $sourceField) :
@@ -138,7 +144,7 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
                         $this->outputField = $sourceField;
                     endif;
                     if (!is_null($this->outputField) && !($this->outputField instanceof $sourceField)) :
-                        throw new FieldError("Expression contains mixed types. You must set output_field");
+                        throw new FieldError('Expression contains mixed types. You must set output_field');
                     endif;
                 endforeach;
             endif;
@@ -161,12 +167,13 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
      * in Exp::Count('username') we need the username to converted to an actual model field.
      *
      * @param ExpResolverInterface $resolver
-     * @param bool $allowJoins
-     * @param null $reuse
-     * @param bool $summarize
-     * @param bool $forSave
+     * @param bool                 $allowJoins
+     * @param null                 $reuse
+     * @param bool                 $summarize
+     * @param bool                 $forSave
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     *
      * @return $this
      */
     public function resolveExpression(ExpResolverInterface $resolver, $allowJoins = true, $reuse = null,
@@ -174,6 +181,7 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
     {
         $obj = clone $this;
         $obj->copied = true;
+
         return $obj;
 
     }
@@ -188,5 +196,13 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
         return $fields;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function __debugInfo()
+    {
+        return [
+        ];
+    }
 
 }

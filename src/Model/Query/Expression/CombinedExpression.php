@@ -38,17 +38,16 @@ class CombinedExpression extends BaseExpression
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function setSourceExpressions($expression)
     {
-        $this->lhs= $expression[0];
-        $this->rhs= $expression[1];
+        $this->lhs = $expression[0];
+        $this->rhs = $expression[1];
     }
 
-
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function asSql(Connection $connection)
     {
@@ -72,7 +71,7 @@ class CombinedExpression extends BaseExpression
         list($sql, $params) = $this->lhs->asSql($connection);
         $expression[] = $sql;
         $expressionParams = array_merge($expressionParams, $params);
-        list($sql, $params) =  $this->rhs->asSql($connection);
+        list($sql, $params) = $this->rhs->asSql($connection);
         $expression[] = $sql;
         $expressionParams = array_merge($expressionParams, $params);
 
@@ -81,9 +80,8 @@ class CombinedExpression extends BaseExpression
         return [$sql, $expressionParams];
     }
 
-
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function resolveExpression(
         ExpResolverInterface $resolver,
@@ -92,7 +90,7 @@ class CombinedExpression extends BaseExpression
         $summarize = false,
         $forSave = false
     ) {
-        $obj =  parent::resolveExpression(
+        $obj = parent::resolveExpression(
             $resolver,
             $allowJoins,
             $reuse,
@@ -103,8 +101,8 @@ class CombinedExpression extends BaseExpression
         $obj->summarize = $summarize;
         $obj->lhs = $obj->lhs->resolveExpression($resolver, $allowJoins, $reuse, $summarize, $forSave);
         $obj->rhs = $obj->rhs->resolveExpression($resolver, $allowJoins, $reuse, $summarize, $forSave);
+
         return $obj;
     }
-
 
 }

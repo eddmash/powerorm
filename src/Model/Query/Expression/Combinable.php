@@ -67,4 +67,13 @@ class Combinable
 
         return new CombinedExpression($this, $connector, $other);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __debugInfo()
+    {
+        return [];
+    }
+
 }

@@ -44,7 +44,7 @@ class Value extends BaseExpression
             return ['NULL', []];
         endif;
 
-        return ['%s', [$val]];
+        return ['?', [$val]];
     }
 
     /**

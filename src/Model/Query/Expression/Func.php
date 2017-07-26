@@ -28,10 +28,10 @@ class Func extends BaseExpression
     protected $function;
     protected $template = '%s(%s)';
     protected $argJoiner = ', ';
-    protected $extra;
+    protected $extra = [];
 
     /**
-     * @var
+     * @var BaseExpression[]
      */
     private $expression;
 
@@ -39,12 +39,13 @@ class Func extends BaseExpression
      * Func constructor.
      *
      * @param array $kwargs
+     *
      * @internal param Field $outputField
      */
     public function __construct($kwargs = [])
     {
         $expression = ArrayHelper::pop($kwargs, 'expression');
-        $outputField = ArrayHelper::pop($kwargs, 'outputField');
+        $outputField = ArrayHelper::pop($kwargs, 'outputField', null);
 
         parent::__construct($outputField);
         $this->expression = $this->parseExpression($expression);
@@ -65,23 +66,45 @@ class Func extends BaseExpression
         return $this->expression = $expression;
     }
 
-
-    public function asSql(Connection $connection)
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveExpression(ExpResolverInterface $resolver, $allowJoins = true, $reuse = null,
+                                      $summarize = false, $forSave = false)
     {
-//        $expressions = (is_array($this->expression)) ? $this->expression : [$this->expression];
+        $obj = clone  $this;
+        $obj->summarize = $summarize;
+
+        foreach ($obj->expression as $key => $item) :
+            $obj->expression[$key] = $item->resolveExpression($resolver, $allowJoins, $reuse, $summarize, $forSave);
+        endforeach;
+
+        return $obj;
+    }
+
+    public function asSql(Connection $connection, $function = null)
+    {
         $sqlParts = [];
+        $func = $this->function;
+        if (!is_null($function)):
+            $func = $function;
+        else:
+            $func = ArrayHelper::pop($this->extra, 'function', $this->function);
+        endif;
         if ($this->extra) :
+
             $sqlParts[] = implode('', $this->extra);
         endif;
         $params = [];
 
         foreach ($this->getSourceExpressions() as $expression) :
+
             list($sql, $param) = $expression->asSql($connection);
             $sqlParts[] = $sql;
             $params = array_merge($params, $param);
         endforeach;
 
-        $template = $this->getTemplate($this->function, implode($this->argJoiner, $sqlParts));
+        $template = $this->getTemplate($func, implode($this->argJoiner, $sqlParts));
 
         return [$template, $params];
     }
