@@ -36,6 +36,8 @@ class Asker
     /**
      * @param Question $question
      *
+     * @return mixed
+     *
      * @throws NotImplemented
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>

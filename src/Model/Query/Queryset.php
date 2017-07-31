@@ -190,6 +190,8 @@ class Queryset implements QuerysetInterface
      *
      * @return Queryset
      *
+     * @throws ValueError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -198,23 +200,33 @@ class Queryset implements QuerysetInterface
     {
         $args = static::formatFilterConditions(__METHOD__, func_get_args());
         $names = $this->_fields;
-        if(is_null($this->_fields)):
+        if (is_null($this->_fields)):
             $names = [];
             foreach ($this->model->meta->getFields() as $field) :
                 $names[] = $field->getName();
             endforeach;
         endif;
-        $obj = $this->_clone();
+        $clone = $this->_clone();
         foreach ($args as $alias => $arg) :
-            if(in_array($alias, $names)):
+            if (in_array($alias, $names)):
                 throw new ValueError(
                     sprintf("The annotation '%s' conflicts with a field on the model.", $alias));
             endif;
-            $obj->query->addAnnotation(['annotation' => $arg, 'alias' => $alias, 'isSummary' => false]);
+            $clone->query->addAnnotation(['annotation' => $arg, 'alias' => $alias, 'isSummary' => false]);
         endforeach;
 
         //todo group by
-        return $obj;
+        foreach ($clone->query->annotations as $alias => $annotation) :
+            if ($annotation->containsAggregate && in_array($alias, $args)):
+                if (is_null($clone->_fields)):
+                    $clone->query->groupBy = true;
+                else:
+                    $clone->query->setGroupBy();
+                endif;
+            endif;
+        endforeach;
+
+        return $clone;
     }
 
     public function aggregate($kwargs = [])

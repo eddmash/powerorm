@@ -85,7 +85,7 @@ class Func extends BaseExpression
     public function asSql(Connection $connection, $function = null)
     {
         $sqlParts = [];
-        $func = $this->function;
+
         if (!is_null($function)):
             $func = $function;
         else:

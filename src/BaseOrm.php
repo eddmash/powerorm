@@ -400,7 +400,7 @@ class BaseOrm extends BaseObject
      *
      * @return BaseOrm
      */
-    public static function &getInstance($config = null)
+    public static function &getInstance($config = [])
     {
         $instance = self::createObject($config);
 

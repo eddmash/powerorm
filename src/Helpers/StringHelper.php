@@ -4,7 +4,6 @@
  * User: eddmash
  * Date: 6/18/16.
  */
-
 namespace Eddmash\PowerOrm\Helpers;
 
 /*

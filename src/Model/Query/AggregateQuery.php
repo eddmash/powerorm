@@ -5,7 +5,6 @@
  * Date: 3/19/17
  * Time: 2:06 PM.
  */
-
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;

@@ -98,6 +98,7 @@ class Query extends BaseObject implements ExpResolverInterface
     public $maxDepth = 5;
     public $columnInfoCache;
     public $usedTableAlias = [];
+    public $groupBy;
     /**
      * @var string
      */
@@ -720,6 +721,10 @@ class Query extends BaseObject implements ExpResolverInterface
 //        $neededInner = $joinpromoter->updateJoinType($this);
 
         return [$targetClause, null];
+    }
+
+    public function setGroupBy()
+    {
     }
 
     private function checkRelatedObjects(Field $field, $value, Meta $meta)
