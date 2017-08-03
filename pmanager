@@ -1,0 +1,21 @@
+#!/usr/bin/env php
+<?php
+
+use Eddmash\PowerOrm\Application;
+
+if (is_file(__DIR__ . '/../vendor/autoload.php')) {
+    $composerLoader = require __DIR__ . '/../vendor/autoload.php';
+} elseif (is_file(__DIR__ . '/../../../autoload.php')) {
+    $composerLoader = require __DIR__ . '/../../../autoload.php';
+} else {
+    echo 'Powerorm dependencies not found, be sure to run `composer install`.' . PHP_EOL;
+    echo 'See https://getcomposer.org to get Composer.' . PHP_EOL;
+    exit(1);
+}
+
+if (!class_exists('\App\Config\Powerorm')) :
+    echo 'Powerorm Could not find a config file' . PHP_EOL;
+    exit(1);
+endif;
+// create in the database config
+Application::consoleRun(\App\Config\Powerorm::asArray(), $composerLoader);
