@@ -1,12 +1,20 @@
 #!/usr/bin/env php
 <?php
 
+/*
+* This file is part of the powerorm package.
+*
+* (c) Eddilbert Macharia <edd.cowan@gmail.com>
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 use Eddmash\PowerOrm\Application;
 
 if (is_file(__DIR__ . '/../vendor/autoload.php')) {
     $composerLoader = require __DIR__ . '/../vendor/autoload.php';
-} elseif (is_file(__DIR__ . '/../../../autoload.php')) {
-    $composerLoader = require __DIR__ . '/../../../autoload.php';
+} elseif (is_file(__DIR__ . '/../../autoload.php')) {
+    $composerLoader = require __DIR__ . '/../../autoload.php';
 } else {
     echo 'Powerorm dependencies not found, be sure to run `composer install`.' . PHP_EOL;
     echo 'See https://getcomposer.org to get Composer.' . PHP_EOL;
