@@ -8,7 +8,7 @@
 [![License](https://poser.pugx.org/eddmash/powerorm/license)](https://packagist.org/packages/eddmash/powerorm)
 
 # PowerOrm
-A powerful php orm with automatic migrations.
+A powerful php orm with automatic migrations inspired by django orm.
 
 # Help and Documentation
 Get the ORM documentation here [PowerOrm Documentation !](http://powerorm.readthedocs.io/).
@@ -26,7 +26,7 @@ Get assistance on the ORM here [PowerOrm Help !](https://groups.google.com/d/for
 
 Setup
 
-To load powerorm use the following code and pass the Configs needed for powerorm to work.
+To load powerorm use the following code and pass the Configs(see below) needed for powerorm to work.
 ensure the orm is loaded early enough in you application.
 
 ``````
