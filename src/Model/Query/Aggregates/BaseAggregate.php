@@ -16,7 +16,7 @@ use Eddmash\PowerOrm\Model\Query\Expression\Func;
 
 class BaseAggregate extends Func
 {
-    public $containsAggregate = true;
+    private $containsAggregate = true;
     protected $name;
 
     /**
@@ -43,5 +43,14 @@ class BaseAggregate extends Func
 
         return $obj;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function containsAggregates()
+    {
+        return $this->containsAggregate;
+    }
+
 
 }

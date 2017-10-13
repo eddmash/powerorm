@@ -346,8 +346,7 @@ class BaseOrm extends BaseObject
             throw new OrmException($message);
         endif;
         if (static::$connection == null):
-            $config = new Configuration();
-
+            $config = new Configuration(); 
             static::$connection = DriverManager::getConnection($this->database, $config);
         endif;
 

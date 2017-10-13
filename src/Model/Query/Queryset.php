@@ -217,7 +217,8 @@ class Queryset implements QuerysetInterface
 
         //todo group by
         foreach ($clone->query->annotations as $alias => $annotation) :
-            if ($annotation->containsAggregate && in_array($alias, $args)):
+
+            if ($annotation->containsAggregates() && in_array($alias, $args)):
                 if (is_null($clone->_fields)):
                     $clone->query->groupBy = true;
                 else:
@@ -236,7 +237,7 @@ class Queryset implements QuerysetInterface
         foreach ($kwargs as $alias => $annotation) :
             $query->addAnnotation(['annotation' => $annotation, 'alias' => $alias, 'isSummary' => true]);
             // ensure we have an aggrated function
-            if (!$query->annotations[$alias]->containsAggregate) :
+            if (!$query->annotations[$alias]->containsAggregates()) :
                 throw new TypeError(sprintf('%s is not an aggregate expression', $alias));
             endif;
         endforeach;

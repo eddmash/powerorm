@@ -54,6 +54,9 @@ Next, run the Powerorm command-line utility to create the database tables automa
 The migrate command looks at all your available models and creates tables in your database for whichever
 tables don't already exist, as well as optionally providing much richer schema control.
 
+If your project is based on an framework :doc:`Integrations <../integrations/index>` for how to access
+Powerorm command line utility.
+
 Persisting Objects to the Database
 -------------------------------------
 

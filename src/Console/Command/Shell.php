@@ -43,8 +43,8 @@ class Shell extends BaseCommand
      */
     protected function configure()
     {
-        $this->setName($this->guessCommandName());
-//            ->setDescription('A little fun is good for the soul')
-//            ->setHelp('A little fun is good for the soul');
+        $this->setName($this->guessCommandName())
+            ->setDescription('A php interactive shell')
+            ->setHelp('A php interactive shell');
     }
 }

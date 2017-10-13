@@ -196,6 +196,16 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
         return $fields;
     }
 
+    public function containsAggregates()
+    {
+        foreach ($this->getSourceExpressions() as $sourceExpression) :
+            if($sourceExpression->containsAggregates()):
+                return true;
+            endif;
+        endforeach;
+        return false;
+    }
+
     /**
      * {@inheritdoc}
      */
