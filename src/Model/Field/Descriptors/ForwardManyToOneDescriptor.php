@@ -15,6 +15,7 @@ use Eddmash\PowerOrm\Exception\RelatedObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
+use Eddmash\PowerOrm\Model\Manager\BaseManager;
 use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
@@ -42,7 +43,7 @@ class ForwardManyToOneDescriptor extends BaseDescriptor
                 $relObj = null;
             else:
 
-                $result = $this->queryset($modelInstance)->get();
+                $result = $this->getManager($modelInstance)->get();
 
                 /* @var $fromField RelatedField */
                 $fromField = $this->field->getRelatedFields()[0];
@@ -128,10 +129,10 @@ class ForwardManyToOneDescriptor extends BaseDescriptor
      *
      * @internal param $modelName
      *
-     * @return Queryset
+     * @return BaseManager
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function queryset($modelInstance, $reverse = false)
+    public function getManager($modelInstance, $reverse = false)
     {
         if ($reverse) :
             $model = $this->field->getRelatedModel();
@@ -142,7 +143,8 @@ class ForwardManyToOneDescriptor extends BaseDescriptor
         // define BaseM2MQueryset
         if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)):
             $baseClass = $model::getManagerClass();
-            $class = sprintf('namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}', $baseClass);
+            $class = sprintf('namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}',
+                $baseClass);
             eval($class);
         endif;
 

@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Query\Results;
 
 use Doctrine\DBAL\Connection;
@@ -30,12 +31,12 @@ class ModelMapper extends Mapper
     {
         $connection = $this->queryset->connection;
 
-        $results = $this->queryset->query->getResultsIterator($connection);
-
-        $klassInfo = $this->queryset->query->klassInfo;
+        $sqlCompiler = $this->queryset->query->getSqlCompiler($connection);
+        $resultsStatement = $sqlCompiler->executeSql($this->chunkedFetch);
+        $klassInfo = $sqlCompiler->klassInfo;
+        $select = $sqlCompiler->select;
 
         $selectedFields = $klassInfo['select_fields'];
-        $select = $this->queryset->query->select;
 
         $initList = [];
 
@@ -51,9 +52,9 @@ class ModelMapper extends Mapper
         /* @var $modelClass Model */
         $modelClass = ArrayHelper::getValue($klassInfo, 'model');
         $mapped = [];
-        $relatedPopulators = static::getRelatedMapper($klassInfo, $select, $this->queryset->connection);
+        $relatedPopulators = static::getRelatedMapper($klassInfo, $select, $connection);
 
-        foreach ($results as $result) :
+        foreach ($sqlCompiler->getResultsIterator($resultsStatement) as $result) :
 
             $vals = array_slice($result, $modelFieldsStart, $modelFieldsEnd);
 

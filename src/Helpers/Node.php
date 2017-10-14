@@ -8,7 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Helpers;
+
+use Doctrine\Common\Collections\ArrayCollection;
 
 class Node implements \Countable
 {
@@ -26,7 +29,7 @@ class Node implements \Countable
      */
     public function __construct($children = [], $connector = null, $negated = false)
     {
-        $this->children = is_null($children) ? [] : $children;
+        $this->children = empty($children) ? new ArrayCollection() : $children;
         $this->connector = is_null($connector) ? $this->defaultConnector : $connector;
         $this->negated = $negated;
     }
@@ -38,25 +41,30 @@ class Node implements \Countable
 
     public function add($node, $connectorType, $squash = true)
     {
-        if (array_search($node, $this->children)):
+        if ($this->children->contains($node)):
             return $node;
         endif;
         if (!$squash):
-            $this->children[] = $node;
+            $this->children->add($node);
 
             return $node;
         endif;
 
         if ($connectorType == $this->connector):
 
-            if ($node instanceof self && !$node->isNegated() &&
+            if ($node instanceof Node && !$node->isNegated() &&
                 ($connectorType == $node->connector || count($node) == 1)
             ):
-                $this->children = array_merge($this->getChildren(), $node->getChildren());
+                $children = array_merge($node->getChildren()->toArray(), $this->getChildren()->toArray());
+                $this->children = new ArrayCollection();
+                foreach ($children as $child) :
+                    $this->children->add($child);
+                endforeach;
+
 
                 return $this;
             else:
-                $this->children[] = $node;
+                $this->children->add($node);
 
                 return $node;
             endif;
@@ -75,7 +83,7 @@ class Node implements \Countable
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection
      */
     public function getChildren()
     {

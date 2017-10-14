@@ -10,11 +10,13 @@
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
+use Eddmash\PowerOrm\Model\Query\Compiler\SqlCovertableinterface;
 use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 
-class WhereNode extends Node
+class WhereNode extends Node implements SqlCovertableinterface, CloneInterface
 {
     protected $defaultConnector = AND_CONNECTOR;
 
@@ -56,15 +58,13 @@ class WhereNode extends Node
     public function deepClone()
     {
         $obj = new self();
-//        foreach ($this->conditions as $conditionInfo) :$whereSql
-//            list($conector, $condition) = $conditionInfo;
-//            if (method_exists($condition, 'deepClone')) :
-//                $obj->setConditions($conector, $condition->deepClone());
-//            else:
-//                $obj->setConditions($conector, $condition);
-//            endif;
-//        endforeach;
-
+        $obj->defaultConnector = $this->defaultConnector;
+        foreach ($this->getChildren() as $child) :
+            if($child instanceof CloneInterface):
+                $child = $child->deepClone();
+            endif;
+            $obj->getChildren()->add($child);
+        endforeach;
         return $obj;
     }
 }

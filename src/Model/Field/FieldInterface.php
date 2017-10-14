@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\ContributorInterface;
 use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Model\Model;
@@ -23,7 +24,7 @@ use Eddmash\PowerOrm\Model\Model;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-interface FieldInterface extends DeConstructableInterface, ContributorInterface
+interface FieldInterface extends DeConstructableInterface, ContributorInterface, CloneInterface
 {
     /**
      * Returns the database column data type for the Field, taking into account the connection.

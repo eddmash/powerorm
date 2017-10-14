@@ -74,9 +74,9 @@ class M2OManager extends BaseM2OManager
     public function getQueryset()
     {
         /** @var $qs Queryset */
-        $qs = parent::getQueryset()->filter($this->filters);
+        $qs = parent::getQueryset();
 
-        return $qs;
+        return $qs->filter($this->filters);
     }
 
 }

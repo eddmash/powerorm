@@ -20,13 +20,18 @@ class Mapper
     protected $queryset;
 
     protected $columnInfoCache = [];
+    /**
+     * @var bool
+     */
+    protected $chunkedFetch;
 
     /**
      * Mapper constructor.
      */
-    public function __construct(Queryset $queryset)
+    public function __construct(Queryset $queryset, $chunkedFetch=false)
     {
         $this->queryset = $queryset;
+        $this->chunkedFetch = $chunkedFetch;
     }
 
 }

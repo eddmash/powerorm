@@ -97,9 +97,9 @@ class Queryset implements QuerysetInterface
 
     /**
      * @param Connection $connection
-     * @param Model      $model
-     * @param Query      $query
-     * @param array      $kwargs
+     * @param Model $model
+     * @param Query $query
+     * @param array $kwargs
      *
      * @return self
      *
@@ -139,7 +139,6 @@ class Queryset implements QuerysetInterface
         $queryset = $this->_filterOrExclude(false, func_get_args());
 
         $resultCount = count($queryset);
-
         if ($resultCount == 1):
             return $queryset->getResults()[0];
         elseif (!$resultCount):
@@ -230,6 +229,24 @@ class Queryset implements QuerysetInterface
         return $clone;
     }
 
+    /**
+     * Returns a new QuerySet instance with the ordering changed.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @param array $fieldNames
+     * @return Queryset
+     */
+    public function orderBy($fieldNames = array())
+    {
+        assert($this->query->isFilterable(), "Cannot reorder a query once a slice has been taken.");
+        $clone = $this->_clone();
+        $clone->query->clearOrdering(false);
+        $clone->query->addOrdering($fieldNames);
+        return $clone;
+    }
+
     public function aggregate($kwargs = [])
     {
         //todo accept non associative items
@@ -289,7 +306,8 @@ class Queryset implements QuerysetInterface
 
     public function exclude()
     {
-        return $this->_filterOrExclude(true, func_get_args());
+        return $this->_filterOrExclude(true,
+            static::formatFilterConditions(__METHOD__, func_get_args()));
     }
 
     public function exists()
@@ -297,10 +315,10 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-            return (bool) $instance->query->execute($this->connection)->fetch();
+            return (bool)$instance->query->execute($this->connection)->fetch();
         endif;
 
-        return (bool) $this->_resultsCache;
+        return (bool)$this->_resultsCache;
     }
 
     public function limit($start, $end)
@@ -356,7 +374,7 @@ class Queryset implements QuerysetInterface
         return $field->prepareValueBeforeSave($value, $this->connection);
     }
 
-    public function _filterOrExclude($negate, $conditions)
+    protected function _filterOrExclude($negate, $conditions)
     {
         $instance = $this->_clone();
 
@@ -435,7 +453,7 @@ class Queryset implements QuerysetInterface
     {
         $instance = $this->_clone();
 
-        list($sql, $params) = $instance->query->asSql($this->connection);
+        list($sql, $params) = $instance->query->getSqlCompiler($this->connection)->asSql($this->connection);
 
         $sql = str_replace('?', '%s', $sql);
 
@@ -452,7 +470,6 @@ class Queryset implements QuerysetInterface
     public function getResults()
     {
         if (false === $this->_evaluated):
-
             $this->_resultsCache = call_user_func($this->getMapper());
 
             $this->_evaluated = true;
@@ -496,12 +513,6 @@ class Queryset implements QuerysetInterface
         return $clone;
     }
 
-    private function addConditions($negate, $conditions)
-    {
-        foreach ($conditions as $condition) :
-            $this->query->addConditions($condition, $negate);
-        endforeach;
-    }
 
     /**
      * @return Query

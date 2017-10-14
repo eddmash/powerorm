@@ -9,38 +9,27 @@ namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\EmptyResultSet;
+use Eddmash\PowerOrm\Model\Query\Compiler\SQLAggregateCompiler;
 
 class AggregateQuery extends Query
 {
+
     public $subQuery;
     public $subQueryParams;
 
     public function addSubQuery(Query $query, Connection $connection)
     {
-        list($this->subQuery, $this->subQueryParams) = $query->asSql($connection, true);
+        $query->isSubQuery = true;
+        list($this->subQuery, $this->subQueryParams) = $query->getSqlCompiler($connection)->asSql($connection);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
-    public function asSql(Connection $connection, $isSubQuery = false)
+    public function getSqlCompiler(Connection $connection)
     {
-        if (is_null($this->isSubQuery)):
-            throw new EmptyResultSet();
-        endif;
-        $sql = $params = [];
-
-        foreach ($this->annotations as $annotation) {
-            list($annSql, $annParam) = $annotation->asSql($connection);
-            $sql[] = $annSql;
-            $params = array_merge($params, $annParam);
-        }
-        $sql = implode(', ', $sql);
-
-        $sql = sprintf('SELECT %s FROM (%s) subquery', $sql, $this->subQuery);
-        $params = array_merge($params, $this->subQueryParams);
-
-        return [$sql, $params];
+        return SQLAggregateCompiler::class;
     }
+
 
 }

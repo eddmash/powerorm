@@ -10,6 +10,7 @@ namespace Eddmash\PowerOrm\Model\Lookup;
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Compiler\SqlCovertableinterface;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
 /**
@@ -19,7 +20,7 @@ use Eddmash\PowerOrm\Model\Query\Expression\Col;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class BaseLookup implements LookupInterface
+class BaseLookup implements LookupInterface, SqlCovertableinterface
 {
     const AND_CONNECTOR = 'and';
     const OR_CONNECTOR = 'or';

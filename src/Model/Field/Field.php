@@ -45,6 +45,12 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
     const BLANK_CHOICE_DASH = ['' => '---------'];
 
+    /**
+     * The model to which this field belongs to.
+     *
+     * @var Model
+     */
+    public $scopeModel;
     protected $name;
 
     /**
@@ -216,12 +222,6 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      */
     public $concrete;
 
-    /**
-     * The model to which this field belongs to.
-     *
-     * @var Model
-     */
-    public $scopeModel;
 
     /**
      * If True, the field is allowed to be blank on form. Default is False.
@@ -776,6 +776,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     {
         $meta = parent::__debugInfo();
         $meta['scopeModel'] = $this->scopeModel->meta->getNamespacedModelName();
+
 
         return $meta;
     }

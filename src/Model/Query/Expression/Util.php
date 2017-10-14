@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
 
 const AND_CONNECTOR = 'AND';
 const OR_CONNECTOR = 'OR';
+const ORDER_PATTERN = '/\?|[-+]?[.\w]+$/';
 
 /**
  * @return Count

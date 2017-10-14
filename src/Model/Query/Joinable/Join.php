@@ -124,4 +124,17 @@ class Join extends BaseJoin
 
         return $join;
     }
+
+
+    public function equal($item)
+    {
+        if($item instanceof static):
+            return (
+                $this->tableName == $item->tableName &&
+                $this->parentAlias == $item->parentAlias &&
+                $this->joinField->deconstruct()===$item->joinField->deconstruct()
+            );
+        endif;
+        return false;
+    }
 }

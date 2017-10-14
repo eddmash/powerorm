@@ -15,8 +15,9 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Query\Compiler\SqlCovertableinterface;
 
-class BaseExpression extends Combinable implements ResolvableExpInterface
+class BaseExpression extends Combinable implements ResolvableExpInterface, SortableInterface, SqlCovertableinterface
 {
     /**
      * @var Field
@@ -56,6 +57,7 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
     {
         return assert(count($expression) == 0, 'Setting empty expression');
     }
+
     /**
      * Ensure $expressions is converted into an instances of BaseExpression i.e if we get a string like "age" convert
      * to new F() object or if we get somethin else convert to a new Value() expression.
@@ -215,4 +217,39 @@ class BaseExpression extends Combinable implements ResolvableExpInterface
         ];
     }
 
+    /**
+     * how to Sort this expression in descending order
+     * @return mixed
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function descendingOrder($kwargs=[])
+    {
+        return new OrderBy($this, false, $kwargs);
+    }
+
+    /**
+     * how to Sort expression in ascending order
+     * @return mixed
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function ascendingOrder($kwargs=[])
+    {
+        return new OrderBy($this, true, $kwargs);
+    }
+
+    /**
+     * how to do reverse the current sorting order
+     * @return mixed
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function reverseOrdering()
+    {
+        return $this;
+    }
 }

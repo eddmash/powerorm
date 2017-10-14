@@ -15,9 +15,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseObject;
+use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\KeyError;
+use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\Node;
@@ -31,21 +33,30 @@ use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Aggregates\BaseAggregate;
+use Eddmash\PowerOrm\Model\Query\Compiler\SqlCompiler;
+use Eddmash\PowerOrm\Model\Query\Compiler\SqlFetchBaseCompiler;
 use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 use Eddmash\PowerOrm\Model\Query\Expression\ExpResolverInterface;
+use const Eddmash\PowerOrm\Model\Query\Expression\ORDER_PATTERN;
+use Eddmash\PowerOrm\Model\Query\Expression\OrderBy;
 use Eddmash\PowerOrm\Model\Query\Expression\ResolvableExpInterface;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
 use Eddmash\PowerOrm\Model\Query\Joinable\Join;
 use Eddmash\PowerOrm\Model\Query\Joinable\WhereNode;
 use function Eddmash\PowerOrm\Model\Query\Expression\count_;
+use Faker\Provider\bn_BD\Utils;
 
 const INNER = 'INNER JOIN';
 const LOUTER = 'LEFT OUTER JOIN';
+const ORDER_DIR = [
+    'ASC' => ['ASC', 'DESC'],
+    'DESC' => ['DESC', 'ASC'],
+];
 
-class Query extends BaseObject implements ExpResolverInterface
+class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 {
     //[
     //  BaseLookup::AND_CONNECTOR => [],
@@ -58,7 +69,7 @@ class Query extends BaseObject implements ExpResolverInterface
     public $where;
     public $tablesAlias = [];
     public $tableAliasMap = [];
-    public $selectRelected = false;
+    public $selectRelected = [];
     /**
      * @var BaseJoin[]
      */
@@ -70,7 +81,7 @@ class Query extends BaseObject implements ExpResolverInterface
      */
     public $select = [];
     public $valueSelect = [];
-    public $klassInfo;
+
     public $isSubQuery = false;
 
     /**
@@ -91,14 +102,21 @@ class Query extends BaseObject implements ExpResolverInterface
     public $annotations = [];
     public $distict;
     public $distictFields = [];
-    public $orderBy;
-    public $defaultOrdering = [];
+    public $orderBy = [];
+    public $defaultOrdering = true;
 
     // Arbitrary limit for select_related to prevents infinite recursion.
     public $maxDepth = 5;
     public $columnInfoCache;
     public $usedTableAlias = [];
     public $groupBy;
+
+    /**
+     * @var bool Dictates if the order by is done in the asc or desc manner,
+     * true indicates the asc manner
+     *
+     */
+    public $standardOrdering = true;
     /**
      * @var string
      */
@@ -107,13 +125,14 @@ class Query extends BaseObject implements ExpResolverInterface
     /**
      * Query constructor.
      *
-     * @param Model     $model
+     * @param Model $model
      * @param WhereNode $whereClass
      *
      * @internal param string $where
      */
     public function __construct(Model $model, $whereClass = WhereNode::class)
     {
+        $this->selectRelected = false;
         $this->model = $model;
         $this->where = $whereClass::createObject();
         $this->whereClass = $whereClass;
@@ -124,82 +143,14 @@ class Query extends BaseObject implements ExpResolverInterface
         return new self($model);
     }
 
-    private function preSqlSetup()
+    public static function getOrderDirection($orderName, $defaultOrder = "ASC")
     {
-        if (!$this->tablesAlias):
-            $this->getInitialAlias();
+        $order = ORDER_DIR["ASC"];
+
+        if (StringHelper::startsWith($orderName, "-")):
+            return [str_replace("-", "", $orderName), $order[1]];
         endif;
-
-        list($select, $klassInfo) = $this->getSelect();
-        $this->select = $select;
-        $this->klassInfo = $klassInfo;
-    }
-
-    /**
-     * Creates the SQL for this query. Returns the SQL string and list of parameters.
-     *
-     * @param Connection $connection
-     * @param bool       $isSubQuery
-     *
-     * @return array
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function asSql(Connection $connection, $isSubQuery = false)
-    {
-        $this->isSubQuery = $isSubQuery;
-        $this->preSqlSetup();
-        $params = [];
-        list($fromClause, $fromParams) = $this->getFrom($connection);
-
-        $results = ['SELECT'];
-
-        // todo DISTINCT
-
-        $cols = [];
-
-        /* @var $col Col */
-        foreach ($this->select as $colInfo) :
-            list($col, $alias) = $colInfo;
-
-            list($colSql, $colParams) = $col->asSql($connection);
-            if ($alias):
-                $cols[] = sprintf('%s AS %s', $colSql, $alias);
-            else:
-                $cols[] = $colSql;
-            endif;
-            $params = array_merge($params, $colParams);
-        endforeach;
-
-        $results[] = implode(', ', $cols);
-
-        $results[] = 'FROM';
-
-        $results = array_merge($results, $fromClause);
-        $params = array_merge($params, $fromParams);
-
-        if ($this->where):
-            list($sql, $whereParams) = $this->where->asSql($connection);
-            if ($sql) :
-                $results[] = 'WHERE';
-                $results[] = $sql;
-                $params = array_merge($params, $whereParams);
-            endif;
-        endif;
-
-        if ($this->limit) :
-            $results[] = 'LIMIT';
-            $results[] = $this->limit;
-        endif;
-
-        if ($this->offset) :
-            $results[] = 'OFFSET';
-            $results[] = $this->offset;
-        endif;
-
-        return [implode(' ', $results), $params];
+        return [$orderName, $order[0]];
     }
 
     public function getNestedSql(Connection $connection)
@@ -217,7 +168,7 @@ class Query extends BaseObject implements ExpResolverInterface
     public function addFields($fieldNames, $allowM2M = true)
     {
         $alias = $this->getInitialAlias();
-        $meta = $this->model->meta;
+        $meta = $this->getMeta();
 
         foreach ($fieldNames as $fieldName) :
             $names = StringHelper::split(BaseLookup::$lookupPattern, $fieldName);
@@ -241,341 +192,6 @@ class Query extends BaseObject implements ExpResolverInterface
     }
 
     /**
-     * @return array
-     */
-    public function getSelect()
-    {
-
-        $klassInfo = [];
-        $select = [];
-        $annotations = [];
-        //keeps track of what position the column is at helpful because of we perform a join we might a column name
-        // thats repeated a cross multiple tables, we can use the colmn names to map back to model since it will cause
-        // issues
-        $selectIDX = 0;
-        if ($this->useDefaultCols):
-            $selectList = [];
-            /* @var $field Field */
-            foreach ($this->getDefaultCols() as $col) :
-                $alias = false;
-                $select[] = [$col, $alias];
-                $selectList[] = $selectIDX;
-                $selectIDX += 1;
-            endforeach;
-            $klassInfo['model'] = $this->model;
-            $klassInfo['select_fields'] = $selectList;
-        endif;
-
-        // this are used when return the result as array so they are not populated to any model
-        foreach ($this->select as $col) :
-            $alias = false;
-            $select[] = [$col, $alias];
-            $selectIDX += 1;
-        endforeach;
-
-        // handle annotations
-        foreach ($this->annotations as $alias => $annotation) :
-            $annotations[$alias] = $selectIDX;
-            $select[] = [$annotation, $alias];
-            $selectIDX += 1;
-        endforeach;
-
-        // handle select related
-
-        if ($this->selectRelected):
-            $klassInfo['related_klass_infos'] = $this->getRelatedSelections($select);
-            $this->getSelectFromParent($klassInfo);
-        endif;
-
-        return [$select, $klassInfo, $annotations];
-    }
-
-    /**
-     * Used to get information needed when we are doing selectRelated(),.
-     *
-     * @param $select
-     * @param Meta|null $meta       the from which we expect to find the related fields
-     * @param null      $rootAlias
-     * @param int       $curDepth
-     * @param null      $requested  the set of fields to use in selectRelated
-     * @param null      $restricted true when we are to use just a set of relationship fields
-     *
-     * @return array
-     *
-     * @throws FieldError
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function getRelatedSelections(&$select, Meta $meta = null,
-                                          $rootAlias = null,
-                                          $curDepth = 1,
-                                          $requested = null,
-                                          $restricted = null)
-    {
-        $relatedKlassInfo = [];
-
-        if (!$restricted && $this->maxDepth && $curDepth > $this->maxDepth):
-            //We've recursed far enough; bail out.
-            return $relatedKlassInfo;
-        endif;
-        $foundFields = [];
-        if (is_null($meta)):
-            $meta = $this->model->meta;
-            $rootAlias = $this->getInitialAlias();
-        endif;
-
-        if (is_null($requested)):
-            if (is_array($this->selectRelected)):
-                $requested = $this->selectRelected;
-                $restricted = true;
-            else:
-                $restricted = false;
-            endif;
-        endif;
-
-        foreach ($meta->getNonM2MForwardFields() as $field) :
-            $fieldModel = $field->scopeModel->meta->concreteModel;
-            $foundFields[] = $field->getName();
-
-            if ($restricted):
-                // first ensure the requested fields are relational
-                // and that we are not trying to use a non-relational field
-                // we are getting the next field in the spanning relationship i.e author__user so we are getting user.
-                // if not a spanning relationship we return an empty array.
-                $nextSpanField = ArrayHelper::getValue($requested, $field->getName(), []);
-                if (!$field->isRelation):
-
-                    if ($nextSpanField || in_array($field->getName(), $requested)):
-                        throw new FieldError(
-                            sprintf("Non-relational field given in selectRelated: '%s'. ".
-                                'Choices are: %s', $field->getName(), implode(', ', $this->getFieldChoices())));
-
-                    endif;
-                endif;
-            else:
-                $nextSpanField = false;
-            endif;
-
-            if (!$this->selectRelatedDescend($field, $restricted, $requested)):
-                continue;
-            endif;
-            $klassInfo = [
-                'model' => $field->relation->getToModel(),
-                'field' => $field,
-                'reverse' => false,
-                'from_parent' => false,
-            ];
-
-            list($_, $_, $joinList, $_) = $this->setupJoins([$field->getName()], $meta, $rootAlias);
-            $alias = end($joinList);
-            $columns = $this->getDefaultCols($alias, $field->relation->getToModel()->meta);
-            $selectFields = [];
-            foreach ($columns as $column) :
-                $selectFields[] = count($select);
-                $select[] = [$column, false];
-            endforeach;
-            $klassInfo['select_fields'] = $selectFields;
-
-            // now go the next field in the spanning relationship i.e. if we have author__user, we just did author
-            // so no we do user and so in
-            $nextKlassInfo = $this->getRelatedSelections(
-                $select,
-                $field->relation->getToModel()->meta,
-                $alias,
-                $curDepth + 1,
-                $nextSpanField,
-                $restricted
-            );
-            $klassInfo['related_klass_infos'] = $nextKlassInfo;
-            $relatedKlassInfo[] = $klassInfo;
-
-        endforeach;
-
-        if ($restricted):
-
-            $reverseFields = [];
-            // we follow back relationship that represent single valuse this most will be relation field that are
-            // unique e.g. OneToOneField or ForeignKey with unique set to true.
-            // this meas we don't consider m2m fields even if they are unique
-
-            foreach ($meta->getReverseRelatedObjects() as $field) :
-
-                if ($field->unique && !$field->manyToMany):
-                    $model = $field->relation->getFromModel();
-                    $reverseFields[] = [$field, $model];
-                endif;
-            endforeach;
-
-            /* @var $rField RelatedField */
-            /* @var $rModel Model */
-            foreach ($reverseFields as $reverseField) :
-                $rField = $reverseField[0];
-                $rModel = $reverseField[1];
-
-                if (!$this->selectRelatedDescend($rField, $restricted, $requested, true)):
-                    continue;
-                endif;
-                $relatedFieldName = $rField->getRelatedQueryName();
-
-                $foundFields[] = $relatedFieldName;
-
-                list($_, $_, $joinList, $_) = $this->setupJoins([$relatedFieldName], $meta, $rootAlias);
-                $alias = end($joinList);
-                $fromParent = false;
-                if (
-                    is_subclass_of($rModel, $meta->getNamespacedModelName()) &&
-                    $rModel->meta->getNamespacedModelName() === $meta->getNamespacedModelName()
-                ):
-                    $fromParent = true;
-                endif;
-
-                $rKlassInfo = [
-                    'model' => $rModel,
-                    'field' => $rField,
-                    'reverse' => true,
-                    'from_parent' => $fromParent,
-                ];
-
-                $rColumns = $this->getDefaultCols($alias, $rModel->meta, $this->model);
-
-                $rSelectFields = [];
-                foreach ($rColumns as $column) :
-                    $selectFields[] = count($select);
-                    $select[] = [$column, false];
-                endforeach;
-                $rKlassInfo['select_fields'] = $rSelectFields;
-
-                $rNextSpanField = ArrayHelper::getValue($requested, $rField->getRelatedQueryName(), []);
-
-                $rNextKlassInfo = $this->getRelatedSelections(
-                    $select,
-                    $rModel->meta,
-                    $alias,
-                    $curDepth + 1,
-                    $rNextSpanField,
-                    $restricted
-                );
-                $rKlassInfo['related_klass_infos'] = $rNextKlassInfo;
-
-                $relatedKlassInfo[] = $rKlassInfo;
-            endforeach;
-
-            $fieldsNotFound = array_diff(array_keys($requested), $foundFields);
-
-            if ($fieldsNotFound):
-                throw new FieldError(
-                    sprintf('Invalid field name(s) given in select_related: %s. Choices are: %s',
-                        implode(', ', $fieldsNotFound), implode(', ', $this->getFieldChoices())));
-
-            endif;
-        endif;
-
-        return $relatedKlassInfo;
-    }
-
-    /**
-     * For each related klass, if the klass extends the model whose info we get, we need to add the models class to
-     * the select_fields of the related class.
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function getSelectFromParent(&$klassInfo)
-    {
-        foreach ($klassInfo['related_klass_infos'] as &$relatedKlassInfo) :
-            // get fields from parent and add them to the related class.
-            if ($relatedKlassInfo['from_parent']):
-
-                $relatedKlassInfo['select_fields'] = array_merge(
-                    $klassInfo['select_fields'],
-                    $relatedKlassInfo['select_fields']
-                );
-            endif;
-
-            // do the same for the related class fields incase it has own children.
-            $this->getSelectFromParent($relatedKlassInfo);
-        endforeach;
-    }
-
-    /**     *
-     * Returns the fields in the current models/those represented by the alias as Col expression, which know how to be
-     * used in a query.
-     *
-     * @param null       $startAlias
-     * @param Meta|null  $meta
-     * @param Model|null $fromParent
-     *
-     * @return Col[]
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function getDefaultCols($startAlias = null, Meta $meta = null, $fromParent = null)
-    {
-
-        $fields = [];
-        if (is_null($meta)):
-            $meta = $this->model->meta;
-        endif;
-        if (is_null($startAlias)):
-            $startAlias = $this->getInitialAlias();
-        endif;
-
-        foreach ($meta->getConcreteFields() as $field) :
-            $model = $field->scopeModel->meta->concreteModel;
-            if ($meta->getNamespacedModelName() == $model->meta->getNamespacedModelName()):
-                $model = null;
-            endif;
-            if ($fromParent && !is_null($model) &&
-                is_subclass_of($fromParent->meta->concreteModel,
-                    $model->meta->concreteModel->meta->getNamespacedModelName())
-            ):
-                // Avoid loading data for already loaded parents.
-                // We end up here in the case selectRelated() resolution
-                // proceeds from parent model to child model. In that case the
-                // parent model data is already present in the SELECT clause,
-                // and we want to avoid reloading the same data again.
-                continue;
-            endif;
-            //todo if we ever do defer
-            $fields[] = $field->getColExpression($startAlias);
-        endforeach;
-
-        return $fields;
-    }
-
-    public function getFrom(Connection $connection)
-    {
-        $result = [];
-        $params = [];
-
-        $refCount = $this->aliasRefCount;
-
-        foreach ($this->tablesAlias as $alias) :
-            if (!ArrayHelper::getValue($refCount, $alias)):
-                continue;
-            endif;
-            try {
-
-                /** @var $from BaseJoin */
-                $from = ArrayHelper::getValue($this->tableAliasMap, $alias, ArrayHelper::STRICT);
-
-                list($fromSql, $fromParams) = $from->asSql($connection);
-                array_push($result, $fromSql);
-                $params = array_merge($params, $fromParams);
-            } catch (KeyError $e) {
-                continue;
-            }
-        endforeach;
-
-        return [$result, []];
-    }
-
-    /**
      * @return WhereNode
      */
     public function getWhere()
@@ -596,7 +212,7 @@ class Query extends BaseObject implements ExpResolverInterface
      */
     private function buildCondition($lookup, $lhs, $rhs)
     {
-        $lookup = (array) $lookup;
+        $lookup = (array)$lookup;
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
         $lookup = $lookup::createObject($lhs, $rhs);
@@ -626,7 +242,7 @@ class Query extends BaseObject implements ExpResolverInterface
         //todo joins
         $whereClass = ($this->whereClass);
         $clause = $whereClass::createObject();
-        $meta = $this->model->meta;
+        $meta = $this->getMeta();
         $alias = $this->getInitialAlias();
 
         list($field, $targets, $joinList, $paths) = $this->setupJoins(
@@ -727,17 +343,85 @@ class Query extends BaseObject implements ExpResolverInterface
     {
     }
 
-    private function checkRelatedObjects(Field $field, $value, Meta $meta)
+    /**
+     * Adds items from the 'ordering' sequence to the query's "order by" clause. These items are either
+     * field names (not column names) -- possibly with a direction prefix ('-' or '?') -- or OrderBy
+     * expressions.
+     *
+     * If 'ordering' is empty, all ordering is cleared from the query.
+     *
+     * @param $fieldNames
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function addOrdering($fieldNames = [])
     {
-        //todo
+        $errors = [];
+
+        foreach ($fieldNames as $fieldName) :
+            if (!$fieldName instanceof ResolvableExpInterface &&
+                !preg_match(ORDER_PATTERN, $fieldName)
+            ):
+                $errors[] = $fieldName;
+            endif;
+
+            if (property_exists($fieldName, "containsAggregate")):
+                throw new FieldError(
+                    sprintf('Using an aggregate in order_by() without also including ' .
+                        'it in annotate() is not allowed: %s', $fieldName)
+                );
+            endif;
+        endforeach;
+
+        if ($errors):
+            throw new FieldError(sprintf('Invalid order_by arguments: %s', json_encode($errors)));
+        endif;
+
+        if ($fieldNames):
+            $this->orderBy = array_merge($this->orderBy, $fieldNames);
+        else:
+            $this->defaultOrdering = false;
+        endif;
     }
+
+    public function getMeta()
+    {
+        return $this->model->meta;
+    }
+
+    /**
+     * @param Connection $connection
+     * @return SqlFetchBaseCompiler
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getSqlCompiler(Connection $connection)
+    {
+        $compiler = $this->getCompilerClass();
+        return new $compiler($this, $connection);
+    }
+
+    /**
+     * Return the class to use when compiling this query into an sql string.
+     * @return string
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    protected function getCompilerClass()
+    {
+        return SqlFetchBaseCompiler::class;
+    }
+
 
     private function solveLookupType($name)
     {
         // get lookupand field
         $split_names = StringHelper::split(BaseLookup::$lookupPattern, $name);
 
-        $paths = $this->getNamesPath($split_names, $this->model->meta);
+        $paths = $this->getNamesPath($split_names, $this->getMeta());
         $lookup = $paths['others'];
 
         $fieldParts = [];
@@ -756,7 +440,7 @@ class Query extends BaseObject implements ExpResolverInterface
                     sprintf(
                         'Invalid lookup "%s" for model %s".',
                         $name,
-                        $this->model->meta->getNamespacedModelName()
+                        $this->getMeta()->getNamespacedModelName()
                     )
                 );
             endif;
@@ -873,32 +557,6 @@ class Query extends BaseObject implements ExpResolverInterface
         ];
     }
 
-    /**
-     * Determines the where clause connector to use.
-     *
-     * @param $name
-     *
-     * @return array
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function getConnector($name)
-    {
-        $connector = BaseLookup::AND_CONNECTOR;
-
-        // get the actual key
-        if (preg_match(BaseLookup::$whereConcatPattern, $name)):
-            // determine how to combine where statements
-            list($lookup, $name) = preg_split(BaseLookup::$whereConcatPattern,
-                $name, -1, PREG_SPLIT_DELIM_CAPTURE);
-
-            $connector = BaseLookup::OR_CONNECTOR;
-        endif;
-
-        return [$connector, $name];
-    }
 
     public function setLimit($offset, $limit)
     {
@@ -912,14 +570,26 @@ class Query extends BaseObject implements ExpResolverInterface
             // get the first one
             $alias = $this->tablesAlias[0];
         else:
-            $alias = $this->join(new BaseTable($this->model->meta->dbTable, null));
+            $alias = $this->join(new BaseTable($this->getMeta()->dbTable, null));
         endif;
 
         return $alias;
     }
 
-    private function setupJoins($names, Meta $meta, $alias)
+    /**
+     * @param $names
+     * @param Meta $meta
+     * @param $alias
+     * @return array
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function setupJoins($names, Meta $meta, $alias)
     {
+        if (is_null($alias)):
+            $alias = $this->getInitialAlias();
+        endif;
         $joins = [$alias];
 
         $namesPaths = $this->getNamesPath($names, $meta, true);
@@ -947,11 +617,24 @@ class Query extends BaseObject implements ExpResolverInterface
             $joins[] = $alias;
         endforeach;
 
-        return [$namesPaths['finalField'], $namesPaths['targets'], $joins, $pathInfos];
+        return [$namesPaths['finalField'], $namesPaths['targets'], $joins, $pathInfos, $meta];
     }
 
-    public function join(BaseJoin $join, $reuse = [])
+    public function join(BaseJoin $join, $reuse = null)
     {
+        // check if we can resuse an alias
+        $resuableAliases = [];
+        foreach ($this->tableAliasMap as $key => $item) :
+            if (($reuse == null || ArrayHelper::hasKey($reuse, $key)) && $join->equal($item)):
+                $resuableAliases[] = $key;
+            endif;
+        endforeach;
+
+        if ($resuableAliases):
+            $this->aliasRefCount[$resuableAliases[0]] += 1;
+            return $resuableAliases[0];
+        endif;
+
         list($alias) = $this->getTableAlias($join->getTableName(), false);
         if ($join->getJoinType()):
             if ($this->tableAliasMap[$join->getParentAlias()]->getJoinType() === LOUTER || $join->getNullable()):
@@ -994,7 +677,7 @@ class Query extends BaseObject implements ExpResolverInterface
             if ($join->getJoinType() == LOUTER):
                 $this->tableAliasMap[$alias] = $join->demote();
                 $parent = $this->tableAliasMap[$join->getParentAlias()];
-                if($parent->getJoinType() == INNER):
+                if ($parent->getJoinType() == INNER):
                     $aliases[] = $join->getParentAlias();
                 endif;
             endif;
@@ -1017,7 +700,7 @@ class Query extends BaseObject implements ExpResolverInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function trimJoins($targets, $joinList, $path)
+    public function trimJoins($targets, $joinList, $path)
     {
         /* @var $joinField RelatedField */
         /* @var $field Field */
@@ -1076,7 +759,6 @@ class Query extends BaseObject implements ExpResolverInterface
         if (ArrayHelper::hasKey($this->tableAlias, $tableName) && false === $create):
             $alias = ArrayHelper::getValue($this->tableAlias, $tableName);
             $this->aliasRefCount[$alias] += 1;
-
             return [$alias, false];
         endif;
 
@@ -1096,13 +778,13 @@ class Query extends BaseObject implements ExpResolverInterface
 
         $annotation = $annotation->resolveExpression($this, true, null, $isSummary);
 
-        var_dump($annotation);
         $this->annotations[$alias] = $annotation;
 
     }
 
-    /**Sets up the select_related data structure so that we only select certain related models
-     * (as opposed to all models, when self.select_related=True)
+    /**
+     * Sets up the selectRelated data structure so that we only select certain related models
+     * (as opposed to all models, when $this->selectRelated=true)
      *
      * @param array $fields
      * @since 1.1.0
@@ -1171,7 +853,7 @@ class Query extends BaseObject implements ExpResolverInterface
                 // used.
                 if ($innerQuery->useDefaultCols && $hasExistingAnnotations):
                     $innerQuery->groupBy = [
-                        $this->model->meta->primaryKey->getColExpression($innerQuery->getInitialAlias()),
+                        $this->getMeta()->primaryKey->getColExpression($innerQuery->getInitialAlias()),
                     ];
                 endif;
                 $innerQuery->useDefaultCols = false;
@@ -1185,7 +867,7 @@ class Query extends BaseObject implements ExpResolverInterface
 
             if ($innerQuery->select == [] && !$innerQuery->useDefaultCols):
                 $innerQuery->select = [
-                    $this->model->meta->primaryKey->getColExpression(
+                    $this->getMeta()->primaryKey->getColExpression(
                         $innerQuery->getInitialAlias()
                     ),
                 ];
@@ -1202,7 +884,7 @@ class Query extends BaseObject implements ExpResolverInterface
         $outQuery->clearLimits();
         $outQuery->selectRelected = false;
 
-        $results = $outQuery->execute($connection)->fetch();
+        $results = $outQuery->getSqlCompiler($connection)->executeSql()->fetch();
 
         $result = [];
         foreach (array_combine(array_keys($this->annotations), array_values($results)) as $key => $item) {
@@ -1212,11 +894,12 @@ class Query extends BaseObject implements ExpResolverInterface
         return $result;
     }
 
+
     /**
-     * Removes any ordering settings. If 'force_empty' is True, there will be no
-     * ordering in the resulting query (not even the model's default).
+     * Removes any ordering settings.
      *
-     * @param bool $forceEmpty
+     * @param bool $forceEmpty If True, there will be no ordering in the resulting query (not even the model's
+     * default).
      *
      * @since 1.1.0
      *
@@ -1224,7 +907,7 @@ class Query extends BaseObject implements ExpResolverInterface
      */
     public function clearOrdering($forceEmpty = false)
     {
-        $this->orderBy = false;
+        $this->orderBy = [];
         if ($forceEmpty):
             $this->defaultOrdering = false;
         endif;
@@ -1240,6 +923,21 @@ class Query extends BaseObject implements ExpResolverInterface
     public function clearLimits()
     {
         $this->limit = $this->offset = null;
+    }
+
+    /**
+     * Returns True if adding filters to this instance is still possible.
+     *
+     * Typically, this means no limits or offsets have been put on the results.
+     *
+     * @return bool
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function isFilterable()
+    {
+        return empty($this->offset) && empty($this->limit);
     }
 
     public function getCount(Connection $connection)
@@ -1265,15 +963,18 @@ class Query extends BaseObject implements ExpResolverInterface
     {
 
         $class = (is_null($class)) ? static::class : $class;
+        /**@var $obj Query */
         $obj = new $class($this->model);
         $obj->aliasRefCount = $this->aliasRefCount;
         $obj->useDefaultCols = $this->useDefaultCols;
         $obj->tableAlias = $this->tableAlias;
         $obj->tableMap = $this->tableAliasMap;
-        $obj->tables = $this->tablesAlias;
         $obj->select = $this->select;
         $obj->selectRelected = $this->selectRelected;
+        $obj->standardOrdering = $this->standardOrdering;
         $obj->annotations = $this->annotations;
+        $obj->defaultOrdering = $this->defaultOrdering;
+        $obj->orderBy = $this->orderBy;
         $obj->offset = $this->offset;
         $obj->limit = $this->limit;
         $obj->where = $this->where->deepClone();
@@ -1281,27 +982,6 @@ class Query extends BaseObject implements ExpResolverInterface
         return $obj;
     }
 
-    /**
-     * @return \Doctrine\DBAL\Driver\Statement|int
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function execute(Connection $connection)
-    {
-        list($sql, $params) = $this->asSql($connection);
-
-        $stmt = $connection->prepare($sql);
-        foreach ($params as $index => $value) :
-            ++$index; // Columns/Parameters are 1-based, so need to start at 1 instead of zero
-            $stmt->bindValue($index, $value);
-        endforeach;
-
-        $stmt->execute();
-
-        return $stmt;
-    }
 
     public function getResultsIterator(Connection $connection)
     {
@@ -1325,17 +1005,17 @@ class Query extends BaseObject implements ExpResolverInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function getFieldChoices()
+    public function getFieldChoices()
     {
         $fields = [];
-        foreach ($this->model->meta->getFields() as $field) :
+        foreach ($this->getMeta()->getFields() as $field) :
             if (!$field->isRelation):
                 continue;
             endif;
             $fields[] = $field->getName();
         endforeach;
 
-        foreach ($this->model->meta->getReverseRelatedObjects() as $reverseRelatedObject) :
+        foreach ($this->getMeta()->getReverseRelatedObjects() as $reverseRelatedObject) :
             if ($reverseRelatedObject->relation->fromField->isUnique()):
                 $fields[] = $reverseRelatedObject->relation->fromField->getRelatedQueryName();
             endif;
@@ -1344,45 +1024,6 @@ class Query extends BaseObject implements ExpResolverInterface
         return $fields;
     }
 
-    /**
-     * Returns True if this field should be used to descend deeper for selectRelated() purposes.
-     *
-     * @param Field $field      the field to be checked
-     * @param bool  $restricted indicating if the field list has been manually restricted using a requested clause
-     * @param array $requested  The selectRelated() array
-     * @param bool  $reverse    True if we are checking a reverse select related
-     *
-     * @return bool
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function selectRelatedDescend(Field $field, $restricted, $requested, $reverse = false)
-    {
-        if (!$field->relation):
-            return false;
-        endif;
-
-        if ($field->relation->parentLink && !$reverse):
-            return false;
-        endif;
-
-        if ($restricted):
-            if ($reverse && !array_key_exists($field->getRelatedQueryName(), $requested)):
-                return false;
-            endif;
-            if (!$reverse && !array_key_exists($field->getName(), $requested)):
-                return false;
-            endif;
-        endif;
-
-        if (!$restricted && $field->isNull()):
-            return false;
-        endif;
-
-        return true;
-    }
 
     /**
      * We check if a field is nullable.
@@ -1460,7 +1101,7 @@ class Query extends BaseObject implements ExpResolverInterface
 
             list($field, $sources, $joinList, $paths) = $this->setupJoins(
                 $splitNames,
-                $this->model->meta,
+                $this->getMeta(),
                 $this->getInitialAlias()
             );
 
@@ -1484,10 +1125,11 @@ class Query extends BaseObject implements ExpResolverInterface
         endif;
 
     }
+
 }
 
 /**
- * @param Model[]        $instances
+ * @param Model[] $instances
  * @param Prefetch|array $lookups
  *
  * @since 1.1.0
@@ -1521,8 +1163,8 @@ function prefetchRelatedObjects($instances, $lookups)
             // does this lookup contain a queryset
             // this means its not a duplication but a different request just containing the same name
             if ($lookup->queryset):
-                throw new ValueError(sprintf("'%s' lookup was already seen with a different queryset. ".
-                    'You may need to adjust the ordering of your lookups.'.$lookup->prefetchTo));
+                throw new ValueError(sprintf("'%s' lookup was already seen with a different queryset. " .
+                    'You may need to adjust the ordering of your lookups.' . $lookup->prefetchTo));
             endif;
 
             // just pass this is just a duplication

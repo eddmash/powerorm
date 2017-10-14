@@ -23,9 +23,11 @@ class ArrayValueMapper extends Mapper
      */
     public function __invoke()
     {
-        $results = $this->queryset->query->execute($this->queryset->connection)->fetchAll();
+        $sqlCompiler = $this->queryset->query->getSqlCompiler($this->queryset->connection);
+        $results = $sqlCompiler->executeSql();
+
         $values = [];
-        foreach ($results as $result) :
+        foreach ($sqlCompiler->getResultsIterator($results) as $result) :
             $vals = [];
             foreach ($result as $name => $item) :
                 $vals[] = $item;

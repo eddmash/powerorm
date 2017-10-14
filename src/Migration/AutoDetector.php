@@ -1175,8 +1175,7 @@ class AutoDetector extends BaseObject
         endif;
 
         if (!$field->isNull() && !$field->hasDefault() && !$field instanceof ManyToManyField):
-            $def = MigrationQuestion::askNotNullAddition($this->asker, $modelName, $fieldName);
-
+            $def = MigrationQuestion::askNotNullAddition($this->asker, $modelName, $fieldName, $field);
             $field = $field->deepClone();
             $field->default = $def;
             $preserveDefault = false;

@@ -12,8 +12,9 @@
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Model\Query\Compiler\SqlCovertableinterface;
 
-abstract class BaseJoin
+abstract class BaseJoin implements SqlCovertableinterface
 {
     protected $tableName;
     protected $tableAlias;
@@ -102,5 +103,6 @@ abstract class BaseJoin
     }
 
     abstract public function asSql(Connection $connection);
+
 
 }

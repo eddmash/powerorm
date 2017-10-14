@@ -10,6 +10,7 @@
  */
 namespace Eddmash\PowerOrm\Model\Query;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Eddmash\PowerOrm\Helpers\Node;
 use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 use const Eddmash\PowerOrm\Model\Query\Expression\OR_CONNECTOR;
@@ -27,12 +28,12 @@ class Q extends Node
      */
     public function __construct($children = [], $connector = null, $negated = false)
     {
-        $items = [];
+        $items = new ArrayCollection();
         foreach ($children as $name => $child) :
             if ($child instanceof Node):
-                $items[] = $child;
+                $items->add($child);
             else:
-                $items[] = [$name => $child];
+                $items->add([$name => $child]);
             endif;
         endforeach;
 

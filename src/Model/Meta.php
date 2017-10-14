@@ -33,9 +33,11 @@ class Meta extends DeconstructableObject implements MetaInterface
     ];
 
     public static $DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy', 'autoCreated',
-        'defaultRelatedName', ];
+        'defaultRelatedName', "orderBy"];
+
     public $modelNamespace;
     public $defaultRelatedName;
+    protected $orderBy = [];
 
     /**
      * Th name of the model this meta holds information for.
@@ -568,5 +570,10 @@ class Meta extends DeconstructableObject implements MetaInterface
     private function modelClassInfo(Model $model)
     {
         return new \ReflectionObject($model);
+    }
+
+    public function getOrderBy()
+    {
+        return $this->orderBy;
     }
 }

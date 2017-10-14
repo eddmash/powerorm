@@ -19,7 +19,23 @@ use Eddmash\PowerOrm\Model\Model;
 
 class DateField extends Field
 {
+    /**
+     * Automatically set the field to now every time the object is saved. Useful for “last-modified”
+     * timestamps.
+     *
+     * Note that the current date is always used; it’s not just a default value that you can override.
+     *
+     * @var
+     */
     public $autoNow;
+
+    /**
+     * Automatically set the field to now when the object is first created. Useful for creation of timestamps.
+     *
+     * Note that the current date is always used; it’s not just a default value that you can override.
+     *
+     * @var
+     */
     public $autoAddNow;
 
     /**

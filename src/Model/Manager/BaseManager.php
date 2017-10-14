@@ -36,7 +36,6 @@ class BaseManager extends BaseObject implements \IteratorAggregate
      */
     public function getQueryset()
     {
-
         return Queryset::createObject(null, $this->model);
     }
 
@@ -48,8 +47,6 @@ class BaseManager extends BaseObject implements \IteratorAggregate
         if (!method_exists($this, $name)) :
             return call_user_func_array([$this->getQueryset(), $name], $arguments);
         endif;
-
-//        throw new MethodNotFoundException($name);
     }
 
     public function __toString()
