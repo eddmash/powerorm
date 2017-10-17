@@ -33,7 +33,7 @@ class ForeignKey extends RelatedField
     public $relation;
 
     /**{inheritdoc}*/
-    protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ForwardManyToOneDescriptor';
+    protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ManyToOneDescriptor';
     public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasManyField';
 
     public function __construct($kwargs)

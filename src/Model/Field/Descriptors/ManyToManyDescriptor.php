@@ -19,6 +19,7 @@ class ManyToManyDescriptor extends BaseDescriptor
 {
     /** @var RelatedField */
     protected $field;
+
     public function setValue(Model $modelInstance, $value)
     {
         $queryset = $this->getValue($modelInstance);

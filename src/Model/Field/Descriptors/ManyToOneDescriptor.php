@@ -20,7 +20,7 @@ use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
-class ForwardManyToOneDescriptor extends BaseDescriptor
+class ManyToOneDescriptor extends BaseDescriptor
 {
     /** @var RelatedField */
     protected $field;

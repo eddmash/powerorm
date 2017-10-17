@@ -6,6 +6,12 @@
 
 namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
+/**
+ * Class OneToOneRel
+ * @inheritdoc
+ * @package Eddmash\PowerOrm\Model\Field\RelatedObjects
+ * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+ */
 class OneToOneRel extends ManyToOneRel
 {
     public function __construct(array $kwargs = [])

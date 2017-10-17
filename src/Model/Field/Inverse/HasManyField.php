@@ -22,7 +22,7 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class HasManyField extends InverseField
 {
-    protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ReverseManyToOneDescriptor';
+    protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\OneToManyDescriptor';
 
     public function __construct(array $kwargs)
     {

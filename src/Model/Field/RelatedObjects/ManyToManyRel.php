@@ -10,6 +10,12 @@ use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Model\Model;
 
+/**
+ * Class ManyToManyRel
+ * @inheritdoc
+ * @package Eddmash\PowerOrm\Model\Field\RelatedObjects
+ * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+ */
 class ManyToManyRel extends ForeignObjectRel
 {
     public $multiple = true;

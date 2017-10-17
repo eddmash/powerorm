@@ -18,7 +18,7 @@ use Eddmash\PowerOrm\Model\Model;
 use Doctrine\DBAL\Connection;
 
 /**
- * THis fields are used to perform queryies in that move from the inverse side to the owning side.
+ * THis fields are used to perform queries that move from the inverse side to the owning side.
  *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */

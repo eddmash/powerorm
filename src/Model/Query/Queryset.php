@@ -93,9 +93,9 @@ class Queryset implements QuerysetInterface
 
     /**
      * @param Connection $connection
-     * @param Model      $model
-     * @param Query      $query
-     * @param array      $kwargs
+     * @param Model $model
+     * @param Query $query
+     * @param array $kwargs
      *
      * @return self
      *
@@ -108,8 +108,7 @@ class Queryset implements QuerysetInterface
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    )
-    {
+    ) {
         return new static($connection, $model, $query, $kwargs);
     }
 
@@ -190,6 +189,7 @@ class Queryset implements QuerysetInterface
     public function annotate()
     {
         $args = func_get_args();
+
         //todo
         return $this;
     }
@@ -261,10 +261,10 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-            return (bool) $instance->query->execute($this->connection)->fetch();
+            return (bool)$instance->query->execute($this->connection)->fetch();
         endif;
 
-        return (bool) $this->_resultsCache;
+        return (bool)$this->_resultsCache;
     }
 
     public function limit($start, $end)

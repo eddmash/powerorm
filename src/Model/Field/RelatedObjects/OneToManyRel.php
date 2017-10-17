@@ -10,6 +10,12 @@
 
 namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
+/**
+ * Class OneToManyRel
+ * @inheritdoc
+ * @package Eddmash\PowerOrm\Model\Field\RelatedObjects
+ * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+ */
 class OneToManyRel extends ForeignObjectRel
 {
 }

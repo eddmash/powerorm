@@ -30,6 +30,6 @@ namespace Eddmash\PowerOrm\Model\Field\Descriptors;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class ForwardOneToOneDescriptor extends ForwardManyToOneDescriptor
+class OneToOneDescriptor extends ManyToOneDescriptor
 {
 }

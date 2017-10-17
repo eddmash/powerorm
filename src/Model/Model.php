@@ -35,6 +35,7 @@ use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
+use function Eddmash\PowerOrm\Model\Query\getFieldNamesFromMeta;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
@@ -769,6 +770,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
         try {
             /** @var $field RelatedField */
+
             $field = $this->meta->getField($name);
 
             if ($field instanceof ForeignObjectRel) :
@@ -776,11 +778,14 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             endif;
 
             return $field->getValue($this);
-        } catch (\Exception $e) {
+        } catch (FieldDoesNotExist $e) {
+
             if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
                 throw new AttributeError(
-                    sprintf("AttributeError: '%s' object has no attribute '%s'",
-                        $this->meta->getNamespacedModelName(), $e->getMessage())
+                    sprintf("AttributeError: '%s' object has no attribute '%s'. choices are [ %s ]",
+                        $this->meta->getNamespacedModelName(),
+                        $name,
+                        implode(", ", getFieldNamesFromMeta($this->meta)))
                 );
             endif;
         }

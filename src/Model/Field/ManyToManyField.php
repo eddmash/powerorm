@@ -107,7 +107,6 @@ class ManyToManyField extends RelatedField
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-
         $hasMany = HasManyField::createObject(
             [
                 'to' => $this->scopeModel->meta->getNamespacedModelName(),
@@ -164,6 +163,7 @@ class ManyToManyField extends RelatedField
             $from => ForeignKey::createObject(
                 [
                     'to' => $modelName,
+                    'relatedName'=>sprintf("%s+", $className),
                     'dbConstraint' => $field->relation->dbConstraint,
                     'onDelete' => Delete::CASCADE,
                 ]
@@ -171,6 +171,7 @@ class ManyToManyField extends RelatedField
             $to => ForeignKey::createObject(
                 [
                     'to' => $toNamespacedModelName,
+                    'relatedName'=>sprintf("%s+", $className),
                     'dbConstraint' => $field->relation->dbConstraint,
                     'onDelete' => Delete::CASCADE,
                 ]
