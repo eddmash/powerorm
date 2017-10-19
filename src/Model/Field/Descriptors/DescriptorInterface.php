@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Model\Model;
  * This class enables field classes to know how to get and set there values.
  *
  * Interface DescriptorInterface
- * @package Eddmash\PowerOrm\Model\Field\Descriptors
+ *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
 interface DescriptorInterface

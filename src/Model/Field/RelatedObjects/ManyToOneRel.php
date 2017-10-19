@@ -15,7 +15,7 @@ use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Model\Field\Field;
 
 /**
- * @inheritdoc
+ * {@inheritdoc}
  *
  * @since 1.1.0
  *

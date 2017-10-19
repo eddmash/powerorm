@@ -12,10 +12,12 @@
 namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Model;
 
 class BaseDescriptor implements DescriptorInterface
 {
+    protected $reverse;
     /**
      * @var Field
      */
@@ -23,6 +25,10 @@ class BaseDescriptor implements DescriptorInterface
 
     public function __construct(Field $field)
     {
+        if ($field instanceof InverseField) :
+            $this->reverse = true;
+            $field = $field->fromField;
+        endif;
         $this->field = $field;
     }
 

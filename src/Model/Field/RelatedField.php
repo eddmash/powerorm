@@ -250,7 +250,7 @@ class RelatedField extends Field
      *
      * e.g. we add the inverse field to use to query when starting on the inverse side.
      *
-     * @param Model|string $relatedModel
+     * @param Model|string     $relatedModel
      * @param ForeignObjectRel $relation
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */

@@ -36,7 +36,7 @@ class ManyToManyDescriptor extends BaseDescriptor
      */
     public function queryset($modelInstance, $reverse = false)
     {
-        if ($reverse) :
+        if ($this->reverse) :
             $model = $this->field->getRelatedModel();
         else:
             $model = $this->field->scopeModel;
@@ -54,7 +54,7 @@ class ManyToManyDescriptor extends BaseDescriptor
                 'model' => $model,
                 'rel' => $this->field->relation,
                 'instance' => $modelInstance,
-                'reverse' => $reverse,
+                'reverse' => $this->reverse,
             ]
         );
 

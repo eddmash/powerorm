@@ -24,11 +24,13 @@ class ManyToOneDescriptor extends BaseDescriptor
 {
     /** @var RelatedField */
     protected $field;
+
     /**
      * {@inheritdoc}
      */
     public function getValue(Model $modelInstance)
     {
+        echo 'im here<br>';
         $result = null;
 
         try {
@@ -59,8 +61,11 @@ class ManyToOneDescriptor extends BaseDescriptor
 
         if (is_null($result) && $this->field->null !== false):
             throw new RelatedObjectDoesNotExist(
-                sprintf('%s has no %s.', $this->field->scopeModel->meta->getNamespacedModelName(),
-                    $this->field->getName())
+                sprintf(
+                    '%s has no %s.',
+                    $this->field->scopeModel->meta->getNamespacedModelName(),
+                    $this->field->getName()
+                )
             );
         endif;
 

@@ -331,7 +331,7 @@ class Tools
     public static function ensureParamIsArray($fields, $messg = null)
     {
         if (!is_array($fields)):
-            if(is_null($messg)):
+            if (is_null($messg)):
                 $messg = sprintf("method '%s()' expects parameters to be an array", __FUNCTION__);
             endif;
             throw new InvalidArgumentException($messg);

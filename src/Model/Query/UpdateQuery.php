@@ -50,8 +50,11 @@ class UpdateQuery extends Query
             $isDirect = (!($field->autoCreated && !$field->concrete) || !$field->concrete);
             if (!$isDirect || ($field->isRelation && $field->manyToMany)):
                 throw new  FieldError(
-                    sprintf('Cannot update model field %r (only non-relations and '.
-                        'foreign keys permitted).', $field)
+                    sprintf(
+                        'Cannot update model field %r (only non-relations and '.
+                        'foreign keys permitted).',
+                        $field
+                    )
                 );
             endif;
             if ($model->meta->getModelName() !== $this->model->meta->getModelName()):
@@ -108,7 +111,11 @@ class UpdateQuery extends Query
                     );
                 else:
                     throw new TypeError(
-                        "Tried to update field '%s' with a model instance, '%s'. Use a value compatible with '%s'.", $field->getName(), $value, get_class($field));
+                        "Tried to update field '%s' with a model instance, '%s'. Use a value compatible with '%s'.",
+                        $field->getName(),
+                        $value,
+                        get_class($field)
+                    );
 
                 endif;
 

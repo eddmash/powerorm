@@ -14,7 +14,6 @@ use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
-use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
 
 /**
@@ -318,15 +317,19 @@ class Meta extends DeconstructableObject implements MetaInterface
             // collect all relation fields for this each model
             foreach ($allModels as $name => $model) :
                 // just get the forward fields
-                $fields = $model->meta->fetchFields(['includeParents' => false,
-                    'inverse' => false,
-                    'reverse' => false, ]);
+                $fields = $model->meta->fetchFields(
+                    [
+                        'includeParents' => false,
+                        'inverse' => false,
+                        'reverse' => false,
+                    ]
+                );
 
                 foreach ($fields as $field) :
 
                     if ($field->isRelation && !empty($field->getRelatedModel())):
-                        $concreteModel =$field->relation->toModel->meta->concreteModel->meta->getNamespacedModelName();
-                        $allRelations[$concreteModel][] =$field;
+                        $concreteModel = $field->relation->toModel->meta->concreteModel->meta->getNamespacedModelName();
+                        $allRelations[$concreteModel][] = $field;
                     endif;
 
                 endforeach;
@@ -395,15 +398,14 @@ class Meta extends DeconstructableObject implements MetaInterface
         $fields = [];
         $seen_models = null;
 
-
-        /** @var $revField RelatedField */
+        /* @var $revField RelatedField */
         if ($reverse):
 
             foreach ($this->getReverseRelatedObjects() as $revField) :
                 // if we need to include hidden we add all fields
                 // otherwise always add non-hidden relationships
                 if ($includeHidden || !$revField->relation->isHidden()) :
-                    $fields[$revField->relation->getAccessorName()] = $revField->relation;
+                    $fields[$revField->relation->getName()] = $revField->relation;
                 endif;
             endforeach;
 

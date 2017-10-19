@@ -16,7 +16,6 @@ use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\TableDiff;
-use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -454,8 +453,10 @@ class SchemaEditor extends BaseObject
             );
             $tableClone->dropColumn($oldField->getColumnName());
         else:
-            $tableClone->changeColumn($oldField->getColumnName(),
-                $this->getDoctrineColumnOptions($newField, true));
+            $tableClone->changeColumn(
+                $oldField->getColumnName(),
+                $this->getDoctrineColumnOptions($newField, true)
+            );
         endif;
 
         $comparator = new Comparator();

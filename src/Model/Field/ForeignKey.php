@@ -180,8 +180,8 @@ class ForeignKey extends RelatedField
      */
     public function prepareValueBeforeSave($value, $connection)
     {
-        if(is_null($value) || $value === ''):
-           return;
+        if (is_null($value) || $value === ''):
+            return;
         endif;
 
         return $this->getRelatedField()->prepareValueBeforeSave($value, $connection, false);

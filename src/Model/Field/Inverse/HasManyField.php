@@ -11,6 +11,7 @@
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Model;
 
 /**
@@ -23,6 +24,7 @@ use Eddmash\PowerOrm\Model\Model;
 class HasManyField extends InverseField
 {
     protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\OneToManyDescriptor';
+    protected $m2mDescriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ManyToManyDescriptor';
 
     public function __construct(array $kwargs)
     {
@@ -61,5 +63,17 @@ class HasManyField extends InverseField
                 'direct' => false,
             ],
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescriptor()
+    {
+        if ($this->fromField instanceof ManyToManyField) :
+            return new $this->m2mDescriptor($this);
+        endif;
+
+        return parent::getDescriptor();
     }
 }

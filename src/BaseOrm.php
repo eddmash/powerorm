@@ -222,8 +222,11 @@ class BaseOrm extends BaseObject
             $path = realpath(self::getInstance()->modelsPath);
             if (!$path && !file_exists(self::getInstance()->modelsPath)):
                 throw new FileHandlerException(
-                    sprintf("The path '%s' does not exist please check the path is correct",
-                        self::getInstance()->modelsPath));
+                    sprintf(
+                        "The path '%s' does not exist please check the path is correct",
+                        self::getInstance()->modelsPath
+                    )
+                );
             endif;
         endif;
 
@@ -237,8 +240,11 @@ class BaseOrm extends BaseObject
             $path = realpath(self::getInstance()->migrationPath);
             if (!$path && !file_exists(self::getInstance()->migrationPath)):
                 throw new FileHandlerException(
-                    sprintf("The path '%s' does not exist please check the path is correct",
-                        self::getInstance()->migrationPath));
+                    sprintf(
+                        "The path '%s' does not exist please check the path is correct",
+                        self::getInstance()->migrationPath
+                    )
+                );
             endif;
         endif;
 

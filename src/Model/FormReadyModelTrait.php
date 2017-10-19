@@ -32,15 +32,15 @@ trait FormReadyModelTrait
     {
         $errors = [];
 
-        try{
+        try {
             $this->cleanFields($exclude);
-        }catch (ValidationError $error){
+        } catch (ValidationError $error) {
             //todo
         }
 
-        try{
+        try {
             $this->clean();
-        }catch (ValidationError $error){
+        } catch (ValidationError $error) {
             //todo
         }
         if (!empty($errors)) :
@@ -78,9 +78,9 @@ trait FormReadyModelTrait
                 continue;
             endif;
 
-            try{
+            try {
                 $this->{$field->getAttrName()} = $field->clean($this, $value);
-            }catch (ValidationError $error){
+            } catch (ValidationError $error) {
                 $errors[$field->getName()] = $error->getErrorList();
             }
         endforeach;

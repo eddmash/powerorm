@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\InvalidArgumentException;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
+use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\TypeError;
@@ -93,9 +94,9 @@ class Queryset implements QuerysetInterface
 
     /**
      * @param Connection $connection
-     * @param Model $model
-     * @param Query $query
-     * @param array $kwargs
+     * @param Model      $model
+     * @param Query      $query
+     * @param array      $kwargs
      *
      * @return self
      *
@@ -231,7 +232,7 @@ class Queryset implements QuerysetInterface
         Tools::ensureParamIsArray($fields);
 
         if ($this->_fields) :
-            throw new TypeError('Cannot call select_related() after .values() or .values_list()');
+            throw new TypeError('Cannot call selectRelated() after .values() or .asArray()');
         endif;
         $obj = $this->_clone();
 
@@ -248,7 +249,7 @@ class Queryset implements QuerysetInterface
 
     public function prefetchRelated()
     {
-
+        throw new NotImplemented(__METHOD__.' NOT IMPLEMENTED');
     }
 
     public function exclude()
@@ -261,10 +262,10 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-            return (bool)$instance->query->execute($this->connection)->fetch();
+            return (bool) $instance->query->execute($this->connection)->fetch();
         endif;
 
-        return (bool)$this->_resultsCache;
+        return (bool) $this->_resultsCache;
     }
 
     public function limit($start, $end)

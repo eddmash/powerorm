@@ -12,8 +12,8 @@ use Eddmash\PowerOrm\Model\Model;
 
 /**
  * Class ManyToManyRel
- * @inheritdoc
- * @package Eddmash\PowerOrm\Model\Field\RelatedObjects
+ * {@inheritdoc}
+ *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
 class ManyToManyRel extends ForeignObjectRel

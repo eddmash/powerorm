@@ -11,8 +11,8 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * A 64 bit integer, much like an IntegerField except that it is guaranteed to fit numbers from

@@ -60,8 +60,13 @@ class BaseExpression
      * @param bool $forSave
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function resolveExpression($query = null, $allowJoins = true, $reuse = null, $summarize = false, $forSave = false)
-    {
+    public function resolveExpression(
+        $query = null,
+        $allowJoins = true,
+        $reuse = null,
+        $summarize = false,
+        $forSave = false
+    ) {
 
     }
 

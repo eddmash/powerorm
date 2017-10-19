@@ -21,18 +21,18 @@ use Eddmash\PowerOrm\Exception\ValidationError;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\Descriptors\DescriptorInterface;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
+use Eddmash\PowerOrm\Model\Lookup\Exact;
 use Eddmash\PowerOrm\Model\Lookup\GreaterThan;
 use Eddmash\PowerOrm\Model\Lookup\GreaterThanOrEqual;
 use Eddmash\PowerOrm\Model\Lookup\IContains;
 use Eddmash\PowerOrm\Model\Lookup\IEndsWith;
-use Eddmash\PowerOrm\Model\Lookup\Exact;
 use Eddmash\PowerOrm\Model\Lookup\In;
 use Eddmash\PowerOrm\Model\Lookup\IsNull;
+use Eddmash\PowerOrm\Model\Lookup\IStartsWith;
 use Eddmash\PowerOrm\Model\Lookup\LessThan;
 use Eddmash\PowerOrm\Model\Lookup\LessThanOrEqual;
 use Eddmash\PowerOrm\Model\Lookup\Range;
 use Eddmash\PowerOrm\Model\Lookup\RegisterLookupTrait;
-use Eddmash\PowerOrm\Model\Lookup\IStartsWith;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
@@ -272,7 +272,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model $modelObject
+     * @param Model  $modelObject
      *
      * @throws FieldError
      *
@@ -562,7 +562,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool $add is whether the instance is being saved to the database for the first time
+     * @param bool  $add   is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *
@@ -602,7 +602,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      *
      * By default it returns value passed in if prepared=true and prepareValue() if is False.
      *
-     * @param mixed $value
+     * @param mixed                     $value
      * @param \Doctrine\DBAL\Connection $connection
      *
      * @return mixed

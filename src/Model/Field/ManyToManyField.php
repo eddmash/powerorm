@@ -163,7 +163,7 @@ class ManyToManyField extends RelatedField
             $from => ForeignKey::createObject(
                 [
                     'to' => $modelName,
-                    'relatedName'=>sprintf("%s+", $className),
+                    'relatedName' => sprintf('%s+', $className),
                     'dbConstraint' => $field->relation->dbConstraint,
                     'onDelete' => Delete::CASCADE,
                 ]
@@ -171,7 +171,7 @@ class ManyToManyField extends RelatedField
             $to => ForeignKey::createObject(
                 [
                     'to' => $toNamespacedModelName,
-                    'relatedName'=>sprintf("%s+", $className),
+                    'relatedName' => sprintf('%s+', $className),
                     'dbConstraint' => $field->relation->dbConstraint,
                     'onDelete' => Delete::CASCADE,
                 ]
@@ -278,7 +278,8 @@ class ManyToManyField extends RelatedField
         /** @var $field RelatedField */
         foreach ($this->relation->through->meta->getFields() as $field) :
             if ($field->isRelation &&
-                $field->relation->toModel->meta->getNamespacedModelName() == $relation->getFromModel()->meta->getNamespacedModelName() &&
+                $field->relation->toModel->meta->getNamespacedModelName() == $relation->getFromModel(
+                )->meta->getNamespacedModelName() &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
 
@@ -311,7 +312,8 @@ class ManyToManyField extends RelatedField
         /** @var $field RelatedField */
         foreach ($this->relation->through->meta->getFields() as $field) :
             if ($field->isRelation &&
-                $field->relation->toModel->meta->getNamespacedModelName() == $relation->toModel->meta->getNamespacedModelName() &&
+                $field->relation->toModel->meta->getNamespacedModelName(
+                ) == $relation->toModel->meta->getNamespacedModelName() &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
                 $this->{$cache_attr} = ($attr == 'name') ? call_user_func([$field, 'getName']) : $field->{$attr};

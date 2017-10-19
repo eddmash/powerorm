@@ -17,10 +17,10 @@ use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
 
 /**
- * This hold all the information about a relationship
+ * This hold all the information about a relationship.
  *
  * Class ForeignObjectRel
- * @package Eddmash\PowerOrm\Model\Field\RelatedObjects
+ *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
 class ForeignObjectRel extends BaseObject

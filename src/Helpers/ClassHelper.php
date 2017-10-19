@@ -12,7 +12,6 @@
 namespace Eddmash\PowerOrm\Helpers;
 
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
-use Eddmash\PowerOrm\Model\Model;
 
 /**
  * A Helper class for dealing with common class related tasks.
@@ -162,14 +161,16 @@ class ClassHelper
         return [$namespace, $name];
     }
 
-    public static function file_get_php_classes($filepath) {
+    public static function file_get_php_classes($filepath)
+    {
         $php_code = file_get_contents($filepath);
         $classes = self::get_php_classes($php_code);
 
         return $classes;
     }
 
-    public static function get_php_classes($php_code) {
+    public static function get_php_classes($php_code)
+    {
         $classes = array();
         $tokens = token_get_all($php_code);
 
@@ -229,13 +230,12 @@ class ClassHelper
             if ($getting_namespace === true) {
 
                 //If the token is a string or the namespace separator...
-                if(is_array($token) && in_array($token[0], [T_STRING, T_NS_SEPARATOR])) {
+                if (is_array($token) && in_array($token[0], [T_STRING, T_NS_SEPARATOR])) {
 
                     //Append the token's value to the name of the namespace
                     $namespace .= $token[1];
 
-                }
-                elseif ($token === ';') {
+                } elseif ($token === ';') {
 
                     //If the token is the semicolon, then we're done with the namespace declaration
                     $getting_namespace = false;
@@ -247,7 +247,7 @@ class ClassHelper
             if ($getting_class === true) {
 
                 //If the token is a string, it's the name of the class
-                if(is_array($token) && $token[0] == T_STRING) {
+                if (is_array($token) && $token[0] == T_STRING) {
 
                     //Store the token's value as the class name
                     $class = $token[1];

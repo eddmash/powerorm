@@ -11,16 +11,11 @@
 
 namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
-use Eddmash\PowerOrm\Exception\AttributeError;
-use Eddmash\PowerOrm\Exception\NotImplemented;
-use Eddmash\PowerOrm\Exception\RelatedObjectDoesNotExist;
-use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Manager\O2MManager;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
- * @inheritdoc
+ * {@inheritdoc}
  *
  * Gets related data from the one side of the relationship
  *
@@ -30,7 +25,7 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
  *  $user->car_set->all()
  *
  * Class ManyToOneDescriptor
- * @package Eddmash\PowerOrm\Model\Field\Descriptors
+ *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
 class OneToManyDescriptor extends BaseDescriptor
@@ -65,9 +60,29 @@ class OneToManyDescriptor extends BaseDescriptor
      */
     public function queryset($modelInstance, $reverse = false)
     {
+        if ($reverse) :
+            $model = $this->field->getRelatedModel();
+        else:
+            $model = $this->field->scopeModel;
+        endif;
 
+        // define BaseM2MQueryset
+        if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)):
+            $baseClass = $model::getManagerClass();
+            $class = sprintf('namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}', $baseClass);
+            eval($class);
+        endif;
 
+        $manager = O2MManager::createObject(
+            [
+                'model' => $model,
+                'rel' => $this->field->relation,
+                'instance' => $modelInstance,
+                'reverse' => true,
+            ]
+        );
 
+        return $manager;
 
     }
 }

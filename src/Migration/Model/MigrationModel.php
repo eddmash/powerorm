@@ -26,7 +26,7 @@ class MigrationModel extends Model
         $extendedClass = '';
 
         list($namespace, $className) = ClassHelper::getNamespaceNamePair($className);
-        if($namespace):
+        if ($namespace):
             $namespace = sprintf('namespace %s;', $namespace);
         endif;
         if (empty($extends) || Model::isModelBase($extends)):

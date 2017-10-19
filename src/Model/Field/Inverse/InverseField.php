@@ -10,12 +10,12 @@
 
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
+use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
-use Doctrine\DBAL\Connection;
 
 /**
  * THis fields are used to perform queries that move from the inverse side to the owning side.

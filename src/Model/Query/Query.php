@@ -299,12 +299,14 @@ class Query extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function getRelatedSelections(&$select, Meta $meta = null,
-                                          $rootAlias = null,
-                                          $curDepth = 1,
-                                          $requested = null,
-                                          $restricted = null)
-    {
+    private function getRelatedSelections(
+        &$select,
+        Meta $meta = null,
+        $rootAlias = null,
+        $curDepth = 1,
+        $requested = null,
+        $restricted = null
+    ) {
         $relatedKlassInfo = [];
 
         if (!$restricted && $this->maxDepth && $curDepth > $this->maxDepth):
@@ -340,8 +342,13 @@ class Query extends BaseObject
 
                     if ($nextSpanField || in_array($field->getName(), $requested)):
                         throw new FieldError(
-                            sprintf("Non-relational field given in selectRelated: '%s'. ".
-                                'Choices are: %s', $field->getName(), implode(', ', $this->getFieldChoices())));
+                            sprintf(
+                                "Non-relational field given in selectRelated: '%s'. ".
+                                'Choices are: %s',
+                                $field->getName(),
+                                implode(', ', $this->getFieldChoices())
+                            )
+                        );
 
                     endif;
                 endif;
@@ -457,8 +464,12 @@ class Query extends BaseObject
 
             if ($fieldsNotFound):
                 throw new FieldError(
-                    sprintf('Invalid field name(s) given in select_related: %s. Choices are: %s',
-                        implode(', ', $fieldsNotFound), implode(', ', $this->getFieldChoices())));
+                    sprintf(
+                        'Invalid field name(s) given in select_related: %s. Choices are: %s',
+                        implode(', ', $fieldsNotFound),
+                        implode(', ', $this->getFieldChoices())
+                    )
+                );
 
             endif;
         endif;
@@ -522,8 +533,10 @@ class Query extends BaseObject
                 $model = null;
             endif;
             if ($fromParent && !is_null($model) &&
-                is_subclass_of($fromParent->meta->concreteModel,
-                    $model->meta->concreteModel->meta->getNamespacedModelName())
+                is_subclass_of(
+                    $fromParent->meta->concreteModel,
+                    $model->meta->concreteModel->meta->getNamespacedModelName()
+                )
             ):
                 // Avoid loading data for already loaded parents.
                 // We end up here in the case selectRelated() resolution
@@ -1284,7 +1297,8 @@ class Query extends BaseObject
             // first use the inbuilt converters
             try {
                 $val = Type::getType(
-                    $field->dbType($connection))->convertToPHPValue($val, $connection->getDatabasePlatform());
+                    $field->dbType($connection)
+                )->convertToPHPValue($val, $connection->getDatabasePlatform());
             } catch (DBALException $exception) {
             }
 
@@ -1340,8 +1354,12 @@ function prefetchRelatedObjects($instances, $lookups)
             // does this lookup contain a queryset
             // this means its not a duplication but a different request just containing the same name
             if ($lookup->queryset):
-                throw new ValueError(sprintf("'%s' lookup was already seen with a different queryset. ".
-                    'You may need to adjust the ordering of your lookups.'.$lookup->prefetchTo));
+                throw new ValueError(
+                    sprintf(
+                        "'%s' lookup was already seen with a different queryset. ".
+                        'You may need to adjust the ordering of your lookups.'.$lookup->prefetchTo
+                    )
+                );
             endif;
 
             // just pass this is just a duplication

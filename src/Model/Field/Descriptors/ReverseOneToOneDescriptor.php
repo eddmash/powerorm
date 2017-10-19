@@ -45,9 +45,12 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
 
         if (is_null($relObj)):
             throw new RelatedObjectDoesNotExist(
-                sprintf('%s has no %s.', $modelInstance->meta->getNamespacedModelName(),
+                sprintf(
+                    '%s has no %s.',
+                    $modelInstance->meta->getNamespacedModelName(),
                     $this->field->relation->getAccessorName()
-                ));
+                )
+            );
         endif;
 
         return $relObj;
