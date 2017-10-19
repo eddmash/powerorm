@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\InvalidArgumentException;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
+use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\NotSupported;
 use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\TypeError;
@@ -112,8 +113,7 @@ class Queryset implements QuerysetInterface
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    )
-    {
+    ) {
         return new static($connection, $model, $query, $kwargs);
     }
 
@@ -284,7 +284,7 @@ class Queryset implements QuerysetInterface
         Tools::ensureParamIsArray($fields);
 
         if ($this->_fields) :
-            throw new TypeError('Cannot call select_related() after .values() or .values_list()');
+            throw new TypeError('Cannot call selectRelated() after .values() or .asArray()');
         endif;
         $obj = $this->_clone();
 
@@ -301,7 +301,7 @@ class Queryset implements QuerysetInterface
 
     public function prefetchRelated()
     {
-
+        throw new NotImplemented(__METHOD__.' NOT IMPLEMENTED');
     }
 
     public function exclude()

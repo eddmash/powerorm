@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
-
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -40,8 +39,8 @@ class OrderBy extends BaseExpression
     public function __construct(BaseExpression $expression, $descending = false, $kwargs = [])
     {
         parent::__construct(null);
-        $nullsFirst = ArrayHelper::getValue($kwargs, "nullFirst", false);
-        $nullsLast = ArrayHelper::getValue($kwargs, "nullsLast", false);
+        $nullsFirst = ArrayHelper::getValue($kwargs, 'nullFirst', false);
+        $nullsLast = ArrayHelper::getValue($kwargs, 'nullsLast', false);
         if ($nullsFirst && $nullsLast):
             throw new ValueError('nulls_first and nulls_last are mutually exclusive');
         endif;
@@ -56,7 +55,7 @@ class OrderBy extends BaseExpression
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getSourceExpressions()
     {
@@ -64,7 +63,7 @@ class OrderBy extends BaseExpression
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function setSourceExpressions($expression)
     {
@@ -83,13 +82,14 @@ class OrderBy extends BaseExpression
         list($expSql, $expParams) = $this->expression->asSql($connection);
         $params = [
             $expSql,
-            ($this->descending) ? "DESC" : "ASC"
+            ($this->descending) ? 'DESC' : 'ASC',
         ];
+
         return [vsprintf($template, $params), $expParams];
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function descendingOrder($kwargs = [])
     {
@@ -97,7 +97,7 @@ class OrderBy extends BaseExpression
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function ascendingOrder($kwargs = [])
     {
@@ -105,12 +105,11 @@ class OrderBy extends BaseExpression
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function reverseOrdering()
     {
         $this->descending = !$this->descending;
     }
-
 
 }

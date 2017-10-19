@@ -74,7 +74,7 @@ class CharField extends Field
     public function convertToPHPValue($value)
     {
         $value = parent::convertToPHPValue($value);
-        if(is_string($value) || is_null($value)):
+        if (is_string($value) || is_null($value)):
             return $value;
         endif;
 

@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\Form\Validations\SlugValidator;
@@ -18,7 +19,7 @@ class SlugField extends CharField
     {
 
         $config['maxLength'] = ArrayHelper::getValue($config, 'maxLength', 50);
-        if(!ArrayHelper::hasKey($config, 'dbIndex')):
+        if (!ArrayHelper::hasKey($config, 'dbIndex')):
             $config['dbIndex'] = true;
         endif;
 
@@ -46,7 +47,7 @@ class SlugField extends CharField
         if ($maxLength === 50) :
             unset($kwargs['maxLength']);
         endif;
-        if(!ArrayHelper::hasKey($kwargs, 'dbIndex')):
+        if (!ArrayHelper::hasKey($kwargs, 'dbIndex')):
             $config['dbIndex'] = true;
         endif;
 

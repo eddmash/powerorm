@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
 use Doctrine\DBAL\Connection;
@@ -15,6 +16,7 @@ use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Query\Compiler\SqlCovertableinterface;
 use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
+
 
 class WhereNode extends Node implements SqlCovertableinterface, CloneInterface
 {
@@ -65,6 +67,7 @@ class WhereNode extends Node implements SqlCovertableinterface, CloneInterface
             endif;
             $obj->getChildren()->add($child);
         endforeach;
+
         return $obj;
     }
 }

@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Eddmash\PowerOrm\Exception\ValueError;
@@ -50,12 +51,12 @@ class Prefetch
         $this->prefetchThrough = $lookups;
 
         // we are mapping this prefetches to models so ensure we have an Model mapper
-        if(!is_null($queryset) && !is_subclass_of($queryset->getMapper(), ModelMapper::class)):
+        if (!is_null($queryset) && !is_subclass_of($queryset->getMapper(), ModelMapper::class)):
             throw new ValueError('Prefetch querysets cannot use values().');
         endif;
         $this->queryset = $queryset;
 
-        if($toAttr):
+        if ($toAttr):
 //            $this->prefetchTo =
         endif;
         $this->toAttr = $toAttr;

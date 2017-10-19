@@ -11,14 +11,10 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
-
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Statement;
-use Eddmash\PowerOrm\Exception\EmptyResultSet;
 
 class SQLAggregateCompiler extends SqlFetchBaseCompiler
 {
-
     /**
      * {@inheritdoc}
      */
@@ -39,6 +35,5 @@ class SQLAggregateCompiler extends SqlFetchBaseCompiler
 
         return [$sql, $params];
     }
-
 
 }

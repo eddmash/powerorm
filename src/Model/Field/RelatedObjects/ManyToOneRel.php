@@ -15,7 +15,7 @@ use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Model\Field\Field;
 
 /**
- * Used by ForeignObject to store information about the relation.
+ * {@inheritdoc}
  *
  * @since 1.1.0
  *

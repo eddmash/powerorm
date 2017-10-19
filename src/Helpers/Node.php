@@ -52,7 +52,7 @@ class Node implements \Countable
 
         if ($connectorType == $this->connector):
 
-            if ($node instanceof Node && !$node->isNegated() &&
+            if ($node instanceof self && !$node->isNegated() &&
                 ($connectorType == $node->connector || count($node) == 1)
             ):
                 $children = array_merge($node->getChildren()->toArray(), $this->getChildren()->toArray());
@@ -60,7 +60,6 @@ class Node implements \Countable
                 foreach ($children as $child) :
                     $this->children->add($child);
                 endforeach;
-
 
                 return $this;
             else:

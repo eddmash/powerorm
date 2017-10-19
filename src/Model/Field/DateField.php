@@ -51,7 +51,7 @@ class DateField extends Field
      */
     public function preSave(Model $model, $add)
     {
-        if($this->autoNow || ($this->autoAddNow && $add)):
+        if ($this->autoNow || ($this->autoAddNow && $add)):
             return new DateTime('now', new \DateTimeZone(BaseOrm::getInstance()->getTimezone()));
         endif;
 

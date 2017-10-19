@@ -18,8 +18,6 @@ use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
-use Eddmash\PowerOrm\Exception\KeyError;
-use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\Node;
@@ -33,21 +31,18 @@ use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Aggregates\BaseAggregate;
-use Eddmash\PowerOrm\Model\Query\Compiler\SqlCompiler;
 use Eddmash\PowerOrm\Model\Query\Compiler\SqlFetchBaseCompiler;
-use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 use Eddmash\PowerOrm\Model\Query\Expression\ExpResolverInterface;
-use const Eddmash\PowerOrm\Model\Query\Expression\ORDER_PATTERN;
-use Eddmash\PowerOrm\Model\Query\Expression\OrderBy;
 use Eddmash\PowerOrm\Model\Query\Expression\ResolvableExpInterface;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
 use Eddmash\PowerOrm\Model\Query\Joinable\Join;
 use Eddmash\PowerOrm\Model\Query\Joinable\WhereNode;
+use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
+use const Eddmash\PowerOrm\Model\Query\Expression\ORDER_PATTERN;
 use function Eddmash\PowerOrm\Model\Query\Expression\count_;
-use Faker\Provider\bn_BD\Utils;
 
 const INNER = 'INNER JOIN';
 const LOUTER = 'LEFT OUTER JOIN';
@@ -113,8 +108,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
     /**
      * @var bool Dictates if the order by is done in the asc or desc manner,
-     * true indicates the asc manner
-     *
+     *           true indicates the asc manner
      */
     public $standardOrdering = true;
     /**
@@ -125,7 +119,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * Query constructor.
      *
-     * @param Model $model
+     * @param Model     $model
      * @param WhereNode $whereClass
      *
      * @internal param string $where
@@ -143,13 +137,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         return new self($model);
     }
 
-    public static function getOrderDirection($orderName, $defaultOrder = "ASC")
+    public static function getOrderDirection($orderName, $defaultOrder = 'ASC')
     {
-        $order = ORDER_DIR["ASC"];
+        $order = ORDER_DIR['ASC'];
 
-        if (StringHelper::startsWith($orderName, "-")):
-            return [str_replace("-", "", $orderName), $order[1]];
+        if (StringHelper::startsWith($orderName, '-')):
+            return [str_replace('-', '', $orderName), $order[1]];
         endif;
+
         return [$orderName, $order[0]];
     }
 
@@ -212,7 +207,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      */
     private function buildCondition($lookup, $lhs, $rhs)
     {
-        $lookup = (array)$lookup;
+        $lookup = (array) $lookup;
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
         $lookup = $lookup::createObject($lhs, $rhs);
@@ -260,7 +255,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         /* @var $targets Field[] */
         /* @var $field Field */
-
         list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
 
         if ($field->isRelation) :
@@ -273,6 +267,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endif;
 
         $clause->add($condition, AND_CONNECTOR);
+
         //todo joins
         return [$clause, $usedJoins];
     }
@@ -307,7 +302,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             $this->where->add($clause, AND_CONNECTOR);
         endif;
         //todo work on joins
-
     }
 
     private function _addQ(Q $q, &$usedAliases, $allowJoins = true, $currentNegated = false)
@@ -351,6 +345,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      * If 'ordering' is empty, all ordering is cleared from the query.
      *
      * @param $fieldNames
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -366,10 +361,13 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                 $errors[] = $fieldName;
             endif;
 
-            if (property_exists($fieldName, "containsAggregate")):
+            if (property_exists($fieldName, 'containsAggregate')):
                 throw new FieldError(
-                    sprintf('Using an aggregate in order_by() without also including ' .
-                        'it in annotate() is not allowed: %s', $fieldName)
+                    sprintf(
+                        'Using an aggregate in order_by() without also including '.
+                        'it in annotate() is not allowed: %s',
+                        $fieldName
+                    )
                 );
             endif;
         endforeach;
@@ -392,7 +390,9 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
     /**
      * @param Connection $connection
+     *
      * @return SqlFetchBaseCompiler
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -400,12 +400,15 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     public function getSqlCompiler(Connection $connection)
     {
         $compiler = $this->getCompilerClass();
+
         return new $compiler($this, $connection);
     }
 
     /**
      * Return the class to use when compiling this query into an sql string.
+     *
      * @return string
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -414,7 +417,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     {
         return SqlFetchBaseCompiler::class;
     }
-
 
     private function solveLookupType($name)
     {
@@ -473,6 +475,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                 endif;
             endforeach;
         endif;
+
         //todo if value is array
         return [$value, $lookups, $usedJoins];
     }
@@ -557,7 +560,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         ];
     }
 
-
     public function setLimit($offset, $limit)
     {
         $this->offset = $offset;
@@ -580,7 +582,9 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      * @param $names
      * @param Meta $meta
      * @param $alias
+     *
      * @return array
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -632,6 +636,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         if ($resuableAliases):
             $this->aliasRefCount[$resuableAliases[0]] += 1;
+
             return $resuableAliases[0];
         endif;
 
@@ -759,6 +764,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         if (ArrayHelper::hasKey($this->tableAlias, $tableName) && false === $create):
             $alias = ArrayHelper::getValue($this->tableAlias, $tableName);
             $this->aliasRefCount[$alias] += 1;
+
             return [$alias, false];
         endif;
 
@@ -784,10 +790,12 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
     /**
      * Sets up the selectRelated data structure so that we only select certain related models
-     * (as opposed to all models, when $this->selectRelated=true)
+     * (as opposed to all models, when $this->selectRelated=true).
      *
      * @param array $fields
+     *
      * @since 1.1.0
+     *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function addSelectRelected($fields = [])
@@ -894,12 +902,11 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         return $result;
     }
 
-
     /**
      * Removes any ordering settings.
      *
      * @param bool $forceEmpty If True, there will be no ordering in the resulting query (not even the model's
-     * default).
+     *                         default)
      *
      * @since 1.1.0
      *
@@ -931,6 +938,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      * Typically, this means no limits or offsets have been put on the results.
      *
      * @return bool
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -963,7 +971,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     {
 
         $class = (is_null($class)) ? static::class : $class;
-        /**@var $obj Query */
+        /** @var $obj Query */
         $obj = new $class($this->model);
         $obj->aliasRefCount = $this->aliasRefCount;
         $obj->useDefaultCols = $this->useDefaultCols;
@@ -981,7 +989,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         return $obj;
     }
-
 
     public function getResultsIterator(Connection $connection)
     {
@@ -1024,7 +1031,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         return $fields;
     }
 
-
     /**
      * We check if a field is nullable.
      *
@@ -1065,7 +1071,8 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             // first use the inbuilt converters
             try {
                 $val = Type::getType(
-                    $field->dbType($connection))->convertToPHPValue($val, $connection->getDatabasePlatform());
+                    $field->dbType($connection)
+                )->convertToPHPValue($val, $connection->getDatabasePlatform());
             } catch (DBALException $exception) {
             }
 
@@ -1129,7 +1136,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 }
 
 /**
- * @param Model[] $instances
+ * @param Model[]        $instances
  * @param Prefetch|array $lookups
  *
  * @since 1.1.0
@@ -1163,8 +1170,14 @@ function prefetchRelatedObjects($instances, $lookups)
             // does this lookup contain a queryset
             // this means its not a duplication but a different request just containing the same name
             if ($lookup->queryset):
-                throw new ValueError(sprintf("'%s' lookup was already seen with a different queryset. " .
-                    'You may need to adjust the ordering of your lookups.' . $lookup->prefetchTo));
+                throw new ValueError(
+                    sprintf(
+                        "'%s' lookup was already seen with a different queryset. ".
+                        'You may need to adjust the ordering of your lookups.',
+                        $lookup->prefetchTo
+                    )
+                );
+
             endif;
 
             // just pass this is just a duplication

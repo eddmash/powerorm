@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model;
 
 use Eddmash\PowerOrm\Exception\ValidationError;
@@ -31,15 +32,15 @@ trait FormReadyModelTrait
     {
         $errors = [];
 
-        try{
+        try {
             $this->cleanFields($exclude);
-        }catch (ValidationError $error){
+        } catch (ValidationError $error) {
             //todo
         }
 
-        try{
+        try {
             $this->clean();
-        }catch (ValidationError $error){
+        } catch (ValidationError $error) {
             //todo
         }
         if (!empty($errors)) :
@@ -77,9 +78,9 @@ trait FormReadyModelTrait
                 continue;
             endif;
 
-            try{
+            try {
                 $this->{$field->getAttrName()} = $field->clean($this, $value);
-            }catch (ValidationError $error){
+            } catch (ValidationError $error) {
                 $errors[$field->getName()] = $error->getErrorList();
             }
         endforeach;

@@ -11,8 +11,8 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Type;
 
 class BooleanField extends Field
 {

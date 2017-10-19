@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
 use Eddmash\PowerOrm\Exception\AttributeError;
@@ -20,7 +21,7 @@ use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
-class ForwardManyToOneDescriptor extends BaseDescriptor
+class ManyToOneDescriptor extends BaseDescriptor
 {
     /** @var RelatedField */
     protected $field;
@@ -30,6 +31,7 @@ class ForwardManyToOneDescriptor extends BaseDescriptor
      */
     public function getValue(Model $modelInstance)
     {
+        echo 'im here<br>';
         $result = null;
 
         try {
@@ -63,8 +65,11 @@ class ForwardManyToOneDescriptor extends BaseDescriptor
         // if this field does not allow null values
         if (is_null($result) && !$this->field->isNull()):
             throw new RelatedObjectDoesNotExist(
-                sprintf('%s has no %s.', $this->field->scopeModel->meta->getNamespacedModelName(),
-                    $this->field->getName())
+                sprintf(
+                    '%s has no %s.',
+                    $this->field->scopeModel->meta->getNamespacedModelName(),
+                    $this->field->getName()
+                )
             );
         endif;
 

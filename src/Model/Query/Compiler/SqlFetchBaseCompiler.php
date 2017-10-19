@@ -58,7 +58,8 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         $orderBy = $this->getOrderBy();
         $this->where = $this->query->where;
-        return [$orderBy, "groupBy"];
+
+        return [$orderBy, 'groupBy'];
     }
 
     /**
@@ -115,8 +116,8 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * Returns the fields in the current models/those represented by the alias as Col expression, which know how to be
      * used in a query.
      *
-     * @param null $startAlias
-     * @param Meta|null $meta
+     * @param null       $startAlias
+     * @param Meta|null  $meta
      * @param Model|null $fromParent
      *
      * @return Col[]
@@ -159,16 +160,15 @@ class SqlFetchBaseCompiler extends SqlCompiler
         return $fields;
     }
 
-
     /**
      * Used to get information needed when we are doing selectRelated(),.
      *
      * @param $select
-     * @param Meta|null $meta the from which we expect to find the related fields
-     * @param null $rootAlias
-     * @param int $curDepth
-     * @param null $requested the set of fields to use in selectRelated
-     * @param null $restricted true when we are to use just a set of relationship fields
+     * @param Meta|null $meta       the from which we expect to find the related fields
+     * @param null      $rootAlias
+     * @param int       $curDepth
+     * @param null      $requested  the set of fields to use in selectRelated
+     * @param null      $restricted true when we are to use just a set of relationship fields
      *
      * @return array
      *
@@ -219,7 +219,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
                     if ($nextSpanField || in_array($field->getName(), $requested)):
                         throw new FieldError(
-                            sprintf("Non-relational field given in selectRelated: '%s'. " .
+                            sprintf("Non-relational field given in selectRelated: '%s'. ".
                                 'Choices are: %s', $field->getName(),
                                 implode(', ', $this->query->getFieldChoices())));
 
@@ -401,7 +401,9 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
     /**
      * @param bool $chunked
+     *
      * @return \Doctrine\DBAL\Statement
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -521,8 +523,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
             endif;
         endforeach;
 
-
-        /**@var $orderExp BaseExpression */
+        /** @var $orderExp BaseExpression */
         foreach ($orderByList as $orderitem) :
             list($orderExp, $isRef) = $orderitem;
             $resolved = $orderExp->resolveExpression($this->query, true);
@@ -534,7 +535,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * Creates the SQL for this query. Returns the SQL string and list of parameters.
      *
      * @param Connection $connection
-     * @param bool $isSubQuery
+     * @param bool       $isSubQuery
      *
      * @return array
      *
@@ -600,41 +601,41 @@ class SqlFetchBaseCompiler extends SqlCompiler
         return [implode(' ', $results), $params];
     }
 
-
     /**
      * Tries ot resolve a name like 'username' into a model field and then into Col expression
-     * suitable for makin queries
+     * suitable for makin queries.
      *
      * @param $col
      * @param $meta
-     * @param null $alias
+     * @param null   $alias
      * @param string $defaultOrder
-     * @param array $alreadyResolved helps avoid infinite loops
+     * @param array  $alreadyResolved helps avoid infinite loops
+     *
      * @return array
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function resolveOrderName($col, Meta $meta, $alias = null, $defaultOrder = "ASC", &$alreadyResolved = [])
+    private function resolveOrderName($col, Meta $meta, $alias = null, $defaultOrder = 'ASC', &$alreadyResolved = [])
     {
         list($col, $order) = Query::getOrderDirection($col, $defaultOrder);
 
         $nameParts = explode(BaseLookup::LOOKUP_SEPARATOR, $col);
 
-        /**@var $targetField Field */
+        /** @var $targetField Field */
         list($relationField, $targetFields, $joinList, $paths, $meta) = $this->_setupJoins($nameParts, $meta, $alias);
 
-
         if ($relationField->isRelation && $meta->getOrderBy() && empty($relationField->getAttrName())):
-            throw new NotImplemented("This capabilty is yet to be implemented");
+            throw new NotImplemented('This capabilty is yet to be implemented');
         endif;
 
         list($targets, $finalAlias, $joinList) = $this->query->trimJoins($targetFields, $joinList, $paths);
         $fields = [];
-//
+
         $descending = ($order == 'DESC') ? true : false;
 
-        /**@var $target Field */
+        /** @var $target Field */
         foreach ($targets as $target):
 
             $fields[] = [new OrderBy($target->getColExpression($alias), $descending), false];
@@ -654,9 +655,11 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * @param $nameParts
      * @param Meta $meta
      * @param null $rootAlias
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @return array
      */
     private function _setupJoins($nameParts, Meta $meta, $rootAlias = null)
@@ -672,6 +675,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
         );
 
         $alias = end($joinList);
+
         return [$field, $targets, $alias, $paths, $meta];
     }
 

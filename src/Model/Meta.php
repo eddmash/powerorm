@@ -33,7 +33,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     ];
 
     public static $DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy', 'autoCreated',
-        'defaultRelatedName', "orderBy"];
+        'defaultRelatedName', 'orderBy', ];
 
     public $modelNamespace;
     public $defaultRelatedName;
@@ -154,7 +154,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @var array
      */
-    public $_reverseRelationTreeCache = [];
+    protected $_reverseRelationTreeCache = [];
 
     public function __construct($overrides = [])
     {
@@ -309,7 +309,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
-     *  Returns all related objects pointing to the current model. The related objects can come from a one-to-one,
+     *  Returns all related field objects pointing to the current model. The related objects can come from a one-to-one,
      * one-to-many, or many-to-many field relation type.
      * As this method is very expensive and is accessed frequently (it looks up every field in a model, in every app),
      * it is computed on first access and then is set as a property on every model.
@@ -331,16 +331,20 @@ class Meta extends DeconstructableObject implements MetaInterface
 
             // collect all relation fields for this each model
             foreach ($allModels as $name => $model) :
-
                 // just get the forward fields
-                $fields = $model->meta->fetchFields(['includeParents' => false,
-                    'inverse' => false,
-                    'reverse' => false, ]);
+                $fields = $model->meta->fetchFields(
+                    [
+                        'includeParents' => false,
+                        'inverse' => false,
+                        'reverse' => false,
+                    ]
+                );
 
                 foreach ($fields as $field) :
 
                     if ($field->isRelation && !empty($field->getRelatedModel())):
-                        $allRelations[$field->relation->toModel->meta->getNamespacedModelName()][] = $field;
+                        $concreteModel = $field->relation->toModel->meta->concreteModel->meta->getNamespacedModelName();
+                        $allRelations[$concreteModel][] = $field;
                     endif;
 
                 endforeach;
@@ -411,33 +415,34 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     private function fetchFields($kwargs = [])
     {
+        $includeHidden = false;
         $forward = $inverse = $reverse = $includeParents = true;
         extract($kwargs);
 
         $fields = [];
         $seen_models = null;
 
+        /* @var $revField RelatedField */
         if ($reverse):
 
-            /** @var $revField RelatedField */
             foreach ($this->getReverseRelatedObjects() as $revField) :
-                $fields[$revField->relation->getName()] = $revField->relation;
+                // if we need to include hidden we add all fields
+                // otherwise always add non-hidden relationships
+                if ($includeHidden || !$revField->relation->isHidden()) :
+                    $fields[$revField->relation->getName()] = $revField->relation;
+                endif;
             endforeach;
 
-        endif;
-
-        if ($forward):
-            $fields = array_merge($fields, array_merge($this->localFields, $this->localManyToMany));
         endif;
 
         if ($inverse) :
             foreach ($this->inverseFields as $inverseField) :
-//                if($inverseField->autoCreated):
-//                    continue;
-//                endif;
                 $fields[$inverseField->getName()] = $inverseField;
             endforeach;
+        endif;
 
+        if ($forward):
+            $fields = array_merge($fields, array_merge($this->localFields, $this->localManyToMany));
         endif;
 
         return $fields;
@@ -559,7 +564,8 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     private function getTableName()
     {
-        return sprintf('%s%s', BaseOrm::getDbPrefix(), str_replace('\\', '_', $this->normalizeKey($this->modelName)));
+        return sprintf('%s%s', BaseOrm::getDbPrefix(),
+            str_replace('\\', '_', $this->normalizeKey($this->modelName)));
     }
 
     public function __toString()

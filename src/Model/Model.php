@@ -35,6 +35,7 @@ use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
 use Eddmash\PowerOrm\Model\Query\Queryset;
+use function Eddmash\PowerOrm\Model\Query\getFieldNamesFromMeta;
 
 /**
  * Base class for all models in the ORM, this class cannot be instantiated on its own.
@@ -781,12 +782,14 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             return $field->getValue($this);
         } catch (FieldDoesNotExist $e) {
 
-            if (!ArrayHelper::hasKey(get_object_vars($this), $name) &&
-                !ArrayHelper::hasKey($this->_fieldCache, $name)
-            ):
+            if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
                 throw new AttributeError(
-                    sprintf("AttributeError: '%s' object has no attribute '%s'",
-                        $this->meta->getNamespacedModelName(), $name)
+                    sprintf(
+                        "AttributeError: '%s' object has no attribute '%s'. choices are [ %s ]",
+                        $this->meta->getNamespacedModelName(),
+                        $name,
+                        implode(', ', getFieldNamesFromMeta($this->meta))
+                    )
                 );
             endif;
         }
@@ -1061,8 +1064,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $forceInsert = false,
         $forceUpdate = false,
         $updateFields = null
-    )
-    {
+    ) {
         $meta = $this->meta;
 
         /** @var $nonPkFields Field[] */

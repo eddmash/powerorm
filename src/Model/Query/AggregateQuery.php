@@ -5,15 +5,14 @@
  * Date: 3/19/17
  * Time: 2:06 PM.
  */
+
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
-use Eddmash\PowerOrm\Exception\EmptyResultSet;
 use Eddmash\PowerOrm\Model\Query\Compiler\SQLAggregateCompiler;
 
 class AggregateQuery extends Query
 {
-
     public $subQuery;
     public $subQueryParams;
 
@@ -24,12 +23,11 @@ class AggregateQuery extends Query
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getSqlCompiler(Connection $connection)
     {
         return SQLAggregateCompiler::class;
     }
-
 
 }

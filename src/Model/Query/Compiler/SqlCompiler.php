@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
-
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Query\Query;
@@ -28,7 +27,7 @@ abstract class SqlCompiler implements SqlCovertableinterface, CompilerInterface
     protected $connection;
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function __construct(Query $query, Connection $connection)
     {
@@ -41,14 +40,13 @@ abstract class SqlCompiler implements SqlCovertableinterface, CompilerInterface
         return $node->asSql($this->connection);
     }
 
-
     /**
      * Returns True if this field should be used to descend deeper for selectRelated() purposes.
      *
-     * @param Field $field the field to be checked
-     * @param bool $restricted indicating if the field list has been manually restricted using a requested clause
-     * @param array $requested The selectRelated() array
-     * @param bool $reverse True if we are checking a reverse select related
+     * @param Field $field      the field to be checked
+     * @param bool  $restricted indicating if the field list has been manually restricted using a requested clause
+     * @param array $requested  The selectRelated() array
+     * @param bool  $reverse    True if we are checking a reverse select related
      *
      * @return bool
      *

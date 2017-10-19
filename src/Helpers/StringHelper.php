@@ -4,6 +4,7 @@
  * User: eddmash
  * Date: 6/18/16.
  */
+
 namespace Eddmash\PowerOrm\Helpers;
 
 /*
@@ -64,7 +65,7 @@ class StringHelper
      */
     public static function byteLength($string)
     {
-        if(!function_exists('mb_strlen')):
+        if (!function_exists('mb_strlen')):
             throw new \Exception("function 'mb_strlen' does not exist ");
         endif;
 
@@ -90,9 +91,9 @@ class StringHelper
             return strncmp($string, $with, $bytes) === 0;
         } else {
             return mb_strtolower(
-                mb_substr($string, 0, $bytes, '8bit'),
-                self::getCharset()
-            ) === mb_strtolower($with, self::getCharset());
+                    mb_substr($string, 0, $bytes, '8bit'),
+                    self::getCharset()
+                ) === mb_strtolower($with, self::getCharset());
         }
     }
 
@@ -120,12 +121,12 @@ class StringHelper
             return substr_compare($string, $with, -$bytes, $bytes) === 0;
         } else {
             return mb_strtolower(
-                mb_substr($string, -$bytes, null, '8bit'),
-                self::getCharset()
-            ) === mb_strtolower(
-                $with,
-                self::getCharset()
-            );
+                    mb_substr($string, -$bytes, null, '8bit'),
+                    self::getCharset()
+                ) === mb_strtolower(
+                    $with,
+                    self::getCharset()
+                );
         }
     }
 

@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Query\Compiler\SqlCovertableinterface;
 
-class BaseExpression extends Combinable implements ResolvableExpInterface, SortableInterface, SqlCovertableinterface
+abstract class BaseExpression extends Combinable implements ResolvableExpInterface, SortableInterface, SqlCovertableinterface
 {
     /**
      * @var Field
@@ -197,7 +197,6 @@ class BaseExpression extends Combinable implements ResolvableExpInterface, Sorta
 
         return $fields;
     }
-
     public function containsAggregates()
     {
         foreach ($this->getSourceExpressions() as $sourceExpression) :

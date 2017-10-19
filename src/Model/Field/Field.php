@@ -21,18 +21,18 @@ use Eddmash\PowerOrm\Exception\ValidationError;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\Descriptors\DescriptorInterface;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
+use Eddmash\PowerOrm\Model\Lookup\Exact;
 use Eddmash\PowerOrm\Model\Lookup\GreaterThan;
 use Eddmash\PowerOrm\Model\Lookup\GreaterThanOrEqual;
 use Eddmash\PowerOrm\Model\Lookup\IContains;
 use Eddmash\PowerOrm\Model\Lookup\IEndsWith;
-use Eddmash\PowerOrm\Model\Lookup\Exact;
 use Eddmash\PowerOrm\Model\Lookup\In;
 use Eddmash\PowerOrm\Model\Lookup\IsNull;
+use Eddmash\PowerOrm\Model\Lookup\IStartsWith;
 use Eddmash\PowerOrm\Model\Lookup\LessThan;
 use Eddmash\PowerOrm\Model\Lookup\LessThanOrEqual;
 use Eddmash\PowerOrm\Model\Lookup\Range;
 use Eddmash\PowerOrm\Model\Lookup\RegisterLookupTrait;
-use Eddmash\PowerOrm\Model\Lookup\IStartsWith;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
@@ -221,7 +221,6 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * @var bool
      */
     public $concrete;
-
 
     /**
      * If True, the field is allowed to be blank on form. Default is False.
@@ -776,7 +775,6 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     {
         $meta = parent::__debugInfo();
         $meta['scopeModel'] = $this->scopeModel->meta->getNamespacedModelName();
-
 
         return $meta;
     }

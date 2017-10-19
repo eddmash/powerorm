@@ -11,31 +11,35 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
-
 interface SortableInterface
 {
-
     /**
-     * how to Sort this expression in descending order
+     * how to Sort this expression in descending order.
+     *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function descendingOrder($kwargs=[]);
+    public function descendingOrder($kwargs = []);
 
     /**
-     * how to Sort expression in ascending order
+     * how to Sort expression in ascending order.
+     *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function ascendingOrder($kwargs=[]);
+    public function ascendingOrder($kwargs = []);
 
     /**
-     * how to do reverse the current sorting order
+     * how to do reverse the current sorting order.
+     *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

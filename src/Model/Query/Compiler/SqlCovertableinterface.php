@@ -11,16 +11,17 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
-
 use Doctrine\DBAL\Connection;
 
 interface SqlCovertableinterface
 {
-
     /**
      * if the instance passed to a compiler it can be converted into a valid Sql string.
+     *
      * @param Connection $connection
+     *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

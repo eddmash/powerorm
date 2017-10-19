@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
 use Eddmash\PowerOrm\Exception\AttributeError;
@@ -44,9 +45,12 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
 
         if (is_null($relObj) && !$this->field->isNull()):
             throw new RelatedObjectDoesNotExist(
-                sprintf('%s has no %s.', $modelInstance->meta->getNamespacedModelName(),
+                sprintf(
+                    '%s has no %s.',
+                    $modelInstance->meta->getNamespacedModelName(),
                     $this->field->relation->getAccessorName()
-                ));
+                )
+            );
         endif;
 
         return $relObj;

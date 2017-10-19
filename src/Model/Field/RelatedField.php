@@ -39,6 +39,7 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class RelatedField extends Field
 {
+    public $dbConstraint = false;
     /**
      * The field on the related object that the relation is to.
      * By default, The Orm uses the primary key of the related object.
@@ -186,8 +187,12 @@ class RelatedField extends Field
             $clashName = sprintf('%s.%s', $relMeta->getNamespacedModelName(), $clashField->getName());
             if (!$isHidden && $clashField->getName() == $relName):
                 $msg = "Reverse accessor for '%s' clashes with field name '%s'.";
-                $hint = sprintf("Rename field '%s', or add/change a related_name argument to the definition ".
-                    "for field '%s'.", $clashName, $fieldName);
+                $hint = sprintf(
+                    "Rename field '%s', or add/change a related_name argument to the definition ".
+                    "for field '%s'.",
+                    $clashName,
+                    $fieldName
+                );
                 $error[] = CheckError::createObject(
                     [
                         'message' => sprintf($msg, $fieldName, $clashName),
@@ -203,8 +208,12 @@ class RelatedField extends Field
 
                 $msg = "Reverse query name for '%s' clashes with field name '%s'.";
 
-                $hint = sprintf("Rename field '%s', or add/change a related_name argument to the ".
-                    "definition for field '%s'.", $clashName, $fieldName);
+                $hint = sprintf(
+                    "Rename field '%s', or add/change a related_name argument to the ".
+                    "definition for field '%s'.",
+                    $clashName,
+                    $fieldName
+                );
 
                 $error[] = CheckError::createObject(
                     [
@@ -223,8 +232,11 @@ class RelatedField extends Field
             if ($reverseRelatedObject->getName() === $this->getName()):
                 continue;
             endif;
-            $clashName = sprintf('%s.%s',
-                $reverseRelatedObject->scopeModel->meta->getNamespacedModelName(), $reverseRelatedObject->getName());
+            $clashName = sprintf(
+                '%s.%s',
+                $reverseRelatedObject->scopeModel->meta->getNamespacedModelName(),
+                $reverseRelatedObject->getName()
+            );
 
             if (!$isHidden && $reverseRelatedObject->relation->getAccessorName() === $relName):
 
@@ -321,22 +333,20 @@ class RelatedField extends Field
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        /** @var $inverseField InverseField */
-        $inverseField = $this->inverseField;
-        $inverse = $inverseField::createObject(
-            [
-                'to' => $this->scopeModel->meta->getNamespacedModelName(),
-                'toField' => $relation->fromField->getName(),
-                'fromField' => $this,
-                'autoCreated' => true,
-            ]
-        );
-        $relatedModel->addToClass($relation->getAccessorName(), $inverse);
 
-        // this allows anyone who var_dumps or any form of dump to see this related fields as part of the model
-        // attributes, mostly this is for cases where the instance has been instantiated using new cls() and not
-        // values for fields have been set
-        $relatedModel->_fieldCache[$relation->getAccessorName()] = $inverse->getDescriptor();
+        if (!$this->relation->isHidden()) :
+            $inverseField = $this->inverseField;
+            $hasMany = $inverseField::createObject(
+                [
+                    'to' => $this->scopeModel->meta->getNamespacedModelName(),
+                    'toField' => $relation->fromField->getName(),
+                    'fromField' => $this,
+                    'autoCreated' => true,
+                ]
+            );
+
+            $relatedModel->meta->concreteModel->addToClass($relation->getAccessorName(), $hasMany);
+        endif;
     }
 
     /**

@@ -11,20 +11,30 @@
 
 namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
-use Eddmash\PowerOrm\Model\Manager\M2OManager;
+use Eddmash\PowerOrm\Model\Manager\O2MManager;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Queryset;
 
-class ReverseManyToOneDescriptor extends BaseDescriptor
+/**
+ * {@inheritdoc}
+ *
+ * Gets related data from the one side of the relationship
+ *
+ * user has many cars so this will query cars related to a particular user in this the
+ * default attribute to be used will be ::
+ *
+ *  $user->car_set->all()
+ *
+ * Class ManyToOneDescriptor
+ *
+ * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+ */
+class OneToManyDescriptor extends BaseDescriptor
 {
     /**
      * {@inheritdoc}
      */
     public function getValue(Model $modelInstance)
     {
-        if(empty($modelInstance)):
-            return $this;
-        endif;
 
         return $this->queryset($modelInstance);
     }
@@ -34,7 +44,7 @@ class ReverseManyToOneDescriptor extends BaseDescriptor
      */
     public function setValue(Model $modelInstance, $value)
     {
-        dump('SETT');
+        return $this->getValue($modelInstance)->set($value);
     }
 
     /**
@@ -45,10 +55,10 @@ class ReverseManyToOneDescriptor extends BaseDescriptor
      *
      * @internal param $modelName
      *
-     * @return Queryset
+     * @return O2MManager
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function queryset($modelInstance, $reverse = true)
+    public function queryset($modelInstance, $reverse = false)
     {
         if ($reverse) :
             $model = $this->field->getRelatedModel();
@@ -63,12 +73,12 @@ class ReverseManyToOneDescriptor extends BaseDescriptor
             eval($class);
         endif;
 
-        $manager = M2OManager::createObject(
+        $manager = O2MManager::createObject(
             [
                 'model' => $model,
                 'rel' => $this->field->relation,
                 'instance' => $modelInstance,
-                'reverse' => $reverse,
+                'reverse' => true,
             ]
         );
 

@@ -10,11 +10,11 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Exception;
-use Doctrine\DBAL\Connection;
 
 /**
  * An IntegerField that automatically increments according to available IDs.
@@ -91,14 +91,14 @@ class AutoField extends Field
             return $value;
         endif;
 
-        try{
+        try {
             $value = (int) $value;
-            if($value):
+            if ($value):
                 return $value;
             endif;
 
             throw new ValueError(sprintf("'%s' value must be an integer.", $value));
-        }catch (Exception $exception){
+        } catch (Exception $exception) {
             throw new ValueError(sprintf("'%s' value must be an integer.", $value));
         }
     }

@@ -7,10 +7,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Manager;
 
 use Eddmash\PowerOrm\BaseObject;
-use Eddmash\PowerOrm\Exception\MethodNotFoundException;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
@@ -55,7 +55,8 @@ class BaseManager extends BaseObject implements \IteratorAggregate
 
     }
 
-    public function getIterator() {
+    public function getIterator()
+    {
         throw new TypeError("'Manager' object is not iterable");
     }
 

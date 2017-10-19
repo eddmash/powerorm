@@ -45,12 +45,11 @@ class BaseAggregate extends Func
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function containsAggregates()
     {
         return $this->containsAggregate;
     }
-
 
 }

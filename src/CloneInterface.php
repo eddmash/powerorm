@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm;
 
-
 interface CloneInterface
 {
     public function deepClone();

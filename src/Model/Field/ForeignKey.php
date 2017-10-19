@@ -34,7 +34,7 @@ class ForeignKey extends RelatedField
     public $relation;
 
     /**{inheritdoc}*/
-    protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ForwardManyToOneDescriptor';
+    protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ManyToOneDescriptor';
     public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasManyField';
 
     public function __construct($kwargs)
@@ -182,8 +182,8 @@ class ForeignKey extends RelatedField
      */
     public function prepareValueBeforeSave($value, $connection)
     {
-        if(is_null($value) || $value === ''):
-           return;
+        if (is_null($value) || $value === ''):
+            return;
         endif;
 
         return $this->getRelatedField()->prepareValueBeforeSave($value, $connection, false);

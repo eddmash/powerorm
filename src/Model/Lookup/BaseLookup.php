@@ -5,6 +5,7 @@
  * Date: 6/19/16
  * Time: 1:17 AM.
  */
+
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;

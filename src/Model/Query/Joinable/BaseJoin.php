@@ -104,5 +104,4 @@ abstract class BaseJoin implements SqlCovertableinterface
 
     abstract public function asSql(Connection $connection);
 
-
 }

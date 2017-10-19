@@ -441,9 +441,21 @@ class AutoDetector extends BaseObject
             elseif ($op instanceof DeleteModel):
                 return sprintf('%s%s_Delete_%s', $prefix, $id, $this->formatName($op->name));
             elseif ($op instanceof AddField):
-                return sprintf('%s%s_%s_%s', $prefix, $id, $this->formatName($op->modelName), $this->formatName($op->name));
+                return sprintf(
+                    '%s%s_%s_%s',
+                    $prefix,
+                    $id,
+                    $this->formatName($op->modelName),
+                    $this->formatName($op->name)
+                );
             elseif ($op instanceof RemoveField):
-                return sprintf('%s%s_Remove_%s_%s', $prefix, $id, $this->formatName($op->modelName), $this->formatName($op->name));
+                return sprintf(
+                    '%s%s_Remove_%s_%s',
+                    $prefix,
+                    $id,
+                    $this->formatName($op->modelName),
+                    $this->formatName($op->name)
+                );
             endif;
         endif;
 

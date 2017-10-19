@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
 use Eddmash\PowerOrm\Model\Field\RelatedField;
@@ -18,6 +19,7 @@ class ManyToManyDescriptor extends BaseDescriptor
 {
     /** @var RelatedField */
     protected $field;
+
     public function setValue(Model $modelInstance, $value)
     {
         $queryset = $this->getValue($modelInstance);
@@ -34,7 +36,7 @@ class ManyToManyDescriptor extends BaseDescriptor
      */
     public function queryset($modelInstance, $reverse = false)
     {
-        if ($reverse) :
+        if ($this->reverse) :
             $model = $this->field->getRelatedModel();
         else:
             $model = $this->field->scopeModel;
@@ -52,7 +54,7 @@ class ManyToManyDescriptor extends BaseDescriptor
                 'model' => $model,
                 'rel' => $this->field->relation,
                 'instance' => $modelInstance,
-                'reverse' => $reverse,
+                'reverse' => $this->reverse,
             ]
         );
 
