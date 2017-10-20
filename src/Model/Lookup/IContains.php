@@ -12,15 +12,16 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 class IContains extends PatternLookup
 {
     public static $lookupName = 'icontains';
 
-    public function processRHS(Connection $connection)
+    public function processRHS(CompilerInterface $compiler, Connection $connection)
     {
         $this->rhs = sprintf('%%%s%%', $this->rhs);
 
-        return parent::processRHS($connection);
+        return parent::processRHS($compiler, $connection);
     }
 }

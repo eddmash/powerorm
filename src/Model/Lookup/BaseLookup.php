@@ -9,9 +9,12 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\NotImplemented;
+use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Compiler\SqlCovertableinterface;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
+use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
 /**
@@ -21,7 +24,7 @@ use Eddmash\PowerOrm\Model\Query\Expression\Col;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class BaseLookup implements LookupInterface, SqlCovertableinterface
+class BaseLookup implements LookupInterface
 {
     const AND_CONNECTOR = 'and';
     const OR_CONNECTOR = 'or';
@@ -55,9 +58,44 @@ class BaseLookup implements LookupInterface, SqlCovertableinterface
         return new static($rhs, $lhs);
     }
 
-    public function processLHS(Connection $connection)
+    /**
+     * @param $value
+     * @param BaseExpression $lhs
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private static function getNomalizedValue($value, $lhs)
     {
-        return $this->lhs->asSql($connection);
+        if ($value instanceof Model):
+            $path = $lhs->getOutputField()->getPathInfo();
+            $sources = end($path)['targetFields'];
+
+            /** @var $source Field */
+            foreach ($sources as $source) :
+
+                while (!$value instanceof $source->scopeModel && $source->relation):
+                    $name = $source->relation->getName();
+                    $source = $source->relation->getFromModel()->meta->getField($name);
+                endwhile;
+
+                try {
+                    return $value->{$source->getAttrName()};
+                } catch (AttributeError $attributeError) {
+                    return $value->pk;
+                }
+            endforeach;
+        endif;
+
+        return $value;
+    }
+
+    public function processLHS(CompilerInterface $compiler, Connection $connection)
+    {
+        return $compiler->compile($this->lhs);
     }
 
     /**
@@ -68,6 +106,7 @@ class BaseLookup implements LookupInterface, SqlCovertableinterface
      */
     public function prepareLookup()
     {
+        $value = $this->rhs;
         if ($this->rhsValueIsIterable) :
 
             $preparedValues = [];
@@ -80,15 +119,17 @@ class BaseLookup implements LookupInterface, SqlCovertableinterface
 
             return $preparedValues;
         else:
-            if(method_exists($this->rhs, '_prepare')):
+            $this->rhs = static::getNomalizedValue($value, $this->lhs);
+            if (method_exists($this->rhs, '_prepare')):
                 return $this->rhs->_prepare($this->lhs->getOutputField());
             endif;
+
             if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
                 return $this->lhs->getOutputField()->prepareValue($this->rhs);
             endif;
         endif;
 
-        // it might be this is just a pure php value
+        // it might be, this is just a pure php value
         return $this->rhs;
 
     }
@@ -114,18 +155,15 @@ class BaseLookup implements LookupInterface, SqlCovertableinterface
 
     }
 
-    public function processRHS(Connection $connection)
+    public function processRHS(CompilerInterface $compiler, Connection $connection)
     {
-        if ($this->rhs instanceof Model):
-            // get pk field
-            $pk = $this->rhs->meta->primaryKey->getAttrName();
-            $this->rhs = $this->rhs->{$pk};
-        elseif (method_exists($this->rhs, '_toSql')):
-            list($sql, $params) = $this->rhs->_toSql();
+        $value = $this->rhs;
+        if (method_exists($value, 'getSqlCompiler')):
+            $value = $value->getSqlCompiler($connection);
+        endif;
 
-            return [sprintf('( %s )', $sql), $params];
-        elseif (method_exists($this->rhs,  'asSql')):
-            list($sql, $params) = $this->rhs->asSql($connection);
+        if (method_exists($value, 'asSql')):
+            list($sql, $params) = $compiler->compile($value);
 
             return [sprintf('( %s )', $sql), $params];
         endif;
@@ -143,10 +181,10 @@ class BaseLookup implements LookupInterface, SqlCovertableinterface
         throw new NotImplemented('The no operator was given for the lookup');
     }
 
-    public function asSql(Connection $connection)
+    public function asSql(CompilerInterface $compiler, Connection $connection)
     {
-        list($lhs_sql, $params) = $this->processLHS($connection);
-        list($rhs_sql, $rhs_params) = $this->processRHS($connection);
+        list($lhs_sql, $params) = $this->processLHS($compiler, $connection);
+        list($rhs_sql, $rhs_params) = $this->processRHS($compiler, $connection);
 
         $params = array_merge($params, $rhs_params);
         $rhs_sql = $this->getLookupOperation($rhs_sql);
@@ -156,7 +194,10 @@ class BaseLookup implements LookupInterface, SqlCovertableinterface
 
     public function valueIsDirect()
     {
-        return !(method_exists($this->rhs, '_toSql'));
+        return !(
+            method_exists($this->rhs, 'getCompiler') &&
+            method_exists($this->rhs, '_toSql')
+        );
     }
 
     public function __toString()

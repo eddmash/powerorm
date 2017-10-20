@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
 use Eddmash\PowerOrm\Model\Field\Field;
-
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
 use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Model;

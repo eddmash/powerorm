@@ -41,7 +41,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
     {
         // check if any of the tables have been used, if not initialize
         $noneUsed = true;
-        foreach ($this->query->tablesAlias as $tablesAlias) :
+        foreach ($this->query->tablesAliasList as $tablesAlias) :
             if (!empty($this->query->aliasRefCount[$tablesAlias])):
                 $noneUsed = false;
             endif;
@@ -372,22 +372,22 @@ class SqlFetchBaseCompiler extends SqlCompiler
         endforeach;
     }
 
-    public function getFrom(Connection $connection)
+    public function getFrom()
     {
         $result = [];
         $params = [];
 
         $refCount = $this->query->aliasRefCount;
 
-        foreach ($this->query->tablesAlias as $alias) :
+        foreach ($this->query->tablesAliasList as $alias) :
             if (!ArrayHelper::getValue($refCount, $alias)):
                 continue;
             endif;
+
             try {
 
                 /** @var $from BaseJoin */
                 $from = ArrayHelper::getValue($this->query->tableAliasMap, $alias, ArrayHelper::STRICT);
-
                 list($fromSql, $fromParams) = $this->compile($from);
                 array_push($result, $fromSql);
                 $params = array_merge($params, $fromParams);
@@ -396,7 +396,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
             }
         endforeach;
 
-        return [$result, []];
+        return [$result, $params];
     }
 
     /**
@@ -410,7 +410,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
      */
     public function executeSql($chunked = false)
     {
-        list($sql, $params) = $this->asSql($this->connection);
+        list($sql, $params) = $this->asSql($this, $this->connection);
 
         $stmt = $this->connection->prepare($sql);
         foreach ($params as $index => $value) :
@@ -494,7 +494,6 @@ class SqlFetchBaseCompiler extends SqlCompiler
         endif;
 
         foreach ($ordering as $orderName) :
-            var_dump($orderName);
             list($col, $orderDir) = Query::getOrderDirection($orderName, $asc);
             $descending = ($orderDir == 'DESC') ? true : false;
 
@@ -517,13 +516,19 @@ class SqlFetchBaseCompiler extends SqlCompiler
             // we are here we still have a string name, we need to convert it to an
             // expression that we can use
             if ($col):
-                $orderByList = array_merge($orderByList,
-                    $this->resolveOrderName($col, $this->query->getMeta(), null, $asc)
+                $orderByList = array_merge(
+                    $orderByList,
+                    $this->resolveOrderName(
+                        $col,
+                        $this->query->getMeta(),
+                        null,
+                        $asc
+                    )
                 );
             endif;
         endforeach;
 
-        /** @var $orderExp BaseExpression */
+        /* @var $orderExp BaseExpression */
         foreach ($orderByList as $orderitem) :
             list($orderExp, $isRef) = $orderitem;
             $resolved = $orderExp->resolveExpression($this->query, true);
@@ -534,8 +539,8 @@ class SqlFetchBaseCompiler extends SqlCompiler
     /**
      * Creates the SQL for this query. Returns the SQL string and list of parameters.
      *
-     * @param Connection $connection
-     * @param bool       $isSubQuery
+     * @param CompilerInterface $compiler
+     * @param Connection        $connection
      *
      * @return array
      *
@@ -543,12 +548,11 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function asSql(Connection $connection, $isSubQuery = false)
+    public function asSql(CompilerInterface $compiler = null, Connection $connection = null)
     {
-        $this->isSubQuery = $isSubQuery;
         list($orderBy, $groupBy) = $this->preSqlSetup();
         $params = [];
-        list($fromClause, $fromParams) = $this->getFrom($connection);
+        list($fromClause, $fromParams) = $this->getFrom();
 
         $results = ['SELECT'];
 
@@ -560,7 +564,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
         foreach ($this->select as $colInfo) :
             list($col, $alias) = $colInfo;
 
-            list($colSql, $colParams) = $col->asSql($connection);
+            list($colSql, $colParams) = $this->compile($col);
             if ($alias):
                 $cols[] = sprintf('%s AS %s', $colSql, $alias);
             else:
@@ -623,7 +627,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         $nameParts = explode(BaseLookup::LOOKUP_SEPARATOR, $col);
 
-        /** @var $targetField Field */
+        /* @var $targetField Field */
         list($relationField, $targetFields, $joinList, $paths, $meta) = $this->_setupJoins($nameParts, $meta, $alias);
 
         if ($relationField->isRelation && $meta->getOrderBy() && empty($relationField->getAttrName())):

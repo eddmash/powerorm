@@ -98,9 +98,9 @@ class Queryset implements QuerysetInterface
 
     /**
      * @param Connection $connection
-     * @param Model $model
-     * @param Query $query
-     * @param array $kwargs
+     * @param Model      $model
+     * @param Query      $query
+     * @param array      $kwargs
      *
      * @return self
      *
@@ -136,7 +136,8 @@ class Queryset implements QuerysetInterface
 
     public function get()
     {
-        $queryset = $this->_filterOrExclude(false, func_get_args());
+        $queryset = $this->_filterOrExclude(false,
+            static::formatFilterConditions(__METHOD__, func_get_args()));
 
         $resultCount = count($queryset);
         if ($resultCount == 1):
@@ -235,15 +236,18 @@ class Queryset implements QuerysetInterface
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @param array $fieldNames
+     *
      * @return Queryset
      */
     public function orderBy($fieldNames = array())
     {
-        assert($this->query->isFilterable(), "Cannot reorder a query once a slice has been taken.");
+        assert($this->query->isFilterable(), 'Cannot reorder a query once a slice has been taken.');
         $clone = $this->_clone();
         $clone->query->clearOrdering(false);
         $clone->query->addOrdering($fieldNames);
+
         return $clone;
     }
 
@@ -315,10 +319,10 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-            return (bool)$instance->query->execute($this->connection)->fetch();
+            return (bool) $instance->query->execute($this->connection)->fetch();
         endif;
 
-        return (bool)$this->_resultsCache;
+        return (bool) $this->_resultsCache;
     }
 
     public function limit($start, $end)
@@ -453,7 +457,7 @@ class Queryset implements QuerysetInterface
     {
         $instance = $this->_clone();
 
-        list($sql, $params) = $instance->query->getSqlCompiler($this->connection)->asSql($this->connection);
+        list($sql, $params) = $instance->query->getSqlCompiler($this->connection)->asSql();
 
         $sql = str_replace('?', '%s', $sql);
 
@@ -512,7 +516,6 @@ class Queryset implements QuerysetInterface
 
         return $clone;
     }
-
 
     /**
      * @return Query
@@ -641,5 +644,26 @@ class Queryset implements QuerysetInterface
     public function __debugInfo()
     {
         return $this->_clone()->getResults();
+    }
+
+    /**
+     * Ready this instance for use as argument in filter.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function _prepareAsFilterValue()
+    {
+        if(is_null($this->_fields)):
+            $queryset = $this->asArray(['pk']);
+        else:
+            if(count($this->_fields) > 1):
+                throw new TypeError('Cannot use multi-field values as a filter value.');
+            endif;
+            $queryset = $this->_clone();
+        endif;
+
+        return $queryset->query->toSubQuery($queryset->connection);
     }
 }

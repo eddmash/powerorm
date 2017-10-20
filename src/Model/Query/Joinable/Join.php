@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 use const Eddmash\PowerOrm\Model\Query\INNER;
 use const Eddmash\PowerOrm\Model\Query\LOUTER;
 
@@ -25,7 +26,7 @@ class Join extends BaseJoin
      */
     private $joinField;
 
-    public function asSql(Connection $connection)
+    public function asSql(CompilerInterface $compiler, Connection $connection)
     {
         $joinConditions = [];
         $fields = [$this->joinField->getJoinColumns()];

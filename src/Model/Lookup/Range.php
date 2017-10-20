@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 class Range extends BaseLookup
 {
@@ -24,7 +25,7 @@ class Range extends BaseLookup
         return sprintf($this->operator, $rhs[0], $rhs[1]);
     }
 
-    public function processRHS(Connection $connection)
+    public function processRHS(CompilerInterface $compiler, Connection $connection)
     {
         if ($this->valueIsDirect()):
             $element = count($this->rhs);
@@ -33,6 +34,6 @@ class Range extends BaseLookup
             return [$placeholders, $this->prepareLookupForDb($this->rhs, $connection)];
         endif;
 
-        return parent::processRHS($connection);
+        return parent::processRHS($compiler, $connection);
     }
 }

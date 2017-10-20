@@ -18,7 +18,7 @@ class SQLAggregateCompiler extends SqlFetchBaseCompiler
     /**
      * {@inheritdoc}
      */
-    public function asSql(Connection $connection, $isSubQuery = false)
+    public function asSql(CompilerInterface $compiler = null, Connection $connection = null)
     {
 
         $sql = $params = [];

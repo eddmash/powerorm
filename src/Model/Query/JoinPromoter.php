@@ -12,10 +12,13 @@
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
+use const Eddmash\PowerOrm\Model\Query\Expression\OR_CONNECTOR;
 
 class JoinPromoter
 {
     public $votes = [];
+    public $effectiveConnector;
     /**
      * @var mixed
      */
@@ -23,21 +26,31 @@ class JoinPromoter
     /**
      * @var int
      */
-    private $count;
+    private $childrenCount;
     private $currentNegated;
 
     /**
      * JoinPromoter constructor.
      *
      * @param mixed $connector
-     * @param int   $count
+     * @param int   $childrenCount
      * @param $currentNegated
      */
-    public function __construct($connector, $count, $currentNegated)
+    public function __construct($connector, $childrenCount, $currentNegated)
     {
         $this->connector = $connector;
-        $this->count = $count;
         $this->currentNegated = $currentNegated;
+
+        if ($this->currentNegated):
+            if ($this->connector === AND_CONNECTOR):
+                $this->effectiveConnector = OR_CONNECTOR;
+            else:
+                $this->effectiveConnector = AND_CONNECTOR;
+            endif;
+        else:
+            $this->effectiveConnector = $this->connector;
+        endif;
+        $this->childrenCount = $childrenCount;
     }
 
     public function addVotes($neededInner)
@@ -50,6 +63,25 @@ class JoinPromoter
 
     public function updateJoinType(Query $query)
     {
-        return [];
+        $changeToInnerJoin = [];
+        $changeToOuterJoin = [];
+
+        foreach ($this->votes as $table => $votes) :
+
+            if ($this->effectiveConnector == OR_CONNECTOR && $votes < $this->childrenCount):
+                $changeToOuterJoin[] = $table;
+            endif;
+
+            if ($this->effectiveConnector === AND_CONNECTOR ||
+                ($this->effectiveConnector == OR_CONNECTOR && $votes === $this->childrenCount)
+            ):
+                $changeToInnerJoin[] = $table;
+            endif;
+        endforeach;
+
+        $query->changeToInnerjoin($changeToInnerJoin);
+        $query->changeToOuterJoin($changeToOuterJoin);
+
+        return $changeToInnerJoin;
     }
 }

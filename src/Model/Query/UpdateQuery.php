@@ -89,7 +89,7 @@ class UpdateQuery extends Query
     public function asSql(Connection $connection, $isSubQuery = false)
     {
         $qb = $connection->createQueryBuilder();
-        $qb->update($this->tablesAlias[0]);
+        $qb->update($this->tablesAliasList[0]);
         $params = [];
 
         /* @var $field Field */

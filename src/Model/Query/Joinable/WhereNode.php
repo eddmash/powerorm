@@ -14,22 +14,22 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
-use Eddmash\PowerOrm\Model\Query\Compiler\SqlCovertableinterface;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
+use Eddmash\PowerOrm\Model\Query\Compiler\SqlCompilableinterface;
 use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 
-
-class WhereNode extends Node implements SqlCovertableinterface, CloneInterface
+class WhereNode extends Node implements SqlCompilableinterface, CloneInterface
 {
     protected $defaultConnector = AND_CONNECTOR;
 
-    public function asSql(Connection $connection)
+    public function asSql(CompilerInterface $compiler, Connection $connection)
     {
         $whereSql = [];
         $whereParams = [];
 
         /* @var $lookup BaseLookup */
         foreach ($this->getChildren() as $child) :
-            list($sql, $parms) = $child->asSql($connection);
+            list($sql, $parms) = $compiler->compile($child);
 
             $whereSql[] = $sql;
             if (!is_array($parms)):

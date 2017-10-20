@@ -19,7 +19,7 @@ class AggregateQuery extends Query
     public function addSubQuery(Query $query, Connection $connection)
     {
         $query->isSubQuery = true;
-        list($this->subQuery, $this->subQueryParams) = $query->getSqlCompiler($connection)->asSql($connection);
+        list($this->subQuery, $this->subQueryParams) = $query->getSqlCompiler($connection)->asSql();
     }
 
     /**

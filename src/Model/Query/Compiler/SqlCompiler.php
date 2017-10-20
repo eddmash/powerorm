@@ -15,12 +15,12 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Query\Query;
 
-abstract class SqlCompiler implements SqlCovertableinterface, CompilerInterface
+abstract class SqlCompiler implements CompilerInterface, SqlCompilableinterface
 {
     /**
      * @var Query
      */
-    protected $query;
+    public $query;
     /**
      * @var Connection
      */
@@ -35,9 +35,9 @@ abstract class SqlCompiler implements SqlCovertableinterface, CompilerInterface
         $this->connection = $connection;
     }
 
-    public function compile(SqlCovertableinterface $node)
+    public function compile(SqlCompilableinterface $node)
     {
-        return $node->asSql($this->connection);
+        return $node->asSql($this, $this->connection);
     }
 
     /**

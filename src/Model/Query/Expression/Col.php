@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 class Col extends BaseExpression
 {
@@ -38,7 +39,7 @@ class Col extends BaseExpression
         return new self($alias, $targetField, $outputField);
     }
 
-    public function asSql(Connection $connection)
+    public function asSql(CompilerInterface $compiler, Connection $connection)
     {
         return [sprintf('%s.%s', $this->alias, $this->targetField->getColumnName()), []];
     }

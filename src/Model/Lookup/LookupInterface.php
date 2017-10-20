@@ -21,6 +21,8 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
+use Eddmash\PowerOrm\Model\Query\Compiler\SqlCompilableinterface;
 
 /**
  * Class Filter.
@@ -29,15 +31,15 @@ use Doctrine\DBAL\Connection;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-interface LookupInterface
+interface LookupInterface extends SqlCompilableinterface
 {
     public static function createObject($rhs, $lhs);
 
-    public function processLHS(Connection $connection);
+    public function processLHS(CompilerInterface $compiler, Connection $connection);
 
-    public function processRHS(Connection $connection);
+    public function processRHS(CompilerInterface $compiler, Connection $connection);
 
     public function getLookupOperation($rhs);
 
-    public function asSql(Connection $connection);
+    public function asSql(CompilerInterface $compiler, Connection $connection);
 }

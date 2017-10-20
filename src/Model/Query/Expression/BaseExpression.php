@@ -15,9 +15,10 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Field\Field;
-use Eddmash\PowerOrm\Model\Query\Compiler\SqlCovertableinterface;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
+use Eddmash\PowerOrm\Model\Query\Compiler\SqlCompilableinterface;
 
-abstract class BaseExpression extends Combinable implements ResolvableExpInterface, SortableInterface, SqlCovertableinterface
+abstract class BaseExpression extends Combinable implements ResolvableExpInterface, SortableInterface, SqlCompilableinterface
 {
     /**
      * @var Field
@@ -89,7 +90,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     /**
      * {@inheritdoc}
      */
-    public function asSql(Connection $connection)
+    public function asSql(CompilerInterface $compiler, Connection $connection)
     {
         throw new NotImplemented('Subclasses must implement asSql()');
     }
@@ -204,6 +205,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
                 return true;
             endif;
         endforeach;
+
         return false;
     }
 
@@ -217,32 +219,38 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     }
 
     /**
-     * how to Sort this expression in descending order
+     * how to Sort this expression in descending order.
+     *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function descendingOrder($kwargs=[])
+    public function descendingOrder($kwargs = [])
     {
         return new OrderBy($this, false, $kwargs);
     }
 
     /**
-     * how to Sort expression in ascending order
+     * how to Sort expression in ascending order.
+     *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function ascendingOrder($kwargs=[])
+    public function ascendingOrder($kwargs = [])
     {
         return new OrderBy($this, true, $kwargs);
     }
 
     /**
-     * how to do reverse the current sorting order
+     * how to do reverse the current sorting order.
+     *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

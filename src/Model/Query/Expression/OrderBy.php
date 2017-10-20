@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 class OrderBy extends BaseExpression
 {
@@ -70,7 +71,7 @@ class OrderBy extends BaseExpression
         return $expression[0];
     }
 
-    public function asSql(Connection $connection, $template = null)
+    public function asSql(CompilerInterface $compiler, Connection $connection, $template = null)
     {
         if (!is_null($template)):
             if ($this->nullsLast):
@@ -79,7 +80,7 @@ class OrderBy extends BaseExpression
                 $template = sprintf('%s NULLS FIRST', $this->template);
             endif;
         endif;
-        list($expSql, $expParams) = $this->expression->asSql($connection);
+        list($expSql, $expParams) = $compiler->compile($this->expression);
         $params = [
             $expSql,
             ($this->descending) ? 'DESC' : 'ASC',

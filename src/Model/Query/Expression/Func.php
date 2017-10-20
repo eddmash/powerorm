@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm\Model\Query\Expression;
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 /**
  * Base type of all expressions that involve database functions like COALESCE and LOWER, or aggregates like SUM
@@ -82,7 +83,7 @@ class Func extends BaseExpression
         return $obj;
     }
 
-    public function asSql(Connection $connection, $function = null)
+    public function asSql(CompilerInterface $compiler, Connection $connection, $function = null)
     {
         $sqlParts = [];
 
@@ -99,7 +100,7 @@ class Func extends BaseExpression
 
         foreach ($this->getSourceExpressions() as $expression) :
 
-            list($sql, $param) = $expression->asSql($connection);
+            list($sql, $param) = $compiler->compile($expression);
             $sqlParts[] = $sql;
             $params = array_merge($params, $param);
         endforeach;

@@ -62,13 +62,21 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
     /** @var WhereNode */
     public $where;
-    public $tablesAlias = [];
-    public $tableAliasMap = [];
-    public $selectRelected = [];
+    public $tablesAliasList = [];
     /**
-     * @var BaseJoin[]
+     * @var
      */
     public $tableAlias = [];
+
+    /**
+     * A assoc array of tables and there BaseJoin instance.
+     *
+     * @var BaseJoin[]
+     */
+    public $tableAliasMap = [];
+
+    public $selectRelected = [];
+
     public $aliasRefCount = [];
 
     /**
@@ -234,7 +242,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $value = current($conditions);
         list($lookups, $fieldParts) = $this->solveLookupType($name);
         list($value, $lookups, $usedJoins) = $this->prepareLookupValue($value, $lookups, $canReuse, $allowJoins);
-        //todo joins
+
         $whereClass = ($this->whereClass);
         $clause = $whereClass::createObject();
         $meta = $this->getMeta();
@@ -296,12 +304,21 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 //]);
     public function addQ(Q $q)
     {
+        $aliases = [];
+        foreach ($this->tableAliasMap as $key => $join) :
+            if ($join->getJoinType() === INNER):
+                $aliases[] = $key;
+            endif;
+        endforeach;
+
         $clause = $this->_addQ($q, $this->usedTableAlias)[0];
 
         if ($clause):
             $this->where->add($clause, AND_CONNECTOR);
         endif;
-        //todo work on joins
+
+        $this->changeToInnerjoin($aliases);
+
     }
 
     private function _addQ(Q $q, &$usedAliases, $allowJoins = true, $currentNegated = false)
@@ -325,12 +342,13 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             if ($childClause):
                 $targetClause->add($childClause, $connector);
             endif;
+
             $joinpromoter->addVotes($neededInner);
         endforeach;
         //todo join
-//        $neededInner = $joinpromoter->updateJoinType($this);
+        $neededInner = $joinpromoter->updateJoinType($this);
 
-        return [$targetClause, null];
+        return [$targetClause, $neededInner];
     }
 
     public function setGroupBy()
@@ -458,7 +476,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             $lookups = ['exact'];
         endif;
 
-        // Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
+        // Interpret '__exact=null' as the sql 'is NULL'; otherwise, reject all
         // uses of null as a query value.
         if (is_null($value)):
             if (!in_array(array_pop($lookups), ['exact'])):
@@ -476,10 +494,31 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             endforeach;
         endif;
 
+        if(method_exists($value, '_prepareAsFilterValue')):
+            $value = $value->_prepareAsFilterValue();
+        endif;
         //todo if value is array
         return [$value, $lookups, $usedJoins];
     }
 
+    /**
+     * Readies this instance for use in filter.
+     *
+     * @return Query
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function _prepareAsFilterValue()
+    {
+        return $this->deepClone();
+    }
+
+    public function _prepare()
+    {
+        return $this;
+    }
     /**
      * @param $names
      * @param Meta $meta
@@ -531,9 +570,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             // todo Check if we need any joins for concrete inheritance cases (the
             // field lives in parent, but we are currently in one of its
             // children)
-
             if ($field->hasMethod('getPathInfo')) :
-
                 $pathsInfos = $field->getPathInfo();
                 $last = $pathsInfos[count($pathsInfos) - 1];
 
@@ -568,9 +605,9 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
     public function getInitialAlias()
     {
-        if ($this->tablesAlias):
+        if ($this->tablesAliasList):
             // get the first one
-            $alias = $this->tablesAlias[0];
+            $alias = $this->tablesAliasList[0];
         else:
             $alias = $this->join(new BaseTable($this->getMeta()->dbTable, null));
         endif;
@@ -641,8 +678,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endif;
 
         list($alias) = $this->getTableAlias($join->getTableName(), false);
+
         if ($join->getJoinType()):
-            if ($this->tableAliasMap[$join->getParentAlias()]->getJoinType() === LOUTER || $join->getNullable()):
+            if ($this->tableAliasMap[$join->getParentAlias()]->getJoinType() === LOUTER ||
+                $join->getNullable()):
 
                 $joinType = LOUTER;
             else:
@@ -653,7 +692,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         $join->setTableAlias($alias);
         $this->tableAliasMap[$alias] = $join;
-        $this->tablesAlias[] = $alias;
+        $this->tablesAliasList[] = $alias;
 
         return $alias;
     }
@@ -672,7 +711,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function demoteJoins($aliases = [])
+    public function changeToInnerjoin($aliases = [])
     {
         /* @var $join Join */
         /* @var $parent Join */
@@ -689,9 +728,56 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endwhile;
     }
 
-    public function prmoteJoins($aliases)
+    /**
+     * Promotes recursively the join type of given aliases and its children to
+     * an outer join. If 'unconditional' is False, the join is only promoted if
+     * it is nullable or the parent join is an outer join.
+     *
+     * The children promotion is done to avoid join chains that contain a LOUTER b INNER c. So, if we have currently
+     * a INNER b INNER c and a->b is promoted, then we must also promote b->c automatically, or otherwise the promotion
+     * of a->b doesn't actually change anything in the query results.
+     *
+     * @param $aliases
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function changeToOuterJoin($aliases)
     {
 
+        /* @var $join Join */
+        /* @var $parent Join */
+        while ($aliases):
+            $alias = array_pop($aliases);
+            $join = $this->tableAliasMap[$alias];
+
+            // for the first join this should be true because its not a join
+            // but a basetable that will be used in the from part of the query
+            if ($join->getJoinType() == null):
+                continue;
+            endif;
+
+            // only the first alias is allowed to havea null join type
+            assert($join->getJoinType() !== null);
+
+            $parentAlias = $join->getParentAlias();
+            $parentIsOuter = ($parentAlias && $this->tableAliasMap[$parentAlias]->getJoinType() == LOUTER);
+            $aliasIsOuter = ($join->getJoinType() == LOUTER);
+
+            if (($join->getNullable() || $parentIsOuter) && !$aliasIsOuter):
+                $this->tableAliasMap[$alias] = $join->promote();
+                // since we have just change the join type of alias we need to update
+                // any thing else that refers to it
+                foreach ($this->tableAliasMap as $key => $join) :
+                    if ($join->getParentAlias() == $alias &&
+                        !ArrayHelper::hasKey($aliases, $key)
+                    ):
+                        $aliases[] = $key;
+                    endif;
+                endforeach;
+            endif;
+        endwhile;
     }
 
     /**
@@ -761,15 +847,24 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
     public function getTableAlias($tableName, $create = false)
     {
-        if (ArrayHelper::hasKey($this->tableAlias, $tableName) && false === $create):
-            $alias = ArrayHelper::getValue($this->tableAlias, $tableName);
+        // we use reference since we need to do an update
+        $aliases = &$this->tableAlias[$tableName];
+
+        if ($aliases && false === $create):
+            $alias = $aliases[0];
             $this->aliasRefCount[$alias] += 1;
 
             return [$alias, false];
         endif;
 
+        // we create a new alias
+        if ($aliases):
+            $aliases[] = sprintf('%s%s', $tableName, count($this->tableAliasMap));
+        else:
+            $this->tableAlias[$tableName] = [$tableName];
+        endif;
+
         $alias = $tableName;
-        $this->tableAlias[$alias] = $alias;
         $this->aliasRefCount[$alias] = 1;
 
         return [$alias, true];
@@ -969,14 +1064,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      */
     public function deepClone($class = null)
     {
-
         $class = (is_null($class)) ? static::class : $class;
         /** @var $obj Query */
         $obj = new $class($this->model);
         $obj->aliasRefCount = $this->aliasRefCount;
         $obj->useDefaultCols = $this->useDefaultCols;
         $obj->tableAlias = $this->tableAlias;
-        $obj->tableMap = $this->tableAliasMap;
+        $obj->tableAliasMap = $this->tableAliasMap;
+        $obj->tablesAliasList = $this->tablesAliasList;
         $obj->select = $this->select;
         $obj->selectRelected = $this->selectRelected;
         $obj->standardOrdering = $this->standardOrdering;
@@ -1131,6 +1226,13 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             return $col;
         endif;
 
+    }
+
+    public function toSubQuery(Connection $connection)
+    {
+        $this->isSubQuery = true;
+        //todo clear ordering
+        return $this;
     }
 
 }
