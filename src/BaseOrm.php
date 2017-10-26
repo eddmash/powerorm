@@ -27,6 +27,7 @@ use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Model\Model;
+use Exception;
 
 define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
 
@@ -274,41 +275,6 @@ class BaseOrm extends BaseObject
         return static::$instance;
     }
 
-    public static function showDebugToolBar()
-    {
-        static::$debugbarRenderer = self::getInstance()->loadToolbar();
-    }
-
-    /**
-     * @return \DebugBar\JavascriptRenderer
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function loadToolbar()
-    {
-        $debugbar = new StandardDebugBar();
-        $debugbarRenderer = $debugbar->getJavascriptRenderer($this->staticBaseUrl);
-
-        $debugbar['messages']->addMessage('hello world!');
-        $debugStack = new \Doctrine\DBAL\Logging\DebugStack();
-        $connection = \Eddmash\PowerOrm\BaseOrm::getDbConnection();
-
-        $connection->getConfiguration()->setSQLLogger($debugStack);
-
-        $debugbar->addCollector(new \DebugBar\Bridge\DoctrineCollector($debugStack));
-
-        return $debugbarRenderer;
-    }
-
-    /**
-     * @return JavascriptRenderer
-     */
-    public static function getDebugbarRenderer()
-    {
-        return self::$debugbarRenderer;
-    }
 
     /**
      * Returns the numeric version of the orm.
@@ -387,18 +353,6 @@ class BaseOrm extends BaseObject
         self::loadRegistry($orm);
     }
 
-    public static function loadRegistry(&$ormInstance = null)
-    {
-        if (is_null($ormInstance)) :
-            $ormInstance = self::getInstance([]);
-        endif;
-
-        try {
-            $ormInstance->registryCache->isAppReady();
-        } catch (AppRegistryNotReady $e) {
-            $ormInstance->registryCache->populate();
-        }
-    }
 
     /**
      * This is just a shortcut method. get the current instance of the orm.
@@ -441,9 +395,9 @@ class BaseOrm extends BaseObject
     /**
      * Configures an object with the initial property values.
      *
-     * @param object $object     the object to be configured
-     * @param array  $properties the property initial values given in terms of name-value pairs
-     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object the object to be configured
+     * @param array $properties the property initial values given in terms of name-value pairs
+     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
@@ -575,6 +529,8 @@ class BaseOrm extends BaseObject
         self::getInstance()->dispatchSignal($signal, $object);
     }
 
+    // ------------------------------------------ ORM SETUP METHODS ------------------------------------
+
     /**
      * Register custom Doctrine dbal types.
      *
@@ -582,11 +538,8 @@ class BaseOrm extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function presetup()
+    public static function presetup(BaseOrm $orm)
     {
-
-        $orm = self::getInstance();
-        static::showDebugToolBar();
 
         foreach ($orm->dbTypes as $name => $type) {
             Type::addType($name, $type);
@@ -598,11 +551,38 @@ class BaseOrm extends BaseObject
 
     }
 
+    public static function loadRegistry(&$ormInstance = null)
+    {
+        if (is_null($ormInstance)) :
+            $ormInstance = self::getInstance([]);
+        endif;
+
+        try {
+            $ormInstance->registryCache->isAppReady();
+        } catch (AppRegistryNotReady $e) {
+            $ormInstance->registryCache->populate();
+        }
+    }
+
+
     /**
      * @return string
      */
     public function getTimezone()
     {
         return ($this->timezone) ? $this->timezone : date_default_timezone_get();
+    }
+
+    public function __get($name)
+    {
+        $this->registryCache->isAppReady();
+
+        if (ArrayHelper::hasKey($this->components, $name)):
+            $component = ArrayHelper::getValue($this->components, $name, null);
+            $this->{$name} = call_user_func($component, $this);
+        endif;
+
+        return $this->{$name};
+
     }
 }

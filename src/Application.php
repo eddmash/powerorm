@@ -65,7 +65,7 @@ class Application
             $composerLoader->setPsr4($migrationsNamespace, $orm->migrationPath);
         endif;
 
-        BaseOrm::presetup();
+        BaseOrm::presetup($orm);
         BaseOrm::loadRegistry();
 
         return $orm;
