@@ -28,6 +28,7 @@ use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 use function Eddmash\PowerOrm\Model\Query\Expression\not_;
 use function Eddmash\PowerOrm\Model\Query\Expression\q_;
+use Eddmash\PowerOrm\Model\Query\Results\ArrayFlatValueMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayValueMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ModelMapper;
@@ -79,6 +80,10 @@ class Queryset implements QuerysetInterface
      * @internal
      */
     protected $_resultsCache;
+
+    /**
+     * @var array Holds fields that will be used in the asArray().
+     */
     private $_fields;
     protected $kwargs = [];
 
@@ -98,9 +103,9 @@ class Queryset implements QuerysetInterface
 
     /**
      * @param Connection $connection
-     * @param Model      $model
-     * @param Query      $query
-     * @param array      $kwargs
+     * @param Model $model
+     * @param Query $query
+     * @param array $kwargs
      *
      * @return self
      *
@@ -113,7 +118,8 @@ class Queryset implements QuerysetInterface
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    ) {
+    )
+    {
         return new static($connection, $model, $query, $kwargs);
     }
 
@@ -305,7 +311,7 @@ class Queryset implements QuerysetInterface
 
     public function prefetchRelated()
     {
-        throw new NotImplemented(__METHOD__.' NOT IMPLEMENTED');
+        throw new NotImplemented(__METHOD__ . ' NOT IMPLEMENTED');
     }
 
     public function exclude()
@@ -322,7 +328,7 @@ class Queryset implements QuerysetInterface
             return $instance->query->hasResults($this->connection);
         endif;
 
-        return (bool) $this->_resultsCache;
+        return (bool)$this->_resultsCache;
     }
 
     public function limit($start, $end)
@@ -418,7 +424,7 @@ class Queryset implements QuerysetInterface
             endif;
         endif;
 
-        $conditions = (empty($conditions)) ?[[]]:$conditions;
+        $conditions = (empty($conditions)) ? [[]] : $conditions;
 
         return call_user_func_array('array_merge', $conditions);
     }
@@ -489,33 +495,39 @@ class Queryset implements QuerysetInterface
         return new $this->resultMapper($this);
     }
 
-    public function _toSql()
+
+    /**
+     * Returns the results as an array of associative array that represents a record in the database.
+     * The orm does not try map the into  there  respective models.
+     *
+     * @param array $fields the fields to select, if null all fields in the model are selected
+     * @param bool $valuesOnly if true return
+     * @param bool $flat if true returns the results as one array others it returns
+     * results as array of arrays each which represents a record in the database for the selected field.
+     * (only works when valueOnly is true)
+     * @return Queryset
+     * @throws TypeError
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function asArray($fields = [], $valuesOnly = false, $flat = false)
     {
 
-        $clone = $this->asArray([$this->model->meta->primaryKey->getColumnName()]);
-
-        return $clone->query->getNestedSql($this->connection);
-    }
-
-    public function asArray($fields = [], $valuesOnly = false)
-    {
+        if ($flat && count($fields) != 1):
+            throw new TypeError("'flat' is valid when asArray is called with exactly one field.");
+        endif;
+        if ($flat && !$valuesOnly):
+            throw new TypeError("'flat' is valid when asArray is called with valuesOnly=true.");
+        endif;
         $clone = $this->_clone();
         $clone->_fields = $fields;
-        if ($fields):
-            $clone->query->clearSelectedFields();
-            $clone->query->useDefaultCols = false;
-        else:
-            foreach ($this->model->meta->getConcreteFields() as $field) :
-                $fields[] = $field->getName();
-            endforeach;
-
-        endif;
-
         $clone->query->setValueSelect($fields);
-        $clone->query->addFields($fields, true);
 
         $clone->resultMapper = ($valuesOnly) ? ArrayValueMapper::class : ArrayMapper::class;
-
+        if($flat):
+            $clone->resultMapper = ArrayFlatValueMapper::class;
+        endif;
         return $clone;
     }
 
@@ -657,10 +669,10 @@ class Queryset implements QuerysetInterface
      */
     public function _prepareAsFilterValue()
     {
-        if(is_null($this->_fields)):
+        if (is_null($this->_fields)):
             $queryset = $this->asArray(['pk']);
         else:
-            if(count($this->_fields) > 1):
+            if (count($this->_fields) > 1):
                 throw new TypeError('Cannot use multi-field values as a filter value.');
             endif;
             $queryset = $this->_clone();

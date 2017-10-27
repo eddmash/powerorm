@@ -61,6 +61,7 @@ class WhereNode extends Node implements SqlCompilableinterface, CloneInterface
     {
         $obj = new self();
         $obj->defaultConnector = $this->defaultConnector;
+        $obj->negated = $this->negated;
         foreach ($this->getChildren() as $child) :
             if($child instanceof CloneInterface):
                 $child = $child->deepClone();

@@ -35,7 +35,7 @@ class Manager extends Base
         // default command path
         $this->path = ['Eddmash\PowerOrm\\' => sprintf('%s/Command', dirname(__FILE__))];
 
-        $this->path = $this->addPath($this->getComponentsPath());
+//        $this->path = $this->addPath($this->getComponentsPath());
 
         $this->managerName = $this->normalizeKey($this->getShortClassName());
     }

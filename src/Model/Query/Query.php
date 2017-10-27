@@ -127,7 +127,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * Query constructor.
      *
-     * @param Model     $model
+     * @param Model $model
      * @param WhereNode $whereClass
      *
      * @internal param string $where
@@ -156,12 +156,13 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         return [$orderName, $order[0]];
     }
 
-    public function getNestedSql(Connection $connection)
-    {
-
-        return $this->asSql($connection, true);
-    }
-
+    /**
+     * manually Adds field to be used on the select statement
+     * @param Col $col
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function addSelect(Col $col)
     {
         $this->useDefaultCols = false;
@@ -215,7 +216,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      */
     private function buildCondition($lookup, $lhs, $rhs)
     {
-        $lookup = (array) $lookup;
+        $lookup = (array)$lookup;
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
         $lookup = $lookup::createObject($lhs, $rhs);
@@ -285,7 +286,25 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      */
     public function setValueSelect($valueSelect)
     {
-        $this->valueSelect[] = $valueSelect;
+        $this->selectRelected = false;
+        $this->clearSelectedFields();
+
+        if ($this->groupBy):
+            //todo
+        endif;
+
+        if ($valueSelect):
+            $this->useDefaultCols = false;
+        else:
+            $valueSelect = [];
+            foreach ($this->model->meta->getConcreteFields() as $field) :
+                $valueSelect[] = $field->getName();
+            endforeach;
+            //todo annotations
+        endif;
+
+        $this->valueSelect = $valueSelect;
+        $this->addFields($valueSelect, true);
     }
 
 // where (
@@ -382,7 +401,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             if (property_exists($fieldName, 'containsAggregate')):
                 throw new FieldError(
                     sprintf(
-                        'Using an aggregate in order_by() without also including '.
+                        'Using an aggregate in order_by() without also including ' .
                         'it in annotate() is not allowed: %s',
                         $fieldName
                     )
@@ -494,7 +513,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             endforeach;
         endif;
 
-        if(method_exists($value, '_prepareAsFilterValue')):
+        if (method_exists($value, '_prepareAsFilterValue')):
             $value = $value->_prepareAsFilterValue();
         endif;
         //todo if value is array
@@ -519,6 +538,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     {
         return $this;
     }
+
     /**
      * @param $names
      * @param Meta $meta
@@ -1073,6 +1093,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $obj->tableAliasMap = $this->tableAliasMap;
         $obj->tablesAliasList = $this->tablesAliasList;
         $obj->select = $this->select;
+        $obj->valueSelect = $this->valueSelect;
         $obj->selectRelected = $this->selectRelected;
         $obj->standardOrdering = $this->standardOrdering;
         $obj->annotations = $this->annotations;
@@ -1240,7 +1261,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $query = $this->deepClone();
         //todo handle distinct and group by
         $query->clearOrdering(true);
-        $query->setLimit(1,1);
+        $query->setLimit(1, 1);
         $compiler = $query->getSqlCompiler($connection);
         return $compiler->hasResults();
     }
@@ -1248,7 +1269,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 }
 
 /**
- * @param Model[]        $instances
+ * @param Model[] $instances
  * @param Prefetch|array $lookups
  *
  * @since 1.1.0
@@ -1284,7 +1305,7 @@ function prefetchRelatedObjects($instances, $lookups)
             if ($lookup->queryset):
                 throw new ValueError(
                     sprintf(
-                        "'%s' lookup was already seen with a different queryset. ".
+                        "'%s' lookup was already seen with a different queryset. " .
                         'You may need to adjust the ordering of your lookups.',
                         $lookup->prefetchTo
                     )

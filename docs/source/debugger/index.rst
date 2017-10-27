@@ -32,6 +32,10 @@ below.
 
 .. code-block:: php
 
+    use DebugBar\StandardDebugBar;
+    use Eddmash\PowerOrm\BaseOrm;
+    use Eddmash\PowerOrmDebug\Debugger;
+
     $config = [
         // ..., other orm settings
 

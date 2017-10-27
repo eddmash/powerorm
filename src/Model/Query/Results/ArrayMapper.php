@@ -10,6 +10,8 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Results;
 
+use Eddmash\PowerOrm\Model\Query\Expression\Col;
+
 class ArrayMapper extends Mapper
 {
     /**
@@ -24,7 +26,17 @@ class ArrayMapper extends Mapper
      */
     public function __invoke()
     {
-        return $this->queryset->query->execute($this->queryset->connection)->fetchAll();
+        $connection = $this->queryset->connection;
+
+        $sqlCompiler = $this->queryset->query->getSqlCompiler($connection);
+        $resultsStatement = $sqlCompiler->executeSql($this->chunkedFetch);
+        $colList = $sqlCompiler->query->valueSelect;
+
+        $resuts = [];
+        foreach ($sqlCompiler->getResultsIterator($resultsStatement) as $result) :
+            $resuts[] = array_combine($colList, $result);
+        endforeach;
+        return $resuts;
 
     }
 }
