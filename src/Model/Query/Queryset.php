@@ -319,7 +319,7 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-            return (bool) $instance->query->execute($this->connection)->fetch();
+            return $instance->query->hasResults($this->connection);
         endif;
 
         return (bool) $this->_resultsCache;
@@ -417,6 +417,8 @@ class Queryset implements QuerysetInterface
                 return $conditions;
             endif;
         endif;
+
+        $conditions = (empty($conditions)) ?[[]]:$conditions;
 
         return call_user_func_array('array_merge', $conditions);
     }

@@ -31,7 +31,6 @@ class ManyToOneDescriptor extends BaseDescriptor
      */
     public function getValue(Model $modelInstance)
     {
-        echo 'im here<br>';
         $result = null;
 
         try {

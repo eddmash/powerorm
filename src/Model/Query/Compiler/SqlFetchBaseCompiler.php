@@ -683,4 +683,11 @@ class SqlFetchBaseCompiler extends SqlCompiler
         return [$field, $targets, $alias, $paths, $meta];
     }
 
+    public function hasResults()
+    {
+        $statement = $this->executeSql();
+
+        return !empty($statement->fetch());
+    }
+
 }

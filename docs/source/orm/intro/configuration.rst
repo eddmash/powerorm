@@ -65,6 +65,20 @@ The ORM takes several configurations
 
     A string representing the time zone .
 
+.. _config_components:
+
+- **components**
+
+    Enables adding extra modules to the orm.
+
+    This is an array of modules that need to be part of the orm.
+
+        - The *key* is used to access the module as an attribute of the orm
+        - The value should be a *callback* that receive the orm instance and returns and instance of the module.
+
+    see :ref:`Debugbar Setup<debugbar_setup>` for example.
+
+
 Sample Configuration file.
 ============================
 
@@ -89,5 +103,5 @@ A sample configurations.
         ],
         'dbPrefix' => 'demo_',
         'charset' => 'utf-8',
-        'timezone'=>'Africa/Nairobi'
+        'timezone'=>'Africa/Nairobi',
     ];

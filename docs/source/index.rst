@@ -16,6 +16,13 @@ Form
 Dealing with HTML forms is one of the most common - and challenging - tasks for a web developer.
 :doc:`Powerform</form/index>` component makes dealing with forms easy.
 
+********
+Debugbar
+********
+
+:doc:`Debugbar</debugger/index>` Displays a debug bar in the browser with information from php.
+
+
 *****************
 Extra Information
 *****************

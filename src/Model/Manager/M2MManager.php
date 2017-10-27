@@ -129,6 +129,20 @@ class M2MManager extends BaseM2MManager
         $this->addItems($this->fromFieldName, $this->toFieldName, func_get_args());
     }
 
+    public function remove()
+    {
+        if (!$this->through->meta->autoCreated):
+            $meta = $this->through->meta;
+            throw new AttributeError(
+                sprintf("Cannot use remove() on a ManyToManyField which specifies " .
+                    "an intermediary model. Use %s's Manager instead.",
+                    $meta->getNamespacedModelName()));
+        endif;
+        //todo clear prefetched
+        $this->removeItems($this->fromFieldName, $this->toFieldName, func_get_args());
+
+    }
+
     public function set($values, $kwargs = [])
     {
         if (!$this->through->meta->autoCreated) :
@@ -147,7 +161,28 @@ class M2MManager extends BaseM2MManager
             $this->clear();
             $this->addItems($this->fromFieldName, $this->toFieldName, $values);
         else:
-            $this->addItems($this->fromFieldName, $this->toFieldName, $values);
+
+            $oldVals = $this->asArray([$this->toField->getRelatedField()->getAttrName()], true);
+            $oldIds = $this->evalQueryset($oldVals);
+            $oldIds = array_unique(call_user_func_array("array_merge", $oldIds)); // flatten
+
+            $newObjects = [];
+            foreach ($values as $value) :
+                if ($value instanceof Model):
+                    $fkVal = $this->toField->getForeignRelatedFieldsValues($value)[0];;
+                else:
+                    $fkVal = $value;
+                endif;
+
+                if (in_array($fkVal, $oldIds)):
+                    unset($oldIds[array_search($fkVal, $oldIds)]);
+                else:
+                    $newObjects[] = $value;
+                endif;
+            endforeach;
+
+            $this->remove(...$oldIds);
+            $this->add(...$newObjects);
         endif;
     }
 
@@ -171,10 +206,10 @@ class M2MManager extends BaseM2MManager
                     $fromFieldName => $this->relatedValues[0],
                 ]
             );
-            $oldIds = [];
-            foreach ($oldVals as $oldVal) :
-                $oldIds[] = $oldVal;
-            endforeach;
+            $oldIds = $this->evalQueryset($oldVals);
+
+            $oldIds = array_unique(call_user_func_array("array_merge", $oldIds));
+
 
             $newIds = array_diff($newIds, $oldIds);
 
@@ -210,5 +245,15 @@ class M2MManager extends BaseM2MManager
                 $oldIds[] = $value;
             endif;
         endforeach;
+    }
+
+
+    private function evalQueryset(Queryset $queryset)
+    {
+        $oldIds = [];
+        foreach ($queryset as $oldVal) :
+            $oldIds[] = $oldVal;
+        endforeach;
+        return $oldIds;
     }
 }

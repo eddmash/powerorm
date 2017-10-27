@@ -2,6 +2,7 @@
 
 namespace Eddmash\PowerOrm\Model;
 
+use App\Models\Entry;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeconstructableObject;
@@ -247,7 +248,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         $forwardFields = [];
 
         /** @var $field Field */
-        foreach ($this->getForwardOnlyField() as $name => $field) :
+        foreach ($this->fetchFields(['reverse' => false, 'inverse' => false]) as $name => $field) :
             if (!$field->manyToMany):
                 $forwardFields[$name] = $field;
             endif;
@@ -257,6 +258,8 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
+     * Used only when we are trying to get field that belongs to the scope model.
+     *
      * @return Field[]
      *
      * @since 1.1.0

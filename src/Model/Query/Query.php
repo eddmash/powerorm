@@ -1235,6 +1235,16 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         return $this;
     }
 
+    public function hasResults(Connection $connection)
+    {
+        $query = $this->deepClone();
+        //todo handle distinct and group by
+        $query->clearOrdering(true);
+        $query->setLimit(1,1);
+        $compiler = $query->getSqlCompiler($connection);
+        return $compiler->hasResults();
+    }
+
 }
 
 /**

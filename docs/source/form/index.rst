@@ -14,7 +14,11 @@ Via composer **(recommended)**::
 
 Or add this to the composer.json file::
 
-	composer require eddmash/powerform:@dev
+	{
+	    "require": {
+	        "eddmash/powerform": "@dev"
+	    }
+	}
 
 You could also Download or Clone package from github.
 

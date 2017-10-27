@@ -10,6 +10,7 @@
 
 namespace Eddmash\PowerOrm\Model;
 
+use App\Models\Entry;
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\ArrayObjectInterface;
 use Eddmash\PowerOrm\BaseOrm;
