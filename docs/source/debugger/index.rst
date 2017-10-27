@@ -38,7 +38,6 @@ below.
         'components' => [
             "debugger" => function (BaseOrm $orm) {
                 $debugger = new Debugger($orm);
-                $debugger->setStaticBaseUrl("/assets/");
                 $debugger->setDebugBar(new StandardDebugBar());
                 return $debugger;
             },
