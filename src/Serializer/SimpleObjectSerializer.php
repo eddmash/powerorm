@@ -160,7 +160,8 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      */
     public function endObject(Model $model)
     {
-        $this->objects[] = $this->dumpObject($model);
+        $this->objects['model']= $model->meta->getNamespacedModelName();
+        $this->objects['fields'] = $this->dumpObject($model);
         $this->_fields = null;
     }
 
