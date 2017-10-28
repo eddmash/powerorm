@@ -51,6 +51,12 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * @var Model
      */
     public $scopeModel;
+
+    /**
+     * Indicates if this field should be serailized when the scope model is being serailized
+     * @var bool
+     */
+    public $serialize=true;
     protected $name;
 
     /**
@@ -797,6 +803,26 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         $this->null = $null;
 
         return $this;
+    }
+
+    public function isSerializable()
+    {
+        return $this->serialize;
+    }
+
+    /**
+     * Converts the value into string. this is used by the serialization module.
+     *
+     * @param $value
+     * @return mixed
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function valueToString(Model $model)
+    {
+        return strval($this->valueFromObject($model));
+
     }
 }
 
