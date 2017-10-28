@@ -1261,7 +1261,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $query = $this->deepClone();
         //todo handle distinct and group by
         $query->clearOrdering(true);
-        $query->setLimit(1, 1);
+        $query->setLimit(null, 1);
         $compiler = $query->getSqlCompiler($connection);
         return $compiler->hasResults();
     }

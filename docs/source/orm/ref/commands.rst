@@ -95,37 +95,9 @@ recovery will be needed to make migrations run correctly.
 generatedata
 ------------
 
-This generates dummy data for the models detected by powerorm on you project. THis might be usefull when developing.
+This generates dummy data for the models detected by powerorm on you project. This might be usefull when developing.
 This command depends on the library ``powerorfaker`` which can be installed via composer
 
-::
-
- composer require eddmash\powerormfaker:@dev
-
-
-`-o, --only`
-
-The list of models to use when generating records.
-
-::
-
-    php pmanager.php generatedata -o 'App\Models\Author' -o 'App\Models\Blog'
-
-`-i, --ignore`
-
-The list of models to ignore when generating records.
-
-::
-
-    php pmanager.php generatedata -i 'App\Models\Entry'
-
-`-r, --records`
-
-The number of records to generate per model.
-
-::
-
-    php pmanager.php generatedata -r 5
 
 showmigrations
 --------------

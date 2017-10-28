@@ -59,6 +59,11 @@ class BaseOrm extends BaseObject
         'H:i:s.u',  // '14:30:59.000200'
         'H:i',        // '14:30'
     ];
+
+    /**
+     * @var string command class names to add to the orm manager
+     */
+    protected $commands =[];
     private $timezone = '';
 
     /**
@@ -584,5 +589,18 @@ class BaseOrm extends BaseObject
 
         return $this->{$name};
 
+    }
+
+
+    /**
+     * Adds a command class to the manager
+     * @param string $command class name
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function registerCliCommand($command)
+    {
+        $this->commands[] = $command;
     }
 }

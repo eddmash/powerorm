@@ -162,9 +162,8 @@ class M2MManager extends BaseM2MManager
             $this->addItems($this->fromFieldName, $this->toFieldName, $values);
         else:
 
-            $oldVals = $this->asArray([$this->toField->getRelatedField()->getAttrName()], true);
+            $oldVals = $this->asArray([$this->toField->getRelatedField()->getAttrName()], true, true);
             $oldIds = $this->evalQueryset($oldVals);
-            $oldIds = array_unique(call_user_func_array("array_merge", $oldIds)); // flatten
 
             $newObjects = [];
             foreach ($values as $value) :
@@ -201,15 +200,12 @@ class M2MManager extends BaseM2MManager
             /** @var $throughClass Model */
             $throughClass = $this->through->meta->getNamespacedModelName();
 
-            $oldVals = $throughClass::objects($this->through)->asArray([$toFieldName], true)->filter(
+            $oldVals = $throughClass::objects($this->through)->asArray([$toFieldName], true, true)->filter(
                 [
                     $fromFieldName => $this->relatedValues[0],
                 ]
             );
             $oldIds = $this->evalQueryset($oldVals);
-
-            $oldIds = array_unique(call_user_func_array("array_merge", $oldIds));
-
 
             $newIds = array_diff($newIds, $oldIds);
 

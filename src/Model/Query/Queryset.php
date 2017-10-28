@@ -348,7 +348,7 @@ class Queryset implements QuerysetInterface
         $clone = $this->query->deepClone(UpdateQuery::class);
         $clone->addUpdateFields($records);
 
-        return $clone->execute($this->connection);
+        return $clone->getSqlCompiler($this->connection)->executeSql();
     }
 
     public function _insert($model, $fields, $returnId)

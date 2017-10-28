@@ -16,6 +16,8 @@ use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
+use Eddmash\PowerOrm\Model\Query\Compiler\SQLUpdateCompiler;
 
 /**
  * Represents an "update" SQL query.
@@ -83,68 +85,10 @@ class UpdateQuery extends Query
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function asSql(Connection $connection, $isSubQuery = false)
+    protected function getCompilerClass()
     {
-        $qb = $connection->createQueryBuilder();
-        $qb->update($this->tablesAliasList[0]);
-        $params = [];
-
-        /* @var $field Field */
-        /* @var $model Model */
-        foreach ($this->values as $valItem) :
-            $field = $valItem[0];
-            $model = $valItem[1];
-            $value = $valItem[2];
-
-            $name = $field->getColumnName();
-            $qb->set($name, '?');
-
-            //todo resolve_expression,
-            if (method_exists($value, 'prepareDatabaseSave')):
-                if ($field->isRelation):
-                    $value = $field->prepareValueBeforeSave(
-                        $value->prepareDatabaseSave($field),
-                        $connection
-                    );
-                else:
-                    throw new TypeError(
-                        "Tried to update field '%s' with a model instance, '%s'. Use a value compatible with '%s'.",
-                        $field->getName(),
-                        $value,
-                        get_class($field)
-                    );
-
-                endif;
-
-            else:
-                $value = $field->prepareValueBeforeSave($value, $connection);
-            endif;
-            // prepare value
-            $params[] = $value;
-        endforeach;
-
-        list($sql, $whereParams) = $this->where->asSql($connection);
-        $qb->where($sql);
-        $params = array_merge($params, $whereParams);
-
-        foreach ($params as $index => $param) :
-            $qb->setParameter($index, $param);
-        endforeach;
-
-        return $qb;
+        return SQLUpdateCompiler::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function execute(Connection $connection)
-    {
-        $qb = $this->asSql($connection);
-
-        return (bool) $qb->execute();
-    }
 
 }

@@ -22,6 +22,12 @@ Debugbar
 
 :doc:`Debugbar</debugger/index>` Displays a debug bar in the browser with information from php.
 
+**********
+Data Faker
+**********
+
+:doc:`Data Faker</faker/index>` Generate dummy data for your models.
+
 
 *****************
 Extra Information
@@ -33,6 +39,8 @@ Extra Information
 
     orm/index
     form/index
+    debugger/index
+    faker/index
     license
     changelog
 

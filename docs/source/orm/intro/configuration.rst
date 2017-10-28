@@ -78,6 +78,14 @@ The ORM takes several configurations
 
     see :ref:`Debugbar Setup<debugbar_setup>` for example.
 
+.. _config_commands:
+
+- **components**
+
+    Allows adding commands to orm manager.
+
+
+    see :ref:`Faker Setup<faker_setup>` for example.
 
 Sample Configuration file.
 ============================

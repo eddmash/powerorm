@@ -40,6 +40,7 @@ class Manager extends Base
         $this->managerName = $this->normalizeKey($this->getShortClassName());
     }
 
+
     public function addPath($paths)
     {
         foreach ($paths as $package => $locations) :
@@ -54,17 +55,17 @@ class Manager extends Base
         return ['help' => '', 'version' => ''];
     }
 
-    public function getComponentsPath()
+    public function getExtraCommands()
     {
-        $components = (array) BaseOrm::getInstance()->components;
+        $components = (array) BaseOrm::getInstance()->commands;
 
-        $paths = [];
+        $comands = [];
 
-        foreach ($components as $name => $path) :
-            $paths[$name] = sprintf('%ssrc/Console/Command', $path);
+        foreach ($components as $command) :
+            $comands[] = new $command();
         endforeach;
 
-        return $paths;
+        return $comands;
     }
 
     public function getDefaultCommands()
@@ -152,6 +153,7 @@ class Manager extends Base
         $console->setDefaultCommand($def->getName());
 
         $console->addCommands(self::getCoreCommands());
+        $console->addCommands(self::getExtraCommands());
         if (null === $output) {
             $output = new ConsoleOutput();
         }

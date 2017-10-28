@@ -37,7 +37,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
     public $select = [];
     public $where;
 
-    private function preSqlSetup()
+    protected function preSqlSetup()
     {
         // check if any of the tables have been used, if not initialize
         $noneUsed = true;
@@ -597,7 +597,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
             $results[] = $this->query->limit;
         endif;
 
-        if ($this->query->offset) :
+        if (!is_null($this->query->offset)) :
             $results[] = 'OFFSET';
             $results[] = $this->query->offset;
         endif;
@@ -687,7 +687,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
     {
         $statement = $this->executeSql();
 
-        return !empty($statement->fetch());
+        return false === empty($statement->fetch());
     }
 
 }
