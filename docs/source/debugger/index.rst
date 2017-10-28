@@ -42,6 +42,9 @@ below.
         'components' => [
             "debugger" => function (BaseOrm $orm) {
                 $debugger = new Debugger($orm);
+                // if debugger css and js are not loading correctly you
+                // can set where the debuger shouw fetch them here
+                //$debugger->setStaticBaseUrl("/assets/");
                 $debugger->setDebugBar(new StandardDebugBar());
                 return $debugger;
             },
