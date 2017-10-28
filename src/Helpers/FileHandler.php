@@ -50,7 +50,6 @@ class FileHandler extends BaseObject
      */
     public function write($content)
     {
-
         // create folder if it does not exist
         if (!file_exists($this->path)):
             mkdir($this->path);
@@ -196,5 +195,4 @@ class FileHandler extends BaseObject
     {
         return (preg_match("/\/$/", $name)) ? $name : $name.'/';
     }
-
 }

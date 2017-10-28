@@ -112,5 +112,4 @@ class OrderBy extends BaseExpression
     {
         $this->descending = !$this->descending;
     }
-
 }

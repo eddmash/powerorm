@@ -51,5 +51,4 @@ class BaseAggregate extends Func
     {
         return $this->containsAggregate;
     }
-
 }

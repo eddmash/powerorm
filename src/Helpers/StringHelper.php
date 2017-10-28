@@ -88,7 +88,7 @@ class StringHelper
             return true;
         }
         if ($caseSensitive) {
-            return strncmp($string, $with, $bytes) === 0;
+            return 0 === strncmp($string, $with, $bytes);
         } else {
             return mb_strtolower(
                     mb_substr($string, 0, $bytes, '8bit'),
@@ -118,7 +118,7 @@ class StringHelper
                 return false;
             }
 
-            return substr_compare($string, $with, -$bytes, $bytes) === 0;
+            return 0 === substr_compare($string, $with, -$bytes, $bytes);
         } else {
             return mb_strtolower(
                     mb_substr($string, -$bytes, null, '8bit'),
@@ -137,7 +137,7 @@ class StringHelper
             $subString = strtolower($subString);
         endif;
 
-        return strpos($string, $subString) !== false;
+        return false !== strpos($string, $subString);
     }
 
     public static function getCharset()
@@ -168,7 +168,7 @@ class StringHelper
 
     public static function isEmpty($string)
     {
-        return $string === '' || $string === null;
+        return '' === $string || null === $string;
     }
 
     public static function split($pattern, $string)

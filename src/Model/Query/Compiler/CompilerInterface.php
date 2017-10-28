@@ -14,5 +14,6 @@ namespace Eddmash\PowerOrm\Model\Query\Compiler;
 interface CompilerInterface
 {
     public function executeSql($chunked = false);
+
     public function compile(SqlCompilableinterface $node);
 }

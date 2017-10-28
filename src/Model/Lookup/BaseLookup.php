@@ -50,7 +50,6 @@ class BaseLookup implements LookupInterface
         $this->lhs = $lhs;
 
         $this->rhs = $this->prepareLookup();
-
     }
 
     public static function createObject($rhs, $lhs)
@@ -131,7 +130,6 @@ class BaseLookup implements LookupInterface
 
         // it might be, this is just a pure php value
         return $this->rhs;
-
     }
 
     /**
@@ -152,7 +150,6 @@ class BaseLookup implements LookupInterface
         endif;
 
         return $preparedValues;
-
     }
 
     public function processRHS(CompilerInterface $compiler, Connection $connection)

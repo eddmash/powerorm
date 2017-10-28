@@ -41,7 +41,7 @@ class OneToOneField extends ForeignKey
     {
         $kwargs['unique'] = true;
 
-        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
+        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && null == $kwargs['rel'])):
             $kwargs['rel'] = OneToOneRel::createObject(
                 [
                     'fromField' => $this,

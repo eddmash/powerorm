@@ -74,5 +74,4 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
     {
         return array_merge(static::DEBUG_IGNORE, ['constructorArgs']);
     }
-
 }

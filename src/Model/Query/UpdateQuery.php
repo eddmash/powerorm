@@ -86,5 +86,4 @@ class UpdateQuery extends Query
     {
         return SQLUpdateCompiler::class;
     }
-
 }

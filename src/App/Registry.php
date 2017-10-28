@@ -53,7 +53,7 @@ class Registry extends BaseObject
 
     public function populate()
     {
-        if ($this->ready == false) :
+        if (false == $this->ready) :
             $this->hydrateRegistry();
             $this->ready = true;
         endif;
@@ -219,7 +219,6 @@ class Registry extends BaseObject
 
     public function registerModel(Model $model)
     {
-
         $name = $model->meta->getNamespacedModelName();
         if (!ArrayHelper::hasKey($this->allModels, $name)) {
             $this->allModels[$name] = $model;
@@ -248,7 +247,6 @@ class Registry extends BaseObject
         }
 
         try {
-
             $model = $this->getRegisteredModel($modelName);
             $kwargs['relatedModel'] = $model;
             $callback($kwargs);
@@ -260,7 +258,7 @@ class Registry extends BaseObject
     public function getRegisteredModel($name)
     {
         $model = ArrayHelper::getValue($this->allModels, $name);
-        if ($model == null):
+        if (null == $model):
             throw new LookupError(sprintf("Model '%s' not registered.", $name));
         endif;
 

@@ -52,5 +52,4 @@ class ManyToManyRel extends ForeignObjectRel
     {
         throw new NotImplemented();
     }
-
 }

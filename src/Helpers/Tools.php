@@ -43,7 +43,7 @@ class Tools
         $linebreak = PHP_EOL;
         $stringState = '';
 
-        if ($indent == false) {
+        if (false == $indent) {
             $linebreak = '';
             $indentCharacter = '';
             $indent = 0;
@@ -57,14 +57,14 @@ class Tools
         $counter = 1;
 
         // unify everything to an array, on the first round for consistencies.
-        if ($level == 0) {
+        if (0 == $level) {
             $data = [$data];
         }
 
         foreach ($data as $key => $value) {
             $stringState .= str_repeat($indentCharacter, $indent);
 
-            $nextIndent = ($indent == false) ? $indent : $indent + 1;
+            $nextIndent = (false == $indent) ? $indent : $indent + 1;
 
             if (is_array($value)) {
                 // HANDLE VALUE IF ARRAY
@@ -78,10 +78,9 @@ class Tools
                 $stringState .= self::stringify($value, $nextIndent, $close, $start, ++$level);
 
                 $stringState .= $linebreak;
-                $stringState .= ($indent != false) ? str_repeat($indentCharacter, $indent - 1) : '';
+                $stringState .= (false != $indent) ? str_repeat($indentCharacter, $indent - 1) : '';
                 $stringState .= ' ]';
             } elseif (is_object($value)) {
-
                 // HANDLE VALUE THAT ARE OBJECTS THAT IMPLEMENT DeConstructableInterface interface
 
                 if ($value instanceof DeConstructableInterface) {
@@ -98,16 +97,15 @@ class Tools
                     $stringState .= sprintf('%s', $value);
                 }
             } else {
-
                 // HANDLE VALUE IF ITS NOT OBJECT OR ARRAY
 
                 $stringState .= (!is_numeric($key)) ? "'$key'=>" : '';
 
-                if ($value === false) {
+                if (false === $value) {
                     $stringState .= 'false';
-                } elseif ($value === true) {
+                } elseif (true === $value) {
                     $stringState .= 'true';
-                } elseif ($value === null) {
+                } elseif (null === $value) {
                     $stringState .= 'null';
                 } elseif (is_numeric($value)) {
                     $stringState .= "$value";
@@ -285,7 +283,7 @@ class Tools
 
     public static function resolveRelation($model, $relModel)
     {
-        if (is_string($relModel) && $relModel == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT):
+        if (is_string($relModel) && BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $relModel):
             return self::resolveRelation($model, $model);
         elseif ($relModel instanceof Model):
             return $relModel->meta->getNamespacedModelName();

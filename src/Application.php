@@ -80,10 +80,8 @@ class Application
      */
     public static function consoleRun($config, &$composerLoader = null, $autoRun = true)
     {
-
         static::run($config, $composerLoader);
 
         return Manager::run($autoRun);
     }
-
 }

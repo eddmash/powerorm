@@ -160,11 +160,11 @@ class Meta extends DeconstructableObject implements MetaInterface
     {
         $this->overrides = $overrides;
 
-        if ($this->registry == null):
+        if (null == $this->registry):
             $this->registry = BaseOrm::getRegistry();
         endif;
 
-        if ($this->managerClass == null):
+        if (null == $this->managerClass):
             $this->managerClass = BaseManager::class;
         endif;
     }
@@ -207,7 +207,6 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getField($name)
     {
-
         // first look in the forward fields only
         $fields = $this->getForwardOnlyField();
 
@@ -397,7 +396,7 @@ class Meta extends DeconstructableObject implements MetaInterface
             endif;
         endforeach;
 
-        if ($this->dbTable == null):
+        if (null == $this->dbTable):
             $this->dbTable = $this->getTableName();
         endif;
 
@@ -455,9 +454,9 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function addField(Field $field)
     {
-        if ($field->relation != null && $field->manyToMany):
+        if (null != $field->relation && $field->manyToMany):
             $this->localManyToMany[$field->getName()] = $field;
-        elseif ($field->relation != null && $field->inverse):
+        elseif (null != $field->relation && $field->inverse):
             $this->inverseFields[$field->getName()] = $field;
         else:
             $this->localFields[$field->getName()] = $field;

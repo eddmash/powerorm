@@ -15,5 +15,4 @@ class Sum extends BaseAggregate
 {
     protected $function = 'SUM';
     protected $name = 'SUM';
-
 }

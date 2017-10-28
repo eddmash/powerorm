@@ -60,5 +60,4 @@ class ManyToManyDescriptor extends BaseDescriptor
 
         return $manager;
     }
-
 }

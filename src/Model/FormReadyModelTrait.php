@@ -50,7 +50,6 @@ trait FormReadyModelTrait
 
     public function clean()
     {
-
     }
 
     /**

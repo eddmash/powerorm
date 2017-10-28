@@ -70,7 +70,7 @@ class DateField extends Field
 
     public function valueToString(Model $model)
     {
-        /**
+        /*
          * @var \DateTime
          */
         $val = $this->valueFromObject($model);

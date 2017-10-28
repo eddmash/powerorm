@@ -270,7 +270,6 @@ class BaseOrm extends BaseObject
      */
     public static function setup($configs = [])
     {
-
         static::getInstance($configs);
 
         static::loadRegistry();
@@ -319,7 +318,7 @@ class BaseOrm extends BaseObject
             $message = 'The database configuration have no been provided, consult documentation for options';
             throw new OrmException($message);
         endif;
-        if (static::$connection == null):
+        if (null == static::$connection):
             $config = new Configuration();
             static::$connection = DriverManager::getConnection($this->database, $config);
         endif;
@@ -437,7 +436,7 @@ class BaseOrm extends BaseObject
      */
     public static function createObject($config = [])
     {
-        if (static::$instance == null):
+        if (null == static::$instance):
 
             static::$instance = new static($config);
         endif;
@@ -489,7 +488,7 @@ class BaseOrm extends BaseObject
      */
     public static function getCheckRegistry($recreate = false)
     {
-        if (self::$checkRegistry === null || ($recreate && self::$checkRegistry !== null)):
+        if (null === self::$checkRegistry || ($recreate && null !== self::$checkRegistry)):
             self::$checkRegistry = ChecksRegistry::createObject();
         endif;
 
@@ -541,7 +540,6 @@ class BaseOrm extends BaseObject
      */
     public static function presetup(BaseOrm $orm)
     {
-
         foreach ($orm->dbTypes as $name => $type) {
             Type::addType($name, $type);
         }
@@ -549,7 +547,6 @@ class BaseOrm extends BaseObject
         foreach ($orm->dbMappingTypes as $name => $mappingType) {
             static::getDbConnection()->getDatabasePlatform()->registerDoctrineTypeMapping($name, $mappingType);
         }
-
     }
 
     public static function loadRegistry(&$ormInstance = null)
@@ -583,7 +580,6 @@ class BaseOrm extends BaseObject
         endif;
 
         return $this->{$name};
-
     }
 
     /**

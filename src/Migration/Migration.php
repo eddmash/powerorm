@@ -147,7 +147,6 @@ class Migration implements MigrationInterface
      */
     public function apply(ProjectState $state, SchemaEditor $schemaEditor)
     {
-
         /** @var $operation Operation */
         foreach ($this->operations as $operation) :
             // preserve state before operation
@@ -185,7 +184,6 @@ class Migration implements MigrationInterface
      */
     public function unApply($state, $schemaEditor)
     {
-
         // we
         $itemsToRun = [];
 

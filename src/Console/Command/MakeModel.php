@@ -117,5 +117,4 @@ class MakeModel extends BaseCommand
 
         return $content->toString();
     }
-
 }

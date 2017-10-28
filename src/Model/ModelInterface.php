@@ -71,5 +71,4 @@ interface ModelInterface extends DeConstructableInterface
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getMetaSettings();
-
 }

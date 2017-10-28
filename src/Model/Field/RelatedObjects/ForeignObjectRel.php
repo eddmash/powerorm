@@ -201,7 +201,7 @@ class ForeignObjectRel extends BaseObject
      */
     public function isHidden()
     {
-        return !empty($this->relatedName) && substr($this->relatedName, -1) === '+';
+        return !empty($this->relatedName) && '+' === substr($this->relatedName, -1);
     }
 
 //    public function __toString()

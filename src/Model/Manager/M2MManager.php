@@ -75,7 +75,7 @@ class M2MManager extends BaseM2MManager
         $rel = ArrayHelper::getValue($kwargs, 'rel');
         $this->reverse = ArrayHelper::getValue($kwargs, 'reverse', false);
 
-        if ($this->reverse === false):
+        if (false === $this->reverse):
             $model = $rel->toModel;
             $this->queryName = $rel->fromField->getRelatedQueryName();
             $this->fromFieldName = call_user_func($rel->fromField->m2mField);
@@ -140,7 +140,6 @@ class M2MManager extends BaseM2MManager
         endif;
         //todo clear prefetched
         $this->removeItems($this->fromFieldName, $this->toFieldName, func_get_args());
-
     }
 
     public function set($values, $kwargs = [])

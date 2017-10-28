@@ -99,7 +99,7 @@ class ArrayHelper
         if (isset($haystack[$key])):
             return $haystack[$key];
         endif;
-        if ($default === self::STRICT) :
+        if (self::STRICT === $default) :
             throw new KeyError(sprintf('%s does not exist', $key));
         endif;
 
@@ -156,6 +156,6 @@ class ArrayHelper
 
     public static function isEmpty($array)
     {
-        return $array === null || $array === [];
+        return null === $array || $array === [];
     }
 }

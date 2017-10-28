@@ -103,7 +103,7 @@ class Loader extends BaseObject
 
         if (count($migrations) > 1):
             throw new AmbiguityError(sprintf("There is more than one migration with the prefix '%s'", $prefix));
-        elseif (count($migrations) == 0):
+        elseif (0 == count($migrations)):
             throw new KeyError(sprintf("There no migrations with the prefix '%s'", $prefix));
         endif;
 

@@ -39,7 +39,7 @@ class ForeignKey extends RelatedField
 
     public function __construct($kwargs)
     {
-        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && $kwargs['rel'] == null)):
+        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && null == $kwargs['rel'])):
             $kwargs['rel'] = ManyToOneRel::createObject(
                 [
                     'fromField' => $this,
@@ -84,7 +84,7 @@ class ForeignKey extends RelatedField
     {
         parent::contributeToInverseClass($relatedModel, $relation);
 
-        if ($this->relation->fieldName == null):
+        if (null == $this->relation->fieldName):
             $this->relation->fieldName = $relatedModel->meta->primaryKey->getName();
         endif;
     }
@@ -94,7 +94,6 @@ class ForeignKey extends RelatedField
      */
     public function dbType(Connection $connection)
     {
-
         // The database column type of a ForeignKey is the column type
         // of the field to which it points.
         return $this->getRelatedField()->dbType($connection);
@@ -117,7 +116,7 @@ class ForeignKey extends RelatedField
         else:
             $kwargs['dbIndex'] = false;
         endif;
-        if ($this->dbConstraint === false) :
+        if (false === $this->dbConstraint) :
             $kwargs['dbConstraint'] = $this->dbConstraint;
         endif;
 
@@ -182,7 +181,7 @@ class ForeignKey extends RelatedField
      */
     public function prepareValueBeforeSave($value, $connection)
     {
-        if (is_null($value) || $value === ''):
+        if (is_null($value) || '' === $value):
             return;
         endif;
 

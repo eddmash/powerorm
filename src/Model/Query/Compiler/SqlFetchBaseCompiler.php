@@ -67,7 +67,6 @@ class SqlFetchBaseCompiler extends SqlCompiler
      */
     public function getSelect()
     {
-
         $klassInfo = [];
         $select = [];
         $annotations = [];
@@ -128,7 +127,6 @@ class SqlFetchBaseCompiler extends SqlCompiler
      */
     public function getDefaultCols($startAlias = null, Meta $meta = null, $fromParent = null)
     {
-
         $fields = [];
         if (is_null($meta)):
             $meta = $this->query->getMeta();
@@ -385,7 +383,6 @@ class SqlFetchBaseCompiler extends SqlCompiler
             endif;
 
             try {
-
                 /** @var $from BaseJoin */
                 $from = ArrayHelper::getValue($this->query->tableAliasMap, $alias, ArrayHelper::STRICT);
                 list($fromSql, $fromParams) = $this->compile($from);
@@ -475,7 +472,6 @@ class SqlFetchBaseCompiler extends SqlCompiler
         foreach ($results as $row) :
             yield $this->preparedResults($row);
         endforeach;
-
     }
 
     public function getOrderBy()
@@ -495,7 +491,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         foreach ($ordering as $orderName) :
             list($col, $orderDir) = Query::getOrderDirection($orderName, $asc);
-            $descending = ($orderDir == 'DESC') ? true : false;
+            $descending = ('DESC' == $orderDir) ? true : false;
 
             if ($orderName instanceof BaseExpression):
                 if (!$orderName instanceof OrderBy):
@@ -637,7 +633,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
         list($targets, $finalAlias, $joinList) = $this->query->trimJoins($targetFields, $joinList, $paths);
         $fields = [];
 
-        $descending = ($order == 'DESC') ? true : false;
+        $descending = ('DESC' == $order) ? true : false;
 
         /** @var $target Field */
         foreach ($targets as $target):
@@ -689,5 +685,4 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         return false === empty($statement->fetch());
     }
-
 }

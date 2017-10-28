@@ -254,11 +254,10 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     {
         BaseOrm::configure($this, $config, ['rel' => 'relation']);
 
-        if ($this->relation !== null):
+        if (null !== $this->relation):
 
             $this->isRelation = true;
         endif;
-
     }
 
     /**
@@ -320,7 +319,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
             $this->name = $fieldName;
         endif;
         $this->attrName = $this->getAttrName();
-        $this->concrete = empty($this->getColumnName()) === false;
+        $this->concrete = false === empty($this->getColumnName());
 
         if (empty($this->verboseName)):
             $this->verboseName = ucwords(str_replace('_', ' ', $this->name));
@@ -376,7 +375,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
     public function hasDefault()
     {
-        return $this->default !== NOT_PROVIDED;
+        return NOT_PROVIDED !== $this->default;
     }
 
     public function getDefault()
@@ -544,7 +543,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      */
     public function getChoices($opts = [])
     {
-        $include_blank_dash = (array_key_exists('include_blank', $opts)) ? $opts['include_blank'] == false : true;
+        $include_blank_dash = (array_key_exists('include_blank', $opts)) ? false == $opts['include_blank'] : true;
 
         $first_choice = [];
         if ($include_blank_dash):
@@ -621,7 +620,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      */
     public function convertToDatabaseValue($value, $connection, $prepared = false)
     {
-        if ($prepared === false):
+        if (false === $prepared):
             $value = $this->prepareValue($value);
         endif;
 
@@ -825,7 +824,6 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     public function valueToString(Model $model)
     {
         return strval($this->valueFromObject($model));
-
     }
 }
 

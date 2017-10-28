@@ -36,6 +36,5 @@ class ArrayMapper extends Mapper
         endforeach;
 
         return $resuts;
-
     }
 }

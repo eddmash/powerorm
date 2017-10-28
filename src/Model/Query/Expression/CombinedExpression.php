@@ -105,5 +105,4 @@ class CombinedExpression extends BaseExpression
 
         return $obj;
     }
-
 }

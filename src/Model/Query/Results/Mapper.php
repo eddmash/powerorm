@@ -34,5 +34,4 @@ class Mapper
         $this->queryset = $queryset;
         $this->chunkedFetch = $chunkedFetch;
     }
-
 }

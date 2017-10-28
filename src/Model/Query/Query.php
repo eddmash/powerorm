@@ -188,7 +188,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             endforeach;
 
         endforeach;
-
     }
 
     public function clearSelectedFields()
@@ -327,7 +326,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     {
         $aliases = [];
         foreach ($this->tableAliasMap as $key => $join) :
-            if ($join->getJoinType() === INNER):
+            if (INNER === $join->getJoinType()):
                 $aliases[] = $key;
             endif;
         endforeach;
@@ -339,7 +338,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endif;
 
         $this->changeToInnerjoin($aliases);
-
     }
 
     private function _addQ(Q $q, &$usedAliases, $allowJoins = true, $currentNegated = false)
@@ -473,7 +471,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             $fieldParts[] = $name;
         endforeach;
 
-        if (count($lookup) === 0) :
+        if (0 === count($lookup)) :
             $lookup[] = 'exact';
         elseif (count($fieldParts) > 1):
             if (!$fieldParts) :
@@ -562,7 +560,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
             $posReached = $pos;
 
-            if ($name === PRIMARY_KEY_ID):
+            if (PRIMARY_KEY_ID === $name):
                 $name = $meta->primaryKey->getName();
             endif;
 
@@ -570,7 +568,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
             try {
                 $field = $meta->getField($name);
-
             } catch (FieldDoesNotExist $e) {
                 //todo check in annotations to
                 $available = getFieldNamesFromMeta($meta);
@@ -688,7 +685,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         // check if we can resuse an alias
         $resuableAliases = [];
         foreach ($this->tableAliasMap as $key => $item) :
-            if (($reuse == null || ArrayHelper::hasKey($reuse, $key)) && $join->equal($item)):
+            if ((null == $reuse || ArrayHelper::hasKey($reuse, $key)) && $join->equal($item)):
                 $resuableAliases[] = $key;
             endif;
         endforeach;
@@ -702,7 +699,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         list($alias) = $this->getTableAlias($join->getTableName(), false);
 
         if ($join->getJoinType()):
-            if ($this->tableAliasMap[$join->getParentAlias()]->getJoinType() === LOUTER ||
+            if (LOUTER === $this->tableAliasMap[$join->getParentAlias()]->getJoinType() ||
                 $join->getNullable()):
 
                 $joinType = LOUTER;
@@ -740,10 +737,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         while ($aliases):
             $alias = array_pop($aliases);
             $join = $this->tableAliasMap[$alias];
-            if ($join->getJoinType() == LOUTER):
+            if (LOUTER == $join->getJoinType()):
                 $this->tableAliasMap[$alias] = $join->demote();
                 $parent = $this->tableAliasMap[$join->getParentAlias()];
-                if ($parent->getJoinType() == INNER):
+                if (INNER == $parent->getJoinType()):
                     $aliases[] = $join->getParentAlias();
                 endif;
             endif;
@@ -767,7 +764,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      */
     public function changeToOuterJoin($aliases)
     {
-
         /* @var $join Join */
         /* @var $parent Join */
         while ($aliases):
@@ -776,16 +772,16 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
             // for the first join this should be true because its not a join
             // but a basetable that will be used in the from part of the query
-            if ($join->getJoinType() == null):
+            if (null == $join->getJoinType()):
                 continue;
             endif;
 
             // only the first alias is allowed to havea null join type
-            assert($join->getJoinType() !== null);
+            assert(null !== $join->getJoinType());
 
             $parentAlias = $join->getParentAlias();
-            $parentIsOuter = ($parentAlias && $this->tableAliasMap[$parentAlias]->getJoinType() == LOUTER);
-            $aliasIsOuter = ($join->getJoinType() == LOUTER);
+            $parentIsOuter = ($parentAlias && LOUTER == $this->tableAliasMap[$parentAlias]->getJoinType());
+            $aliasIsOuter = (LOUTER == $join->getJoinType());
 
             if (($join->getNullable() || $parentIsOuter) && !$aliasIsOuter):
                 $this->tableAliasMap[$alias] = $join->promote();
@@ -820,7 +816,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         /* @var $relField Field[] */
 
         foreach (array_reverse($path) as $info) :
-            if (!$info['direct'] || count($joinList) === 1):
+            if (!$info['direct'] || 1 === count($joinList)):
                 break;
             endif;
 
@@ -902,7 +898,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $annotation = $annotation->resolveExpression($this, true, null, $isSummary);
 
         $this->annotations[$alias] = $annotation;
-
     }
 
     /**
@@ -1248,7 +1243,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
             return $col;
         endif;
-
     }
 
     public function toSubQuery(Connection $connection)
@@ -1268,7 +1262,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         return $compiler->hasResults();
     }
-
 }
 
 /**
@@ -1286,7 +1279,7 @@ function prefetchRelatedObjects($instances, $lookups)
         Tools::ensureParamIsArray($lookups, $msg);
     endif;
 
-    if (count($instances) == 0):
+    if (0 == count($instances)):
         return;
     endif;
 
@@ -1324,7 +1317,7 @@ function prefetchRelatedObjects($instances, $lookups)
 
         $throughtAttrs = StringHelper::split(BaseLookup::$lookupPattern, $lookup->prefetchThrough);
         foreach ($throughtAttrs as $level => $throughtAttr) :
-            if (count($objList) == 0):
+            if (0 == count($objList)):
                 break;
             endif;
 
@@ -1336,7 +1329,6 @@ function prefetchRelatedObjects($instances, $lookups)
             endif;
         endforeach;
     endwhile;
-
 }
 
 /**
@@ -1353,7 +1345,6 @@ function prefetchRelatedObjects($instances, $lookups)
  */
 function normalizePrefetchLookup($lookups, $prefix = null)
 {
-
     $results = [];
     foreach ($lookups as $lookup) :
         if (!$lookup instanceof Prefetch):

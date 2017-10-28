@@ -165,7 +165,7 @@ abstract class BaseCommand extends Command
         endforeach;
 
         if ($showErrorCount):
-            $issueText = ($visibleIssues === 1) ? 'issue' : 'issues';
+            $issueText = (1 === $visibleIssues) ? 'issue' : 'issues';
             $silenced = count($checks) - $visibleIssues;
             if ($visibleIssues):
                 $footer .= PHP_EOL;

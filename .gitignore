@@ -14,3 +14,4 @@ cs_fixer*
 
 api/
 docs/build/
+.php_cs.cache

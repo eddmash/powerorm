@@ -42,7 +42,7 @@ class JoinPromoter
         $this->currentNegated = $currentNegated;
 
         if ($this->currentNegated):
-            if ($this->connector === AND_CONNECTOR):
+            if (AND_CONNECTOR === $this->connector):
                 $this->effectiveConnector = OR_CONNECTOR;
             else:
                 $this->effectiveConnector = AND_CONNECTOR;
@@ -68,12 +68,12 @@ class JoinPromoter
 
         foreach ($this->votes as $table => $votes) :
 
-            if ($this->effectiveConnector == OR_CONNECTOR && $votes < $this->childrenCount):
+            if (OR_CONNECTOR == $this->effectiveConnector && $votes < $this->childrenCount):
                 $changeToOuterJoin[] = $table;
             endif;
 
-            if ($this->effectiveConnector === AND_CONNECTOR ||
-                ($this->effectiveConnector == OR_CONNECTOR && $votes === $this->childrenCount)
+            if (AND_CONNECTOR === $this->effectiveConnector ||
+                (OR_CONNECTOR == $this->effectiveConnector && $votes === $this->childrenCount)
             ):
                 $changeToInnerJoin[] = $table;
             endif;

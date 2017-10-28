@@ -61,11 +61,9 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
         if (empty($value)):
             //Update the cached related instance (if any) & clear the cache.
             try {
-
                 $relObj = $modelInstance->{$this->field->getCacheName()};
                 unset($modelInstance->{$this->field->getCacheName()});
                 unset($relObj->{$this->field->relation->getCacheName()});
-
             } catch (AttributeError $exception) {
             }
 
@@ -94,5 +92,4 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
 
         return $relModel::objects();
     }
-
 }

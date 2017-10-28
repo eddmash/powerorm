@@ -24,7 +24,7 @@ class Count extends BaseAggregate
      */
     public function __construct($expression, $distinct = false, $kwargs = [])
     {
-        if ($expression === '*'):
+        if ('*' === $expression):
             $expression = new Star();
         endif;
         $extra = [];
@@ -38,5 +38,4 @@ class Count extends BaseAggregate
             $extra + $kwargs
         );
     }
-
 }

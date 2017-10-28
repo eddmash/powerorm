@@ -64,7 +64,6 @@ class Prefetch
 
     public function addPrefix($prefix)
     {
-
     }
 
     /**

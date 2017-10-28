@@ -35,7 +35,6 @@ class OneToManyDescriptor extends BaseDescriptor
      */
     public function getValue(Model $modelInstance)
     {
-
         return $this->queryset($modelInstance);
     }
 
@@ -83,6 +82,5 @@ class OneToManyDescriptor extends BaseDescriptor
         );
 
         return $manager;
-
     }
 }

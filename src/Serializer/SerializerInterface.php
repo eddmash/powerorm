@@ -19,7 +19,9 @@ interface SerializerInterface
     public static function serialize($item, $fields = []);
 
     public function handleForeignField(Model $model, Field $field);
+
     public function handleM2MField(Model $model, Field $field);
+
     public function handleField(Model $model, Field $field);
 
     /**
@@ -76,5 +78,4 @@ interface SerializerInterface
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getValue();
-
 }

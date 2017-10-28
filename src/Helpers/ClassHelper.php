@@ -179,7 +179,6 @@ class ClassHelper
             if ($tokens[$i - 2][0] == T_CLASS
                 && $tokens[$i - 1][0] == T_WHITESPACE
                 && $tokens[$i][0] == T_STRING) {
-
                 $class_name = $tokens[$i][1];
                 $classes[] = $class_name;
             }
@@ -215,40 +214,32 @@ class ClassHelper
 
         //Go through each token and evaluate it as necessary
         foreach (token_get_all($contents) as $token) {
-
             //If this token is the namespace declaring, then flag that the next tokens will be the namespace name
-            if (is_array($token) && $token[0] == T_NAMESPACE) {
+            if (is_array($token) && T_NAMESPACE == $token[0]) {
                 $getting_namespace = true;
             }
 
             //If this token is the class declaring, then flag that the next tokens will be the class name
-            if (is_array($token) && $token[0] == T_CLASS) {
+            if (is_array($token) && T_CLASS == $token[0]) {
                 $getting_class = true;
             }
 
             //While we're grabbing the namespace name...
-            if ($getting_namespace === true) {
-
+            if (true === $getting_namespace) {
                 //If the token is a string or the namespace separator...
                 if (is_array($token) && in_array($token[0], [T_STRING, T_NS_SEPARATOR])) {
-
                     //Append the token's value to the name of the namespace
                     $namespace .= $token[1];
-
-                } elseif ($token === ';') {
-
+                } elseif (';' === $token) {
                     //If the token is the semicolon, then we're done with the namespace declaration
                     $getting_namespace = false;
-
                 }
             }
 
             //While we're grabbing the class name...
-            if ($getting_class === true) {
-
+            if (true === $getting_class) {
                 //If the token is a string, it's the name of the class
-                if (is_array($token) && $token[0] == T_STRING) {
-
+                if (is_array($token) && T_STRING == $token[0]) {
                     //Store the token's value as the class name
                     $class = $token[1];
 
@@ -260,6 +251,5 @@ class ClassHelper
 
         //Build the fully-qualified class name and return it
         return $namespace ? $namespace.'\\'.$class : $class;
-
     }
 }

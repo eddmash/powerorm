@@ -219,7 +219,7 @@ class ManyToManyField extends RelatedField
      */
     private function getM2MDbTable($meta)
     {
-        if ($this->relation->through !== null):
+        if (null !== $this->relation->through):
             return $this->relation->through->meta->dbTable;
         elseif ($this->dbTable):
             return $this->dbTable;
@@ -283,7 +283,7 @@ class ManyToManyField extends RelatedField
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
 
-                $this->{$cache_attr} = ($attr == 'name') ? call_user_func([$field, 'getName']) : $field->{$attr};
+                $this->{$cache_attr} = ('name' == $attr) ? call_user_func([$field, 'getName']) : $field->{$attr};
 
                 return $this->{$cache_attr};
             endif;
@@ -316,7 +316,7 @@ class ManyToManyField extends RelatedField
                 ) == $relation->toModel->meta->getNamespacedModelName() &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
-                $this->{$cache_attr} = ($attr == 'name') ? call_user_func([$field, 'getName']) : $field->{$attr};
+                $this->{$cache_attr} = ('name' == $attr) ? call_user_func([$field, 'getName']) : $field->{$attr};
 
                 return $this->{$cache_attr};
             endif;
@@ -401,5 +401,4 @@ class ManyToManyField extends RelatedField
     {
         $model->{$this->getName()}->set($value);
     }
-
 }

@@ -25,7 +25,6 @@ class Col extends BaseExpression
 
     public function __construct($alias, Field $targetField, Field $outputField = null)
     {
-
         $this->alias = $alias;
         $this->targetField = $targetField;
         if (is_null($outputField)):
@@ -63,5 +62,4 @@ class Col extends BaseExpression
             );
         endif;
     }
-
 }

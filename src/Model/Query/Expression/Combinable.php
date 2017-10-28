@@ -29,32 +29,26 @@ class Combinable
 
     public function sub($other)
     {
-
         return $this->combine($other, static::SUB, false);
     }
 
     public function div($other)
     {
-
         return $this->combine($other, static::DIV, false);
-
     }
 
     public function mult($other)
     {
         return $this->combine($other, static::MUL, false);
-
     }
 
     public function mod($other)
     {
         return $this->combine($other, static::MOD, false);
-
     }
 
     public function pow($other)
     {
-
         return $this->combine($other, static::POW, false);
     }
 
@@ -68,12 +62,8 @@ class Combinable
         return new CombinedExpression($this, $connector, $other);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __debugInfo()
     {
         return [];
     }
-
 }

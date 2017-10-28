@@ -110,5 +110,4 @@ class AutoField extends Field
     {
         return;
     }
-
 }

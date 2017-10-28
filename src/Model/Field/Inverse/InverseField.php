@@ -36,7 +36,7 @@ class InverseField extends RelatedField
             throw new ValueError(sprintf('Related model "%s" cannot be resolved', $this->relation->toModel));
         endif;
 
-        if ($this->fromField == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT) :
+        if (BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $this->fromField) :
             // we need this field to point to the primary key of the model which is an actual column on the database
             $this->fromField = $this->scopeModel->meta->primaryKey;
         elseif (is_string($this->fromField)):
@@ -72,12 +72,10 @@ class InverseField extends RelatedField
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-
     }
 
     public function getJoinColumns()
     {
         return [$this->fromField, $this];
     }
-
 }

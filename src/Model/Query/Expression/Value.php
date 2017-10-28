@@ -59,5 +59,4 @@ class Value extends BaseExpression
 
         return $c;
     }
-
 }

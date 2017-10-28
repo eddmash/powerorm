@@ -180,7 +180,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $this->constructorArgs = $kwargs;
         $this->init();
         $this->setFieldValues($kwargs);
-
     }
 
     public static function fromDb(Connection $connection, $fieldNames, $values)
@@ -498,7 +497,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 endif;
                 $parentMethodCall = sprintf('%1$s::%2$s', $parentName, $method);
 
-                if ($args != null):
+                if (null != $args):
                     if (is_array($args)):
                         $fields = call_user_func_array([$model, $parentMethodCall], $args);
                     else:
@@ -574,7 +573,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         endforeach;
 
-        if ($isProxy && $concreteParent == null):
+        if ($isProxy && null == $concreteParent):
             throw new TypeError(
                 sprintf(
                     "Proxy model '%s' has no non-abstract".
@@ -585,7 +584,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
 
         return [
-            ($concreteParent == null) ?: $concreteParent->getName(),
+            (null == $concreteParent) ?: $concreteParent->getName(),
             $immediateParent,
             $parentIsAbstract,
             $modelFields[$model->meta->getNamespacedModelName()],
@@ -766,7 +765,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function __get($name)
     {
         // pk has a special meaning to the orm.
-        if ($name === 'pk'):
+        if ('pk' === $name):
             $pkName = $this->meta->primaryKey->getAttrName();
 
             return ArrayHelper::getValue($this->_fieldCache, $pkName);
@@ -781,7 +780,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             return $field->getValue($this);
         } catch (FieldDoesNotExist $e) {
-
             if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
                 throw new AttributeError(
                     sprintf(
@@ -799,13 +797,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
 
         return $this->{$name};
-
     }
 
     public function __set($name, $value)
     {
         // pk has a special meaning to the orm.
-        if ($name === 'pk'):
+        if ('pk' === $name):
             $pkName = $this->meta->primaryKey->getAttrName();
             $this->{$pkName} = $value;
 
@@ -899,7 +896,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function getPkValue(Meta $meta = null)
     {
-        if ($meta === null):
+        if (null === $meta):
             $meta = $this->meta;
         endif;
 
@@ -925,7 +922,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function save($updateFields = null, $forceInsert = false, $forceUpdate = false, $connection = null)
     {
-
         // Ensure that a model instance without a PK hasn't been assigned to
         // a ForeignKey or OneToOneField on this model. If the field is
         // nullable, allowing the save() would result in silent data loss.
@@ -1265,5 +1261,4 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         return $meta;
     }
-
 }

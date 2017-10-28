@@ -76,7 +76,7 @@ abstract class CheckMessage extends Base
 
     public function toLevel($level)
     {
-        $level = ($level === null) ? static::ERROR : $level;
+        $level = (null === $level) ? static::ERROR : $level;
 
         if (is_string($level)):
             $level = ArrayHelper::getValue($this->levelsMap, strtolower($level));

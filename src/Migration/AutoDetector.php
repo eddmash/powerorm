@@ -334,7 +334,7 @@ class AutoDetector extends BaseObject
         foreach ($fields as $name => $field) :
             $def = $this->deepDeconstruct($field);
 
-            if ($field->relation !== null && $field->relation->toModel !== null):
+            if (null !== $field->relation && null !== $field->relation->toModel):
                 unset($def['constructorArgs']['to']);
             endif;
 
@@ -375,12 +375,12 @@ class AutoDetector extends BaseObject
         $action = ArrayHelper::getValue($dependency, 'action');
         $model = ArrayHelper::getValue($dependency, 'model', null);
 
-        if ($type === self::TYPE_MODEL && $action === self::ACTION_CREATED):
+        if (self::TYPE_MODEL === $type && self::ACTION_CREATED === $action):
             // add model
             return
                 $operation instanceof CreateModel &&
                 strtolower($operation->name) === strtolower($target);
-        elseif ($type === self::TYPE_FIELD && $action === self::ACTION_CREATED):
+        elseif (self::TYPE_FIELD === $type && self::ACTION_CREATED === $action):
             // add field
             return
 
@@ -393,18 +393,18 @@ class AutoDetector extends BaseObject
 //        any(dependency[2] == x for x, y in operation.fields)
 //                )
 //            )
-        elseif ($type === self::TYPE_FIELD && $action === self::ACTION_DROPPED):
+        elseif (self::TYPE_FIELD === $type && self::ACTION_DROPPED === $action):
             // remove field
             return
                 $operation instanceof RemoveField &&
                 strtolower($operation->modelName) === strtolower($model) &&
                 strtolower($operation->name) === strtolower($target);
-        elseif ($type === self::TYPE_MODEL && $action === self::ACTION_DROPPED):
+        elseif (self::TYPE_MODEL === $type && self::ACTION_DROPPED === $action):
             //dropped model
             return
                 $operation instanceof DeleteModel &&
                 strtolower($operation->name) === strtolower($target);
-        elseif ($type === self::TYPE_FIELD && $action === self::ACTION_ALTER):
+        elseif (self::TYPE_FIELD === $type && self::ACTION_ALTER === $action):
             // altered field
             return
                 $operation instanceof AlterField &&
@@ -430,10 +430,10 @@ class AutoDetector extends BaseObject
     public function suggestName($operations = null, $id = null)
     {
         $prefix = $this->migrationNamePrefix;
-        if ($operations === null):
+        if (null === $operations):
             return sprintf('%s0001_Initial', $prefix);
         endif;
-        if (count($operations) == 1):
+        if (1 == count($operations)):
 
             $op = $operations[0];
             if ($op instanceof CreateModel):
@@ -530,7 +530,7 @@ class AutoDetector extends BaseObject
 
             /** @var $localField Field */
             foreach ($meta->localFields as $localField) :
-                if ($localField->relation != null && $localField->relation->toModel != null):
+                if (null != $localField->relation && null != $localField->relation->toModel):
 
                     if ($localField->primaryKey):
                         $primaryKeyRel = $localField->relation->toModel;
@@ -545,7 +545,7 @@ class AutoDetector extends BaseObject
             /** @var $localM2MField RelatedField */
             foreach ($meta->localManyToMany as $name => $localM2MField) :
 
-                if ($localM2MField->relation->toModel != null):
+                if (null != $localM2MField->relation->toModel):
                     $relatedFields[$localM2MField->getName()] = $localM2MField;
                 endif;
 
@@ -565,7 +565,7 @@ class AutoDetector extends BaseObject
             $opDep = [['target' => $addedModelName, 'type' => self::TYPE_MODEL, 'action' => self::ACTION_DROPPED]];
 
             // depend on related model being created if primary key is a relationship field
-            if ($primaryKeyRel !== null):
+            if (null !== $primaryKeyRel):
                 $opDep[] = [
                     'target' => $primaryKeyRel->meta->getNamespacedModelName(),
                     'type' => self::TYPE_MODEL,
@@ -621,7 +621,7 @@ class AutoDetector extends BaseObject
                 ];
 
                 // if the through model was not automatically created, depend on it also
-                if ($relationField->relation->hasProperty('through') && !$relationField->relation != null &&
+                if ($relationField->relation->hasProperty('through') && null != !$relationField->relation &&
                     !$relationField->relation->through->meta->autoCreated
                 ):
 
@@ -872,7 +872,6 @@ class AutoDetector extends BaseObject
      */
     public function generateAlteredMeta()
     {
-
         //get unmanaged converted to managed
         $managed = array_intersect($this->oldUnmanagedKeys, $this->newModelKeys);
 
@@ -953,7 +952,7 @@ class AutoDetector extends BaseObject
                 foreach ($removedFields as $remField) :
                     $oldFieldDef = $this->deepDeconstruct($oldModelState->getFieldByName($remField));
 
-                    if ($field->relation !== null && $field->relation->toModel !== null &&
+                    if (null !== $field->relation && null !== $field->relation->toModel &&
                         isset($oldFieldDef['constructorArgs']['to'])
                     ):
                         $oldRelTo = $oldFieldDef['constructorArgs']['to'];
@@ -1084,7 +1083,7 @@ class AutoDetector extends BaseObject
                             $field = $newField->deepClone();
                             $default = MigrationQuestion::askNotNullAlteration($this->asker, $modelName, $keptField);
 
-                            if ($default !== NOT_PROVIDED):
+                            if (NOT_PROVIDED !== $default):
                                 $field->default = $default;
                                 $preserveDefault = false;
                             endif;
@@ -1161,7 +1160,7 @@ class AutoDetector extends BaseObject
 
         $preserveDefault = true;
 
-        if ($field->relation !== null && $field->relation->toModel):
+        if (null !== $field->relation && $field->relation->toModel):
 
             // depend on related model being created
             $opDep[] = [
@@ -1172,7 +1171,7 @@ class AutoDetector extends BaseObject
 
             // if it has through also depend on through model being created
             if ($field->relation->hasProperty('through') &&
-                $field->relation->through != null &&
+                null != $field->relation->through &&
                 !$field->relation->through->meta->autoCreated
             ):
 
@@ -1242,7 +1241,6 @@ class AutoDetector extends BaseObject
 
     public function sortModels()
     {
-
     }
 
     /**
@@ -1296,5 +1294,4 @@ class AutoDetector extends BaseObject
 
         return $sorted;
     }
-
 }

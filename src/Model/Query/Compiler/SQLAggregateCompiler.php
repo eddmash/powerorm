@@ -20,7 +20,6 @@ class SQLAggregateCompiler extends SqlFetchBaseCompiler
      */
     public function asSql(CompilerInterface $compiler = null, Connection $connection = null)
     {
-
         $sql = $params = [];
 
         foreach ($this->annotations as $annotation) {
@@ -35,5 +34,4 @@ class SQLAggregateCompiler extends SqlFetchBaseCompiler
 
         return [$sql, $params];
     }
-
 }

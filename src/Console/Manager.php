@@ -110,7 +110,7 @@ class Manager extends Base
             $file_handler = new FileHandler($path);
 
             $file = $file_handler->getFile($name);
-            if ($file !== false):
+            if (false !== $file):
                 $packageName = $package;
                 break;
             endif;
@@ -165,7 +165,6 @@ class Manager extends Base
         endif;
 
         return $console;
-
     }
 
     public static function warningText(OutputInterface $output)

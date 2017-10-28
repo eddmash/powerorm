@@ -219,7 +219,7 @@ class SchemaEditor extends BaseObject
         endif;
         $comparator = new Comparator();
         $diff = $comparator->diffTable($schema->getTable($model->meta->dbTable), $tableDef);
-        if ($diff !== false):
+        if (false !== $diff):
             $this->schemaManager->alterTable($diff);
 
             // we need to drop in-database defaults
@@ -258,7 +258,7 @@ class SchemaEditor extends BaseObject
         $table = $model->meta->dbTable;
         $tableDef = clone $schema->getTable($table);
         // Drop any FK constraints, MySQL requires explicit deletion
-        if ($field->isRelation && $field->relation !== null):
+        if ($field->isRelation && null !== $field->relation):
             foreach ($this->constraintName($table, $name, ['foreignKey' => true]) as $fkConstraint) :
                 $tableDef->removeForeignKey($fkConstraint);
             endforeach;
@@ -276,7 +276,7 @@ class SchemaEditor extends BaseObject
                 );
                 $relDiff = new TableDiff($newRel->scopeModel->meta->dbTable);
                 $relDiff->removedForeignKeys = $fkConstraints;
-                if ($relDiff !== false):
+                if (false !== $relDiff):
                     $this->schemaManager->alterTable($relDiff);
                 endif;
             endforeach;
@@ -286,7 +286,7 @@ class SchemaEditor extends BaseObject
         $tableDef->dropColumn($name);
         $comparator = new Comparator();
         $diff = $comparator->diffTable($schema->getTable($table), $tableDef);
-        if ($diff !== false):
+        if (false !== $diff):
             $this->schemaManager->alterTable($diff);
         endif;
     }
@@ -323,8 +323,8 @@ class SchemaEditor extends BaseObject
             );
         elseif (is_null($oldType) && is_null($newType) &&
             (
-                $oldField->relation->through !== null &&
-                $newField->relation->through !== null &&
+                null !== $oldField->relation->through &&
+                null !== $newField->relation->through &&
                 $oldField->relation->through->meta->autoCreated &&
                 $newField->relation->through->meta->autoCreated
             )
@@ -332,8 +332,8 @@ class SchemaEditor extends BaseObject
             $this->alterManyToMany($model, $oldField, $newField, $strict);
         elseif (is_null($oldType) && is_null($newType) &&
             (
-                $oldField->relation->through !== null &&
-                $newField->relation->through !== null &&
+                null !== $oldField->relation->through &&
+                null !== $newField->relation->through &&
                 !$oldField->relation->through->meta->autoCreated &&
                 !$newField->relation->through->meta->autoCreated
             )
@@ -395,7 +395,7 @@ class SchemaEditor extends BaseObject
                 $diff->removedForeignKeys[] = $fkConstraint;
                 $droppedFks[] = $oldField->getName();
             endforeach;
-            if ($diff !== false):
+            if (false !== $diff):
                 $this->schemaManager->alterTable($diff);
             endif;
         endif;
@@ -405,7 +405,7 @@ class SchemaEditor extends BaseObject
             foreach ($this->constraintName($table, $oldField->getColumnName(), ['unique' => true]) as $constraint) :
                 $diff->removedIndexes[] = $constraint;
             endforeach;
-            if ($diff !== false):
+            if (false !== $diff):
                 $this->schemaManager->alterTable($diff);
             endif;
         endif;
@@ -421,7 +421,7 @@ class SchemaEditor extends BaseObject
                 );
                 $relDiff = new TableDiff($newRel->scopeModel->meta->dbTable);
                 $relDiff->removedForeignKeys = $fkConstraints;
-                if ($relDiff !== false):
+                if (false !== $relDiff):
                     $this->schemaManager->alterTable($relDiff);
                 endif;
             endforeach;
@@ -434,7 +434,7 @@ class SchemaEditor extends BaseObject
             foreach ($this->constraintName($table, $oldField->getColumnName(), ['index' => true]) as $indexConstraint) :
                 $diff->removedIndexes[] = $indexConstraint;
             endforeach;
-            if ($diff !== false):
+            if (false !== $diff):
                 $this->schemaManager->alterTable($diff);
             endif;
         endif;
@@ -462,7 +462,7 @@ class SchemaEditor extends BaseObject
         $comparator = new Comparator();
         $diff = $comparator->diffTable($schema->getTable($table), $tableClone);
 
-        if ($diff !== false):
+        if (false !== $diff):
             $this->schemaManager->alterTable($diff);
         endif;
 
@@ -480,7 +480,7 @@ class SchemaEditor extends BaseObject
                 [$newField->getColumnName()],
                 true
             );
-            if ($diff !== false):
+            if (false !== $diff):
                 $this->schemaManager->alterTable($diff);
             endif;
         endif;
@@ -494,7 +494,7 @@ class SchemaEditor extends BaseObject
                 [$newField->getColumnName()],
                 true
             );
-            if ($diff !== false):
+            if (false !== $diff):
                 $this->schemaManager->alterTable($diff);
             endif;
         endif;
@@ -514,7 +514,7 @@ class SchemaEditor extends BaseObject
                 $newField->getRelatedModel()->meta->dbTable,
                 [$toField->getColumnName()]
             );
-            if ($diff !== false):
+            if (false !== $diff):
                 $this->schemaManager->alterTable($diff);
             endif;
         endif;
@@ -539,7 +539,7 @@ class SchemaEditor extends BaseObject
                         [$toField->getColumnName()]
                     );
                 endforeach;
-                if ($relDiff !== false):
+                if (false !== $relDiff):
                     $this->schemaManager->alterTable($relDiff);
                 endif;
             endforeach;
@@ -570,14 +570,14 @@ class SchemaEditor extends BaseObject
             $options['scale'] = $field->decimalPlaces;
         endif;
         // for columns that can be signed
-        if ($field->hasProperty('signed') && $field->signed !== null):
-            $options['unsigned'] = $field->signed === false;
+        if ($field->hasProperty('signed') && null !== $field->signed):
+            $options['unsigned'] = false === $field->signed;
         endif;
         if ($field->hasDefault() && $includeDefault):
             // the default value
             $default_value = $this->effectiveDefault($field);
             // if value is provided, create the defualt
-            if ($default_value != NOT_PROVIDED):
+            if (NOT_PROVIDED != $default_value):
                 $options['default'] = $default_value;
             endif;
         endif;

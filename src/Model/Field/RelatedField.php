@@ -333,7 +333,6 @@ class RelatedField extends Field
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-
         if (!$this->relation->isHidden()) :
             $inverseField = $this->inverseField;
             $hasMany = $inverseField::createObject(
@@ -390,19 +389,19 @@ class RelatedField extends Field
 
     public function getLookup($name)
     {
-        if ($name == 'in'):
+        if ('in' == $name):
             return RelatedIn::class;
-        elseif ($name == 'exact'):
+        elseif ('exact' == $name):
             return RelatedExact::class;
-        elseif ($name == 'gt'):
+        elseif ('gt' == $name):
             return RelatedGreaterThan::class;
-        elseif ($name == 'gte'):
+        elseif ('gte' == $name):
             return RelatedGreaterThanOrEqual::class;
-        elseif ($name == 'lt'):
+        elseif ('lt' == $name):
             return RelatedLessThan::class;
-        elseif ($name == 'lte'):
+        elseif ('lte' == $name):
             return RelatedLessThanOrEqual::class;
-        elseif ($name == 'isnull'):
+        elseif ('isnull' == $name):
             return RelatedIsNull::class;
         else:
             throw new TypeError(sprintf('Related Field got invalid lookup: %s', $name));
@@ -426,7 +425,7 @@ class RelatedField extends Field
         endif;
         // origin of relation
 
-        if ($this->fromField == BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT) :
+        if (BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $this->fromField) :
             $this->fromField = $this;
         elseif (is_string($this->fromField)):
             $this->fromField = $this->scopeModel->meta->getField($this->fromField);
@@ -564,7 +563,7 @@ class RelatedField extends Field
 
     public function getForwardRelatedFilter(Model $model)
     {
-        $toField = $this->getRelatedFields() [1];
+        $toField = $this->getRelatedFields()[1];
         $val = $model->{$toField->getAttrName()};
         $lookup = sprintf('%s__%s', $this->getName(), $toField->getName());
 
@@ -573,7 +572,5 @@ class RelatedField extends Field
 
     public function getReverseRelatedFilter(Model $model)
     {
-
     }
-
 }

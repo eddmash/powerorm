@@ -88,5 +88,4 @@ class RelatedMappers
             $relObj->{$this->reverseCacheName} = $fromObj;
         endif;
     }
-
 }

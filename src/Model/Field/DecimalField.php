@@ -172,5 +172,4 @@ class DecimalField extends Field
 
         return [];
     }
-
 }

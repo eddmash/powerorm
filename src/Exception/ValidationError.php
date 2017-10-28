@@ -60,7 +60,6 @@ class ValidationError extends \Exception implements \IteratorAggregate
      */
     public function getIterator()
     {
-
         return new \ArrayIterator($this->getMessages());
     }
 
@@ -87,5 +86,4 @@ class ValidationError extends \Exception implements \IteratorAggregate
     {
         return implode(', ', $this->getMessages());
     }
-
 }

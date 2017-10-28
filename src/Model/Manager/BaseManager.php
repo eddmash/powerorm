@@ -52,12 +52,10 @@ class BaseManager extends BaseObject implements \IteratorAggregate
     public function __toString()
     {
         return sprintf('%s object', get_class($this));
-
     }
 
     public function getIterator()
     {
         throw new TypeError("'Manager' object is not iterable");
     }
-
 }

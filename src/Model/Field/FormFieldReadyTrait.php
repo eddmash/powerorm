@@ -146,7 +146,6 @@ trait FormFieldReadyTrait
         if (empty($value) && !$this->formBlank) :
             throw new ValidationError('This field cannot be blank.', 'blank');
         endif;
-
     }
 
     /**

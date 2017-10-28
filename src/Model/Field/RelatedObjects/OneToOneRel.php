@@ -19,5 +19,4 @@ class OneToOneRel extends ManyToOneRel
         parent::__construct($kwargs);
         $this->multiple = false;
     }
-
 }

@@ -37,7 +37,6 @@ class ManyToOneDescriptor extends BaseDescriptor
             // incase the value has been set
             $result = $modelInstance->{$this->field->getCacheName()};
         } catch (AttributeError $e) {
-
             $relObj = $this->field->getLocalRelatedFieldsValues($modelInstance);
 
             if (empty($relObj)):
@@ -80,7 +79,7 @@ class ManyToOneDescriptor extends BaseDescriptor
      */
     public function setValue(Model $modelInstance, $value)
     {
-        if ($value !== null && !$value instanceof $this->field->relation->toModel):
+        if (null !== $value && !$value instanceof $this->field->relation->toModel):
             throw new ValueError(
                 sprintf(
                     'Cannot assign "%s": "%s->%s" must be a "%s" instance.',
@@ -120,7 +119,7 @@ class ManyToOneDescriptor extends BaseDescriptor
         // If this is a one-to-one relation, set the reverse accessor cache on
         // the related object to the current instance to avoid an extra SQL
         // query if it's accessed later on.
-        if ($value !== null && !$this->field->relation->multiple):
+        if (null !== $value && !$this->field->relation->multiple):
             $value->{$this->field->relation->getCacheName()} = $modelInstance;
         endif;
     }
@@ -162,6 +161,5 @@ class ManyToOneDescriptor extends BaseDescriptor
         );
 
         return $manager;
-
     }
 }

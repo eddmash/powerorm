@@ -56,7 +56,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
      */
     public function setSourceExpressions($expression)
     {
-        return assert(count($expression) == 0, 'Setting empty expression');
+        return assert(0 == count($expression), 'Setting empty expression');
     }
 
     /**
@@ -139,7 +139,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     {
         if (is_null($this->outputField)) :
             $sourceFields = $this->getSourceFields();
-            if (count($sourceFields) == 0) :
+            if (0 == count($sourceFields)) :
                 $this->outputField = null;
             else:
                 foreach ($sourceFields as $sourceField) :
@@ -186,7 +186,6 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
         $obj->copied = true;
 
         return $obj;
-
     }
 
     private function getSourceFields()
@@ -198,6 +197,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
 
         return $fields;
     }
+
     public function containsAggregates()
     {
         foreach ($this->getSourceExpressions() as $sourceExpression) :

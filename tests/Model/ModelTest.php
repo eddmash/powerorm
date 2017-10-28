@@ -125,7 +125,6 @@ class PublicFieldMethodModel extends Model
     public function unboundFields()
     {
         return [
-
         ];
     }
 }

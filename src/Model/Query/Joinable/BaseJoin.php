@@ -104,5 +104,4 @@ abstract class BaseJoin implements SqlCompilableinterface
     }
 
     abstract public function asSql(CompilerInterface $compiler, Connection $connection);
-
 }

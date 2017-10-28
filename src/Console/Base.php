@@ -47,7 +47,7 @@ class Base extends BaseObject
      */
     public function isColorEnabled($stream = \STDOUT)
     {
-        return $this->color === null ? Console::streamSupportsAnsiColors($stream) : $this->color;
+        return null === $this->color ? Console::streamSupportsAnsiColors($stream) : $this->color;
     }
 
     /**

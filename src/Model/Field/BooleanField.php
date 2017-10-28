@@ -50,5 +50,4 @@ class BooleanField extends Field
 
         return $kwargs;
     }
-
 }

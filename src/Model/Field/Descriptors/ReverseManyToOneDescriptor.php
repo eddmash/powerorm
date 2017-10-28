@@ -73,6 +73,5 @@ class ReverseManyToOneDescriptor extends BaseDescriptor
         );
 
         return $manager;
-
     }
 }

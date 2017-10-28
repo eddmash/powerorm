@@ -20,5 +20,4 @@ class Star extends BaseExpression
     {
         return ['*', []];
     }
-
 }

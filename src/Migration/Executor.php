@@ -100,7 +100,7 @@ class Executor extends BaseObject
 
         foreach ($targets as $target) :
             // if target is 'zero' unmigrate all
-            if ($target == 'zero'):
+            if ('zero' == $target):
 
                 foreach ($this->loader->graph->getRootNodes() as $rootNode) :
                     foreach ($this->loader->graph->getDecedentsTree($rootNode) as $migrationName) :

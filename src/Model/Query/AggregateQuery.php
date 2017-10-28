@@ -29,5 +29,4 @@ class AggregateQuery extends Query
     {
         return SQLAggregateCompiler::class;
     }
-
 }

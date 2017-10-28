@@ -79,7 +79,7 @@ class ModelState extends BaseObject
             }
         endforeach;
 
-        if ($excludeRels == false):
+        if (false == $excludeRels):
             foreach ($model->meta->localManyToMany as $name => $field) :
                 try {
                     $fields[$name] = $field->deepClone();

@@ -53,7 +53,7 @@ class Node implements \Countable
         if ($connectorType == $this->connector):
 
             if ($node instanceof self && !$node->isNegated() &&
-                ($connectorType == $node->connector || count($node) == 1)
+                ($connectorType == $node->connector || 1 == count($node))
             ):
                 $children = array_merge($node->getChildren()->toArray(), $this->getChildren()->toArray());
                 $this->children = new ArrayCollection();
@@ -100,7 +100,7 @@ class Node implements \Countable
     /**
      * Count elements of an object.
      *
-     * @link http://php.net/manual/en/countable.count.php
+     * @see http://php.net/manual/en/countable.count.php
      *
      * @return int The custom count as an integer.
      *             </p>

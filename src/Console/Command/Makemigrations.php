@@ -69,7 +69,7 @@ class Makemigrations extends BaseCommand
 
     private function writeMigrations($migrationChanges, InputInterface $input, OutputInterface $output)
     {
-        if ($output->getVerbosity() === OutputInterface::VERBOSITY_NORMAL && !$input->getOption('dry-run')) :
+        if (OutputInterface::VERBOSITY_NORMAL === $output->getVerbosity() && !$input->getOption('dry-run')) :
             $output->writeln('Creating Migrations :');
         endif;
 
@@ -80,7 +80,7 @@ class Makemigrations extends BaseCommand
             $migrationFile = MigrationFile::createObject($migration);
 
             $fileName = $migrationFile->getFileName();
-            if ($output->getVerbosity() === OutputInterface::VERBOSITY_NORMAL && !$input->getOption('dry-run')) :
+            if (OutputInterface::VERBOSITY_NORMAL === $output->getVerbosity() && !$input->getOption('dry-run')) :
                 $output->writeln('  '.$fileName);
             endif;
 
@@ -90,7 +90,7 @@ class Makemigrations extends BaseCommand
 
                 $output->writeln('  -- '.$migration->getName());
 
-                if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) :
+                if (OutputInterface::VERBOSITY_DEBUG === $output->getVerbosity()) :
                     $output->writeln($migrationFile->getContent());
                 endif;
                 continue;

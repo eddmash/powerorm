@@ -54,5 +54,4 @@ class F extends Combinable implements ResolvableExpInterface
 
         return $data;
     }
-
 }

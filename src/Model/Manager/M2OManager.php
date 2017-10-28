@@ -52,7 +52,7 @@ class M2OManager extends BaseM2OManager
         /** @var ForeignObjectRel $rel */
         $rel = ArrayHelper::getValue($kwargs, 'rel');
 
-        if ($this->reverse === false) :
+        if (false === $this->reverse) :
             $model = $rel->toModel;
             $fromField = $rel->fromField;
             $toField = $rel->getRelatedField();
@@ -79,5 +79,4 @@ class M2OManager extends BaseM2OManager
 
         return $qs->filter($this->filters);
     }
-
 }

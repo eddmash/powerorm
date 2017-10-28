@@ -306,11 +306,11 @@ class FormatFileContent
             return [sprintf('%1$s::createObject(%2$s)', $class, implode(',', $cons_args)), $import];
         endif;
 
-        if ($value === true):
+        if (true === $value):
             return ['true', []];
         endif;
 
-        if ($value === false):
+        if (false === $value):
             return ['false', []];
         endif;
 

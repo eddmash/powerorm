@@ -91,7 +91,7 @@ class Queryset implements QuerysetInterface
     {
         $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
-        $this->query = ($query == null) ? $this->getQueryBuilder() : $query;
+        $this->query = (null == $query) ? $this->getQueryBuilder() : $query;
         $this->resultMapper = ArrayHelper::pop($kwargs, 'resultMapper', ModelMapper::class);
         $this->kwargs = $kwargs;
     }
@@ -146,7 +146,7 @@ class Queryset implements QuerysetInterface
             static::formatFilterConditions(__METHOD__, func_get_args()));
 
         $resultCount = count($queryset);
-        if ($resultCount == 1):
+        if (1 == $resultCount):
             return $queryset->getResults()[0];
         elseif (!$resultCount):
             throw new ObjectDoesNotExist(
@@ -418,7 +418,7 @@ class Queryset implements QuerysetInterface
                 sprintf("Method '%s' supports a single array input", $methondname));
         endif;
 
-        if (count($conditions) == 1):
+        if (1 == count($conditions)):
             if ($conditions[0] instanceof Node):
                 return $conditions;
             endif;
@@ -515,8 +515,7 @@ class Queryset implements QuerysetInterface
      */
     public function asArray($fields = [], $valuesOnly = false, $flat = false)
     {
-
-        if ($flat && count($fields) != 1):
+        if ($flat && 1 != count($fields)):
             throw new TypeError("'flat' is valid when asArray is called with exactly one field.");
         endif;
         if ($flat && !$valuesOnly):

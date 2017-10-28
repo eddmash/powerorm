@@ -13,7 +13,7 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
  *
  * @author Carsten Brandt <mail@cebe.cc>
  *
- * @link http://www.yiiframework.com/
+ * @see http://www.yiiframework.com/
  *
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
@@ -71,7 +71,7 @@ class Console
     {
         $code = implode(';', $format);
 
-        return "\033[0m".($code !== '' ? "\033[".$code.'m' : '').$string."\033[0m";
+        return "\033[0m".('' !== $code ? "\033[".$code.'m' : '').$string."\033[0m";
     }
 
     /**
@@ -164,7 +164,7 @@ class Console
     public static function streamSupportsAnsiColors($stream)
     {
         return DIRECTORY_SEPARATOR === '\\'
-            ? getenv('ANSICON') !== false || getenv('ConEmuANSI') === 'ON'
+            ? false !== getenv('ANSICON') || 'ON' === getenv('ConEmuANSI')
             : function_exists('posix_isatty') && @posix_isatty($stream);
     }
 
@@ -190,14 +190,14 @@ class Console
     public static function getScreenSize($refresh = false)
     {
         static $size;
-        if ($size !== null && !$refresh) {
+        if (null !== $size && !$refresh) {
             return $size;
         }
 
         if (static::isRunningOnWindows()) {
             $output = [];
             exec('mode con', $output);
-            if (isset($output, $output[1]) && strpos($output[1], 'CON') !== false) {
+            if (isset($output, $output[1]) && false !== strpos($output[1], 'CON')) {
                 return $size = [(int) preg_replace('~\D~', '', $output[3]), (int) preg_replace('~\D~', '', $output[4])];
             }
         } else {
@@ -252,7 +252,7 @@ class Console
     public static function wrapText($text, $indent = 0, $refresh = false)
     {
         $size = static::getScreenSize($refresh);
-        if ($size === false || $size[0] <= $indent) {
+        if (false === $size || $size[0] <= $indent) {
             return $text;
         }
         $pad = str_repeat(' ', $indent);
@@ -303,7 +303,7 @@ class Console
             ? static::input("$text [".$options['default'].'] ')
             : static::input("$text ");
 
-        if ($input === '') {
+        if ('' === $input) {
             if (isset($options['default'])) {
                 $input = $options['default'];
             } elseif ($options['required']) {
@@ -365,7 +365,7 @@ class Console
         top:
         static::stdout("$prompt [".implode(',', array_keys($options)).',?]: ');
         $input = static::stdin();
-        if ($input === '?') {
+        if ('?' === $input) {
             foreach ($options as $key => $value) {
                 static::output(" $key - $value");
             }

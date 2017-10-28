@@ -17,7 +17,6 @@ class SlugField extends CharField
 {
     public function __construct(array $config = [])
     {
-
         $config['maxLength'] = ArrayHelper::getValue($config, 'maxLength', 50);
         if (!ArrayHelper::hasKey($config, 'dbIndex')):
             $config['dbIndex'] = true;
@@ -44,7 +43,7 @@ class SlugField extends CharField
     {
         $kwargs = parent::getConstructorArgs();
         $maxLength = ArrayHelper::getValue($kwargs, 'maxLength');
-        if ($maxLength === 50) :
+        if (50 === $maxLength) :
             unset($kwargs['maxLength']);
         endif;
         if (!ArrayHelper::hasKey($kwargs, 'dbIndex')):
@@ -63,5 +62,4 @@ class SlugField extends CharField
 
         return parent::formField($kwargs);
     }
-
 }
