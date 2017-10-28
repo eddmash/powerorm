@@ -134,7 +134,7 @@ class M2MManager extends BaseM2MManager
         if (!$this->through->meta->autoCreated):
             $meta = $this->through->meta;
             throw new AttributeError(
-                sprintf("Cannot use remove() on a ManyToManyField which specifies " .
+                sprintf('Cannot use remove() on a ManyToManyField which specifies '.
                     "an intermediary model. Use %s's Manager instead.",
                     $meta->getNamespacedModelName()));
         endif;
@@ -168,7 +168,7 @@ class M2MManager extends BaseM2MManager
             $newObjects = [];
             foreach ($values as $value) :
                 if ($value instanceof Model):
-                    $fkVal = $this->toField->getForeignRelatedFieldsValues($value)[0];;
+                    $fkVal = $this->toField->getForeignRelatedFieldsValues($value)[0];
                 else:
                     $fkVal = $value;
                 endif;
@@ -243,13 +243,13 @@ class M2MManager extends BaseM2MManager
         endforeach;
     }
 
-
     private function evalQueryset(Queryset $queryset)
     {
         $oldIds = [];
         foreach ($queryset as $oldVal) :
             $oldIds[] = $oldVal;
         endforeach;
+
         return $oldIds;
     }
 }

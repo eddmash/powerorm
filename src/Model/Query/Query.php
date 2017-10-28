@@ -127,7 +127,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * Query constructor.
      *
-     * @param Model $model
+     * @param Model     $model
      * @param WhereNode $whereClass
      *
      * @internal param string $where
@@ -157,8 +157,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     }
 
     /**
-     * manually Adds field to be used on the select statement
+     * manually Adds field to be used on the select statement.
+     *
      * @param Col $col
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -216,7 +218,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      */
     private function buildCondition($lookup, $lhs, $rhs)
     {
-        $lookup = (array)$lookup;
+        $lookup = (array) $lookup;
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
         $lookup = $lookup::createObject($lhs, $rhs);
@@ -401,7 +403,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             if (property_exists($fieldName, 'containsAggregate')):
                 throw new FieldError(
                     sprintf(
-                        'Using an aggregate in order_by() without also including ' .
+                        'Using an aggregate in order_by() without also including '.
                         'it in annotate() is not allowed: %s',
                         $fieldName
                     )
@@ -1263,13 +1265,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $query->clearOrdering(true);
         $query->setLimit(null, 1);
         $compiler = $query->getSqlCompiler($connection);
+
         return $compiler->hasResults();
     }
 
 }
 
 /**
- * @param Model[] $instances
+ * @param Model[]        $instances
  * @param Prefetch|array $lookups
  *
  * @since 1.1.0
@@ -1305,7 +1308,7 @@ function prefetchRelatedObjects($instances, $lookups)
             if ($lookup->queryset):
                 throw new ValueError(
                     sprintf(
-                        "'%s' lookup was already seen with a different queryset. " .
+                        "'%s' lookup was already seen with a different queryset. ".
                         'You may need to adjust the ordering of your lookups.',
                         $lookup->prefetchTo
                     )

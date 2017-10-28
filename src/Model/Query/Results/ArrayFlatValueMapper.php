@@ -11,10 +11,8 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Results;
 
-
 class ArrayFlatValueMapper extends Mapper
 {
-
     public function __invoke()
     {
         $sqlCompiler = $this->queryset->query->getSqlCompiler($this->queryset->connection);

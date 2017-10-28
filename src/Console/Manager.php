@@ -40,7 +40,6 @@ class Manager extends Base
         $this->managerName = $this->normalizeKey($this->getShortClassName());
     }
 
-
     public function addPath($paths)
     {
         foreach ($paths as $package => $locations) :

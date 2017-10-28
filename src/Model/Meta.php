@@ -2,7 +2,6 @@
 
 namespace Eddmash\PowerOrm\Model;
 
-use App\Models\Entry;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeconstructableObject;

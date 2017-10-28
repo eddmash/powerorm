@@ -10,8 +10,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Results;
 
-use Eddmash\PowerOrm\Model\Query\Expression\Col;
-
 class ArrayMapper extends Mapper
 {
     /**
@@ -36,6 +34,7 @@ class ArrayMapper extends Mapper
         foreach ($sqlCompiler->getResultsIterator($resultsStatement) as $result) :
             $resuts[] = array_combine($colList, $result);
         endforeach;
+
         return $resuts;
 
     }

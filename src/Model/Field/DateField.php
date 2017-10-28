@@ -68,13 +68,13 @@ class DateField extends Field
         return parent::formField($kwargs);
     }
 
-
     public function valueToString(Model $model)
     {
         /**
-         * @var $val \DateTime
+         * @var \DateTime
          */
         $val = $this->valueFromObject($model);
+
         return $val->format('c');
     }
 }

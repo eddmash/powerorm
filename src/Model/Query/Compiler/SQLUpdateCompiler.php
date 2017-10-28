@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Eddmash\PowerOrm\Exception\TypeError;
@@ -21,7 +20,6 @@ use Eddmash\PowerOrm\Model\Query\UpdateQuery;
 
 class SQLUpdateCompiler extends SqlFetchBaseCompiler
 {
-
     /**
      * @var UpdateQuery
      */
@@ -36,9 +34,12 @@ class SQLUpdateCompiler extends SqlFetchBaseCompiler
      * if the instance passed to a compiler it can be converted into a valid Sql string.
      *
      * @param CompilerInterface $compiler
-     * @param Connection $connection
+     * @param Connection        $connection
+     *
      * @return QueryBuilder
+     *
      * @throws TypeError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

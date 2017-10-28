@@ -12,7 +12,6 @@
 namespace Eddmash\PowerOrm;
 
 use DebugBar\JavascriptRenderer;
-use DebugBar\StandardDebugBar;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
@@ -27,7 +26,6 @@ use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Model\Model;
-use Exception;
 
 define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
 
@@ -63,7 +61,7 @@ class BaseOrm extends BaseObject
     /**
      * @var string command class names to add to the orm manager
      */
-    protected $commands =[];
+    protected $commands = [];
     private $timezone = '';
 
     /**
@@ -280,7 +278,6 @@ class BaseOrm extends BaseObject
         return static::$instance;
     }
 
-
     /**
      * Returns the numeric version of the orm.
      *
@@ -358,7 +355,6 @@ class BaseOrm extends BaseObject
         self::loadRegistry($orm);
     }
 
-
     /**
      * This is just a shortcut method. get the current instance of the orm.
      *
@@ -400,9 +396,9 @@ class BaseOrm extends BaseObject
     /**
      * Configures an object with the initial property values.
      *
-     * @param object $object the object to be configured
-     * @param array $properties the property initial values given in terms of name-value pairs
-     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object     the object to be configured
+     * @param array  $properties the property initial values given in terms of name-value pairs
+     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
@@ -569,7 +565,6 @@ class BaseOrm extends BaseObject
         }
     }
 
-
     /**
      * @return string
      */
@@ -591,10 +586,11 @@ class BaseOrm extends BaseObject
 
     }
 
-
     /**
-     * Adds a command class to the manager
+     * Adds a command class to the manager.
+     *
      * @param string $command class name
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

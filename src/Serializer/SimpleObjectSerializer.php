@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Serializer;
 
-
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Model;
@@ -19,7 +18,6 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
 
 abstract class SimpleObjectSerializer implements SerializerInterface
 {
-
     public $objects;
     public $_fields;
     public $items;
@@ -42,7 +40,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
         if (!is_array($items) && !$items instanceof Queryset):
             $items = [$items];
         endif;
-        /**@var $item Model */
+        /** @var $item Model */
         foreach ($items as $item) :
             $this->startObject($item);
             $concreteModel = $item->meta->concreteModel;
@@ -74,6 +72,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
         endforeach;
 
         $this->endSerialization();
+
         return $this->getValue();
     }
 
@@ -86,6 +85,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
     /**
      * @param Model $model
      * @param Field $field
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -93,7 +93,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
     public function handleM2MField(Model $model, Field $field)
     {
         $vals = [];
-        /**@var $field ManyToManyField */
+        /** @var $field ManyToManyField */
         if ($field->relation->through->meta->autoCreated):
             //todo handle natuaral keys
             $m2mValues = function (Model $model) {
@@ -113,8 +113,10 @@ abstract class SimpleObjectSerializer implements SerializerInterface
     }
 
     /**
-     * Invoked when serialization starts
+     * Invoked when serialization starts.
+     *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -127,7 +129,9 @@ abstract class SimpleObjectSerializer implements SerializerInterface
 
     /**
      * invoked when serialization ends.
+     *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -141,6 +145,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      * Invoked when creating of a serial representation of an item starts.
      *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -154,20 +159,23 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      * Invoked when ending the serial representation of an item starts.
      *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function endObject(Model $model)
     {
-        $this->objects['model']= $model->meta->getNamespacedModelName();
+        $this->objects['model'] = $model->meta->getNamespacedModelName();
         $this->objects['fields'] = $this->dumpObject($model);
         $this->_fields = null;
     }
 
     /**
-     * Returns the serialize object/objects
+     * Returns the serialize object/objects.
+     *
      * @return mixed
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

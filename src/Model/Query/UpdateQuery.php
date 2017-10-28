@@ -11,12 +11,9 @@
 
 namespace Eddmash\PowerOrm\Model\Query;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Exception\FieldError;
-use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\SQLUpdateCompiler;
 
 /**
@@ -89,6 +86,5 @@ class UpdateQuery extends Query
     {
         return SQLUpdateCompiler::class;
     }
-
 
 }

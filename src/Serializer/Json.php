@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Serializer;
 
-
 class Json extends SimpleObjectSerializer
 {
     public function getValue()

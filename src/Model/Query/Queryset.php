@@ -82,7 +82,7 @@ class Queryset implements QuerysetInterface
     protected $_resultsCache;
 
     /**
-     * @var array Holds fields that will be used in the asArray().
+     * @var array Holds fields that will be used in the asArray()
      */
     private $_fields;
     protected $kwargs = [];
@@ -103,9 +103,9 @@ class Queryset implements QuerysetInterface
 
     /**
      * @param Connection $connection
-     * @param Model $model
-     * @param Query $query
-     * @param array $kwargs
+     * @param Model      $model
+     * @param Query      $query
+     * @param array      $kwargs
      *
      * @return self
      *
@@ -311,7 +311,7 @@ class Queryset implements QuerysetInterface
 
     public function prefetchRelated()
     {
-        throw new NotImplemented(__METHOD__ . ' NOT IMPLEMENTED');
+        throw new NotImplemented(__METHOD__.' NOT IMPLEMENTED');
     }
 
     public function exclude()
@@ -328,7 +328,7 @@ class Queryset implements QuerysetInterface
             return $instance->query->hasResults($this->connection);
         endif;
 
-        return (bool)$this->_resultsCache;
+        return (bool) $this->_resultsCache;
     }
 
     public function limit($start, $end)
@@ -495,18 +495,20 @@ class Queryset implements QuerysetInterface
         return new $this->resultMapper($this);
     }
 
-
     /**
      * Returns the results as an array of associative array that represents a record in the database.
      * The orm does not try map the into  there  respective models.
      *
-     * @param array $fields the fields to select, if null all fields in the model are selected
-     * @param bool $valuesOnly if true return
-     * @param bool $flat if true returns the results as one array others it returns
-     * results as array of arrays each which represents a record in the database for the selected field.
-     * (only works when valueOnly is true)
+     * @param array $fields     the fields to select, if null all fields in the model are selected
+     * @param bool  $valuesOnly if true return
+     * @param bool  $flat       if true returns the results as one array others it returns
+     *                          results as array of arrays each which represents a record in the database for the selected field.
+     *                          (only works when valueOnly is true)
+     *
      * @return Queryset
+     *
      * @throws TypeError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -528,6 +530,7 @@ class Queryset implements QuerysetInterface
         if($flat):
             $clone->resultMapper = ArrayFlatValueMapper::class;
         endif;
+
         return $clone;
     }
 
