@@ -56,6 +56,7 @@ class UpdateQuery extends Query
             endif;
             if ($model->meta->getModelName() !== $this->model->meta->getModelName()):
                 $this->addRelatedUpdate($model, $field, $value);
+
                 continue;
             endif;
             $valuesSeq[] = [$field, $model, $value];

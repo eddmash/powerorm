@@ -8,6 +8,7 @@ return PhpCsFixer\Config::create()
     ->setRules(array(
         '@Symfony' => true,
         'braces'=>false,
+        'blank_line_before_statement'=>false
         )
     )
     ->setFinder($finder);

@@ -112,6 +112,7 @@ class Manager extends Base
             $file = $file_handler->getFile($name);
             if (false !== $file):
                 $packageName = $package;
+
                 break;
             endif;
         endforeach;

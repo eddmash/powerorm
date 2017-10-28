@@ -133,6 +133,7 @@ class M2MManager extends BaseM2MManager
     {
         if (!$this->through->meta->autoCreated):
             $meta = $this->through->meta;
+
             throw new AttributeError(
                 sprintf(
                     'Cannot use remove() on a ManyToManyField which specifies '.

@@ -182,6 +182,7 @@ abstract class BaseCommand extends Command
             $header = sprintf('<errorText> SystemCheckError: %s</errorText>', $header);
             $message = $header.$body.$footer;
             $output->writeln($message);
+
             throw new SystemCheckError();
         endif;
 

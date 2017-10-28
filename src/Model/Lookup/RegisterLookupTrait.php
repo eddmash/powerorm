@@ -38,6 +38,7 @@ trait RegisterLookupTrait
         if (array_key_exists($name, self::$lookups)):
             return self::$lookups[$name];
         endif;
+
         throw new FieldError(sprintf('Lookup %s is not recognized', $name));
     }
 

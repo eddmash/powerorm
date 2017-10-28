@@ -770,6 +770,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             return ArrayHelper::getValue($this->_fieldCache, $pkName);
         endif;
+
         try {
             /** @var $field RelatedField */
             $field = $this->meta->getField($name);

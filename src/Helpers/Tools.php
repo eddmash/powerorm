@@ -334,6 +334,7 @@ class Tools
             if (is_null($messg)):
                 $messg = sprintf("method '%s()' expects parameters to be an array", __FUNCTION__);
             endif;
+
             throw new InvalidArgumentException($messg);
         endif;
     }

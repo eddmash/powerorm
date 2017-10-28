@@ -513,11 +513,13 @@ class SqlFetchBaseCompiler extends SqlCompiler
                     $orderName = $orderName->reverseOrdering();
                 endif;
                 $orderByList[] = [$orderName, false];
+
                 continue;
             endif;
 
             if (array_key_exists($col, $this->query->annotations)):
                 $orderByList[] = new OrderBy($this->query->annotations[$col], $descending);
+
                 continue;
             endif;
 

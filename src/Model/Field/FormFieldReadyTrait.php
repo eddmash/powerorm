@@ -133,6 +133,7 @@ trait FormFieldReadyTrait
                     endif;
                 endif;
             endforeach;
+
             throw new ValidationError(
                 sprintf('Value %s is not a valid choice.', $value),
                 'invalid_choice'

@@ -155,6 +155,7 @@ class ModelState extends BaseObject
             return ArrayHelper::getValue($this->fields, $name);
 
         endif;
+
         throw new ValueError(sprintf('No field called [ %s ] on model [ %s ]', $name, $this->name));
     }
 

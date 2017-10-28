@@ -93,6 +93,7 @@ class Makemigrations extends BaseCommand
                 if (OutputInterface::VERBOSITY_DEBUG === $output->getVerbosity()) :
                     $output->writeln($migrationFile->getContent());
                 endif;
+
                 continue;
             endif;
 

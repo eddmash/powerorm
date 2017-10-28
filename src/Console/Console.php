@@ -261,6 +261,7 @@ class Console
         foreach ($lines as $i => $line) {
             if ($first) {
                 $first = false;
+
                 continue;
             }
             $lines[$i] = $pad.$line;

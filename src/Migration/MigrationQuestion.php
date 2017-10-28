@@ -157,9 +157,11 @@ class MigrationQuestion
                 break;
             elseif (false === $default):
                 Console::error(PHP_EOL.' An error occured while trying to set default value');
+
                 break;
             else:
                 $default_val = $default;
+
                 break;
             endif;
         endwhile;

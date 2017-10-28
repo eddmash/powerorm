@@ -33,6 +33,7 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
                 $relObj = null;
             else:
                 $filterArgs = $this->field->getForwardRelatedFilter($modelInstance);
+
                 try {
                     $relObj = $this->getQueryset($modelInstance)->get($filterArgs);
                     $relObj->{$this->field->getCacheName()} = $modelInstance;

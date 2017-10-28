@@ -316,6 +316,7 @@ class BaseOrm extends BaseObject
         if (empty($this->database)):
 
             $message = 'The database configuration have no been provided, consult documentation for options';
+
             throw new OrmException($message);
         endif;
         if (null == static::$connection):

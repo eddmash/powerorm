@@ -986,6 +986,7 @@ class AutoDetector extends BaseObject
 
                             array_splice($this->oldFieldKeys[$modelName], $pos, 1, [$addedField]);
                             $this->renamedFields[$modelName][$addedField] = $remField;
+
                             break;
 
                         endif;

@@ -1327,6 +1327,7 @@ function prefetchRelatedObjects($instances, $lookups)
 
             if (array_key_exists($prefetchTo, $doneQueries)):
                 $objList = ArrayHelper::getValue($doneQueries, $prefetchTo);
+
                 continue; //if its already fetched skip it
             endif;
         endforeach;
