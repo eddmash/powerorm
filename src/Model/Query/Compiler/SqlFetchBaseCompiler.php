@@ -19,8 +19,8 @@ use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 use Eddmash\PowerOrm\Model\Query\Expression\OrderBy;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
-use const Eddmash\PowerOrm\Model\Query\ORDER_DIR;
 use Eddmash\PowerOrm\Model\Query\Query;
+use const Eddmash\PowerOrm\Model\Query\ORDER_DIR;
 
 /**
  * This file is part of the powercomponents package.
@@ -141,8 +141,10 @@ class SqlFetchBaseCompiler extends SqlCompiler
                 $model = null;
             endif;
             if ($fromParent && !is_null($model) &&
-                is_subclass_of($fromParent->meta->concreteModel,
-                    $model->meta->concreteModel->meta->getNamespacedModelName())
+                is_subclass_of(
+                    $fromParent->meta->concreteModel,
+                    $model->meta->concreteModel->meta->getNamespacedModelName()
+                )
             ):
                 // Avoid loading data for already loaded parents.
                 // We end up here in the case selectRelated() resolution
@@ -176,12 +178,14 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function getRelatedSelections(&$select, Meta $meta = null,
-                                          $rootAlias = null,
-                                          $curDepth = 1,
-                                          $requested = null,
-                                          $restricted = null)
-    {
+    private function getRelatedSelections(
+        &$select,
+        Meta $meta = null,
+        $rootAlias = null,
+        $curDepth = 1,
+        $requested = null,
+        $restricted = null
+    ) {
         $relatedKlassInfo = [];
 
         if (!$restricted && $this->query->maxDepth && $curDepth > $this->query->maxDepth):
@@ -217,9 +221,13 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
                     if ($nextSpanField || in_array($field->getName(), $requested)):
                         throw new FieldError(
-                            sprintf("Non-relational field given in selectRelated: '%s'. ".
-                                'Choices are: %s', $field->getName(),
-                                implode(', ', $this->query->getFieldChoices())));
+                            sprintf(
+                                "Non-relational field given in selectRelated: '%s'. ".
+                                'Choices are: %s',
+                                $field->getName(),
+                                implode(', ', $this->query->getFieldChoices())
+                            )
+                        );
 
                     endif;
                 endif;
@@ -335,9 +343,12 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
             if ($fieldsNotFound):
                 throw new FieldError(
-                    sprintf('Invalid field name(s) given in select_related: %s. Choices are: %s',
+                    sprintf(
+                        'Invalid field name(s) given in select_related: %s. Choices are: %s',
                         implode(', ', $fieldsNotFound),
-                        implode(', ', $this->query->getFieldChoices())));
+                        implode(', ', $this->query->getFieldChoices())
+                    )
+                );
 
             endif;
         endif;
@@ -444,7 +455,8 @@ class SqlFetchBaseCompiler extends SqlCompiler
             // first use the inbuilt converters
             try {
                 $val = Type::getType(
-                    $field->dbType($this->connection))->convertToPHPValue($val, $this->connection->getDatabasePlatform());
+                    $field->dbType($this->connection)
+                )->convertToPHPValue($val, $this->connection->getDatabasePlatform());
             } catch (DBALException $exception) {
             }
 

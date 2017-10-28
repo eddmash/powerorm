@@ -15,7 +15,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Eddmash\PowerOrm\Helpers\Node;
 use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 use const Eddmash\PowerOrm\Model\Query\Expression\OR_CONNECTOR;
-use function Eddmash\PowerOrm\Model\Query\Expression\or_;
 use function Eddmash\PowerOrm\Model\Query\Expression\not_;
 
 class Q extends Node

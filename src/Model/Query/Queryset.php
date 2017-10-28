@@ -26,12 +26,12 @@ use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
-use function Eddmash\PowerOrm\Model\Query\Expression\not_;
-use function Eddmash\PowerOrm\Model\Query\Expression\q_;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayFlatValueMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayValueMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ModelMapper;
+use function Eddmash\PowerOrm\Model\Query\Expression\not_;
+use function Eddmash\PowerOrm\Model\Query\Expression\q_;
 
 const PRIMARY_KEY_ID = 'pk';
 
@@ -118,8 +118,7 @@ class Queryset implements QuerysetInterface
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    )
-    {
+    ) {
         return new static($connection, $model, $query, $kwargs);
     }
 
@@ -142,8 +141,10 @@ class Queryset implements QuerysetInterface
 
     public function get()
     {
-        $queryset = $this->_filterOrExclude(false,
-            static::formatFilterConditions(__METHOD__, func_get_args()));
+        $queryset = $this->_filterOrExclude(
+            false,
+            static::formatFilterConditions(__METHOD__, func_get_args())
+        );
 
         $resultCount = count($queryset);
         if (1 == $resultCount):
@@ -187,8 +188,10 @@ class Queryset implements QuerysetInterface
      */
     public function filter()
     {
-        return $this->_filterOrExclude(false,
-            static::formatFilterConditions(__METHOD__, func_get_args()));
+        return $this->_filterOrExclude(
+            false,
+            static::formatFilterConditions(__METHOD__, func_get_args())
+        );
     }
 
     /**
@@ -216,7 +219,8 @@ class Queryset implements QuerysetInterface
         foreach ($args as $alias => $arg) :
             if (in_array($alias, $names)):
                 throw new ValueError(
-                    sprintf("The annotation '%s' conflicts with a field on the model.", $alias));
+                    sprintf("The annotation '%s' conflicts with a field on the model.", $alias)
+                );
             endif;
             $clone->query->addAnnotation(['annotation' => $arg, 'alias' => $alias, 'isSummary' => false]);
         endforeach;
@@ -316,8 +320,10 @@ class Queryset implements QuerysetInterface
 
     public function exclude()
     {
-        return $this->_filterOrExclude(true,
-            static::formatFilterConditions(__METHOD__, func_get_args()));
+        return $this->_filterOrExclude(
+            true,
+            static::formatFilterConditions(__METHOD__, func_get_args())
+        );
     }
 
     public function exists()
@@ -415,7 +421,8 @@ class Queryset implements QuerysetInterface
     {
         if (count($conditions) > 1):
             throw new InvalidArgumentException(
-                sprintf("Method '%s' supports a single array input", $methondname));
+                sprintf("Method '%s' supports a single array input", $methondname)
+            );
         endif;
 
         if (1 == count($conditions)):
@@ -526,7 +533,7 @@ class Queryset implements QuerysetInterface
         $clone->query->setValueSelect($fields);
 
         $clone->resultMapper = ($valuesOnly) ? ArrayValueMapper::class : ArrayMapper::class;
-        if($flat):
+        if ($flat):
             $clone->resultMapper = ArrayFlatValueMapper::class;
         endif;
 

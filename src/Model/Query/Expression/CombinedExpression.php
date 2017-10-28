@@ -54,13 +54,13 @@ class CombinedExpression extends BaseExpression
     {
         try {
             $lhsOutputField = $this->lhs->getOutputField();
-        }catch(FieldError $error){
+        } catch (FieldError $error) {
             $lhsOutputField = null;
         }
 
         try {
             $rhsOutputField = $this->rhs->getOutputField();
-        }catch (FieldError $error){
+        } catch (FieldError $error) {
             $rhsOutputField = null;
         }
 

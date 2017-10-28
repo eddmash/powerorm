@@ -22,7 +22,7 @@ class ReverseManyToOneDescriptor extends BaseDescriptor
      */
     public function getValue(Model $modelInstance)
     {
-        if(empty($modelInstance)):
+        if (empty($modelInstance)):
             return $this;
         endif;
 

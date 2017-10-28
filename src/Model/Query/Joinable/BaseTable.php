@@ -41,7 +41,7 @@ class BaseTable extends BaseJoin
 
     public function equal($item)
     {
-        if($item instanceof static):
+        if ($item instanceof static):
             return
                 $this->tableName == $item->tableName;
         endif;

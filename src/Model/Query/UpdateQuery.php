@@ -12,8 +12,6 @@
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Eddmash\PowerOrm\Exception\FieldError;
-use Eddmash\PowerOrm\Model\Field\Field;
-use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Compiler\SQLUpdateCompiler;
 
 /**

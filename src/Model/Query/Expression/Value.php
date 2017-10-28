@@ -51,9 +51,14 @@ class Value extends BaseExpression
     /**
      * {@inheritdoc}
      */
-    public function resolveExpression(ExpResolverInterface $resolver, $allowJoins = true, $reuse = null, $summarize =
-    false, $forSave = false)
-    {
+    public function resolveExpression(
+        ExpResolverInterface $resolver,
+        $allowJoins = true,
+        $reuse = null,
+        $summarize =
+        false,
+        $forSave = false
+    ) {
         $c = parent::resolveExpression($resolver, $allowJoins, $reuse, $summarize, $forSave);
         $c->forSave = $forSave;
 

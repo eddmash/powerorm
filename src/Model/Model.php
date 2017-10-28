@@ -812,7 +812,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         /* @var $field RelatedField */
         try {
             $field = $this->meta->getField($name);
-            if($field->getAttrName() !== $field->getName() && $field->getAttrName() === $name):
+            if ($field->getAttrName() !== $field->getName() && $field->getAttrName() === $name):
                 $this->{$name} = $value;
             else:
                 $field->setValue($this, $value);

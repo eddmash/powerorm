@@ -19,7 +19,6 @@ use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
 use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Queryset;
 
 class ManyToOneDescriptor extends BaseDescriptor
 {
@@ -146,8 +145,10 @@ class ManyToOneDescriptor extends BaseDescriptor
         // define BaseM2MQueryset
         if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)):
             $baseClass = $model::getManagerClass();
-            $class = sprintf('namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}',
-                $baseClass);
+            $class = sprintf(
+                'namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}',
+                $baseClass
+            );
             eval($class);
         endif;
 

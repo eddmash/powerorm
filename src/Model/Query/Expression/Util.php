@@ -42,6 +42,7 @@ function or_()
 {
     return new Q(Queryset::formatFilterConditions(__FUNCTION__, func_get_args()), OR_CONNECTOR);
 }
+
 /**
  * @return Q
  *
@@ -77,6 +78,7 @@ function f_($name)
 {
     return new F($name);
 }
+
 /**
  * @return Func
  *

@@ -516,6 +516,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         if (method_exists($value, '_prepareAsFilterValue')):
             $value = $value->_prepareAsFilterValue();
         endif;
+
         //todo if value is array
         return [$value, $lookups, $usedJoins];
     }
@@ -1248,6 +1249,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     public function toSubQuery(Connection $connection)
     {
         $this->isSubQuery = true;
+
         //todo clear ordering
         return $this;
     }

@@ -161,7 +161,8 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function _prepare() {
+    public function _prepare()
+    {
         return $this;
     }
 
@@ -179,9 +180,13 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
      *
      * @return $this
      */
-    public function resolveExpression(ExpResolverInterface $resolver, $allowJoins = true, $reuse = null,
-        $summarize = false, $forSave = false)
-    {
+    public function resolveExpression(
+        ExpResolverInterface $resolver,
+        $allowJoins = true,
+        $reuse = null,
+        $summarize = false,
+        $forSave = false
+    ) {
         $obj = clone $this;
         $obj->copied = true;
 
@@ -201,7 +206,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     public function containsAggregates()
     {
         foreach ($this->getSourceExpressions() as $sourceExpression) :
-            if($sourceExpression->containsAggregates()):
+            if ($sourceExpression->containsAggregates()):
                 return true;
             endif;
         endforeach;

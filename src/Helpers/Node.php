@@ -128,6 +128,7 @@ class Node implements \Countable
         $children = rtrim($children, ']');
         $children = ltrim($children, '[');
         $children = trim($children);
+
 //        $children = trim($children, ",");
         return sprintf('(%s : %s)', $this->connector, $children);
     }

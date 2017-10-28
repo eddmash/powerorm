@@ -54,7 +54,7 @@ class Combinable
 
     private function combine($other, $connector, $reversed, $node = null)
     {
-        if(!$other instanceof ResolvableExpInterface):
+        if (!$other instanceof ResolvableExpInterface):
             //todo date
             $other = new Value($other);
         endif;

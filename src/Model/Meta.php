@@ -32,8 +32,16 @@ class Meta extends DeconstructableObject implements MetaInterface
         'overrides',
     ];
 
-    public static $DEFAULT_NAMES = ['registry', 'verboseName', 'dbTable', 'managed', 'proxy', 'autoCreated',
-        'defaultRelatedName', 'orderBy', ];
+    public static $DEFAULT_NAMES = [
+        'registry',
+        'verboseName',
+        'dbTable',
+        'managed',
+        'proxy',
+        'autoCreated',
+        'defaultRelatedName',
+        'orderBy',
+    ];
 
     public $modelNamespace;
     public $defaultRelatedName;
@@ -565,8 +573,11 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     private function getTableName()
     {
-        return sprintf('%s%s', BaseOrm::getDbPrefix(),
-            str_replace('\\', '_', $this->normalizeKey($this->modelName)));
+        return sprintf(
+            '%s%s',
+            BaseOrm::getDbPrefix(),
+            str_replace('\\', '_', $this->normalizeKey($this->modelName))
+        );
     }
 
     public function __toString()

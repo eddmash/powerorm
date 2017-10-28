@@ -134,9 +134,12 @@ class M2MManager extends BaseM2MManager
         if (!$this->through->meta->autoCreated):
             $meta = $this->through->meta;
             throw new AttributeError(
-                sprintf('Cannot use remove() on a ManyToManyField which specifies '.
+                sprintf(
+                    'Cannot use remove() on a ManyToManyField which specifies '.
                     "an intermediary model. Use %s's Manager instead.",
-                    $meta->getNamespacedModelName()));
+                    $meta->getNamespacedModelName()
+                )
+            );
         endif;
         //todo clear prefetched
         $this->removeItems($this->fromFieldName, $this->toFieldName, func_get_args());

@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
-use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 /**
@@ -70,9 +69,13 @@ class Func extends BaseExpression
     /**
      * {@inheritdoc}
      */
-    public function resolveExpression(ExpResolverInterface $resolver, $allowJoins = true, $reuse = null,
-                                      $summarize = false, $forSave = false)
-    {
+    public function resolveExpression(
+        ExpResolverInterface $resolver,
+        $allowJoins = true,
+        $reuse = null,
+        $summarize = false,
+        $forSave = false
+    ) {
         $obj = clone  $this;
         $obj->summarize = $summarize;
 

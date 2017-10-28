@@ -132,7 +132,7 @@ class StringHelper
 
     public static function contains($string, $subString, $caseSensitive = true)
     {
-        if($caseSensitive):
+        if ($caseSensitive):
             $string = strtolower($string);
             $subString = strtolower($subString);
         endif;

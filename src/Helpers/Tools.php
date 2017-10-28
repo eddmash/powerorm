@@ -93,7 +93,7 @@ class Tools
                     $string = self::stringify(reset($constructorArgs), $nextIndent, $close, $start, ++$level);
 
                     $stringState .= sprintf('%1$s(%2$s)', $class, $string);
-                }else{
+                } else {
                     $stringState .= sprintf('%s', $value);
                 }
             } else {

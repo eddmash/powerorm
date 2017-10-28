@@ -33,8 +33,10 @@ class Shell extends BaseCommand
             $shell->run();
         else:
 
-            $message = sprintf('<error>%s</error>',
-                "Shell command depends on Psych, please install as shown 'composer require psy/psysh:@stable'");
+            $message = sprintf(
+                '<error>%s</error>',
+                "Shell command depends on Psych, please install as shown 'composer require psy/psysh:@stable'"
+            );
             $output->writeln($message);
         endif;
     }
