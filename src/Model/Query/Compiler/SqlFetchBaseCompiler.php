@@ -2,6 +2,7 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Statement;
@@ -20,7 +21,7 @@ use Eddmash\PowerOrm\Model\Query\Expression\Col;
 use Eddmash\PowerOrm\Model\Query\Expression\OrderBy;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Query;
-use const Eddmash\PowerOrm\Model\Query\ORDER_DIR;
+use const Eddmash\PowerOrm\Model\Query\ORDER_DIRECTION;
 
 /**
  * This file is part of the powercomponents package.
@@ -57,9 +58,10 @@ class SqlFetchBaseCompiler extends SqlCompiler
         $this->annotations = $annotations;
 
         $orderBy = $this->getOrderBy();
+        $groupBy = $this->getGroupBy($this->select, $orderBy);
         $this->where = $this->query->where;
 
-        return [$orderBy, 'groupBy'];
+        return [$orderBy, $groupBy];
     }
 
     /**
@@ -70,7 +72,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
         $klassInfo = [];
         $select = [];
         $annotations = [];
-        //keeps track of what position the column is at helpful because of we perform a join we might a column name
+        //keeps track of what position the column is at, helpful because of we perform a join we might a column name
         // thats repeated a cross multiple tables, we can use the colmn names to map back to model since it will cause
         // issues
         $selectIDX = 0;
@@ -111,12 +113,143 @@ class SqlFetchBaseCompiler extends SqlCompiler
         return [$select, $klassInfo, $annotations];
     }
 
+    public function getOrderBy()
+    {
+        // an array of arrays that indicate a colname and its a reference e.g. [['name', false]]
+        $orderByList = [];
+        if (!$this->query->defaultOrdering):
+            $ordering = $this->query->orderBy;
+        else:
+            $ordering = ($this->query->orderBy) ? $this->query->orderBy : $this->query->getMeta()->getOrderBy();
+        endif;
+
+        if ($this->query->standardOrdering):
+            list($asc, $desc) = ORDER_DIRECTION['ASC'];
+        else:
+            list($asc, $desc) = ORDER_DIRECTION['DESC'];
+        endif;
+
+        foreach ($ordering as $orderName) :
+            list($colName, $orderDir) = Query::getOrderDirection($orderName, $asc);
+            $descending = ('DESC' == $orderDir) ? true : false;
+
+            if ($orderName instanceof BaseExpression):
+                $order = $orderName;
+                if (!$orderName instanceof OrderBy):
+                    $order = $orderName->ascendingOrder();
+                endif;
+                if (!$this->query->standardOrdering):
+                    $order = $order->reverseOrdering();
+                endif;
+                $orderByList[] = [$order, false];
+
+                continue;
+            endif;
+
+            if (array_key_exists($colName, $this->query->annotations)):
+                $orderByList[] = [new OrderBy($this->query->annotations[$colName], $descending), false];
+
+                continue;
+            endif;
+
+            // we are here we still have a string name, we need to convert it to an
+            // expression that we can use
+            if ($colName):
+                $orderByList = array_merge(
+                    $orderByList,
+                    $this->resolveOrderName(
+                        $orderName,
+                        $this->query->getMeta(),
+                        null,
+                        $asc
+                    )
+                );
+            endif;
+        endforeach;
+
+        $seen = new ArrayCollection();
+        $results = [];
+        /* @var $orderExp BaseExpression */
+        foreach ($orderByList as $orderitem) :
+            list($orderExp, $isRef) = $orderitem;
+            $resolved = $orderExp->resolveExpression($this->query, true);
+            list($sql, $params) = $this->compile($resolved);
+
+            preg_match("/(?P<name>.*)\s(?P<order>ASC|DESC)(.*)/", "demo_entry.id DESC", $match);
+            $strippedSql = $match['name'];
+
+            // ensure we dont add the same field twice
+            if ($seen->contains([$strippedSql, $params])):
+                continue;
+            endif;
+            $seen->add([$strippedSql, $params]);
+            $results[] = [$resolved, [$sql, $params, $isRef]];
+        endforeach;
+
+        return $results;
+    }
+
+    public function getGroupBy($select, $orderBy)
+    {
+        if (is_null($this->query->groupBy)):
+            return [];
+        endif;
+
+        $expressions = [];
+        if (!$this->query->groupBy):
+            foreach ($this->query->groupBy as $item) :
+                if (!$item instanceof SqlCompilableinterface):
+//                    $item = $item->re
+                    throw new NotImplemented();
+                else:
+                    $expressions[] = $item;
+                endif;
+            endforeach;
+        endif;
+        // Note that even if the group_by is set, it is only the minimal
+        // set to group by. So, we need to add cols in select, order_by, and
+        // having into the select in any case.
+
+        /**@var $exp BaseExpression */
+        foreach ($this->select as $colInfo) :
+            list($exp, $alias) = $colInfo;
+            foreach ($exp->getGroupByCols() as $groupByCol) :
+                $expressions[] = $groupByCol;
+            endforeach;
+        endforeach;
+
+        foreach ($orderBy as $orderItems) :
+            list($exp, $opts) = $orderItems;
+            list($sql, $params, $isRef) = $opts;
+            if ($exp->containsAggregates()):
+                continue;
+            endif;
+            if ($isRef):
+                continue;
+            endif;
+            $expressions = array_merge($expressions, $exp->getSourceExpressions());
+        endforeach;
+
+        $results = [];
+        $seen = new ArrayCollection();
+        //todo having
+        foreach ($expressions as $expression) :
+            list($sql, $params) = $this->compile($expression);
+            if (!$seen->contains([$sql, $params])):
+                $results[] = [$sql, $params];
+                $seen[] = [$sql, $params];
+            endif;
+        endforeach;
+
+        return $results;
+    }
+
     /**     *
      * Returns the fields in the current models/those represented by the alias as Col expression, which know how to be
      * used in a query.
      *
-     * @param null       $startAlias
-     * @param Meta|null  $meta
+     * @param null $startAlias
+     * @param Meta|null $meta
      * @param Model|null $fromParent
      *
      * @return Col[]
@@ -164,11 +297,11 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * Used to get information needed when we are doing selectRelated(),.
      *
      * @param $select
-     * @param Meta|null $meta       the from which we expect to find the related fields
-     * @param null      $rootAlias
-     * @param int       $curDepth
-     * @param null      $requested  the set of fields to use in selectRelated
-     * @param null      $restricted true when we are to use just a set of relationship fields
+     * @param Meta|null $meta the from which we expect to find the related fields
+     * @param null $rootAlias
+     * @param int $curDepth
+     * @param null $requested the set of fields to use in selectRelated
+     * @param null $restricted true when we are to use just a set of relationship fields
      *
      * @return array
      *
@@ -481,76 +614,18 @@ class SqlFetchBaseCompiler extends SqlCompiler
         // by column number as returned in the corresponding result set, starting at column 0.
         // this to avoid issues where joins result in columns with the same name e.g. user.id joined by blog.id
         $results = $statement->fetchAll(\PDO::FETCH_NUM);
+
         foreach ($results as $row) :
             yield $this->preparedResults($row);
         endforeach;
     }
 
-    public function getOrderBy()
-    {
-        $orderByList = [];
-        if (!$this->query->defaultOrdering):
-            $ordering = $this->query->orderBy;
-        else:
-            $ordering = ($this->query->orderBy) ? $this->query->orderBy : $this->query->getMeta()->getOrderBy();
-        endif;
-
-        if ($this->query->standardOrdering):
-            list($asc, $desc) = ORDER_DIR['ASC'];
-        else:
-            list($asc, $desc) = ORDER_DIR['DESC'];
-        endif;
-
-        foreach ($ordering as $orderName) :
-            list($col, $orderDir) = Query::getOrderDirection($orderName, $asc);
-            $descending = ('DESC' == $orderDir) ? true : false;
-
-            if ($orderName instanceof BaseExpression):
-                if (!$orderName instanceof OrderBy):
-                    $orderName = $orderName->ascendingOrder();
-                endif;
-                if (!$this->query->standardOrdering):
-                    $orderName = $orderName->reverseOrdering();
-                endif;
-                $orderByList[] = [$orderName, false];
-
-                continue;
-            endif;
-
-            if (array_key_exists($col, $this->query->annotations)):
-                $orderByList[] = new OrderBy($this->query->annotations[$col], $descending);
-
-                continue;
-            endif;
-
-            // we are here we still have a string name, we need to convert it to an
-            // expression that we can use
-            if ($col):
-                $orderByList = array_merge(
-                    $orderByList,
-                    $this->resolveOrderName(
-                        $col,
-                        $this->query->getMeta(),
-                        null,
-                        $asc
-                    )
-                );
-            endif;
-        endforeach;
-
-        /* @var $orderExp BaseExpression */
-        foreach ($orderByList as $orderitem) :
-            list($orderExp, $isRef) = $orderitem;
-            $resolved = $orderExp->resolveExpression($this->query, true);
-            list($sql, $params) = $this->compile($resolved);
-        endforeach;
-    }
 
     /**
      * Creates the SQL for this query. Returns the SQL string and list of parameters.
      *
      * @param CompilerInterface $compiler
-     * @param Connection        $connection
+     * @param Connection $connection
      *
      * @return array
      *
@@ -599,8 +674,29 @@ class SqlFetchBaseCompiler extends SqlCompiler
             endif;
         endif;
 
+        $grouping = [];
+        if ($groupBy):
+            foreach ($groupBy as $groupbyItem) :
+                list($groupBySql, $groupByParams) = $groupbyItem;
+                $grouping[] = $groupBySql;
+                $params = array_merge($params, $groupByParams);
+            endforeach;
+        endif;
+
+        if ($grouping):
+            //todo distinct
+            $results[] = sprintf("GROUP BY %s", implode(", ", $grouping));
+        endif;
+
         if ($orderBy):
-            //todo append orderby and having
+            $ordering = [];
+            foreach ($orderBy as $orderByItem) :
+                list($_, $opts) = $orderByItem;
+                list($orderSql, $orderParams, $_) = $opts;
+                $ordering[] = $orderSql;
+                $params = array_merge($params, $orderParams);
+            endforeach;
+            $results[] = sprintf("ORDER BY %s", implode(", ", $ordering));
         endif;
         if ($this->query->limit) :
             $results[] = 'LIMIT';
@@ -621,9 +717,9 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @param $col
      * @param $meta
-     * @param null   $alias
+     * @param null $alias
      * @param string $defaultOrder
-     * @param array  $alreadyResolved helps avoid infinite loops
+     * @param array $alreadyResolved helps avoid infinite loops
      *
      * @return array
      *
@@ -638,16 +734,24 @@ class SqlFetchBaseCompiler extends SqlCompiler
         $nameParts = explode(BaseLookup::LOOKUP_SEPARATOR, $col);
 
         /* @var $targetField Field */
-        list($relationField, $targetFields, $joinList, $paths, $meta) = $this->_setupJoins($nameParts, $meta, $alias);
+        list($relationField, $targetFields, $alias, $joinList, $paths, $meta) = $this->_setupJoins(
+            $nameParts,
+            $meta,
+            $alias
+        );
 
         if ($relationField->isRelation && $meta->getOrderBy() && empty($relationField->getAttrName())):
-            throw new NotImplemented('This capabilty is yet to be implemented');
+            throw new NotImplemented('This capability is yet to be implemented');
         endif;
 
+
         list($targets, $finalAlias, $joinList) = $this->query->trimJoins($targetFields, $joinList, $paths);
+
         $fields = [];
 
         $descending = ('DESC' == $order) ? true : false;
+
+        // convert the names to expressions
 
         /** @var $target Field */
         foreach ($targets as $target):
@@ -690,7 +794,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         $alias = end($joinList);
 
-        return [$field, $targets, $alias, $paths, $meta];
+        return [$field, $targets, $alias, $joinList, $paths, $meta];
     }
 
     public function hasResults()

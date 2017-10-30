@@ -69,6 +69,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @var array
      */
     public $_fieldCache = [];
+    public $_nonModelfields = [];
 
     /**
      * Holds the name of the database table that this model represents.
@@ -339,7 +340,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string       $name
+     * @param string $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -425,9 +426,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param Model     $model
-     * @param string    $method     the method to invoke
-     * @param null      $args       the arguments to pass to the method
+     * @param Model $model
+     * @param string $method the method to invoke
+     * @param null $args the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -759,7 +760,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array) unserialize((string) $serialized);
+        $this->_fieldCache = (array)unserialize((string)$serialized);
     }
 
     public function __get($name)
@@ -781,13 +782,16 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             return $field->getValue($this);
         } catch (FieldDoesNotExist $e) {
+            if(ArrayHelper::hasKey($this->_nonModelfields, $name)):
+                return ArrayHelper::getValue($this->_nonModelfields, $name);
+            endif;
             if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
                 throw new AttributeError(
                     sprintf(
                         "AttributeError: '%s' object has no attribute '%s'. choices are [ %s ]",
                         $this->meta->getNamespacedModelName(),
                         $name,
-                        implode(', ', getFieldNamesFromMeta($this->meta))
+                        implode(', ', \Eddmash\PowerOrm\Model\Query\getFieldNamesFromMeta($this->meta))
                     )
                 );
             endif;
@@ -797,7 +801,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             return ArrayHelper::getValue($this->_fieldCache, $name);
         endif;
 
-        return $this->{$name};
+        return ArrayHelper::getValue($this->_nonModelfields, $name);
     }
 
     public function __set($name, $value)
@@ -805,7 +809,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         // pk has a special meaning to the orm.
         if ('pk' === $name):
             $pkName = $this->meta->primaryKey->getAttrName();
-            $this->{$pkName} = $value;
+            $this->_fieldCache[$pkName] = $value;
 
             return;
         endif;
@@ -814,14 +818,14 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         try {
             $field = $this->meta->getField($name);
             if ($field->getAttrName() !== $field->getName() && $field->getAttrName() === $name):
-                $this->{$name} = $value;
+                $this->_fieldCache[$name] = $value;
             else:
                 $field->setValue($this, $value);
             endif;
         } catch (FieldDoesNotExist $e) {
             // we assume this is not a model field being set
             // or its a completely new property we are attaching to the model dynamicaklly
-            $this->{$name} = $value;
+            $this->_nonModelfields[$name] = $value;
         }
     }
 
@@ -912,8 +916,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $connection
-     * @param null       $updateField
+     * @param null $connection
+     * @param null $updateField
      *
      * @throws ValueError
      *
@@ -1015,7 +1019,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $updateFields
+     * @param null $updateFields
      *
      * @since 1.1.0
      *

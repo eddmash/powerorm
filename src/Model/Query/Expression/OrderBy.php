@@ -73,7 +73,7 @@ class OrderBy extends BaseExpression
 
     public function asSql(CompilerInterface $compiler, Connection $connection, $template = null)
     {
-        if (!is_null($template)):
+        if (is_null($template)):
             if ($this->nullsLast):
                 $template = sprintf('%s NULLS LAST', $this->template);
             elseif ($this->nullsFirst):
@@ -81,10 +81,16 @@ class OrderBy extends BaseExpression
             endif;
         endif;
         list($expSql, $expParams) = $compiler->compile($this->expression);
+
         $params = [
             $expSql,
             ($this->descending) ? 'DESC' : 'ASC',
         ];
+
+        $template = ($template) ? $template : $this->template;
+        dump($this->descending);
+        dump($template);
+        dump($params);
 
         return [vsprintf($template, $params), $expParams];
     }
@@ -111,5 +117,15 @@ class OrderBy extends BaseExpression
     public function reverseOrdering()
     {
         $this->descending = !$this->descending;
+    }
+
+
+    public function getGroupByCols()
+    {
+        $cols = [];
+        foreach ($this->getSourceExpressions() as $sourceExpression) :
+            $cols[] = $sourceExpression->getGroupByCols();
+        endforeach;
+        return $cols;
     }
 }

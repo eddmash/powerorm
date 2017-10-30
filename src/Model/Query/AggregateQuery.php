@@ -25,7 +25,7 @@ class AggregateQuery extends Query
     /**
      * {@inheritdoc}
      */
-    public function getSqlCompiler(Connection $connection)
+    public function getCompilerClass()
     {
         return SQLAggregateCompiler::class;
     }

@@ -51,4 +51,9 @@ class BaseAggregate extends Func
     {
         return $this->containsAggregate;
     }
+
+    public function getGroupByCols()
+    {
+        return [];
+    }
 }

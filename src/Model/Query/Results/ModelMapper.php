@@ -35,6 +35,7 @@ class ModelMapper extends Mapper
         $resultsStatement = $sqlCompiler->executeSql($this->chunkedFetch);
         $klassInfo = $sqlCompiler->klassInfo;
         $select = $sqlCompiler->select;
+        $annotationMap = $sqlCompiler->annotations;
 
         $selectedFields = $klassInfo['select_fields'];
 
@@ -60,6 +61,9 @@ class ModelMapper extends Mapper
 
             $obj = $modelClass::fromDb($connection, $initList, $vals);
 
+            foreach ($annotationMap as $name=>$pos) :
+                $obj->{$name} = $result[$pos];
+            endforeach;
             if ($relatedPopulators):
                 foreach ($relatedPopulators as $relatedPopulator) :
                     $relatedPopulator->populate($result, $obj);

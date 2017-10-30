@@ -30,6 +30,7 @@ class ArrayMapper extends Mapper
         $resultsStatement = $sqlCompiler->executeSql($this->chunkedFetch);
         $colList = $sqlCompiler->query->valueSelect;
 
+        $colList = array_merge($colList, array_keys($sqlCompiler->query->annotations));
         $resuts = [];
         foreach ($sqlCompiler->getResultsIterator($resultsStatement) as $result) :
             $resuts[] = array_combine($colList, $result);

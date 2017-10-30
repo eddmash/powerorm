@@ -46,7 +46,7 @@ use function Eddmash\PowerOrm\Model\Query\Expression\count_;
 
 const INNER = 'INNER JOIN';
 const LOUTER = 'LEFT OUTER JOIN';
-const ORDER_DIR = [
+const ORDER_DIRECTION = [
     'ASC' => ['ASC', 'DESC'],
     'DESC' => ['DESC', 'ASC'],
 ];
@@ -112,7 +112,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     public $maxDepth = 5;
     public $columnInfoCache;
     public $usedTableAlias = [];
-    public $groupBy;
+
+    /**
+     * if null no grouping is done
+     * if true group by select fields
+     * if array fields in array are used to group
+     * @var null
+     */
+    public $groupBy=null;
 
     /**
      * @var bool Dictates if the order by is done in the asc or desc manner,
@@ -145,9 +152,19 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         return new self($model);
     }
 
+    /**
+     * Determine how a field needs to be ordered.
+     *
+     * @param $orderName
+     * @param string $defaultOrder
+     * @return array
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public static function getOrderDirection($orderName, $defaultOrder = 'ASC')
     {
-        $order = ORDER_DIR['ASC'];
+        $order = ORDER_DIRECTION[$defaultOrder];
 
         if (StringHelper::startsWith($orderName, '-')):
             return [str_replace('-', '', $orderName), $order[1]];
@@ -372,6 +389,19 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
     public function setGroupBy()
     {
+        $this->groupBy = [];
+
+        foreach ($this->select as $col) :
+            $this->groupBy[]= $col;
+        endforeach;
+
+        if($this->annotations):
+            foreach ($this->annotations as $alias=>$annotation) :
+                foreach ($annotation->getGroupByCols() as $groupByCol) :
+                    $this->groupBy[] = $groupByCol;
+                endforeach;
+            endforeach;
+        endif;
     }
 
     /**
@@ -398,10 +428,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                 $errors[] = $fieldName;
             endif;
 
-            if (property_exists($fieldName, 'containsAggregate')):
+            if (is_object($fieldName) && property_exists($fieldName, 'containsAggregate')):
                 throw new FieldError(
                     sprintf(
-                        'Using an aggregate in order_by() without also including '.
+                        'Using an aggregate in orderBy() without also including '.
                         'it in annotate() is not allowed: %s',
                         $fieldName
                     )
@@ -410,7 +440,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endforeach;
 
         if ($errors):
-            throw new FieldError(sprintf('Invalid order_by arguments: %s', json_encode($errors)));
+            throw new FieldError(sprintf('Invalid orderBy arguments: %s', json_encode($errors)));
         endif;
 
         if ($fieldNames):
@@ -953,7 +983,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endforeach;
 
         // we have of this we need to make the core query a subquery and aggregate over it.
-        if ($hasExistingAnnotations || $hasLimit || $this->distict):
+        if ($hasExistingAnnotations || $hasLimit || $this->distict|| is_array($this->groupBy)):
             $outQuery = new AggregateQuery($this->model);
             $innerQuery = $this->deepClone();
 
@@ -981,7 +1011,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             endif;
 
             // add annotations to the outerquery todo
-            foreach ($this->annotations as $alias => $annotation) :
+            foreach ($innerQuery->annotations as $alias => $annotation) :
                 $outQuery->annotations[$alias] = $annotation;
                 unset($innerQuery->annotations[$alias]);
             endforeach;
@@ -1091,6 +1121,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $obj->tableAliasMap = $this->tableAliasMap;
         $obj->tablesAliasList = $this->tablesAliasList;
         $obj->select = $this->select;
+        $obj->groupBy= $this->groupBy;
         $obj->valueSelect = $this->valueSelect;
         $obj->selectRelected = $this->selectRelected;
         $obj->standardOrdering = $this->standardOrdering;

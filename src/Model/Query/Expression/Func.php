@@ -95,14 +95,13 @@ class Func extends BaseExpression
         else:
             $func = ArrayHelper::pop($this->extra, 'function', $this->function);
         endif;
-        if ($this->extra) :
 
+        if ($this->extra) :
             $sqlParts[] = implode('', $this->extra);
         endif;
         $params = [];
 
         foreach ($this->getSourceExpressions() as $expression) :
-
             list($sql, $param) = $compiler->compile($expression);
             $sqlParts[] = $sql;
             $params = array_merge($params, $param);
@@ -117,4 +116,15 @@ class Func extends BaseExpression
     {
         return sprintf($this->template, $function, $expression);
     }
+
+    public function __debugInfo()
+    {
+        return [
+            "extra"=>$this->extra,
+            "function"=>$this->function,
+            "argJoiner"=>$this->argJoiner,
+            "template"=>$this->template,
+        ];
+    }
+
 }

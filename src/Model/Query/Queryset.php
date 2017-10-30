@@ -147,6 +147,7 @@ class Queryset implements QuerysetInterface
         );
 
         $resultCount = count($queryset);
+
         if (1 == $resultCount):
             return $queryset->getResults()[0];
         elseif (!$resultCount):
@@ -208,6 +209,7 @@ class Queryset implements QuerysetInterface
     public function annotate()
     {
         $args = static::formatFilterConditions(__METHOD__, func_get_args());
+
         $names = $this->_fields;
         if (is_null($this->_fields)):
             $names = [];
@@ -225,10 +227,8 @@ class Queryset implements QuerysetInterface
             $clone->query->addAnnotation(['annotation' => $arg, 'alias' => $alias, 'isSummary' => false]);
         endforeach;
 
-        //todo group by
         foreach ($clone->query->annotations as $alias => $annotation) :
-
-            if ($annotation->containsAggregates() && in_array($alias, $args)):
+            if ($annotation->containsAggregates() && array_key_exists($alias, $args)):
                 if (is_null($clone->_fields)):
                     $clone->query->groupBy = true;
                 else:
@@ -253,7 +253,7 @@ class Queryset implements QuerysetInterface
      */
     public function orderBy($fieldNames = array())
     {
-        assert($this->query->isFilterable(), 'Cannot reorder a query once a slice has been taken.');
+        assert($this->query->isFilterable(), 'Cannot reorder a query once a limiting has been done.');
         $clone = $this->_clone();
         $clone->query->clearOrdering(false);
         $clone->query->addOrdering($fieldNames);
@@ -337,11 +337,43 @@ class Queryset implements QuerysetInterface
         return (bool) $this->_resultsCache;
     }
 
-    public function limit($start, $end)
+    /**
+     * @param $offset
+     * @param $size
+     * @return $this
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function limit($offset, $size)
     {
-        $this->query->setLimit($start, $end);
+        $this->query->setLimit($offset, $size);
 
         return $this;
+    }
+
+    /**
+     * Returns the number of rows affected by the last DELETE, INSERT, or UPDATE statement
+     * executed by the corresponding object.
+     *
+     * If the last SQL statement executed by the associated Statement object was a SELECT statement,
+     * some databases may return the number of rows returned by that statement. However,
+     * this behaviour is not guaranteed for all databases and should not be
+     * relied on for portable applications.
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function size()
+    {
+        if ($this->_resultsCache):
+            return count($this->_resultsCache);
+        endif;
+
+        return $this->query->getCount($this->connection);
     }
 
     public function update()
@@ -472,7 +504,7 @@ class Queryset implements QuerysetInterface
     {
         $instance = $this->_clone();
 
-        list($sql, $params) = $instance->query->getSqlCompiler($this->connection)->asSql();
+        list($sql, $params) = $instance->query->getSqlCompiler($instance->connection)->asSql();
 
         $sql = str_replace('?', '%s', $sql);
 
@@ -569,6 +601,7 @@ class Queryset implements QuerysetInterface
      * this behaviour is not guaranteed for all databases and should not be
      * relied on for portable applications.
      *
+     * @internal
      * @throws \Doctrine\DBAL\DBALException
      *
      * @since 1.1.0
@@ -577,17 +610,16 @@ class Queryset implements QuerysetInterface
      */
     public function count()
     {
-        if ($this->_resultsCache):
-            return count($this->_resultsCache);
-        endif;
+        $this->getResults();
 
-        return $this->query->getCount($this->connection);
+        return count($this->_resultsCache);
     }
 
     /**
      * Evaluates the Queryset when Queryset Result is used in a foreach.
      *
      * @ignore
+     * @internal
      *
      * @return \ArrayIterator
      */

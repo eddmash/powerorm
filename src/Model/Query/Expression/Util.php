@@ -11,7 +11,11 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
+use Eddmash\PowerOrm\Model\Query\Aggregates\Avg;
 use Eddmash\PowerOrm\Model\Query\Aggregates\Count;
+use Eddmash\PowerOrm\Model\Query\Aggregates\Max;
+use Eddmash\PowerOrm\Model\Query\Aggregates\Min;
+use Eddmash\PowerOrm\Model\Query\Aggregates\Sum;
 use Eddmash\PowerOrm\Model\Query\Q;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
@@ -29,6 +33,50 @@ const ORDER_PATTERN = '/\?|[-+]?[.\w]+$/';
 function count_($expression, $distinct = false)
 {
     return new Count($expression, $distinct);
+}
+
+/**
+ * @param $expression
+ * @return Avg
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+function avg_($expression){
+    return new Avg($expression);
+}
+
+/**
+ * @param $expression
+ * @return Min
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+function min_($expression){
+    return new Min($expression);
+}
+
+/**
+ * @param $expression
+ * @return Max
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+function max_($expression){
+    return new Max($expression);
+}
+
+/**
+ * @param $expression
+ * @return Sum
+ * @since 1.1.0
+ *
+ * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ */
+function sum_($expression){
+    return new Sum($expression);
 }
 
 /**
@@ -86,9 +134,9 @@ function f_($name)
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-function func_($name)
+function func_()
 {
-    return new Func($name);
+    return new Func(Queryset::formatFilterConditions(__FUNCTION__, func_get_args()));
 }
 
 /**

@@ -171,10 +171,10 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
      * in Exp::Count('username') we need the username to converted to an actual model field.
      *
      * @param ExpResolverInterface $resolver
-     * @param bool                 $allowJoins
-     * @param null                 $reuse
-     * @param bool                 $summarize
-     * @param bool                 $forSave
+     * @param bool $allowJoins
+     * @param null $reuse
+     * @param bool $summarize
+     * @param bool $forSave
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      *
@@ -264,4 +264,25 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     {
         return $this;
     }
+
+    /**
+     * Retuns the fields to be used when this expression is used in a group by.
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getGroupByCols()
+    {
+        if (!$this->containsAggregates()):
+            return [$this];
+        endif;
+        $cols = [];
+        foreach ($this->getSourceExpressions() as $sourceExpression) :
+            $cols[] = $sourceExpression->getGroupByCols();
+        endforeach;
+
+        return $cols;
+    }
+
 }
