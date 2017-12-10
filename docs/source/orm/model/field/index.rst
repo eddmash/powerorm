@@ -55,6 +55,7 @@ The name of the database column to use for this field. If this isn't given, Powe
 
 
 .. _model_field_db_index:
+
 dbIndex
 -------
 If True, this field will be indexed.
@@ -242,7 +243,7 @@ relatedQueryName
 ****************
 The name to use for the reverse filter name from the target model. It defaults to the value of
 :ref:`<_related_name>relatedName` or :ref:`<default_related_name>defaultRelatedName` if set, otherwise it defaults to
- the name of the model:
+the name of the model.
 
 Like :ref:`<_related_name>relatedName`, :ref:`<default_related_name>defaultRelatedName` supports app label and class
 interpolation via some :ref:`<abstract_related_name>special syntax`.

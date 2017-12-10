@@ -30,23 +30,14 @@ class Manager extends Base
 
     public $managerName;
 
+    protected $defaultCommandsPaths;
+
     public function __construct()
     {
         // default command path
-        $this->path = ['Eddmash\PowerOrm\\' => sprintf('%s/Command', dirname(__FILE__))];
-
-//        $this->path = $this->addPath($this->getComponentsPath());
+        $this->defaultCommandsPaths = ['Eddmash\PowerOrm\\' => sprintf('%s/Command', dirname(__FILE__))];
 
         $this->managerName = $this->normalizeKey($this->getShortClassName());
-    }
-
-    public function addPath($paths)
-    {
-        foreach ($paths as $package => $locations) :
-            $this->path[$package] = $locations;
-        endforeach;
-
-        return $this->path;
     }
 
     public function defaultCommands()
@@ -70,7 +61,7 @@ class Manager extends Base
     public function getDefaultCommands()
     {
         $commands = [];
-        foreach ($this->path as $path) :
+        foreach ($this->defaultCommandsPaths as $path) :
             $files = (new FileHandler($path))->readDir();
             foreach ($files as $file) :
                 $command = basename($file, '.php');
@@ -85,9 +76,10 @@ class Manager extends Base
         return $commands;
     }
 
-    public static function getCoreCommands()
+    public static function getCommands()
     {
-        return (new static())->getDefaultCommands();
+        $manager = new static();
+        return array_merge($manager->getDefaultCommands(), $manager->getExtraCommands());
     }
 
     /**
@@ -106,7 +98,7 @@ class Manager extends Base
         $file = null;
         $packageName = null;
 
-        foreach ($this->path as $package => $path) :
+        foreach ($this->defaultCommandsPaths as $package => $path) :
             $file_handler = new FileHandler($path);
 
             $file = $file_handler->getFile($name);
@@ -122,7 +114,7 @@ class Manager extends Base
                 sprintf(
                     'Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?'.PHP_EOL,
                     $name,
-                    $this->path
+                    $this->defaultCommandsPaths
                 )
             );
             $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
@@ -152,8 +144,7 @@ class Manager extends Base
         $console->add($def);
         $console->setDefaultCommand($def->getName());
 
-        $console->addCommands(self::getCoreCommands());
-        $console->addCommands(self::getExtraCommands());
+        $console->addCommands(self::getCommands());
         if (null === $output) {
             $output = new ConsoleOutput();
         }

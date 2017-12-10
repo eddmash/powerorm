@@ -120,11 +120,10 @@ class Func extends BaseExpression
     public function __debugInfo()
     {
         return [
-            "extra"=>$this->extra,
-            "function"=>$this->function,
-            "argJoiner"=>$this->argJoiner,
-            "template"=>$this->template,
+            'extra' => $this->extra,
+            'function' => $this->function,
+            'argJoiner' => $this->argJoiner,
+            'template' => $this->template,
         ];
     }
-
 }

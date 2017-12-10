@@ -175,7 +175,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
             $resolved = $orderExp->resolveExpression($this->query, true);
             list($sql, $params) = $this->compile($resolved);
 
-            preg_match("/(?P<name>.*)\s(?P<order>ASC|DESC)(.*)/", "demo_entry.id DESC", $match);
+            preg_match("/(?P<name>.*)\s(?P<order>ASC|DESC)(.*)/", 'demo_entry.id DESC', $match);
             $strippedSql = $match['name'];
 
             // ensure we dont add the same field twice
@@ -210,7 +210,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
         // set to group by. So, we need to add cols in select, order_by, and
         // having into the select in any case.
 
-        /**@var $exp BaseExpression */
+        /** @var $exp BaseExpression */
         foreach ($this->select as $colInfo) :
             list($exp, $alias) = $colInfo;
             foreach ($exp->getGroupByCols() as $groupByCol) :
@@ -248,8 +248,8 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * Returns the fields in the current models/those represented by the alias as Col expression, which know how to be
      * used in a query.
      *
-     * @param null $startAlias
-     * @param Meta|null $meta
+     * @param null       $startAlias
+     * @param Meta|null  $meta
      * @param Model|null $fromParent
      *
      * @return Col[]
@@ -297,11 +297,11 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * Used to get information needed when we are doing selectRelated(),.
      *
      * @param $select
-     * @param Meta|null $meta the from which we expect to find the related fields
-     * @param null $rootAlias
-     * @param int $curDepth
-     * @param null $requested the set of fields to use in selectRelated
-     * @param null $restricted true when we are to use just a set of relationship fields
+     * @param Meta|null $meta       the from which we expect to find the related fields
+     * @param null      $rootAlias
+     * @param int       $curDepth
+     * @param null      $requested  the set of fields to use in selectRelated
+     * @param null      $restricted true when we are to use just a set of relationship fields
      *
      * @return array
      *
@@ -620,12 +620,11 @@ class SqlFetchBaseCompiler extends SqlCompiler
         endforeach;
     }
 
-
     /**
      * Creates the SQL for this query. Returns the SQL string and list of parameters.
      *
      * @param CompilerInterface $compiler
-     * @param Connection $connection
+     * @param Connection        $connection
      *
      * @return array
      *
@@ -685,7 +684,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         if ($grouping):
             //todo distinct
-            $results[] = sprintf("GROUP BY %s", implode(", ", $grouping));
+            $results[] = sprintf('GROUP BY %s', implode(', ', $grouping));
         endif;
 
         if ($orderBy):
@@ -696,7 +695,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
                 $ordering[] = $orderSql;
                 $params = array_merge($params, $orderParams);
             endforeach;
-            $results[] = sprintf("ORDER BY %s", implode(", ", $ordering));
+            $results[] = sprintf('ORDER BY %s', implode(', ', $ordering));
         endif;
         if ($this->query->limit) :
             $results[] = 'LIMIT';
@@ -717,9 +716,9 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @param $col
      * @param $meta
-     * @param null $alias
+     * @param null   $alias
      * @param string $defaultOrder
-     * @param array $alreadyResolved helps avoid infinite loops
+     * @param array  $alreadyResolved helps avoid infinite loops
      *
      * @return array
      *
@@ -743,7 +742,6 @@ class SqlFetchBaseCompiler extends SqlCompiler
         if ($relationField->isRelation && $meta->getOrderBy() && empty($relationField->getAttrName())):
             throw new NotImplemented('This capability is yet to be implemented');
         endif;
-
 
         list($targets, $finalAlias, $joinList) = $this->query->trimJoins($targetFields, $joinList, $paths);
 

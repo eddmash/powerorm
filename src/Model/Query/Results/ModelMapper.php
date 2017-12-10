@@ -61,7 +61,7 @@ class ModelMapper extends Mapper
 
             $obj = $modelClass::fromDb($connection, $initList, $vals);
 
-            foreach ($annotationMap as $name=>$pos) :
+            foreach ($annotationMap as $name => $pos) :
                 $obj->{$name} = $result[$pos];
             endforeach;
             if ($relatedPopulators):

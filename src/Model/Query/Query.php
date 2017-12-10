@@ -116,10 +116,11 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * if null no grouping is done
      * if true group by select fields
-     * if array fields in array are used to group
+     * if array fields in array are used to group.
+     *
      * @var null
      */
-    public $groupBy=null;
+    public $groupBy = null;
 
     /**
      * @var bool Dictates if the order by is done in the asc or desc manner,
@@ -157,7 +158,9 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @param $orderName
      * @param string $defaultOrder
+     *
      * @return array
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -392,11 +395,11 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $this->groupBy = [];
 
         foreach ($this->select as $col) :
-            $this->groupBy[]= $col;
+            $this->groupBy[] = $col;
         endforeach;
 
         if($this->annotations):
-            foreach ($this->annotations as $alias=>$annotation) :
+            foreach ($this->annotations as $alias => $annotation) :
                 foreach ($annotation->getGroupByCols() as $groupByCol) :
                     $this->groupBy[] = $groupByCol;
                 endforeach;
@@ -983,7 +986,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endforeach;
 
         // we have of this we need to make the core query a subquery and aggregate over it.
-        if ($hasExistingAnnotations || $hasLimit || $this->distict|| is_array($this->groupBy)):
+        if ($hasExistingAnnotations || $hasLimit || $this->distict || is_array($this->groupBy)):
             $outQuery = new AggregateQuery($this->model);
             $innerQuery = $this->deepClone();
 
@@ -1121,7 +1124,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $obj->tableAliasMap = $this->tableAliasMap;
         $obj->tablesAliasList = $this->tablesAliasList;
         $obj->select = $this->select;
-        $obj->groupBy= $this->groupBy;
+        $obj->groupBy = $this->groupBy;
         $obj->valueSelect = $this->valueSelect;
         $obj->selectRelected = $this->selectRelected;
         $obj->standardOrdering = $this->standardOrdering;

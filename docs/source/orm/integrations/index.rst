@@ -60,5 +60,5 @@ see below for setup on some common frameworks :
 .. toctree::
     :titlesonly:
 
-    codeigniter
+    codeigniter/index
     laravel

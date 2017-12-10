@@ -162,7 +162,7 @@ and `General Formatters <https://github.com/fzaninotto/Faker#formatters>`_ on th
 .. _faker_providers:
 
 Adding Providers to Faker object
--------------------------------
+--------------------------------
 
 You can create you custom data providers for the faker as shown below.
 

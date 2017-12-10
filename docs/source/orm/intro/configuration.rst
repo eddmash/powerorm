@@ -76,11 +76,13 @@ The ORM takes several configurations
         - The *key* is used to access the module as an attribute of the orm
         - The value should be a *callback* that receive the orm instance and returns and instance of the module.
 
+    The component will be accessible from the orm instance via the *key*.
+
     see :ref:`Debugbar Setup<debugbar_setup>` for example.
 
 .. _config_commands:
 
-- **components**
+- **commands**
 
     Allows adding commands to orm manager.
 

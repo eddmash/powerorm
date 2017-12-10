@@ -340,7 +340,9 @@ class Queryset implements QuerysetInterface
     /**
      * @param $offset
      * @param $size
+     *
      * @return $this
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -602,6 +604,7 @@ class Queryset implements QuerysetInterface
      * relied on for portable applications.
      *
      * @internal
+     *
      * @throws \Doctrine\DBAL\DBALException
      *
      * @since 1.1.0
@@ -619,6 +622,7 @@ class Queryset implements QuerysetInterface
      * Evaluates the Queryset when Queryset Result is used in a foreach.
      *
      * @ignore
+     *
      * @internal
      *
      * @return \ArrayIterator

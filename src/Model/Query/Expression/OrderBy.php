@@ -119,7 +119,6 @@ class OrderBy extends BaseExpression
         $this->descending = !$this->descending;
     }
 
-
     public function getGroupByCols()
     {
         $cols = [];

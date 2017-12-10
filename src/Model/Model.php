@@ -35,7 +35,7 @@ use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
 use Eddmash\PowerOrm\Model\Query\Queryset;
-use function Eddmash\PowerOrm\Model\Query\getFieldNamesFromMeta;
+use Eddmash\PowerOrm\Signals\Signal;
 
 /**
  * Base class for all models in the ORM, this class cannot be instantiated on its own.
@@ -55,14 +55,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     const DEBUG_IGNORE = ['tableName', 'managed', 'verboseName', 'isNew', 'proxy'];
     const MODELBASE = '\Eddmash\PowerOrm\Model\Model';
     public static $managerClass;
-
-    /**
-     * Holds the arguments passed to the constructor.
-     *
-     * @var array
-     */
-    protected $constructorArgs;
-
     /**
      * Holds all the fields tha belong to this model.
      *
@@ -70,7 +62,20 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public $_fieldCache = [];
     public $_nonModelfields = [];
-
+    /**
+     * Meta information about the model.
+     *
+     * @ignore
+     *
+     * @var Meta
+     */
+    public $meta;
+    /**
+     * Holds the arguments passed to the constructor.
+     *
+     * @var array
+     */
+    protected $constructorArgs;
     /**
      * Holds the name of the database table that this model represents.
      *
@@ -83,7 +88,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @ignore
      */
     protected $tableName;
-
     /**
      * Indicates if the orm should managed the table being represented by this model.
      *
@@ -116,7 +120,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @var
      */
     protected $managed = true;
-
     /**
      * When using multi-table inheritance, a new database table is created for each subclass of a model.
      *
@@ -139,14 +142,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @var
      */
     protected $proxy = false;
-
     /**
      * Human friendly name.
      *
      * @var string
      */
     protected $verboseName;
-
     /**
      * Indicates if this is a new model, in the sense that it has not been loaded with values from the database like
      * you would when you want to update a database record.
@@ -156,15 +157,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @var bool
      */
     protected $isNew = true;
-
-    /**
-     * Meta information about the model.
-     *
-     * @ignore
-     *
-     * @var Meta
-     */
-    public $meta;
 
     /**
      * Model constructor.
@@ -180,14 +172,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         $this->constructorArgs = $kwargs;
         $this->init();
+        Signal::dispatch(Signal::MODEL_PRE_INIT, $this, $kwargs);
         $this->setFieldValues($kwargs);
-    }
-
-    public static function fromDb(Connection $connection, $fieldNames, $values)
-    {
-        $vals = array_combine($fieldNames, $values);
-
-        return new static($vals);
     }
 
     /**
@@ -273,74 +259,16 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
     }
 
-    public function setFieldValues($kwargs)
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetaSettings()
     {
-        // we need meta to exists
-        if (is_null($this->meta) || empty($kwargs)):
-            return;
-        endif;
-
-        if ($kwargs):
-            // get also related field if we have kwargs
-            $fields = $this->meta->getNonM2MForwardFields();
-        else:
-            // otherwise get only the concrete fields
-            $fields = $this->meta->getConcreteFields();
-        endif;
-
-        /* @var $field Field */
-        foreach ($fields as $name => $field) :
-            if (!array_key_exists($field->getAttrName(), $kwargs) && is_null($field->getColumnName())):
-                continue;
-            endif;
-
-            $val = null;
-            $isRelated = false;
-            $relObject = null;
-            if ($kwargs):
-                if ($field instanceof RelatedField):
-                    try {
-                        $relObject = ArrayHelper::getValue($kwargs, $field->getName(), ArrayHelper::STRICT);
-                        $isRelated = true;
-                        // Object instance was passed in, You can
-                        // pass in null for related objects if it's allowed.
-                        if (is_null($relObject) && $field->isNull()):
-                            $val = null;
-                        endif;
-                    } catch (KeyError $e) {
-                        try {
-                            $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), ArrayHelper::STRICT);
-                        } catch (KeyError $e) {
-                            $val = $field->getDefault();
-                        }
-                    }
-
-                else:
-                    try {
-                        $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), ArrayHelper::STRICT);
-                    } catch (KeyError $e) {
-                        $val = $field->getDefault();
-                    }
-                endif;
-            else:
-                $val = $field->getDefault();
-            endif;
-
-            if ($isRelated):
-                $this->{$field->getName()} = $relObject;
-            else:
-                $this->{$field->getAttrName()} = $val;
-            endif;
-        endforeach;
-    }
-
-    public static function isModelBase($className)
-    {
-        return in_array($className, [self::getFullClassName()]);
+        return [];
     }
 
     /**
-     * @param string $name
+     * @param string       $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -357,66 +285,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
     }
 
-    public function setupFields($fields, $classFields)
-    {
-        if (empty($fields)):
-
-            $fields = $classFields;
-
-        endif;
-
-        foreach ($fields as $name => $fieldObj) :
-            $this->addToClass($name, $fieldObj);
-        endforeach;
-    }
-
-    /**
-     * @param Model $concreteParent
-     *
-     * @throws FieldError
-     * @throws TypeError
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function proxySetup($concreteParent)
-    {
-        $this->meta->setupProxy($concreteParent);
-        $this->meta->concreteModel = $concreteParent->meta->concreteModel;
-    }
-
-    public function prepareMultiInheritance($parentModelName)
-    {
-        if (!self::isModelBase($parentModelName) && !StringHelper::isEmpty($parentModelName)):
-            $name = ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace());
-            $attrName = lcfirst(str_replace(' ', '', ucwords(str_replace('\\', ' ', $name))));
-            $attrName = sprintf('%sPtr', $attrName);
-
-//            if (!ArrayHelper::hasKey($this->meta->getFields(), $attrName)):
-            //todo find a way to avoid name clash
-            $field = OneToOneField::createObject(
-                [
-                    'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
-                    'onDelete' => Delete::CASCADE,
-                    'name' => $attrName,
-                    'autoCreated' => true,
-                    'parentLink' => true,
-                ]
-            );
-
-            $this->addToClass($attrName, $field);
-            $this->meta->parents[$name] = $field;
-//            endif;
-
-        endif;
-    }
-
-    public function prepare()
-    {
-        $this->meta->prepare($this);
-    }
-
     /**
      * Gets information about a model and all its parent.
      *
@@ -426,9 +294,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param Model $model
-     * @param string $method the method to invoke
-     * @param null $args the arguments to pass to the method
+     * @param Model     $model
+     * @param string    $method     the method to invoke
+     * @param null      $args       the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -592,6 +460,139 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         ];
     }
 
+    private function setupFields($fields, $classFields)
+    {
+        if (empty($fields)):
+
+            $fields = $classFields;
+
+        endif;
+
+        foreach ($fields as $name => $fieldObj) :
+            $this->addToClass($name, $fieldObj);
+        endforeach;
+    }
+
+    /**
+     * @param Model $concreteParent
+     *
+     * @throws FieldError
+     * @throws TypeError
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function proxySetup($concreteParent)
+    {
+        $this->meta->setupProxy($concreteParent);
+        $this->meta->concreteModel = $concreteParent->meta->concreteModel;
+    }
+
+    private function prepareMultiInheritance($parentModelName)
+    {
+        if (!self::isModelBase($parentModelName) && !StringHelper::isEmpty($parentModelName)):
+            $name = ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace());
+            $attrName = lcfirst(str_replace(' ', '', ucwords(str_replace('\\', ' ', $name))));
+            $attrName = sprintf('%sPtr', $attrName);
+
+//            if (!ArrayHelper::hasKey($this->meta->getFields(), $attrName)):
+            //todo find a way to avoid name clash
+            $field = OneToOneField::createObject(
+                [
+                    'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
+                    'onDelete' => Delete::CASCADE,
+                    'name' => $attrName,
+                    'autoCreated' => true,
+                    'parentLink' => true,
+                ]
+            );
+
+            $this->addToClass($attrName, $field);
+            $this->meta->parents[$name] = $field;
+//            endif;
+
+        endif;
+    }
+
+    public static function isModelBase($className)
+    {
+        return in_array($className, [self::getFullClassName()]);
+    }
+
+    private function prepare()
+    {
+        $this->meta->prepare($this);
+    }
+
+    public function setFieldValues($kwargs)
+    {
+        // we need meta to exists
+        if (is_null($this->meta) || empty($kwargs)):
+            return;
+        endif;
+
+        if ($kwargs):
+            // get also related field if we have kwargs
+            $fields = $this->meta->getNonM2MForwardFields();
+        else:
+            // otherwise get only the concrete fields
+            $fields = $this->meta->getConcreteFields();
+        endif;
+
+        /* @var $field Field */
+        foreach ($fields as $name => $field) :
+            if (!array_key_exists($field->getAttrName(), $kwargs) && is_null($field->getColumnName())):
+                continue;
+            endif;
+
+            $val = null;
+            $isRelated = false;
+            $relObject = null;
+            if ($kwargs):
+                if ($field instanceof RelatedField):
+                    try {
+                        $relObject = ArrayHelper::getValue($kwargs, $field->getName(), ArrayHelper::STRICT);
+                        $isRelated = true;
+                        // Object instance was passed in, You can
+                        // pass in null for related objects if it's allowed.
+                        if (is_null($relObject) && $field->isNull()):
+                            $val = null;
+                        endif;
+                    } catch (KeyError $e) {
+                        try {
+                            $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), ArrayHelper::STRICT);
+                        } catch (KeyError $e) {
+                            $val = $field->getDefault();
+                        }
+                    }
+
+                else:
+                    try {
+                        $val = ArrayHelper::getValue($kwargs, $field->getAttrName(), ArrayHelper::STRICT);
+                    } catch (KeyError $e) {
+                        $val = $field->getDefault();
+                    }
+                endif;
+            else:
+                $val = $field->getDefault();
+            endif;
+
+            if ($isRelated):
+                $this->{$field->getName()} = $relObject;
+            else:
+                $this->{$field->getAttrName()} = $val;
+            endif;
+        endforeach;
+    }
+
+    public static function fromDb(Connection $connection, $fieldNames, $values)
+    {
+        $vals = array_combine($fieldNames, $values);
+
+        return new static($vals);
+    }
+
     public function checks()
     {
         $errors = [];
@@ -640,41 +641,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * All the model fields are set on this model.
-     *
-     * <pre><code>public function fields(){
-     *      $this->username = ORM::CharField(['max_length'=>30]);
-     *      $this->first_name = ORM::CharField(['max_length'=>30]);
-     *      $this->last_name = ORM::CharField(['max_length'=>30]);
-     *      $this->password = ORM::CharField(['max_length'=>255]);
-     *      $this->phone_number = ORM::CharField(['max_length'=>30]);
-     * }</code></pre>.
-     *
-     * @return array
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function unboundFields()
-    {
-        return [];
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function prepareMeta($config = [])
     {
         return new Meta($config);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetaSettings()
-    {
-        return [];
     }
 
     /**
@@ -760,7 +731,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array)unserialize((string)$serialized);
+        $this->_fieldCache = (array) unserialize((string) $serialized);
     }
 
     public function __get($name)
@@ -845,70 +816,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @return Queryset
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public static function objects(Model $modelInstance = null)
-    {
-        $manager = self::getManagerClass();
-        $modelInstance = (is_null($modelInstance)) ? self::createObject() : $modelInstance;
-
-        return new $manager($modelInstance);
-    }
-
-    /**
-     * @return mixed
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     */
-    public static function getManagerClass()
-    {
-        if (is_null(static::$managerClass)) :
-            static::$managerClass = BaseManager::class;
-        endif;
-
-        return static::$managerClass;
-    }
-
-    public function getDeferredFields()
-    {
-        $concreteFields = $this->meta->getConcreteFields();
-
-        $deferedFields = [];
-        /** @var $concreteField Field */
-        foreach ($concreteFields as $concreteField) :
-            if (!array_key_exists($concreteField->getName(), $this->_fieldCache)):
-                $deferedFields[] = $concreteField->getName();
-            endif;
-
-        endforeach;
-
-        return $deferedFields;
-    }
-
-    /**
-     * Get the value of the model primary key.
-     *
-     * @param Meta|null $meta
-     *
-     * @return mixed
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function getPkValue(Meta $meta = null)
-    {
-        if (null === $meta):
-            $meta = $this->meta;
-        endif;
-
-        return $this->{$meta->primaryKey->getAttrName()};
-    }
-
-    /**
      * Saves the current instance. Override this in a subclass if you want to control the saving process.
      *
      * The 'force_insert' and 'force_update' parameters can be used to insist that the "save" must be an SQL
@@ -916,8 +823,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null $connection
-     * @param null $updateField
+     * @param null       $connection
+     * @param null       $updateField
      *
      * @throws ValueError
      *
@@ -1010,6 +917,30 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function hasProperty($name)
+    {
+        return parent::hasProperty($name) || array_key_exists($name, $this->_fieldCache);
+    }
+
+    public function getDeferredFields()
+    {
+        $concreteFields = $this->meta->getConcreteFields();
+
+        $deferedFields = [];
+        /** @var $concreteField Field */
+        foreach ($concreteFields as $concreteField) :
+            if (!array_key_exists($concreteField->getName(), $this->_fieldCache)):
+                $deferedFields[] = $concreteField->getName();
+            endif;
+
+        endforeach;
+
+        return $deferedFields;
+    }
+
+    /**
      * Handles the parts of saving which should be done only once per save, yet need to be done in raw saves, too.
      * This includes some sanity checks and signal sending.
      *
@@ -1019,7 +950,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null $updateFields
+     * @param null       $updateFields
      *
      * @since 1.1.0
      *
@@ -1050,6 +981,25 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if (!$meta->autoCreated):
             $this->dispatchSignal('powerorm.model.post_save', $model);
         endif;
+    }
+
+    /**
+     * Saves all the parents of cls using values from self.
+     *
+     * @param Model $model
+     * @param $updateFields
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function saveParent(Model $model, $updateFields)
+    {
+        $meta = $model->meta;
+        foreach ($meta->parents as $key => $field) :
+            // Make sure the link fields are synced between parent and self.todo
+
+        endforeach;
     }
 
     /**
@@ -1143,30 +1093,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * Saves all the parents of cls using values from self.
+     * Get the value of the model primary key.
      *
-     * @param Model $model
-     * @param $updateFields
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function saveParent(Model $model, $updateFields)
-    {
-        $meta = $model->meta;
-        foreach ($meta->parents as $key => $field) :
-            // Make sure the link fields are synced between parent and self.todo
-
-        endforeach;
-    }
-
-    /**
-     * Do an INSERT. If update_pk is defined then this method should return the new pk for the model.
-     *
-     * @param Model $model
-     * @param $fields
-     * @param $returnId
+     * @param Meta|null $meta
      *
      * @return mixed
      *
@@ -1174,9 +1103,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function doInsert(Model $model, $fields, $returnId)
+    public function getPkValue(Meta $meta = null)
     {
-        return $model::objects()->_insert($this, $fields, $returnId);
+        if (null === $meta):
+            $meta = $this->meta;
+        endif;
+
+        return $this->{$meta->primaryKey->getAttrName()};
     }
 
     /**
@@ -1227,11 +1160,49 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * {@inheritdoc}
+     * @return Queryset
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function hasProperty($name)
+    public static function objects(Model $modelInstance = null)
     {
-        return parent::hasProperty($name) || array_key_exists($name, $this->_fieldCache);
+        $manager = self::getManagerClass();
+        $modelInstance = (is_null($modelInstance)) ? self::createObject() : $modelInstance;
+
+        return new $manager($modelInstance);
+    }
+
+    /**
+     * @return mixed
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public static function getManagerClass()
+    {
+        if (is_null(static::$managerClass)) :
+            static::$managerClass = BaseManager::class;
+        endif;
+
+        return static::$managerClass;
+    }
+
+    /**
+     * Do an INSERT. If update_pk is defined then this method should return the new pk for the model.
+     *
+     * @param Model $model
+     * @param $fields
+     * @param $returnId
+     *
+     * @return mixed
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function doInsert(Model $model, $fields, $returnId)
+    {
+        return $model::objects()->_insert($this, $fields, $returnId);
     }
 
     /**
@@ -1265,5 +1236,27 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endforeach;
 
         return $meta;
+    }
+
+    /**
+     * All the model fields are set on this model.
+     *
+     * <pre><code>public function fields(){
+     *      $this->username = ORM::CharField(['max_length'=>30]);
+     *      $this->first_name = ORM::CharField(['max_length'=>30]);
+     *      $this->last_name = ORM::CharField(['max_length'=>30]);
+     *      $this->password = ORM::CharField(['max_length'=>255]);
+     *      $this->phone_number = ORM::CharField(['max_length'=>30]);
+     * }</code></pre>.
+     *
+     * @return array
+     *
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function unboundFields()
+    {
+        return [];
     }
 }

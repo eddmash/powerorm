@@ -65,7 +65,6 @@ class Value extends BaseExpression
         return $c;
     }
 
-
     public function getGroupByCols()
     {
         return [];

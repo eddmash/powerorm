@@ -63,7 +63,6 @@ class Col extends BaseExpression
         endif;
     }
 
-
     public function getGroupByCols()
     {
         return [$this];

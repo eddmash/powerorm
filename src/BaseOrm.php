@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm;
 
-use DebugBar\JavascriptRenderer;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
@@ -26,6 +25,7 @@ use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Signals\SignalManagerInterface;
 
 define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
 
@@ -38,10 +38,6 @@ class BaseOrm extends BaseObject
 {
     const RECURSIVE_RELATIONSHIP_CONSTANT = 'this';
 
-    /**
-     * @var JavascriptRenderer
-     */
-    public static $debugbarRenderer;
     private static $checkRegistry;
     public $modelsNamespace;
     public $migrationNamespace = 'App\Migrations';
@@ -59,17 +55,16 @@ class BaseOrm extends BaseObject
     ];
 
     /**
+     * @var SignalManagerInterface event manager to use.
+     */
+    private $signalManager;
+
+    /**
      * @var string command class names to add to the orm manager
      */
     protected $commands = [];
     private $timezone = '';
 
-    /**
-     * Url to use to load css/js/image used by ORM resource e.g. debugtoolbar.
-     *
-     * @var string
-     */
-    private $staticBaseUrl = '';
     /**
      * The configurations to use to connect to the database.
      *
@@ -209,6 +204,7 @@ class BaseOrm extends BaseObject
         $models = ArrayHelper::pop($config, 'models', null);
         $migrations = ArrayHelper::pop($config, 'migrations', null);
 
+        $this->signalManager = ArrayHelper::pop($models, 'signalManager', null);
         $this->modelsPath = ArrayHelper::getValue($models, 'path', null);
         $this->autoloadModels = ArrayHelper::getValue($models, 'autoload', true);
         $this->modelsNamespace = ArrayHelper::getValue($models, 'namespace');
@@ -396,9 +392,9 @@ class BaseOrm extends BaseObject
     /**
      * Configures an object with the initial property values.
      *
-     * @param object $object     the object to be configured
-     * @param array  $properties the property initial values given in terms of name-value pairs
-     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object the object to be configured
+     * @param array $properties the property initial values given in terms of name-value pairs
+     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
@@ -595,5 +591,21 @@ class BaseOrm extends BaseObject
     public function registerCliCommand($command)
     {
         $this->commands[] = $command;
+    }
+
+    /**
+     * @return SignalManagerInterface
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getSignalManager()
+    {
+        static $manager;
+        if (is_callable($this->signalManager) && $manager == null):
+            $manager = call_user_func($this->signalManager, $this);
+        endif;
+
+        return $manager;
     }
 }
