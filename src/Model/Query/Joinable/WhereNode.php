@@ -12,6 +12,7 @@ namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\CloneInterface;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
@@ -22,7 +23,7 @@ class WhereNode extends Node implements SqlCompilableinterface, CloneInterface
 {
     protected $defaultConnector = AND_CONNECTOR;
 
-    public function asSql(CompilerInterface $compiler, Connection $connection)
+    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         $whereSql = [];
         $whereParams = [];

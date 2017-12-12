@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
@@ -50,7 +51,7 @@ class CombinedExpression extends BaseExpression
     /**
      * {@inheritdoc}
      */
-    public function asSql(CompilerInterface $compiler, Connection $connection)
+    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         try {
             $lhsOutputField = $this->lhs->getOutputField();

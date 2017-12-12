@@ -12,13 +12,14 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 class IEndsWith extends PatternLookup
 {
     public static $lookupName = 'iendswith';
 
-    public function processRHS(CompilerInterface $compiler, Connection $connection)
+    public function processRHS(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         $this->rhs = sprintf('%%%s', $this->rhs);
 

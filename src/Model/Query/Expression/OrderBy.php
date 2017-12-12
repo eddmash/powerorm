@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
@@ -37,6 +38,14 @@ class OrderBy extends BaseExpression
      */
     private $nullsLast;
 
+    /**
+     * OrderBy constructor.
+     * @param BaseExpression $expression
+     * @param bool $descending
+     * @param array $kwargs
+     * @throws ValueError
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
+     */
     public function __construct(BaseExpression $expression, $descending = false, $kwargs = [])
     {
         parent::__construct(null);
@@ -71,7 +80,8 @@ class OrderBy extends BaseExpression
         return $expression[0];
     }
 
-    public function asSql(CompilerInterface $compiler, Connection $connection, $template = null)
+    /**@inheritdoc*/
+    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection, $template = null)
     {
         if (is_null($template)):
             if ($this->nullsLast):

@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Field\Field;
@@ -90,7 +91,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     /**
      * {@inheritdoc}
      */
-    public function asSql(CompilerInterface $compiler, Connection $connection)
+    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         throw new NotImplemented('Subclasses must implement asSql()');
     }

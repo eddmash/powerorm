@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 class In extends BaseLookup
@@ -24,8 +25,9 @@ class In extends BaseLookup
     {
         return sprintf('%s %s', $this->operator, $rhs);
     }
-
-    public function processRHS(CompilerInterface $compiler, Connection $connection)
+    
+    /**@inheritdoc*/
+    public function processRHS(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         if ($this->valueIsDirect()):
             $element = count($this->rhs);

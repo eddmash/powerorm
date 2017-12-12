@@ -12,13 +12,14 @@
 namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 
 class SQLAggregateCompiler extends SqlFetchBaseCompiler
 {
     /**
      * {@inheritdoc}
      */
-    public function asSql(CompilerInterface $compiler = null, Connection $connection = null)
+    public function asSql(CompilerInterface $compiler = null, ConnectionInterface $connection = null)
     {
         $sql = $params = [];
 

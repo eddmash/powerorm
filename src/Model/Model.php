@@ -15,6 +15,7 @@ use Eddmash\PowerOrm\ArrayObjectInterface;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\ContributorInterface;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
@@ -586,7 +587,16 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endforeach;
     }
 
-    public static function fromDb(Connection $connection, $fieldNames, $values)
+    /**
+     * @param ConnectionInterface $connection
+     * @param $fieldNames
+     * @param $values
+     * @return static
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function fromDb(ConnectionInterface $connection, $fieldNames, $values)
     {
         $vals = array_combine($fieldNames, $values);
 
@@ -734,6 +744,15 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $this->_fieldCache = (array) unserialize((string) $serialized);
     }
 
+    /**
+     * @param $name
+     * @return mixed
+     * @throws AttributeError
+     * @throws KeyError
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function __get($name)
     {
         // pk has a special meaning to the orm.

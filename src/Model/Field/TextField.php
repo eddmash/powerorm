@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Form\Widgets\TextArea;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 
@@ -21,7 +22,7 @@ class TextField extends Field
     /**
      * {@inheritdoc}
      */
-    public function dbType(Connection $connection)
+    public function dbType(ConnectionInterface $connection)
     {
         return Type::TEXT;
     }

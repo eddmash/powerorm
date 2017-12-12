@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\InvalidArgumentException;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -56,7 +57,7 @@ function getFieldNamesFromMeta(Meta $meta)
 class Queryset implements QuerysetInterface
 {
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     public $connection;
 
@@ -87,7 +88,7 @@ class Queryset implements QuerysetInterface
     private $_fields;
     protected $kwargs = [];
 
-    public function __construct(Connection $connection = null, Model $model = null, Query $query = null, $kwargs = [])
+    public function __construct(ConnectionInterface $connection = null, Model $model = null, Query $query = null, $kwargs = [])
     {
         $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
@@ -96,13 +97,19 @@ class Queryset implements QuerysetInterface
         $this->kwargs = $kwargs;
     }
 
+    /**
+     * @return ConnectionInterface
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     private function getConnection()
     {
         return BaseOrm::getDbConnection();
     }
 
     /**
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      * @param Model      $model
      * @param Query      $query
      * @param array      $kwargs
@@ -261,6 +268,14 @@ class Queryset implements QuerysetInterface
         return $clone;
     }
 
+    /**
+     * @param array $kwargs
+     * @return array
+     * @throws TypeError
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function aggregate($kwargs = [])
     {
         //todo accept non associative items

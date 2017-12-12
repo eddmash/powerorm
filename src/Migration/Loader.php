@@ -9,10 +9,10 @@
 */
 
 namespace Eddmash\PowerOrm\Migration;
-
-use Doctrine\DBAL\Connection;
+ 
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AmbiguityError;
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
 use Eddmash\PowerOrm\Exception\KeyError;
@@ -29,11 +29,19 @@ class Loader extends BaseObject
     public $appliedMigrations;
 
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     private $connection;
 
-    public function __construct($connection = null, $loadGraph = true)
+    /**
+     * Loader constructor.
+     * @param ConnectionInterface|null $connection
+     * @param bool $loadGraph
+     * @throws ClassNotFoundException
+     * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
+     * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
+     */
+    public function __construct(ConnectionInterface $connection = null, $loadGraph = true)
     {
         $this->connection = $connection;
         if ($loadGraph):
@@ -41,11 +49,26 @@ class Loader extends BaseObject
         endif;
     }
 
+    /**
+     * @return State\ProjectState
+     * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function getProjectState()
     {
         return $this->graph->getState();
     }
 
+    /**
+     * @throws ClassNotFoundException
+     * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
+     * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function buildGraph()
     {
         if (!empty($this->connection)):
@@ -84,8 +107,9 @@ class Loader extends BaseObject
      * @return mixed
      *
      * @throws AmbiguityError
+     * @throws ClassNotFoundException
      * @throws KeyError
-     *
+     * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -129,6 +153,8 @@ class Loader extends BaseObject
      * List of migration objects.
      *
      * @return array
+     * @throws ClassNotFoundException
+     * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      */
     public function getMigrations()
     {
@@ -152,6 +178,7 @@ class Loader extends BaseObject
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      */
     public function getMigrationsClasses()
     {
@@ -173,6 +200,13 @@ class Loader extends BaseObject
         return $classes;
     }
 
+    /**
+     * @return array
+     * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
     public function getMigrationsFiles()
     {
         if (!BaseOrm::getMigrationsPath()) :
@@ -187,6 +221,7 @@ class Loader extends BaseObject
      * returns the latest migration number.
      *
      * @return int
+     * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      */
     public function getLatestMigrationVersion()
     {

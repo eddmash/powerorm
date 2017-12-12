@@ -11,9 +11,9 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Console\Console;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
@@ -33,7 +33,7 @@ class Executor extends BaseObject
     public $loader;
 
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     private $connection;
 
@@ -50,9 +50,9 @@ class Executor extends BaseObject
     /**
      * Executor constructor.
      *
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      */
-    public function __construct($connection)
+    public function __construct(ConnectionInterface $connection)
     {
         $this->connection = $connection;
         $this->schemaEditor = SchemaEditor::createObject($this->connection);
@@ -61,7 +61,7 @@ class Executor extends BaseObject
     }
 
     /**
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      *
      * @return static
      *

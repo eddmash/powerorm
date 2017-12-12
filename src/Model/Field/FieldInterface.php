@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\ContributorInterface;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -29,7 +30,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
     /**
      * Returns the database column data type for the Field, taking into account the connection.
      *
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      *
      * @return string
      *
@@ -37,7 +38,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function dbType(Connection $connection);
+    public function dbType(ConnectionInterface $connection);
 
     /**
      * Convert the value to a php value.
@@ -128,7 +129,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      * If present for the field subclass, fromDbValue() will be called in all circumstances when the data is loaded
      * from the database, including in aggregates and asArray() calls.
      *
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      * @param $value
      * @param $expression
      *
@@ -138,7 +139,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function fromDbValue(Connection $connection, $value, $expression);
+    public function fromDbValue(ConnectionInterface $connection, $value, $expression);
 
     /**
      * Returns the value of this field in the given model instance.

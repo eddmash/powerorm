@@ -9,6 +9,7 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Field\Field;
@@ -44,6 +45,7 @@ class BaseLookup implements LookupInterface
     protected $lhs;
     protected $rhsValueIsIterable = false;
 
+    /**@inheritdoc*/
     public function __construct($lhs, $rhs)
     {
         $this->rhs = $rhs;
@@ -63,6 +65,8 @@ class BaseLookup implements LookupInterface
      *
      * @return mixed
      *
+     * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
+     * @throws \Eddmash\PowerOrm\Exception\FieldError
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -92,7 +96,7 @@ class BaseLookup implements LookupInterface
         return $value;
     }
 
-    public function processLHS(CompilerInterface $compiler, Connection $connection)
+    public function processLHS(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         return $compiler->compile($this->lhs);
     }
@@ -101,6 +105,8 @@ class BaseLookup implements LookupInterface
      * Preperes the rhs for use in the lookup.
      *
      * @return mixed
+     * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
+     * @throws \Eddmash\PowerOrm\Exception\FieldError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function prepareLookup()
@@ -136,8 +142,9 @@ class BaseLookup implements LookupInterface
      * Prepare the rhs for use on database queries.
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     * @throws \Eddmash\PowerOrm\Exception\FieldError
      */
-    public function prepareLookupForDb($values, Connection $connection)
+    public function prepareLookupForDb($values, ConnectionInterface $connection)
     {
         $preparedValues = [];
         if ($this->rhsValueIsIterable) :
@@ -152,7 +159,8 @@ class BaseLookup implements LookupInterface
         return $preparedValues;
     }
 
-    public function processRHS(CompilerInterface $compiler, Connection $connection)
+    /**@inheritdoc*/
+    public function processRHS(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         $value = $this->rhs;
         if (method_exists($value, 'getSqlCompiler')):
@@ -167,7 +175,8 @@ class BaseLookup implements LookupInterface
 
         return ['?', $this->prepareLookupForDb($this->rhs, $connection)];
     }
-
+    
+    /**@inheritdoc*/
     public function getLookupOperation($rhs)
     {
         if ($this->operator):
@@ -178,7 +187,8 @@ class BaseLookup implements LookupInterface
         throw new NotImplemented('The no operator was given for the lookup');
     }
 
-    public function asSql(CompilerInterface $compiler, Connection $connection)
+    /**@inheritdoc*/
+    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         list($lhs_sql, $params) = $this->processLHS($compiler, $connection);
         list($rhs_sql, $rhs_params) = $this->processRHS($compiler, $connection);

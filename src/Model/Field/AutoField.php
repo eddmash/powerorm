@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Exception;
 
@@ -61,7 +62,7 @@ class AutoField extends Field
     /**
      * {@inheritdoc}
      */
-    public function dbType(Connection $connection)
+    public function dbType(ConnectionInterface $connection)
     {
         return Type::INTEGER;
     }

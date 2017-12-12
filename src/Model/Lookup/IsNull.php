@@ -11,6 +11,7 @@
 namespace Eddmash\PowerOrm\Model\Lookup;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 class IsNull extends BaseLookup
@@ -21,7 +22,7 @@ class IsNull extends BaseLookup
     /**
      * {@inheritdoc}
      */
-    public function asSql(CompilerInterface $compiler, Connection $connection)
+    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         list($lhs_sql, $params) = $this->processLHS($compiler, $connection);
 

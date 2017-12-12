@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
@@ -38,7 +39,7 @@ class Col extends BaseExpression
         return new self($alias, $targetField, $outputField);
     }
 
-    public function asSql(CompilerInterface $compiler, Connection $connection)
+    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         return [sprintf('%s.%s', $this->alias, $this->targetField->getColumnName()), []];
     }
@@ -51,7 +52,15 @@ class Col extends BaseExpression
         return $this->targetField;
     }
 
-    public function getDbConverters(Connection $connection)
+    /**
+     * @param ConnectionInterface $connection
+     * @return array
+     * @throws \Eddmash\PowerOrm\Exception\FieldError
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getDbConverters(ConnectionInterface $connection)
     {
         if ($this->getTargetField()->getName() === $this->getOutputField()->getName()):
             return $this->getOutputField()->getDbConverters($connection);

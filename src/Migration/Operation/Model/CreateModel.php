@@ -86,6 +86,10 @@ class CreateModel extends ModelOperation
         endif;
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function databaseBackwards($schemaEditor, $fromState, $toState)
     {
         $model = $fromState->getRegistry()->getModel($this->name);

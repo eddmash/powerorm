@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Form\Validations\MaxLengthValidator;
 
 class CharField extends Field
@@ -63,7 +64,7 @@ class CharField extends Field
     /**
      * {@inheritdoc}
      */
-    public function dbType(Connection $connection)
+    public function dbType(ConnectionInterface $connection)
     {
         return Type::STRING;
     }

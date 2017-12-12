@@ -14,6 +14,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 
 /**
  * A fixed-precision decimal number. SQl column DECIMAL(M,D).
@@ -50,7 +51,7 @@ class DecimalField extends Field
     /**
      * {@inheritdoc}
      */
-    public function dbType(Connection $connection)
+    public function dbType(ConnectionInterface $connection)
     {
         return Type::DECIMAL;
     }

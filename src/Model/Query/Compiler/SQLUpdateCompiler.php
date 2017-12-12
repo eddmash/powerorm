@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
@@ -44,7 +45,7 @@ class SQLUpdateCompiler extends SqlFetchBaseCompiler
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function asSql(CompilerInterface $compiler = null, Connection $connection = null)
+    public function asSql(CompilerInterface $compiler = null, ConnectionInterface $connection = null)
     {
         $connection = $this->connection;
 

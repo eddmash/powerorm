@@ -10,14 +10,14 @@
 */
 
 namespace Eddmash\PowerOrm\Migration;
-
-use Doctrine\DBAL\Connection;
+ 
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 
 class Recorder
 {
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     private $connection;
 //    private $schema;
@@ -28,24 +28,23 @@ class Recorder
     /**
      * Recorder constructor.
      *
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      */
-    public function __construct($connection)
+    public function __construct(ConnectionInterface $connection)
     {
         $this->connection = $connection;
         $this->createTable();
     }
 
     /**
-     * @param array $config
-     *
+     * @param ConnectionInterface $connection
      * @return Recorder
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function createObject($connection)
+    public static function createObject(ConnectionInterface $connection)
     {
         return new static($connection);
     }

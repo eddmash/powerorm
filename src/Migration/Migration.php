@@ -9,8 +9,8 @@
 */
 
 namespace Eddmash\PowerOrm\Migration;
-
-use Doctrine\DBAL\Connection;
+ 
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
@@ -144,6 +144,7 @@ class Migration implements MigrationInterface
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @throws \Eddmash\PowerOrm\Exception\NotImplemented
      */
     public function apply(ProjectState $state, SchemaEditor $schemaEditor)
     {
@@ -154,7 +155,7 @@ class Migration implements MigrationInterface
 
             $operation->updateState($state);
 
-            $forwardCallback = function (Connection $connection) use ($operation, $schemaEditor, $oldState, $state) {
+            $forwardCallback = function (ConnectionInterface $connection) use ($operation, $schemaEditor, $oldState, $state) {
                 $operation->databaseForwards($schemaEditor, $oldState, $state);
             };
 
@@ -181,6 +182,7 @@ class Migration implements MigrationInterface
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @throws \Eddmash\PowerOrm\Exception\NotImplemented
      */
     public function unApply($state, $schemaEditor)
     {
@@ -227,13 +229,14 @@ class Migration implements MigrationInterface
      * Preserves the original object state by default and will return a mutated state from a copy.
      *
      * @param ProjectState $state
-     * @param bool|true    $preserveState
+     * @param bool|true $preserveState
      *
      * @return mixed
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @throws \Eddmash\PowerOrm\Exception\NotImplemented
      */
     public function updateState($state, $preserveState = true)
     {

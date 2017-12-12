@@ -16,6 +16,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\CloneInterface;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\ValueError;
@@ -53,10 +54,6 @@ const ORDER_DIRECTION = [
 
 class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 {
-    //[
-    //  BaseLookup::AND_CONNECTOR => [],
-    //  BaseLookup::OR_CONNECTOR => [],
-    //];
     public $offset;
     public $limit;
 
@@ -459,7 +456,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     }
 
     /**
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      *
      * @return SqlFetchBaseCompiler
      *
@@ -467,7 +464,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getSqlCompiler(Connection $connection)
+    public function getSqlCompiler(ConnectionInterface $connection)
     {
         $compiler = $this->getCompilerClass();
 
@@ -973,7 +970,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getAggregation(Connection $connection, $addedAggregateNames = [])
+    public function getAggregation(ConnectionInterface $connection, $addedAggregateNames = [])
     {
         if (!$this->annotations):
             return [];
@@ -1094,7 +1091,15 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         return empty($this->offset) && empty($this->limit);
     }
 
-    public function getCount(Connection $connection)
+    /**
+     * @param ConnectionInterface $connection
+     * @return mixed
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getCount(ConnectionInterface $connection)
     {
         $obj = $this->deepClone();
         $obj->addAnnotation(['annotation' => count_('*'), 'alias' => '_count', 'isSummary' => true]);
@@ -1138,7 +1143,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         return $obj;
     }
 
-    public function getResultsIterator(Connection $connection)
+    public function getResultsIterator(ConnectionInterface $connection)
     {
         $preparedResults = [];
 
@@ -1198,15 +1203,18 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * Ensure results are converted back to there respective php types.
      *
+     * @param ConnectionInterface $connection
      * @param $values
      *
      * @return array
      *
+     * @throws FieldError
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function preparedResults(Connection $connection, $values)
+    public function preparedResults(ConnectionInterface $connection, $values)
     {
         $preparedValues = [];
 
@@ -1280,7 +1288,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endif;
     }
 
-    public function toSubQuery(Connection $connection)
+    public function toSubQuery(ConnectionInterface $connection)
     {
         $this->isSubQuery = true;
 
@@ -1288,7 +1296,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         return $this;
     }
 
-    public function hasResults(Connection $connection)
+    public function hasResults(ConnectionInterface $connection)
     {
         $query = $this->deepClone();
         //todo handle distinct and group by
@@ -1301,9 +1309,12 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 }
 
 /**
- * @param Model[]        $instances
+ * @param Model[] $instances
  * @param Prefetch|array $lookups
  *
+ * @throws ValueError
+ * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
+ * @throws \Eddmash\PowerOrm\Exception\KeyError
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

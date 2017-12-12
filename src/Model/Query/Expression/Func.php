@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
@@ -86,7 +87,8 @@ class Func extends BaseExpression
         return $obj;
     }
 
-    public function asSql(CompilerInterface $compiler, Connection $connection, $function = null)
+    /**@inheritdoc*/
+    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection, $function = null)
     {
         $sqlParts = [];
 

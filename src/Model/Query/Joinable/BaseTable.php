@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 class BaseTable extends BaseJoin
@@ -28,7 +29,7 @@ class BaseTable extends BaseJoin
         $this->setTableAlias($tableAlias);
     }
 
-    public function asSql(CompilerInterface $compiler, Connection $connection)
+    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         $tableAlias = '';
         if ($this->getTableName() !== $this->getTableAlias()):

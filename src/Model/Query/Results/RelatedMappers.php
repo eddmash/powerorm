@@ -28,6 +28,13 @@ class RelatedMappers
     private $model;
     private $connection;
 
+    /**
+     * RelatedMappers constructor.
+     * @param $klassInfo
+     * @param $select
+     * @param $connection
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
+     */
     public function __construct($klassInfo, $select, $connection)
     {
         $this->model = ArrayHelper::getValue($klassInfo, 'model');

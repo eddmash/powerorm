@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\ValidationError;
@@ -491,7 +492,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     /**
      * Returns the database column data type for the Field, taking into account the connection.
      *
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      *
      * @return string
      *
@@ -499,7 +500,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function dbType(Connection $connection)
+    public function dbType(ConnectionInterface $connection)
     {
         return;
     }
@@ -610,7 +611,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * By default it returns value passed in if prepared=true and prepareValue() if is False.
      *
      * @param mixed                     $value
-     * @param \Doctrine\DBAL\Connection $connection
+     * @param ConnectionInterface $connection
      *
      * @return mixed
      *
@@ -657,7 +658,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * If present for the field subclass, fromDbValue() will be called in all circumstances when the data is loaded
      * from the database, including in aggregates and asArray() calls.
      *
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      * @param $value
      * @param $expression
      *
@@ -667,7 +668,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function fromDbValue(Connection $connection, $value, $expression)
+    public function fromDbValue(ConnectionInterface $connection, $value, $expression)
     {
         return $value;
     }

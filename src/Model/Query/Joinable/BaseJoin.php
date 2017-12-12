@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\SqlCompilableinterface;
 
@@ -103,5 +104,5 @@ abstract class BaseJoin implements SqlCompilableinterface
         $this->nullable = $nullable;
     }
 
-    abstract public function asSql(CompilerInterface $compiler, Connection $connection);
+    abstract public function asSql(CompilerInterface $compiler, ConnectionInterface $connection);
 }

@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
@@ -31,7 +32,8 @@ class Value extends BaseExpression
         $this->value = $value;
     }
 
-    public function asSql(CompilerInterface $compiler, Connection $connection)
+    /**@inheritdoc*/
+    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         $val = $this->value;
         if (!is_null($this->outputField)):

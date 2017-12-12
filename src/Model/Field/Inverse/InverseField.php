@@ -12,6 +12,7 @@ namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
@@ -62,7 +63,7 @@ class InverseField extends RelatedField
     /**
      * {@inheritdoc}
      */
-    public function dbType(Connection $connection)
+    public function dbType(ConnectionInterface $connection)
     {
         return;
     }

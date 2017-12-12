@@ -10,7 +10,7 @@
 
 namespace Eddmash\PowerOrm\Db;
 
-use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
@@ -31,7 +31,7 @@ use Eddmash\PowerOrm\Model\Model;
 class SchemaEditor extends BaseObject
 {
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     public $connection;
     /**
@@ -40,16 +40,16 @@ class SchemaEditor extends BaseObject
     private $schemaManager;
 
     /**
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      */
-    public function __construct($connection)
+    public function __construct(ConnectionInterface $connection)
     {
         $this->connection = $connection;
         $this->schemaManager = $this->connection->getSchemaManager();
     }
 
     /**
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      *
      * @return SchemaEditor
      *
@@ -57,7 +57,7 @@ class SchemaEditor extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function createObject($connection)
+    public static function createObject(ConnectionInterface $connection)
     {
         return new static($connection);
     }
@@ -173,6 +173,9 @@ class SchemaEditor extends BaseObject
      * @param Model $model
      * @param Field $field
      *
+     * @throws NotImplemented
+     * @throws ValueError
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -224,7 +227,7 @@ class SchemaEditor extends BaseObject
 
             // we need to drop in-database defaults
             if ($this->effectiveDefault($field)):
-
+                //todo
             endif;
         endif;
     }
@@ -238,6 +241,7 @@ class SchemaEditor extends BaseObject
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function removeField($model, $field)
     {

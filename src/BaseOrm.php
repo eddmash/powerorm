@@ -13,12 +13,14 @@ namespace Eddmash\PowerOrm;
 
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\Checks\ChecksRegistry;
 use Eddmash\PowerOrm\Checks\Tags;
 use Eddmash\PowerOrm\Console\Manager;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\FileHandlerException;
 use Eddmash\PowerOrm\Exception\OrmException;
@@ -191,7 +193,7 @@ class BaseOrm extends BaseObject
     public static $fakeNamespace = 'Eddmash\PowerOrm\__Fake';
 
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     public static $connection;
 
@@ -300,10 +302,9 @@ class BaseOrm extends BaseObject
     }
 
     /**
-     * @return Connection
+     * @return ConnectionInterface
      *
      * @throws OrmException
-     * @throws \Doctrine\DBAL\DBALException
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -317,7 +318,13 @@ class BaseOrm extends BaseObject
         endif;
         if (null == static::$connection):
             $config = new Configuration();
-            static::$connection = DriverManager::getConnection($this->database, $config);
+            $this->database['wrapperClass'] = \Eddmash\PowerOrm\Db\Connection::class;
+            try{
+
+                static::$connection = DriverManager::getConnection($this->database, $config);
+            }catch (DBALException $exception){
+                throw new OrmException($exception->getMessage());
+            }
         endif;
 
         return static::$connection;
@@ -364,7 +371,7 @@ class BaseOrm extends BaseObject
     }
 
     /**
-     * @return Connection
+     * @return ConnectionInterface
      *
      * @since 1.1.0
      *
@@ -534,6 +541,7 @@ class BaseOrm extends BaseObject
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @throws DBALException
      */
     public static function presetup(BaseOrm $orm)
     {

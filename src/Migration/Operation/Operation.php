@@ -10,9 +10,9 @@
 */
 
 namespace Eddmash\PowerOrm\Migration\Operation;
-
-use Doctrine\DBAL\Connection;
+ 
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -178,8 +178,8 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * it preemptively rejects any proxy, unmanaged model.
      *
-     * @param Connection $connection
-     * @param Model      $model
+     * @param ConnectionInterface $connection
+     * @param Model $model
      *
      * @return mixed
      *
@@ -187,7 +187,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function allowMigrateModel($connection, $model)
+    public function allowMigrateModel(ConnectionInterface $connection, $model)
     {
         return $model->meta->canMigrate();
     }

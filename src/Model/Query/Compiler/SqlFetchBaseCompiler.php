@@ -7,6 +7,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Type;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -632,7 +633,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function asSql(CompilerInterface $compiler = null, Connection $connection = null)
+    public function asSql(CompilerInterface $compiler = null, ConnectionInterface $connection = null)
     {
         list($orderBy, $groupBy) = $this->preSqlSetup();
         $params = [];
