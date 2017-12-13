@@ -11,12 +11,8 @@
 
 namespace Eddmash\PowerOrm\Components;
 
-use Eddmash\PowerOrm\BaseOrm;
-
-interface ComponentInterface
+abstract class Component implements ComponentInterface
 {
-    public function ready(BaseOrm $baseOrm);
-
     /**
      * True if it this component is accessible as an attribute of the orm.
      *
@@ -26,7 +22,10 @@ interface ComponentInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function isQueryable();
+    public function isQueryable()
+    {
+        return false;
+    }
 
     /**
      * Instance to to return if the component is queryable.
@@ -37,27 +36,16 @@ interface ComponentInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getInstance();
+    public function getInstance()
+    {
+        return $this;
+    }
 
     /**
-     * Name to use when querying this component.
-     *
-     * @return mixed
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
-    public function getName();
-
-    /**
-     * Command classes.
-     *
-     * @return array
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function getCommands();
+    public function getCommands()
+    {
+        return [];
+    }
 }

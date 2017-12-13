@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
@@ -54,8 +53,11 @@ class Col extends BaseExpression
 
     /**
      * @param ConnectionInterface $connection
+     *
      * @return array
+     *
      * @throws \Eddmash\PowerOrm\Exception\FieldError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

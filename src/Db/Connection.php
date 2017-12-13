@@ -11,8 +11,6 @@
 
 namespace Eddmash\PowerOrm\Db;
 
-
 class Connection extends \Doctrine\DBAL\Connection implements ConnectionInterface
 {
-
 }

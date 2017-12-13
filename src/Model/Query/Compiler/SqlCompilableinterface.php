@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 
 interface SqlCompilableinterface
@@ -19,7 +18,7 @@ interface SqlCompilableinterface
     /**
      * if the instance passed to a compiler it can be converted into a valid Sql string.
      *
-     * @param CompilerInterface $compiler
+     * @param CompilerInterface   $compiler
      * @param ConnectionInterface $connection
      *
      * @return mixed

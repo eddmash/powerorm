@@ -14,10 +14,8 @@ namespace Eddmash\PowerOrm\Db;
 use Closure;
 use Doctrine\DBAL\Exception\InvalidArgumentException;
 
-
 interface ConnectionInterface
 {
-
     /**
      * Gets the parameters used during instantiation.
      *
@@ -97,9 +95,7 @@ interface ConnectionInterface
      * If an exception occurs during execution of the function or transaction commit,
      * the transaction is rolled back and the exception re-thrown.
      *
-     * @param \Closure $func The function to execute transactionally.
-     *
-     * @return void
+     * @param \Closure $func the function to execute transactionally
      *
      * @throws \Exception
      */
@@ -110,11 +106,11 @@ interface ConnectionInterface
      *
      * Table expression and columns are not escaped and are not safe for user-input.
      *
-     * @param string $tableExpression The expression of the table to insert data into, quoted or unquoted.
-     * @param array $data An associative array containing column-value pairs.
-     * @param array $types Types of the inserted data.
+     * @param string $tableExpression the expression of the table to insert data into, quoted or unquoted
+     * @param array  $data            an associative array containing column-value pairs
+     * @param array  $types           types of the inserted data
      *
-     * @return integer The number of affected rows.
+     * @return int the number of affected rows
      */
     public function insert($tableExpression, array $data, array $types = array());
 
@@ -124,11 +120,11 @@ interface ConnectionInterface
      *
      * This method supports PDO binding types as well as DBAL mapping types.
      *
-     * @param string $query The SQL query.
-     * @param array $params The query parameters.
-     * @param array $types The parameter types.
+     * @param string $query  the SQL query
+     * @param array  $params the query parameters
+     * @param array  $types  the parameter types
      *
-     * @return integer The number of affected rows.
+     * @return int the number of affected rows
      *
      * @throws \Doctrine\DBAL\DBALException
      */
@@ -137,9 +133,9 @@ interface ConnectionInterface
     /**
      * Prepares and executes an SQL query and returns the result as an associative array.
      *
-     * @param string $sql The SQL query.
-     * @param array $params The query parameters.
-     * @param array $types The query parameter types.
+     * @param string $sql    the SQL query
+     * @param array  $params the query parameters
+     * @param array  $types  the query parameter types
      *
      * @return array
      */
@@ -150,24 +146,23 @@ interface ConnectionInterface
      *
      * Table expression and columns are not escaped and are not safe for user-input.
      *
-     * @param string $tableExpression The expression of the table on which to delete.
-     * @param array $identifier The deletion criteria. An associative array containing column-value pairs.
-     * @param array $types The types of identifiers.
+     * @param string $tableExpression the expression of the table on which to delete
+     * @param array  $identifier      The deletion criteria. An associative array containing column-value pairs.
+     * @param array  $types           the types of identifiers
      *
-     * @return integer The number of affected rows.
+     * @return int the number of affected rows
      *
      * @throws InvalidArgumentException
      */
     public function delete($tableExpression, array $identifier, array $types = array());
 
-
     /**
      * Prepares and executes an SQL query and returns the first row of the result
      * as an associative array.
      *
-     * @param string $statement The SQL query.
-     * @param array $params The query parameters.
-     * @param array $types The query parameter types.
+     * @param string $statement the SQL query
+     * @param array  $params    the query parameters
+     * @param array  $types     the query parameter types
      *
      * @return array
      */
@@ -177,9 +172,9 @@ interface ConnectionInterface
      * Prepares and executes an SQL query and returns the first row of the result
      * as a numerically indexed array.
      *
-     * @param string $statement The SQL query to be executed.
-     * @param array $params The prepared statement params.
-     * @param array $types The query parameter types.
+     * @param string $statement the SQL query to be executed
+     * @param array  $params    the prepared statement params
+     * @param array  $types     the query parameter types
      *
      * @return array
      */
@@ -189,13 +184,19 @@ interface ConnectionInterface
      * Prepares and executes an SQL query and returns the value of a single column
      * of the first row of the result.
      *
-     * @param string $statement The SQL query to be executed.
-     * @param array $params The prepared statement params.
-     * @param integer $column The 0-indexed column number to retrieve.
-     * @param array $types The query parameter types.
+     * @param string $statement the SQL query to be executed
+     * @param array  $params    the prepared statement params
+     * @param int    $column    the 0-indexed column number to retrieve
+     * @param array  $types     the query parameter types
      *
      * @return mixed
      */
     public function fetchColumn($statement, array $params = array(), $column = 0, array $types = array());
 
+    /**
+     * Gets the Configuration used by the Connection.
+     *
+     * @return \Doctrine\DBAL\Configuration
+     */
+    public function getConfiguration();
 }

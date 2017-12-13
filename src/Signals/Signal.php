@@ -11,16 +11,13 @@
 
 namespace Eddmash\PowerOrm\Signals;
 
-
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Signals\SignalManagerInterface;
 
 class Signal
 {
+    const MODEL_PRE_INIT = 'powerorm.model.pre_init';
 
-    const MODEL_PRE_INIT = "powerorm.model.pre_init";
-
-    public static function dispatch($name, $sender, $kwargs=[])
+    public static function dispatch($name, $sender, $kwargs = [])
     {
         if(self::getSignalManager()):
             self::getSignalManager()->dispatch($name, $sender, $kwargs);
@@ -29,12 +26,18 @@ class Signal
 
     /**
      * @return SignalManagerInterface
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public static function getSignalManager()
     {
-        return BaseOrm::getInstance()->getSignalManager();
+        $manager = BaseOrm::getInstance()->getSignalManager();
+
+        if($manager):
+            $manager = new SignalManager();
+        endif;
+        return $manager;
     }
 }

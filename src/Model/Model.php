@@ -591,7 +591,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param ConnectionInterface $connection
      * @param $fieldNames
      * @param $values
+     *
      * @return static
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -746,9 +748,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     /**
      * @param $name
+     *
      * @return mixed
+     *
      * @throws AttributeError
      * @throws KeyError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

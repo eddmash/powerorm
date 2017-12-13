@@ -45,7 +45,7 @@ abstract class CheckMessage extends Base
 
     public function isSilenced()
     {
-        return in_array($this->id, BaseOrm::getInstance()->silencedChecks);
+        return BaseOrm::isCheckSilenced($this->id);
     }
 
     public function isSerious($level = null)

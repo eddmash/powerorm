@@ -10,7 +10,6 @@
 
 namespace Eddmash\PowerOrm\Db;
 
-use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
@@ -176,6 +175,7 @@ class SchemaEditor extends BaseObject
      * @throws NotImplemented
      * @throws ValueError
      * @throws \Doctrine\DBAL\Schema\SchemaException
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -241,6 +241,7 @@ class SchemaEditor extends BaseObject
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function removeField($model, $field)

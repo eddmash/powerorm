@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
@@ -111,6 +110,7 @@ class Join extends BaseJoin
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
     public function relabeledClone($changeMap = [])

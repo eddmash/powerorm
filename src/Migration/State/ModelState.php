@@ -47,7 +47,7 @@ class ModelState extends BaseObject
     {
         $this->name = $name;
         $this->fields = $fields;
-        BaseOrm::configure($this, $kwargs);
+        ClassHelper::setAttributes($this, $kwargs);
     }
 
     /**

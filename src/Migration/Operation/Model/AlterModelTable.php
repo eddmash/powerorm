@@ -77,6 +77,7 @@ class AlterModelTable extends Operation
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\LookupError
      */
     private function alterModelTable($schemaEditor, $fromState, $toState)

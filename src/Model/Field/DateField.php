@@ -12,7 +12,6 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use DateTime;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Db\ConnectionInterface;

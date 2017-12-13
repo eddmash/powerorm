@@ -9,10 +9,16 @@
 * file that was distributed with this source code.
 */
 
+use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 
 class ClassHelperTest extends PHPUnit_Framework_TestCase
 {
+    protected function setUp()
+    {
+        \Eddmash\PowerOrm\BaseOrm::setup(new Settings([]));
+    }
+
     /**
      * @dataProvider namespaceProvider
      *
@@ -42,7 +48,7 @@ class ClassHelperTest extends PHPUnit_Framework_TestCase
             'Eddmash\PowerOrm\DeconstructableObject',
             'Eddmash\PowerOrm\BaseObject',
         ];
-        $mock = $this->getMockBuilder(\Eddmash\PowerOrm\Model\Model::class)->getMock();
+        $mock = $this->getMockForAbstractClass(\Eddmash\PowerOrm\Model\Model::class);
 
         $this->assertEquals($expected, array_keys(ClassHelper::getParents($mock)), 'Failed to assert expected order of parents');
     }

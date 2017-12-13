@@ -8,13 +8,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\Model\Model;
 
 class ModelTest extends PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
-        \Eddmash\PowerOrm\BaseOrm::setup();
+        \Eddmash\PowerOrm\BaseOrm::setup(new Settings([]));
     }
 
     public function testFieldMethodIsNotPublic()

@@ -20,7 +20,6 @@
 
 namespace Eddmash\PowerOrm\Model\Lookup;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\SqlCompilableinterface;

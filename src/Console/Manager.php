@@ -45,14 +45,23 @@ class Manager extends Base
         return ['help' => '', 'version' => ''];
     }
 
-    public function getExtraCommands()
+    public function getComponentCommands()
     {
-        $components = (array) BaseOrm::getInstance()->commands;
+        $components = BaseOrm::getInstance()->getComponents();
 
         $comands = [];
 
-        foreach ($components as $command) :
-            $comands[] = new $command();
+        foreach ($components as $component) :
+
+            foreach ($component->getCommands() as $command) :
+                if(is_object($command) && $command instanceof BaseCommand):
+                    $comands[] = $command;
+                endif;
+                if(is_string($command)):
+                    $comands[] = new $command();
+                endif;
+            endforeach;
+
         endforeach;
 
         return $comands;
@@ -79,7 +88,7 @@ class Manager extends Base
     public static function getCommands()
     {
         $manager = new static();
-        return array_merge($manager->getDefaultCommands(), $manager->getExtraCommands());
+        return array_merge($manager->getDefaultCommands(), $manager->getComponentCommands());
     }
 
     /**
@@ -120,7 +129,6 @@ class Manager extends Base
             $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
             $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
 
-            return false;
         endif;
 
         // commands are in the commands namespace
@@ -135,10 +143,11 @@ class Manager extends Base
      *
      * @return Application
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     *
+     * @throws \Exception
      */
     public static function run($autoRun = true, InputInterface $input = null, OutputInterface $output = null)
     {
-        BaseOrm::getInstance()->registerModelChecks();
         $console = new Application('');
         $def = new ListCommand();
         $console->add($def);

@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Lookup;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
@@ -25,6 +24,7 @@ class Range extends BaseLookup
     {
         return sprintf($this->operator, $rhs[0], $rhs[1]);
     }
+
     /**@inheritdoc*/
     public function processRHS(CompilerInterface $compiler, ConnectionInterface $connection)
     {

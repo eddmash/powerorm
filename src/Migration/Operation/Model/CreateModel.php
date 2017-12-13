@@ -86,7 +86,6 @@ class CreateModel extends ModelOperation
         endif;
     }
 
-
     /**
      * {@inheritdoc}
      */

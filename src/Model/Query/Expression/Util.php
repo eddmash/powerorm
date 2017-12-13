@@ -93,6 +93,7 @@ function sum_($expression) {
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ *
  * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
  */
 function or_()
@@ -106,6 +107,7 @@ function or_()
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ *
  * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
  */
 function not_()
@@ -119,6 +121,7 @@ function not_()
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ *
  * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
  */
 function q_()
@@ -144,6 +147,7 @@ function f_($name)
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ *
  * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
  */
 function func_()

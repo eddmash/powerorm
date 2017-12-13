@@ -19,7 +19,7 @@ trait RegisterLookupTrait
 
     /**
      * @param BaseLookup $class
-     * @param null   $name
+     * @param null       $name
      *
      * @since 1.1.0
      *
@@ -35,8 +35,11 @@ trait RegisterLookupTrait
 
     /**
      * @param $name
+     *
      * @return mixed
+     *
      * @throws FieldError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

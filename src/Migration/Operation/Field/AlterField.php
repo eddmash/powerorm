@@ -82,6 +82,7 @@ class AlterField extends FieldOperation
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\LookupError
      * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
      * @throws \Eddmash\PowerOrm\Exception\ValueError

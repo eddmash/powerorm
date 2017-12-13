@@ -9,7 +9,7 @@
 */
 
 namespace Eddmash\PowerOrm\Migration;
- 
+
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
@@ -35,8 +35,10 @@ class Loader extends BaseObject
 
     /**
      * Loader constructor.
+     *
      * @param ConnectionInterface|null $connection
-     * @param bool $loadGraph
+     * @param bool                     $loadGraph
+     *
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
@@ -51,7 +53,9 @@ class Loader extends BaseObject
 
     /**
      * @return State\ProjectState
+     *
      * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -65,6 +69,7 @@ class Loader extends BaseObject
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -110,6 +115,7 @@ class Loader extends BaseObject
      * @throws ClassNotFoundException
      * @throws KeyError
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -153,6 +159,7 @@ class Loader extends BaseObject
      * List of migration objects.
      *
      * @return array
+     *
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      */
@@ -178,6 +185,7 @@ class Loader extends BaseObject
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      */
     public function getMigrationsClasses()
@@ -202,7 +210,9 @@ class Loader extends BaseObject
 
     /**
      * @return array
+     *
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -221,6 +231,7 @@ class Loader extends BaseObject
      * returns the latest migration number.
      *
      * @return int
+     *
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      */
     public function getLatestMigrationVersion()

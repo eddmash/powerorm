@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -40,9 +39,11 @@ class OrderBy extends BaseExpression
 
     /**
      * OrderBy constructor.
+     *
      * @param BaseExpression $expression
-     * @param bool $descending
-     * @param array $kwargs
+     * @param bool           $descending
+     * @param array          $kwargs
+     *
      * @throws ValueError
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      */

@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
@@ -19,6 +18,7 @@ use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\ValidationError;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\Descriptors\DescriptorInterface;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
@@ -253,7 +253,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
     public function __construct($config = [])
     {
-        BaseOrm::configure($this, $config, ['rel' => 'relation']);
+        ClassHelper::setAttributes($this, $config, ['rel' => 'relation']);
 
         if (null !== $this->relation):
 
@@ -264,7 +264,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     /**
      * @param array $config
      *
-     * @return Field
+     * @return *Field
      *
      * @since 1.1.0
      *
@@ -610,7 +610,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      *
      * By default it returns value passed in if prepared=true and prepareValue() if is False.
      *
-     * @param mixed                     $value
+     * @param mixed               $value
      * @param ConnectionInterface $connection
      *
      * @return mixed

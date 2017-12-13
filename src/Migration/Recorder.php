@@ -10,7 +10,7 @@
 */
 
 namespace Eddmash\PowerOrm\Migration;
- 
+
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 
@@ -38,6 +38,7 @@ class Recorder
 
     /**
      * @param ConnectionInterface $connection
+     *
      * @return Recorder
      *
      * @since 1.1.0

@@ -211,7 +211,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
         // set to group by. So, we need to add cols in select, order_by, and
         // having into the select in any case.
 
-        /** @var $exp BaseExpression */
+        /* @var $exp BaseExpression */
         foreach ($this->select as $colInfo) :
             list($exp, $alias) = $colInfo;
             foreach ($exp->getGroupByCols() as $groupByCol) :
