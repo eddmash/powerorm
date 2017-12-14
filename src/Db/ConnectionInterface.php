@@ -13,6 +13,8 @@ namespace Eddmash\PowerOrm\Db;
 
 use Closure;
 use Doctrine\DBAL\Exception\InvalidArgumentException;
+use Eddmash\PhpGis\Db\Backends\Features\BaseFeatures;
+use Eddmash\PhpGis\Db\Backends\Operations\OperationsInterface;
 
 interface ConnectionInterface
 {
@@ -199,4 +201,20 @@ interface ConnectionInterface
      * @return \Doctrine\DBAL\Configuration
      */
     public function getConfiguration();
+
+    /**
+     * @return OperationsInterface
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getOperations();
+
+    /**
+     * @return BaseFeatures
+     * @since 1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function getFeatures();
 }

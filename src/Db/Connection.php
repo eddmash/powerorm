@@ -11,6 +11,17 @@
 
 namespace Eddmash\PowerOrm\Db;
 
+use Eddmash\PhpGis\Db\Backends\Features\BaseFeatures;
+use Eddmash\PhpGis\Db\Backends\Operations\BaseOperations;
+
 class Connection extends \Doctrine\DBAL\Connection implements ConnectionInterface
 {
+    public function getOperations()
+    {
+        return BaseOperations::getOperator($this->getDatabasePlatform());
+    }
+
+    public function getFeatures(){
+        return BaseFeatures::getFeatures($this->getDatabasePlatform());
+    }
 }
