@@ -18,7 +18,7 @@ class Connection extends \Doctrine\DBAL\Connection implements ConnectionInterfac
 {
     public function getOperations()
     {
-        return BaseOperations::getOperator($this->getDatabasePlatform());
+        return BaseOperations::getOperations($this->getDatabasePlatform());
     }
 
     public function getFeatures(){
