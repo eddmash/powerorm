@@ -24,7 +24,7 @@ use Eddmash\PowerOrm\Model\Query\Expression\Col;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class BaseLookup implements LookupInterface
+abstract class BaseLookup implements LookupInterface
 {
     const AND_CONNECTOR = 'and';
     const OR_CONNECTOR = 'or';

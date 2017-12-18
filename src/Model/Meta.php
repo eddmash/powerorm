@@ -328,6 +328,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @throws \Eddmash\PowerOrm\Exception\LookupError
      */
     public function getReverseRelatedObjects()
     {

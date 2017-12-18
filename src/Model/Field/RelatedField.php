@@ -59,6 +59,11 @@ class RelatedField extends Field
      */
     public $inverseField = '';
 
+    /**
+     * RelatedField constructor.
+     * @param array $kwargs
+     * @throws TypeError
+     */
     public function __construct($kwargs = [])
     {
         if (!ArrayHelper::hasKey($kwargs, 'to')):

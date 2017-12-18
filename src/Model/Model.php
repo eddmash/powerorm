@@ -492,25 +492,28 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     private function prepareMultiInheritance($parentModelName)
     {
-        if (!self::isModelBase($parentModelName) && !StringHelper::isEmpty($parentModelName)):
+        if (!self::isModelBase($parentModelName) && !StringHelper::isEmpty($parentModelName) &&
+            !StringHelper::startsWith($parentModelName, "Eddmash") &&
+            !StringHelper::startsWith($parentModelName, "\Eddmash")):
+
             $name = ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace());
             $attrName = lcfirst(str_replace(' ', '', ucwords(str_replace('\\', ' ', $name))));
             $attrName = sprintf('%sPtr', $attrName);
 
 //            if (!ArrayHelper::hasKey($this->meta->getFields(), $attrName)):
             //todo find a way to avoid name clash
-            $field = OneToOneField::createObject(
-                [
-                    'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
-                    'onDelete' => Delete::CASCADE,
-                    'name' => $attrName,
-                    'autoCreated' => true,
-                    'parentLink' => true,
-                ]
-            );
-
-            $this->addToClass($attrName, $field);
-            $this->meta->parents[$name] = $field;
+//            $field = OneToOneField::createObject(
+//                [
+//                    'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
+//                    'onDelete' => Delete::CASCADE,
+//                    'name' => $attrName,
+//                    'autoCreated' => true,
+//                    'parentLink' => true,
+//                ]
+//            );
+//
+//            $this->addToClass($attrName, $field);
+//            $this->meta->parents[$name] = $field;
 //            endif;
 
         endif;

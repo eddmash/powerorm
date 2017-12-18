@@ -37,6 +37,12 @@ class OneToOneField extends ForeignKey
 
     public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasOneField';
 
+    /**
+     * OneToOneField constructor.
+     * @param $kwargs
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
+     * @throws \Eddmash\PowerOrm\Exception\TypeError
+     */
     public function __construct($kwargs)
     {
         $kwargs['unique'] = true;

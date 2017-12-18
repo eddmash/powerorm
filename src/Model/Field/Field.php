@@ -59,6 +59,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * @var bool
      */
     public $serialize = true;
+
     protected $name;
 
     /**
@@ -825,6 +826,14 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     public function valueToString(Model $model)
     {
         return strval($this->valueFromObject($model));
+    }
+
+    /**
+     * @param mixed $name
+     */
+    protected function setName($name)
+    {
+        $this->name = $name;
     }
 }
 

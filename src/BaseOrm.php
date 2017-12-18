@@ -332,7 +332,8 @@ class BaseOrm extends BaseObject
 
     public static function getMigrationsNamespace()
     {
-        return ClassHelper::getFormatNamespace(self::getInstance()->migrationNamespace, true, false);
+        return ClassHelper::getFormatNamespace(self::getInstance()->getSettings()->getMigrationNamespace(), true,
+            false);
     }
 
     public static function getQueryBuilder()
