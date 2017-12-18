@@ -10,7 +10,6 @@
 
 namespace Eddmash\PowerOrm\Model;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\ArrayObjectInterface;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
@@ -269,7 +268,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * @param string       $name
+     * @param string $name
      * @param object|mixed $value
      *
      * @since 1.1.0
@@ -295,9 +294,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * returns the concrete model in the hierarchy and the fields in each of the models in the hierarchy.
      *
-     * @param Model     $model
-     * @param string    $method     the method to invoke
-     * @param null      $args       the arguments to pass to the method
+     * @param Model $model
+     * @param string $method the method to invoke
+     * @param null $args the arguments to pass to the method
      * @param bool|true $fromOldest do we traverse from BaseObject to the child model
      *
      * @return array
@@ -501,19 +500,19 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $attrName = sprintf('%sPtr', $attrName);
 
 //            if (!ArrayHelper::hasKey($this->meta->getFields(), $attrName)):
-            //todo find a way to avoid name clash
-//            $field = OneToOneField::createObject(
-//                [
-//                    'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
-//                    'onDelete' => Delete::CASCADE,
-//                    'name' => $attrName,
-//                    'autoCreated' => true,
-//                    'parentLink' => true,
-//                ]
-//            );
-//
-//            $this->addToClass($attrName, $field);
-//            $this->meta->parents[$name] = $field;
+                //todo find a way to avoid name clash
+                $field = OneToOneField::createObject(
+                    [
+                        'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
+                        'onDelete' => Delete::CASCADE,
+                        'name' => $attrName,
+                        'autoCreated' => true,
+                        'parentLink' => true,
+                    ]
+                );
+
+                $this->addToClass($attrName, $field);
+                $this->meta->parents[$name] = $field;
 //            endif;
 
         endif;
@@ -746,7 +745,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array) unserialize((string) $serialized);
+        $this->_fieldCache = (array)unserialize((string)$serialized);
     }
 
     /**
@@ -780,7 +779,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             return $field->getValue($this);
         } catch (FieldDoesNotExist $e) {
-            if(ArrayHelper::hasKey($this->_nonModelfields, $name)):
+            if (ArrayHelper::hasKey($this->_nonModelfields, $name)):
                 return ArrayHelper::getValue($this->_nonModelfields, $name);
             endif;
             if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
@@ -850,8 +849,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $connection
-     * @param null       $updateField
+     * @param null $connection
+     * @param null $updateField
      *
      * @throws ValueError
      *
@@ -977,7 +976,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $raw
      * @param bool|false $forceInsert
      * @param bool|false $forceUpdate
-     * @param null       $updateFields
+     * @param null $updateFields
      *
      * @since 1.1.0
      *
