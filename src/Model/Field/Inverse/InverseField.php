@@ -10,7 +10,6 @@
 
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\ValueError;

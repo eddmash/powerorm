@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
@@ -19,6 +18,7 @@ use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\ValidationError;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Field\Descriptors\DescriptorInterface;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
@@ -59,6 +59,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * @var bool
      */
     public $serialize = true;
+
     protected $name;
 
     /**
@@ -253,7 +254,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
     public function __construct($config = [])
     {
-        BaseOrm::configure($this, $config, ['rel' => 'relation']);
+        ClassHelper::setAttributes($this, $config, ['rel' => 'relation']);
 
         if (null !== $this->relation):
 
@@ -264,7 +265,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     /**
      * @param array $config
      *
-     * @return Field
+     * @return *Field
      *
      * @since 1.1.0
      *
@@ -444,8 +445,8 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
         if (StringHelper::startsWith(static::class, 'Eddmash\PowerOrm\Model\Field')):
             $alias = 'modelField';
-            $path = sprintf('Eddmash\PowerOrm\Model\Field as %s', $alias);
-            $name = sprintf('%s\%s', $alias, $this->getShortClassName());
+            $path = 'Eddmash\PowerOrm\Model\Model';
+            $name = sprintf('Model::%s', $this->getShortClassName());
         endif;
 
         return [
@@ -610,7 +611,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      *
      * By default it returns value passed in if prepared=true and prepareValue() if is False.
      *
-     * @param mixed                     $value
+     * @param mixed               $value
      * @param ConnectionInterface $connection
      *
      * @return mixed
@@ -692,7 +693,14 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
         $name = (is_null($this->name)) ? '' : $this->name;
 
-        return sprintf('< %s : (%s %s)>', static::class, $class, $name);
+        $fieldName = static::class;
+        if (StringHelper::startsWith($fieldName,
+            "Eddmash\PowerOrm\Model\Field")):
+
+            $fieldName = $this->getShortClassName();
+        endif;
+        return sprintf('< %s : %s (%s)>', $class,
+            $fieldName, $name);
     }
 
     /**
@@ -825,6 +833,14 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     public function valueToString(Model $model)
     {
         return strval($this->valueFromObject($model));
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 }
 

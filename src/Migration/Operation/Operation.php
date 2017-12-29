@@ -10,12 +10,12 @@
 */
 
 namespace Eddmash\PowerOrm\Migration\Operation;
- 
-use Eddmash\PowerOrm\BaseOrm;
+
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\NotImplemented;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 use Eddmash\PowerOrm\Model\Model;
@@ -30,10 +30,11 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * @var array
      */
     private $_dependency;
+    private $appLabel;
 
     public function __construct($params)
     {
-        BaseOrm::configure($this, $params);
+        ClassHelper::setAttributes($this, $params);
     }
 
     /**
@@ -179,7 +180,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * it preemptively rejects any proxy, unmanaged model.
      *
      * @param ConnectionInterface $connection
-     * @param Model $model
+     * @param Model               $model
      *
      * @return mixed
      *
@@ -190,5 +191,26 @@ abstract class Operation extends DeconstructableObject implements OperationInter
     public function allowMigrateModel(ConnectionInterface $connection, $model)
     {
         return $model->meta->canMigrate();
+    }
+
+    public function getAppLabel()
+    {
+        return $this->appLabel;
+    }
+
+    /**
+     * @param mixed $appLabel
+     */
+    public function setAppLabel($appLabel)
+    {
+        $this->appLabel = $appLabel;
+    }
+
+
+    public function __debugInfo()
+    {
+        return [
+            'appLabel' => $this->appLabel,
+        ];
     }
 }

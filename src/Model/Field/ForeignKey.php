@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Form\Fields\ModelChoiceField;
@@ -38,6 +37,12 @@ class ForeignKey extends RelatedField
     protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ManyToOneDescriptor';
     public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasManyField';
 
+    /**
+     * ForeignKey constructor.
+     * @param $kwargs
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
+     * @throws \Eddmash\PowerOrm\Exception\TypeError
+     */
     public function __construct($kwargs)
     {
         if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && null == $kwargs['rel'])):

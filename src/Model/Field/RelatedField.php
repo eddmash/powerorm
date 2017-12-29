@@ -32,7 +32,7 @@ use Eddmash\PowerOrm\Model\Model;
 /**
  * Base class that all relational fields inherit from.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -59,10 +59,17 @@ class RelatedField extends Field
      */
     public $inverseField = '';
 
+    /**
+     * RelatedField constructor.
+     * @param array $kwargs
+     * @throws TypeError
+     */
     public function __construct($kwargs = [])
     {
         if (!ArrayHelper::hasKey($kwargs, 'to')):
-            throw new TypeError(sprintf("missing 1 required argument: 'to' for %s", static::class));
+            throw new TypeError(
+                sprintf("missing 1 required argument: 'to' for %s",
+                    static::class));
         endif;
         parent::__construct($kwargs);
     }
@@ -90,7 +97,8 @@ class RelatedField extends Field
         $error = [];
 
         if (!$relMissing) :
-            $msg = "Field defines a relation with model '%s', which is either does not exist, or is abstract.";
+            $msg = "Field defines a relation with model '%s', which is either ".
+                "does not exist, or is abstract.";
 
             $error = [
                 CheckError::createObject(
@@ -119,7 +127,8 @@ class RelatedField extends Field
                         "Reverse query name '%s' must not end with an underscore.",
                         $relatedQueryName
                     ),
-                    'hint' => 'Add or change a related_name or related_query_name argument for this field.',
+                    'hint' => 'Add or change a relatedName or relatedQueryName '.
+                        'argument for this field.',
                     'context' => $this,
                     'id' => 'fields.E308',
                 ]
@@ -133,7 +142,8 @@ class RelatedField extends Field
                         $relatedQueryName,
                         BaseLookup::LOOKUP_SEPARATOR
                     ),
-                    'hint' => 'Add or change a related_name or related_query_name argument for this field.',
+                    'hint' => 'Add or change a relatedName or relatedQueryName '.
+                        'argument for this field.',
                     'context' => $this,
                     'id' => 'fields.E309',
                 ]
@@ -156,7 +166,7 @@ class RelatedField extends Field
         // if its not a valid name and it doesnt end with '+'
         if (!($isValid || StringHelper::endsWith($relatedName, '+'))):
             $msg = sprintf(
-                "The name '%s' is invalid related_name for field %s.%s",
+                "The name '%s' is invalid relatedName for field %s.%s",
                 $relatedName,
                 $this->scopeModel->meta->getNamespacedModelName(),
                 $this->getName()
@@ -180,7 +190,7 @@ class RelatedField extends Field
     /**
      * Check accessor and reverse query name clashes.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -202,7 +212,7 @@ class RelatedField extends Field
             if (!$isHidden && $clashField->getName() == $relName):
                 $msg = "Reverse accessor for '%s' clashes with field name '%s'.";
                 $hint = sprintf(
-                    "Rename field '%s', or add/change a related_name argument to the definition ".
+                    "Rename field '%s', or add/change a relatedName argument to the definition ".
                     "for field '%s'.",
                     $clashName,
                     $fieldName
@@ -223,7 +233,7 @@ class RelatedField extends Field
                 $msg = "Reverse query name for '%s' clashes with field name '%s'.";
 
                 $hint = sprintf(
-                    "Rename field '%s', or add/change a related_name argument to the ".
+                    "Rename field '%s', or add/change a relatedName argument to the ".
                     "definition for field '%s'.",
                     $clashName,
                     $fieldName
@@ -255,7 +265,7 @@ class RelatedField extends Field
             if (!$isHidden && $reverseRelatedObject->relation->getAccessorName() === $relName):
 
                 $msg = "Reverse accessor for '%s' clashes with reverse accessor for '%s'.";
-                $hint = "Add or change a related_name argument to the definition for '%s' or '%s'.";
+                $hint = "Add or change a relatedName argument to the definition for '%s' or '%s'.";
                 $error[] = CheckError::createObject(
                     [
                         'message' => sprintf($msg, $fieldName, $clashName),
@@ -268,7 +278,7 @@ class RelatedField extends Field
 
             if ($reverseRelatedObject->relation->getAccessorName() === $relQueryName):
                 $msg = "Reverse query name for '%s' clashes with reverse query name for '%s'.";
-                $hint = "Add or change a related_name argument to the definition for '%s' or '%s'.";
+                $hint = "Add or change a relatedName argument to the definition for '%s' or '%s'.";
                 $error[] = CheckError::createObject(
                     [
                         'message' => sprintf($msg, $fieldName, $clashName),
@@ -288,7 +298,7 @@ class RelatedField extends Field
      *
      * @return Model
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -314,11 +324,16 @@ class RelatedField extends Field
             $this->relation->relatedName = sprintf($this->relation->relatedName, $namespace);
         elseif ($this->scopeModel->meta->defaultRelatedName):
 
-            $this->relation->relatedName = sprintf($this->scopeModel->meta->defaultRelatedName, $namespace);
+            $this->relation->relatedName =
+                sprintf(
+                    $this->scopeModel->meta->defaultRelatedName,
+                    $namespace
+                );
         endif;
 
         if ($this->relation->relatedQueryName):
-            $this->relation->relatedQueryName = sprintf($this->relation->relatedQueryName, $namespace);
+            $this->relation->relatedQueryName =
+                sprintf($this->relation->relatedQueryName, $namespace);
         endif;
 
         $callback = function ($kwargs) {
@@ -330,10 +345,17 @@ class RelatedField extends Field
             $field->doRelatedClass($related, $this->relation);
         };
 
-        Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->toModel, ['fromField' => $this]);
+        Tools::lazyRelatedOperation(
+            $callback,
+            $this->scopeModel,
+            $this->relation->toModel,
+            ['fromField' => $this]
+        );
 
-        // this allows anyone who var_dumps or any form of dump to see this related fields as part of the model
-        // attributes, mostly this is for cases where the instance has been instantiated using new cls() and not
+        // this allows anyone who var_dumps or any form of dump to see this
+        // related fields as part of the model
+        // attributes, mostly this is for cases where the instance has been
+        // instantiated using new cls() and not
         // values for fields have been set
         $this->scopeModel->_fieldCache[$this->getName()] = $this->getDescriptor();
     }
@@ -348,8 +370,10 @@ class RelatedField extends Field
      * @param ForeignObjectRel $relation
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
-    {
+    public function contributeToInverseClass(
+        Model $relatedModel,
+        ForeignObjectRel $relation
+    ) {
         if (!$this->relation->isHidden()) :
             $inverseField = $this->inverseField;
             $hasMany = $inverseField::createObject(
@@ -369,7 +393,7 @@ class RelatedField extends Field
      * @param Model $relatedModel
      * @param Model $scopeModel
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

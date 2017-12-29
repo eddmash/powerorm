@@ -8,7 +8,6 @@
 
 namespace Eddmash\PowerOrm\Model\Lookup;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -25,7 +24,7 @@ use Eddmash\PowerOrm\Model\Query\Expression\Col;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class BaseLookup implements LookupInterface
+abstract class BaseLookup implements LookupInterface
 {
     const AND_CONNECTOR = 'and';
     const OR_CONNECTOR = 'or';
@@ -67,6 +66,7 @@ class BaseLookup implements LookupInterface
      *
      * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
      * @throws \Eddmash\PowerOrm\Exception\FieldError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -105,6 +105,7 @@ class BaseLookup implements LookupInterface
      * Preperes the rhs for use in the lookup.
      *
      * @return mixed
+     *
      * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
      * @throws \Eddmash\PowerOrm\Exception\FieldError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
@@ -142,6 +143,7 @@ class BaseLookup implements LookupInterface
      * Prepare the rhs for use on database queries.
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\FieldError
      */
     public function prepareLookupForDb($values, ConnectionInterface $connection)
@@ -175,7 +177,7 @@ class BaseLookup implements LookupInterface
 
         return ['?', $this->prepareLookupForDb($this->rhs, $connection)];
     }
-    
+
     /**@inheritdoc*/
     public function getLookupOperation($rhs)
     {

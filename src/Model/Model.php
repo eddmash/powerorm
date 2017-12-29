@@ -10,7 +10,6 @@
 
 namespace Eddmash\PowerOrm\Model;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\ArrayObjectInterface;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
@@ -42,7 +41,7 @@ use Eddmash\PowerOrm\Signals\Signal;
  * Base class for all models in the ORM, this class cannot be instantiated on its own.
  * Class Model.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -172,7 +171,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function __construct($kwargs = [])
     {
         $this->constructorArgs = $kwargs;
-        $this->init();
+//        $this->setupClassInfo();
         Signal::dispatch(Signal::MODEL_PRE_INIT, $this, $kwargs);
         $this->setFieldValues($kwargs);
     }
@@ -186,9 +185,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param array $fields
      * @param array $kwargs
+     * @throws \Eddmash\PowerOrm\Exception\FieldError
+     * @throws \Eddmash\PowerOrm\Exception\LookupError
+     * @throws \Eddmash\PowerOrm\Exception\MethodNotExtendableException
+     * @throws \Eddmash\PowerOrm\Exception\TypeError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function init($fields = [], $kwargs = [])
+    public function setupClassInfo($fields = [], $kwargs = [])
     {
         if (ArrayHelper::hasKey($kwargs, 'registry')):
             $registry = $kwargs['registry'];
@@ -198,13 +201,18 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         // if the registry is already ready and an
         // instance of this class has already been registered with the registry
-        // there is no need to register again, just re-use the meta information of the already registered instance
-        // remember meta only holds information that related to the class as a whole and not the instances.
+        // there is no need to register again, just re-use the meta
+        // information of the already registered instance
+        // remember meta only holds information that related to the
+        // class as a whole and not the instances.
         if ($registry->hasModel(get_class($this)) && $registry->ready) :
 
             $model = $registry->getModel(get_class($this));
-            $this->meta = $model->meta; //todo do a deep clone to be sure all is copied or do a by ref assignment ie.
+
+            //todo do a deep clone to be sure all is copied or do
+            // a by ref assignment ie.
             // instance references the same meta instance
+            $this->meta = $model->meta;
 
             $this->_fieldCache = $model->_fieldCache;
 
@@ -212,11 +220,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // get meta settings for this model
             $metaSettings = $this->getMetaSettings();
 
-            if (!empty($kwargs)):
-
+            if ($kwargs):
                 if (ArrayHelper::hasKey($kwargs, 'meta')):
-                    $metaSettings = $kwargs['meta'];
+                    $metaSettings = array_merge($kwargs['meta'], $metaSettings);
                 endif;
+
                 // we only add registry if it came in as an argument
                 // don't add the default registry, meta class takes care of this.
                 if (ArrayHelper::hasKey($kwargs, 'registry')):
@@ -229,9 +237,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             $this->addToClass('meta', $meta);
 
-            list($concreteParentName, $immediateParent, $parentIsAbstract, $classFields) = self::getHierarchyMeta(
-                $this
-            );
+            list(
+                $concreteParentName, $immediateParent, $parentIsAbstract,
+                $classFields
+                ) = self::getHierarchyMeta($this);
 
             $this->setupFields($fields, $classFields);
 
@@ -272,7 +281,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param string       $name
      * @param object|mixed $value
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -306,7 +315,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @throws MethodNotExtendableException
      * @throws TypeError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -477,10 +486,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     /**
      * @param Model $concreteParent
      *
-     * @throws FieldError
-     * @throws TypeError
-     *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -492,16 +498,20 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     private function prepareMultiInheritance($parentModelName)
     {
-        if (!self::isModelBase($parentModelName) && !StringHelper::isEmpty($parentModelName)):
-            $name = ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace());
-            $attrName = lcfirst(str_replace(' ', '', ucwords(str_replace('\\', ' ', $name))));
-            $attrName = sprintf('%sPtr', $attrName);
+        if (!self::isModelBase($parentModelName) &&
+            !StringHelper::isEmpty($parentModelName) &&
+            !StringHelper::startsWith($parentModelName, "Eddmash") &&
+            !StringHelper::startsWith($parentModelName, "\Eddmash")):
 
-//            if (!ArrayHelper::hasKey($this->meta->getFields(), $attrName)):
+            $ref = new \ReflectionClass($parentModelName);
+            $name = $ref->getShortName();
+            $attrName = sprintf('%s_ptr', strtolower($name));
+
+            //            if (!ArrayHelper::hasKey($this->meta->getFields(), $attrName)):
             //todo find a way to avoid name clash
             $field = OneToOneField::createObject(
                 [
-                    'to' => ClassHelper::getNameFromNs($parentModelName, BaseOrm::getModelsNamespace()),
+                    'to' => $parentModelName,
                     'onDelete' => Delete::CASCADE,
                     'name' => $attrName,
                     'autoCreated' => true,
@@ -511,7 +521,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             $this->addToClass($attrName, $field);
             $this->meta->parents[$name] = $field;
-//            endif;
+            //            endif;
 
         endif;
     }
@@ -589,10 +599,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     /**
      * @param ConnectionInterface $connection
-     * @param $fieldNames
-     * @param $values
+     * @param                     $fieldNames
+     * @param                     $values
+     *
      * @return static
-     * @since 1.1.0
+     *
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -741,15 +753,18 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array) unserialize((string) $serialized);
+        $this->_fieldCache = (array)unserialize((string)$serialized);
     }
 
     /**
      * @param $name
+     *
      * @return mixed
+     *
      * @throws AttributeError
      * @throws KeyError
-     * @since 1.1.0
+     *
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -772,7 +787,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             return $field->getValue($this);
         } catch (FieldDoesNotExist $e) {
-            if(ArrayHelper::hasKey($this->_nonModelfields, $name)):
+            if (ArrayHelper::hasKey($this->_nonModelfields, $name)):
                 return ArrayHelper::getValue($this->_nonModelfields, $name);
             endif;
             if (!ArrayHelper::hasKey(get_object_vars($this), $name) && !ArrayHelper::hasKey($this->_fieldCache, $name)):
@@ -847,7 +862,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @throws ValueError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -971,7 +986,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|false $forceUpdate
      * @param null       $updateFields
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1006,9 +1021,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * Saves all the parents of cls using values from self.
      *
      * @param Model $model
-     * @param $updateFields
+     * @param       $updateFields
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1024,7 +1039,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     /**
      * Does the heavy-lifting involved in saving. Updates or inserts the data for a single table.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1118,7 +1133,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1141,7 +1156,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @return bool|int
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1181,7 +1196,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     /**
      * @return Queryset
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1210,12 +1225,12 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * Do an INSERT. If update_pk is defined then this method should return the new pk for the model.
      *
      * @param Model $model
-     * @param $fields
-     * @param $returnId
+     * @param       $fields
+     * @param       $returnId
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1233,7 +1248,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @throws ValueError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1270,7 +1285,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

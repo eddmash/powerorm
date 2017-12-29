@@ -10,8 +10,7 @@ namespace Eddmash\PowerOrm\Signals;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 interface SignalManagerInterface
 {
-    function dispatch($signal, $sender, $kwargs = []);
+    public function dispatch($signal, $sender, $kwargs = []);
 }

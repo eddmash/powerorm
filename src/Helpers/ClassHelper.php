@@ -252,4 +252,40 @@ class ClassHelper
         //Build the fully-qualified class name and return it
         return $namespace ? $namespace.'\\'.$class : $class;
     }
+
+    /**
+     * Configures an object with the initial property values.
+     *
+     * @param object $object     the object to be configured
+     * @param array  $properties the property initial values given in terms of name-value pairs
+     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
+     *                           the $object to which the the values of $properties will be assigned to
+     *
+     * @return object the object itself
+     */
+    public static function setAttributes($object, $properties, $map = [])
+    {
+        if (empty($properties)):
+            return $object;
+        endif;
+
+        foreach ($properties as $name => $value) :
+
+            if (ArrayHelper::hasKey($map, $name)):
+
+                $name = $map[$name];
+            endif;
+
+            $setterMethod = sprintf('set%s', ucfirst($name));
+            if (method_exists($object, $setterMethod)):
+                call_user_func([$object, $setterMethod], $value);
+            elseif (property_exists($object, $name)):
+
+                $object->{$name} = $value;
+            endif;
+
+        endforeach;
+
+        return $object;
+    }
 }

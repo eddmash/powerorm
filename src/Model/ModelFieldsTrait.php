@@ -116,13 +116,12 @@ trait ModelFieldsTrait
     /**
      * @ignore
      *
-     * @param array $opts
-     *
+     * @param array   $options
      * @return DecimalField
      */
-    public static function DecimalField($opts = [])
+    public static function DecimalField($options)
     {
-        return DecimalField::createObject($opts);
+        return DecimalField::createObject($options);
     }
 
     /**

@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm;
 
 use Composer\Autoload\ClassLoader;
+use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\Console\Manager;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 
@@ -36,7 +37,7 @@ class Application
      */
     public static function webRun($config = [], &$composerLoader = null)
     {
-        return static::run($config, $composerLoader);
+        return static::setup($config, $composerLoader);
     }
 
     /**
@@ -46,27 +47,20 @@ class Application
      * @return BaseOrm
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public static function run($config, &$composerLoader = null)
+    public static function setup($config, &$composerLoader = null)
     {
-        $orm = BaseOrm::createObject($config);
-        $modelsNamespace = $orm->modelsNamespace;
-        $migrationsNamespace = $orm->migrationNamespace;
+        $settings = new Settings($config);
+        $orm = BaseOrm::setup($settings);
+        $modelsNamespace = $settings->getModelsNamespace();
+        $migrationsNamespace = $settings->getMigrationNamespace();
 
         if ($modelsNamespace):
-            $modelsNamespace = ClassHelper::getFormatNamespace($orm->modelsNamespace, false, true);
+            $modelsNamespace = ClassHelper::getFormatNamespace($modelsNamespace, false, true);
         endif;
 
         if ($migrationsNamespace) :
-            $migrationsNamespace = ClassHelper::getFormatNamespace($orm->migrationNamespace, false, true);
+            $migrationsNamespace = ClassHelper::getFormatNamespace($migrationsNamespace, false, true);
         endif;
-
-        if ($composerLoader && $orm->autoloadModels) :
-            $composerLoader->setPsr4($modelsNamespace, $orm->modelsPath);
-            $composerLoader->setPsr4($migrationsNamespace, $orm->migrationPath);
-        endif;
-
-        BaseOrm::presetup($orm);
-        BaseOrm::loadRegistry();
 
         return $orm;
     }
@@ -80,7 +74,7 @@ class Application
      */
     public static function consoleRun($config, &$composerLoader = null, $autoRun = true)
     {
-        static::run($config, $composerLoader);
+        static::setup($config, $composerLoader);
 
         return Manager::run($autoRun);
     }

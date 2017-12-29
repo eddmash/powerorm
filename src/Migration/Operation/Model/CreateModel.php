@@ -27,7 +27,7 @@ class CreateModel extends ModelOperation
     /**
      * @var Meta
      */
-    public $meta;
+    public $meta=[];
 
     public $extends;
 
@@ -43,6 +43,10 @@ class CreateModel extends ModelOperation
     public function getConstructorArgs()
     {
         $constructorArgs = parent::getConstructorArgs();
+        if (isset($constructorArgs['meta']) &&
+            isset($constructorArgs['meta']['appName'])):
+            unset($constructorArgs['meta']['appName']);
+        endif;
         if (isset($constructorArgs['meta']) && empty($constructorArgs['meta'])):
             unset($constructorArgs['meta']);
         endif;
@@ -66,6 +70,7 @@ class CreateModel extends ModelOperation
      */
     public function updateState($state)
     {
+        $this->meta['appName'] = $this->getAppLabel();
         $state->addModelState(
             ModelState::createObject(
                 $this->name,
@@ -85,7 +90,6 @@ class CreateModel extends ModelOperation
             $schemaEditor->createModel($model);
         endif;
     }
-
 
     /**
      * {@inheritdoc}
@@ -114,25 +118,31 @@ class CreateModel extends ModelOperation
      */
     public function reduce($operation, $inBetween)
     {
-        if ($operation instanceof DeleteModel && $this->name === $operation->name && !$this->meta->proxy) :
+        if ($operation instanceof DeleteModel &&
+            $this->name === $operation->name && !$this->meta->proxy) :
             return [];
         endif;
 
-        if ($operation instanceof FieldOperation && strtolower($operation->modelName) === strtolower($this->name)) :
+        if ($operation instanceof FieldOperation &&
+            strtolower($operation->modelName) === strtolower($this->name)) :
 
             if ($operation instanceof AddField) :
-                // check if there is an operation in between that references the same model if so, don't merge
+                // check if there is an operation in between that references
+                // the same model if so, don't merge
                 if ($operation->field->relation) :
                     foreach ($inBetween as $between) :
-                        $modelName = $operation->field->relation->toModel->meta->getNamespacedModelName();
+                        $modelName = $operation->field->relation
+                            ->toModel->meta->getNamespacedModelName();
                         if ($between->referencesModel($modelName)) :
                             return false;
                         endif;
 
-                        if ($operation->field->relation->hasProperty('through') &&
+                        if ($operation->field->relation
+                                ->hasProperty('through') &&
                             $operation->field->relation->through
                         ) :
-                            $modelName = $operation->field->relation->through->meta->getNamespacedModelName();
+                            $modelName = $operation->field->relation
+                                ->through->meta->getNamespacedModelName();
                             if ($between->referencesModel($modelName)) :
                                 return false;
                             endif;
@@ -143,15 +153,17 @@ class CreateModel extends ModelOperation
                 $fields = $this->fields;
                 $fields[$operation->field->getName()] = $operation->field;
 
+                $op = static::createObject(
+                    [
+                        'name' => $this->name,
+                        'fields' => $fields,
+                        'meta' => $this->meta,
+                        'extends' => $this->extends,
+                    ]
+                );
+                $op->setAppLabel($this->getAppLabel());
                 return [
-                    static::createObject(
-                        [
-                            'name' => $this->name,
-                            'fields' => $fields,
-                            'meta' => $this->meta,
-                            'extends' => $this->extends,
-                        ]
-                    ),
+                    $op
                 ];
 
             endif;

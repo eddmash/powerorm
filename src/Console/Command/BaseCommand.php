@@ -129,7 +129,8 @@ abstract class BaseCommand extends Command
 
         // get the count of visible issues only, hide the silenced ones
 
-        $visibleIssues = count($errors) + count($warning) + count($info) + count($debugs) + count($critical);
+        $visibleIssues = count($errors) + count($warning) + count($info)
+            + count($debugs) + count($critical);
 
         if ($visibleIssues):
             $header = 'System check identified issues: '.PHP_EOL;
@@ -155,7 +156,7 @@ abstract class BaseCommand extends Command
             foreach ($categoryIssues as $catIssue) :
 
                 if ($catIssue->isSerious()):
-                    $msg = ' <errorText>%s</errorText>'.PHP_EOL;
+                    $msg = ' <fg=red>%s</>'.PHP_EOL;
                 else:
                     $msg = ' <warning>%s</warning>'.PHP_EOL;
                 endif;
@@ -179,7 +180,7 @@ abstract class BaseCommand extends Command
         endif;
 
         if (!empty($serious)):
-            $header = sprintf('<errorText> SystemCheckError: %s</errorText>', $header);
+            $header = sprintf('<fg=red;options=bold> SystemCheckError: %s</>', $header);
             $message = $header.$body.$footer;
             $output->writeln($message);
 

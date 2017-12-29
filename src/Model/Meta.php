@@ -6,6 +6,7 @@ use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
+use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
@@ -19,7 +20,7 @@ use Eddmash\PowerOrm\Model\Manager\BaseManager;
 /**
  * Metadata options that can be given to a mode..
  *
- * @since 1.0.0
+ * @since  1.0.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -164,8 +165,12 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     protected $_reverseRelationTreeCache = [];
 
+    private $appName;
+
     public function __construct($overrides = [])
     {
+        $this->appName = ArrayHelper::getValue($overrides, "appName");
+
         $this->overrides = $overrides;
 
         if (null == $this->registry):
@@ -175,6 +180,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         if (null == $this->managerClass):
             $this->managerClass = BaseManager::class;
         endif;
+
     }
 
     public static function createObject($params = [])
@@ -190,13 +196,14 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @return Field[]
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getFields($includeParents = true, $inverse = true, $reverse = true)
     {
-        return $this->fetchFields(['includeParents' => $includeParents, 'inverse' => $inverse, 'reverse' => $reverse]);
+        return $this->fetchFields(['includeParents' => $includeParents,
+            'inverse' => $inverse, 'reverse' => $reverse]);
     }
 
     /**
@@ -205,7 +212,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @param $name
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @return Field
      *
@@ -226,7 +233,8 @@ class Meta extends DeconstructableObject implements MetaInterface
         if (!$this->registry->ready):
             throw new FieldDoesNotExist(
                 sprintf(
-                    "%s has no field named %s. The App registry isn't ready yet, so if this is an autoCreated ".
+                    "%s has no field named %s. The App registry isn't".
+                    " ready yet, so if this is an autoCreated ".
                     "related field, it won't  be available yet.",
                     $this->getNamespacedModelName(),
                     $name
@@ -242,7 +250,8 @@ class Meta extends DeconstructableObject implements MetaInterface
         endif;
 
         // if we get here we didn't get the field.
-        throw new FieldDoesNotExist(sprintf('%s has no field named %s', $this->namspacedModelName, $name));
+        throw new FieldDoesNotExist(sprintf('%s has no field named %s',
+            $this->namspacedModelName, $name));
     }
 
     /**
@@ -268,7 +277,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @return Field[]
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -298,7 +307,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @return Field[]
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -318,16 +327,19 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
-     *  Returns all related field objects pointing to the current model. The related objects can come from a one-to-one,
+     *  Returns all related field objects pointing to the current model.
+     * The related objects can come from a one-to-one,
      * one-to-many, or many-to-many field relation type.
-     * As this method is very expensive and is accessed frequently (it looks up every field in a model, in every app),
+     * As this method is very expensive and is accessed frequently
+     * (it looks up every field in a model, in every app),
      * it is computed on first access and then is set as a property on every model.
      *
      * @return RelatedField[]
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @throws \Eddmash\PowerOrm\Exception\LookupError
      */
     public function getReverseRelatedObjects()
     {
@@ -352,7 +364,9 @@ class Meta extends DeconstructableObject implements MetaInterface
                 foreach ($fields as $field) :
 
                     if ($field->isRelation && !empty($field->getRelatedModel())):
-                        $concreteModel = $field->relation->toModel->meta->concreteModel->meta->getNamespacedModelName();
+                        $concreteModel = $field->relation->toModel
+                            ->meta->concreteModel
+                            ->meta->getNamespacedModelName();
                         $allRelations[$concreteModel][] = $field;
                     endif;
 
@@ -380,7 +394,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      * @param string $propertyName the name map the current object to, in the class object passed in
      * @param Model  $classObject  the object to attach the current object to
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -418,7 +432,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @return Field[]
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -477,7 +491,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @param Field $field
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -491,7 +505,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     /**
      * @param Model $model
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -503,6 +517,7 @@ class Meta extends DeconstructableObject implements MetaInterface
                 $field->primaryKey = true;
                 $this->setupPrimaryKey($field);
             else:
+
                 $field = AutoField::createObject(
                     [
                         'verboseName' => 'ID',
@@ -510,6 +525,7 @@ class Meta extends DeconstructableObject implements MetaInterface
                         'autoCreated' => true,
                     ]
                 );
+
                 $model->addToClass('id', $field);
             endif;
         endif;
@@ -518,7 +534,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     /**
      * @param Model $parent
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -593,5 +609,13 @@ class Meta extends DeconstructableObject implements MetaInterface
     public function getOrderBy()
     {
         return $this->orderBy;
+    }
+
+    public function getAppName()
+    {
+        if (empty($this->appName)):
+            throw new OrmException("AppName not set");
+        endif;
+        return $this->appName;
     }
 }

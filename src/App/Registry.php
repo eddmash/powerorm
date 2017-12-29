@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\App;
 
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
 use Eddmash\PowerOrm\Exception\LookupError;
@@ -28,7 +29,7 @@ use Eddmash\PowerOrm\Model\Model;
  *
  * Class Registry
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -51,6 +52,9 @@ class Registry extends BaseObject
         return new static();
     }
 
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\ClassNotFoundException
+     */
     public function populate()
     {
         if (false == $this->ready) :
@@ -61,6 +65,9 @@ class Registry extends BaseObject
         return;
     }
 
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
+     */
     public function isAppReady()
     {
         if (!$this->ready) {
@@ -82,20 +89,25 @@ class Registry extends BaseObject
      */
     public function getModelFiles()
     {
-        if (BaseOrm::getModelsPath()):
+        $files = [];
 
-            $fileHandler = new FileHandler(BaseOrm::getModelsPath());
+        foreach (BaseOrm::getInstance()->getComponents() as $component) :
 
-            return $fileHandler->readDir('php');
-        endif;
+            if ($component instanceof AppInterface):
+                $fileHandler = new FileHandler($component->getModelsPath());
+                $files[$component->getName()] = $fileHandler->readDir('php');
+            endif;
 
-        return [];
+        endforeach;
+
+        return $files;
     }
 
     /**
      * Returns the list of all the models that extend the PModel in the current app.
      *
      * @return array
+     * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
      */
     public function getModels($includeAutoCreated = false)
     {
@@ -120,9 +132,11 @@ class Registry extends BaseObject
     /**
      * Loads all the models in the current application.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws ClassNotFoundException
      */
     protected function hydrateRegistry()
     {
@@ -132,23 +146,32 @@ class Registry extends BaseObject
 
         $modelClasses = $this->getModelClasses();
 
-        /* @var $className Model */
+        /* @var $obj Model */
 
         if (!empty($modelClasses)) :
-            foreach ($modelClasses as $className) :
-                $reflect = new \ReflectionClass($className);
+            foreach ($modelClasses as $appName => $classes) :
 
-                // if we cannot create an instance of a class just skip, e.g traits abstrat etc
-                if (!$reflect->isInstantiable()) :
-                    continue;
-                endif;
+                foreach ($classes as $class) :
 
-                if ($this->hasModel($className)):
-                    continue;
-                endif;
+                    $reflect = new \ReflectionClass($class);
 
-                new $className();
+                    // if we cannot create an instance of a class just skip,
+                    // e.g traits abstrat etc
 
+                    if (!$reflect->isInstantiable()) :
+                        continue;
+                    endif;
+
+                    if ($this->hasModel($class)):
+                        continue;
+                    endif;
+
+                    $obj = new $class();
+                    $obj->setupClassInfo(
+                        null,
+                        ['meta' => ['appName' => $appName]]
+                    );
+                endforeach;
             endforeach;
         endif;
     }
@@ -160,7 +183,7 @@ class Registry extends BaseObject
      *
      * @throws LookupError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -187,7 +210,7 @@ class Registry extends BaseObject
      *
      * @throws ClassNotFoundException
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -201,17 +224,17 @@ class Registry extends BaseObject
             return false;
         }
 
-        $namespace = BaseOrm::getModelsNamespace();
-        foreach ($this->getModelFiles() as $file) :
+        foreach ($this->getModelFiles() as $appName => $files) :
+            foreach ($files as $file) :
+                $className = ClassHelper::getClassFromFile($file);
 
-            $className = ClassHelper::getClassFromFile($file);
-
-            if (!class_exists($className)):
-                throw new ClassNotFoundException(
-                    sprintf('The class [ %s ] could not be located', $className)
-                );
-            endif;
-            $models[] = $className;
+                if (!class_exists($className)):
+                    throw new ClassNotFoundException(
+                        sprintf('The class [ %s ] could not be located', $className)
+                    );
+                endif;
+                $models[$appName][] = $className;
+            endforeach;
         endforeach;
 
         return $models;
@@ -232,7 +255,7 @@ class Registry extends BaseObject
      *                             the callback as the first argument
      * @param array    $kwargs     an associative array to be passed to the callback
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -268,7 +291,7 @@ class Registry extends BaseObject
     /**
      * @param Model $model
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -291,6 +314,6 @@ class Registry extends BaseObject
 
     public function __toString()
     {
-        return (string) sprintf('%s Object', $this->getFullClassName());
+        return (string)sprintf('%s Object', $this->getFullClassName());
     }
 }

@@ -181,7 +181,8 @@ class ManyToManyField extends RelatedField
         /* @var $intermediaryObj Model */
         $intermediaryClass = FormatFileContent::createObject();
 
-        $intermediaryClass->addItem(sprintf('class %1$s extends \%2$s{', $className, Model::class));
+        $intermediaryClass->addItem(sprintf('class %1$s extends \%2$s{',
+            $className, Model::class));
         $intermediaryClass->addItem('public function fields(){');
         $intermediaryClass->addItem('}');
         $intermediaryClass->addItem('public function getMetaSettings(){');
@@ -201,7 +202,9 @@ class ManyToManyField extends RelatedField
         /** @var $obj Model */
         $obj = new $className();
 
-        $obj->init($fields);
+        $obj->setupClassInfo($fields, [
+            'meta'=>['appName'=>$model->meta->getAppName()]
+        ]);
 
         return $obj;
     }

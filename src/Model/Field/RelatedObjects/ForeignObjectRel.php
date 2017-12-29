@@ -12,7 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Field\RelatedObjects;
 
 use Eddmash\PowerOrm\BaseObject;
-use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -89,7 +89,7 @@ class ForeignObjectRel extends BaseObject
 
     public function __construct($kwargs = [])
     {
-        BaseOrm::configure($this, $kwargs, ['to' => 'toModel']);
+        ClassHelper::setAttributes($this, $kwargs, ['to' => 'toModel']);
     }
 
     /**

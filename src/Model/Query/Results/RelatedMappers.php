@@ -30,9 +30,11 @@ class RelatedMappers
 
     /**
      * RelatedMappers constructor.
+     *
      * @param $klassInfo
      * @param $select
      * @param $connection
+     *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
     public function __construct($klassInfo, $select, $connection)

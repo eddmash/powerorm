@@ -9,9 +9,10 @@
 */
 
 namespace Eddmash\PowerOrm\Migration;
- 
+
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AmbiguityError;
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
@@ -35,8 +36,10 @@ class Loader extends BaseObject
 
     /**
      * Loader constructor.
+     *
      * @param ConnectionInterface|null $connection
-     * @param bool $loadGraph
+     * @param bool                     $loadGraph
+     *
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
@@ -51,8 +54,10 @@ class Loader extends BaseObject
 
     /**
      * @return State\ProjectState
+     *
      * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
-     * @since 1.1.0
+     *
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -65,7 +70,8 @@ class Loader extends BaseObject
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
-     * @since 1.1.0
+     *
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -110,7 +116,8 @@ class Loader extends BaseObject
      * @throws ClassNotFoundException
      * @throws KeyError
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
-     * @since 1.1.0
+     *
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -140,7 +147,7 @@ class Loader extends BaseObject
      *
      * @return Loader
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -153,6 +160,7 @@ class Loader extends BaseObject
      * List of migration objects.
      *
      * @return array
+     *
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      */
@@ -161,10 +169,14 @@ class Loader extends BaseObject
         $migrations = [];
 
         /* @var $migrationName Migration */
-        foreach ($this->getMigrationsClasses() as $fileName) :
-            $migrationName = $fileName;
+        foreach ($this->getMigrationsClasses() as $appName => $classes) :
+            foreach ($classes as $fileName) :
+                $migrationName = $fileName;
 
-            $migrations[$fileName] = $migrationName::createObject($fileName);
+                $migration = $migrationName::createObject($fileName);
+                $migration->setAppLabel($appName);
+                $migrations[$fileName] = $migration;
+            endforeach;
         endforeach;
 
         return $migrations;
@@ -175,26 +187,38 @@ class Loader extends BaseObject
      *
      * @throws ClassNotFoundException
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      */
     public function getMigrationsClasses()
     {
-        $migrationFiles = $this->getMigrationsFiles();
+        $appFiles = $this->getMigrationsFiles();
         $classes = [];
 
-        $namespace = BaseOrm::getMigrationsNamespace();
-        foreach ($migrationFiles as $migrationFile) :
-            $className = ClassHelper::getClassFromFile($migrationFile);
-            $foundClass = ClassHelper::classExists($className, $namespace);
-            if (!$className):
-                throw new ClassNotFoundException(
-                    sprintf('The class [ %2$s\\%1$s or \\%1$s ] could not be located', $className, $namespace)
+        /**@var $component AppInterface */
+        foreach ($appFiles as $appName => $migrationFiles) :
+            $component = BaseOrm::getInstance()->getComponent($appName);
+            foreach ($migrationFiles as $migrationFile) :
+                $className = ClassHelper::getClassFromFile($migrationFile);
+                $foundClass = ClassHelper::classExists(
+                    $className,
+                    $component->getNamespace()
                 );
-            endif;
-            $classes[] = $foundClass;
+                if (!$className):
+                    throw new ClassNotFoundException(
+                        sprintf(
+                            'The class [ %2$s\\%1$s or \\%1$s ] '.
+                            'could not be located',
+                            $className,
+                            $component->getNamespace()
+                        )
+                    );
+                endif;
+                $classes[$appName][] = $foundClass;
+            endforeach;
         endforeach;
 
         return $classes;
@@ -202,25 +226,36 @@ class Loader extends BaseObject
 
     /**
      * @return array
+     *
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
-     * @since 1.1.0
+     *
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getMigrationsFiles()
     {
-        if (!BaseOrm::getMigrationsPath()) :
-            return [];
-        endif;
-        $fileHandler = FileHandler::createObject(['path' => BaseOrm::getMigrationsPath()]);
+        $files = [];
+        foreach (BaseOrm::getInstance()->getComponents() as $component) :
+            if ($component instanceof AppInterface):
+                $fileHandler = FileHandler::createObject(
+                    [
+                        'path' => $component->getMigrationsPath(),
+                    ]
+                );
 
-        return $fileHandler->getPathFiles();
+                $files[$component->getName()] = $fileHandler->getPathFiles();
+            endif;
+        endforeach;
+
+        return $files;
     }
 
     /**
      * returns the latest migration number.
      *
      * @return int
+     *
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      */
     public function getLatestMigrationVersion()
@@ -230,7 +265,7 @@ class Loader extends BaseObject
         $last_version = basename($last_version);
         $last_version = preg_split('/_/', $last_version)[0];
 
-        return (int) $last_version;
+        return (int)$last_version;
     }
 
     /**
@@ -238,17 +273,20 @@ class Loader extends BaseObject
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function detectConflicts()
     {
-        $latest = $this->graph->getLeafNodes();
-        if (count($latest) > 1):
-            return $latest;
-        endif;
+        $conflicts = [];
+        $apps = $this->graph->getLeafNodes();
+        foreach ($apps as $name=>$latest) :
+            if (count($latest) > 1):
+                $conflicts[$name] = $latest;
+            endif;
+        endforeach;
 
-        return [];
+        return $conflicts;
     }
 }

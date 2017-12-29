@@ -229,7 +229,8 @@ class FormatFileContent
 
         $string = trim($string, ',');
 
-        return [sprintf("%1\$s::createObject(%2\$s\t\t\t)", $class, PHP_EOL.$string.PHP_EOL), $import];
+        return [sprintf("%1\$s::createObject(%2\$s\t\t\t)", $class,
+            PHP_EOL.$string.PHP_EOL), $import];
     }
 
     /**
@@ -303,7 +304,8 @@ class FormatFileContent
                 endif;
             endforeach;
 
-            return [sprintf('%1$s::createObject(%2$s)', $class, implode(',', $cons_args)), $import];
+            return [sprintf('%1$s(%2$s)',
+                $class, implode(',', $cons_args)), $import];
         endif;
 
         if (true === $value):

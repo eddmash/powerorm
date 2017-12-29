@@ -3,8 +3,10 @@
 namespace Eddmash\PowerOrm\Console\Command;
 
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Console\Question\InteractiveAsker;
 use Eddmash\PowerOrm\Console\Question\NonInteractiveAsker;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Migration\AutoDetector;
@@ -20,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class Makemigrations.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -37,9 +39,11 @@ class Makemigrations extends BaseCommand
         $issues = $loader->detectConflicts();
 
         if (!empty($issues)):
-            $message = 'The following migrations seem to indicate they are both the latest migration :'.PHP_EOL;
-            $message .= ' %s '.PHP_EOL;
-            $output->writeln(sprintf($message, Tools::stringify($issues)));
+            $message = '<error>The following migrations seem to indicate they'.
+                ' are both the latest migration :</error>'.PHP_EOL;
+            $message .= '  %s '.PHP_EOL;
+            $output->writeln(sprintf($message,
+                Tools::stringify($issues)));
 
             return;
         endif;
@@ -69,44 +73,58 @@ class Makemigrations extends BaseCommand
 
     private function writeMigrations($migrationChanges, InputInterface $input, OutputInterface $output)
     {
-        if (OutputInterface::VERBOSITY_NORMAL === $output->getVerbosity() && !$input->getOption('dry-run')) :
-            $output->writeln('Creating Migrations :');
-        endif;
-
         /** @var $migration Migration */
         /* @var $op Operation */
-        foreach ($migrationChanges as $migration) :
 
-            $migrationFile = MigrationFile::createObject($migration);
+        foreach (BaseOrm::getInstance()->getComponents() as $component) :
+            if ($component instanceof AppInterface):
+                if (ArrayHelper::hasKey($migrationChanges, $component->getName())) :
 
-            $fileName = $migrationFile->getFileName();
-            if (OutputInterface::VERBOSITY_NORMAL === $output->getVerbosity() && !$input->getOption('dry-run')) :
-                $output->writeln('  '.$fileName);
-            endif;
+                    $output->writeln(
+                        sprintf(
+                            '<fg=green;options=bold>Migrations for '.
+                            'the application "%s" :</>',
+                            $component->getName()
+                        )
+                    );
+                    $migration = ArrayHelper::getValue(
+                        $migrationChanges,
+                        $component->getName()
+                    );
+                    $migrationFile = MigrationFile::createObject($migration);
 
-            if ($input->getOption('dry-run')):
+                    $fileName = $migrationFile->getFileName();
 
-                $output->writeln('<info>Migrations :</info>');
+                    $output->writeln(sprintf('  <options=bold>%s</>',$fileName));
 
-                $output->writeln('  -- '.$migration->getName());
+                    $operations = $migration->getOperations();
+                    foreach ($operations as $op) :
+                        $output->writeln(
+                            sprintf(
+                                '    - %s',
+                                ucwords($op->getDescription())
+                            )
+                        );
+                    endforeach;
 
-                if (OutputInterface::VERBOSITY_DEBUG === $output->getVerbosity()) :
-                    $output->writeln($migrationFile->getContent());
+                    if ($input->getOption('dry-run')):
+
+                        if (OutputInterface::VERBOSITY_DEBUG === $output->getVerbosity()) :
+                            $output->writeln($migrationFile->getContent());
+                        endif;
+
+                        continue;
+                    endif;
+                    $handler = new FileHandler(
+                        $component->getMigrationsPath(),
+                        $fileName
+                    );
+
+                    $handler->write($migrationFile->getContent());
                 endif;
-
-                continue;
             endif;
-
-            $operations = $migration->getOperations();
-            foreach ($operations as $op) :
-                $output->writeln(sprintf('     - %s', ucwords($op->getDescription())));
-            endforeach;
-
-            // write content to file.
-            $handler = new FileHandler(BaseOrm::getMigrationsPath(), $fileName);
-
-            $handler->write($migrationFile->getContent());
         endforeach;
+
     }
 
     /**

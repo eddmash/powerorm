@@ -9,10 +9,8 @@
 * file that was distributed with this source code.
 */
 
-namespace Eddmash\PowerOrm\Model\Lookup;
+namespace Eddmash\PowerOrm\Exception;
 
-class Exact extends BaseLookup
+class ComponentException extends \Exception
 {
-    public static $lookupName = '';
-    public $operator = '=';
 }

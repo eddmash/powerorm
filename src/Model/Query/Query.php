@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseObject;
@@ -1093,8 +1092,11 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
     /**
      * @param ConnectionInterface $connection
+     *
      * @return mixed
+     *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -1210,6 +1212,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @throws FieldError
      * @throws \Eddmash\PowerOrm\Exception\KeyError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -1309,12 +1312,13 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 }
 
 /**
- * @param Model[] $instances
+ * @param Model[]        $instances
  * @param Prefetch|array $lookups
  *
  * @throws ValueError
  * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
  * @throws \Eddmash\PowerOrm\Exception\KeyError
+ *
  * @since 1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

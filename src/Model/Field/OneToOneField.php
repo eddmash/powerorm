@@ -20,7 +20,7 @@ use Eddmash\PowerOrm\Model\Field\RelatedObjects\OneToOneRel;
  * always carries a "unique" constraint with it and the reverse relation always returns the object pointed
  * to (since there will only ever be one), rather than returning a list.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -37,11 +37,19 @@ class OneToOneField extends ForeignKey
 
     public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasOneField';
 
+    /**
+     * OneToOneField constructor.
+     * @param $kwargs
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
+     * @throws \Eddmash\PowerOrm\Exception\TypeError
+     */
     public function __construct($kwargs)
     {
         $kwargs['unique'] = true;
 
-        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && null == $kwargs['rel'])):
+        if (
+            !isset($kwargs['rel']) ||
+            (isset($kwargs['rel']) && null == $kwargs['rel'])):
             $kwargs['rel'] = OneToOneRel::createObject(
                 [
                     'fromField' => $this,
@@ -50,7 +58,11 @@ class OneToOneField extends ForeignKey
                     'relatedQueryName' => ArrayHelper::getValue($kwargs, 'relatedQueryName'),
                     'toField' => ArrayHelper::getValue($kwargs, 'toField'),
                     'parentLink' => ArrayHelper::getValue($kwargs, 'parentLink'),
-                    'onDelete' => ArrayHelper::getValue($kwargs, 'onDelete', Delete::CASCADE),
+                    'onDelete' => ArrayHelper::getValue(
+                        $kwargs,
+                        'onDelete',
+                        Delete::CASCADE
+                    ),
                 ]
             );
         endif;

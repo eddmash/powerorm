@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 

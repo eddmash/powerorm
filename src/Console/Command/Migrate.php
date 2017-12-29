@@ -110,6 +110,6 @@ class Migrate extends BaseCommand
 
         endif;
 
-        BaseOrm::signalDispatch('powerorm.migration.post_migrate', $this);
+        BaseOrm::signalDispatch('powerorm.migration.post_migrate');
     }
 }

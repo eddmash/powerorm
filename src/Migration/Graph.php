@@ -19,7 +19,7 @@ class Graph
     /**
      * keeps track of Migrations already taken care of in the graph.
      *
-     * @var array
+     * @var \Eddmash\PowerOrm\Migration\Migration[]
      */
     public $nodes;
 
@@ -119,9 +119,9 @@ class Graph
             // get the nodes  children
             $children = $this->getNodeFamilyTree($name)->children;
 
-            // if not children exist this must be the latest migration
+            // if no children exist this must be the latest migration
             if (empty($children)):
-                $leaves[] = $name;
+                $leaves[$migration->getAppLabel()][] = $name;
             endif;
 
         endforeach;
@@ -130,7 +130,8 @@ class Graph
     }
 
     /**
-     * Given a node, returns a list of which previous nodes (dependencies) must be applied, ending with the node itself.
+     * Given a node, returns a list of which previous nodes (dependencies) must
+     * be applied, ending with the node itself.
      *
      * This is the list you would follow if applying the migrations to a database.
      *
@@ -147,7 +148,9 @@ class Graph
     public function getAncestryTree($node)
     {
         if (!ArrayHelper::hasKey($this->nodes, $node)):
-            throw new NodeNotFoundError(sprintf('Migration with the name %s does not exist', $node));
+            throw new NodeNotFoundError(
+                sprintf('Migration with the name %s does not exist',
+                    $node));
         endif;
 
         return $this->getNodeFamilyTree($node)->getAncestors();
@@ -217,21 +220,25 @@ class Graph
             return $state;
         endif;
 
-        // from the leave go up its family tree though its parents and ancestors until we get to the root_node.
-        // this way we get the full lineage we need to follow to get to this leaf from root_node to leaf_node
+        // from the leave go up its family tree though its parents and
+        // ancestors until we get to the root_node.
+        // this way we get the full lineage we need to follow to get to
+        // this leaf from root_node to leaf_node
         // we use this lineage to apply migrations in database
         $lineage = [];
-        foreach ($leaves as $leaf) :
+        foreach ($leaves as $appName=>$appLeaves) :
 
             // get lineage
-            $lineage_members = $this->getAncestryTree($leaf);
+            foreach ($appLeaves as $leaf) :
+                $lineage_members = $this->getAncestryTree($leaf);
 
-            foreach ($lineage_members as $i => $l_member) :
+                foreach ($lineage_members as $i => $l_member) :
 
-                if (in_array($l_member, $lineage)):
-                    continue;
-                endif;
-                $lineage[] = $l_member;
+                    if (in_array($l_member, $lineage)):
+                        continue;
+                    endif;
+                    $lineage[] = $l_member;
+                endforeach;
             endforeach;
 
         endforeach;
@@ -241,6 +248,7 @@ class Graph
         foreach ($lineage as $member) :
 
             $migration = $this->nodes[$member];
+
             $state = $migration->updateState($state);
 
         endforeach;

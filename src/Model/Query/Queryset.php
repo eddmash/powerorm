@@ -99,6 +99,7 @@ class Queryset implements QuerysetInterface
 
     /**
      * @return ConnectionInterface
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -110,9 +111,9 @@ class Queryset implements QuerysetInterface
 
     /**
      * @param ConnectionInterface $connection
-     * @param Model      $model
-     * @param Query      $query
-     * @param array      $kwargs
+     * @param Model               $model
+     * @param Query               $query
+     * @param array               $kwargs
      *
      * @return self
      *
@@ -270,8 +271,11 @@ class Queryset implements QuerysetInterface
 
     /**
      * @param array $kwargs
+     *
      * @return array
+     *
      * @throws TypeError
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

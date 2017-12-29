@@ -27,6 +27,7 @@ class ModelMapper extends Mapper
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
     public function __invoke()
@@ -88,6 +89,7 @@ class ModelMapper extends Mapper
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
     public static function getRelatedMapper($klassInfo, $select, ConnectionInterface $connection)

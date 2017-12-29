@@ -47,7 +47,7 @@ class ModelState extends BaseObject
     {
         $this->name = $name;
         $this->fields = $fields;
-        BaseOrm::configure($this, $kwargs);
+        ClassHelper::setAttributes($this, $kwargs);
     }
 
     /**
@@ -74,7 +74,8 @@ class ModelState extends BaseObject
                 $fields[$name] = $field->deepClone();
             } catch (\Exception $e) {
                 throw new TypeError(
-                    sprintf("Couldn't reconstruct field %s on %s: %s", $name, $model->meta->getNamespacedModelName())
+                    sprintf("Couldn't reconstruct field %s on %s: %s",
+                        $name, $model->meta->getNamespacedModelName())
                 );
             }
         endforeach;
@@ -139,7 +140,7 @@ class ModelState extends BaseObject
         foreach ($this->fields as $name => $field) :
             $fields[$name] = $field->deepClone();
         endforeach;
-        $model->init($fields, ['meta' => $metaData, 'registry' => $registry]);
+        $model->setupClassInfo($fields, ['meta' => $metaData, 'registry' => $registry]);
 
         return $model;
     }
@@ -191,7 +192,8 @@ class ModelState extends BaseObject
             $fields[$name] = $field->deepClone();
         endforeach;
 
-        return static::createObject($this->name, $fields, ['meta' => $this->meta, 'extends' => $this->extends]);
+        return static::createObject($this->name, $fields,
+            ['meta' => $this->meta, 'extends' => $this->extends]);
     }
 
     public function __toString()

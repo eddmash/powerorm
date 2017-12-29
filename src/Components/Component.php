@@ -11,21 +11,8 @@
 
 namespace Eddmash\PowerOrm\Components;
 
-use Eddmash\PowerOrm\BaseOrm;
-
-interface ComponentInterface
+abstract class Component implements ComponentInterface
 {
-    /**
-     * This method is invoked after the orm registry is ready .
-     *
-     * This means the models can be accessed within this model without any
-     * issues.
-     *
-     * @param \Eddmash\PowerOrm\BaseOrm $baseOrm
-     * @return mixed
-     */
-    public function ready(BaseOrm $baseOrm);
-
     /**
      * True if it this component is accessible as an attribute of the orm.
      *
@@ -35,7 +22,10 @@ interface ComponentInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function isQueryable();
+    public function isQueryable()
+    {
+        return false;
+    }
 
     /**
      * Instance to to return if the component is queryable.
@@ -46,27 +36,34 @@ interface ComponentInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getInstance();
+    public function getInstance()
+    {
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCommands()
+    {
+        return [];
+    }
 
     /**
      * Name to use when querying this component.
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getName();
+    public function getName()
+    {
+        $ref = new \ReflectionObject($this);
+        $name = $ref->getNamespaceName();
+        $name = rtrim($name, "\\");
 
-    /**
-     * Command classes.
-     *
-     * @return array
-     *
-     * @since 1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function getCommands();
+        return str_replace( "\\", "_", strtolower($name));
+    }
 }

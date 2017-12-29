@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Db\ConnectionInterface;

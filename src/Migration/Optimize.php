@@ -16,10 +16,11 @@ use Eddmash\PowerOrm\Migration\Operation\Operation;
 /**
  * Powers the optimization process,.
  *
- * where you provide a list of Operations and you are returned a list of equal or shorter length - operations
- * are merged into one if possible.
+ * where you provide a list of Operations and you are returned a list of equal
+ * or shorter length - operations are merged into one if possible.
  *
- * For example, a CreateModel and an AddField can be optimized into a new CreateModel, and
+ * For example, a CreateModel and an AddField can be optimized into a
+ * new CreateModel, and
  * CreateModel and DeleteModel can be optimized into nothing.
  *
  * @since 1.1.0
@@ -29,16 +30,23 @@ use Eddmash\PowerOrm\Migration\Operation\Operation;
 class Optimize
 {
     /**
-     * Main optimization entry point. Pass in a list of Operation instances, get out a new list of Operation instances.
+     * Main optimization entry point. Pass in a list of Operation instances,
+     * get out a new list of Operation instances.
      *
-     * Unfortunately, due to the scope of the optimization (two combinable operations might be separated by several
-     * hundred others), this can't be done as a peephole optimization with checks/output implemented on
-     * the Operations themselves; instead, the optimizer looks at each individual operation and scans forwards in
-     * the list to see if there are any matches, stopping at boundaries - operations which can't  be optimized over
+     * Unfortunately, due to the scope of the optimization (two combinable
+     * operations might be separated by several
+     * hundred others), this can't be done as a peephole optimization with
+     * checks/output implemented on
+     * the Operations themselves; instead, the optimizer looks at each
+     * individual operation and scans forwards in
+     * the list to see if there are any matches, stopping at
+     * boundaries - operations which can't  be optimized over
      * (RunSQL, operations on the same field/model, etc.).
      *
-     * The inner loop is run until the starting list is the same as the result list, and then the result is returned.
-     * This means that operation optimization must be stable and always return an equal or shorter list.
+     * The inner loop is run until the starting list is the same as the result
+     * list, and then the result is returned.
+     * This means that operation optimization must be stable and always return
+     * an equal or shorter list.
      *
      * @param $operations
      *

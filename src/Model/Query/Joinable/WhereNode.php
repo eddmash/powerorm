@@ -10,7 +10,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Helpers\Node;

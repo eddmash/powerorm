@@ -11,12 +11,14 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 
 /**
  * This class represent a migration file.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -33,6 +35,7 @@ class MigrationFile
     public function __construct($migration)
     {
         $this->migration = $migration;
+        $this->appName = $migration->getAppLabel();
     }
 
     /**
@@ -42,7 +45,7 @@ class MigrationFile
      *
      * @return static
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -56,7 +59,7 @@ class MigrationFile
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -70,12 +73,13 @@ class MigrationFile
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getContent()
     {
+        $app = BaseOrm::getInstance()->getComponent($this->appName);
         $imports = [];
 
         $stringedOperations = [];
@@ -107,8 +111,18 @@ class MigrationFile
 
         $indent = (count($dependencies) <= 1) ? false : 3;
 
+        $namespace = sprintf(
+            "%s\Migrations",
+            ClassHelper::getFormatNamespace(
+                $app->getNamespace(),
+                false,
+                false
+            )
+        );
+
         return sprintf(
             $this->getFileTemplate(),
+            $namespace,
             $importPaths,
             $this->migration->getName(),
             Tools::stringify($dependencies, $indent),
@@ -121,7 +135,7 @@ class MigrationFile
      *
      * @return static
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -138,18 +152,18 @@ class MigrationFile
             ).PHP_EOL
         );
 
-        $content->addItem('namespace App\\Migrations;'.PHP_EOL);
+        $content->addItem('namespace %s;'.PHP_EOL);
 
         $content->addItem('use Eddmash\\PowerOrm\\Migration\\Migration;');
-        $content->addItem('%1$s');
+        $content->addItem('%s');
 
-        $content->addItem('class %2$s extends Migration{'.PHP_EOL);
+        $content->addItem('class %s extends Migration{'.PHP_EOL);
 
         $content->addIndent();
         $content->addItem('public function getDependency(){');
 
         $content->addIndent();
-        $content->addItem('return %3$s;');
+        $content->addItem('return %s;');
         $content->reduceIndent();
 
         $content->addItem('}'.PHP_EOL);
@@ -157,7 +171,7 @@ class MigrationFile
         $content->addItem('public function getOperations(){');
 
         $content->addIndent();
-        $content->addItem('return %4$s ;');
+        $content->addItem('return %s ;');
         $content->reduceIndent();
 
         $content->addItem('}'.PHP_EOL);

@@ -45,7 +45,7 @@ abstract class CheckMessage extends Base
 
     public function isSilenced()
     {
-        return in_array($this->id, BaseOrm::getInstance()->silencedChecks);
+        return BaseOrm::isCheckSilenced($this->id);
     }
 
     public function isSerious($level = null)
@@ -55,13 +55,16 @@ abstract class CheckMessage extends Base
 
     public function __toString()
     {
-        $hint = sprintf('%s %s HINT: %s', PHP_EOL, str_pad('', 10, ' '), $this->hint);
+        $hint = sprintf('<fg=black>%s %s <fg=yellow;options=bold>HINT:</> %s</>', PHP_EOL,
+            str_pad('', 1, ' '),
+            $this->hint);
 
+        $msg = PHP_EOL.str_pad('', 3, ' ').$this->message;
         return sprintf(
-            'Issue %s : (%s) %s %s',
+            'Issue <fg=red;options=bold>%s</> : <fg=black>(%s)</> %s %s',
             $this->id,
             $this->context,
-            $this->message,
+            $msg,
             $hint
         );
     }

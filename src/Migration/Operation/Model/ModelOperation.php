@@ -23,8 +23,8 @@ abstract class ModelOperation extends Operation
 
     public function __debugInfo()
     {
-        return [
-            'name' => $this->name,
-        ];
+        $arr = parent::__debugInfo();
+        $arr['name'] = $this->name;
+        return $arr;
     }
 }

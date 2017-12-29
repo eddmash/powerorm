@@ -9,7 +9,7 @@
 */
 
 namespace Eddmash\PowerOrm\Migration;
- 
+
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
@@ -38,6 +38,7 @@ class Migration implements MigrationInterface
     protected $operations;
     protected $description;
     protected $dependency = [];
+    private $appLabel;
 
     public function __construct($name)
     {
@@ -144,6 +145,7 @@ class Migration implements MigrationInterface
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\NotImplemented
      */
     public function apply(ProjectState $state, SchemaEditor $schemaEditor)
@@ -182,6 +184,7 @@ class Migration implements MigrationInterface
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\NotImplemented
      */
     public function unApply($state, $schemaEditor)
@@ -229,13 +232,14 @@ class Migration implements MigrationInterface
      * Preserves the original object state by default and will return a mutated state from a copy.
      *
      * @param ProjectState $state
-     * @param bool|true $preserveState
+     * @param bool|true    $preserveState
      *
      * @return mixed
      *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\NotImplemented
      */
     public function updateState($state, $preserveState = true)
@@ -247,7 +251,7 @@ class Migration implements MigrationInterface
 
         /** @var $operation Operation */
         foreach ($this->operations as $operation) :
-
+            $operation->setAppLabel($this->getAppLabel());
             $operation->updateState($newState);
 
         endforeach;
@@ -258,5 +262,18 @@ class Migration implements MigrationInterface
     public function __toString()
     {
         return sprintf('<Migration %s>', $this->name);
+    }
+
+    public function setAppLabel($label)
+    {
+        $this->appLabel = $label;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAppLabel()
+    {
+        return $this->appLabel;
     }
 }

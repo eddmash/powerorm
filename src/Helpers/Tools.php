@@ -10,7 +10,7 @@ use Eddmash\PowerOrm\Model\Model;
 /**
  * Class Tools.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -33,12 +33,17 @@ class Tools
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function stringify($data, $indent = 1, $close = '', $start = '', $level = 0)
-    {
+    public static function stringify(
+        $data,
+        $indent = 1,
+        $close = '',
+        $start = '',
+        $level = 0
+    ) {
         $indentCharacter = "\t";
         $linebreak = PHP_EOL;
         $stringState = '';
@@ -153,7 +158,7 @@ class Tools
         $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/countries.json';
         $countries = self::readJson($path, true);
 
-        $listCountries = array();
+        $listCountries = [];
 
         foreach ($countries['Names'] as $code => $value) {
             $listCountries[$code] = $value;
@@ -186,7 +191,7 @@ class Tools
         $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/phone.json';
         $phone_codes = self::readJson($path, true);
 
-        $listCodes = array();
+        $listCodes = [];
 
         foreach ($phone_codes as $code => $value) {
             $listCodes[$code] = $value;
@@ -225,7 +230,7 @@ class Tools
         $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/currency.json';
         $currency = self::readJson($path, true);
 
-        $listCurrency = array();
+        $listCurrency = [];
 
         foreach ($currency['Names'] as $code => $value) {
             $listCurrency[$code] = $value[1];
@@ -257,7 +262,7 @@ class Tools
      * @param mixed    $relModel   the related models that needs to be resolved
      * @param array    $kwargs
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
