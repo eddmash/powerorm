@@ -204,6 +204,7 @@ interface ConnectionInterface
 
     /**
      * @return OperationsInterface
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -212,6 +213,7 @@ interface ConnectionInterface
 
     /**
      * @return BaseFeatures
+     *
      * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>

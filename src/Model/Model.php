@@ -185,6 +185,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @param array $fields
      * @param array $kwargs
+     *
      * @throws \Eddmash\PowerOrm\Exception\FieldError
      * @throws \Eddmash\PowerOrm\Exception\LookupError
      * @throws \Eddmash\PowerOrm\Exception\MethodNotExtendableException
@@ -319,7 +320,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function getHierarchyMeta(Model $model, $method = 'unboundFields', $args = null, $fromOldest = true)
+    public static function getHierarchyMeta(self $model, $method = 'unboundFields', $args = null, $fromOldest = true)
     {
         $isProxy = $model->meta->proxy;
         // start from oldest parent e.g BaseObject to the last child model
@@ -500,7 +501,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         if (!self::isModelBase($parentModelName) &&
             !StringHelper::isEmpty($parentModelName) &&
-            !StringHelper::startsWith($parentModelName, "Eddmash") &&
+            !StringHelper::startsWith($parentModelName, 'Eddmash') &&
             !StringHelper::startsWith($parentModelName, "\Eddmash")):
 
             $ref = new \ReflectionClass($parentModelName);
@@ -605,6 +606,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @return static
      *
      * @since  1.1.0
+=======
+     * @param $fieldNames
+     * @param $values
+     *
+     * @return static
+     *
+     * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -753,7 +761,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array)unserialize((string)$serialized);
+        $this->_fieldCache = (array) unserialize((string) $serialized);
     }
 
     /**
@@ -763,8 +771,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @throws AttributeError
      * @throws KeyError
-     *
+<<<<<<< HEAD
      * @since  1.1.0
+     * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1027,7 +1036,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function saveParent(Model $model, $updateFields)
+    private function saveParent(self $model, $updateFields)
     {
         $meta = $model->meta;
         foreach ($meta->parents as $key => $field) :
@@ -1044,7 +1053,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     private function saveTable(
-        Model $model,
+        self $model,
         $raw = false,
         $forceInsert = false,
         $forceUpdate = false,
@@ -1200,7 +1209,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function objects(Model $modelInstance = null)
+    public static function objects(self $modelInstance = null)
     {
         $manager = self::getManagerClass();
         $modelInstance = (is_null($modelInstance)) ? self::createObject() : $modelInstance;
@@ -1234,7 +1243,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function doInsert(Model $model, $fields, $returnId)
+    private function doInsert(self $model, $fields, $returnId)
     {
         return $model::objects()->_insert($this, $fields, $returnId);
     }

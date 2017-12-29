@@ -4,6 +4,7 @@ namespace Eddmash\PowerOrm\Model;
 
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\OrmException;
@@ -169,7 +170,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     public function __construct($overrides = [])
     {
-        $this->appName = ArrayHelper::getValue($overrides, "appName");
+        $this->appName = ArrayHelper::getValue($overrides, 'appName');
 
         $this->overrides = $overrides;
 
@@ -180,7 +181,6 @@ class Meta extends DeconstructableObject implements MetaInterface
         if (null == $this->managerClass):
             $this->managerClass = BaseManager::class;
         endif;
-
     }
 
     public static function createObject($params = [])
@@ -202,8 +202,13 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getFields($includeParents = true, $inverse = true, $reverse = true)
     {
-        return $this->fetchFields(['includeParents' => $includeParents,
-            'inverse' => $inverse, 'reverse' => $reverse]);
+        return $this->fetchFields(
+            [
+                'includeParents' => $includeParents,
+                'inverse' => $inverse,
+                'reverse' => $reverse,
+            ]
+        );
     }
 
     /**
@@ -234,7 +239,7 @@ class Meta extends DeconstructableObject implements MetaInterface
             throw new FieldDoesNotExist(
                 sprintf(
                     "%s has no field named %s. The App registry isn't".
-                    " ready yet, so if this is an autoCreated ".
+                    ' ready yet, so if this is an autoCreated '.
                     "related field, it won't  be available yet.",
                     $this->getNamespacedModelName(),
                     $name
@@ -250,8 +255,13 @@ class Meta extends DeconstructableObject implements MetaInterface
         endif;
 
         // if we get here we didn't get the field.
-        throw new FieldDoesNotExist(sprintf('%s has no field named %s',
-            $this->namspacedModelName, $name));
+        throw new FieldDoesNotExist(
+            sprintf(
+                '%s has no field named %s',
+                $this->namspacedModelName,
+                $name
+            )
+        );
     }
 
     /**
@@ -339,6 +349,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\LookupError
      */
     public function getReverseRelatedObjects()
@@ -556,7 +567,12 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     public function getName($name)
     {
-        return ClassHelper::getNameFromNs($name, BaseOrm::getModelsNamespace());
+        $namespace = '';
+        if ($this->getApp()):
+            $namespace = $this->getApp()->getNamespace();
+        endif;
+
+        return ClassHelper::getNameFromNs($name, $namespace);
     }
 
     public function canMigrate()
@@ -611,11 +627,32 @@ class Meta extends DeconstructableObject implements MetaInterface
         return $this->orderBy;
     }
 
+    /**
+     * @return mixed
+     *
+     * @throws OrmException
+     */
     public function getAppName()
     {
         if (empty($this->appName)):
-            throw new OrmException("AppName not set");
+            throw new OrmException('AppName not set');
         endif;
+
         return $this->appName;
+    }
+
+    /**
+     * @return AppInterface|null
+     */
+    public function getApp()
+    {
+        try {
+            $app = BaseOrm::getInstance()->getComponent($this->getAppName());
+
+            /** @var $app AppInterface */
+            return $app;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

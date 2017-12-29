@@ -61,7 +61,9 @@ class RelatedField extends Field
 
     /**
      * RelatedField constructor.
+     *
      * @param array $kwargs
+     *
      * @throws TypeError
      */
     public function __construct($kwargs = [])
@@ -98,7 +100,7 @@ class RelatedField extends Field
 
         if (!$relMissing) :
             $msg = "Field defines a relation with model '%s', which is either ".
-                "does not exist, or is abstract.";
+                'does not exist, or is abstract.';
 
             $error = [
                 CheckError::createObject(

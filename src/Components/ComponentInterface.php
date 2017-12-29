@@ -22,6 +22,7 @@ interface ComponentInterface
      * issues.
      *
      * @param \Eddmash\PowerOrm\BaseOrm $baseOrm
+     *
      * @return mixed
      */
     public function ready(BaseOrm $baseOrm);

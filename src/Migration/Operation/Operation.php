@@ -11,9 +11,11 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation;
 
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\DeconstructableObject;
+use Eddmash\PowerOrm\Exception\ComponentException;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
@@ -206,6 +208,19 @@ abstract class Operation extends DeconstructableObject implements OperationInter
         $this->appLabel = $appLabel;
     }
 
+    /**
+     * @return \Eddmash\PowerOrm\Components\AppInterface|null
+     */
+    public function getApp()
+    {
+        try {
+            $app = BaseOrm::getInstance()->getComponent($this->getAppLabel());
+            /** @var $app \Eddmash\PowerOrm\Components\AppInterface */
+            return $app;
+        } catch (ComponentException $e) {
+            return null;
+        }
+    }
 
     public function __debugInfo()
     {

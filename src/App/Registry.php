@@ -107,6 +107,7 @@ class Registry extends BaseObject
      * Returns the list of all the models that extend the PModel in the current app.
      *
      * @return array
+     *
      * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
      */
     public function getModels($includeAutoCreated = false)
@@ -314,6 +315,6 @@ class Registry extends BaseObject
 
     public function __toString()
     {
-        return (string)sprintf('%s Object', $this->getFullClassName());
+        return (string) sprintf('%s Object', $this->getFullClassName());
     }
 }

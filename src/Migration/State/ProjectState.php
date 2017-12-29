@@ -47,6 +47,7 @@ class ProjectState extends DeconstructableObject
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\TypeError
      */
     public static function fromApps($registry)

@@ -73,7 +73,7 @@ class Makemigrations extends BaseCommand
 
     private function writeMigrations($migrationChanges, InputInterface $input, OutputInterface $output)
     {
-        /** @var $migration Migration */
+        /* @var $migration Migration */
         /* @var $op Operation */
 
         foreach (BaseOrm::getInstance()->getComponents() as $component) :
@@ -95,7 +95,7 @@ class Makemigrations extends BaseCommand
 
                     $fileName = $migrationFile->getFileName();
 
-                    $output->writeln(sprintf('  <options=bold>%s</>',$fileName));
+                    $output->writeln(sprintf('  <options=bold>%s</>', $fileName));
 
                     $operations = $migration->getOperations();
                     foreach ($operations as $op) :
@@ -124,7 +124,6 @@ class Makemigrations extends BaseCommand
                 endif;
             endif;
         endforeach;
-
     }
 
     /**

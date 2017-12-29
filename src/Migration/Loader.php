@@ -120,22 +120,42 @@ class Loader extends BaseObject
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws \Eddmash\PowerOrm\Exception\ComponentException
      */
     public function getMigrationByPrefix($prefix)
     {
         $migrations = [];
+        /** @var $app AppInterface */
 
         foreach ($this->getMigrations() as $name => $migration) :
-            $shortName = ClassHelper::getNameFromNs($name, BaseOrm::getMigrationsNamespace());
-            if (StringHelper::startsWith($name, $prefix) || StringHelper::startsWith($shortName, $prefix)):
+            $app = BaseOrm::getInstance()
+                ->getComponent($migration->getAppLabel());
+            $shortName = ClassHelper::getNameFromNs(
+                $name,
+                $app->getNamespace()."\Migrations"
+            );
+            if (StringHelper::startsWith($name, $prefix) ||
+                StringHelper::startsWith($shortName, $prefix)):
                 $migrations[] = $name;
             endif;
         endforeach;
 
         if (count($migrations) > 1):
-            throw new AmbiguityError(sprintf("There is more than one migration with the prefix '%s'", $prefix));
+            throw new AmbiguityError(
+                sprintf(
+                    'There is more than one '.
+                    "migration with the prefix '%s'",
+                    $prefix
+                )
+            );
         elseif (0 == count($migrations)):
-            throw new KeyError(sprintf("There no migrations with the prefix '%s'", $prefix));
+            throw new KeyError(
+                sprintf(
+                    "There no migrations with the prefix '%s'",
+                    $prefix
+                )
+            );
         endif;
 
         return $migrations[0];
@@ -159,7 +179,7 @@ class Loader extends BaseObject
     /**
      * List of migration objects.
      *
-     * @return array
+     * @return \Eddmash\PowerOrm\Migration\Migration[]
      *
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
@@ -198,7 +218,7 @@ class Loader extends BaseObject
         $appFiles = $this->getMigrationsFiles();
         $classes = [];
 
-        /**@var $component AppInterface */
+        /** @var $component AppInterface */
         foreach ($appFiles as $appName => $migrationFiles) :
             $component = BaseOrm::getInstance()->getComponent($appName);
             foreach ($migrationFiles as $migrationFile) :
@@ -265,7 +285,7 @@ class Loader extends BaseObject
         $last_version = basename($last_version);
         $last_version = preg_split('/_/', $last_version)[0];
 
-        return (int)$last_version;
+        return (int) $last_version;
     }
 
     /**
@@ -281,7 +301,7 @@ class Loader extends BaseObject
     {
         $conflicts = [];
         $apps = $this->graph->getLeafNodes();
-        foreach ($apps as $name=>$latest) :
+        foreach ($apps as $name => $latest) :
             if (count($latest) > 1):
                 $conflicts[$name] = $latest;
             endif;

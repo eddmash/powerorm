@@ -39,7 +39,9 @@ class ForeignKey extends RelatedField
 
     /**
      * ForeignKey constructor.
+     *
      * @param $kwargs
+     *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      * @throws \Eddmash\PowerOrm\Exception\TypeError
      */

@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Migration\State;
 
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\BaseObject;
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -177,7 +176,7 @@ class ModelState extends BaseObject
      */
     private static function createInstance($className, $extends = '')
     {
-        if (!ClassHelper::classExists($className, BaseOrm::getModelsNamespace())):
+        if (!class_exists($className)):
             $className = MigrationModel::defineClass($className, $extends);
         endif;
 

@@ -39,7 +39,9 @@ class OneToOneField extends ForeignKey
 
     /**
      * OneToOneField constructor.
+     *
      * @param $kwargs
+     *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      * @throws \Eddmash\PowerOrm\Exception\TypeError
      */

@@ -14,7 +14,6 @@ namespace Eddmash\PowerOrm;
 use Composer\Autoload\ClassLoader;
 use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\Console\Manager;
-use Eddmash\PowerOrm\Helpers\ClassHelper;
 
 define('POWERORM_VERSION', '1.1.0-alpha');
 define('POWERORM_HOME', dirname(dirname(__FILE__)));
@@ -51,17 +50,6 @@ class Application
     {
         $settings = new Settings($config);
         $orm = BaseOrm::setup($settings);
-        $modelsNamespace = $settings->getModelsNamespace();
-        $migrationsNamespace = $settings->getMigrationNamespace();
-
-        if ($modelsNamespace):
-            $modelsNamespace = ClassHelper::getFormatNamespace($modelsNamespace, false, true);
-        endif;
-
-        if ($migrationsNamespace) :
-            $migrationsNamespace = ClassHelper::getFormatNamespace($migrationsNamespace, false, true);
-        endif;
-
         return $orm;
     }
 

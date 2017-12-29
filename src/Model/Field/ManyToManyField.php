@@ -203,7 +203,7 @@ class ManyToManyField extends RelatedField
         $obj = new $className();
 
         $obj->setupClassInfo($fields, [
-            'meta'=>['appName'=>$model->meta->getAppName()]
+            'meta' => ['appName' => $model->meta->getAppName()],
         ]);
 
         return $obj;

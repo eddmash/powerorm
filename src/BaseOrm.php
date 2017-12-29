@@ -19,15 +19,12 @@ use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\Checks\ChecksRegistry;
 use Eddmash\PowerOrm\Checks\Tags;
-use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Components\ComponentInterface;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\ComponentException;
-use Eddmash\PowerOrm\Exception\FileHandlerException;
 use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
-use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Signals\SignalManagerInterface;
 
@@ -92,25 +89,6 @@ class BaseOrm extends BaseObject
         $this->registryCache = Registry::createObject();
     }
 
-
-    public static function getMigrationsPath()
-    {
-        $path = null;
-        if (self::getInstance()->getSettings()->getMigrationPath()):
-            $path = realpath(self::getInstance()->getSettings()->getMigrationPath());
-            if (!$path && !file_exists(self::getInstance()->getSettings()->getMigrationPath())):
-                throw new FileHandlerException(
-                    sprintf(
-                        "The path '%s' does not exist please check the path is correct",
-                        self::getInstance()->getSettings()->getMigrationPath()
-                    )
-                );
-            endif;
-        endif;
-
-        return $path;
-    }
-
     public static function getCharset()
     {
         return self::getInstance()->getSettings()->getCharset();
@@ -131,7 +109,6 @@ class BaseOrm extends BaseObject
         $instance->loadRegistry();
         $instance->registerModelChecks();
         $instance->componentsReady();
-
         return $instance;
     }
 
@@ -285,44 +262,12 @@ class BaseOrm extends BaseObject
         return self::$checkRegistry;
     }
 
-    /**
-     * The fake namespace to use in migration.
-     *
-     * @return string
-     *
-     * @since  1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public static function getFakeNamespace()
-    {
-        return self::$fakeNamespace;
-    }
-
-    public static function getModelsNamespace()
-    {
-        return ClassHelper::getFormatNamespace(
-            self::getInstance()->getSettings()->getModelsNamespace(),
-            true,
-            false
-        );
-    }
-
-    public static function getMigrationsNamespace()
-    {
-        return ClassHelper::getFormatNamespace(
-            self::getInstance()->getSettings()->getMigrationNamespace(),
-            true,
-            false
-        );
-    }
-
     public static function getQueryBuilder()
     {
         return self::getDbConnection()->createQueryBuilder();
     }
 
-    public static function signalDispatch($signal, $object=null)
+    public static function signalDispatch($signal, $object = null)
     {
         self::getInstance()->dispatchSignal($signal, $object);
     }
@@ -339,7 +284,7 @@ class BaseOrm extends BaseObject
      * @throws DBALException
      * @throws OrmException
      */
-    public static function presetup(BaseOrm $orm)
+    public static function presetup(self $orm)
     {
         foreach ($orm->dbTypes as $name => $type) {
             Type::addType($name, $type);
@@ -351,7 +296,7 @@ class BaseOrm extends BaseObject
     }
 
     /**
-     * Populate the registray
+     * Populate the registray.
      */
     private function loadRegistry()
     {
@@ -364,7 +309,6 @@ class BaseOrm extends BaseObject
 
     /**
      * Load the components to the orm.
-     *
      */
     private function loadComponents()
     {
@@ -412,8 +356,9 @@ class BaseOrm extends BaseObject
      */
     public function getTimezone()
     {
-        return ($this->getSettings()->getTimezone()) ? $this->getSettings()->getTimezone() : date_default_timezone_get(
-        );
+        return ($this->getSettings()->getTimezone()) ?
+            $this->getSettings()->getTimezone() :
+            date_default_timezone_get();
     }
 
     /**
@@ -442,7 +387,7 @@ class BaseOrm extends BaseObject
     /**
      * @return SignalManagerInterface
      *
-     * @since  1.1.0
+     * @since 1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -479,7 +424,9 @@ class BaseOrm extends BaseObject
 
     /**
      * @param $name
+     *
      * @return \Eddmash\PowerOrm\Components\ComponentInterface
+     *
      * @throws \Eddmash\PowerOrm\Exception\ComponentException
      */
     public function getComponent($name)
@@ -493,5 +440,4 @@ class BaseOrm extends BaseObject
             sprintf("'%s' is not a registered component", $name)
         );
     }
-
 }

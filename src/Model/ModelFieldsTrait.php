@@ -116,7 +116,8 @@ trait ModelFieldsTrait
     /**
      * @ignore
      *
-     * @param array   $options
+     * @param array $options
+     *
      * @return DecimalField
      */
     public static function DecimalField($options)

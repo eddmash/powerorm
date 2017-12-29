@@ -62,8 +62,8 @@ abstract class Component implements ComponentInterface
     {
         $ref = new \ReflectionObject($this);
         $name = $ref->getNamespaceName();
-        $name = rtrim($name, "\\");
+        $name = rtrim($name, '\\');
 
-        return str_replace( "\\", "_", strtolower($name));
+        return str_replace('\\', '_', strtolower($name));
     }
 }

@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
@@ -27,7 +26,7 @@ class CreateModel extends ModelOperation
     /**
      * @var Meta
      */
-    public $meta=[];
+    public $meta = [];
 
     public $extends;
 
@@ -57,8 +56,15 @@ class CreateModel extends ModelOperation
 
                 unset($constructorArgs['extends']);
             else:
+                $namespace = '';
+                if ($this->getApp()):
+                    $namespace = $this->getApp()->getNamespace();
+                endif;
                 $constructorArgs['extends'] =
-                    ClassHelper::getNameFromNs($constructorArgs['extends'], BaseOrm::getModelsNamespace());
+                    ClassHelper::getNameFromNs(
+                        $constructorArgs['extends'],
+                        $namespace
+                    );
             endif;
         endif;
 
@@ -112,7 +118,7 @@ class CreateModel extends ModelOperation
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -162,8 +168,9 @@ class CreateModel extends ModelOperation
                     ]
                 );
                 $op->setAppLabel($this->getAppLabel());
+
                 return [
-                    $op
+                    $op,
                 ];
 
             endif;

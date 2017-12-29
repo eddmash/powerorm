@@ -226,7 +226,7 @@ class Graph
         // this leaf from root_node to leaf_node
         // we use this lineage to apply migrations in database
         $lineage = [];
-        foreach ($leaves as $appName=>$appLeaves) :
+        foreach ($leaves as $appName => $appLeaves) :
 
             // get lineage
             foreach ($appLeaves as $leaf) :

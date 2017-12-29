@@ -159,6 +159,7 @@ class AutoDetector extends BaseObject
 
     /**
      * @param $graph
+     *
      * @return array
      */
     private function detectChanges($graph)
@@ -287,7 +288,6 @@ class AutoDetector extends BaseObject
 
             endif;
 
-
             // set name for migration
             if (empty($leaf)):
                 // this mean we don't have previous migrations
@@ -318,7 +318,7 @@ class AutoDetector extends BaseObject
     /**
      * @param Operation  $operation
      * @param array      $dependencies
-     * @param bool|false $pushToTop some operations should come before others, use this determine which
+     * @param bool|false $pushToTop    some operations should come before others, use this determine which
      *
      * @since  1.1.0
      *
@@ -348,7 +348,7 @@ class AutoDetector extends BaseObject
 
         $app = [];
 
-        /**@var $operations \Eddmash\PowerOrm\Migration\Operation\Operation[] */
+        /** @var $operations \Eddmash\PowerOrm\Migration\Operation\Operation[] */
         foreach ($operations as $operation) :
             $app[$operation->getAppLabel()][] = $operation;
         endforeach;
@@ -426,7 +426,9 @@ class AutoDetector extends BaseObject
     /**
      * @param $operation
      * @param $dependency
+     *
      * @return bool
+     *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      * @throws \Eddmash\PowerOrm\Exception\ValueError
      */
@@ -547,7 +549,7 @@ class AutoDetector extends BaseObject
         $name = str_replace('\\', '_', $name);
         if ($appLabel):
             $name = str_replace(
-                "".$appLabel."_models_",
+                ''.$appLabel.'_models_',
                 '',
                 strtolower($name)
             );
@@ -560,7 +562,7 @@ class AutoDetector extends BaseObject
     {
         $name = explode('_', $name);
 
-        return (int)str_replace($this->migrationNamePrefix, '', $name[0]);
+        return (int) str_replace($this->migrationNamePrefix, '', $name[0]);
     }
 
     private function getOldModelName($modelName)
@@ -574,7 +576,9 @@ class AutoDetector extends BaseObject
     /**
      * @param $modelName
      * @param $fieldName
+     *
      * @return mixed
+     *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
     private function getOldFieldName($modelName, $fieldName)
@@ -604,6 +608,7 @@ class AutoDetector extends BaseObject
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
      * @throws \Eddmash\PowerOrm\Exception\LookupError
      * @throws \Eddmash\PowerOrm\Exception\OrmException
      */

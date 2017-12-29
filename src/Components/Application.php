@@ -3,19 +3,17 @@
  * Created by PhpStorm.
  * User: edd
  * Date: 12/28/17
- * Time: 10:36 AM
+ * Time: 10:36 AM.
  */
 
 namespace Eddmash\PowerOrm\Components;
 
-
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use ReflectionClass;
 
 abstract class Application extends Component implements AppInterface
 {
-    function getNamespace()
+    public function getNamespace()
     {
         $name = get_class($this);
         list($namespace, $name) = ClassHelper::getNamespaceNamePair($name);
@@ -27,20 +25,18 @@ abstract class Application extends Component implements AppInterface
         );
     }
 
-
-    function getModelsPath()
+    public function getModelsPath()
     {
-        return dirname($this->getFileName())."/Models";
+        return dirname($this->getFileName()).'/Models';
     }
 
-    function getMigrationsPath()
+    public function getMigrationsPath()
     {
-        return dirname($this->getFileName())."/Migrations";
+        return dirname($this->getFileName()).'/Migrations';
     }
 
     private function getFileName()
     {
-
         $reflector = new ReflectionClass(static::class);
         return $reflector->getFileName();
     }

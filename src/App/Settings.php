@@ -17,10 +17,6 @@ use Eddmash\PowerOrm\Signals\SignalManagerInterface;
 
 class Settings
 {
-    private $autoloadModels;
-    private $modelsNamespace;
-    private $migrationNamespace = 'App\Migrations';
-
     private $dateFormats = [
         'Y-m-d',      // '2006-10-25'
         'm/d/Y',      // '10/25/2006'
@@ -104,13 +100,6 @@ class Settings
     private $charset = 'utf-8';
 
     /**
-     * path from where to get and put migration files.
-     *
-     * @var string
-     */
-    private $migrationPath = [];
-
-    /**
      * The value to prefix the database tables with.
      *
      * @var string
@@ -127,13 +116,6 @@ class Settings
      * @var array
      */
     private $silencedChecks = [];
-
-    /**
-     * The namespace to check for the application models and migrations.
-     *
-     * @var string
-     */
-    private $appNamespace = 'App\\';
 
     private $components;
 
@@ -156,38 +138,6 @@ class Settings
         if (!$this->components):
             $this->components = []; // incase nothing is set, guarantee it iterable
         endif;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getModelsNamespace()
-    {
-        return $this->modelsNamespace;
-    }
-
-    /**
-     * @param mixed $modelsNamespace
-     */
-    public function setModelsNamespace($modelsNamespace)
-    {
-        $this->modelsNamespace = $modelsNamespace;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMigrationNamespace()
-    {
-        return $this->migrationNamespace;
-    }
-
-    /**
-     * @param string $migrationNamespace
-     */
-    public function setMigrationNamespace($migrationNamespace)
-    {
-        $this->migrationNamespace = $migrationNamespace;
     }
 
     /**
@@ -238,9 +188,6 @@ class Settings
         $this->signalManager = $signalManager;
     }
 
-    /**
-     * @return string
-     */
     public function getTimezone()
     {
         return $this->timezone;
@@ -289,22 +236,6 @@ class Settings
     /**
      * @return string
      */
-    public function getMigrationPath()
-    {
-        return $this->migrationPath;
-    }
-
-    /**
-     * @param string $migrationPath
-     */
-    public function setMigrationPath($migrationPath)
-    {
-        $this->migrationPath = $migrationPath;
-    }
-
-    /**
-     * @return string
-     */
     public function getDbPrefix()
     {
         return $this->dbPrefix;
@@ -335,22 +266,6 @@ class Settings
     }
 
     /**
-     * @return string
-     */
-    public function getAppNamespace()
-    {
-        return $this->appNamespace;
-    }
-
-    /**
-     * @param string $appNamespace
-     */
-    public function setAppNamespace($appNamespace)
-    {
-        $this->appNamespace = $appNamespace;
-    }
-
-    /**
      * @return mixed
      */
     public function getComponents()
@@ -364,21 +279,5 @@ class Settings
     public function setComponents($components)
     {
         $this->components = $components;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAutoloadModels()
-    {
-        return $this->autoloadModels;
-    }
-
-    /**
-     * @param mixed $autoloadModels
-     */
-    public function setAutoloadModels($autoloadModels)
-    {
-        $this->autoloadModels = $autoloadModels;
     }
 }

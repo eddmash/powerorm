@@ -3,18 +3,16 @@
  * Created by PhpStorm.
  * User: edd
  * Date: 12/28/17
- * Time: 10:37 AM
+ * Time: 10:37 AM.
  */
 
 namespace Eddmash\PowerOrm\Components;
 
-
 interface AppInterface extends ComponentInterface
 {
-    function getNamespace();
+    public function getNamespace();
 
-    function getModelsPath();
+    public function getModelsPath();
 
-    function getMigrationsPath();
-
+    public function getMigrationsPath();
 }
