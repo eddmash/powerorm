@@ -33,6 +33,7 @@ class Loader extends BaseObject
      * @var ConnectionInterface
      */
     private $connection;
+    private $migratedApps;
 
     /**
      * Loader constructor.
@@ -61,9 +62,9 @@ class Loader extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getProjectState()
+    public function getProjectState($node = null, $atEnd = true)
     {
-        return $this->graph->getState();
+        return $this->graph->getState($node, $atEnd);
     }
 
     /**
@@ -96,9 +97,13 @@ class Loader extends BaseObject
         // the for each migration set its dependencies
         /** @var $migration Migration */
         foreach ($migrations as $name => $migration) :
-            foreach ($migration->getDependency() as $parent) :
+            foreach ($migration->getDependency() as $appName => $parent) :
 
-                $this->graph->addDependency($name, $parent, $migration);
+                $this->graph->addDependency(
+                    $name,
+                    [$appName => $parent],
+                    $migration
+                );
 
             endforeach;
 
@@ -108,36 +113,39 @@ class Loader extends BaseObject
     /**
      * Returns the migration(s) which match the given prefix.
      *
+     * @param $appName
      * @param $prefix
      *
-     * @return mixed
+     * @return Migration
      *
      * @throws AmbiguityError
      * @throws ClassNotFoundException
      * @throws KeyError
+     * @throws \Eddmash\PowerOrm\Exception\ComponentException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      *
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     *
-     * @throws \Eddmash\PowerOrm\Exception\ComponentException
      */
-    public function getMigrationByPrefix($prefix)
+    public function getMigrationByPrefix($appName, $prefix)
     {
         $migrations = [];
-        /** @var $app AppInterface */
+        /* @var $app AppInterface */
 
         foreach ($this->getMigrations() as $name => $migration) :
-            $app = BaseOrm::getInstance()
-                ->getComponent($migration->getAppLabel());
+            $app = $migration->getApp();
+            if ($migration->getAppLabel() != strtolower($appName)):
+                continue;
+            endif;
             $shortName = ClassHelper::getNameFromNs(
                 $name,
                 $app->getNamespace()."\Migrations"
             );
+
             if (StringHelper::startsWith($name, $prefix) ||
                 StringHelper::startsWith($shortName, $prefix)):
-                $migrations[] = $name;
+                $migrations[] = $migration;
             endif;
         endforeach;
 
@@ -195,6 +203,7 @@ class Loader extends BaseObject
 
                 $migration = $migrationName::createObject($fileName);
                 $migration->setAppLabel($appName);
+                $this->setMigratedApps($appName);
                 $migrations[$fileName] = $migration;
             endforeach;
         endforeach;
@@ -218,7 +227,7 @@ class Loader extends BaseObject
         $appFiles = $this->getMigrationsFiles();
         $classes = [];
 
-        /** @var $component AppInterface */
+        /* @var $component AppInterface */
         foreach ($appFiles as $appName => $migrationFiles) :
             $component = BaseOrm::getInstance()->getComponent($appName);
             foreach ($migrationFiles as $migrationFile) :
@@ -308,5 +317,18 @@ class Loader extends BaseObject
         endforeach;
 
         return $conflicts;
+    }
+
+    public function setMigratedApps($appName)
+    {
+        $this->migratedApps[] = $appName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMigratedApps()
+    {
+        return $this->migratedApps;
     }
 }

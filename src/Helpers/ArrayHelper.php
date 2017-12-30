@@ -156,6 +156,17 @@ class ArrayHelper
 
     public static function isEmpty($array)
     {
-        return null === $array || $array === [];
+        array_filter($array);
+        $empty = empty($array);
+
+        if (!$empty):
+            array_walk_recursive($array, function ($item) use (&$empty) {
+                if (!empty($item)):
+                    $empty = false;
+                endif;
+            });
+        endif;
+
+        return $empty;
     }
 }

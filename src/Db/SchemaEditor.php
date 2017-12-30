@@ -10,11 +10,16 @@
 
 namespace Eddmash\PowerOrm\Db;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\ColumnDiff;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
+use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -37,14 +42,21 @@ class SchemaEditor extends BaseObject
      * @var AbstractSchemaManager
      */
     private $schemaManager;
+    /**
+     * @var bool
+     */
+    private $getSqlStatements;
+    private $sqls;
 
     /**
      * @param ConnectionInterface $connection
+     * @param bool                $getSql
      */
-    public function __construct(ConnectionInterface $connection)
+    public function __construct(ConnectionInterface $connection, $getSql = false)
     {
         $this->connection = $connection;
         $this->schemaManager = $this->connection->getSchemaManager();
+        $this->getSqlStatements = $getSql;
     }
 
     /**
@@ -52,13 +64,15 @@ class SchemaEditor extends BaseObject
      *
      * @return SchemaEditor
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function createObject(ConnectionInterface $connection)
-    {
-        return new static($connection);
+    public static function createObject(
+        ConnectionInterface $connection,
+        $getSql = false
+    ) {
+        return new static($connection, $getSql);
     }
 
     /**
@@ -66,13 +80,16 @@ class SchemaEditor extends BaseObject
      *
      * @param Model $model
      *
-     * @since 1.1.0
+     * @throws ValueError
+     * @throws \Doctrine\DBAL\DBALException
+     *
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function createModel($model)
     {
-        $schema = $this->schemaManager->createSchema();
+        $schema = new Schema();
         $tableDef = $schema->createTable($model->meta->dbTable);
         // this assumes fields set_from_name has been invoked
         $primaryKeyFields = [];
@@ -114,7 +131,7 @@ class SchemaEditor extends BaseObject
         if (!empty($unique_fields)):
             $tableDef->addUniqueIndex($unique_fields);
         endif;
-        $this->schemaManager->createTable($tableDef);
+        $this->createTable($tableDef);
         // many to many
         /** @var $relationField ManyToManyField */
         foreach ($model->meta->localManyToMany as $name => $relationField) :
@@ -129,7 +146,7 @@ class SchemaEditor extends BaseObject
      *
      * @param Model $model
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -142,7 +159,7 @@ class SchemaEditor extends BaseObject
                 $this->deleteModel($relationField->relation->through);
             endif;
         endforeach;
-        $this->schemaManager->dropTable($model->meta->dbTable);
+        $this->dropTable($model->meta->dbTable);
     }
 
     /**
@@ -152,16 +169,18 @@ class SchemaEditor extends BaseObject
      * @param string $oldDbTableName
      * @param string $newDbTableName
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function alterDbTable($model, $oldDbTableName, $newDbTableName)
     {
         if ($oldDbTableName === $newDbTableName):
             return;
         endif;
-        $this->schemaManager->renameTable($oldDbTableName, $newDbTableName);
+        $this->renameTable($oldDbTableName, $newDbTableName);
     }
 
     /**
@@ -176,13 +195,14 @@ class SchemaEditor extends BaseObject
      * @throws ValueError
      * @throws \Doctrine\DBAL\Schema\SchemaException
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function addField($model, $field)
     {
-        $schema = $this->schemaManager->createSchema();
         // many to many
         if ($field->manyToMany && $field->relation->through->meta->autoCreated):
             $this->createModel($field->relation->through);
@@ -196,40 +216,56 @@ class SchemaEditor extends BaseObject
         if (empty($type)):
             return;
         endif;
-        $tableDef = clone $schema->getTable($model->meta->dbTable);
+
+        $tableDef = new TableDiff($model->meta->dbTable);
         // normal column
-        $tableDef->addColumn($name, $type, $fieldOptions);
+        $tableDef->addedColumns[] = new Column(
+            $name,
+            Type::getType($type),
+            $fieldOptions
+        );
         // unique constraint
         if ($field->primaryKey):
-            $tableDef->setPrimaryKey([$name]);
+            $tableDef->addedIndexes[] = new Index(
+                'primary',
+                [$name],
+                true,
+                true
+            );
         endif;
         // unique constraint
-        if ($field->isUnique()):
-            $tableDef->addUniqueIndex([$name]);
+        if ($field->isUnique() && !$field->primaryKey):
+            $tableDef->addedIndexes[] = new Index(
+                sprintf('uniq_%s_%s', mt_rand(1, 1000), $name),
+                [$name],
+                true
+            );
         endif;
         // index constraint
-        if ($field->dbIndex && !$field->isUnique()):
-            $tableDef->addIndex([$name]);
+        if ($field->dbIndex && !$field->isUnique() && !$field->primaryKey):
+            $tableDef->addedIndexes[] = new Index(
+                sprintf('idx_%s_%s', mt_rand(1, 1000), $name),
+                [$name]
+            );
         endif;
+
+        // we need to drop in-database defaults
+        if ($this->effectiveDefault($field)):
+            //todo
+        endif;
+
         /* @var $field ForeignKey */
         if ($field->isRelation && $field->relation && $field->dbConstraint):
             $relField = $field->getRelatedField();
-            $tableDef->addForeignKeyConstraint(
-                $relField->scopeModel->meta->dbTable,
+
+            $tableDef->addedForeignKeys[] = new ForeignKeyConstraint(
                 [$field->getColumnName()],
+                $relField->scopeModel->meta->dbTable,
                 [$relField->getColumnName()]
             );
         endif;
-        $comparator = new Comparator();
-        $diff = $comparator->diffTable($schema->getTable($model->meta->dbTable), $tableDef);
-        if (false !== $diff):
-            $this->schemaManager->alterTable($diff);
 
-            // we need to drop in-database defaults
-            if ($this->effectiveDefault($field)):
-                //todo
-            endif;
-        endif;
+        $this->alterTable($tableDef);
     }
 
     /**
@@ -238,11 +274,14 @@ class SchemaEditor extends BaseObject
      * @param Model $model
      * @param Field $field
      *
-     * @since 1.1.0
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws \Eddmash\PowerOrm\Exception\LookupError
+     *
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function removeField($model, $field)
     {
@@ -261,11 +300,11 @@ class SchemaEditor extends BaseObject
             return;
         endif;
         $table = $model->meta->dbTable;
-        $tableDef = clone $schema->getTable($table);
+        $tableDef = new TableDiff($table);
         // Drop any FK constraints, MySQL requires explicit deletion
         if ($field->isRelation && null !== $field->relation):
             foreach ($this->constraintName($table, $name, ['foreignKey' => true]) as $fkConstraint) :
-                $tableDef->removeForeignKey($fkConstraint);
+                $tableDef->removedForeignKeys[] = $fkConstraint;
             endforeach;
         endif;
 
@@ -281,19 +320,14 @@ class SchemaEditor extends BaseObject
                 );
                 $relDiff = new TableDiff($newRel->scopeModel->meta->dbTable);
                 $relDiff->removedForeignKeys = $fkConstraints;
-                if (false !== $relDiff):
-                    $this->schemaManager->alterTable($relDiff);
-                endif;
+                $this->alterTable($relDiff);
             endforeach;
         endif;
 
         // remove column
-        $tableDef->dropColumn($name);
-        $comparator = new Comparator();
-        $diff = $comparator->diffTable($schema->getTable($table), $tableDef);
-        if (false !== $diff):
-            $this->schemaManager->alterTable($diff);
-        endif;
+        $tableDef->removedColumns[] = new Column($name, Type::getType($type));
+
+        $this->alterTable($tableDef);
     }
 
     /**
@@ -309,7 +343,7 @@ class SchemaEditor extends BaseObject
      *
      * @throws ValueError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -365,7 +399,7 @@ class SchemaEditor extends BaseObject
      * @param Field      $newField
      * @param bool|false $strict
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -381,6 +415,18 @@ class SchemaEditor extends BaseObject
         endif;
     }
 
+    /**
+     * @param Model $model
+     * @param Field $oldField
+     * @param Field $newField
+     * @param bool  $strict
+     *
+     * @throws ValueError
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
+     * @throws \Eddmash\PowerOrm\Exception\LookupError
+     */
     private function doFieldAlter(Model $model, Field $oldField, Field $newField, $strict = false)
     {
         $schema = $this->schemaManager->createSchema();
@@ -401,17 +447,23 @@ class SchemaEditor extends BaseObject
                 $droppedFks[] = $oldField->getName();
             endforeach;
             if (false !== $diff):
-                $this->schemaManager->alterTable($diff);
+                $this->alterTable($diff);
             endif;
         endif;
         // *****************  get uniques and drop them  *****************
-        if ($oldField->isUnique() && (!$newField->isUnique() || (!$oldField->primaryKey && $newField->primaryKey))) :
+        if ($oldField->isUnique() &&
+            (!$newField->isUnique() ||
+                (!$oldField->primaryKey && $newField->primaryKey))) :
             $diff = new TableDiff($table);
-            foreach ($this->constraintName($table, $oldField->getColumnName(), ['unique' => true]) as $constraint) :
+            foreach ($this->constraintName(
+                $table,
+                $oldField->getColumnName(),
+                ['unique' => true]
+            ) as $constraint) :
                 $diff->removedIndexes[] = $constraint;
             endforeach;
             if (false !== $diff):
-                $this->schemaManager->alterTable($diff);
+                $this->alterTable($diff);
             endif;
         endif;
         // *************  if Primary key is changing drop FK constraints that point to it first. *********
@@ -427,20 +479,25 @@ class SchemaEditor extends BaseObject
                 $relDiff = new TableDiff($newRel->scopeModel->meta->dbTable);
                 $relDiff->removedForeignKeys = $fkConstraints;
                 if (false !== $relDiff):
-                    $this->schemaManager->alterTable($relDiff);
+                    $this->alterTable($relDiff);
                 endif;
             endforeach;
         endif;
         // *************  get index and drop them. *********
         if ($oldField->dbIndex && !$newField->dbIndex &&
-            (!$oldField->isUnique() && (!$newField->isUnique() && $oldField->isUnique()))
+            (!$oldField->isUnique() &&
+                (!$newField->isUnique() && $oldField->isUnique()))
         ) :
             $diff = new TableDiff($table);
-            foreach ($this->constraintName($table, $oldField->getColumnName(), ['index' => true]) as $indexConstraint) :
+            foreach ($this->constraintName(
+                $table,
+                $oldField->getColumnName(),
+                ['index' => true]
+            ) as $indexConstraint) :
                 $diff->removedIndexes[] = $indexConstraint;
             endforeach;
             if (false !== $diff):
-                $this->schemaManager->alterTable($diff);
+                $this->alterTable($diff);
             endif;
         endif;
         // ******** todo Change check constraints? ***********
@@ -449,26 +506,51 @@ class SchemaEditor extends BaseObject
         // ************************ We change the other column properties like null, default etc ********************
         // **********************************************************************************************************
 
-        $tableClone = clone  $schema->getTable($table);
         if ($oldField->getColumnName() !== $newField->getColumnName()) :
-            $tableClone->addColumn(
+
+            $diff = new TableDiff($table);
+
+            $diff->renamedColumns[$oldField->getColumnName()] = new Column(
                 $newField->getColumnName(),
-                $newType,
-                $this->getDoctrineColumnOptions($newField, true)
+                Type::getType($oldField->dbType($this->connection))
             );
-            $tableClone->dropColumn($oldField->getColumnName());
+
         else:
-            $tableClone->changeColumn(
-                $oldField->getColumnName(),
-                $this->getDoctrineColumnOptions($newField, true)
+
+            $oldOpts = $this->getDoctrineColumnOptions(
+                $oldField,
+                true
             );
+            $newOpts = $this->getDoctrineColumnOptions(
+                $newField,
+                true
+            );
+            $newColumn = new Column($oldField->getColumnName(),
+                Type::getType($oldField->dbType($this->connection)),
+                $newOpts
+            );
+
+            $changeProperties = array_diff(
+                array_keys($oldOpts),
+                array_keys($newOpts)
+            );
+            foreach ($oldOpts as $name => $oldOpt) :
+                if (isset($newOpts[$name]) && $newOpts[$name] != $oldOpts[$name]):
+                    $changeProperties[] = $name;
+                endif;
+            endforeach;
+
+            $diff = new TableDiff($table);
+            $diff->changedColumns[] = new ColumnDiff(
+                $oldField->getColumnName(),
+                $newColumn,
+                array_unique($changeProperties)
+            );
+
         endif;
 
-        $comparator = new Comparator();
-        $diff = $comparator->diffTable($schema->getTable($table), $tableClone);
-
-        if (false !== $diff):
-            $this->schemaManager->alterTable($diff);
+        if ($diff):
+            $this->alterTable($diff);
         endif;
 
         // **********************************************************************************************************
@@ -486,7 +568,7 @@ class SchemaEditor extends BaseObject
                 true
             );
             if (false !== $diff):
-                $this->schemaManager->alterTable($diff);
+                $this->alterTable($diff);
             endif;
         endif;
         // **************** Added a index? *****************
@@ -500,7 +582,7 @@ class SchemaEditor extends BaseObject
                 true
             );
             if (false !== $diff):
-                $this->schemaManager->alterTable($diff);
+                $this->alterTable($diff);
             endif;
         endif;
         // **************** Type alteration on primary key? Then we need to alter the column referring to us. *********
@@ -520,7 +602,7 @@ class SchemaEditor extends BaseObject
                 [$toField->getColumnName()]
             );
             if (false !== $diff):
-                $this->schemaManager->alterTable($diff);
+                $this->alterTable($diff);
             endif;
         endif;
         // ****************** Rebuild FKs that pointed to us if we previously had to drop them ****************
@@ -545,7 +627,7 @@ class SchemaEditor extends BaseObject
                     );
                 endforeach;
                 if (false !== $relDiff):
-                    $this->schemaManager->alterTable($relDiff);
+                    $this->alterTable($relDiff);
                 endif;
             endforeach;
         endif;
@@ -557,7 +639,7 @@ class SchemaEditor extends BaseObject
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -637,7 +719,7 @@ class SchemaEditor extends BaseObject
      *
      * @throws NotImplemented
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -685,5 +767,86 @@ class SchemaEditor extends BaseObject
         endforeach;
 
         return $keys;
+    }
+
+    private function getPlatform()
+    {
+        return $this->connection->getDatabasePlatform();
+    }
+
+    private function addSql($sql)
+    {
+        foreach ((array) $sql as $query) :
+
+            $this->sqls[] = $query;
+
+        endforeach;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSqls()
+    {
+        return $this->sqls;
+    }
+
+    /**
+     * Creates a new table.
+     *
+     * @param \Doctrine\DBAL\Schema\Table $table
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function createTable(Table $table)
+    {
+        if ($this->getSqlStatements):
+            $createFlags = AbstractPlatform::CREATE_INDEXES |
+                AbstractPlatform::CREATE_FOREIGNKEYS;
+            $this->addSql(
+                $this->getPlatform()
+                    ->getCreateTableSQL($table, $createFlags)
+            );
+        else:
+            $this->schemaManager->createTable($table);
+        endif;
+    }
+
+    private function dropTable($dbTable)
+    {
+        if ($this->getSqlStatements):
+            $this->addSql($this->getPlatform()->getDropTableSQL($dbTable));
+        else:
+            $this->schemaManager->dropTable($dbTable);
+        endif;
+    }
+
+    /**
+     * Renames a given table to another name.
+     *
+     * @param string $name    the current name of the table
+     * @param string $newName the new name of the table
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function renameTable($name, $newName)
+    {
+        $tableDiff = new TableDiff($name);
+        $tableDiff->newName = $newName;
+        $this->alterTable($tableDiff);
+    }
+
+    /**
+     * @param $tableDiff
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function alterTable($tableDiff)
+    {
+        if ($this->getSqlStatements):
+            $this->addSql($this->getPlatform()->getAlterTableSQL($tableDiff));
+        else:
+            $this->schemaManager->alterTable($tableDiff);
+        endif;
     }
 }

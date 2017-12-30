@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\DeconstructableObject;
 /**
  * Takes a series of content that need to be properly indented for writing on disk.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -52,7 +52,7 @@ class FormatFileContent
      *
      * @param $item
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -66,7 +66,7 @@ class FormatFileContent
     /**
      * adds indentation to content.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -78,7 +78,7 @@ class FormatFileContent
     /**
      * Reduces indentation on content.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -94,7 +94,7 @@ class FormatFileContent
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -110,7 +110,7 @@ class FormatFileContent
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -129,7 +129,7 @@ class FormatFileContent
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -229,8 +229,14 @@ class FormatFileContent
 
         $string = trim($string, ',');
 
-        return [sprintf("%1\$s::createObject(%2\$s\t\t\t)", $class,
-            PHP_EOL.$string.PHP_EOL), $import];
+        return [
+            sprintf(
+                "%1\$s::createObject(%2\$s\t\t\t)",
+                $class,
+                PHP_EOL.$string.PHP_EOL
+            ),
+            $import,
+        ];
     }
 
     /**
@@ -240,7 +246,7 @@ class FormatFileContent
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -304,8 +310,20 @@ class FormatFileContent
                 endif;
             endforeach;
 
-            return [sprintf('%1$s(%2$s)',
-                $class, implode(',', $cons_args)), $import];
+            if (empty($constructor_args[0])):
+                $cons_args = '';
+            else:
+                $cons_args = implode(',', $cons_args);
+            endif;
+
+            return [
+                sprintf(
+                    '%1$s(%2$s)',
+                    $class,
+                    $cons_args
+                ),
+                $import,
+            ];
         endif;
 
         if (true === $value):

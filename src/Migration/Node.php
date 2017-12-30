@@ -15,7 +15,7 @@ namespace Eddmash\PowerOrm\Migration;
  * i.e what migrations need to exist before this one can exist (parent)
  * and which migrations cannot exist if this one does not (children).
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -24,12 +24,14 @@ class Node
     public $name;
     public $children;
     public $parent;
+    public $appName;
 
-    public function __construct($name)
+    public function __construct($appName, $name)
     {
         $this->name = $name;
         $this->children = [];
         $this->parent = [];
+        $this->appName = $appName;
     }
 
     /**
@@ -55,15 +57,19 @@ class Node
      */
     public function getAncestors($ignoreSelf = false)
     {
-        $ancestors = [];
+        $ancestors[$this->appName] = [];
 
         if (false === $ignoreSelf):
-            $ancestors[] = $this->name;
+            $ancestors[$this->appName][] = $this->name;
         endif;
 
         /** @var $parent Node */
         foreach ($this->parent as $parent) :
-            $ancestors = array_merge($parent->getAncestors(), $ancestors);
+            $parentAncenstors = $parent->getAncestors();
+            $ancestors[$this->appName] = array_merge(
+                $parentAncenstors[$this->appName],
+                $ancestors[$this->appName]
+            );
         endforeach;
 
         return $ancestors;
@@ -79,11 +85,15 @@ class Node
     {
         $descendants = [];
 
-        $descendants[] = $this->name;
+        $descendants[$this->appName][] = $this->name;
 
         /** @var $child Node */
         foreach ($this->children as $child) :
-            $descendants = array_merge($child->getDescendants(), $descendants);
+            $childDescendats = $child->getDescendants();
+            $descendants[$this->appName] = array_merge(
+                $childDescendats[$this->appName],
+                $descendants[$this->appName]
+            );
         endforeach;
 
         return $descendants;

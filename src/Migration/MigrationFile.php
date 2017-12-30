@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 
@@ -79,7 +78,7 @@ class MigrationFile
      */
     public function getContent()
     {
-        $app = BaseOrm::getInstance()->getComponent($this->appName);
+        $app = $this->migration->getApp();
         $imports = [];
 
         $stringedOperations = [];

@@ -294,7 +294,7 @@ class AutoDetector extends BaseObject
                 $migrationName = $this->suggestName();
             else:
                 // first set previous as dependency of this
-                $migration->setDependency($leaf);
+                $migration->setDependency($appName, $leaf);
 
                 $migrationNo = str_pad(
                     $migrationNo,

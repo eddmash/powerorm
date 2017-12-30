@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class Showmigrations.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -27,20 +27,36 @@ class Showmigrations extends BaseCommand
 
         $leaves = $loader->graph->getLeafNodes();
 
-        foreach ($leaves as $leaf) :
-            $list = $loader->graph->getAncestryTree($leaf);
+        foreach ($leaves as $appName => $appLeaves) :
+            $leaf = $appLeaves[0];
+            $list = $loader->graph->getAncestryTree($appName, $leaf);
 
-            foreach ($list as $item) :
-                $itemArr = explode('\\', $item);
-                $migrationName = array_pop($itemArr);
+            foreach ($list as $ansAppName => $migrations) :
 
-                if (in_array($item, $loader->appliedMigrations)):
-                    $indicator = '<info>(applied)</info>';
-                else:
-                    $indicator = '(pending)';
-                endif;
+                $output->writeln(
+                    sprintf(
+                        '<options=bold>%s</>',
+                        ucfirst($ansAppName)
+                    )
+                );
+                foreach ($migrations as $item) :
+                    $itemArr = explode('\\', $item);
+                    $migrationName = array_pop($itemArr);
 
-                $output->writeln(sprintf('%1$s %2$s', $indicator, $migrationName));
+                    if (!empty($loader->appliedMigrations[$ansAppName][$item])):
+                        $indicator = '<info>(applied)</info>';
+                    else:
+                        $indicator = '<fg=yellow>(pending)</>';
+                    endif;
+                    $output->writeln(
+                        str_pad(' ', 2, ' ').
+                        sprintf(
+                            '%1$s %2$s',
+                            $indicator,
+                            $migrationName
+                        )
+                    );
+                endforeach;
             endforeach;
         endforeach;
     }

@@ -10,6 +10,8 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
@@ -28,7 +30,7 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
  * Note that all migrations come out of migrations and into the Loader or Graph as instances, having been
  * initialized with their app name.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -126,9 +128,9 @@ class Migration implements MigrationInterface
     /**
      * @param mixed $dependency
      */
-    public function setDependency($dependency)
+    public function setDependency($appName, $dependency)
     {
-        $this->dependency[] = $dependency;
+        $this->dependency[$appName] = $dependency;
     }
 
     /**
@@ -142,7 +144,7 @@ class Migration implements MigrationInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
@@ -157,7 +159,12 @@ class Migration implements MigrationInterface
 
             $operation->updateState($state);
 
-            $forwardCallback = function (ConnectionInterface $connection) use ($operation, $schemaEditor, $oldState, $state) {
+            $forwardCallback = function (ConnectionInterface $connection) use (
+                $operation,
+                $schemaEditor,
+                $oldState,
+                $state
+            ) {
                 $operation->databaseForwards($schemaEditor, $oldState, $state);
             };
 
@@ -181,7 +188,7 @@ class Migration implements MigrationInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
@@ -205,7 +212,14 @@ class Migration implements MigrationInterface
             /*
              * we insert them in the reverse order so the last operation is run first
              */
-            array_unshift($itemsToRun, ['operation' => $operation, 'oldState' => $oldState, 'newState' => $newState]);
+            array_unshift(
+                $itemsToRun,
+                [
+                    'operation' => $operation,
+                    'oldState' => $oldState,
+                    'newState' => $newState,
+                ]
+            );
         endforeach;
 
         // Phase 2 -- Since we are un applying the old state is where we want to go back to
@@ -218,7 +232,11 @@ class Migration implements MigrationInterface
                 function () use ($runItem, $schemaEditor) {
                     /** @var $operation Operation */
                     $operation = $runItem['operation'];
-                    $operation->databaseBackwards($schemaEditor, $runItem['newState'], $runItem['oldState']);
+                    $operation->databaseBackwards(
+                        $schemaEditor,
+                        $runItem['newState'],
+                        $runItem['oldState']
+                    );
                 }
             );
         endforeach;
@@ -236,7 +254,7 @@ class Migration implements MigrationInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
@@ -275,5 +293,20 @@ class Migration implements MigrationInterface
     public function getAppLabel()
     {
         return $this->appLabel;
+    }
+
+    /**
+     * @return AppInterface|null
+     */
+    public function getApp()
+    {
+        try {
+            $app = BaseOrm::getInstance()->getComponent($this->getAppLabel());
+
+            /* @var $app AppInterface */
+            return $app;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 }

@@ -11,7 +11,6 @@
 namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\Exception\NodeNotFoundError;
-use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 class Graph
@@ -41,61 +40,68 @@ class Graph
      *
      * @return Node
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getNodeFamilyTree($node)
+    public function getNodeFamilyTree($appName, $node)
     {
-        return $this->nodeFamilyTree[$node];
+        return $this->nodeFamilyTree[$appName][$node];
     }
 
     /**
-     * @param $migrationName
-     * @param $migrationObject
+     * @param           $migrationName
+     * @param Migration $migrationObject
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function addNode($migrationName, $migrationObject)
     {
-        $node = new Node($migrationName);
+        $appName = $migrationObject->getAppLabel();
+        $node = new Node($appName, $migrationName);
 
         // add to node store
-        $this->nodes[$migrationName] = $migrationObject;
+        $this->nodes[$appName][$migrationName] = $migrationObject;
 
         // create family tree
-        $this->nodeFamilyTree[$migrationName] = $node;
+        $this->nodeFamilyTree[$appName][$migrationName] = $node;
     }
 
     /**
-     * @param $child
-     * @param $parent
+     * @param           $child
+     * @param           $parent
      * @param Migration $migration
      *
      * @throws NodeNotFoundError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function addDependency($child, $parent, Migration $migration)
     {
+        $appName = $migration->getAppLabel();
+        $parentAppName = key($parent);
+        $parent = $parent[$parentAppName];
+
         // both parent and child need to be already in the graph
-        if (!ArrayHelper::hasKey($this->nodes, $child)):
+        if (empty($this->nodes[$appName][$child])):
             throw new NodeNotFoundError(
                 sprintf(
-                    'Migration %s dependencies reference nonexistent child node %s',
+                    'Migration %s dependencies reference '.
+                    'nonexistent child node %s',
                     $migration->getName(),
                     $child
                 )
             );
         endif;
-        if (!ArrayHelper::hasKey($this->nodes, $parent)):
+        if (empty($this->nodes[$parentAppName][$parent])):
             throw new NodeNotFoundError(
                 sprintf(
-                    'Migration %s dependencies reference nonexistent parent node %s',
+                    'Migration %s dependencies reference nonexistent'.
+                    ' parent node %s',
                     $migration->getName(),
                     $parent
                 )
@@ -104,8 +110,11 @@ class Graph
 
         // add to the family tree of both the child and parent
 
-        $this->getNodeFamilyTree($child)->addParent($this->nodeFamilyTree[$parent]);
-        $this->getNodeFamilyTree($parent)->addChild($this->nodeFamilyTree[$child]);
+        $this->getNodeFamilyTree($appName, $child)
+            ->addParent($this->nodeFamilyTree[$parentAppName][$parent]);
+
+        $this->getNodeFamilyTree($appName, $parent)
+            ->addChild($this->nodeFamilyTree[$appName][$child]);
     }
 
     /**
@@ -114,16 +123,22 @@ class Graph
     public function getLeafNodes()
     {
         $leaves = [];
-        foreach ($this->nodes as $name => $migration) :
 
-            // get the nodes  children
-            $children = $this->getNodeFamilyTree($name)->children;
+        foreach ($this->nodes as $appName => $nodes) :
+            foreach ($nodes as $name => $migration) :
 
-            // if no children exist this must be the latest migration
-            if (empty($children)):
-                $leaves[$migration->getAppLabel()][] = $name;
-            endif;
+                // get the nodes  children
+                $children = $this->getNodeFamilyTree(
+                    $appName,
+                    $name
+                )->children;
 
+                // if no children exist this must be the latest migration
+                if (empty($children)):
+                    $leaves[$appName][] = $name;
+                endif;
+
+            endforeach;
         endforeach;
 
         return $leaves;
@@ -145,15 +160,21 @@ class Graph
      *
      * @throws NodeNotFoundError
      */
-    public function getAncestryTree($node)
+    public function getAncestryTree($appName, $node)
     {
-        if (!ArrayHelper::hasKey($this->nodes, $node)):
+        if (empty($this->nodes[$appName][$node])):
             throw new NodeNotFoundError(
-                sprintf('Migration with the name %s does not exist',
-                    $node));
+                sprintf(
+                    'Migration with the name %s does not exist',
+                    $node
+                )
+            );
         endif;
 
-        return $this->getNodeFamilyTree($node)->getAncestors();
+        return $this->getNodeFamilyTree(
+            $appName,
+            $node
+        )->getAncestors();
     }
 
     /**
@@ -171,13 +192,18 @@ class Graph
      *
      * @throws NodeNotFoundError
      */
-    public function getDecedentsTree($node)
+    public function getDecedentsTree($appName, $node)
     {
-        if (!ArrayHelper::hasKey($this->nodes, $node)):
-            throw new NodeNotFoundError(sprintf('Migration with the name %s does not exist', $node));
+        if (empty($this->nodes[$appName][$node])):
+            throw new NodeNotFoundError(
+                sprintf(
+                    'Migration with the name %s does not exist',
+                    $node
+                )
+            );
         endif;
 
-        return $this->getNodeFamilyTree($node)->getDescendants();
+        return $this->getNodeFamilyTree($appName, $node)->getDescendants();
     }
 
     /**
@@ -186,15 +212,19 @@ class Graph
     public function getRootNodes()
     {
         $root = [];
-        foreach ($this->nodes as $name => $migration) :
-            // get the nodes  parent
-            $parents = $this->getNodeFamilyTree($name)->parent;
 
-            // if no parent exist this must be the first migration aka adam/eve which ever tickles your fancy
-            if (empty($parents)):
-                $root[] = $name;
-            endif;
+        foreach ($this->nodes as $appName => $nodes) :
+            foreach ($nodes as $name => $migration) :
+                // get the nodes  parent
+                $parents = $this->getNodeFamilyTree($appName, $name)->parent;
 
+                // if no parent exist this must be the first migration aka
+                // adam/eve which ever tickles your fancy
+                if (empty($parents)):
+                    $root[$appName] = $name;
+                endif;
+
+            endforeach;
         endforeach;
 
         return $root;
@@ -207,13 +237,15 @@ class Graph
      *
      * @throws NodeNotFoundError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getState()
+    public function getState($leaves = null, $atEnd = true)
     {
-        $leaves = $this->getLeafNodes();
+        if (is_null($leaves)):
+            $leaves = $this->getLeafNodes();
+        endif;
 
         $state = ProjectState::createObject();
         if (empty($leaves)):
@@ -230,14 +262,21 @@ class Graph
 
             // get lineage
             foreach ($appLeaves as $leaf) :
-                $lineage_members = $this->getAncestryTree($leaf);
+                $lineage_members = $this->getAncestryTree($appName, $leaf);
 
-                foreach ($lineage_members as $i => $l_member) :
+                foreach ($lineage_members as $l_appName => $l_members) :
 
-                    if (in_array($l_member, $lineage)):
-                        continue;
-                    endif;
-                    $lineage[] = $l_member;
+                    foreach ($l_members as $l_member) :
+
+                        if (empty($lineage[$l_appName][$l_member])):
+                            if (!$atEnd && in_array($l_member, $appLeaves)):
+                                continue;
+                            endif;
+
+                            $lineage[$l_appName][] = $l_member;
+                        endif;
+
+                    endforeach;
                 endforeach;
             endforeach;
 
@@ -245,11 +284,13 @@ class Graph
 
         // use the lineage to update the project state based on the migrations.
         /* @var $migration Migration */
-        foreach ($lineage as $member) :
+        foreach ($lineage as $lAppName => $members) :
 
-            $migration = $this->nodes[$member];
+            foreach ($members as $member) :
+                $migration = $this->nodes[$lAppName][$member];
 
-            $state = $migration->updateState($state);
+                $state = $migration->updateState($state);
+            endforeach;
 
         endforeach;
 
@@ -261,12 +302,12 @@ class Graph
      *
      * @return Migration
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getMigration($migrationName)
+    public function getMigration($appName, $migrationName)
     {
-        return $this->nodes[$migrationName];
+        return $this->nodes[$appName][$migrationName];
     }
 }

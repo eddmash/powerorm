@@ -219,4 +219,11 @@ interface ConnectionInterface
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getFeatures();
+
+    /**
+     * @param bool $getSql
+     *
+     * @return SchemaEditor
+     */
+    public function getSchemaEditor($getSql = false);
 }

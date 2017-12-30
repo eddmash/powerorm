@@ -120,7 +120,7 @@ trait ModelFieldsTrait
      *
      * @return DecimalField
      */
-    public static function DecimalField($options)
+    public static function DecimalField($options = [])
     {
         return DecimalField::createObject($options);
     }
