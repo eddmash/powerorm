@@ -19,7 +19,7 @@ use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 /**
  * Renames a model's table.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -46,24 +46,31 @@ class AlterModelTable extends Operation
     /**
      * {@inheritdoc}
      */
-    public function updateState($state)
+    public function updateState(ProjectState $state)
     {
-        $state->modelStates[$this->name]->meta['dbTable'] = $this->table;
+        $meta = $state->getModelState($this->name)->getMeta();
+        $meta['dbTable'] = $this->table;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function databaseForwards($schemaEditor, $fromState, $toState)
-    {
+    public function databaseForwards(
+        SchemaEditor $schemaEditor,
+        ProjectState $fromState,
+        ProjectState $toState
+    ) {
         $this->alterModelTable($schemaEditor, $fromState, $toState);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function databaseBackwards($schemaEditor, $fromState, $toState)
-    {
+    public function databaseBackwards(
+        SchemaEditor $schemaEditor,
+        ProjectState $fromState,
+        ProjectState $toState
+    ) {
         $this->alterModelTable($schemaEditor, $fromState, $toState);
     }
 
@@ -74,7 +81,7 @@ class AlterModelTable extends Operation
      * @param ProjectState $fromState
      * @param ProjectState $toState
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
@@ -86,19 +93,23 @@ class AlterModelTable extends Operation
 
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->name);
-            $schemaEditor->alterDbTable($toModel, $fromModel->meta->dbTable, $toModel->meta->dbTable);
+            $schemaEditor->alterDbTable(
+                $toModel,
+                $fromModel->getMeta()->getDbTable(),
+                $toModel->getMeta()->getDbTable()
+            );
 
             // Rename M2M fields whose name is based on this model's db_table
 
             /** @var $newField ManyToManyField */
             /* @var $oldField ManyToManyField */
-            foreach ($toModel->meta->localManyToMany as $newName => $newField) :
-                foreach ($fromModel->meta->localManyToMany as $oldName => $oldField) :
+            foreach ($toModel->getMeta()->localManyToMany as $newName => $newField) :
+                foreach ($fromModel->getMeta()->localManyToMany as $oldName => $oldField) :
                     if ($newName === $oldName):
                         $schemaEditor->alterDbTable(
                             $newField->relation->through,
-                            $oldField->relation->through->meta->dbTable,
-                            $newField->relation->through->meta->dbTable
+                            $oldField->relation->through->getMeta()->getDbTable(),
+                            $newField->relation->through->getMeta()->getDbTable()
                         );
                     endif;
                 endforeach;

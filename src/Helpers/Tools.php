@@ -278,12 +278,12 @@ class Tools
 
                 $relatedModels[] = $relM;
             elseif ($relM instanceof Model):
-                $relatedModels[] = $relM->meta->getNamespacedModelName();
+                $relatedModels[] = $relM->getMeta()->getNamespacedModelName();
             endif;
         endforeach;
 
         $kwargs['scopeModel'] = $scopeModel;
-        $scopeModel->meta->registry->lazyModelOps($callback, $relatedModels, $kwargs);
+        $scopeModel->getMeta()->registry->lazyModelOps($callback, $relatedModels, $kwargs);
     }
 
     public static function resolveRelation($model, $relModel)
@@ -291,7 +291,7 @@ class Tools
         if (is_string($relModel) && BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $relModel):
             return self::resolveRelation($model, $model);
         elseif ($relModel instanceof Model):
-            return $relModel->meta->getNamespacedModelName();
+            return $relModel->getMeta()->getNamespacedModelName();
         endif;
 
         return $relModel;

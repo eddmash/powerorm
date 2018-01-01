@@ -109,7 +109,7 @@ class Sqlmigrate extends BaseCommand
                 ->graph->nodes[$appName][$name],
         ];
 
-        var_dump($executor->getSql($plan));
-//        $output->writeln($executor->getSql($plan));
+        $sql = $executor->getSql($plan);
+        $output->writeln(implode(PHP_EOL, $sql));
     }
 }

@@ -42,8 +42,8 @@ class UpdateQuery extends Query
     {
         $valuesSeq = [];
         foreach ($values as $name => $value) :
-            $field = $this->model->meta->getField($name);
-            $model = $field->scopeModel->meta->concreteModel;
+            $field = $this->model->getMeta()->getField($name);
+            $model = $field->scopeModel->getMeta()->concreteModel;
             $isDirect = (!($field->autoCreated && !$field->concrete) || !$field->concrete);
             if (!$isDirect || ($field->isRelation && $field->manyToMany)):
                 throw new  FieldError(
@@ -54,7 +54,7 @@ class UpdateQuery extends Query
                     )
                 );
             endif;
-            if ($model->meta->getModelName() !== $this->model->meta->getModelName()):
+            if ($model->getMeta()->getModelName() !== $this->model->getMeta()->getModelName()):
                 $this->addRelatedUpdate($model, $field, $value);
 
                 continue;

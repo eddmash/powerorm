@@ -149,15 +149,35 @@ class Migration implements MigrationInterface
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
      * @throws \Eddmash\PowerOrm\Exception\NotImplemented
+     * @throws \Exception
      */
     public function apply(ProjectState $state, SchemaEditor $schemaEditor)
     {
         /** @var $operation Operation */
         foreach ($this->operations as $operation) :
+
+            if (!$operation->isReducibleToSql()):
+                $schemaEditor->addSql(
+                    '-- MIGRATION NOW PERFORMS'.
+                    ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
+                );
+            endif;
+            $schemaEditor->addSql(
+                sprintf(
+                    '<fg=yellow>-- %s</>',
+                    $operation->getDescription()
+                )
+            );
+
+            if (!$operation->isReducibleToSql()):
+                continue;
+            endif;
+
             // preserve state before operation
             $oldState = $state->deepClone();
 
             $operation->updateState($state);
+            $operation->setAppLabel($this->getAppLabel());
 
             $forwardCallback = function (ConnectionInterface $connection) use (
                 $operation,
@@ -193,6 +213,7 @@ class Migration implements MigrationInterface
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
      * @throws \Eddmash\PowerOrm\Exception\NotImplemented
+     * @throws \Exception
      */
     public function unApply($state, $schemaEditor)
     {
@@ -209,6 +230,7 @@ class Migration implements MigrationInterface
             $newState = $newState->deepClone();
             $oldState = $newState->deepClone();
             $operation->updateState($newState);
+            $operation->setAppLabel($this->getAppLabel());
             /*
              * we insert them in the reverse order so the last operation is run first
              */
@@ -232,11 +254,28 @@ class Migration implements MigrationInterface
                 function () use ($runItem, $schemaEditor) {
                     /** @var $operation Operation */
                     $operation = $runItem['operation'];
-                    $operation->databaseBackwards(
-                        $schemaEditor,
-                        $runItem['newState'],
-                        $runItem['oldState']
+
+                    if (!$operation->isReducibleToSql()):
+                        $schemaEditor->addSql(
+                            '-- MIGRATION NOW PERFORMS'.
+                            ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
+                        );
+                    endif;
+                    $schemaEditor->addSql(
+                        sprintf(
+                            '<fg=yellow>-- %s </>',
+                            ucfirst($operation->getDescription())
+                        )
                     );
+
+                    if ($operation->isReducibleToSql()):
+
+                        $operation->databaseBackwards(
+                            $schemaEditor,
+                            $runItem['newState'],
+                            $runItem['oldState']
+                        );
+                    endif;
                 }
             );
         endforeach;

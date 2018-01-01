@@ -121,7 +121,7 @@ class Registry extends BaseObject
         $models = [];
         /** @var $model Model */
         foreach ($this->allModels as $name => $model) :
-            if ($model->meta->autoCreated):
+            if ($model->getMeta()->autoCreated):
                 continue;
             endif;
             $models[$name] = $model;
@@ -243,7 +243,7 @@ class Registry extends BaseObject
 
     public function registerModel(Model $model)
     {
-        $name = $model->meta->getNamespacedModelName();
+        $name = $model->getMeta()->getNamespacedModelName();
         if (!ArrayHelper::hasKey($this->allModels, $name)) {
             $this->allModels[$name] = $model;
         }
@@ -298,8 +298,8 @@ class Registry extends BaseObject
      */
     public function resolvePendingOps($model)
     {
-        if (isset($this->_pendingOps[$model->meta->getNamespacedModelName()])) {
-            $todoActions = $this->_pendingOps[$model->meta->getNamespacedModelName()];
+        if (isset($this->_pendingOps[$model->getMeta()->getNamespacedModelName()])) {
+            $todoActions = $this->_pendingOps[$model->getMeta()->getNamespacedModelName()];
             foreach ($todoActions as $todoAction) {
                 list($callback, $kwargs) = $todoAction;
                 $kwargs['relatedModel'] = $model;

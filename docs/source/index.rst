@@ -26,7 +26,13 @@ Debugbar
 Data Faker
 **********
 
-:doc:`Data Faker</faker/index>` Generate dummy data for your models.
+:doc:`Data Faker</faker/index>` Generate dummy data for powerorm models.
+
+******
+PhpGis
+******
+
+:doc:`PhpGis</phpgis/index>` Makes the powerorm work with gis data.
 
 
 *****************
@@ -41,6 +47,7 @@ Extra Information
     form/index
     debugger/index
     faker/index
+    phpgis/index
     license
     changelog
 

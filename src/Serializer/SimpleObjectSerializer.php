@@ -43,8 +43,8 @@ abstract class SimpleObjectSerializer implements SerializerInterface
         /** @var $item Model */
         foreach ($items as $item) :
             $this->startObject($item);
-            $concreteModel = $item->meta->concreteModel;
-            $localFields = $concreteModel->meta->localFields;
+            $concreteModel = $item->getMeta()->concreteModel;
+            $localFields = $concreteModel->getMeta()->localFields;
             foreach ($localFields as $field) :
                 if ($field->isSerializable()):
                     if (!$field->isRelation):
@@ -60,7 +60,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
                     endif;
                 endif;
             endforeach;
-            $m2mFields = $concreteModel->meta->localManyToMany;
+            $m2mFields = $concreteModel->getMeta()->localManyToMany;
             foreach ($m2mFields as $m2mField) :
                 if ($m2mField->isSerializable()):
                     if (empty($this->selectedFields) || in_array($m2mField->getAttrName(), $this->selectedFields)):
@@ -94,7 +94,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
     {
         $vals = [];
         /** @var $field ManyToManyField */
-        if ($field->relation->through->meta->autoCreated):
+        if ($field->relation->through->getMeta()->autoCreated):
             //todo handle natuaral keys
             $m2mValues = function (Model $model) {
                 return $model->getPkValue();
@@ -166,7 +166,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      */
     public function endObject(Model $model)
     {
-        $this->objects['model'] = $model->meta->getNamespacedModelName();
+        $this->objects['model'] = $model->getMeta()->getNamespacedModelName();
         $this->objects['fields'] = $this->dumpObject($model);
         $this->_fields = null;
     }

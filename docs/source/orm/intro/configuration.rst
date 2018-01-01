@@ -18,31 +18,15 @@ The ORM takes several configurations
 
     An example of database configuration for mysql is presented below.
 
-- **migrations**
+- **charset**
 
-    - path (*required*)
+    The charset used when working with strings.
 
-        This is location where the ORM will use to store migrations files.
+- **timezone**
 
-- **models**
+    Default: uses timezone of the current php installation.
 
-    This are configarations that relate to the models the orm will interact with.
-
-    - path (*required*)
-
-        This is location where the ORM will expect to find the model files.
-
-    - namespace (*optional*)
-
-        The namespace for the models in the path provided,
-        if the models don't make use of namespace this optional is not needed.
-
-    - autoload (*optional*)
-
-        Tells the orm to autoload the models, if on projects that already
-        take care of autoloading the models, set this option to false.
-
-        **default:** true
+    A string representing the time zone .
 
 - **dbPrefix**
 
@@ -55,39 +39,26 @@ The ORM takes several configurations
 
     all tables created will prefixed with testing so instead of the table *user* it will becomes *testing_user*.
 
-- **charset**
-
-    The charset used when working with strings.
-
-- **timezone**
-
-    Default: uses timezone of the current php installation.
-
-    A string representing the time zone .
-
 .. _config_components:
 
 - **components**
 
-    Enables adding extra modules to the orm.
+    This configuration serves two purposes:
+     - Registering :ref:`applications<component_apps>`. This are
+       applications/project
+       that the orm will be used to manage models, migrations and perform
+       queries.
+     - Registering :ref:`components<component_home>` that extend the orm good
+       examples of this are :
 
-    This is an array of modules that need to be part of the orm.
+        - :ref:`Faker <faker_home>` which is used to generate dummy data for
+          the orm.
+        - :ref:`Debuging Toolbar <debugbar_home>` A tool bar to help in
+          development to view things like what sql the orm ran.
+        - :ref:`PhpGis <gis_home>` Makes the orm work with gis data.
 
-        - The *key* is used to access the module as an attribute of the orm
-        - The value should be a *callback* that receive the orm instance and returns and instance of the module.
+    see :doc:`Components<components>` for more.
 
-    The component will be accessible from the orm instance via the *key*.
-
-    see :ref:`Debugbar Setup<debugbar_setup>` for example.
-
-.. _config_commands:
-
-- **commands**
-
-    Allows adding commands to orm manager.
-
-
-    see :ref:`Faker Setup<faker_setup>` for example.
 
 Sample Configuration file.
 ============================
@@ -100,18 +71,21 @@ A sample configurations.
         'database' => [
             'host' => '127.0.0.1',
             'dbname' => 'tester',
-            'user' => 'admin',
-            'password' => 'admin',
-            'driver' => 'pdo_pgsql',
-        ],
-        'migrations' => [
-            'path' => dirname(__FILE__) . '/application/Migrations',
-        ],
-        'models' => [
-            'path' => dirname(__FILE__) . '/application/Models',
-            'namespace' => 'App\Models',
+            'user' => 'root',
+            'password' => 'root1.',
+            'driver' => 'pdo_mysql',
         ],
         'dbPrefix' => 'demo_',
         'charset' => 'utf-8',
-        'timezone'=>'Africa/Nairobi',
+        'timezone' => 'Africa/Nairobi',
+        'components' => [
+            App::class,
+            PhpGis::class,
+            Toolbar::class,
+            Faker::class,
+        ],
+        'signalManager' => function (BaseOrm $orm) {
+
+            return new SignalManager();
+        },
     ];

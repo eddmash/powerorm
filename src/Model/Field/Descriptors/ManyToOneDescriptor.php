@@ -64,7 +64,7 @@ class ManyToOneDescriptor extends BaseDescriptor
             throw new RelatedObjectDoesNotExist(
                 sprintf(
                     '%s has no %s.',
-                    $this->field->scopeModel->meta->getNamespacedModelName(),
+                    $this->field->scopeModel->getMeta()->getNamespacedModelName(),
                     $this->field->getName()
                 )
             );
@@ -83,9 +83,9 @@ class ManyToOneDescriptor extends BaseDescriptor
                 sprintf(
                     'Cannot assign "%s": "%s->%s" must be a "%s" instance.',
                     $value,
-                    $this->field->scopeModel->meta->getNamespacedModelName(),
+                    $this->field->scopeModel->getMeta()->getNamespacedModelName(),
                     $this->field->getName(),
-                    $this->field->relation->toModel->meta->getNamespacedModelName()
+                    $this->field->relation->toModel->getMeta()->getNamespacedModelName()
                 )
             );
         endif;

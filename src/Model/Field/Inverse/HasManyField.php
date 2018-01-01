@@ -51,13 +51,13 @@ class HasManyField extends InverseField
 
     public function getPathInfo()
     {
-        $meta = $this->scopeModel->meta;
+        $meta = $this->scopeModel->getMeta();
 
         return [
             [
                 'fromMeta' => $meta,
-                'toMeta' => $this->fromField->scopeModel->meta,
-                'targetFields' => [$this->fromField->scopeModel->meta->primaryKey],
+                'toMeta' => $this->fromField->scopeModel->getMeta(),
+                'targetFields' => [$this->fromField->scopeModel->getMeta()->primaryKey],
                 'joinField' => $this->relation, //field that joins the relationship
                 'm2m' => false,
                 'direct' => false,

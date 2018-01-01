@@ -27,6 +27,7 @@ class MigrationFile
      * @var Migration
      */
     private $migration;
+    private $appName;
 
     /**
      * @param Migration $migration

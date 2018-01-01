@@ -61,7 +61,7 @@ interface ComponentInterface
     public function getName();
 
     /**
-     * Command classes.
+     * An array of Command classes that this component provides.
      *
      * @return array
      *

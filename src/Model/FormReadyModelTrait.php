@@ -66,7 +66,7 @@ trait FormReadyModelTrait
         $errors = [];
 
         /** @var $field Field */
-        foreach ($this->meta->getConcreteFields() as $field) :
+        foreach ($this->getMeta()->getConcreteFields() as $field) :
             if (in_array($field->getName(), $exclude)) :
                 continue;
             endif;

@@ -82,7 +82,7 @@ abstract class BaseLookup implements LookupInterface
 
                 while (!$value instanceof $source->scopeModel && $source->relation):
                     $name = $source->relation->getName();
-                    $source = $source->relation->getFromModel()->meta->getField($name);
+                    $source = $source->relation->getFromModel()->getMeta()->getField($name);
                 endwhile;
 
                 try {

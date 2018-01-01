@@ -171,7 +171,7 @@ class ForeignObjectRel extends BaseObject
             return $this->relatedName;
         endif;
 
-        $name = strtolower($model->meta->getModelName());
+        $name = strtolower($model->getMeta()->getModelName());
 
         return ($this->multiple) ? sprintf('%s_set', $name) : $name;
     }
@@ -206,6 +206,6 @@ class ForeignObjectRel extends BaseObject
 
 //    public function __toString()
 //    {
-//        return sprintf('<%s %s>', static::class, $this->toModel->meta->modelName);
+//        return sprintf('<%s %s>', static::class, $this->toModel->getMeta()->modelName);
 //    }
 }

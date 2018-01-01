@@ -152,12 +152,12 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * Determine how a field needs to be ordered.
      *
-     * @param $orderName
+     * @param        $orderName
      * @param string $defaultOrder
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -177,7 +177,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @param Col $col
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -227,7 +227,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @return LookupInterface
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -249,7 +249,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -314,7 +314,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             $this->useDefaultCols = false;
         else:
             $valueSelect = [];
-            foreach ($this->model->meta->getConcreteFields() as $field) :
+            foreach ($this->model->getMeta()->getConcreteFields() as $field) :
                 $valueSelect[] = $field->getName();
             endforeach;
             //todo annotations
@@ -324,20 +324,20 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $this->addFields($valueSelect, true);
     }
 
-// where (
-//      blog_text='men are' and (
-//                              headline='matt' or
-//                              name = 'adsd' or
-//                              not (pub_date=2012)
-//                              )
-// )
-//$users = \App\Models\Entry::objects()->filter([
-//    "blog_text" => "men are",
-//    or_([
-//        'headline' => 'matt',
-//        "n_comments" => "adsd"
-//    ])
-//]);
+    // where (
+    //      blog_text='men are' and (
+    //                              headline='matt' or
+    //                              name = 'adsd' or
+    //                              not (pub_date=2012)
+    //                              )
+    // )
+    //$users = \App\Models\Entry::objects()->filter([
+    //    "blog_text" => "men are",
+    //    or_([
+    //        'headline' => 'matt',
+    //        "n_comments" => "adsd"
+    //    ])
+    //]);
     public function addQ(Q $q)
     {
         $aliases = [];
@@ -394,7 +394,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             $this->groupBy[] = $col;
         endforeach;
 
-        if($this->annotations):
+        if ($this->annotations):
             foreach ($this->annotations as $alias => $annotation) :
                 foreach ($annotation->getGroupByCols() as $groupByCol) :
                     $this->groupBy[] = $groupByCol;
@@ -412,7 +412,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @param $fieldNames
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -451,7 +451,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
     public function getMeta()
     {
-        return $this->model->meta;
+        return $this->model->getMeta();
     }
 
     /**
@@ -459,7 +459,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @return SqlFetchBaseCompiler
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -475,7 +475,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -555,7 +555,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @return Query
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -570,7 +570,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     }
 
     /**
-     * @param $names
+     * @param      $names
      * @param Meta $meta
      * @param bool $failOnMissing
      *
@@ -658,20 +658,25 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             // get the first one
             $alias = $this->tablesAliasList[0];
         else:
-            $alias = $this->join(new BaseTable($this->getMeta()->dbTable, null));
+            $alias = $this->join(
+                new BaseTable(
+                    $this->getMeta()->getDbTable(),
+                    null
+                )
+            );
         endif;
 
         return $alias;
     }
 
     /**
-     * @param $names
+     * @param      $names
      * @param Meta $meta
-     * @param $alias
+     * @param      $alias
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -696,7 +701,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                 $nullable = true;
             endif;
             $join = new Join();
-            $join->setTableName($meta->dbTable);
+            $join->setTableName($meta->getDbTable());
             $join->setParentAlias($alias);
             $join->setJoinType(INNER);
             $join->setJoinField($pathInfo['joinField']);
@@ -756,7 +761,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @param array $aliases
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -788,7 +793,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @param $aliases
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -835,7 +840,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -936,7 +941,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @param array $fields
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -965,7 +970,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1050,7 +1055,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      * @param bool $forceEmpty If True, there will be no ordering in the resulting query (not even the model's
      *                         default)
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1065,7 +1070,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * Clears any existing limits.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1081,7 +1086,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @return bool
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1097,7 +1102,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1116,7 +1121,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @return $this
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1163,7 +1168,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * Gets all names for the fields in the query model, inclusing reverse fields.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1191,7 +1196,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @param Field $joinField
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
@@ -1206,14 +1211,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      * Ensure results are converted back to there respective php types.
      *
      * @param ConnectionInterface $connection
-     * @param $values
+     * @param                     $values
      *
      * @return array
      *
      * @throws FieldError
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -1319,7 +1324,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
  * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
  * @throws \Eddmash\PowerOrm\Exception\KeyError
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -1386,11 +1391,11 @@ function prefetchRelatedObjects($instances, $lookups)
 /**
  * Enusures all prefetch looks are of the same form i.e. instance of Prefetch.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  *
- * @param $lookups
+ * @param      $lookups
  * @param null $prefix
  *
  * @return Prefetch[]

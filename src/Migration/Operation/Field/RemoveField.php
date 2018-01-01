@@ -11,6 +11,9 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
+use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
+
 /**
  * Removes a field from a model.
  *
@@ -23,9 +26,9 @@ class RemoveField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function updateState($state)
+    public function updateState(ProjectState $state)
     {
-        $fields = $state->modelStates[$this->modelName]->fields;
+        $fields = $state->getModelState($this->modelName)->fields;
 
         $fieldsNew = [];
         foreach ($fields as $name => $field) :
@@ -33,7 +36,7 @@ class RemoveField extends FieldOperation
                 $fieldsNew[$name] = $field;
             endif;
         endforeach;
-        $state->modelStates[$this->modelName]->fields = $fieldsNew;
+        $state->getModelState($this->modelName)->fields = $fieldsNew;
     }
 
     /**
@@ -47,24 +50,24 @@ class RemoveField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseForwards($schemaEditor, $fromState, $toState)
+    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $fromModel = $fromState->getRegistry()->getModel($this->modelName);
 
         if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
-            $schemaEditor->removeField($fromModel, $fromModel->meta->getField($this->name));
+            $schemaEditor->removeField($fromModel, $fromModel->getMeta()->getField($this->name));
         endif;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-            $schemaEditor->addField($fromModel, $toModel->meta->getField($this->name));
+            $schemaEditor->addField($fromModel, $toModel->getMeta()->getField($this->name));
         endif;
     }
 }

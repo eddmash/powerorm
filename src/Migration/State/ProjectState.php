@@ -16,7 +16,7 @@ use Eddmash\PowerOrm\DeconstructableObject;
 
 class ProjectState extends DeconstructableObject
 {
-    public $modelStates;
+    protected $modelStates;
 
     public function __construct($modelStates = [])
     {
@@ -28,7 +28,7 @@ class ProjectState extends DeconstructableObject
      *
      * @return ProjectState
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -64,13 +64,16 @@ class ProjectState extends DeconstructableObject
     /**
      * @param ModelState $model
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function addModelState($model)
+    public function addModelState($model, $name = null)
     {
-        $this->modelStates[$model->name] = $model;
+        if (is_null($name)):
+            $name = $model->name;
+        endif;
+        $this->modelStates[$name] = $model;
     }
 
     /**
@@ -78,7 +81,7 @@ class ProjectState extends DeconstructableObject
      *
      * @param $modelName
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -90,7 +93,7 @@ class ProjectState extends DeconstructableObject
     /**
      * @return StateRegistry
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -121,5 +124,15 @@ class ProjectState extends DeconstructableObject
 
     public function deconstruct()
     {
+    }
+
+    /**
+     * @param $oldModelName
+     *
+     * @return ModelState
+     */
+    public function getModelState($oldModelName)
+    {
+        return $this->modelStates[$oldModelName];
     }
 }

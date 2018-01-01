@@ -1,6 +1,8 @@
 Powerorm Faker Guide
 #######################
 
+.. _faker_home:
+
 PowerOrmFaker is an extension of Faker library that generates fake data for the PowerOrm Library.
 
 This is just wrapper to the `PHP Faker <https://github.com/fzaninotto/Faker>`_

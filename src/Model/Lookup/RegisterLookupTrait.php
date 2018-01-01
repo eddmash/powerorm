@@ -27,8 +27,7 @@ trait RegisterLookupTrait
      */
     public static function registerLookup($class, $name = null)
     {
-        /** @var $class BaseLookup */
-
+        /* @var $class BaseLookup */
         if (is_null($name)):
             $name = strtolower($class::$lookupName);
         endif;

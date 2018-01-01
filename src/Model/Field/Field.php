@@ -302,7 +302,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
         $this->scopeModel = $modelObject;
         $this->setFromName($fieldName);
-        $this->scopeModel->meta->addField($this);
+        $this->scopeModel->getMeta()->addField($this);
         $this->scopeModel->_fieldCache[$this->getAttrName()] = $this->getDefault();
     }
 
@@ -728,7 +728,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
             $outputField = $this;
         endif;
 
-        if ($alias !== $this->scopeModel->meta->dbTable && $outputField->name !== $this->name):
+        if ($alias !== $this->scopeModel->getMeta()->getDbTable() && $outputField->name !== $this->name):
             return Col::createObject($alias, $this, $outputField);
         endif;
 
@@ -788,7 +788,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     public function __debugInfo()
     {
         $meta = parent::__debugInfo();
-        $meta['scopeModel'] = $this->scopeModel->meta->getNamespacedModelName();
+        $meta['scopeModel'] = $this->scopeModel->getMeta()->getNamespacedModelName();
 
         return $meta;
     }

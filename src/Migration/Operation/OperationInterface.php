@@ -22,11 +22,11 @@ interface OperationInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function updateState($state);
+    public function updateState(ProjectState $state);
 
     /**
      * @param SchemaEditor $schemaEditor
@@ -35,11 +35,11 @@ interface OperationInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function databaseForwards($schemaEditor, $fromState, $toState);
+    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState);
 
     /**
      * @param SchemaEditor $schemaEditor
@@ -48,11 +48,11 @@ interface OperationInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function databaseBackwards($schemaEditor, $fromState, $toState);
+    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState);
 
     /**
      * Return either a list of operations the actual operation should be
@@ -64,11 +64,11 @@ interface OperationInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function reduce($operation, $inBetween);
+    public function reduce(Operation $operation, $inBetween);
 
     /**
      * Returns True if there is a chance this operation references the given  model name (as a string).

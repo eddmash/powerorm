@@ -11,6 +11,9 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
+use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
+
 /**
  * Renames a field on the model. Might affect db_column too.
  *
@@ -27,9 +30,9 @@ class RenameField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function updateState($state)
+    public function updateState(ProjectState $state)
     {
-        $fields = $state->modelStates[$this->modelName]->fields;
+        $fields = $state->getModelState($this->modelName)->fields;
         $fieldsNew = [];
         foreach ($fields as $name => $field) :
             if ($name === $this->oldName):
@@ -39,7 +42,7 @@ class RenameField extends FieldOperation
             endif;
         endforeach;
 
-        $state->modelStates[$this->modelName]->fields = $fieldsNew;
+        $state->getModelState($this->modelName)->fields = $fieldsNew;
     }
 
     /**
@@ -53,15 +56,15 @@ class RenameField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseForwards($schemaEditor, $fromState, $toState)
+    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $schemaEditor->alterField(
                 $fromModel,
-                $fromModel->meta->getField($this->oldName),
-                $toModel->meta->getField($this->newName)
+                $fromModel->getMeta()->getField($this->oldName),
+                $toModel->getMeta()->getField($this->newName)
             );
         endif;
     }
@@ -69,15 +72,15 @@ class RenameField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $schemaEditor->alterField(
                 $fromModel,
-                $fromModel->meta->getField($this->newName),
-                $toModel->meta->getField($this->oldName)
+                $fromModel->getMeta()->getField($this->newName),
+                $toModel->getMeta()->getField($this->oldName)
             );
         endif;
     }

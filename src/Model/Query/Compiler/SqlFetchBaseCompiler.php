@@ -270,14 +270,14 @@ class SqlFetchBaseCompiler extends SqlCompiler
         endif;
 
         foreach ($meta->getConcreteFields() as $field) :
-            $model = $field->scopeModel->meta->concreteModel;
-            if ($meta->getNamespacedModelName() == $model->meta->getNamespacedModelName()):
+            $model = $field->scopeModel->getMeta()->concreteModel;
+            if ($meta->getNamespacedModelName() == $model->getMeta()->getNamespacedModelName()):
                 $model = null;
             endif;
             if ($fromParent && !is_null($model) &&
                 is_subclass_of(
-                    $fromParent->meta->concreteModel,
-                    $model->meta->concreteModel->meta->getNamespacedModelName()
+                    $fromParent->getMeta()->concreteModel,
+                    $model->getMeta()->concreteModel->getMeta()->getNamespacedModelName()
                 )
             ):
                 // Avoid loading data for already loaded parents.
@@ -342,7 +342,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
         endif;
 
         foreach ($meta->getNonM2MForwardFields() as $field) :
-            $fieldModel = $field->scopeModel->meta->concreteModel;
+            $fieldModel = $field->scopeModel->getMeta()->concreteModel;
             $foundFields[] = $field->getName();
 
             if ($restricted):
@@ -381,7 +381,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
             list($_, $_, $joinList, $_) = $this->query->setupJoins([$field->getName()], $meta, $rootAlias);
             $alias = end($joinList);
-            $columns = $this->getDefaultCols($alias, $field->relation->getToModel()->meta);
+            $columns = $this->getDefaultCols($alias, $field->relation->getToModel()->getMeta());
             $selectFields = [];
             foreach ($columns as $column) :
                 $selectFields[] = count($select);
@@ -393,7 +393,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
             // so no we do user and so in
             $nextKlassInfo = $this->getRelatedSelections(
                 $select,
-                $field->relation->getToModel()->meta,
+                $field->relation->getToModel()->getMeta(),
                 $alias,
                 $curDepth + 1,
                 $nextSpanField,
@@ -437,7 +437,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
                 $fromParent = false;
                 if (
                     is_subclass_of($rModel, $meta->getNamespacedModelName()) &&
-                    $rModel->meta->getNamespacedModelName() === $meta->getNamespacedModelName()
+                    $rModel->getMeta()->getNamespacedModelName() === $meta->getNamespacedModelName()
                 ):
                     $fromParent = true;
                 endif;
@@ -449,7 +449,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
                     'from_parent' => $fromParent,
                 ];
 
-                $rColumns = $this->getDefaultCols($alias, $rModel->meta, $this->query->model);
+                $rColumns = $this->getDefaultCols($alias, $rModel->getMeta(), $this->query->model);
 
                 $rSelectFields = [];
                 foreach ($rColumns as $column) :
@@ -462,7 +462,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
                 $rNextKlassInfo = $this->getRelatedSelections(
                     $select,
-                    $rModel->meta,
+                    $rModel->getMeta(),
                     $alias,
                     $curDepth + 1,
                     $rNextSpanField,

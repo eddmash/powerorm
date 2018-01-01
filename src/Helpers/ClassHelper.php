@@ -277,6 +277,7 @@ class ClassHelper
             endif;
 
             $setterMethod = sprintf('set%s', ucfirst($name));
+
             if (method_exists($object, $setterMethod)):
                 call_user_func([$object, $setterMethod], $value);
             elseif (property_exists($object, $name)):

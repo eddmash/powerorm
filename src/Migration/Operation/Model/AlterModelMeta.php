@@ -6,14 +6,16 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
+use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ModelState;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 class AlterModelMeta extends Operation
 {
     public $name;
-    public $meta = [];
+    protected $meta = [];
 
     private static $alterableOptions = ['managed', 'verbosename'];
 
@@ -25,20 +27,20 @@ class AlterModelMeta extends Operation
     /**
      * {@inheritdoc}
      */
-    public function updateState($state)
+    public function updateState(ProjectState $state)
     {
         /** @var $modelState ModelState */
-        $modelState = $state->modelStates[$this->name];
-        $meta = ($modelState->meta) ? $modelState->meta : [];
-        $meta = array_replace($meta, $this->meta);
+        $modelState = $state->getModelState($this->name);
+        $meta = ($modelState->getMeta()) ? $modelState->getMeta() : [];
+        $meta = array_replace($meta, $this->getMeta());
 
         foreach (self::$alterableOptions as $alterableOption) :
-            if (!ArrayHelper::hasKey($this->meta, $alterableOption) && ArrayHelper::hasKey($meta, $alterableOption)):
+            if (!ArrayHelper::hasKey($this->getMeta(), $alterableOption) && ArrayHelper::hasKey($meta, $alterableOption)):
 
                 unset($meta[$alterableOption]);
             endif;
         endforeach;
-        $modelState->meta = $meta;
+        $modelState->setMeta($meta);
     }
 
     public function getDescription()
@@ -49,7 +51,7 @@ class AlterModelMeta extends Operation
     /**
      * {@inheritdoc}
      */
-    public function databaseForwards($schemaEditor, $fromState, $toState)
+    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         parent::databaseForwards($schemaEditor, $fromState, $toState);
     }
@@ -57,8 +59,16 @@ class AlterModelMeta extends Operation
     /**
      * {@inheritdoc}
      */
-    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         parent::databaseBackwards($schemaEditor, $fromState, $toState);
+    }
+
+    /**
+     * @return array
+     */
+    public function getMeta()
+    {
+        return $this->meta;
     }
 }

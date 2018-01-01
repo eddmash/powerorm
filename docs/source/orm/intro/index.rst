@@ -18,6 +18,8 @@ Powerorm at a glance
 This is an informal overview of how to write a database-driven Web app with Powerorm.
 The goal of this document is to give you enough technical specifics to understand how Powerorm works.
 
+This assumes you have already :doc:`Installed <install>` the orm
+
 Design your model
 ----------------------
 Powerorm is an object-relational mapper in which you describe your database layout in PHP code.
@@ -176,6 +178,7 @@ You can access the manager object for an model class via the objects() method:
    self
    install
    configuration
+   components
    dependencies
    features
    credits

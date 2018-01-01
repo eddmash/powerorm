@@ -28,7 +28,7 @@ abstract class Component implements ComponentInterface
     }
 
     /**
-     * Instance to to return if the component is queryable.
+     * Instance to return if the component is queryable.
      *
      * @return mixed
      *

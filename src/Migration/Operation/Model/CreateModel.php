@@ -11,12 +11,14 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
+use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\FieldOperation;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ModelState;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -26,7 +28,7 @@ class CreateModel extends ModelOperation
     /**
      * @var Meta
      */
-    public $meta = [];
+    protected $meta = [];
 
     public $extends;
 
@@ -34,7 +36,7 @@ class CreateModel extends ModelOperation
     {
         return sprintf(
             'Create %smodel %s',
-            (isset($this->meta['proxy']) && $this->meta['proxy']) ? 'proxy ' : '',
+            (isset($this->getMeta()['proxy']) && $this->getMeta()['proxy']) ? 'proxy ' : '',
             $this->name
         );
     }
@@ -74,14 +76,14 @@ class CreateModel extends ModelOperation
     /**
      * {@inheritdoc}
      */
-    public function updateState($state)
+    public function updateState(ProjectState $state)
     {
-        $this->meta['appName'] = $this->getAppLabel();
+        $this->getMeta()['appName'] = $this->getAppLabel();
         $state->addModelState(
             ModelState::createObject(
                 $this->name,
                 $this->fields,
-                ['meta' => $this->meta, 'extends' => $this->extends]
+                ['meta' => $this->getMeta(), 'extends' => $this->extends]
             )
         );
     }
@@ -89,7 +91,7 @@ class CreateModel extends ModelOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseForwards($schemaEditor, $fromState, $toState)
+    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $model = $toState->getRegistry()->getModel($this->name);
         if ($this->allowMigrateModel($schemaEditor->connection, $model)):
@@ -100,7 +102,7 @@ class CreateModel extends ModelOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $model = $fromState->getRegistry()->getModel($this->name);
         if ($this->allowMigrateModel($schemaEditor->connection, $model)):
@@ -122,10 +124,10 @@ class CreateModel extends ModelOperation
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function reduce($operation, $inBetween)
+    public function reduce(Operation $operation, $inBetween)
     {
         if ($operation instanceof DeleteModel &&
-            $this->name === $operation->name && !$this->meta->proxy) :
+            $this->name === $operation->name && !$this->getMeta()->proxy) :
             return [];
         endif;
 
@@ -138,7 +140,7 @@ class CreateModel extends ModelOperation
                 if ($operation->field->relation) :
                     foreach ($inBetween as $between) :
                         $modelName = $operation->field->relation
-                            ->toModel->meta->getNamespacedModelName();
+                            ->toModel->getMeta()->getNamespacedModelName();
                         if ($between->referencesModel($modelName)) :
                             return false;
                         endif;
@@ -148,7 +150,7 @@ class CreateModel extends ModelOperation
                             $operation->field->relation->through
                         ) :
                             $modelName = $operation->field->relation
-                                ->through->meta->getNamespacedModelName();
+                                ->through->getMeta()->getNamespacedModelName();
                             if ($between->referencesModel($modelName)) :
                                 return false;
                             endif;
@@ -163,7 +165,7 @@ class CreateModel extends ModelOperation
                     [
                         'name' => $this->name,
                         'fields' => $fields,
-                        'meta' => $this->meta,
+                        'meta' => $this->getMeta(),
                         'extends' => $this->extends,
                     ]
                 );
@@ -190,5 +192,19 @@ class CreateModel extends ModelOperation
         $arr['fields'] = array_keys($this->fields);
 
         return $arr;
+    }
+
+    public function getMeta()
+    {
+        $this->meta['appName'] = $this->getAppLabel();
+        return $this->meta;
+    }
+
+    /**
+     * @param Meta $meta
+     */
+    public function setMeta($meta)
+    {
+        $this->meta = $meta;
     }
 }

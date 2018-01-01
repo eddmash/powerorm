@@ -162,7 +162,7 @@ class Queryset implements QuerysetInterface
             throw new ObjectDoesNotExist(
                 sprintf(
                     '%s matching query does not exist.',
-                    $this->model->meta->getNamespacedModelName()
+                    $this->model->getMeta()->getNamespacedModelName()
                 )
             );
         endif;
@@ -170,7 +170,7 @@ class Queryset implements QuerysetInterface
         throw new MultipleObjectsReturned(
             sprintf(
                 '"get() returned more than one %s -- it returned %s!"',
-                $this->model->meta->getNamespacedModelName(),
+                $this->model->getMeta()->getNamespacedModelName(),
                 $resultCount
             )
         );
@@ -221,7 +221,7 @@ class Queryset implements QuerysetInterface
         $names = $this->_fields;
         if (is_null($this->_fields)):
             $names = [];
-            foreach ($this->model->meta->getFields() as $field) :
+            foreach ($this->model->getMeta()->getFields() as $field) :
                 $names[] = $field->getName();
             endforeach;
         endif;
@@ -410,11 +410,18 @@ class Queryset implements QuerysetInterface
         return $clone->getSqlCompiler($this->connection)->executeSql();
     }
 
-    public function _insert($model, $fields, $returnId)
+    /**
+     * @param Model $model
+     * @param $fields
+     * @param $returnId
+     *
+     * @return mixed
+     */
+    public function _insert(Model $model, $fields, $returnId)
     {
         $qb = $this->connection->createQueryBuilder();
 
-        $qb->insert($model->meta->dbTable);
+        $qb->insert($model->getMeta()->getDbTable());
 
         /** @var $field Field */
         foreach ($fields as $name => $field) :

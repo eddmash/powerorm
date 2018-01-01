@@ -34,7 +34,7 @@ class AlterField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function updateState($state)
+    public function updateState(ProjectState $state)
     {
         if (false === $this->preserveDefault):
             $alteredField = $this->field->deepClone();
@@ -43,7 +43,7 @@ class AlterField extends FieldOperation
             $alteredField = $this->field;
         endif;
 
-        $fields = $state->modelStates[$this->modelName]->fields;
+        $fields = $state->getModelState($this->modelName)->fields;
         $newFields = [];
 
         foreach ($fields as $name => $oldField) :
@@ -53,13 +53,13 @@ class AlterField extends FieldOperation
                 $newFields[$name] = $oldField;
             endif;
         endforeach;
-        $state->modelStates[$this->modelName]->fields = $newFields;
+        $state->getModelState($this->modelName)->fields = $newFields;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function databaseForwards($schemaEditor, $fromState, $toState)
+    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $this->alterField($schemaEditor, $fromState, $toState);
     }
@@ -67,7 +67,7 @@ class AlterField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $this->alterField($schemaEditor, $fromState, $toState);
     }
@@ -92,8 +92,8 @@ class AlterField extends FieldOperation
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-            $fromField = $fromModel->meta->getField($this->name);
-            $toField = $toModel->meta->getField($this->name);
+            $fromField = $fromModel->getMeta()->getField($this->name);
+            $toField = $toModel->getMeta()->getField($this->name);
             if (false === $this->preserveDefault):
                 $toField->default = $this->field->default;
             endif;

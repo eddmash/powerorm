@@ -11,6 +11,9 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
+use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
+
 /**
  *  Drops a model's table.
  *
@@ -23,7 +26,7 @@ class DeleteModel extends ModelOperation
     /**
      * {@inheritdoc}
      */
-    public function updateState($state)
+    public function updateState(ProjectState $state)
     {
         $state->removeModelState($this->name);
     }
@@ -39,7 +42,7 @@ class DeleteModel extends ModelOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseForwards($schemaEditor, $fromState, $toState)
+    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $model = $fromState->getRegistry()->getModel($this->name);
         if ($this->allowMigrateModel($schemaEditor->connection, $model)):
@@ -50,7 +53,7 @@ class DeleteModel extends ModelOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $model = $toState->getRegistry()->getModel($this->name);
         if ($this->allowMigrateModel($schemaEditor->connection, $model)):

@@ -89,8 +89,8 @@ class M2MManager extends BaseM2MManager
 
         $this->through = $rel->through;
 
-        $this->fromField = $this->through->meta->getField($this->fromFieldName);
-        $this->toField = $this->through->meta->getField($this->toFieldName);
+        $this->fromField = $this->through->getMeta()->getField($this->fromFieldName);
+        $this->toField = $this->through->getMeta()->getField($this->toFieldName);
         $this->filters = [];
 
         foreach ([$this->fromField->getRelatedFields()] as $fields) :
@@ -105,7 +105,7 @@ class M2MManager extends BaseM2MManager
             throw new ValueError(
                 sprintf(
                     '"%s" needs to have a value for field "%s" before this many-to-many relationship can be used.',
-                    $this->instance->meta->getNamespacedModelName(),
+                    $this->instance->getMeta()->getNamespacedModelName(),
                     $this->fromFieldName
                 )
             );
@@ -116,12 +116,12 @@ class M2MManager extends BaseM2MManager
 
     public function add()
     {
-        if (!$this->through->meta->autoCreated) :
+        if (!$this->through->getMeta()->autoCreated) :
             throw new AttributeError(
                 sprintf(
                     "Cannot set values on a ManyToManyField which specifies an intermediary model. 
                 Use %s's Manager instead.",
-                    $this->through->meta->getModelName()
+                    $this->through->getMeta()->getModelName()
                 )
             );
         endif;
@@ -131,8 +131,8 @@ class M2MManager extends BaseM2MManager
 
     public function remove()
     {
-        if (!$this->through->meta->autoCreated):
-            $meta = $this->through->meta;
+        if (!$this->through->getMeta()->autoCreated):
+            $meta = $this->through->getMeta();
 
             throw new AttributeError(
                 sprintf(
@@ -148,12 +148,12 @@ class M2MManager extends BaseM2MManager
 
     public function set($values, $kwargs = [])
     {
-        if (!$this->through->meta->autoCreated) :
+        if (!$this->through->getMeta()->autoCreated) :
             throw new AttributeError(
                 sprintf(
                     "Cannot set values on a ManyToManyField which specifies an intermediary model. 
                 Use %s's Manager instead.",
-                    $this->through->meta->getModelName()
+                    $this->through->getMeta()->getModelName()
                 )
             );
         endif;
@@ -195,13 +195,13 @@ class M2MManager extends BaseM2MManager
             $newIds = [];
 
             foreach ($values as $value) :
-                $field = $this->through->meta->getField($this->toFieldName);
+                $field = $this->through->getMeta()->getField($this->toFieldName);
                 $newIds[] = $field->getForeignRelatedFieldsValues($value)[0];
             endforeach;
             $newIds = array_unique($newIds);
 
             /** @var $throughClass Model */
-            $throughClass = $this->through->meta->getNamespacedModelName();
+            $throughClass = $this->through->getMeta()->getNamespacedModelName();
 
             $oldVals = $throughClass::objects($this->through)->asArray([$toFieldName], true, true)->filter(
                 [
@@ -216,7 +216,7 @@ class M2MManager extends BaseM2MManager
             $qb = BaseOrm::getDbConnection()->createQueryBuilder();
 
             foreach ($newIds as $newId) :
-                $qb->insert($this->through->meta->dbTable);
+                $qb->insert($this->through->getMeta()->getDbTable());
 
                 $qb->setValue(sprintf('%s_id', $fromFieldName), $qb->createNamedParameter($this->relatedValues[0]));
                 $qb->setValue(sprintf('%s_id', $toFieldName), $qb->createNamedParameter($newId));
@@ -238,7 +238,7 @@ class M2MManager extends BaseM2MManager
         foreach ($values as $value) :
             if ($value instanceof Model):
 
-                $field = $this->through->meta->getField($this->toFieldName);
+                $field = $this->through->getMeta()->getField($this->toFieldName);
                 $oldIds[] = $field->getForeignRelatedFieldsValues($value)[0];
             else:
                 $oldIds[] = $value;

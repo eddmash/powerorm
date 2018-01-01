@@ -14,7 +14,6 @@ namespace Eddmash\PowerOrm;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\Checks\ChecksRegistry;
@@ -273,27 +272,6 @@ class BaseOrm extends BaseObject
     }
 
     // ---------------------------- ORM SETUP METHODS ----------------------
-
-    /**
-     * Register custom Doctrine dbal types.
-     *
-     * @since  1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     *
-     * @throws DBALException
-     * @throws OrmException
-     */
-    public static function presetup(self $orm)
-    {
-        foreach ($orm->dbTypes as $name => $type) {
-            Type::addType($name, $type);
-        }
-
-        foreach ($orm->dbMappingTypes as $name => $mappingType) {
-            static::getDbConnection()->getDatabasePlatform()->registerDoctrineTypeMapping($name, $mappingType);
-        }
-    }
 
     /**
      * Populate the registray.

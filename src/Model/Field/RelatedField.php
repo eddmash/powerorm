@@ -91,10 +91,10 @@ class RelatedField extends Field
     {
         $relModel = $this->relation->toModel;
         if ($relModel instanceof Model):
-            $relModel = $relModel->meta->getNamespacedModelName();
+            $relModel = $relModel->getMeta()->getNamespacedModelName();
         endif;
 
-        $relMissing = $this->scopeModel->meta->registry->hasModel($relModel);
+        $relMissing = $this->scopeModel->getMeta()->registry->hasModel($relModel);
 
         $error = [];
 
@@ -170,7 +170,7 @@ class RelatedField extends Field
             $msg = sprintf(
                 "The name '%s' is invalid relatedName for field %s.%s",
                 $relatedName,
-                $this->scopeModel->meta->getNamespacedModelName(),
+                $this->scopeModel->getMeta()->getNamespacedModelName(),
                 $this->getName()
             );
 
@@ -203,11 +203,11 @@ class RelatedField extends Field
             return [];
         endif;
         $error = [];
-        $relMeta = $this->relation->getToModel()->meta;
+        $relMeta = $this->relation->getToModel()->getMeta();
         $relName = $this->relation->getAccessorName();
         $relQueryName = $this->getRelatedQueryName();
         $isHidden = $this->relation->isHidden();
-        $fieldName = sprintf('%s.%s', $this->scopeModel->meta->getNamespacedModelName(), $this->getName());
+        $fieldName = sprintf('%s.%s', $this->scopeModel->getMeta()->getNamespacedModelName(), $this->getName());
 
         foreach ($relMeta->getFields(true, false, false) as $clashField) :
             $clashName = sprintf('%s.%s', $relMeta->getNamespacedModelName(), $clashField->getName());
@@ -260,7 +260,7 @@ class RelatedField extends Field
             endif;
             $clashName = sprintf(
                 '%s.%s',
-                $reverseRelatedObject->scopeModel->meta->getNamespacedModelName(),
+                $reverseRelatedObject->scopeModel->getMeta()->getNamespacedModelName(),
                 $reverseRelatedObject->getName()
             );
 
@@ -320,15 +320,15 @@ class RelatedField extends Field
         $namespace = str_replace(
             '\\',
             '_',
-            rtrim($this->scopeModel->meta->getNamespacedModelName(), '\\')
+            rtrim($this->scopeModel->getMeta()->getNamespacedModelName(), '\\')
         );
         if ($this->relation->relatedName):
             $this->relation->relatedName = sprintf($this->relation->relatedName, $namespace);
-        elseif ($this->scopeModel->meta->defaultRelatedName):
+        elseif ($this->scopeModel->getMeta()->defaultRelatedName):
 
             $this->relation->relatedName =
                 sprintf(
-                    $this->scopeModel->meta->defaultRelatedName,
+                    $this->scopeModel->getMeta()->defaultRelatedName,
                     $namespace
                 );
         endif;
@@ -380,14 +380,14 @@ class RelatedField extends Field
             $inverseField = $this->inverseField;
             $hasMany = $inverseField::createObject(
                 [
-                    'to' => $this->scopeModel->meta->getNamespacedModelName(),
+                    'to' => $this->scopeModel->getMeta()->getNamespacedModelName(),
                     'toField' => $relation->fromField->getName(),
                     'fromField' => $this,
                     'autoCreated' => true,
                 ]
             );
 
-            $relatedModel->meta->concreteModel->addToClass($relation->getAccessorName(), $hasMany);
+            $relatedModel->getMeta()->concreteModel->addToClass($relation->getAccessorName(), $hasMany);
         endif;
     }
 
@@ -417,7 +417,7 @@ class RelatedField extends Field
         if (is_string($this->relation->toModel)):
             $kwargs['to'] = $this->relation->toModel;
         else:
-            $name = $this->relation->toModel->meta->getNamespacedModelName();
+            $name = $this->relation->toModel->getMeta()->getNamespacedModelName();
 
             $kwargs['to'] = $name;
         endif;
@@ -471,14 +471,14 @@ class RelatedField extends Field
         if (BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $this->fromField) :
             $this->fromField = $this;
         elseif (is_string($this->fromField)):
-            $this->fromField = $this->scopeModel->meta->getField($this->fromField);
+            $this->fromField = $this->scopeModel->getMeta()->getField($this->fromField);
         endif;
 
         //end point of relation
         if (is_string($this->toField)):
-            $this->toField = $this->relation->toModel->meta->getField($this->toField);
+            $this->toField = $this->relation->toModel->getMeta()->getField($this->toField);
         else:
-            $this->toField = $this->relation->toModel->meta->primaryKey;
+            $this->toField = $this->relation->toModel->getMeta()->primaryKey;
         endif;
 
         return [$this->fromField, $this->toField];
@@ -552,8 +552,8 @@ class RelatedField extends Field
     {
         return [
             [
-                'fromMeta' => $this->scopeModel->meta,
-                'toMeta' => $this->relation->toModel->meta,
+                'fromMeta' => $this->scopeModel->getMeta(),
+                'toMeta' => $this->relation->toModel->getMeta(),
                 'targetFields' => $this->getForeignRelatedFields(),
                 'joinField' => $this, //field that joins the relationship
                 'm2m' => false,
@@ -570,12 +570,12 @@ class RelatedField extends Field
      */
     public function getReversePathInfo()
     {
-        $meta = $this->relation->toModel->meta;
+        $meta = $this->relation->toModel->getMeta();
 
         return [
             [
                 'fromMeta' => $meta,
-                'toMeta' => $this->scopeModel->meta,
+                'toMeta' => $this->scopeModel->getMeta(),
                 'targetFields' => [$meta->primaryKey],
                 'joinField' => $this->relation, //field that joins the relationship
                 'm2m' => false,
@@ -598,7 +598,7 @@ class RelatedField extends Field
         elseif ($this->relation->relatedName):
             $name = $this->relation->relatedName;
         else:
-            $name = $this->scopeModel->meta->getModelName();
+            $name = $this->scopeModel->getMeta()->getModelName();
         endif;
 
         return strtolower($name);

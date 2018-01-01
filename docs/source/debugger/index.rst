@@ -1,6 +1,8 @@
 Powerorm Debugbar Guide
 #######################
 
+.. _debugbar_home:
+
 Displays a debug bar in the browser with information from php. No more var_dump() in your code!
 
 .. image:: https://raw.githubusercontent.com/maximebf/php-debugbar/master/docs/screenshot.png

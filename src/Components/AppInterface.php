@@ -15,4 +15,6 @@ interface AppInterface extends ComponentInterface
     public function getModelsPath();
 
     public function getMigrationsPath();
+
+    public function getDbPrefix();
 }

@@ -109,7 +109,7 @@ class ManyToManyField extends RelatedField
     {
         $hasMany = HasManyField::createObject(
             [
-                'to' => $this->scopeModel->meta->getNamespacedModelName(),
+                'to' => $this->scopeModel->getMeta()->getNamespacedModelName(),
                 'toField' => $relation->fromField->getName(),
                 'fromField' => $this,
                 'autoCreated' => true,
@@ -140,7 +140,7 @@ class ManyToManyField extends RelatedField
      */
     public function createManyToManyIntermediaryModel($field, $model)
     {
-        $modelName = $model->meta->getNamespacedModelName();
+        $modelName = $model->getMeta()->getNamespacedModelName();
 
         if (is_string($field->relation->toModel)):
             $toModelName = Tools::resolveRelation($model, $field->relation->toModel);
@@ -148,12 +148,12 @@ class ManyToManyField extends RelatedField
             $toModelName = $ref->getShortName();
             $toNamespacedModelName = $ref->getName();
         else:
-            $toModelName = $field->relation->toModel->meta->getModelName();
-            $toNamespacedModelName = $field->relation->toModel->meta->getNamespacedModelName();
+            $toModelName = $field->relation->toModel->getMeta()->getModelName();
+            $toNamespacedModelName = $field->relation->toModel->getMeta()->getNamespacedModelName();
         endif;
 
-        $className = sprintf('%1$s_%2$s', $model->meta->getModelName(), $field->getName());
-        $from = strtolower($model->meta->getModelName());
+        $className = sprintf('%1$s_%2$s', $model->getMeta()->getModelName(), $field->getName());
+        $from = strtolower($model->getMeta()->getModelName());
         $to = strtolower($toModelName);
         if ($from == $to):
             $to = sprintf('to_%s', $to);
@@ -187,7 +187,7 @@ class ManyToManyField extends RelatedField
         $intermediaryClass->addItem('}');
         $intermediaryClass->addItem('public function getMetaSettings(){');
         $intermediaryClass->addItem('return [');
-        $intermediaryClass->addItem(sprintf("'dbTable' => '%s',", $field->getM2MDbTable($model->meta)));
+        $intermediaryClass->addItem(sprintf("'dbTable' => '%s',", $field->getM2MDbTable($model->getMeta())));
         $intermediaryClass->addItem(sprintf("'verboseName' => '%s',", sprintf('%s-%s relationship', $from, $to)));
         $intermediaryClass->addItem(sprintf("'uniqueTogether' => ['%s','%s'],", $from, $to));
         $intermediaryClass->addItem("'autoCreated' => true");
@@ -203,7 +203,7 @@ class ManyToManyField extends RelatedField
         $obj = new $className();
 
         $obj->setupClassInfo($fields, [
-            'meta' => ['appName' => $model->meta->getAppName()],
+            'meta' => ['appName' => $model->getMeta()->getAppName()],
         ]);
 
         return $obj;
@@ -223,12 +223,12 @@ class ManyToManyField extends RelatedField
     private function getM2MDbTable($meta)
     {
         if (null !== $this->relation->through):
-            return $this->relation->through->meta->dbTable;
-        elseif ($this->dbTable):
-            return $this->dbTable;
+            return $this->relation->through->getMeta()->getDbTable();
+        elseif ($this->getDbTable()):
+            return $this->getDbTable();
         else:
             // oracle allows identifier of 30 chars max
-            return StringHelper::truncate(sprintf('%s_%s', $meta->dbTable, $this->getName()), 30);
+            return StringHelper::truncate(sprintf('%s_%s', $meta->getDbTable(), $this->getName()), 30);
         endif;
     }
 
@@ -279,10 +279,10 @@ class ManyToManyField extends RelatedField
         endif;
 
         /** @var $field RelatedField */
-        foreach ($this->relation->through->meta->getFields() as $field) :
+        foreach ($this->relation->through->getMeta()->getFields() as $field) :
             if ($field->isRelation &&
-                $field->relation->toModel->meta->getNamespacedModelName() == $relation->getFromModel(
-                )->meta->getNamespacedModelName() &&
+                $field->relation->toModel->getMeta()->getNamespacedModelName() == $relation->getFromModel(
+                )->getMeta()->getNamespacedModelName() &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
 
@@ -313,10 +313,10 @@ class ManyToManyField extends RelatedField
         endif;
 
         /** @var $field RelatedField */
-        foreach ($this->relation->through->meta->getFields() as $field) :
+        foreach ($this->relation->through->getMeta()->getFields() as $field) :
             if ($field->isRelation &&
-                $field->relation->toModel->meta->getNamespacedModelName(
-                ) == $relation->toModel->meta->getNamespacedModelName() &&
+                $field->relation->toModel->getMeta()->getNamespacedModelName(
+                ) == $relation->toModel->getMeta()->getNamespacedModelName() &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
                 $this->{$cache_attr} = ('name' == $attr) ? call_user_func([$field, 'getName']) : $field->{$attr};
@@ -343,8 +343,8 @@ class ManyToManyField extends RelatedField
         $m2mField = call_user_func($this->m2mField);
         $m2mReverseField = call_user_func($this->m2mReverseField);
 
-        $field = $model->meta->getField($m2mField);
-        $reverseField = $model->meta->getField($m2mReverseField);
+        $field = $model->getMeta()->getField($m2mField);
+        $reverseField = $model->getMeta()->getField($m2mReverseField);
 
         if ($direct):
             $paths = array_merge($paths, $field->getReversePathInfo());

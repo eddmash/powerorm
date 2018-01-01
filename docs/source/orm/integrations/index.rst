@@ -8,10 +8,11 @@ This is guide in setting up and using Powerorm on projects.
 Setting up
 ----------
 
-For projects that use namespace that are loaded using composer autoloader. Place powerorm in a locatin where it's
-loaded early enough.
+For projects that use namespace that are loaded using composer autoloader.
+Place powerorm in a locatin where it's loaded early enough.
 
-To load powerorm use the following code and pass the :ref:`Configs <self_config>` needed for powerorm to work
+To load powerorm use the following code and pass the
+:ref:`Configs <self_config>` needed for powerorm to work
 
 .. code-block:: php
 
@@ -23,7 +24,8 @@ To load powerorm use the following code and pass the :ref:`Configs <self_config>
 Configuration
 -------------
 
-Powerorm takes several configurations see :doc:`Configs <../intro/configuration>` for options.
+Powerorm takes several configurations see
+:doc:`Configs <../intro/configuration>` for options.
 
 .. code-block:: php
 

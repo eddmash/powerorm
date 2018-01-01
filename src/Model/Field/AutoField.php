@@ -66,20 +66,26 @@ class AutoField extends Field
         return Type::INTEGER;
     }
 
+    /**
+     * @param string                        $field
+     * @param \Eddmash\PowerOrm\Model\Model $model
+     *
+     * @throws \Eddmash\PowerOrm\Exception\FieldError
+     */
     public function contributeToClass($field, $model)
     {
         parent::contributeToClass($field, $model);
 
         assert(
-            !$model->meta->hasAutoField,
+            !$model->getMeta()->hasAutoField,
             sprintf(
                 "The Model '%s' more than one AutoField, which is not allowed.",
-                $this->scopeModel->meta->getNamespacedModelName()
+                $this->scopeModel->getMeta()->getNamespacedModelName()
             )
         );
 
-        $this->scopeModel->meta->hasAutoField = true;
-        $this->scopeModel->meta->autoField = $this;
+        $this->scopeModel->getMeta()->hasAutoField = true;
+        $this->scopeModel->getMeta()->autoField = $this;
     }
 
     /**

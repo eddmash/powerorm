@@ -34,6 +34,11 @@ abstract class Operation extends DeconstructableObject implements OperationInter
     private $_dependency;
     private $appLabel;
 
+    /**
+     * @var bool true if this operation can be reduced into an sql statement
+     */
+    private $reducibleToSql = true;
+
     public function __construct($params)
     {
         ClassHelper::setAttributes($this, $params);
@@ -99,11 +104,11 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @throws NotImplemented
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function updateState($state)
+    public function updateState(ProjectState $state)
     {
         throw new NotImplemented();
     }
@@ -115,11 +120,11 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function databaseForwards($schemaEditor, $fromState, $toState)
+    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         return;
     }
@@ -131,11 +136,11 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function databaseBackwards($schemaEditor, $fromState, $toState)
+    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         return;
     }
@@ -150,11 +155,11 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function reduce($operation, $inBetween)
+    public function reduce(self $operation, $inBetween)
     {
         return false;
     }
@@ -192,7 +197,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      */
     public function allowMigrateModel(ConnectionInterface $connection, $model)
     {
-        return $model->meta->canMigrate();
+        return $model->getMeta()->canMigrate();
     }
 
     public function getAppLabel()
@@ -215,7 +220,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
     {
         try {
             $app = BaseOrm::getInstance()->getComponent($this->getAppLabel());
-            /** @var $app \Eddmash\PowerOrm\Components\AppInterface */
+            /* @var $app \Eddmash\PowerOrm\Components\AppInterface */
             return $app;
         } catch (ComponentException $e) {
             return null;
@@ -227,5 +232,13 @@ abstract class Operation extends DeconstructableObject implements OperationInter
         return [
             'appLabel' => $this->appLabel,
         ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isReducibleToSql()
+    {
+        return $this->reducibleToSql;
     }
 }

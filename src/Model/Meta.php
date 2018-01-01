@@ -81,7 +81,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @var string
      */
-    public $dbTable;
+    protected $dbTable;
 
     /**
      * The primary key for the model.
@@ -364,7 +364,7 @@ class Meta extends DeconstructableObject implements MetaInterface
             // collect all relation fields for this each model
             foreach ($allModels as $name => $model) :
                 // just get the forward fields
-                $fields = $model->meta->fetchFields(
+                $fields = $model->getMeta()->fetchFields(
                     [
                         'includeParents' => false,
                         'inverse' => false,
@@ -376,8 +376,8 @@ class Meta extends DeconstructableObject implements MetaInterface
 
                     if ($field->isRelation && !empty($field->getRelatedModel())):
                         $concreteModel = $field->relation->toModel
-                            ->meta->concreteModel
-                            ->meta->getNamespacedModelName();
+                            ->getMeta()->concreteModel
+                            ->getMeta()->getNamespacedModelName();
                         $allRelations[$concreteModel][] = $field;
                     endif;
 
@@ -390,13 +390,13 @@ class Meta extends DeconstructableObject implements MetaInterface
                 // get fields for each model
                 $fields = (isset($allRelations[$name])) ? $allRelations[$name] : [];
 
-                $model->meta->_reverseRelationTreeCache = $fields;
+                $model->getMeta()->_reverseRelationTreeCache = $fields;
             endforeach;
         endif;
 
         // we get the model from the registry
         // to ensure we get the same model instance and same meta class for the model.
-        return $this->registry->getModel($this->getNamespacedModelName())->meta->_reverseRelationTreeCache;
+        return $this->registry->getModel($this->getNamespacedModelName())->getMeta()->_reverseRelationTreeCache;
     }
 
     /**
@@ -411,7 +411,8 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function contributeToClass($propertyName, $classObject)
     {
-        $classObject->{$propertyName} = $this;
+        //        $classObject-> = $this;
+        ClassHelper::setAttributes($classObject, [$propertyName => $this]);
 
         $modelClass = $this->modelClassInfo($classObject);
         $this->modelName = $modelClass->getShortName();
@@ -429,8 +430,8 @@ class Meta extends DeconstructableObject implements MetaInterface
             endif;
         endforeach;
 
-        if (null == $this->dbTable):
-            $this->dbTable = $this->getTableName();
+        if (null == $this->getDbTable()):
+            $this->setDbTable($this->getTableName());
         endif;
 
         $vName = $this->verboseName;
@@ -551,8 +552,8 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function setupProxy($parent)
     {
-        $this->dbTable = $parent->meta->dbTable;
-        $this->primaryKey = $parent->meta->primaryKey;
+        $this->dbTable = $parent->getMeta()->getDbTable();
+        $this->primaryKey = $parent->getMeta()->primaryKey;
     }
 
     /**
@@ -605,10 +606,10 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     private function getTableName()
     {
-        return sprintf(
-            '%s%s',
-            BaseOrm::getDbPrefix(),
-            str_replace('\\', '_', $this->normalizeKey($this->modelName))
+        return str_replace(
+            '\\',
+            '_',
+            $this->normalizeKey($this->modelName)
         );
     }
 
@@ -642,17 +643,50 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
-     * @return AppInterface|null
+     * @return AppInterface
      */
     public function getApp()
     {
         try {
             $app = BaseOrm::getInstance()->getComponent($this->getAppName());
 
-            /** @var $app AppInterface */
+            /* @var $app AppInterface */
             return $app;
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    public function getDbPrefix()
+    {
+        $prefix = BaseOrm::getDbPrefix();
+        if ($this->getApp()):
+            $prefix = $this->getApp()->getDbPrefix();
+        endif;
+        if (!StringHelper::endsWith($prefix, '_')):
+            return sprintf('%s_', $prefix);
+        endif;
+
+        return $prefix;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDbTable()
+    {
+        return $this->dbTable;
+    }
+
+    /**
+     * @param string $dbTable
+     */
+    public function setDbTable($dbTable)
+    {
+        $this->dbTable = sprintf(
+            '%s%s',
+            $this->getDbPrefix(),
+            $dbTable
+        );
     }
 }

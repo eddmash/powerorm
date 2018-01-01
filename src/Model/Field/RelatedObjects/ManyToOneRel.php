@@ -38,7 +38,7 @@ class ManyToOneRel extends ForeignObjectRel
      */
     public function getRelatedField()
     {
-        $field = $this->toModel->meta->getField($this->fieldName);
+        $field = $this->toModel->getMeta()->getField($this->fieldName);
         if (!$field->concrete):
             throw new FieldDoesNotExist(sprintf("No related field named '%s'", $this->fieldName));
         endif;

@@ -11,12 +11,14 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
+use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Migration\State\ProjectState;
 use Eddmash\PowerOrm\Model\Field\Field;
 
 /**
  * Adds a field to a model.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -33,7 +35,7 @@ class AddField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function updateState($state)
+    public function updateState(ProjectState $state)
     {
         // remove default if preserveDefault==false, we dont want it in future updates.
         if (false === $this->preserveDefault):
@@ -42,20 +44,20 @@ class AddField extends FieldOperation
         else:
             $field = $this->field;
         endif;
-        $state->modelStates[$this->modelName]->fields[$this->name] = $field;
+        $state->getModelState($this->modelName)->fields[$this->name] = $field;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function databaseForwards($schemaEditor, $fromState, $toState)
+    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
 
         /* @var $field Field */
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-            $field = $toModel->meta->getField($this->name);
+            $field = $toModel->getMeta()->getField($this->name);
             if (false === $this->preserveDefault):
                 $field->default = $this->field->default;
             endif;
@@ -71,11 +73,17 @@ class AddField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseBackwards($schemaEditor, $fromState, $toState)
-    {
+    public function databaseBackwards(
+        SchemaEditor $schemaEditor,
+        ProjectState $fromState,
+        ProjectState $toState
+    ) {
         $fromModel = $fromState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
-            $schemaEditor->removeField($fromModel, $fromModel->meta->getField($this->name));
+            $schemaEditor->removeField(
+                $fromModel,
+                $fromModel->getMeta()->getField($this->name)
+            );
         endif;
     }
 

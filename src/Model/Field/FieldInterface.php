@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
-use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\ContributorInterface;
 use Eddmash\PowerOrm\Db\ConnectionInterface;

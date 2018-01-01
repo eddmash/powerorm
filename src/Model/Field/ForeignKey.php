@@ -93,7 +93,7 @@ class ForeignKey extends RelatedField
         parent::contributeToInverseClass($relatedModel, $relation);
 
         if (null == $this->relation->fieldName):
-            $this->relation->fieldName = $relatedModel->meta->primaryKey->getName();
+            $this->relation->fieldName = $relatedModel->getMeta()->primaryKey->getName();
         endif;
     }
 

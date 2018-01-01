@@ -30,16 +30,16 @@ use Eddmash\PowerOrm\Model\Model;
  * Note that while you are allowed to mutate .fields, you are not allowed to mutate the Field instances inside there
  * themselves - you must instead assign new ones, as these are not detached during a clone.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class ModelState extends BaseObject
 {
     public $name;
+    protected $meta = [];
     /** @var Field[] */
     public $fields = [];
-    public $meta = [];
     public $extends;
 
     public function __construct($name, $fields, $kwargs = [])
@@ -59,7 +59,7 @@ class ModelState extends BaseObject
      *
      * @throws TypeError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -68,19 +68,22 @@ class ModelState extends BaseObject
         $fields = [];
 
         /** @var $field Field */
-        foreach ($model->meta->localFields as $name => $field) :
+        foreach ($model->getMeta()->localFields as $name => $field) :
             try {
                 $fields[$name] = $field->deepClone();
             } catch (\Exception $e) {
                 throw new TypeError(
-                    sprintf("Couldn't reconstruct field %s on %s: %s",
-                        $name, $model->meta->getNamespacedModelName())
+                    sprintf(
+                        "Couldn't reconstruct field %s on %s: %s",
+                        $name,
+                        $model->getMeta()->getNamespacedModelName()
+                    )
                 );
             }
         endforeach;
 
         if (false == $excludeRels):
-            foreach ($model->meta->localManyToMany as $name => $field) :
+            foreach ($model->getMeta()->localManyToMany as $name => $field) :
                 try {
                     $fields[$name] = $field->deepClone();
                 } catch (\Exception $e) {
@@ -88,14 +91,14 @@ class ModelState extends BaseObject
                         sprintf(
                             "Couldn't reconstruct field %s on %s: %s",
                             $name,
-                            $model->meta->getNamespacedModelName()
+                            $model->getMeta()->getNamespacedModelName()
                         )
                     );
                 }
             endforeach;
         endif;
 
-        $overrides = $model->meta->getOverrides();
+        $overrides = $model->getMeta()->getOverrides();
         $meta = [];
         $ignore = ['registry'];
         foreach ($overrides as $name => $value) :
@@ -115,7 +118,7 @@ class ModelState extends BaseObject
             'extends' => $extends,
         ];
 
-        return new static($model->meta->getNamespacedModelName(), $fields, $kwargs);
+        return new static($model->getMeta()->getNamespacedModelName(), $fields, $kwargs);
     }
 
     /**
@@ -125,13 +128,14 @@ class ModelState extends BaseObject
      *
      * @return Model
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function toModel(&$registry)
     {
-        $metaData = $this->meta;
+        $metaData = $this->getMeta();
+//        var_dump($this);
         $extends = $this->extends;
 
         $model = $this->createInstance($this->name, $extends);
@@ -170,7 +174,7 @@ class ModelState extends BaseObject
      *
      * @return Model
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -191,12 +195,25 @@ class ModelState extends BaseObject
             $fields[$name] = $field->deepClone();
         endforeach;
 
-        return static::createObject($this->name, $fields,
-            ['meta' => $this->meta, 'extends' => $this->extends]);
+        return static::createObject(
+            $this->name,
+            $fields,
+            ['meta' => $this->getMeta(), 'extends' => $this->extends]
+        );
     }
 
     public function __toString()
     {
         return (string) sprintf("<ModelState: '%s'>", $this->name);
+    }
+
+    public function &getMeta()
+    {
+        return $this->meta;
+    }
+
+    public function setMeta($meta)
+    {
+        $this->meta = $meta;
     }
 }
