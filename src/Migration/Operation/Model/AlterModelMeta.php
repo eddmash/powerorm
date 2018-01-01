@@ -38,7 +38,7 @@ class AlterModelMeta extends Operation
             if (!ArrayHelper::hasKey($this->getMeta(), $alterableOption) && ArrayHelper::hasKey($meta, $alterableOption)):
 
                 unset($meta[$alterableOption]);
-            endif;
+        endif;
         endforeach;
         $modelState->setMeta($meta);
     }

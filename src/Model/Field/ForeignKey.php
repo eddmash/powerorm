@@ -120,8 +120,7 @@ class ForeignKey extends RelatedField
         $kwargs = parent::getConstructorArgs();
 
         if ($this->dbIndex) :
-            unset($kwargs['dbIndex']);
-        else:
+            unset($kwargs['dbIndex']); else:
             $kwargs['dbIndex'] = false;
         endif;
         if (false === $this->dbConstraint) :
@@ -176,7 +175,7 @@ class ForeignKey extends RelatedField
         );
         if (!ArrayHelper::hasKey($kwargs, 'queryset')) :
             $model = $this->relation->getToModel();
-            $kwargs['queryset'] = $model::objects();
+        $kwargs['queryset'] = $model::objects();
         endif;
 
         $kwargs['valueField'] = $this->relation->fieldName;

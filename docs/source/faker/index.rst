@@ -27,7 +27,8 @@ Or add this to the composer.json file::
 Setup
 -----
 
-To enable the faker, just add its command to the orm on the :ref:`commands <config_commands>` setting as shown below.
+To enable the faker, just register it as a
+:ref:`component <config_components>` with the orm on the as shown below.
 
 .. code-block:: php
 
@@ -37,8 +38,8 @@ To enable the faker, just add its command to the orm on the :ref:`commands <conf
         // ..., other orm settings
 
 
-        'commands' =>[
-            Generatedata::class
+        'components' =>[
+            Faker::class,
         ],
     ];
 

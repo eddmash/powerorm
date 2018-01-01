@@ -39,24 +39,23 @@ class ManyToOneDescriptor extends BaseDescriptor
             $relObj = $this->field->getLocalRelatedFieldsValues($modelInstance);
 
             if (empty($relObj)):
-                $relObj = null;
-            else:
+                $relObj = null; else:
 
                 $result = $this->getManager($modelInstance)->get();
 
-                /* @var $fromField RelatedField */
-                $fromField = $this->field->getRelatedFields()[0];
-                // cache the value of the model
-                $modelInstance->{$fromField->getCacheName()} = $result;
+            /* @var $fromField RelatedField */
+            $fromField = $this->field->getRelatedFields()[0];
+            // cache the value of the model
+            $modelInstance->{$fromField->getCacheName()} = $result;
 
-                // if we are dealing with fields that only supports one field e.g. OneToOneField
-                // If this is a one-to-one relation, set the reverse accessor cache on
-                // the related object to the current instance to avoid an extra SQL
-                // query if it's accessed later on.
+            // if we are dealing with fields that only supports one field e.g. OneToOneField
+            // If this is a one-to-one relation, set the reverse accessor cache on
+            // the related object to the current instance to avoid an extra SQL
+            // query if it's accessed later on.
 
-                if (!is_null($result) && !$this->field->relation->multiple):
+            if (!is_null($result) && !$this->field->relation->multiple):
                     $result->{$this->field->relation->getCacheName()} = $modelInstance;
-                endif;
+            endif;
             endif;
         }
         // if this field does not allow null values
@@ -101,17 +100,16 @@ class ManyToOneDescriptor extends BaseDescriptor
             // we need to clear it on that related object to since we will be setting it to null on this side
             $relObj = ArrayHelper::getValue($modelInstance->_fieldCache, $this->field->getCacheName(), null);
 
-            if ($relObj):
+        if ($relObj):
                 $relObj->{$this->field->relation->getCacheName()} = null;
-            endif;
-            // set the attrib value e.g *_id
-            $modelInstance->{$fromField->getAttrName()} = null;
-        else:
+        endif;
+        // set the attrib value e.g *_id
+        $modelInstance->{$fromField->getAttrName()} = null; else:
             // cache the value of the model
             $modelInstance->_fieldCache[$fromField->getCacheName()] = $value;
 
-            // set the attrib value e.g *_id
-            $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
+        // set the attrib value e.g *_id
+        $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
         endif;
 
         // if we are dealing with fields that only supports one field e.g. OneToOneField
@@ -137,19 +135,18 @@ class ManyToOneDescriptor extends BaseDescriptor
     public function getManager($modelInstance, $reverse = false)
     {
         if ($reverse) :
-            $model = $this->field->getRelatedModel();
-        else:
+            $model = $this->field->getRelatedModel(); else:
             $model = $this->field->scopeModel;
         endif;
 
         // define BaseM2MQueryset
         if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)):
             $baseClass = $model::getManagerClass();
-            $class = sprintf(
+        $class = sprintf(
                 'namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}',
                 $baseClass
             );
-            eval($class);
+        eval($class);
         endif;
 
         $manager = M2OManager::createObject(

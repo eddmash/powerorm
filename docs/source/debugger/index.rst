@@ -29,27 +29,19 @@ Or add this to the composer.json file::
 Setup
 -----
 
-To enable the debugbar, add it as component of the orm on the :ref:`components <config_components>` setting as shown
-below.
+To enable the debugbar, add it as component of the orm on the
+:ref:`components <config_components>` setting as shown below.
 
 .. code-block:: php
 
-    use DebugBar\StandardDebugBar;
     use Eddmash\PowerOrm\BaseOrm;
-    use Eddmash\PowerOrmDebug\Debugger;
+    use Eddmash\PowerOrmDebug\Toolbar;
 
     $config = [
         // ..., other orm settings
 
         'components' => [
-            "debugger" => function (BaseOrm $orm) {
-                $debugger = new Debugger($orm);
-                // if debugger css and js are not loading correctly you
-                // can set where the debuger shouw fetch them here
-                //$debugger->setStaticBaseUrl("/assets/");
-                $debugger->setDebugBar(new StandardDebugBar());
-                return $debugger;
-            },
+            Toolbar::class,
         ]
     ];
 

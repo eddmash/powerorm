@@ -96,8 +96,7 @@ class ManyToManyField extends RelatedField
                 $field->doRelatedClass($related, $this->relation);
             };
 
-            Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->through, ['fromField' => $this]);
-        else:
+        Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->through, ['fromField' => $this]); else:
             $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
         endif;
     }
@@ -144,12 +143,11 @@ class ManyToManyField extends RelatedField
 
         if (is_string($field->relation->toModel)):
             $toModelName = Tools::resolveRelation($model, $field->relation->toModel);
-            $ref = new \ReflectionClass($toModelName);
-            $toModelName = $ref->getShortName();
-            $toNamespacedModelName = $ref->getName();
-        else:
+        $ref = new \ReflectionClass($toModelName);
+        $toModelName = $ref->getShortName();
+        $toNamespacedModelName = $ref->getName(); else:
             $toModelName = $field->relation->toModel->getMeta()->getModelName();
-            $toNamespacedModelName = $field->relation->toModel->getMeta()->getNamespacedModelName();
+        $toNamespacedModelName = $field->relation->toModel->getMeta()->getNamespacedModelName();
         endif;
 
         $className = sprintf('%1$s_%2$s', $model->getMeta()->getModelName(), $field->getName());
@@ -157,7 +155,7 @@ class ManyToManyField extends RelatedField
         $to = strtolower($toModelName);
         if ($from == $to):
             $to = sprintf('to_%s', $to);
-            $from = sprintf('from_%s', $from);
+        $from = sprintf('from_%s', $from);
         endif;
         $fields = [
             $from => ForeignKey::createObject(
@@ -181,8 +179,11 @@ class ManyToManyField extends RelatedField
         /* @var $intermediaryObj Model */
         $intermediaryClass = FormatFileContent::createObject();
 
-        $intermediaryClass->addItem(sprintf('class %1$s extends \%2$s{',
-            $className, Model::class));
+        $intermediaryClass->addItem(sprintf(
+            'class %1$s extends \%2$s{',
+            $className,
+            Model::class
+        ));
         $intermediaryClass->addItem('public function fields(){');
         $intermediaryClass->addItem('}');
         $intermediaryClass->addItem('public function getMetaSettings(){');
@@ -223,10 +224,8 @@ class ManyToManyField extends RelatedField
     private function getM2MDbTable($meta)
     {
         if (null !== $this->relation->through):
-            return $this->relation->through->getMeta()->getDbTable();
-        elseif ($this->getDbTable()):
-            return $this->getDbTable();
-        else:
+            return $this->relation->through->getMeta()->getDbTable(); elseif ($this->getDbTable()):
+            return $this->getDbTable(); else:
             // oracle allows identifier of 30 chars max
             return StringHelper::truncate(sprintf('%s_%s', $meta->getDbTable(), $this->getName()), 30);
         endif;
@@ -288,8 +287,8 @@ class ManyToManyField extends RelatedField
 
                 $this->{$cache_attr} = ('name' == $attr) ? call_user_func([$field, 'getName']) : $field->{$attr};
 
-                return $this->{$cache_attr};
-            endif;
+        return $this->{$cache_attr};
+        endif;
         endforeach;
     }
 
@@ -321,8 +320,8 @@ class ManyToManyField extends RelatedField
             ) :
                 $this->{$cache_attr} = ('name' == $attr) ? call_user_func([$field, 'getName']) : $field->{$attr};
 
-                return $this->{$cache_attr};
-            endif;
+        return $this->{$cache_attr};
+        endif;
         endforeach;
     }
 
@@ -348,10 +347,9 @@ class ManyToManyField extends RelatedField
 
         if ($direct):
             $paths = array_merge($paths, $field->getReversePathInfo());
-            $paths = array_merge($paths, $reverseField->getPathInfo());
-        else:
+        $paths = array_merge($paths, $reverseField->getPathInfo()); else:
             $paths = array_merge($paths, $reverseField->getReversePathInfo());
-            $paths = array_merge($paths, $field->getPathInfo());
+        $paths = array_merge($paths, $field->getPathInfo());
         endif;
 
         return $paths;
@@ -379,7 +377,7 @@ class ManyToManyField extends RelatedField
         );
         if (!ArrayHelper::hasKey($kwargs, 'queryset')) :
             $model = $this->relation->getToModel();
-            $kwargs['queryset'] = $model::objects();
+        $kwargs['queryset'] = $model::objects();
         endif;
 
         return parent::formField($kwargs);

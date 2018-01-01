@@ -194,14 +194,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         foreach ($fieldNames as $fieldName) :
             $names = StringHelper::split(BaseLookup::$lookupPattern, $fieldName);
-            list($field, $targets, $joinList, $paths) = $this->setupJoins($names, $meta, $alias);
+        list($field, $targets, $joinList, $paths) = $this->setupJoins($names, $meta, $alias);
 
-            /** @var $targets Field[] */
-            list($targets, $finalAlias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
+        /** @var $targets Field[] */
+        list($targets, $finalAlias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
 
-            foreach ($targets as $target) :
+        foreach ($targets as $target) :
                 $this->addSelect($target->getColExpression($finalAlias));
-            endforeach;
+        endforeach;
 
         endforeach;
     }
@@ -275,7 +275,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         if (!is_null($canReuse)):
             foreach ($joinList as $list):
                 $canReuse[] = $list;
-            endforeach;
+        endforeach;
         endif;
         $usedJoins = array_merge(array_unique($usedJoins), array_unique($joinList));
 
@@ -285,11 +285,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         if ($field->isRelation) :
             $lookupClass = $field->getLookup($lookups[0]);
+        $col = $targets[0]->getColExpression($alias, $field);
+        $condition = $lookupClass::createObject($col, $value); else:
             $col = $targets[0]->getColExpression($alias, $field);
-            $condition = $lookupClass::createObject($col, $value);
-        else:
-            $col = $targets[0]->getColExpression($alias, $field);
-            $condition = $this->buildCondition($lookups, $col, $value);
+        $condition = $this->buildCondition($lookups, $col, $value);
         endif;
 
         $clause->add($condition, AND_CONNECTOR);
@@ -311,13 +310,12 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endif;
 
         if ($valueSelect):
-            $this->useDefaultCols = false;
-        else:
+            $this->useDefaultCols = false; else:
             $valueSelect = [];
-            foreach ($this->model->getMeta()->getConcreteFields() as $field) :
+        foreach ($this->model->getMeta()->getConcreteFields() as $field) :
                 $valueSelect[] = $field->getName();
-            endforeach;
-            //todo annotations
+        endforeach;
+        //todo annotations
         endif;
 
         $this->valueSelect = $valueSelect;
@@ -344,7 +342,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         foreach ($this->tableAliasMap as $key => $join) :
             if (INNER === $join->getJoinType()):
                 $aliases[] = $key;
-            endif;
+        endif;
         endforeach;
 
         $clause = $this->_addQ($q, $this->usedTableAlias)[0];
@@ -369,16 +367,15 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $joinpromoter = new JoinPromoter($connector, count($q->getChildren()), $currentNegated);
         foreach ($q->getChildren() as $child) :
             if ($child instanceof Node):
-                list($childClause, $neededInner) = $this->_addQ($child, $usedAliases, $allowJoins);
-            else:
+                list($childClause, $neededInner) = $this->_addQ($child, $usedAliases, $allowJoins); else:
                 list($childClause, $neededInner) = $this->buildFilter($child, $connector, $allowJoins, $usedAliases);
-            endif;
+        endif;
 
-            if ($childClause):
+        if ($childClause):
                 $targetClause->add($childClause, $connector);
-            endif;
+        endif;
 
-            $joinpromoter->addVotes($neededInner);
+        $joinpromoter->addVotes($neededInner);
         endforeach;
         //todo join
         $neededInner = $joinpromoter->updateJoinType($this);
@@ -398,8 +395,8 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             foreach ($this->annotations as $alias => $annotation) :
                 foreach ($annotation->getGroupByCols() as $groupByCol) :
                     $this->groupBy[] = $groupByCol;
-                endforeach;
-            endforeach;
+        endforeach;
+        endforeach;
         endif;
     }
 
@@ -425,9 +422,9 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                 !preg_match(ORDER_PATTERN, $fieldName)
             ):
                 $errors[] = $fieldName;
-            endif;
+        endif;
 
-            if (is_object($fieldName) && property_exists($fieldName, 'containsAggregate')):
+        if (is_object($fieldName) && property_exists($fieldName, 'containsAggregate')):
                 throw new FieldError(
                     sprintf(
                         'Using an aggregate in orderBy() without also including '.
@@ -435,7 +432,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                         $fieldName
                     )
                 );
-            endif;
+        endif;
         endforeach;
 
         if ($errors):
@@ -443,8 +440,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endif;
 
         if ($fieldNames):
-            $this->orderBy = array_merge($this->orderBy, $fieldNames);
-        else:
+            $this->orderBy = array_merge($this->orderBy, $fieldNames); else:
             $this->defaultOrdering = false;
         endif;
     }
@@ -496,13 +492,12 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         foreach ($split_names as $name) :
             if (in_array($name, $lookup)) :
                 continue;
-            endif;
-            $fieldParts[] = $name;
+        endif;
+        $fieldParts[] = $name;
         endforeach;
 
         if (0 === count($lookup)) :
-            $lookup[] = 'exact';
-        elseif (count($fieldParts) > 1):
+            $lookup[] = 'exact'; elseif (count($fieldParts) > 1):
             if (!$fieldParts) :
                 throw new FieldError(
                     sprintf(
@@ -511,7 +506,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                         $this->getMeta()->getNamespacedModelName()
                     )
                 );
-            endif;
+        endif;
         endif;
 
         return [$lookup, $fieldParts];
@@ -529,17 +524,16 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         if (is_null($value)):
             if (!in_array(array_pop($lookups), ['exact'])):
                 throw new ValueError('Cannot use "null" as a query value');
-            endif;
+        endif;
 
-            return [true, ['isnull']];
-        elseif ($value instanceof ResolvableExpInterface):
+        return [true, ['isnull']]; elseif ($value instanceof ResolvableExpInterface):
             $preJoins = $this->aliasRefCount;
-            $value = $value->resolveExpression($this, $allowJoins, $canReuse);
-            foreach ($this->aliasRefCount as $key => $count) :
+        $value = $value->resolveExpression($this, $allowJoins, $canReuse);
+        foreach ($this->aliasRefCount as $key => $count) :
                 if ($count > ArrayHelper::getValue($preJoins, $key, 0)):
                     $usedJoins[] = $key;
-                endif;
-            endforeach;
+        endif;
+        endforeach;
         endif;
 
         if (method_exists($value, '_prepareAsFilterValue')):
@@ -590,18 +584,18 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
             $posReached = $pos;
 
-            if (PRIMARY_KEY_ID === $name):
+        if (PRIMARY_KEY_ID === $name):
                 $name = $meta->primaryKey->getName();
-            endif;
+        endif;
 
-            $field = null;
+        $field = null;
 
-            try {
-                $field = $meta->getField($name);
-            } catch (FieldDoesNotExist $e) {
-                //todo check in annotations to
-                $available = getFieldNamesFromMeta($meta);
-                if ($failOnMissing) :
+        try {
+            $field = $meta->getField($name);
+        } catch (FieldDoesNotExist $e) {
+            //todo check in annotations to
+            $available = getFieldNamesFromMeta($meta);
+            if ($failOnMissing) :
 
                     throw new FieldError(
                         sprintf(
@@ -610,32 +604,30 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                             $name,
                             implode(', ', $available)
                         )
-                    );
-                else:
+                    ); else:
                     break;
-                endif;
-            }
+            endif;
+        }
 
-            // todo Check if we need any joins for concrete inheritance cases (the
-            // field lives in parent, but we are currently in one of its
-            // children)
-            if ($field->hasMethod('getPathInfo')) :
+        // todo Check if we need any joins for concrete inheritance cases (the
+        // field lives in parent, but we are currently in one of its
+        // children)
+        if ($field->hasMethod('getPathInfo')) :
                 $pathsInfos = $field->getPathInfo();
-                $last = $pathsInfos[count($pathsInfos) - 1];
+        $last = $pathsInfos[count($pathsInfos) - 1];
 
-                $finalField = ArrayHelper::getValue($last, 'joinField');
-                $targets = ArrayHelper::getValue($last, 'targetFields');
-                $meta = ArrayHelper::getValue($last, 'toMeta');
-                $paths = array_merge($paths, $pathsInfos);
-            else:
+        $finalField = ArrayHelper::getValue($last, 'joinField');
+        $targets = ArrayHelper::getValue($last, 'targetFields');
+        $meta = ArrayHelper::getValue($last, 'toMeta');
+        $paths = array_merge($paths, $pathsInfos); else:
                 // none relational field
                 $finalField = null;
-                $finalField = $field;
+        $finalField = $field;
 
-                $targets = [$field];
-                // no need to go on since this is a none relation field.
-                break;
-            endif;
+        $targets = [$field];
+        // no need to go on since this is a none relation field.
+        break;
+        endif;
         endforeach;
 
         return [
@@ -656,8 +648,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     {
         if ($this->tablesAliasList):
             // get the first one
-            $alias = $this->tablesAliasList[0];
-        else:
+            $alias = $this->tablesAliasList[0]; else:
             $alias = $this->join(
                 new BaseTable(
                     $this->getMeta()->getDbTable(),
@@ -695,21 +686,20 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         foreach ($pathInfos as $pathInfo) :
             $meta = $pathInfo['toMeta'];
 
-            if ($pathInfo['direct']):
-                $nullable = $this->isNullable($pathInfo['joinField']);
-            else:
+        if ($pathInfo['direct']):
+                $nullable = $this->isNullable($pathInfo['joinField']); else:
                 $nullable = true;
-            endif;
-            $join = new Join();
-            $join->setTableName($meta->getDbTable());
-            $join->setParentAlias($alias);
-            $join->setJoinType(INNER);
-            $join->setJoinField($pathInfo['joinField']);
-            $join->setNullable($nullable);
+        endif;
+        $join = new Join();
+        $join->setTableName($meta->getDbTable());
+        $join->setParentAlias($alias);
+        $join->setJoinType(INNER);
+        $join->setJoinField($pathInfo['joinField']);
+        $join->setNullable($nullable);
 
-            $alias = $this->join($join);
+        $alias = $this->join($join);
 
-            $joins[] = $alias;
+        $joins[] = $alias;
         endforeach;
 
         return [$namesPaths['finalField'], $namesPaths['targets'], $joins, $pathInfos, $meta];
@@ -722,13 +712,13 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         foreach ($this->tableAliasMap as $key => $item) :
             if ((null == $reuse || ArrayHelper::hasKey($reuse, $key)) && $join->equal($item)):
                 $resuableAliases[] = $key;
-            endif;
+        endif;
         endforeach;
 
         if ($resuableAliases):
             $this->aliasRefCount[$resuableAliases[0]] += 1;
 
-            return $resuableAliases[0];
+        return $resuableAliases[0];
         endif;
 
         list($alias) = $this->getTableAlias($join->getTableName(), false);
@@ -737,11 +727,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             if (LOUTER === $this->tableAliasMap[$join->getParentAlias()]->getJoinType() ||
                 $join->getNullable()):
 
-                $joinType = LOUTER;
-            else:
+                $joinType = LOUTER; else:
                 $joinType = INNER;
-            endif;
-            $join->setJoinType($joinType);
+        endif;
+        $join->setJoinType($joinType);
         endif;
 
         $join->setTableAlias($alias);
@@ -771,14 +760,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         /* @var $parent Join */
         while ($aliases):
             $alias = array_pop($aliases);
-            $join = $this->tableAliasMap[$alias];
-            if (LOUTER == $join->getJoinType()):
+        $join = $this->tableAliasMap[$alias];
+        if (LOUTER == $join->getJoinType()):
                 $this->tableAliasMap[$alias] = $join->demote();
-                $parent = $this->tableAliasMap[$join->getParentAlias()];
-                if (INNER == $parent->getJoinType()):
+        $parent = $this->tableAliasMap[$join->getParentAlias()];
+        if (INNER == $parent->getJoinType()):
                     $aliases[] = $join->getParentAlias();
-                endif;
-            endif;
+        endif;
+        endif;
         endwhile;
     }
 
@@ -803,33 +792,33 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         /* @var $parent Join */
         while ($aliases):
             $alias = array_pop($aliases);
-            $join = $this->tableAliasMap[$alias];
+        $join = $this->tableAliasMap[$alias];
 
-            // for the first join this should be true because its not a join
-            // but a basetable that will be used in the from part of the query
-            if (null == $join->getJoinType()):
+        // for the first join this should be true because its not a join
+        // but a basetable that will be used in the from part of the query
+        if (null == $join->getJoinType()):
                 continue;
-            endif;
+        endif;
 
-            // only the first alias is allowed to havea null join type
-            assert(null !== $join->getJoinType());
+        // only the first alias is allowed to havea null join type
+        assert(null !== $join->getJoinType());
 
-            $parentAlias = $join->getParentAlias();
-            $parentIsOuter = ($parentAlias && LOUTER == $this->tableAliasMap[$parentAlias]->getJoinType());
-            $aliasIsOuter = (LOUTER == $join->getJoinType());
+        $parentAlias = $join->getParentAlias();
+        $parentIsOuter = ($parentAlias && LOUTER == $this->tableAliasMap[$parentAlias]->getJoinType());
+        $aliasIsOuter = (LOUTER == $join->getJoinType());
 
-            if (($join->getNullable() || $parentIsOuter) && !$aliasIsOuter):
+        if (($join->getNullable() || $parentIsOuter) && !$aliasIsOuter):
                 $this->tableAliasMap[$alias] = $join->promote();
-                // since we have just change the join type of alias we need to update
-                // any thing else that refers to it
-                foreach ($this->tableAliasMap as $key => $join) :
+        // since we have just change the join type of alias we need to update
+        // any thing else that refers to it
+        foreach ($this->tableAliasMap as $key => $join) :
                     if ($join->getParentAlias() == $alias &&
                         !ArrayHelper::hasKey($aliases, $key)
                     ):
                         $aliases[] = $key;
-                    endif;
-                endforeach;
-            endif;
+        endif;
+        endforeach;
+        endif;
         endwhile;
     }
 
@@ -853,39 +842,39 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         foreach (array_reverse($path) as $info) :
             if (!$info['direct'] || 1 === count($joinList)):
                 break;
-            endif;
+        endif;
 
-            $joinTargets = [];
-            $currentTargets = [];
-            $joinField = $info['joinField'];
+        $joinTargets = [];
+        $currentTargets = [];
+        $joinField = $info['joinField'];
 
-            foreach ($joinField->getForeignRelatedFields() as $field) :
+        foreach ($joinField->getForeignRelatedFields() as $field) :
                 $joinTargets[] = $field->getColumnName();
-            endforeach;
+        endforeach;
 
-            foreach ($targets as $field) :
+        foreach ($targets as $field) :
                 $currentTargets[] = $field->getColumnName();
-            endforeach;
+        endforeach;
 
-            if (!array_intersect($joinTargets, $currentTargets)):
+        if (!array_intersect($joinTargets, $currentTargets)):
                 break;
-            endif;
+        endif;
 
-            $relFields = [$joinField->getRelatedFields()];
-            $relMap = [];
-            foreach ($relFields as $relField) :
+        $relFields = [$joinField->getRelatedFields()];
+        $relMap = [];
+        foreach ($relFields as $relField) :
                 if (in_array($relField[1]->getColumnName(), $currentTargets)):
                     $relMap[$relField[1]->getColumnName()] = $relField[0];
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
-            $targetsNew = [];
-            foreach ($targets as $target) :
+        $targetsNew = [];
+        foreach ($targets as $target) :
                 $targetsNew[] = $relMap[$target->getColumnName()];
-            endforeach;
-            $targets = $targetsNew;
+        endforeach;
+        $targets = $targetsNew;
 
-            $this->unrefAlias(array_pop($joinList));
+        $this->unrefAlias(array_pop($joinList));
         endforeach;
 
         $alias = array_slice($joinList, -1)[0];
@@ -905,15 +894,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         if ($aliases && false === $create):
             $alias = $aliases[0];
-            $this->aliasRefCount[$alias] += 1;
+        $this->aliasRefCount[$alias] += 1;
 
-            return [$alias, false];
+        return [$alias, false];
         endif;
 
         // we create a new alias
         if ($aliases):
-            $aliases[] = sprintf('%s%s', $tableName, count($this->tableAliasMap));
-        else:
+            $aliases[] = sprintf('%s%s', $tableName, count($this->tableAliasMap)); else:
             $this->tableAlias[$tableName] = [$tableName];
         endif;
 
@@ -948,21 +936,20 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     public function addSelectRelected($fields = [])
     {
         if (is_bool($this->selectRelected)):
-            $relatedFields = [];
-        else:
+            $relatedFields = []; else:
             $relatedFields = $this->selectRelected;
         endif;
 
         foreach ($fields as $field) :
             $names = StringHelper::split(BaseLookup::$lookupPattern, $field);
-            // we use by reference so that we assigned the values back to the original array
-            $d = &$relatedFields;
-            foreach ($names as $name) :
+        // we use by reference so that we assigned the values back to the original array
+        $d = &$relatedFields;
+        foreach ($names as $name) :
                 $d = &$d[$name];
-                if (empty($d)):
+        if (empty($d)):
                     $d = [];
-                endif;
-            endforeach;
+        endif;
+        endforeach;
         endforeach;
         $this->selectRelected = $relatedFields;
     }
@@ -989,18 +976,18 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         // we have of this we need to make the core query a subquery and aggregate over it.
         if ($hasExistingAnnotations || $hasLimit || $this->distict || is_array($this->groupBy)):
             $outQuery = new AggregateQuery($this->model);
-            $innerQuery = $this->deepClone();
+        $innerQuery = $this->deepClone();
 
-            $innerQuery->selectRelected = false;
+        $innerQuery->selectRelected = false;
 
-            if (!$hasLimit && !$this->distictFields):
+        if (!$hasLimit && !$this->distictFields):
                 // Queries with distinct_fields need ordering and when a limit
                 // is applied we must take the slice from the ordered query.
                 // Otherwise no need for ordering, so clear.
                 $innerQuery->clearOrdering(true);
-            endif;
+        endif;
 
-            if (!$innerQuery->distict):
+        if (!$innerQuery->distict):
                 // if we are using default columns and we already have aggregate annotations existing
                 // then we must make sure the inner
                 // query is grouped by the main model's primary key. However,
@@ -1010,29 +997,28 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                     $innerQuery->groupBy = [
                         $this->getMeta()->primaryKey->getColExpression($innerQuery->getInitialAlias()),
                     ];
-                endif;
-                $innerQuery->useDefaultCols = false;
-            endif;
+        endif;
+        $innerQuery->useDefaultCols = false;
+        endif;
 
-            // add annotations to the outerquery todo
-            foreach ($innerQuery->annotations as $alias => $annotation) :
+        // add annotations to the outerquery todo
+        foreach ($innerQuery->annotations as $alias => $annotation) :
                 $outQuery->annotations[$alias] = $annotation;
-                unset($innerQuery->annotations[$alias]);
-            endforeach;
+        unset($innerQuery->annotations[$alias]);
+        endforeach;
 
-            if ($innerQuery->select == [] && !$innerQuery->useDefaultCols):
+        if ($innerQuery->select == [] && !$innerQuery->useDefaultCols):
                 $innerQuery->select = [
                     $this->getMeta()->primaryKey->getColExpression(
                         $innerQuery->getInitialAlias()
                     ),
                 ];
-            endif;
+        endif;
 
-            $outQuery->addSubQuery($innerQuery, $connection);
-        else:
+        $outQuery->addSubQuery($innerQuery, $connection); else:
             $outQuery = $this;
-            $outQuery->select = [];
-            $outQuery->useDefaultCols = false;
+        $outQuery->select = [];
+        $outQuery->useDefaultCols = false;
         endif;
 
         $outQuery->clearOrdering(true);
@@ -1178,14 +1164,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         foreach ($this->getMeta()->getFields() as $field) :
             if (!$field->isRelation):
                 continue;
-            endif;
-            $fields[] = $field->getName();
+        endif;
+        $fields[] = $field->getName();
         endforeach;
 
         foreach ($this->getMeta()->getReverseRelatedObjects() as $reverseRelatedObject) :
             if ($reverseRelatedObject->relation->fromField->isUnique()):
                 $fields[] = $reverseRelatedObject->relation->fromField->getRelatedQueryName();
-            endif;
+        endif;
         endforeach;
 
         return $fields;
@@ -1230,25 +1216,25 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         /* @var $field Field */
         foreach ($this->select as $pos => $selectColumn) :
             $col = $selectColumn[0];
-            $field = $col->getOutputField();
-            $val = ArrayHelper::getValue($values, $pos);
-            // first use the inbuilt converters
-            try {
-                $val = Type::getType(
+        $field = $col->getOutputField();
+        $val = ArrayHelper::getValue($values, $pos);
+        // first use the inbuilt converters
+        try {
+            $val = Type::getType(
                     $field->dbType($connection)
                 )->convertToPHPValue($val, $connection->getDatabasePlatform());
-            } catch (DBALException $exception) {
-            }
+        } catch (DBALException $exception) {
+        }
 
-            // use the field converters if any were provided by the user.
-            $converters = $field->getDbConverters($connection);
+        // use the field converters if any were provided by the user.
+        $converters = $field->getDbConverters($connection);
 
-            if ($converters):
+        if ($converters):
                 foreach ($converters as $converter) :
                     $val = call_user_func($converter, $connection, $val, $field);
-                endforeach;
-            endif;
-            $preparedValues[] = $val;
+        endforeach;
+        endif;
+        $preparedValues[] = $val;
 
         endforeach;
 
@@ -1266,33 +1252,32 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                 //todo
             else:
                 return ArrayHelper::getValue($this->annotations, $name);
-            endif;
-        else:
+        endif; else:
             $splitNames = StringHelper::split(BaseLookup::$lookupPattern, $name);
 
-            list($field, $sources, $joinList, $paths) = $this->setupJoins(
+        list($field, $sources, $joinList, $paths) = $this->setupJoins(
                 $splitNames,
                 $this->getMeta(),
                 $this->getInitialAlias()
             );
 
-            /* @var $targets Field[] */
-            /* @var $field Field */
+        /* @var $targets Field[] */
+        /* @var $field Field */
 
-            list($targets, $finalAlias, $joinList) = $this->trimJoins($sources, $joinList, $paths);
-            if (count($targets) > 1):
+        list($targets, $finalAlias, $joinList) = $this->trimJoins($sources, $joinList, $paths);
+        if (count($targets) > 1):
                 throw new FieldError("Referencing multicolumn fields with F() objects isn't supported");
-            endif;
+        endif;
 
-            if (!is_null($reuse)):
+        if (!is_null($reuse)):
                 foreach ($joinList as $item) :
                     $reuse[] = $item;
-                endforeach;
-            endif;
+        endforeach;
+        endif;
 
-            $col = $targets[0]->getColExpression(array_pop($joinList), $sources[0]);
+        $col = $targets[0]->getColExpression(array_pop($joinList), $sources[0]);
 
-            return $col;
+        return $col;
         endif;
     }
 
@@ -1332,7 +1317,7 @@ function prefetchRelatedObjects($instances, $lookups)
 {
     if (!$lookups instanceof Prefetch):
         $msg = sprintf("method '%s()' expects parameter 'lookup' to be an array", __FUNCTION__);
-        Tools::ensureParamIsArray($lookups, $msg);
+    Tools::ensureParamIsArray($lookups, $msg);
     endif;
 
     if (0 == count($instances)):
@@ -1349,8 +1334,8 @@ function prefetchRelatedObjects($instances, $lookups)
     while ($lookups):
         $lookup = array_shift($lookups);
 
-        // have already worked on a lookup that has similar name
-        if (array_key_exists($lookup->prefetchTo, $doneQueries)):
+    // have already worked on a lookup that has similar name
+    if (array_key_exists($lookup->prefetchTo, $doneQueries)):
 
             // does this lookup contain a queryset
             // this means its not a duplication but a different request just containing the same name
@@ -1363,28 +1348,28 @@ function prefetchRelatedObjects($instances, $lookups)
                     )
                 );
 
-            endif;
+    endif;
 
-            // just pass this is just a duplication
-            continue;
-        endif;
+    // just pass this is just a duplication
+    continue;
+    endif;
 
-        $objList = $instances;
+    $objList = $instances;
 
-        $throughtAttrs = StringHelper::split(BaseLookup::$lookupPattern, $lookup->prefetchThrough);
-        foreach ($throughtAttrs as $level => $throughtAttr) :
+    $throughtAttrs = StringHelper::split(BaseLookup::$lookupPattern, $lookup->prefetchThrough);
+    foreach ($throughtAttrs as $level => $throughtAttr) :
             if (0 == count($objList)):
                 break;
-            endif;
+    endif;
 
-            $prefetchTo = $lookup->getCurrentPrefetchTo($level);
+    $prefetchTo = $lookup->getCurrentPrefetchTo($level);
 
-            if (array_key_exists($prefetchTo, $doneQueries)):
+    if (array_key_exists($prefetchTo, $doneQueries)):
                 $objList = ArrayHelper::getValue($doneQueries, $prefetchTo);
 
-                continue; //if its already fetched skip it
-            endif;
-        endforeach;
+    continue; //if its already fetched skip it
+    endif;
+    endforeach;
     endwhile;
 }
 
@@ -1406,11 +1391,11 @@ function normalizePrefetchLookup($lookups, $prefix = null)
     foreach ($lookups as $lookup) :
         if (!$lookup instanceof Prefetch):
             $lookup = new Prefetch($lookup);
-        endif;
-        if ($prefix):
+    endif;
+    if ($prefix):
             $lookup->addPrefix($prefix);
-        endif;
-        $results[] = $lookup;
+    endif;
+    $results[] = $lookup;
     endforeach;
 
     return $results;

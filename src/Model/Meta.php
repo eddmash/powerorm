@@ -276,7 +276,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         foreach ($this->fetchFields(['reverse' => false, 'inverse' => false]) as $name => $field) :
             if (!$field->manyToMany):
                 $forwardFields[$name] = $field;
-            endif;
+        endif;
         endforeach;
 
         return $forwardFields;
@@ -298,10 +298,10 @@ class Meta extends DeconstructableObject implements MetaInterface
         foreach ($fields as $field) :
             $fFields[$field->getName()] = $field;
 
-            // Due to the way powerorm's internals work, getField() should also
-            // be able to fetch a field by attname. In the case of a concrete
-            // field with relation, includes the *_id name too
-            $fFields[$field->getAttrName()] = $field;
+        // Due to the way powerorm's internals work, getField() should also
+        // be able to fetch a field by attname. In the case of a concrete
+        // field with relation, includes the *_id name too
+        $fFields[$field->getAttrName()] = $field;
         endforeach;
 
         return $fFields;
@@ -330,7 +330,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
             if ($field->concrete):
                 $concreteFields[$name] = $field;
-            endif;
+        endif;
         endforeach;
 
         return $concreteFields;
@@ -359,10 +359,10 @@ class Meta extends DeconstructableObject implements MetaInterface
         if (empty($this->_reverseRelationTreeCache)):
             $allRelations = [];
 
-            $allModels = $this->registry->getModels(true);
+        $allModels = $this->registry->getModels(true);
 
-            // collect all relation fields for this each model
-            foreach ($allModels as $name => $model) :
+        // collect all relation fields for this each model
+        foreach ($allModels as $name => $model) :
                 // just get the forward fields
                 $fields = $model->getMeta()->fetchFields(
                     [
@@ -372,26 +372,26 @@ class Meta extends DeconstructableObject implements MetaInterface
                     ]
                 );
 
-                foreach ($fields as $field) :
+        foreach ($fields as $field) :
 
                     if ($field->isRelation && !empty($field->getRelatedModel())):
                         $concreteModel = $field->relation->toModel
                             ->getMeta()->concreteModel
                             ->getMeta()->getNamespacedModelName();
-                        $allRelations[$concreteModel][] = $field;
-                    endif;
+        $allRelations[$concreteModel][] = $field;
+        endif;
 
-                endforeach;
+        endforeach;
 
-            endforeach;
+        endforeach;
 
-            // set cache relation to models
-            foreach ($allModels as $name => $model) :
+        // set cache relation to models
+        foreach ($allModels as $name => $model) :
                 // get fields for each model
                 $fields = (isset($allRelations[$name])) ? $allRelations[$name] : [];
 
-                $model->getMeta()->_reverseRelationTreeCache = $fields;
-            endforeach;
+        $model->getMeta()->_reverseRelationTreeCache = $fields;
+        endforeach;
         endif;
 
         // we get the model from the registry
@@ -427,7 +427,7 @@ class Meta extends DeconstructableObject implements MetaInterface
             if (ArrayHelper::hasKey($this->overrides, $defaultName)):
 
                 $this->{$defaultName} = $this->overrides[$defaultName];
-            endif;
+        endif;
         endforeach;
 
         if (null == $this->getDbTable()):
@@ -465,15 +465,15 @@ class Meta extends DeconstructableObject implements MetaInterface
                 // otherwise always add non-hidden relationships
                 if ($includeHidden || !$revField->relation->isHidden()) :
                     $fields[$revField->relation->getName()] = $revField->relation;
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
         endif;
 
         if ($inverse) :
             foreach ($this->inverseFields as $inverseField) :
                 $fields[$inverseField->getName()] = $inverseField;
-            endforeach;
+        endforeach;
         endif;
 
         if ($forward):
@@ -489,12 +489,10 @@ class Meta extends DeconstructableObject implements MetaInterface
     public function addField(Field $field)
     {
         if (null != $field->relation && $field->manyToMany):
-            $this->localManyToMany[$field->getName()] = $field;
-        elseif (null != $field->relation && $field->inverse):
-            $this->inverseFields[$field->getName()] = $field;
-        else:
+            $this->localManyToMany[$field->getName()] = $field; elseif (null != $field->relation && $field->inverse):
+            $this->inverseFields[$field->getName()] = $field; else:
             $this->localFields[$field->getName()] = $field;
-            $this->setupPrimaryKey($field);
+        $this->setupPrimaryKey($field);
         endif;
     }
 
@@ -526,9 +524,8 @@ class Meta extends DeconstructableObject implements MetaInterface
         if (empty($this->primaryKey)):
             if (!empty($this->parents)):
                 $field = current(array_values($this->parents));
-                $field->primaryKey = true;
-                $this->setupPrimaryKey($field);
-            else:
+        $field->primaryKey = true;
+        $this->setupPrimaryKey($field); else:
 
                 $field = AutoField::createObject(
                     [
@@ -538,8 +535,8 @@ class Meta extends DeconstructableObject implements MetaInterface
                     ]
                 );
 
-                $model->addToClass('id', $field);
-            endif;
+        $model->addToClass('id', $field);
+        endif;
         endif;
     }
 

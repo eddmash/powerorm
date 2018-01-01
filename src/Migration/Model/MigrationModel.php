@@ -30,20 +30,19 @@ class MigrationModel extends Model
             $namespace = sprintf('namespace %s;', $namespace);
         endif;
         if (empty($extends) || Model::isModelBase($extends)):
-            $extends = ClassHelper::getFormatNamespace(Model::getFullClassName(), true, false);
-        else:
+            $extends = ClassHelper::getFormatNamespace(Model::getFullClassName(), true, false); else:
             $extendedClass = sprintf('%s%s', ClassHelper::getFormatNamespace($namespace, true), $extends);
 
-            $use = sprintf('use %s;', $extendedClass);
+        $use = sprintf('use %s;', $extendedClass);
 
-            $extends = trim(substr($extends, strripos($extends, '\\')), '\\');
+        $extends = trim(substr($extends, strripos($extends, '\\')), '\\');
         endif;
 
         if (!StringHelper::isEmpty($extendedClass) && !ClassHelper::classExists($extendedClass, $namespace)):
 
             self::$deferedClasses[$extends][] = ['class' => $className, 'extends' => $extends];
 
-            return false;
+        return false;
         endif;
 
         $class = sprintf(self::getTemplate(), $namespace, $use, $className, $extends);
@@ -55,7 +54,7 @@ class MigrationModel extends Model
             foreach (self::$deferedClasses[$className] as $deferedClass) :
 
                 self::defineClass($deferedClass['class'], $deferedClass['extends']);
-            endforeach;
+        endforeach;
         endif;
 
         if (!ClassHelper::classExists($className, $namespace)):

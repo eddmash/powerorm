@@ -41,16 +41,17 @@ class Makemigrations extends BaseCommand
         if (!empty($issues)):
             $message = '<error>The following migrations seem to indicate they'.
                 ' are both the latest migration :</error>'.PHP_EOL;
-            $message .= '  %s '.PHP_EOL;
-            $output->writeln(sprintf($message,
-                Tools::stringify($issues)));
+        $message .= '  %s '.PHP_EOL;
+        $output->writeln(sprintf(
+                $message,
+                Tools::stringify($issues)
+            ));
 
-            return;
+        return;
         endif;
 
         if ($input->getOption('no-interaction')):
-            $asker = NonInteractiveAsker::createObject($input, $output);
-        else:
+            $asker = NonInteractiveAsker::createObject($input, $output); else:
             $asker = InteractiveAsker::createObject($input, $output);
         endif;
 
@@ -65,7 +66,7 @@ class Makemigrations extends BaseCommand
         if (empty($changes)):
             $output->writeln('No changes were detected');
 
-            return;
+        return;
         endif;
 
         $this->writeMigrations($changes, $input, $output);
@@ -87,42 +88,42 @@ class Makemigrations extends BaseCommand
                             $component->getName()
                         )
                     );
-                    $migration = ArrayHelper::getValue(
+        $migration = ArrayHelper::getValue(
                         $migrationChanges,
                         $component->getName()
                     );
-                    $migrationFile = MigrationFile::createObject($migration);
+        $migrationFile = MigrationFile::createObject($migration);
 
-                    $fileName = $migrationFile->getFileName();
+        $fileName = $migrationFile->getFileName();
 
-                    $output->writeln(sprintf('  <options=bold>%s</>', $fileName));
+        $output->writeln(sprintf('  <options=bold>%s</>', $fileName));
 
-                    $operations = $migration->getOperations();
-                    foreach ($operations as $op) :
+        $operations = $migration->getOperations();
+        foreach ($operations as $op) :
                         $output->writeln(
                             sprintf(
                                 '    - %s',
                                 ucwords($op->getDescription())
                             )
                         );
-                    endforeach;
+        endforeach;
 
-                    if ($input->getOption('dry-run')):
+        if ($input->getOption('dry-run')):
 
                         if (OutputInterface::VERBOSITY_DEBUG === $output->getVerbosity()) :
                             $output->writeln($migrationFile->getContent());
-                        endif;
+        endif;
 
-                        continue;
-                    endif;
-                    $handler = new FileHandler(
+        continue;
+        endif;
+        $handler = new FileHandler(
                         $component->getMigrationsPath(),
                         $fileName
                     );
 
-                    $handler->write($migrationFile->getContent());
-                endif;
-            endif;
+        $handler->write($migrationFile->getContent());
+        endif;
+        endif;
         endforeach;
     }
 

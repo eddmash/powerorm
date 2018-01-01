@@ -42,8 +42,11 @@ class HelpCommand extends BaseCommand
                 array(
                     new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
                     new InputOption(
-                        'format', null, InputOption::VALUE_REQUIRED,
-                        'The output format (txt, xml, json, or md)', 'txt'
+                        'format',
+                        null,
+                        InputOption::VALUE_REQUIRED,
+                        'The output format (txt, xml, json, or md)',
+                        'txt'
                     ),
                     new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help'),
                 )

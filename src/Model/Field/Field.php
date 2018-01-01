@@ -385,9 +385,9 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         if ($this->hasDefault()):
             if (is_callable($this->default)):
                 return call_user_func($this->default);
-            endif;
+        endif;
 
-            return $this->default;
+        return $this->default;
         endif;
 
         return '';
@@ -445,7 +445,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
         if (StringHelper::startsWith(static::class, 'Eddmash\PowerOrm\Model\Field')):
             $path = 'Eddmash\PowerOrm\Model\Model';
-            $name = sprintf('Model::%s', $this->getShortClassName());
+        $name = sprintf('Model::%s', $this->getShortClassName());
         endif;
 
         return [
@@ -479,11 +479,11 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         foreach ($defaults as $name => $default) :
             $value = ($this->hasProperty($name)) ? $this->{$name} : $default;
 
-            if ($value != $default):
+        if ($value != $default):
 
                 $constArgs[$name] = $value;
 
-            endif;
+        endif;
         endforeach;
 
         return $constArgs;
@@ -693,13 +693,19 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         $name = (is_null($this->name)) ? '' : $this->name;
 
         $fieldName = static::class;
-        if (StringHelper::startsWith($fieldName,
-            "Eddmash\PowerOrm\Model\Field")):
+        if (StringHelper::startsWith(
+            $fieldName,
+            "Eddmash\PowerOrm\Model\Field"
+        )):
 
             $fieldName = $this->getShortClassName();
         endif;
-        return sprintf('< %s : %s (%s)>', $class,
-            $fieldName, $name);
+        return sprintf(
+            '< %s : %s (%s)>',
+            $class,
+            $fieldName,
+            $name
+        );
     }
 
     /**

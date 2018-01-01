@@ -44,8 +44,7 @@ class CharField extends Field
                         'id' => 'fields.E120',
                     ]
                 ),
-            ];
-        elseif ($this->maxLength <= 0 || is_string($this->maxLength)):
+            ]; elseif ($this->maxLength <= 0 || is_string($this->maxLength)):
             $errors = [
                 CheckError::createObject(
                     [

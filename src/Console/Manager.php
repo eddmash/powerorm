@@ -54,13 +54,13 @@ class Manager extends Base
         foreach ($components as $component) :
 
             foreach ($component->getCommands() as $command) :
-                if(is_object($command) && $command instanceof BaseCommand):
+                if (is_object($command) && $command instanceof BaseCommand):
                     $comands[] = $command;
-                endif;
-                if(is_string($command)):
+        endif;
+        if (is_string($command)):
                     $comands[] = new $command();
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
         endforeach;
 
@@ -72,13 +72,13 @@ class Manager extends Base
         $commands = [];
         foreach ($this->defaultCommandsPaths as $path) :
             $files = (new FileHandler($path))->readDir();
-            foreach ($files as $file) :
+        foreach ($files as $file) :
                 $command = basename($file, '.php');
-                if ('BaseCommand' === $command):
+        if ('BaseCommand' === $command):
                     continue;
-                endif;
-                $commands[] = $this->fetchCommand($command);
-            endforeach;
+        endif;
+        $commands[] = $this->fetchCommand($command);
+        endforeach;
 
         endforeach;
 
@@ -110,12 +110,12 @@ class Manager extends Base
         foreach ($this->defaultCommandsPaths as $package => $path) :
             $file_handler = new FileHandler($path);
 
-            $file = $file_handler->getFile($name);
-            if (false !== $file):
+        $file = $file_handler->getFile($name);
+        if (false !== $file):
                 $packageName = $package;
 
-                break;
-            endif;
+        break;
+        endif;
         endforeach;
 
         if (false === $file):
@@ -126,8 +126,8 @@ class Manager extends Base
                     $this->defaultCommandsPaths
                 )
             );
-            $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
-            $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
+        $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
+        $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
 
         endif;
 

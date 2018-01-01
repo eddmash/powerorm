@@ -86,10 +86,9 @@ class OrderBy extends BaseExpression
     {
         if (is_null($template)):
             if ($this->nullsLast):
-                $template = sprintf('%s NULLS LAST', $this->template);
-            elseif ($this->nullsFirst):
+                $template = sprintf('%s NULLS LAST', $this->template); elseif ($this->nullsFirst):
                 $template = sprintf('%s NULLS FIRST', $this->template);
-            endif;
+        endif;
         endif;
         list($expSql, $expParams) = $compiler->compile($this->expression);
 

@@ -136,18 +136,18 @@ class BaseOrm extends BaseObject
 
             $message = 'The database configuration have no been provided, consult documentation for options';
 
-            throw new OrmException($message);
+        throw new OrmException($message);
         endif;
         if (null == static::$connection):
             $config = new Configuration();
-            $db = $this->getSettings()->getDatabase();
-            $db['wrapperClass'] = \Eddmash\PowerOrm\Db\Connection::class;
-            $this->getSettings()->setDatabase($db);
-            try {
-                static::$connection = DriverManager::getConnection($this->getSettings()->getDatabase(), $config);
-            } catch (DBALException $exception) {
-                throw new OrmException($exception->getMessage());
-            }
+        $db = $this->getSettings()->getDatabase();
+        $db['wrapperClass'] = \Eddmash\PowerOrm\Db\Connection::class;
+        $this->getSettings()->setDatabase($db);
+        try {
+            static::$connection = DriverManager::getConnection($this->getSettings()->getDatabase(), $config);
+        } catch (DBALException $exception) {
+            throw new OrmException($exception->getMessage());
+        }
         endif;
 
         return static::$connection;
@@ -236,9 +236,9 @@ class BaseOrm extends BaseObject
 
             if (!$modelObj->hasMethod('checks')):
                 continue;
-            endif;
+        endif;
 
-            self::getCheckRegistry()->register([$modelObj, 'checks'], [Tags::Model]);
+        self::getCheckRegistry()->register([$modelObj, 'checks'], [Tags::Model]);
 
         endforeach;
     }
@@ -293,11 +293,11 @@ class BaseOrm extends BaseObject
         if (!$this->componentsloaded):
             foreach ($this->getSettings()->getComponents() as $componentClass) :
                 $component = new $componentClass();
-                if ($component instanceof ComponentInterface):
+        if ($component instanceof ComponentInterface):
                     static::getInstance()->addComponent($component);
-                endif;
-            endforeach;
-            $this->componentsloaded = true;
+        endif;
+        endforeach;
+        $this->componentsloaded = true;
         endif;
     }
 
@@ -314,7 +314,7 @@ class BaseOrm extends BaseObject
 
             foreach ($this->components as $component) :
                 $component->ready($this);
-            endforeach;
+        endforeach;
         endif;
     }
 
@@ -322,8 +322,7 @@ class BaseOrm extends BaseObject
     {
         if ($component->isQueryable()):
 
-            $this->components[$component->getName()] = $component;
-        else:
+            $this->components[$component->getName()] = $component; else:
 
             $this->components[] = $component;
         endif;
@@ -412,7 +411,7 @@ class BaseOrm extends BaseObject
         foreach ($this->getComponents() as $component) :
             if ($component->getName() == $name):
                 return $component;
-            endif;
+        endif;
         endforeach;
         throw new ComponentException(
             sprintf("'%s' is not a registered component", $name)

@@ -37,10 +37,9 @@ class Value extends BaseExpression
         $val = $this->value;
         if (!is_null($this->outputField)):
             if (property_exists($this, 'forSave') && $this->forSave):
-                $val = $this->getOutputField()->prepareValueBeforeSave($val, $connection);
-            else:
+                $val = $this->getOutputField()->prepareValueBeforeSave($val, $connection); else:
                 $val = $this->getOutputField()->convertToDatabaseValue($val, $connection);
-            endif;
+        endif;
         endif;
         if (is_null($val)):
             return ['NULL', []];

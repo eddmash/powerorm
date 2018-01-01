@@ -30,10 +30,9 @@ class In extends BaseLookup
     {
         if ($this->valueIsDirect()):
             $element = count($this->rhs);
-            $placeholders = implode(', ', array_fill(null, $element, '?'));
+        $placeholders = implode(', ', array_fill(null, $element, '?'));
 
-            return [sprintf('(%s)', $placeholders), $this->prepareLookupForDb($this->rhs, $connection)];
-        else:
+        return [sprintf('(%s)', $placeholders), $this->prepareLookupForDb($this->rhs, $connection)]; else:
             return parent::processRHS($compiler, $connection);
         endif;
     }

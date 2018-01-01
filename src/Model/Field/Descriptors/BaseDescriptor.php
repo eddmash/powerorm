@@ -28,7 +28,7 @@ class BaseDescriptor implements DescriptorInterface
     {
         if ($field instanceof InverseField) :
             $this->reverse = true;
-            $field = $field->fromField;
+        $field = $field->fromField;
         endif;
         $this->field = $field;
     }

@@ -56,18 +56,17 @@ class CreateModel extends ModelOperation
 
             if (StringHelper::isEmpty($constructorArgs['extends']) || Model::isModelBase($constructorArgs['extends'])):
 
-                unset($constructorArgs['extends']);
-            else:
+                unset($constructorArgs['extends']); else:
                 $namespace = '';
-                if ($this->getApp()):
+        if ($this->getApp()):
                     $namespace = $this->getApp()->getNamespace();
-                endif;
-                $constructorArgs['extends'] =
+        endif;
+        $constructorArgs['extends'] =
                     ClassHelper::getNameFromNs(
                         $constructorArgs['extends'],
                         $namespace
                     );
-            endif;
+        endif;
         endif;
 
         return $constructorArgs;
@@ -141,27 +140,27 @@ class CreateModel extends ModelOperation
                     foreach ($inBetween as $between) :
                         $modelName = $operation->field->relation
                             ->toModel->getMeta()->getNamespacedModelName();
-                        if ($between->referencesModel($modelName)) :
+        if ($between->referencesModel($modelName)) :
                             return false;
-                        endif;
+        endif;
 
-                        if ($operation->field->relation
+        if ($operation->field->relation
                                 ->hasProperty('through') &&
                             $operation->field->relation->through
                         ) :
                             $modelName = $operation->field->relation
                                 ->through->getMeta()->getNamespacedModelName();
-                            if ($between->referencesModel($modelName)) :
+        if ($between->referencesModel($modelName)) :
                                 return false;
-                            endif;
-                        endif;
-                    endforeach;
-                endif;
+        endif;
+        endif;
+        endforeach;
+        endif;
 
-                $fields = $this->fields;
-                $fields[$operation->field->getName()] = $operation->field;
+        $fields = $this->fields;
+        $fields[$operation->field->getName()] = $operation->field;
 
-                $op = static::createObject(
+        $op = static::createObject(
                     [
                         'name' => $this->name,
                         'fields' => $fields,
@@ -169,13 +168,13 @@ class CreateModel extends ModelOperation
                         'extends' => $this->extends,
                     ]
                 );
-                $op->setAppLabel($this->getAppLabel());
+        $op->setAppLabel($this->getAppLabel());
 
-                return [
+        return [
                     $op,
                 ];
 
-            endif;
+        endif;
         endif;
 
         return parent::reduce($operation, $inBetween);

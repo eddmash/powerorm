@@ -92,8 +92,7 @@ class Func extends BaseExpression
         $sqlParts = [];
 
         if (!is_null($function)):
-            $func = $function;
-        else:
+            $func = $function; else:
             $func = ArrayHelper::pop($this->extra, 'function', $this->function);
         endif;
 
@@ -104,8 +103,8 @@ class Func extends BaseExpression
 
         foreach ($this->getSourceExpressions() as $expression) :
             list($sql, $param) = $compiler->compile($expression);
-            $sqlParts[] = $sql;
-            $params = array_merge($params, $param);
+        $sqlParts[] = $sql;
+        $params = array_merge($params, $param);
         endforeach;
 
         $template = $this->getTemplate($func, implode($this->argJoiner, $sqlParts));

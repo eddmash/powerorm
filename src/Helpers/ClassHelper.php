@@ -139,10 +139,10 @@ class ClassHelper
         $parents = [];
         while ($reflectionClass->getParentClass()):
             $reflectionClass = $reflectionClass->getParentClass();
-            if (in_array($reflectionClass->getName(), $stopAt)):
+        if (in_array($reflectionClass->getName(), $stopAt)):
                 break;
-            endif;
-            $parents[$reflectionClass->getName()] = $reflectionClass;
+        endif;
+        $parents[$reflectionClass->getName()] = $reflectionClass;
         endwhile;
 
         return $parents;
@@ -155,7 +155,7 @@ class ClassHelper
         $name = rtrim($name, '\\');
         if ($pos = strrpos($name, '\\')) :
             $namespace = substr($name, 0, $pos);
-            $name = substr($name, $pos + 1);
+        $name = substr($name, $pos + 1);
         endif;
 
         return [$namespace, $name];
@@ -274,16 +274,15 @@ class ClassHelper
             if (ArrayHelper::hasKey($map, $name)):
 
                 $name = $map[$name];
-            endif;
+        endif;
 
-            $setterMethod = sprintf('set%s', ucfirst($name));
+        $setterMethod = sprintf('set%s', ucfirst($name));
 
-            if (method_exists($object, $setterMethod)):
-                call_user_func([$object, $setterMethod], $value);
-            elseif (property_exists($object, $name)):
+        if (method_exists($object, $setterMethod)):
+                call_user_func([$object, $setterMethod], $value); elseif (property_exists($object, $name)):
 
                 $object->{$name} = $value;
-            endif;
+        endif;
 
         endforeach;
 

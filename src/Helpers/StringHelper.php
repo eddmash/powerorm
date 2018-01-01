@@ -134,7 +134,7 @@ class StringHelper
     {
         if ($caseSensitive):
             $string = strtolower($string);
-            $subString = strtolower($subString);
+        $subString = strtolower($subString);
         endif;
 
         return false !== strpos($string, $subString);

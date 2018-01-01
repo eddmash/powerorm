@@ -54,17 +54,16 @@ class M2OManager extends BaseM2OManager
 
         if (false === $this->reverse) :
             $model = $rel->toModel;
-            $fromField = $rel->fromField;
-            $toField = $rel->getRelatedField();
-            $value = $this->instance->{$fromField->getAttrName()};
-            $filter[$toField->getAttrName()] = $value;
-        else:
+        $fromField = $rel->fromField;
+        $toField = $rel->getRelatedField();
+        $value = $this->instance->{$fromField->getAttrName()};
+        $filter[$toField->getAttrName()] = $value; else:
             $model = $rel->getFromModel();
-            //todo
-            $fromField = $rel->getRelatedField();
-            $toField = $rel->fromField;
-            $value = $this->instance->{$fromField->getAttrName()};
-            $filter[$toField->getName()] = $value;
+        //todo
+        $fromField = $rel->getRelatedField();
+        $toField = $rel->fromField;
+        $value = $this->instance->{$fromField->getAttrName()};
+        $filter[$toField->getName()] = $value;
         endif;
 
         $this->filters = $filter;

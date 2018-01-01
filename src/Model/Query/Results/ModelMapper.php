@@ -50,7 +50,7 @@ class ModelMapper extends Mapper
         /* @var $col Col */
         foreach (array_slice($select, $modelFieldsStart, $modelFieldsEnd) as $colInfo) :
             $col = $colInfo[0];
-            $initList[] = $col->getTargetField()->getAttrName();
+        $initList[] = $col->getTargetField()->getAttrName();
         endforeach;
 
         /* @var $modelClass Model */
@@ -62,17 +62,17 @@ class ModelMapper extends Mapper
 
             $vals = array_slice($result, $modelFieldsStart, $modelFieldsEnd);
 
-            $obj = $modelClass::fromDb($connection, $initList, $vals);
+        $obj = $modelClass::fromDb($connection, $initList, $vals);
 
-            foreach ($annotationMap as $name => $pos) :
+        foreach ($annotationMap as $name => $pos) :
                 $obj->{$name} = $result[$pos];
-            endforeach;
-            if ($relatedPopulators):
+        endforeach;
+        if ($relatedPopulators):
                 foreach ($relatedPopulators as $relatedPopulator) :
                     $relatedPopulator->populate($result, $obj);
-                endforeach;
-            endif;
-            $mapped[] = $obj;
+        endforeach;
+        endif;
+        $mapped[] = $obj;
         endforeach;
 
         return $mapped;

@@ -127,10 +127,9 @@ class ArrayHelper
     {
         if (array_key_exists($key, $haystack)):
             $value = $haystack[$key];
-            unset($haystack[$key]);
+        unset($haystack[$key]);
 
-            return $value;
-        elseif (self::STRICT !== $default):
+        return $value; elseif (self::STRICT !== $default):
             return $default;
         endif;
 

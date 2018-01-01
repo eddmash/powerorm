@@ -44,7 +44,8 @@ function count_($expression, $distinct = false)
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-function avg_($expression) {
+function avg_($expression)
+{
     return new Avg($expression);
 }
 
@@ -57,7 +58,8 @@ function avg_($expression) {
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-function min_($expression) {
+function min_($expression)
+{
     return new Min($expression);
 }
 
@@ -70,7 +72,8 @@ function min_($expression) {
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-function max_($expression) {
+function max_($expression)
+{
     return new Max($expression);
 }
 
@@ -83,7 +86,8 @@ function max_($expression) {
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-function sum_($expression) {
+function sum_($expression)
+{
     return new Sum($expression);
 }
 

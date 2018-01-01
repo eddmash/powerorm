@@ -95,7 +95,7 @@ class ModelState extends BaseObject
                         )
                     );
                 }
-            endforeach;
+        endforeach;
         endif;
 
         $overrides = $model->getMeta()->getOverrides();
@@ -104,8 +104,8 @@ class ModelState extends BaseObject
         foreach ($overrides as $name => $value) :
             if (in_array($name, $ignore)):
                 continue;
-            endif;
-            $meta[$name] = $value;
+        endif;
+        $meta[$name] = $value;
         endforeach;
 
         $extends = '';

@@ -63,8 +63,8 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
         foreach (get_object_vars($this) as $name => $value) :
             if (in_array($name, $this->getIgnored())):
                 continue;
-            endif;
-            $meta[$name] = $value;
+        endif;
+        $meta[$name] = $value;
         endforeach;
 
         return $meta;

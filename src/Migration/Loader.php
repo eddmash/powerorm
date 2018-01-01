@@ -81,7 +81,7 @@ class Loader extends BaseObject
         if (!empty($this->connection)):
             $recoder = new Recorder($this->connection);
 
-            $this->appliedMigrations = $recoder->getApplied();
+        $this->appliedMigrations = $recoder->getApplied();
         endif;
 
         $migrations = $this->getMigrations();
@@ -105,7 +105,7 @@ class Loader extends BaseObject
                     $migration
                 );
 
-            endforeach;
+        endforeach;
 
         endforeach;
     }
@@ -135,18 +135,18 @@ class Loader extends BaseObject
 
         foreach ($this->getMigrations() as $name => $migration) :
             $app = $migration->getApp();
-            if ($migration->getAppLabel() != strtolower($appName)):
+        if ($migration->getAppLabel() != strtolower($appName)):
                 continue;
-            endif;
-            $shortName = ClassHelper::getNameFromNs(
+        endif;
+        $shortName = ClassHelper::getNameFromNs(
                 $name,
                 $app->getNamespace()."\Migrations"
             );
 
-            if (StringHelper::startsWith($name, $prefix) ||
+        if (StringHelper::startsWith($name, $prefix) ||
                 StringHelper::startsWith($shortName, $prefix)):
                 $migrations[] = $migration;
-            endif;
+        endif;
         endforeach;
 
         if (count($migrations) > 1):
@@ -156,8 +156,7 @@ class Loader extends BaseObject
                     "migration with the prefix '%s'",
                     $prefix
                 )
-            );
-        elseif (0 == count($migrations)):
+            ); elseif (0 == count($migrations)):
             throw new KeyError(
                 sprintf(
                     "There no migrations with the prefix '%s'",
@@ -201,11 +200,11 @@ class Loader extends BaseObject
             foreach ($classes as $fileName) :
                 $migrationName = $fileName;
 
-                $migration = $migrationName::createObject($fileName);
-                $migration->setAppLabel($appName);
-                $this->setMigratedApps($appName);
-                $migrations[$fileName] = $migration;
-            endforeach;
+        $migration = $migrationName::createObject($fileName);
+        $migration->setAppLabel($appName);
+        $this->setMigratedApps($appName);
+        $migrations[$fileName] = $migration;
+        endforeach;
         endforeach;
 
         return $migrations;
@@ -230,13 +229,13 @@ class Loader extends BaseObject
         /* @var $component AppInterface */
         foreach ($appFiles as $appName => $migrationFiles) :
             $component = BaseOrm::getInstance()->getComponent($appName);
-            foreach ($migrationFiles as $migrationFile) :
+        foreach ($migrationFiles as $migrationFile) :
                 $className = ClassHelper::getClassFromFile($migrationFile);
-                $foundClass = ClassHelper::classExists(
+        $foundClass = ClassHelper::classExists(
                     $className,
                     $component->getNamespace()
                 );
-                if (!$className):
+        if (!$className):
                     throw new ClassNotFoundException(
                         sprintf(
                             'The class [ %2$s\\%1$s or \\%1$s ] '.
@@ -245,9 +244,9 @@ class Loader extends BaseObject
                             $component->getNamespace()
                         )
                     );
-                endif;
-                $classes[$appName][] = $foundClass;
-            endforeach;
+        endif;
+        $classes[$appName][] = $foundClass;
+        endforeach;
         endforeach;
 
         return $classes;
@@ -273,8 +272,8 @@ class Loader extends BaseObject
                     ]
                 );
 
-                $files[$component->getName()] = $fileHandler->getPathFiles();
-            endif;
+        $files[$component->getName()] = $fileHandler->getPathFiles();
+        endif;
         endforeach;
 
         return $files;
@@ -313,7 +312,7 @@ class Loader extends BaseObject
         foreach ($apps as $name => $latest) :
             if (count($latest) > 1):
                 $conflicts[$name] = $latest;
-            endif;
+        endif;
         endforeach;
 
         return $conflicts;

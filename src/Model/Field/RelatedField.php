@@ -70,8 +70,11 @@ class RelatedField extends Field
     {
         if (!ArrayHelper::hasKey($kwargs, 'to')):
             throw new TypeError(
-                sprintf("missing 1 required argument: 'to' for %s",
-                    static::class));
+                sprintf(
+                    "missing 1 required argument: 'to' for %s",
+                    static::class
+                )
+            );
         endif;
         parent::__construct($kwargs);
     }
@@ -102,7 +105,7 @@ class RelatedField extends Field
             $msg = "Field defines a relation with model '%s', which is either ".
                 'does not exist, or is abstract.';
 
-            $error = [
+        $error = [
                 CheckError::createObject(
                     [
                         'message' => sprintf($msg, $relModel),
@@ -174,7 +177,7 @@ class RelatedField extends Field
                 $this->getName()
             );
 
-            return [
+        return [
                 CheckError::createObject(
                     [
                         'message' => $msg,
@@ -211,15 +214,15 @@ class RelatedField extends Field
 
         foreach ($relMeta->getFields(true, false, false) as $clashField) :
             $clashName = sprintf('%s.%s', $relMeta->getNamespacedModelName(), $clashField->getName());
-            if (!$isHidden && $clashField->getName() == $relName):
+        if (!$isHidden && $clashField->getName() == $relName):
                 $msg = "Reverse accessor for '%s' clashes with field name '%s'.";
-                $hint = sprintf(
+        $hint = sprintf(
                     "Rename field '%s', or add/change a relatedName argument to the definition ".
                     "for field '%s'.",
                     $clashName,
                     $fieldName
                 );
-                $error[] = CheckError::createObject(
+        $error[] = CheckError::createObject(
                     [
                         'message' => sprintf($msg, $fieldName, $clashName),
                         'hint' => $hint,
@@ -228,20 +231,20 @@ class RelatedField extends Field
                     ]
                 );
 
-            endif;
+        endif;
 
-            if ($clashField->getName() === $relQueryName):
+        if ($clashField->getName() === $relQueryName):
 
                 $msg = "Reverse query name for '%s' clashes with field name '%s'.";
 
-                $hint = sprintf(
+        $hint = sprintf(
                     "Rename field '%s', or add/change a relatedName argument to the ".
                     "definition for field '%s'.",
                     $clashName,
                     $fieldName
                 );
 
-                $error[] = CheckError::createObject(
+        $error[] = CheckError::createObject(
                     [
                         'message' => sprintf($msg, $fieldName, $clashName),
                         'hint' => $hint,
@@ -250,25 +253,25 @@ class RelatedField extends Field
                     ]
                 );
 
-            endif;
+        endif;
 
         endforeach;
 
         foreach ($relMeta->getReverseRelatedObjects() as $reverseRelatedObject) :
             if ($reverseRelatedObject->getName() === $this->getName()):
                 continue;
-            endif;
-            $clashName = sprintf(
+        endif;
+        $clashName = sprintf(
                 '%s.%s',
                 $reverseRelatedObject->scopeModel->getMeta()->getNamespacedModelName(),
                 $reverseRelatedObject->getName()
             );
 
-            if (!$isHidden && $reverseRelatedObject->relation->getAccessorName() === $relName):
+        if (!$isHidden && $reverseRelatedObject->relation->getAccessorName() === $relName):
 
                 $msg = "Reverse accessor for '%s' clashes with reverse accessor for '%s'.";
-                $hint = "Add or change a relatedName argument to the definition for '%s' or '%s'.";
-                $error[] = CheckError::createObject(
+        $hint = "Add or change a relatedName argument to the definition for '%s' or '%s'.";
+        $error[] = CheckError::createObject(
                     [
                         'message' => sprintf($msg, $fieldName, $clashName),
                         'hint' => sprintf($hint, $fieldName, $clashName),
@@ -276,12 +279,12 @@ class RelatedField extends Field
                         'id' => 'fields.E304',
                     ]
                 );
-            endif;
+        endif;
 
-            if ($reverseRelatedObject->relation->getAccessorName() === $relQueryName):
+        if ($reverseRelatedObject->relation->getAccessorName() === $relQueryName):
                 $msg = "Reverse query name for '%s' clashes with reverse query name for '%s'.";
-                $hint = "Add or change a relatedName argument to the definition for '%s' or '%s'.";
-                $error[] = CheckError::createObject(
+        $hint = "Add or change a relatedName argument to the definition for '%s' or '%s'.";
+        $error[] = CheckError::createObject(
                     [
                         'message' => sprintf($msg, $fieldName, $clashName),
                         'hint' => sprintf($hint, $fieldName, $clashName),
@@ -289,7 +292,7 @@ class RelatedField extends Field
                         'id' => 'fields.E305',
                     ]
                 );
-            endif;
+        endif;
         endforeach;
 
         return $error;
@@ -323,8 +326,7 @@ class RelatedField extends Field
             rtrim($this->scopeModel->getMeta()->getNamespacedModelName(), '\\')
         );
         if ($this->relation->relatedName):
-            $this->relation->relatedName = sprintf($this->relation->relatedName, $namespace);
-        elseif ($this->scopeModel->getMeta()->defaultRelatedName):
+            $this->relation->relatedName = sprintf($this->relation->relatedName, $namespace); elseif ($this->scopeModel->getMeta()->defaultRelatedName):
 
             $this->relation->relatedName =
                 sprintf(
@@ -378,7 +380,7 @@ class RelatedField extends Field
     ) {
         if (!$this->relation->isHidden()) :
             $inverseField = $this->inverseField;
-            $hasMany = $inverseField::createObject(
+        $hasMany = $inverseField::createObject(
                 [
                     'to' => $this->scopeModel->getMeta()->getNamespacedModelName(),
                     'toField' => $relation->fromField->getName(),
@@ -387,7 +389,7 @@ class RelatedField extends Field
                 ]
             );
 
-            $relatedModel->getMeta()->concreteModel->addToClass($relation->getAccessorName(), $hasMany);
+        $relatedModel->getMeta()->concreteModel->addToClass($relation->getAccessorName(), $hasMany);
         endif;
     }
 
@@ -415,11 +417,10 @@ class RelatedField extends Field
         endif;
 
         if (is_string($this->relation->toModel)):
-            $kwargs['to'] = $this->relation->toModel;
-        else:
+            $kwargs['to'] = $this->relation->toModel; else:
             $name = $this->relation->toModel->getMeta()->getNamespacedModelName();
 
-            $kwargs['to'] = $name;
+        $kwargs['to'] = $name;
         endif;
 
         if ($this->relation->parentLink):
@@ -433,20 +434,13 @@ class RelatedField extends Field
     public function getLookup($name)
     {
         if ('in' == $name):
-            return RelatedIn::class;
-        elseif ('exact' == $name):
-            return RelatedExact::class;
-        elseif ('gt' == $name):
-            return RelatedGreaterThan::class;
-        elseif ('gte' == $name):
-            return RelatedGreaterThanOrEqual::class;
-        elseif ('lt' == $name):
-            return RelatedLessThan::class;
-        elseif ('lte' == $name):
-            return RelatedLessThanOrEqual::class;
-        elseif ('isnull' == $name):
-            return RelatedIsNull::class;
-        else:
+            return RelatedIn::class; elseif ('exact' == $name):
+            return RelatedExact::class; elseif ('gt' == $name):
+            return RelatedGreaterThan::class; elseif ('gte' == $name):
+            return RelatedGreaterThanOrEqual::class; elseif ('lt' == $name):
+            return RelatedLessThan::class; elseif ('lte' == $name):
+            return RelatedLessThanOrEqual::class; elseif ('isnull' == $name):
+            return RelatedIsNull::class; else:
             throw new TypeError(sprintf('Related Field got invalid lookup: %s', $name));
         endif;
     }
@@ -469,15 +463,13 @@ class RelatedField extends Field
         // origin of relation
 
         if (BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $this->fromField) :
-            $this->fromField = $this;
-        elseif (is_string($this->fromField)):
+            $this->fromField = $this; elseif (is_string($this->fromField)):
             $this->fromField = $this->scopeModel->getMeta()->getField($this->fromField);
         endif;
 
         //end point of relation
         if (is_string($this->toField)):
-            $this->toField = $this->relation->toModel->getMeta()->getField($this->toField);
-        else:
+            $this->toField = $this->relation->toModel->getMeta()->getField($this->toField); else:
             $this->toField = $this->relation->toModel->getMeta()->primaryKey;
         endif;
 
@@ -533,10 +525,10 @@ class RelatedField extends Field
         foreach ($fields as $field) :
 
             $val = $modelInstance->{$field->getAttrName()};
-            if (!$val):
+        if (!$val):
                 continue;
-            endif;
-            $values[] = $val;
+        endif;
+        $values[] = $val;
         endforeach;
 
         return $values;
@@ -594,10 +586,8 @@ class RelatedField extends Field
     {
         // we check if the queryname/ relatedName is set otherwise use we use the name of the model.
         if ($this->relation->relatedQueryName) :
-            $name = $this->relation->relatedQueryName;
-        elseif ($this->relation->relatedName):
-            $name = $this->relation->relatedName;
-        else:
+            $name = $this->relation->relatedQueryName; elseif ($this->relation->relatedName):
+            $name = $this->relation->relatedName; else:
             $name = $this->scopeModel->getMeta()->getModelName();
         endif;
 

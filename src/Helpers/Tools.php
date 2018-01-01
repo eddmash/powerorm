@@ -276,10 +276,9 @@ class Tools
         foreach ($relModels as $relM) :
             if (is_string($relM)):
 
-                $relatedModels[] = $relM;
-            elseif ($relM instanceof Model):
+                $relatedModels[] = $relM; elseif ($relM instanceof Model):
                 $relatedModels[] = $relM->getMeta()->getNamespacedModelName();
-            endif;
+        endif;
         endforeach;
 
         $kwargs['scopeModel'] = $scopeModel;
@@ -289,8 +288,7 @@ class Tools
     public static function resolveRelation($model, $relModel)
     {
         if (is_string($relModel) && BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $relModel):
-            return self::resolveRelation($model, $model);
-        elseif ($relModel instanceof Model):
+            return self::resolveRelation($model, $model); elseif ($relModel instanceof Model):
             return $relModel->getMeta()->getNamespacedModelName();
         endif;
 
@@ -338,9 +336,9 @@ class Tools
         if (!is_array($fields)):
             if (is_null($messg)):
                 $messg = sprintf("method '%s()' expects parameters to be an array", __FUNCTION__);
-            endif;
+        endif;
 
-            throw new InvalidArgumentException($messg);
+        throw new InvalidArgumentException($messg);
         endif;
     }
 }

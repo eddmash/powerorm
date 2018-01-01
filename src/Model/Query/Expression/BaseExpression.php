@@ -74,14 +74,12 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
         $args = [];
         foreach ($expressions as $expression) :
             if ($expression instanceof ResolvableExpInterface) :
-                $args[] = $expression;
-            else:
+                $args[] = $expression; else:
                 if (is_string($expression)) :
-                    $args[] = f_($expression);
-                else:
+                    $args[] = f_($expression); else:
                     $args[] = value_($expression);
-                endif;
-            endif;
+        endif;
+        endif;
         endforeach;
 
         return $args;
@@ -139,18 +137,17 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     {
         if (is_null($this->outputField)) :
             $sourceFields = $this->getSourceFields();
-            if (0 == count($sourceFields)) :
-                $this->outputField = null;
-            else:
+        if (0 == count($sourceFields)) :
+                $this->outputField = null; else:
                 foreach ($sourceFields as $sourceField) :
                     if (is_null($this->outputField)) :
                         $this->outputField = $sourceField;
-                    endif;
-                    if (!is_null($this->outputField) && !($this->outputField instanceof $sourceField)) :
+        endif;
+        if (!is_null($this->outputField) && !($this->outputField instanceof $sourceField)) :
                         throw new FieldError('Expression contains mixed types. You must set output_field');
-                    endif;
-                endforeach;
-            endif;
+        endif;
+        endforeach;
+        endif;
         endif;
     }
 
@@ -208,7 +205,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
         foreach ($this->getSourceExpressions() as $sourceExpression) :
             if ($sourceExpression->containsAggregates()):
                 return true;
-            endif;
+        endif;
         endforeach;
 
         return false;

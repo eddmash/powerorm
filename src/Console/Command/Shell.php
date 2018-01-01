@@ -30,14 +30,13 @@ class Shell extends BaseCommand
     {
         if (class_exists('\Psy\Shell')):
             $shell = new \Psy\Shell();
-            $shell->run();
-        else:
+        $shell->run(); else:
 
             $message = sprintf(
                 '<error>%s</error>',
                 "Shell command depends on Psych, please install as shown 'composer require psy/psysh:@stable'"
             );
-            $output->writeln($message);
+        $output->writeln($message);
         endif;
     }
 

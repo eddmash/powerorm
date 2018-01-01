@@ -34,7 +34,7 @@ class RemoveField extends FieldOperation
         foreach ($fields as $name => $field) :
             if ($name !== $this->name):
                 $fieldsNew[$name] = $field;
-            endif;
+        endif;
         endforeach;
         $state->getModelState($this->modelName)->fields = $fieldsNew;
     }
@@ -67,7 +67,7 @@ class RemoveField extends FieldOperation
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-            $schemaEditor->addField($fromModel, $toModel->getMeta()->getField($this->name));
+        $schemaEditor->addField($fromModel, $toModel->getMeta()->getField($this->name));
         endif;
     }
 }

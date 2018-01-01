@@ -128,8 +128,7 @@ class MigrationQuestion
         $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if (2 == $selected):
-            return NOT_PROVIDED;
-        elseif (3 == $selected):
+            return NOT_PROVIDED; elseif (3 == $selected):
             return;
         endif;
 
@@ -151,19 +150,16 @@ class MigrationQuestion
         $msg = PHP_EOL.'Please enter the default value now, ensure its a valid PHP '.PHP_EOL;
         while (true):
             $default = $asker->ask(new Question($msg));
-            if (empty($default)):
-                $msg = " Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL;
-            elseif ('exit' == $default):
-                break;
-            elseif (false === $default):
+        if (empty($default)):
+                $msg = " Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL; elseif ('exit' == $default):
+                break; elseif (false === $default):
                 Console::error(PHP_EOL.' An error occured while trying to set default value');
 
-                break;
-            else:
+        break; else:
                 $default_val = $default;
 
-                break;
-            endif;
+        break;
+        endif;
         endwhile;
 
         return $default_val;

@@ -92,7 +92,10 @@ EOF
                 new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
                 new InputOption(
-                    'format', null, InputOption::VALUE_REQUIRED, 'The output format (txt, xml, json, or md)',
+                    'format',
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                    'The output format (txt, xml, json, or md)',
                     'txt'
                 ),
             )

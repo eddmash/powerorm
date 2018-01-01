@@ -75,22 +75,22 @@ abstract class BaseLookup implements LookupInterface
     {
         if ($value instanceof Model):
             $path = $lhs->getOutputField()->getPathInfo();
-            $sources = end($path)['targetFields'];
+        $sources = end($path)['targetFields'];
 
-            /** @var $source Field */
-            foreach ($sources as $source) :
+        /** @var $source Field */
+        foreach ($sources as $source) :
 
                 while (!$value instanceof $source->scopeModel && $source->relation):
                     $name = $source->relation->getName();
-                    $source = $source->relation->getFromModel()->getMeta()->getField($name);
-                endwhile;
+        $source = $source->relation->getFromModel()->getMeta()->getField($name);
+        endwhile;
 
-                try {
-                    return $value->{$source->getAttrName()};
-                } catch (AttributeError $attributeError) {
-                    return $value->pk;
-                }
-            endforeach;
+        try {
+            return $value->{$source->getAttrName()};
+        } catch (AttributeError $attributeError) {
+            return $value->pk;
+        }
+        endforeach;
         endif;
 
         return $value;
@@ -116,23 +116,22 @@ abstract class BaseLookup implements LookupInterface
         if ($this->rhsValueIsIterable) :
 
             $preparedValues = [];
-            foreach ($this->rhs as $rh) :
+        foreach ($this->rhs as $rh) :
                 if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
 
                     $preparedValues[] = $this->lhs->getOutputField()->prepareValue($rh);
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
-            return $preparedValues;
-        else:
+        return $preparedValues; else:
             $this->rhs = static::getNomalizedValue($value, $this->lhs);
-            if (method_exists($this->rhs, '_prepare')):
+        if (method_exists($this->rhs, '_prepare')):
                 return $this->rhs->_prepare($this->lhs->getOutputField());
-            endif;
+        endif;
 
-            if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
+        if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
                 return $this->lhs->getOutputField()->prepareValue($this->rhs);
-            endif;
+        endif;
         endif;
 
         // it might be, this is just a pure php value
@@ -153,8 +152,7 @@ abstract class BaseLookup implements LookupInterface
 
             foreach ($values as $value) :
                 $preparedValues[] = $this->lhs->getOutputField()->convertToDatabaseValue($value, $connection);
-            endforeach;
-        else:
+        endforeach; else:
             $preparedValues[] = $this->lhs->getOutputField()->convertToDatabaseValue($values, $connection);
         endif;
 
@@ -172,7 +170,7 @@ abstract class BaseLookup implements LookupInterface
         if (method_exists($value, 'asSql')):
             list($sql, $params) = $compiler->compile($value);
 
-            return [sprintf('( %s )', $sql), $params];
+        return [sprintf('( %s )', $sql), $params];
         endif;
 
         return ['?', $this->prepareLookupForDb($this->rhs, $connection)];

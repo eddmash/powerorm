@@ -133,12 +133,12 @@ class Graph
                     $name
                 )->children;
 
-                // if no children exist this must be the latest migration
-                if (empty($children)):
+        // if no children exist this must be the latest migration
+        if (empty($children)):
                     $leaves[$appName][] = $name;
-                endif;
+        endif;
 
-            endforeach;
+        endforeach;
         endforeach;
 
         return $leaves;
@@ -218,13 +218,13 @@ class Graph
                 // get the nodes  parent
                 $parents = $this->getNodeFamilyTree($appName, $name)->parent;
 
-                // if no parent exist this must be the first migration aka
-                // adam/eve which ever tickles your fancy
-                if (empty($parents)):
+        // if no parent exist this must be the first migration aka
+        // adam/eve which ever tickles your fancy
+        if (empty($parents)):
                     $root[$appName] = $name;
-                endif;
+        endif;
 
-            endforeach;
+        endforeach;
         endforeach;
 
         return $root;
@@ -264,21 +264,21 @@ class Graph
             foreach ($appLeaves as $leaf) :
                 $lineage_members = $this->getAncestryTree($appName, $leaf);
 
-                foreach ($lineage_members as $l_appName => $l_members) :
+        foreach ($lineage_members as $l_appName => $l_members) :
 
                     foreach ($l_members as $l_member) :
 
                         if (empty($lineage[$l_appName][$l_member])):
                             if (!$atEnd && in_array($l_member, $appLeaves)):
                                 continue;
-                            endif;
+        endif;
 
-                            $lineage[$l_appName][] = $l_member;
-                        endif;
+        $lineage[$l_appName][] = $l_member;
+        endif;
 
-                    endforeach;
-                endforeach;
-            endforeach;
+        endforeach;
+        endforeach;
+        endforeach;
 
         endforeach;
 
@@ -289,8 +289,8 @@ class Graph
             foreach ($members as $member) :
                 $migration = $this->nodes[$lAppName][$member];
 
-                $state = $migration->updateState($state);
-            endforeach;
+        $state = $migration->updateState($state);
+        endforeach;
 
         endforeach;
 

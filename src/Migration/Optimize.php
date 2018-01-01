@@ -60,10 +60,10 @@ class Optimize
     {
         while (true):
             $results = self::optimize($operations);
-            if ($results == $operations):
+        if ($results == $operations):
                 return $results;
-            endif;
-            $operations = $results;
+        endif;
+        $operations = $results;
         endwhile;
     }
 
@@ -85,33 +85,32 @@ class Optimize
         foreach ($operations as $outIndex => $outOperation) :
             $inOperations = array_slice($operations, $outIndex + 1);
 
-            if ($inOperations) :
+        if ($inOperations) :
                 foreach ($inOperations as $inIndex => $inOperation) :
                     // get how many items to fetch
                     $length = $inIndex;
 
-                    $inBetween = array_slice($operations, $outIndex + 1, $length);
+        $inBetween = array_slice($operations, $outIndex + 1, $length);
 
-                    $result = $outOperation->reduce($inOperation, $inBetween);
+        $result = $outOperation->reduce($inOperation, $inBetween);
 
-                    if ($result) :
+        if ($result) :
                         // add the result of the two merging
                         $newOperations = array_merge($newOperations, $result);
-                        // add points that fell in between those that merged
-                        $newOperations = array_merge($newOperations, $inBetween);
-                        // add points that come after
-                        $newOperations = array_merge(
+        // add points that fell in between those that merged
+        $newOperations = array_merge($newOperations, $inBetween);
+        // add points that come after
+        $newOperations = array_merge(
                             $newOperations,
                             array_slice($operations, $outIndex + $inIndex + 2)
                         );
 
-                        return $newOperations;
-                    endif;
-                endforeach;
+        return $newOperations;
+        endif;
+        endforeach;
+        $newOperations[] = $outOperation; else:
                 $newOperations[] = $outOperation;
-            else:
-                $newOperations[] = $outOperation;
-            endif;
+        endif;
 
         endforeach;
 

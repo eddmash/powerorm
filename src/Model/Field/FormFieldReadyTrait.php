@@ -53,14 +53,14 @@ trait FormFieldReadyTrait
         if ($this->choices):
             $include_blank = true;
 
-            if ($this->formBlank || empty($this->hasDefault()) || !in_array('initial', $kwargs)):
+        if ($this->formBlank || empty($this->hasDefault()) || !in_array('initial', $kwargs)):
                 $include_blank = false;
-            endif;
+        endif;
 
-            $defaults['choices'] = $this->getChoices(['include_blank' => $include_blank]);
-            $defaults['coerce'] = [$this, 'toPhp'];
+        $defaults['choices'] = $this->getChoices(['include_blank' => $include_blank]);
+        $defaults['coerce'] = [$this, 'toPhp'];
 
-            $fieldClass = ArrayHelper::getValue(
+        $fieldClass = ArrayHelper::getValue(
                 $kwargs,
                 'formChoicesClass',
                 TypedChoiceField::class
@@ -125,16 +125,15 @@ trait FormFieldReadyTrait
                     foreach ($choice as $inkey => $inchoice) :
                         if ($value === $inchoice) :
                             return;
-                        endif;
-                    endforeach;
-                else:
+        endif;
+        endforeach; else:
                     if ($value === $choice) :
                         return;
-                    endif;
-                endif;
-            endforeach;
+        endif;
+        endif;
+        endforeach;
 
-            throw new ValidationError(
+        throw new ValidationError(
                 sprintf('Value %s is not a valid choice.', $value),
                 'invalid_choice'
             );

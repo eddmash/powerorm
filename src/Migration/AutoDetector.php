@@ -180,13 +180,11 @@ class AutoDetector extends BaseObject
 
         foreach ($oldModelNames as $oldModelName) :
             $oldModel = $this->oldRegistry->getModel($oldModelName);
-            if (!$oldModel->getMeta()->managed):
-                $this->oldUnmanagedKeys[] = $oldModelName;
-            elseif ($oldModel->getMeta()->proxy):
-                $this->oldProxyKeys[] = $oldModelName;
-            else:
+        if (!$oldModel->getMeta()->managed):
+                $this->oldUnmanagedKeys[] = $oldModelName; elseif ($oldModel->getMeta()->proxy):
+                $this->oldProxyKeys[] = $oldModelName; else:
                 $this->oldModelKeys[] = $oldModelName;
-            endif;
+        endif;
         endforeach;
 
         // new state
@@ -195,14 +193,12 @@ class AutoDetector extends BaseObject
         foreach ($newModelNames as $newModelName) :
             $newModel = $this->newRegistry->getModel($newModelName);
 
-            if (false === $newModel->getMeta()->managed):
-                $this->newUnmanagedKeys[] = $newModelName;
-            elseif ($newModel->getMeta()->proxy):
+        if (false === $newModel->getMeta()->managed):
+                $this->newUnmanagedKeys[] = $newModelName; elseif ($newModel->getMeta()->proxy):
 
-                $this->newProxyKeys[] = $newModelName;
-            else:
+                $this->newProxyKeys[] = $newModelName; else:
                 $this->newModelKeys[] = $newModelName;
-            endif;
+        endif;
         endforeach;
 
         $this->generateRenamedModels();
@@ -227,16 +223,16 @@ class AutoDetector extends BaseObject
         foreach ($this->keptModelKeys as $modelName) :
 
             $oldModelName = $this->getOldModelName($modelName);
-            $oldState = $this->fromState->getModelState($oldModelName);
-            $newState = $this->toState->getModelState($modelName);
+        $oldState = $this->fromState->getModelState($oldModelName);
+        $newState = $this->toState->getModelState($modelName);
 
-            foreach ($newState->fields as $newName => $newField) :
+        foreach ($newState->fields as $newName => $newField) :
                 $this->newFieldKeys[$modelName][] = $newName;
-            endforeach;
+        endforeach;
 
-            foreach ($oldState->fields as $oldName => $oldField) :
+        foreach ($oldState->fields as $oldName => $oldField) :
                 $this->oldFieldKeys[$modelName][] = $oldName;
-            endforeach;
+        endforeach;
 
         endforeach;
 
@@ -276,39 +272,37 @@ class AutoDetector extends BaseObject
         foreach ($changes as $appName => &$migration) :
             if (empty($appName)):
                 continue;
-            endif;
-            $appLeaves = (empty($leaves)) ? [] : $leaves[$appName];
-            $leaf = (empty($appLeaves)) ? '' : $appLeaves[0];
-            if (empty($leaf)):
-                $migrationNo = 1;
-            else:
+        endif;
+        $appLeaves = (empty($leaves)) ? [] : $leaves[$appName];
+        $leaf = (empty($appLeaves)) ? '' : $appLeaves[0];
+        if (empty($leaf)):
+                $migrationNo = 1; else:
                 $migrationNo = $this->getMigrationNumber(
                         Migration::createShortName($leaf)
                     ) + 1;
 
-            endif;
+        endif;
 
-            // set name for migration
-            if (empty($leaf)):
+        // set name for migration
+        if (empty($leaf)):
                 // this mean we don't have previous migrations
-                $migrationName = $this->suggestName();
-            else:
+                $migrationName = $this->suggestName(); else:
                 // first set previous as dependency of this
                 $migration->setDependency($appName, $leaf);
 
-                $migrationNo = str_pad(
+        $migrationNo = str_pad(
                     $migrationNo,
                     4,
                     '0',
                     STR_PAD_LEFT
                 );
-                $migrationName = $this->suggestName(
+        $migrationName = $this->suggestName(
                     $migration->getOperations(),
                     $migrationNo
                 );
-            endif;
+        endif;
 
-            $migration->setName($migrationName);
+        $migration->setName($migrationName);
 
         endforeach;
 
@@ -334,8 +328,7 @@ class AutoDetector extends BaseObject
         $operation->setAppLabel($appLabel);
 
         if ($pushToTop):
-            array_unshift($this->generatedOperations, $operation);
-        else:
+            array_unshift($this->generatedOperations, $operation); else:
             array_push($this->generatedOperations, $operation);
         endif;
     }
@@ -356,10 +349,10 @@ class AutoDetector extends BaseObject
         $migrations = [];
         foreach ($app as $label => $ops) :
             $migration = new Migration('auto');
-            // optimize the migrations
-            $migration->setOperations($ops);
-            $migration->setAppLabel($label);
-            $migrations[$label] = $migration;
+        // optimize the migrations
+        $migration->setOperations($ops);
+        $migration->setAppLabel($label);
+        $migrations[$label] = $migration;
         endforeach;
 
         return $migrations;
@@ -386,11 +379,11 @@ class AutoDetector extends BaseObject
         foreach ($fields as $name => $field) :
             $def = $this->deepDeconstruct($field);
 
-            if (null !== $field->relation && null !== $field->relation->toModel):
+        if (null !== $field->relation && null !== $field->relation->toModel):
                 unset($def['constructorArgs']['to']);
-            endif;
+        endif;
 
-            $fieldDefs[] = $def;
+        $fieldDefs[] = $def;
         endforeach;
 
         return $fieldDefs;
@@ -444,8 +437,7 @@ class AutoDetector extends BaseObject
             // add model
             return
                 $operation instanceof CreateModel &&
-                strtolower($operation->name) === strtolower($target);
-        elseif (self::TYPE_FIELD === $type && self::ACTION_CREATED === $action):
+                strtolower($operation->name) === strtolower($target); elseif (self::TYPE_FIELD === $type && self::ACTION_CREATED === $action):
             // add field
             return
 
@@ -463,13 +455,11 @@ class AutoDetector extends BaseObject
             return
                 $operation instanceof RemoveField &&
                 strtolower($operation->modelName) === strtolower($model) &&
-                strtolower($operation->name) === strtolower($target);
-        elseif (self::TYPE_MODEL === $type && self::ACTION_DROPPED === $action):
+                strtolower($operation->name) === strtolower($target); elseif (self::TYPE_MODEL === $type && self::ACTION_DROPPED === $action):
             //dropped model
             return
                 $operation instanceof DeleteModel &&
-                strtolower($operation->name) === strtolower($target);
-        elseif (self::TYPE_FIELD === $type && self::ACTION_ALTER === $action):
+                strtolower($operation->name) === strtolower($target); elseif (self::TYPE_FIELD === $type && self::ACTION_ALTER === $action):
             // altered field
             return
                 $operation instanceof AlterField &&
@@ -508,29 +498,26 @@ class AutoDetector extends BaseObject
         if (1 == count($operations)):
 
             $op = $operations[0];
-            if ($op instanceof CreateModel):
+        if ($op instanceof CreateModel):
                 return sprintf(
                     '%s%s_%s',
                     $prefix,
                     $id,
                     $this->formatName($op->name, $op->getAppLabel())
-                );
-            elseif ($op instanceof DeleteModel):
+                ); elseif ($op instanceof DeleteModel):
                 return sprintf(
                     '%s%s_Delete_%s',
                     $prefix,
                     $id,
                     $this->formatName($op->name, $op->getAppLabel())
-                );
-            elseif ($op instanceof AddField):
+                ); elseif ($op instanceof AddField):
                 return sprintf(
                     '%s%s_%s_%s',
                     $prefix,
                     $id,
                     $this->formatName($op->modelName, $op->getAppLabel()),
                     $this->formatName($op->name)
-                );
-            elseif ($op instanceof RemoveField):
+                ); elseif ($op instanceof RemoveField):
                 return sprintf(
                     '%s%s_Remove_%s_%s',
                     $prefix,
@@ -538,7 +525,7 @@ class AutoDetector extends BaseObject
                     $this->formatName($op->modelName, $op->getAppLabel()),
                     $this->formatName($op->name)
                 );
-            endif;
+        endif;
         endif;
 
         return sprintf('%s%s_Auto_%s', $prefix, $id, date('Ymd_hm'));
@@ -635,54 +622,53 @@ class AutoDetector extends BaseObject
         foreach ($allAddedModels as $addedModelName) :
 
             $modelState = $this->toState->getModelState($addedModelName);
-            $meta = $this->newRegistry->getModel($addedModelName)->getMeta();
+        $meta = $this->newRegistry->getModel($addedModelName)->getMeta();
 
-            $primaryKeyRel = null;
-            $relatedFields = [];
+        $primaryKeyRel = null;
+        $relatedFields = [];
 
-            // get all the relationship fields since they will need to
+        // get all the relationship fields since they will need to
 
-            // be created in there own operations aside from
+        // be created in there own operations aside from
 
-            // the one that creates the model remember the model needs
+        // the one that creates the model remember the model needs
 
-            // to exist first before enforcing the relationships.
+        // to exist first before enforcing the relationships.
 
-            /** @var $localField Field */
-            foreach ($meta->localFields as $localField) :
+        /** @var $localField Field */
+        foreach ($meta->localFields as $localField) :
                 if (null != $localField->relation && null != $localField->relation->toModel):
 
                     if ($localField->primaryKey):
-                        $primaryKeyRel = $localField->relation->toModel;
-                    elseif (!$localField->relation->parentLink):
+                        $primaryKeyRel = $localField->relation->toModel; elseif (!$localField->relation->parentLink):
                         $relatedFields[$localField->getName()] = $localField;
-                    endif;
+        endif;
 
-                endif;
+        endif;
 
-            endforeach;
+        endforeach;
 
-            /** @var $localM2MField RelatedField */
-            foreach ($meta->localManyToMany as $name => $localM2MField) :
+        /** @var $localM2MField RelatedField */
+        foreach ($meta->localManyToMany as $name => $localM2MField) :
 
                 if (null != $localM2MField->relation->toModel):
                     $relatedFields[$localM2MField->getName()] = $localM2MField;
-                endif;
+        endif;
 
-                // if related field has a through model and it was not auto created
-                if ($localM2MField->relation->hasProperty('through') &&
+        // if related field has a through model and it was not auto created
+        if ($localM2MField->relation->hasProperty('through') &&
                     !$localM2MField->relation->through->getMeta()->autoCreated
                 ):
 
                     $relatedFields[$localM2MField->getName()] = $localM2MField;
-                endif;
+        endif;
 
-            endforeach;
+        endforeach;
 
-            // we need to keep track of which operation need to run the create one i.e us
+        // we need to keep track of which operation need to run the create one i.e us
 
-            // first, check for operations that drops a proxy version of us has been dropped
-            $opDep = [
+        // first, check for operations that drops a proxy version of us has been dropped
+        $opDep = [
                 [
                     'target' => $addedModelName,
                     'type' => self::TYPE_MODEL,
@@ -690,28 +676,28 @@ class AutoDetector extends BaseObject
                 ],
             ];
 
-            // depend on related model being created if primary key is a relationship field
-            if (null !== $primaryKeyRel):
+        // depend on related model being created if primary key is a relationship field
+        if (null !== $primaryKeyRel):
                 $opDep[] = [
                     'target' => $primaryKeyRel->getMeta()->getNamespacedModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];
-            endif;
+        endif;
 
-            //we need to get the unbound fields
-            $boundRelationFieldKeys = array_keys($relatedFields);
-            $unboundFields = $modelState->fields;
-            $uFields = [];
-            foreach ($unboundFields as $uname => $ufield) :
+        //we need to get the unbound fields
+        $boundRelationFieldKeys = array_keys($relatedFields);
+        $unboundFields = $modelState->fields;
+        $uFields = [];
+        foreach ($unboundFields as $uname => $ufield) :
                 if (in_array($uname, $boundRelationFieldKeys)):
                     continue;
-                endif;
-                $uFields[$uname] = $ufield;
-            endforeach;
+        endif;
+        $uFields[$uname] = $ufield;
+        endforeach;
 
-            // create operation
-            $this->addOperation(
+        // create operation
+        $this->addOperation(
                 $meta->getAppName(),
                 CreateModel::createObject(
                     [
@@ -725,16 +711,16 @@ class AutoDetector extends BaseObject
                 true
             );
 
-            // at this point if we the model is un manged just stop ,
-            // since we just need to have it recorded in our
-            // migrations, we don't need to create the relationship fields
-            // also, its not our problem anymore
-            if (!$meta->managed):
+        // at this point if we the model is un manged just stop ,
+        // since we just need to have it recorded in our
+        // migrations, we don't need to create the relationship fields
+        // also, its not our problem anymore
+        if (!$meta->managed):
                 continue;
-            endif;
+        endif;
 
-            // take care of relationships
-            foreach ($relatedFields as $fieldName => $relationField) :
+        // take care of relationships
+        foreach ($relatedFields as $fieldName => $relationField) :
                 // we need the current model to be in existence
                 $opDep[] = [
                     'target' => $addedModelName,
@@ -742,15 +728,15 @@ class AutoDetector extends BaseObject
                     'action' => self::ACTION_CREATED,
                 ];
 
-                // depend on the related model also
-                $opDep[] = [
+        // depend on the related model also
+        $opDep[] = [
                     'target' => $relationField->relation->toModel->getMeta()->getNamespacedModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];
 
-                // if the through model was not automatically created, depend on it also
-                if ($relationField->relation->hasProperty(
+        // if the through model was not automatically created, depend on it also
+        if ($relationField->relation->hasProperty(
                         'through'
                     ) && null != !$relationField->relation &&
                     !$relationField->relation->through->getMeta()->autoCreated
@@ -761,10 +747,10 @@ class AutoDetector extends BaseObject
                         'type' => self::TYPE_MODEL,
                         'action' => self::ACTION_CREATED,
                     ];
-                endif;
+        endif;
 
-                //create the operation
-                $this->addOperation(
+        //create the operation
+        $this->addOperation(
                     $meta->getAppName(),
                     AddField::createObject(
                         [
@@ -775,7 +761,7 @@ class AutoDetector extends BaseObject
                     ),
                     $opDep
                 );
-            endforeach;
+        endforeach;
 
         endforeach;
     }
@@ -808,46 +794,46 @@ class AutoDetector extends BaseObject
         foreach ($allDeletedModels as $deletedModel) :
 
             $modelState = $this->fromState->getModelState($deletedModel);
-            $meta = $this->fromState->getRegistry()
+        $meta = $this->fromState->getRegistry()
                 ->getModel($deletedModel)->getMeta();
 
-            // at this point if we the model is un manged just stop ,
-            // since we just need to have it recorded in our
-            // migrations, we don't need to create the relationship fields also,
-            // its not our problem anymore
-            if (!$meta->managed):
+        // at this point if we the model is un manged just stop ,
+        // since we just need to have it recorded in our
+        // migrations, we don't need to create the relationship fields also,
+        // its not our problem anymore
+        if (!$meta->managed):
                 continue;
-            endif;
+        endif;
 
-            $localFields = $meta->localFields;
-            $localM2MFields = $meta->localManyToMany;
+        $localFields = $meta->localFields;
+        $localM2MFields = $meta->localManyToMany;
 
-            $relatedFields = [];
+        $relatedFields = [];
 
-            // get all the relationship fields that we initiated since they
-            // will need to be created on there own  operations aside from
-            //  the one that creates the model
-            // remember the model needs to exist first before enforcing the
-            // relationships.
+        // get all the relationship fields that we initiated since they
+        // will need to be created on there own  operations aside from
+        //  the one that creates the model
+        // remember the model needs to exist first before enforcing the
+        // relationships.
 
-            /** @var $localField Field */
-            foreach ($localFields as $localField) :
+        /** @var $localField Field */
+        foreach ($localFields as $localField) :
                 if ($localField->relation && $localField->relation->toModel):
                     $relatedFields[$localField->getName()] = $localField;
-                endif;
+        endif;
 
-            endforeach;
+        endforeach;
 
-            /** @var $localM2MField Field */
-            foreach ($localM2MFields as $localM2MField) :
+        /** @var $localM2MField Field */
+        foreach ($localM2MFields as $localM2MField) :
                 if ($localField->relation && $localField->relation->toModel):
                     $relatedFields[$localM2MField->getName()] = $localM2MField;
-                endif;
+        endif;
 
-            endforeach;
+        endforeach;
 
-            // take care of relationships
-            foreach ($relatedFields as $fieldName => $relationField) :
+        // take care of relationships
+        foreach ($relatedFields as $fieldName => $relationField) :
                 //remove the operation
                 $this->addOperation(
                     $meta->getAppName(),
@@ -858,37 +844,37 @@ class AutoDetector extends BaseObject
                         ]
                     )
                 );
-            endforeach;
+        endforeach;
 
-            $opDep = [];
+        $opDep = [];
 
-            // we also need to drop all relationship fields that point to us,
-            // initiated by other models.
-            $reverseRelatedFields = $meta->getReverseRelatedObjects();
+        // we also need to drop all relationship fields that point to us,
+        // initiated by other models.
+        $reverseRelatedFields = $meta->getReverseRelatedObjects();
 
-            /** @var $reverseRelatedField RelatedField */
-            foreach ($reverseRelatedFields as $reverseRelatedField) :
+        /** @var $reverseRelatedField RelatedField */
+        foreach ($reverseRelatedFields as $reverseRelatedField) :
                 $modelName = $reverseRelatedField
                     ->relation->toModel->getMeta()->getNamespacedModelName();
-                $fieldName = $reverseRelatedField->relation->fromField->getName();
-                $opDep[] = [
+        $fieldName = $reverseRelatedField->relation->fromField->getName();
+        $opDep[] = [
                     'target' => $fieldName,
                     'model' => $modelName,
                     'type' => self::TYPE_FIELD,
                     'action' => self::ACTION_DROPPED,
                 ];
-                if (!$reverseRelatedField->relation->isManyToMany()):
+        if (!$reverseRelatedField->relation->isManyToMany()):
                     $opDep[] = [
                         'target' => $fieldName,
                         'model' => $modelName,
                         'type' => self::TYPE_FIELD,
                         'action' => self::ACTION_ALTER,
                     ];
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
-            // finally remove the model
-            $this->addOperation(
+        // finally remove the model
+        $this->addOperation(
                 $meta->getAppName(),
                 DeleteModel::createObject(['name' => $modelState->name]),
                 $opDep
@@ -912,23 +898,23 @@ class AutoDetector extends BaseObject
         /* @var $modelState ModelState */
         foreach ($addedModels as $addedModel) :
             $modelState = $this->toState->getModelState($addedModel);
-            $meta = $this->toState->getRegistry()->getModel($addedModel)->getMeta();
-            $modelDefinitionList = $this->getFieldsDefinitions(
+        $meta = $this->toState->getRegistry()->getModel($addedModel)->getMeta();
+        $modelDefinitionList = $this->getFieldsDefinitions(
                 $modelState->fields
             );
 
-            $removedModels = array_diff(
+        $removedModels = array_diff(
                 $this->oldModelKeys,
                 $this->newModelKeys
             );
-            foreach ($removedModels as $removedModel) :
+        foreach ($removedModels as $removedModel) :
 
                 $remModelState = $this->fromState->getModelState($removedModel);
-                $remModelDefinitionList = $this->getFieldsDefinitions(
+        $remModelDefinitionList = $this->getFieldsDefinitions(
                     $remModelState->fields
                 );
 
-                if ($remModelDefinitionList == $modelDefinitionList):
+        if ($remModelDefinitionList == $modelDefinitionList):
 
                     if (MigrationQuestion::hasModelRenamed(
                         $this->asker,
@@ -946,23 +932,23 @@ class AutoDetector extends BaseObject
                             )
                         );
 
-                        $this->renamedModels[$addedModel] = $removedModel;
+        $this->renamedModels[$addedModel] = $removedModel;
 
-                        // remove the old name and update with the new name.
-                        $pos = array_search($removedModel, $this->oldModelKeys);
+        // remove the old name and update with the new name.
+        $pos = array_search($removedModel, $this->oldModelKeys);
 
-                        array_splice(
+        array_splice(
                             $this->oldModelKeys,
                             $pos,
                             1,
                             [$addedModel]
                         );
 
-                        // you can stop here.
-                        break;
-                    endif;
-                endif;
-            endforeach;
+        // you can stop here.
+        break;
+        endif;
+        endif;
+        endforeach;
         endforeach;
     }
 
@@ -983,18 +969,18 @@ class AutoDetector extends BaseObject
         /* @var $modelState ModelState */
         foreach ($addedProxies as $addedProxy) :
             $meta = $this->toState->getRegistry()->getModel($addedProxy)->getMeta();
-            $modelState = $this->toState->getModelState($addedProxy);
-            assert($modelState->getMeta()['proxy']);
+        $modelState = $this->toState->getModelState($addedProxy);
+        assert($modelState->getMeta()['proxy']);
 
-            $opDep = [
+        $opDep = [
                 [
                     'target' => $addedProxy,
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_DROPPED,
                 ],
             ];
-            // create operation
-            $this->addOperation(
+        // create operation
+        $this->addOperation(
                 $meta->getAppName(),
                 CreateModel::createObject(
                     [
@@ -1022,11 +1008,11 @@ class AutoDetector extends BaseObject
 
         foreach ($droppedProxies as $droppedProxy) :
             $modelState = $this->fromState->getModelState($droppedProxy);
-            $meta = $this->fromState->getRegistry()->getModel($droppedProxy)
+        $meta = $this->fromState->getRegistry()->getModel($droppedProxy)
                 ->getMeta();
 
-            // create operation
-            $this->addOperation(
+        // create operation
+        $this->addOperation(
                 $meta->getAppName(),
                 DeleteModel::createObject(
                     [
@@ -1072,29 +1058,29 @@ class AutoDetector extends BaseObject
         /* @var $newState ModelState */
         foreach ($modelsToCheck as $modelName) :
             $oldModelName = $this->getOldModelName($modelName);
-            $oldState = $this->fromState->getModelState($oldModelName);
-            $newState = $this->toState->getModelState($modelName);
+        $oldState = $this->fromState->getModelState($oldModelName);
+        $newState = $this->toState->getModelState($modelName);
 
-            $oldMeta = [];
+        $oldMeta = [];
 
-            if ($oldState->getMeta()):
+        if ($oldState->getMeta()):
                 foreach ($oldState->getMeta() as $name => $opt) :
                     if (AlterModelMeta::isAlterableOption($name)):
                         $oldMeta[$name] = $opt;
-                    endif;
-                endforeach;
-            endif;
+        endif;
+        endforeach;
+        endif;
 
-            $newMeta = [];
-            if ($newState->getMeta()):
+        $newMeta = [];
+        if ($newState->getMeta()):
                 foreach ($newState->getMeta() as $name => $opt) :
                     if (AlterModelMeta::isAlterableOption($name)):
                         $newMeta[$name] = $opt;
-                    endif;
-                endforeach;
-            endif;
+        endif;
+        endforeach;
+        endif;
 
-            if ($oldMeta !== $newMeta):
+        if ($oldMeta !== $newMeta):
                 $this->addOperation(
                     $newMeta->getAppName(),
                     AlterModelMeta::createObject(
@@ -1104,7 +1090,7 @@ class AutoDetector extends BaseObject
                         ]
                     )
                 );
-            endif;
+        endif;
         endforeach;
     }
 
@@ -1121,38 +1107,38 @@ class AutoDetector extends BaseObject
         /* @var $field Field */
         foreach ($this->keptModelKeys as $modelName) :
             $oldModelName = $this->getOldModelName($modelName);
-            $meta = $this->toState->getRegistry()->getModel($modelName)->getMeta();
-            $oldModelState = $this->fromState->getModelState($oldModelName);
+        $meta = $this->toState->getRegistry()->getModel($modelName)->getMeta();
+        $oldModelState = $this->fromState->getModelState($oldModelName);
 
-            $newModel = $this->newRegistry->getModel($modelName);
+        $newModel = $this->newRegistry->getModel($modelName);
 
-            $oldFieldKeys = $this->oldFieldKeys[$modelName];
-            $newFieldKeys = $this->newFieldKeys[$modelName];
+        $oldFieldKeys = $this->oldFieldKeys[$modelName];
+        $newFieldKeys = $this->newFieldKeys[$modelName];
 
-            $addedFields = array_diff($newFieldKeys, $oldFieldKeys);
+        $addedFields = array_diff($newFieldKeys, $oldFieldKeys);
 
-            foreach ($addedFields as $addedField) :
+        foreach ($addedFields as $addedField) :
                 $field = $newModel->getMeta()->getField($addedField);
-                $fieldDef = $this->deepDeconstruct($field);
+        $fieldDef = $this->deepDeconstruct($field);
 
-                $removedFields = array_diff($oldFieldKeys, $newFieldKeys);
-                foreach ($removedFields as $remField) :
+        $removedFields = array_diff($oldFieldKeys, $newFieldKeys);
+        foreach ($removedFields as $remField) :
                     $oldFieldDef = $this->deepDeconstruct(
                         $oldModelState->getFieldByName($remField)
                     );
 
-                    if (null !== $field->relation && null !== $field->relation->toModel &&
+        if (null !== $field->relation && null !== $field->relation->toModel &&
                         isset($oldFieldDef['constructorArgs']['to'])
                     ):
                         $oldRelTo = $oldFieldDef['constructorArgs']['to'];
-                        if (in_array($oldRelTo, $this->renamedModels)):
+        if (in_array($oldRelTo, $this->renamedModels)):
                             $oldFieldDef['constructorArgs']['to'] = $this->getOldModelName(
                                 $oldRelTo
                             );
-                        endif;
-                    endif;
+        endif;
+        endif;
 
-                    if ($fieldDef === $oldFieldDef):
+        if ($fieldDef === $oldFieldDef):
                         if (MigrationQuestion::hasFieldRenamed(
                             $this->asker,
                             $modelName,
@@ -1173,27 +1159,27 @@ class AutoDetector extends BaseObject
                                 )
                             );
 
-                            // remove the old name and update with the new name.
-                            $pos = array_search(
+        // remove the old name and update with the new name.
+        $pos = array_search(
                                 $remField,
                                 $this->oldFieldKeys[$modelName]
                             );
 
-                            array_splice(
+        array_splice(
                                 $this->oldFieldKeys[$modelName],
                                 $pos,
                                 1,
                                 [$addedField]
                             );
-                            $this->renamedFields[$modelName][$addedField] = $remField;
+        $this->renamedFields[$modelName][$addedField] = $remField;
 
-                            break;
+        break;
 
-                        endif;
-                    endif;
-                endforeach;
+        endif;
+        endif;
+        endforeach;
 
-            endforeach;
+        endforeach;
 
         endforeach;
     }
@@ -1210,13 +1196,13 @@ class AutoDetector extends BaseObject
         foreach ($this->keptModelKeys as $modelName) :
 
             $oldFieldKeys = $this->oldFieldKeys[$modelName];
-            $newFieldKeys = $this->newFieldKeys[$modelName];
+        $newFieldKeys = $this->newFieldKeys[$modelName];
 
-            $addedFields = array_diff($newFieldKeys, $oldFieldKeys);
+        $addedFields = array_diff($newFieldKeys, $oldFieldKeys);
 
-            foreach ($addedFields as $addedField) :
+        foreach ($addedFields as $addedField) :
                 $this->findAddedFields($modelName, $addedField);
-            endforeach;
+        endforeach;
         endforeach;
     }
 
@@ -1232,13 +1218,13 @@ class AutoDetector extends BaseObject
         foreach ($this->keptModelKeys as $modelName) :
 
             $oldFieldKeys = $this->oldFieldKeys[$modelName];
-            $newFieldKeys = $this->newFieldKeys[$modelName];
+        $newFieldKeys = $this->newFieldKeys[$modelName];
 
-            $remFields = array_diff($oldFieldKeys, $newFieldKeys);
+        $remFields = array_diff($oldFieldKeys, $newFieldKeys);
 
-            foreach ($remFields as $remField) :
+        foreach ($remFields as $remField) :
                 $this->findRemovedFields($modelName, $remField);
-            endforeach;
+        endforeach;
         endforeach;
     }
 
@@ -1256,56 +1242,55 @@ class AutoDetector extends BaseObject
         foreach ($this->keptModelKeys as $modelName) :
 
             $oldFieldKeys = $this->oldFieldKeys[$modelName];
-            $newFieldKeys = $this->newFieldKeys[$modelName];
+        $newFieldKeys = $this->newFieldKeys[$modelName];
 
-            $keptFieldKeys = array_intersect($oldFieldKeys, $newFieldKeys);
+        $keptFieldKeys = array_intersect($oldFieldKeys, $newFieldKeys);
 
-            $oldModelName = $this->getOldModelName($modelName);
+        $oldModelName = $this->getOldModelName($modelName);
 
-            foreach ($keptFieldKeys as $keptField) :
+        foreach ($keptFieldKeys as $keptField) :
                 $oldFieldName = $this->getOldFieldName($modelName, $keptField);
-                $oldField = $this->oldRegistry->getModel(
+        $oldField = $this->oldRegistry->getModel(
                     $oldModelName
                 )->getMeta()->getField($oldFieldName);
 
-                $meta = $this->newRegistry->getModel(
+        $meta = $this->newRegistry->getModel(
                     $modelName
                 )->getMeta();
-                $newField = $meta->getField($keptField);
+        $newField = $meta->getField($keptField);
 
-                $oldDec = $this->deepDeconstruct($oldField);
-                $newDec = $this->deepDeconstruct($newField);
+        $oldDec = $this->deepDeconstruct($oldField);
+        $newDec = $this->deepDeconstruct($newField);
 
-                if ($oldDec !== $newDec):
+        if ($oldDec !== $newDec):
                     $bothM2M = ($newField instanceof ManyToManyField &&
                         $oldField instanceof ManyToManyField);
-                    $neitherM2M = (!$newField instanceof ManyToManyField &&
+        $neitherM2M = (!$newField instanceof ManyToManyField &&
                         !$oldField instanceof ManyToManyField);
 
-                    // Either both fields are m2m or neither is
-                    if ($bothM2M || $neitherM2M):
+        // Either both fields are m2m or neither is
+        if ($bothM2M || $neitherM2M):
                         $preserveDefault = true;
 
-                        if ($oldField->isNull() && !$newField->isNull() &&
+        if ($oldField->isNull() && !$newField->isNull() &&
                             !$newField->hasDefault() &&
                             !$newField instanceof ManyToManyField
                         ):
                             $field = $newField->deepClone();
-                            $default = MigrationQuestion::askNotNullAlteration(
+        $default = MigrationQuestion::askNotNullAlteration(
                                 $this->asker,
                                 $modelName,
                                 $keptField
                             );
 
-                            if (NOT_PROVIDED !== $default):
+        if (NOT_PROVIDED !== $default):
                                 $field->default = $default;
-                                $preserveDefault = false;
-                            endif;
-                        else:
+        $preserveDefault = false;
+        endif; else:
                             $field = $newField;
-                        endif;
+        endif;
 
-                        $this->addOperation(
+        $this->addOperation(
                             $meta->getAppName(),
                             AlterField::createObject(
                                 [
@@ -1315,15 +1300,14 @@ class AutoDetector extends BaseObject
                                     'preserveDefault' => $preserveDefault,
                                 ]
                             )
-                        );
-                    else:
+                        ); else:
                         // We cannot alter between m2m and concrete fields
                         $this->findRemovedFields($modelName, $keptField);
-                        $this->findAddedFields($modelName, $keptField);
-                    endif;
-                endif;
+        $this->findAddedFields($modelName, $keptField);
+        endif;
+        endif;
 
-            endforeach;
+        endforeach;
 
         endforeach;
     }
@@ -1340,13 +1324,13 @@ class AutoDetector extends BaseObject
         /* @var $newModelState ModelState */
         foreach ($modelToCheck as $modelName) :
             $oldModelName = $this->getOldModelName($modelName);
-            $oldModelState = $this->fromState->getModelState($oldModelName);
-            $newModelState = $this->toState->getModelState($oldModelName);
-            $meta = $this->toState->getRegistry()->getModel($modelName)->getMeta();
-            $oldDbTableName = (!isset($oldModelState->getMeta()['dbTable'])) ? '' : $oldModelState->getMeta()['dbTable'];
-            $newDbTableName = (!isset($newModelState->getMeta()['dbTable'])) ? '' : $newModelState->getMeta()['dbTable'];
+        $oldModelState = $this->fromState->getModelState($oldModelName);
+        $newModelState = $this->toState->getModelState($oldModelName);
+        $meta = $this->toState->getRegistry()->getModel($modelName)->getMeta();
+        $oldDbTableName = (!isset($oldModelState->getMeta()['dbTable'])) ? '' : $oldModelState->getMeta()['dbTable'];
+        $newDbTableName = (!isset($newModelState->getMeta()['dbTable'])) ? '' : $newModelState->getMeta()['dbTable'];
 
-            if ($oldDbTableName !== $newDbTableName) :
+        if ($oldDbTableName !== $newDbTableName) :
                 $this->addOperation(
                     $meta->getAppName(),
                     AlterModelTable::createObject(
@@ -1356,7 +1340,7 @@ class AutoDetector extends BaseObject
                         ]
                     )
                 );
-            endif;
+        endif;
         endforeach;
     }
 
@@ -1393,8 +1377,8 @@ class AutoDetector extends BaseObject
                 'action' => self::ACTION_CREATED,
             ];
 
-            // if it has through also depend on through model being created
-            if ($field->relation->hasProperty('through') &&
+        // if it has through also depend on through model being created
+        if ($field->relation->hasProperty('through') &&
                 null != $field->relation->through &&
                 !$field->relation->through->getMeta()->autoCreated
             ):
@@ -1405,7 +1389,7 @@ class AutoDetector extends BaseObject
                     'action' => self::ACTION_CREATED,
                 ];
 
-            endif;
+        endif;
 
         endif;
 
@@ -1416,9 +1400,9 @@ class AutoDetector extends BaseObject
                 $fieldName,
                 $field
             );
-            $field = $field->deepClone();
-            $field->default = $def;
-            $preserveDefault = false;
+        $field = $field->deepClone();
+        $field->default = $def;
+        $preserveDefault = false;
         endif;
 
         $this->addOperation(
@@ -1455,17 +1439,17 @@ class AutoDetector extends BaseObject
         $graphDependency = [];
         foreach ($this->generatedOperations as $index => $operation) :
             $graphDependency[$index] = [];
-            //check if a dependency exists on the current ops
-            foreach ($operation->getDependency() as $dep) :
+        //check if a dependency exists on the current ops
+        foreach ($operation->getDependency() as $dep) :
 
                 foreach ($this->generatedOperations as $inIndex => $operation2) :
 
                     if ($this->checkDependency($operation2, $dep)):
                         $graphDependency[$index][] = $inIndex;
-                    endif;
-                endforeach;
+        endif;
+        endforeach;
 
-            endforeach;
+        endforeach;
         endforeach;
 
         $this->generatedOperations = $this->topologicalSort(
@@ -1500,26 +1484,26 @@ class AutoDetector extends BaseObject
 
             $noDeps = [];
 
-            foreach ($deps as $index => $dep) :
+        foreach ($deps as $index => $dep) :
                 if (!$dep):
                     $noDeps[] = $index;
-                endif;
-            endforeach;
+        endif;
+        endforeach;
 
-            if (!$noDeps):
+        if (!$noDeps):
                 throw new ValueError('Cyclic dependency on topological sort');
-            endif;
+        endif;
 
-            $arranged = array_merge($arranged, $noDeps);
+        $arranged = array_merge($arranged, $noDeps);
 
-            $newDeps = [];
-            foreach ($deps as $index => $dep) :
+        $newDeps = [];
+        foreach ($deps as $index => $dep) :
                 if (!in_array($index, $noDeps)):
                     $parents = array_diff($dep, $noDeps);
-                    $newDeps[$index] = $parents;
-                endif;
-            endforeach;
-            $deps = $newDeps;
+        $newDeps[$index] = $parents;
+        endif;
+        endforeach;
+        $deps = $newDeps;
 
         endwhile;
 

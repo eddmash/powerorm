@@ -38,8 +38,7 @@ class InverseField extends RelatedField
 
         if (BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $this->fromField) :
             // we need this field to point to the primary key of the model which is an actual column on the database
-            $this->fromField = $this->scopeModel->getMeta()->primaryKey;
-        elseif (is_string($this->fromField)):
+            $this->fromField = $this->scopeModel->getMeta()->primaryKey; elseif (is_string($this->fromField)):
             $this->fromField = $this->relation->toModel->getMeta()->getField($this->fromField);
         endif;
 

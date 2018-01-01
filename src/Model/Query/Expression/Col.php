@@ -65,8 +65,7 @@ class Col extends BaseExpression
     public function getDbConverters(ConnectionInterface $connection)
     {
         if ($this->getTargetField()->getName() === $this->getOutputField()->getName()):
-            return $this->getOutputField()->getDbConverters($connection);
-        else:
+            return $this->getOutputField()->getDbConverters($connection); else:
             return array_merge(
                 $this->getOutputField()->getDbConverters($connection),
                 $this->getTargetField()->getDbConverters($connection)

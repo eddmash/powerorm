@@ -43,11 +43,9 @@ class JoinPromoter
 
         if ($this->currentNegated):
             if (AND_CONNECTOR === $this->connector):
-                $this->effectiveConnector = OR_CONNECTOR;
-            else:
+                $this->effectiveConnector = OR_CONNECTOR; else:
                 $this->effectiveConnector = AND_CONNECTOR;
-            endif;
-        else:
+        endif; else:
             $this->effectiveConnector = $this->connector;
         endif;
         $this->childrenCount = $childrenCount;
@@ -57,7 +55,7 @@ class JoinPromoter
     {
         foreach ($neededInner as $need):
             $count = ArrayHelper::getValue($this->votes, $need, 0) + 1;
-            $this->votes[$need] = $count;
+        $this->votes[$need] = $count;
         endforeach;
     }
 
@@ -70,13 +68,13 @@ class JoinPromoter
 
             if (OR_CONNECTOR == $this->effectiveConnector && $votes < $this->childrenCount):
                 $changeToOuterJoin[] = $table;
-            endif;
+        endif;
 
-            if (AND_CONNECTOR === $this->effectiveConnector ||
+        if (AND_CONNECTOR === $this->effectiveConnector ||
                 (OR_CONNECTOR == $this->effectiveConnector && $votes === $this->childrenCount)
             ):
                 $changeToInnerJoin[] = $table;
-            endif;
+        endif;
         endforeach;
 
         $query->changeToInnerjoin($changeToInnerJoin);

@@ -19,7 +19,7 @@ class Signal
 
     public static function dispatch($name, $sender, $kwargs = [])
     {
-        if(self::getSignalManager()):
+        if (self::getSignalManager()):
             self::getSignalManager()->dispatch($name, $sender, $kwargs);
         endif;
     }
@@ -35,7 +35,7 @@ class Signal
     {
         $manager = BaseOrm::getInstance()->getSignalManager();
 
-        if($manager):
+        if ($manager):
             $manager = new SignalManager();
         endif;
         return $manager;

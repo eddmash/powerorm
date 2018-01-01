@@ -93,17 +93,17 @@ class AlterModelTable extends Operation
 
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->name);
-            $schemaEditor->alterDbTable(
+        $schemaEditor->alterDbTable(
                 $toModel,
                 $fromModel->getMeta()->getDbTable(),
                 $toModel->getMeta()->getDbTable()
             );
 
-            // Rename M2M fields whose name is based on this model's db_table
+        // Rename M2M fields whose name is based on this model's db_table
 
-            /** @var $newField ManyToManyField */
-            /* @var $oldField ManyToManyField */
-            foreach ($toModel->getMeta()->localManyToMany as $newName => $newField) :
+        /** @var $newField ManyToManyField */
+        /* @var $oldField ManyToManyField */
+        foreach ($toModel->getMeta()->localManyToMany as $newName => $newField) :
                 foreach ($fromModel->getMeta()->localManyToMany as $oldName => $oldField) :
                     if ($newName === $oldName):
                         $schemaEditor->alterDbTable(
@@ -111,9 +111,9 @@ class AlterModelTable extends Operation
                             $oldField->relation->through->getMeta()->getDbTable(),
                             $newField->relation->through->getMeta()->getDbTable()
                         );
-                    endif;
-                endforeach;
-            endforeach;
+        endif;
+        endforeach;
+        endforeach;
 
         endif;
     }

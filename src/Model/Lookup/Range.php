@@ -30,9 +30,9 @@ class Range extends BaseLookup
     {
         if ($this->valueIsDirect()):
             $element = count($this->rhs);
-            $placeholders = array_fill(null, $element, '?');
+        $placeholders = array_fill(null, $element, '?');
 
-            return [$placeholders, $this->prepareLookupForDb($this->rhs, $connection)];
+        return [$placeholders, $this->prepareLookupForDb($this->rhs, $connection)];
         endif;
 
         return parent::processRHS($compiler, $connection);

@@ -55,9 +55,12 @@ abstract class CheckMessage extends Base
 
     public function __toString()
     {
-        $hint = sprintf('<fg=black>%s %s <fg=yellow;options=bold>HINT:</> %s</>', PHP_EOL,
+        $hint = sprintf(
+            '<fg=black>%s %s <fg=yellow;options=bold>HINT:</> %s</>',
+            PHP_EOL,
             str_pad('', 1, ' '),
-            $this->hint);
+            $this->hint
+        );
 
         $msg = PHP_EOL.str_pad('', 3, ' ').$this->message;
         return sprintf(
