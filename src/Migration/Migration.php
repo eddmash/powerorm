@@ -161,34 +161,34 @@ class Migration implements MigrationInterface
                     '-- MIGRATION NOW PERFORMS'.
                     ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
                 );
-        endif;
-        $schemaEditor->addSql(
+            endif;
+            $schemaEditor->addSql(
                 sprintf(
                     '<fg=yellow>-- %s</>',
                     $operation->getDescription()
                 )
             );
 
-        if (!$operation->isReducibleToSql()):
+            if (!$operation->isReducibleToSql()):
                 continue;
-        endif;
+            endif;
 
-        // preserve state before operation
-        $oldState = $state->deepClone();
+            // preserve state before operation
+            $oldState = $state->deepClone();
 
-        $operation->updateState($state);
-        $operation->setAppLabel($this->getAppLabel());
+            $operation->updateState($state);
+            $operation->setAppLabel($this->getAppLabel());
 
-        $forwardCallback = function (ConnectionInterface $connection) use (
+            $forwardCallback = function (ConnectionInterface $connection) use (
                 $operation,
                 $schemaEditor,
                 $oldState,
                 $state
             ) {
-            $operation->databaseForwards($schemaEditor, $oldState, $state);
-        };
+                $operation->databaseForwards($schemaEditor, $oldState, $state);
+            };
 
-        $schemaEditor->connection->transactional($forwardCallback);
+            $schemaEditor->connection->transactional($forwardCallback);
         endforeach;
 
         return $state;
@@ -228,13 +228,13 @@ class Migration implements MigrationInterface
         foreach ($this->operations as $operation) :
             //Preserve new state from previous run to not tamper the same state over all operations
             $newState = $newState->deepClone();
-        $oldState = $newState->deepClone();
-        $operation->updateState($newState);
-        $operation->setAppLabel($this->getAppLabel());
-        /*
-         * we insert them in the reverse order so the last operation is run first
-         */
-        array_unshift(
+            $oldState = $newState->deepClone();
+            $operation->updateState($newState);
+            $operation->setAppLabel($this->getAppLabel());
+            /*
+             * we insert them in the reverse order so the last operation is run first
+             */
+            array_unshift(
                 $itemsToRun,
                 [
                     'operation' => $operation,
@@ -309,7 +309,7 @@ class Migration implements MigrationInterface
         /** @var $operation Operation */
         foreach ($this->operations as $operation) :
             $operation->setAppLabel($this->getAppLabel());
-        $operation->updateState($newState);
+            $operation->updateState($newState);
 
         endforeach;
 

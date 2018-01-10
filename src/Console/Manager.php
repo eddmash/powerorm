@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class Manager.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -56,11 +56,11 @@ class Manager extends Base
             foreach ($component->getCommands() as $command) :
                 if (is_object($command) && $command instanceof BaseCommand):
                     $comands[] = $command;
-        endif;
-        if (is_string($command)):
+                endif;
+                if (is_string($command)):
                     $comands[] = new $command();
-        endif;
-        endforeach;
+                endif;
+            endforeach;
 
         endforeach;
 
@@ -72,13 +72,13 @@ class Manager extends Base
         $commands = [];
         foreach ($this->defaultCommandsPaths as $path) :
             $files = (new FileHandler($path))->readDir();
-        foreach ($files as $file) :
+            foreach ($files as $file) :
                 $command = basename($file, '.php');
-        if ('BaseCommand' === $command):
+                if ('BaseCommand' === $command):
                     continue;
-        endif;
-        $commands[] = $this->fetchCommand($command);
-        endforeach;
+                endif;
+                $commands[] = $this->fetchCommand($command);
+            endforeach;
 
         endforeach;
 
@@ -88,6 +88,7 @@ class Manager extends Base
     public static function getCommands()
     {
         $manager = new static();
+
         return array_merge($manager->getDefaultCommands(), $manager->getComponentCommands());
     }
 
@@ -96,7 +97,7 @@ class Manager extends Base
      *
      * @return BaseCommand
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -110,12 +111,12 @@ class Manager extends Base
         foreach ($this->defaultCommandsPaths as $package => $path) :
             $file_handler = new FileHandler($path);
 
-        $file = $file_handler->getFile($name);
-        if (false !== $file):
+            $file = $file_handler->getFile($name);
+            if (false !== $file):
                 $packageName = $package;
 
-        break;
-        endif;
+                break;
+            endif;
         endforeach;
 
         if (false === $file):
@@ -126,8 +127,8 @@ class Manager extends Base
                     $this->defaultCommandsPaths
                 )
             );
-        $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
-        $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
+            $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
+            $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
 
         endif;
 
@@ -170,13 +171,13 @@ class Manager extends Base
 
     public static function warningText(OutputInterface $output)
     {
-        $style = new OutputFormatterStyle('magenta', 'black', array('bold'));
+        $style = new OutputFormatterStyle('magenta', 'black', ['bold']);
         $output->getFormatter()->setStyle('warning', $style);
     }
 
     public static function errorText(OutputInterface $output)
     {
-        $style = new OutputFormatterStyle('red', 'black', array('bold'));
+        $style = new OutputFormatterStyle('red', 'black', ['bold']);
         $output->getFormatter()->setStyle('errortext', $style);
     }
 }

@@ -11,6 +11,8 @@
 namespace Eddmash\PowerOrm\Model;
 
 use Eddmash\PowerOrm\Model\Field\AutoField;
+use Eddmash\PowerOrm\Model\Field\BigAutoField;
+use Eddmash\PowerOrm\Model\Field\BigIntegerField;
 use Eddmash\PowerOrm\Model\Field\BooleanField;
 use Eddmash\PowerOrm\Model\Field\CharField;
 use Eddmash\PowerOrm\Model\Field\DateField;
@@ -39,6 +41,18 @@ trait ModelFieldsTrait
     public static function AutoField($opts = [])
     {
         return AutoField::createObject($opts);
+    }
+
+    /**
+     * @ignore
+     *
+     * @param array $opts
+     *
+     * @return BigAutoField
+     */
+    public static function BigAutoField($opts = [])
+    {
+        return BigAutoField::createObject($opts);
     }
 
     /**
@@ -135,6 +149,18 @@ trait ModelFieldsTrait
     public static function IntegerField($opts = [])
     {
         return IntegerField::createObject($opts);
+    }
+
+    /**
+     * @ignore
+     *
+     * @param array $opts
+     *
+     * @return BigIntegerField
+     */
+    public static function BigIntegerField($opts = [])
+    {
+        return BigIntegerField::createObject($opts);
     }
 
     /**

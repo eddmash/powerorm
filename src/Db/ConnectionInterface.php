@@ -114,7 +114,7 @@ interface ConnectionInterface
      *
      * @return int the number of affected rows
      */
-    public function insert($tableExpression, array $data, array $types = array());
+    public function insert($tableExpression, array $data, array $types = []);
 
     /**
      * Executes an SQL INSERT/UPDATE/DELETE query with the given parameters
@@ -130,7 +130,7 @@ interface ConnectionInterface
      *
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function executeUpdate($query, array $params = array(), array $types = array());
+    public function executeUpdate($query, array $params = [], array $types = []);
 
     /**
      * Prepares and executes an SQL query and returns the result as an associative array.
@@ -141,7 +141,7 @@ interface ConnectionInterface
      *
      * @return array
      */
-    public function fetchAll($sql, array $params = array(), $types = array());
+    public function fetchAll($sql, array $params = [], $types = []);
 
     /**
      * Executes an SQL DELETE statement on a table.
@@ -156,7 +156,7 @@ interface ConnectionInterface
      *
      * @throws InvalidArgumentException
      */
-    public function delete($tableExpression, array $identifier, array $types = array());
+    public function delete($tableExpression, array $identifier, array $types = []);
 
     /**
      * Prepares and executes an SQL query and returns the first row of the result
@@ -168,7 +168,7 @@ interface ConnectionInterface
      *
      * @return array
      */
-    public function fetchAssoc($statement, array $params = array(), array $types = array());
+    public function fetchAssoc($statement, array $params = [], array $types = []);
 
     /**
      * Prepares and executes an SQL query and returns the first row of the result
@@ -180,7 +180,7 @@ interface ConnectionInterface
      *
      * @return array
      */
-    public function fetchArray($statement, array $params = array(), array $types = array());
+    public function fetchArray($statement, array $params = [], array $types = []);
 
     /**
      * Prepares and executes an SQL query and returns the value of a single column
@@ -193,7 +193,7 @@ interface ConnectionInterface
      *
      * @return mixed
      */
-    public function fetchColumn($statement, array $params = array(), $column = 0, array $types = array());
+    public function fetchColumn($statement, array $params = [], $column = 0, array $types = []);
 
     /**
      * Gets the Configuration used by the Connection.
@@ -205,7 +205,7 @@ interface ConnectionInterface
     /**
      * @return OperationsInterface
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -214,7 +214,7 @@ interface ConnectionInterface
     /**
      * @return BaseFeatures
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

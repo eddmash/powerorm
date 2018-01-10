@@ -5,7 +5,7 @@
  * Date: 3/20/17
  * Time: 7:38 PM.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -19,7 +19,7 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
  *
  * @return Queryset
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */

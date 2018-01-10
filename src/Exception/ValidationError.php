@@ -5,7 +5,7 @@ namespace Eddmash\PowerOrm\Exception;
 /**
  * Class ValidationError.
  *
- * @since 1.0.0
+ * @since  1.0.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -21,19 +21,20 @@ class ValidationError extends \Exception implements \IteratorAggregate
     {
         if ($message instanceof self) :
             $message = $message->getMessage();
-        $code = $message->validationCode;
+            $code = $message->validationCode;
         endif;
 
         if (is_array($message)) :
             foreach ($message as $item) :
                 if (!$item instanceof self) :
                     $item = new self($item);
-        endif;
-        $this->errorList = array_merge($this->errorList, $item->errorList);
-        endforeach; else:
+                endif;
+                $this->errorList = array_merge($this->errorList, $item->errorList);
+            endforeach;
+        else:
             $this->message = $message;
-        $this->validationCode = $code;
-        $this->errorList = [$this];
+            $this->validationCode = $code;
+            $this->errorList = [$this];
         endif;
         parent::__construct($this->message);
     }

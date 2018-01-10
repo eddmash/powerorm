@@ -18,7 +18,7 @@ interface ContributorInterface
      * @param string $propertyName the name map the current object to, in the class object passed in
      * @param object $classObject  the object to attach the current object to
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

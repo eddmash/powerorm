@@ -19,7 +19,7 @@ use Eddmash\PowerOrm\Db\ConnectionInterface;
  *
  * Values from -32768 to 32767 are safe in all databases supported by Doctrine Dbal.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */

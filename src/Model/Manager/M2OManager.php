@@ -5,7 +5,7 @@
  * Date: 3/20/17
  * Time: 7:38 PM.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -21,7 +21,7 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
  *
  * @return Queryset
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -54,16 +54,17 @@ class M2OManager extends BaseM2OManager
 
         if (false === $this->reverse) :
             $model = $rel->toModel;
-        $fromField = $rel->fromField;
-        $toField = $rel->getRelatedField();
-        $value = $this->instance->{$fromField->getAttrName()};
-        $filter[$toField->getAttrName()] = $value; else:
+            $fromField = $rel->fromField;
+            $toField = $rel->getRelatedField();
+            $value = $this->instance->{$fromField->getAttrName()};
+            $filter[$toField->getAttrName()] = $value;
+        else:
             $model = $rel->getFromModel();
-        //todo
-        $fromField = $rel->getRelatedField();
-        $toField = $rel->fromField;
-        $value = $this->instance->{$fromField->getAttrName()};
-        $filter[$toField->getName()] = $value;
+            //todo
+            $fromField = $rel->getRelatedField();
+            $toField = $rel->fromField;
+            $value = $this->instance->{$fromField->getAttrName()};
+            $filter[$toField->getName()] = $value;
         endif;
 
         $this->filters = $filter;

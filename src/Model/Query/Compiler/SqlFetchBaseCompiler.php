@@ -46,7 +46,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
         foreach ($this->query->tablesAliasList as $tablesAlias) :
             if (!empty($this->query->aliasRefCount[$tablesAlias])):
                 $noneUsed = false;
-        endif;
+            endif;
         endforeach;
 
         if ($noneUsed):
@@ -79,36 +79,36 @@ class SqlFetchBaseCompiler extends SqlCompiler
         $selectIDX = 0;
         if ($this->query->useDefaultCols):
             $selectList = [];
-        /* @var $field Field */
-        foreach ($this->getDefaultCols() as $col) :
+            /* @var $field Field */
+            foreach ($this->getDefaultCols() as $col) :
                 $alias = false;
-        $select[] = [$col, $alias];
-        $selectList[] = $selectIDX;
-        $selectIDX += 1;
-        endforeach;
-        $klassInfo['model'] = $this->query->model;
-        $klassInfo['select_fields'] = $selectList;
+                $select[] = [$col, $alias];
+                $selectList[] = $selectIDX;
+                $selectIDX += 1;
+            endforeach;
+            $klassInfo['model'] = $this->query->model;
+            $klassInfo['select_fields'] = $selectList;
         endif;
 
         // this are used when return the result as array so they are not populated to any model
         foreach ($this->query->select as $col) :
             $alias = false;
-        $select[] = [$col, $alias];
-        $selectIDX += 1;
+            $select[] = [$col, $alias];
+            $selectIDX += 1;
         endforeach;
 
         // handle annotations
         foreach ($this->query->annotations as $alias => $annotation) :
             $annotations[$alias] = $selectIDX;
-        $select[] = [$annotation, $alias];
-        $selectIDX += 1;
+            $select[] = [$annotation, $alias];
+            $selectIDX += 1;
         endforeach;
 
         // handle select related
 
         if ($this->query->selectRelected):
             $klassInfo['related_klass_infos'] = $this->getRelatedSelections($select);
-        $this->getSelectFromParent($klassInfo);
+            $this->getSelectFromParent($klassInfo);
         endif;
 
         return [$select, $klassInfo, $annotations];
@@ -119,41 +119,43 @@ class SqlFetchBaseCompiler extends SqlCompiler
         // an array of arrays that indicate a colname and its a reference e.g. [['name', false]]
         $orderByList = [];
         if (!$this->query->defaultOrdering):
-            $ordering = $this->query->orderBy; else:
+            $ordering = $this->query->orderBy;
+        else:
             $ordering = ($this->query->orderBy) ? $this->query->orderBy : $this->query->getMeta()->getOrderBy();
         endif;
 
         if ($this->query->standardOrdering):
-            list($asc, $desc) = ORDER_DIRECTION['ASC']; else:
+            list($asc, $desc) = ORDER_DIRECTION['ASC'];
+        else:
             list($asc, $desc) = ORDER_DIRECTION['DESC'];
         endif;
 
         foreach ($ordering as $orderName) :
             list($colName, $orderDir) = Query::getOrderDirection($orderName, $asc);
-        $descending = ('DESC' == $orderDir) ? true : false;
+            $descending = ('DESC' == $orderDir) ? true : false;
 
-        if ($orderName instanceof BaseExpression):
+            if ($orderName instanceof BaseExpression):
                 $order = $orderName;
-        if (!$orderName instanceof OrderBy):
+                if (!$orderName instanceof OrderBy):
                     $order = $orderName->ascendingOrder();
-        endif;
-        if (!$this->query->standardOrdering):
+                endif;
+                if (!$this->query->standardOrdering):
                     $order = $order->reverseOrdering();
-        endif;
-        $orderByList[] = [$order, false];
+                endif;
+                $orderByList[] = [$order, false];
 
-        continue;
-        endif;
+                continue;
+            endif;
 
-        if (array_key_exists($colName, $this->query->annotations)):
+            if (array_key_exists($colName, $this->query->annotations)):
                 $orderByList[] = [new OrderBy($this->query->annotations[$colName], $descending), false];
 
-        continue;
-        endif;
+                continue;
+            endif;
 
-        // we are here we still have a string name, we need to convert it to an
-        // expression that we can use
-        if ($colName):
+            // we are here we still have a string name, we need to convert it to an
+            // expression that we can use
+            if ($colName):
                 $orderByList = array_merge(
                     $orderByList,
                     $this->resolveOrderName(
@@ -163,7 +165,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
                         $asc
                     )
                 );
-        endif;
+            endif;
         endforeach;
 
         $seen = new ArrayCollection();
@@ -171,18 +173,18 @@ class SqlFetchBaseCompiler extends SqlCompiler
         /* @var $orderExp BaseExpression */
         foreach ($orderByList as $orderitem) :
             list($orderExp, $isRef) = $orderitem;
-        $resolved = $orderExp->resolveExpression($this->query, true);
-        list($sql, $params) = $this->compile($resolved);
+            $resolved = $orderExp->resolveExpression($this->query, true);
+            list($sql, $params) = $this->compile($resolved);
 
-        preg_match("/(?P<name>.*)\s(?P<order>ASC|DESC)(.*)/", 'demo_entry.id DESC', $match);
-        $strippedSql = $match['name'];
+            preg_match("/(?P<name>.*)\s(?P<order>ASC|DESC)(.*)/", 'demo_entry.id DESC', $match);
+            $strippedSql = $match['name'];
 
-        // ensure we dont add the same field twice
-        if ($seen->contains([$strippedSql, $params])):
+            // ensure we dont add the same field twice
+            if ($seen->contains([$strippedSql, $params])):
                 continue;
-        endif;
-        $seen->add([$strippedSql, $params]);
-        $results[] = [$resolved, [$sql, $params, $isRef]];
+            endif;
+            $seen->add([$strippedSql, $params]);
+            $results[] = [$resolved, [$sql, $params, $isRef]];
         endforeach;
 
         return $results;
@@ -198,11 +200,12 @@ class SqlFetchBaseCompiler extends SqlCompiler
         if (!$this->query->groupBy):
             foreach ($this->query->groupBy as $item) :
                 if (!$item instanceof SqlCompilableinterface):
-//                    $item = $item->re
-                    throw new NotImplemented(); else:
+                    //                    $item = $item->re
+                    throw new NotImplemented();
+                else:
                     $expressions[] = $item;
-        endif;
-        endforeach;
+                endif;
+            endforeach;
         endif;
         // Note that even if the group_by is set, it is only the minimal
         // set to group by. So, we need to add cols in select, order_by, and
@@ -211,21 +214,21 @@ class SqlFetchBaseCompiler extends SqlCompiler
         /* @var $exp BaseExpression */
         foreach ($this->select as $colInfo) :
             list($exp, $alias) = $colInfo;
-        foreach ($exp->getGroupByCols() as $groupByCol) :
+            foreach ($exp->getGroupByCols() as $groupByCol) :
                 $expressions[] = $groupByCol;
-        endforeach;
+            endforeach;
         endforeach;
 
         foreach ($orderBy as $orderItems) :
             list($exp, $opts) = $orderItems;
-        list($sql, $params, $isRef) = $opts;
-        if ($exp->containsAggregates()):
+            list($sql, $params, $isRef) = $opts;
+            if ($exp->containsAggregates()):
                 continue;
-        endif;
-        if ($isRef):
+            endif;
+            if ($isRef):
                 continue;
-        endif;
-        $expressions = array_merge($expressions, $exp->getSourceExpressions());
+            endif;
+            $expressions = array_merge($expressions, $exp->getSourceExpressions());
         endforeach;
 
         $results = [];
@@ -233,10 +236,10 @@ class SqlFetchBaseCompiler extends SqlCompiler
         //todo having
         foreach ($expressions as $expression) :
             list($sql, $params) = $this->compile($expression);
-        if (!$seen->contains([$sql, $params])):
+            if (!$seen->contains([$sql, $params])):
                 $results[] = [$sql, $params];
-        $seen[] = [$sql, $params];
-        endif;
+                $seen[] = [$sql, $params];
+            endif;
         endforeach;
 
         return $results;
@@ -252,7 +255,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @return Col[]
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -268,10 +271,10 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         foreach ($meta->getConcreteFields() as $field) :
             $model = $field->scopeModel->getMeta()->concreteModel;
-        if ($meta->getNamespacedModelName() == $model->getMeta()->getNamespacedModelName()):
+            if ($meta->getNamespacedModelName() == $model->getMeta()->getNamespacedModelName()):
                 $model = null;
-        endif;
-        if ($fromParent && !is_null($model) &&
+            endif;
+            if ($fromParent && !is_null($model) &&
                 is_subclass_of(
                     $fromParent->getMeta()->concreteModel,
                     $model->getMeta()->concreteModel->getMeta()->getNamespacedModelName()
@@ -283,9 +286,9 @@ class SqlFetchBaseCompiler extends SqlCompiler
                 // parent model data is already present in the SELECT clause,
                 // and we want to avoid reloading the same data again.
                 continue;
-        endif;
-        //todo if we ever do defer
-        $fields[] = $field->getColExpression($startAlias);
+            endif;
+            //todo if we ever do defer
+            $fields[] = $field->getColExpression($startAlias);
         endforeach;
 
         return $fields;
@@ -294,7 +297,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
     /**
      * Used to get information needed when we are doing selectRelated(),.
      *
-     * @param $select
+     * @param           $select
      * @param Meta|null $meta       the from which we expect to find the related fields
      * @param null      $rootAlias
      * @param int       $curDepth
@@ -305,7 +308,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @throws FieldError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -326,28 +329,29 @@ class SqlFetchBaseCompiler extends SqlCompiler
         $foundFields = [];
         if (is_null($meta)):
             $meta = $this->query->getMeta();
-        $rootAlias = $this->query->getInitialAlias();
+            $rootAlias = $this->query->getInitialAlias();
         endif;
 
         if (is_null($requested)):
             if (is_array($this->query->selectRelected)):
                 $requested = $this->query->selectRelected;
-        $restricted = true; else:
+                $restricted = true;
+            else:
                 $restricted = false;
-        endif;
+            endif;
         endif;
 
         foreach ($meta->getNonM2MForwardFields() as $field) :
             $fieldModel = $field->scopeModel->getMeta()->concreteModel;
-        $foundFields[] = $field->getName();
+            $foundFields[] = $field->getName();
 
-        if ($restricted):
+            if ($restricted):
                 // first ensure the requested fields are relational
                 // and that we are not trying to use a non-relational field
                 // we are getting the next field in the spanning relationship i.e author__user so we are getting user.
                 // if not a spanning relationship we return an empty array.
                 $nextSpanField = ArrayHelper::getValue($requested, $field->getName(), []);
-        if (!$field->isRelation):
+                if (!$field->isRelation):
 
                     if ($nextSpanField || in_array($field->getName(), $requested)):
                         throw new FieldError(
@@ -359,34 +363,35 @@ class SqlFetchBaseCompiler extends SqlCompiler
                             )
                         );
 
-        endif;
-        endif; else:
+                    endif;
+                endif;
+            else:
                 $nextSpanField = false;
-        endif;
+            endif;
 
-        if (!static::selectRelatedDescend($field, $restricted, $requested)):
+            if (!static::selectRelatedDescend($field, $restricted, $requested)):
                 continue;
-        endif;
-        $klassInfo = [
+            endif;
+            $klassInfo = [
                 'model' => $field->relation->getToModel(),
                 'field' => $field,
                 'reverse' => false,
                 'from_parent' => false,
             ];
 
-        list($_, $_, $joinList, $_) = $this->query->setupJoins([$field->getName()], $meta, $rootAlias);
-        $alias = end($joinList);
-        $columns = $this->getDefaultCols($alias, $field->relation->getToModel()->getMeta());
-        $selectFields = [];
-        foreach ($columns as $column) :
+            list($_, $_, $joinList, $_) = $this->query->setupJoins([$field->getName()], $meta, $rootAlias);
+            $alias = end($joinList);
+            $columns = $this->getDefaultCols($alias, $field->relation->getToModel()->getMeta());
+            $selectFields = [];
+            foreach ($columns as $column) :
                 $selectFields[] = count($select);
-        $select[] = [$column, false];
-        endforeach;
-        $klassInfo['select_fields'] = $selectFields;
+                $select[] = [$column, false];
+            endforeach;
+            $klassInfo['select_fields'] = $selectFields;
 
-        // now go the next field in the spanning relationship i.e. if we have author__user, we just did author
-        // so no we do user and so in
-        $nextKlassInfo = $this->getRelatedSelections(
+            // now go the next field in the spanning relationship i.e. if we have author__user, we just did author
+            // so no we do user and so in
+            $nextKlassInfo = $this->getRelatedSelections(
                 $select,
                 $field->relation->getToModel()->getMeta(),
                 $alias,
@@ -394,68 +399,68 @@ class SqlFetchBaseCompiler extends SqlCompiler
                 $nextSpanField,
                 $restricted
             );
-        $klassInfo['related_klass_infos'] = $nextKlassInfo;
-        $relatedKlassInfo[] = $klassInfo;
+            $klassInfo['related_klass_infos'] = $nextKlassInfo;
+            $relatedKlassInfo[] = $klassInfo;
 
         endforeach;
 
         if ($restricted):
 
             $reverseFields = [];
-        // we follow back relationship that represent single valuse this most will be relation field that are
-        // unique e.g. OneToOneField or ForeignKey with unique set to true.
-        // this meas we don't consider m2m fields even if they are unique
+            // we follow back relationship that represent single valuse this most will be relation field that are
+            // unique e.g. OneToOneField or ForeignKey with unique set to true.
+            // this meas we don't consider m2m fields even if they are unique
 
-        foreach ($meta->getReverseRelatedObjects() as $field) :
+            foreach ($meta->getReverseRelatedObjects() as $field) :
 
                 if ($field->unique && !$field->manyToMany):
                     $model = $field->relation->getFromModel();
-        $reverseFields[] = [$field, $model];
-        endif;
-        endforeach;
+                    $reverseFields[] = [$field, $model];
+                endif;
+            endforeach;
 
-        /* @var $rField RelatedField */
-        /* @var $rModel Model */
-        foreach ($reverseFields as $reverseField) :
+            /* @var $rField RelatedField */
+            /* @var $rModel Model */
+            foreach ($reverseFields as $reverseField) :
                 $rField = $reverseField[0];
-        $rModel = $reverseField[1];
+                $rModel = $reverseField[1];
 
-        if (!$this->selectRelatedDescend($rField, $restricted, $requested, true)):
+                if (!$this->selectRelatedDescend($rField, $restricted, $requested, true)):
                     continue;
-        endif;
-        $relatedFieldName = $rField->getRelatedQueryName();
+                endif;
+                $relatedFieldName = $rField->getRelatedQueryName();
 
-        $foundFields[] = $relatedFieldName;
+                $foundFields[] = $relatedFieldName;
 
-        list($_, $_, $joinList, $_) = $this->query->setupJoins([$relatedFieldName], $meta, $rootAlias);
-        $alias = end($joinList);
-        $fromParent = false;
-        if (
+                list($_, $_, $joinList, $_) = $this->query->setupJoins([$relatedFieldName], $meta, $rootAlias);
+                $alias = end($joinList);
+                $fromParent = false;
+                if (
                     is_subclass_of($rModel, $meta->getNamespacedModelName()) &&
                     $rModel->getMeta()->getNamespacedModelName() === $meta->getNamespacedModelName()
                 ):
                     $fromParent = true;
-        endif;
+                endif;
 
-        $rKlassInfo = [
+                $rKlassInfo = [
                     'model' => $rModel,
                     'field' => $rField,
                     'reverse' => true,
                     'from_parent' => $fromParent,
                 ];
 
-        $rColumns = $this->getDefaultCols($alias, $rModel->getMeta(), $this->query->model);
+                $rColumns = $this->getDefaultCols($alias, $rModel->getMeta(), $this->query->model);
 
-        $rSelectFields = [];
-        foreach ($rColumns as $column) :
+                $rSelectFields = [];
+                foreach ($rColumns as $column) :
                     $selectFields[] = count($select);
-        $select[] = [$column, false];
-        endforeach;
-        $rKlassInfo['select_fields'] = $rSelectFields;
+                    $select[] = [$column, false];
+                endforeach;
+                $rKlassInfo['select_fields'] = $rSelectFields;
 
-        $rNextSpanField = ArrayHelper::getValue($requested, $rField->getRelatedQueryName(), []);
+                $rNextSpanField = ArrayHelper::getValue($requested, $rField->getRelatedQueryName(), []);
 
-        $rNextKlassInfo = $this->getRelatedSelections(
+                $rNextKlassInfo = $this->getRelatedSelections(
                     $select,
                     $rModel->getMeta(),
                     $alias,
@@ -463,14 +468,14 @@ class SqlFetchBaseCompiler extends SqlCompiler
                     $rNextSpanField,
                     $restricted
                 );
-        $rKlassInfo['related_klass_infos'] = $rNextKlassInfo;
+                $rKlassInfo['related_klass_infos'] = $rNextKlassInfo;
 
-        $relatedKlassInfo[] = $rKlassInfo;
-        endforeach;
+                $relatedKlassInfo[] = $rKlassInfo;
+            endforeach;
 
-        $fieldsNotFound = array_diff(array_keys($requested), $foundFields);
+            $fieldsNotFound = array_diff(array_keys($requested), $foundFields);
 
-        if ($fieldsNotFound):
+            if ($fieldsNotFound):
                 throw new FieldError(
                     sprintf(
                         'Invalid field name(s) given in select_related: %s. Choices are: %s',
@@ -479,7 +484,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
                     )
                 );
 
-        endif;
+            endif;
         endif;
 
         return $relatedKlassInfo;
@@ -489,7 +494,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * For each related klass, if the klass extends the model whose info we get, we need to add the models class to
      * the select_fields of the related class.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -503,10 +508,10 @@ class SqlFetchBaseCompiler extends SqlCompiler
                     $klassInfo['select_fields'],
                     $relatedKlassInfo['select_fields']
                 );
-        endif;
+            endif;
 
-        // do the same for the related class fields incase it has own children.
-        $this->getSelectFromParent($relatedKlassInfo);
+            // do the same for the related class fields incase it has own children.
+            $this->getSelectFromParent($relatedKlassInfo);
         endforeach;
     }
 
@@ -520,17 +525,17 @@ class SqlFetchBaseCompiler extends SqlCompiler
         foreach ($this->query->tablesAliasList as $alias) :
             if (!ArrayHelper::getValue($refCount, $alias)):
                 continue;
-        endif;
+            endif;
 
-        try {
-            /** @var $from BaseJoin */
-            $from = ArrayHelper::getValue($this->query->tableAliasMap, $alias, ArrayHelper::STRICT);
-            list($fromSql, $fromParams) = $this->compile($from);
-            array_push($result, $fromSql);
-            $params = array_merge($params, $fromParams);
-        } catch (KeyError $e) {
-            continue;
-        }
+            try {
+                /** @var $from BaseJoin */
+                $from = ArrayHelper::getValue($this->query->tableAliasMap, $alias, ArrayHelper::STRICT);
+                list($fromSql, $fromParams) = $this->compile($from);
+                array_push($result, $fromSql);
+                $params = array_merge($params, $fromParams);
+            } catch (KeyError $e) {
+                continue;
+            }
         endforeach;
 
         return [$result, $params];
@@ -541,7 +546,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @return \Doctrine\DBAL\Statement
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -552,7 +557,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
         $stmt = $this->connection->prepare($sql);
         foreach ($params as $index => $value) :
             ++$index; // Columns/Parameters are 1-based, so need to start at 1 instead of zero
-        $stmt->bindValue($index, $value);
+            $stmt->bindValue($index, $value);
         endforeach;
 
         $stmt->execute();
@@ -567,7 +572,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -579,25 +584,25 @@ class SqlFetchBaseCompiler extends SqlCompiler
         /* @var $field Field */
         foreach ($this->select as $pos => $selectColumn) :
             $col = $selectColumn[0];
-        $field = $col->getOutputField();
-        $val = ArrayHelper::getValue($values, $pos);
-        // first use the inbuilt converters
-        try {
-            $val = Type::getType(
+            $field = $col->getOutputField();
+            $val = ArrayHelper::getValue($values, $pos);
+            // first use the inbuilt converters
+            try {
+                $val = Type::getType(
                     $field->dbType($this->connection)
                 )->convertToPHPValue($val, $this->connection->getDatabasePlatform());
-        } catch (DBALException $exception) {
-        }
+            } catch (DBALException $exception) {
+            }
 
-        // use the field converters if any were provided by the user.
-        $converters = $field->getDbConverters($this->connection);
+            // use the field converters if any were provided by the user.
+            $converters = $field->getDbConverters($this->connection);
 
-        if ($converters):
+            if ($converters):
                 foreach ($converters as $converter) :
                     $val = call_user_func($converter, $this->connection, $val, $field);
-        endforeach;
-        endif;
-        $preparedValues[] = $val;
+                endforeach;
+            endif;
+            $preparedValues[] = $val;
 
         endforeach;
 
@@ -624,7 +629,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -644,12 +649,13 @@ class SqlFetchBaseCompiler extends SqlCompiler
         foreach ($this->select as $colInfo) :
             list($col, $alias) = $colInfo;
 
-        list($colSql, $colParams) = $this->compile($col);
-        if ($alias):
-                $cols[] = sprintf('%s AS %s', $colSql, $alias); else:
+            list($colSql, $colParams) = $this->compile($col);
+            if ($alias):
+                $cols[] = sprintf('%s AS %s', $colSql, $alias);
+            else:
                 $cols[] = $colSql;
-        endif;
-        $params = array_merge($params, $colParams);
+            endif;
+            $params = array_merge($params, $colParams);
         endforeach;
 
         $results[] = implode(', ', $cols);
@@ -661,20 +667,20 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         if ($this->where):
             list($sql, $whereParams) = $this->compile($this->where);
-        if ($sql) :
+            if ($sql) :
                 $results[] = 'WHERE';
-        $results[] = $sql;
-        $params = array_merge($params, $whereParams);
-        endif;
+                $results[] = $sql;
+                $params = array_merge($params, $whereParams);
+            endif;
         endif;
 
         $grouping = [];
         if ($groupBy):
             foreach ($groupBy as $groupbyItem) :
                 list($groupBySql, $groupByParams) = $groupbyItem;
-        $grouping[] = $groupBySql;
-        $params = array_merge($params, $groupByParams);
-        endforeach;
+                $grouping[] = $groupBySql;
+                $params = array_merge($params, $groupByParams);
+            endforeach;
         endif;
 
         if ($grouping):
@@ -684,22 +690,22 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         if ($orderBy):
             $ordering = [];
-        foreach ($orderBy as $orderByItem) :
+            foreach ($orderBy as $orderByItem) :
                 list($_, $opts) = $orderByItem;
-        list($orderSql, $orderParams, $_) = $opts;
-        $ordering[] = $orderSql;
-        $params = array_merge($params, $orderParams);
-        endforeach;
-        $results[] = sprintf('ORDER BY %s', implode(', ', $ordering));
+                list($orderSql, $orderParams, $_) = $opts;
+                $ordering[] = $orderSql;
+                $params = array_merge($params, $orderParams);
+            endforeach;
+            $results[] = sprintf('ORDER BY %s', implode(', ', $ordering));
         endif;
         if ($this->query->limit) :
             $results[] = 'LIMIT';
-        $results[] = $this->query->limit;
+            $results[] = $this->query->limit;
         endif;
 
         if (!is_null($this->query->offset)) :
             $results[] = 'OFFSET';
-        $results[] = $this->query->offset;
+            $results[] = $this->query->offset;
         endif;
 
         return [implode(' ', $results), $params];
@@ -709,15 +715,15 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * Tries ot resolve a name like 'username' into a model field and then into Col expression
      * suitable for makin queries.
      *
-     * @param $col
-     * @param $meta
+     * @param        $col
+     * @param        $meta
      * @param null   $alias
      * @param string $defaultOrder
      * @param array  $alreadyResolved helps avoid infinite loops
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -763,11 +769,11 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * columns on same input, as the prefixes of get_ordering and get_distinct
      * must match. Executing SQL where this is not true is an error.
      *
-     * @param $nameParts
+     * @param      $nameParts
      * @param Meta $meta
      * @param null $rootAlias
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *

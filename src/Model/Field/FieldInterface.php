@@ -20,7 +20,7 @@ use Eddmash\PowerOrm\Model\Model;
 /**
  * Interface FieldInterface.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -33,7 +33,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -46,7 +46,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -64,11 +64,11 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool  $add   is whether the instance is being saved to the database for the first time
+     * @param bool  $add is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -82,7 +82,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -97,7 +97,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -113,7 +113,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -129,12 +129,12 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      * from the database, including in aggregates and asArray() calls.
      *
      * @param ConnectionInterface $connection
-     * @param $value
-     * @param $expression
+     * @param                     $value
+     * @param                     $expression
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -147,7 +147,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

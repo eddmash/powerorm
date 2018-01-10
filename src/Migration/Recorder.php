@@ -88,30 +88,30 @@ class Recorder
         if (!$schemaM->tablesExist($this->migrationTableName)):
 
             $myTable = $schema->createTable($this->migrationTableName);
-        $myTable->addColumn(
+            $myTable->addColumn(
                 'id',
                 'integer',
                 ['unsigned' => true, 'autoincrement' => true]
             );
-        $myTable->addColumn(
+            $myTable->addColumn(
                 'app',
                 'string',
                 ['length' => 254]
             );
-        $myTable->addColumn(
+            $myTable->addColumn(
                 'name',
                 'string',
                 ['length' => 254]
             );
-        $myTable->addColumn(
+            $myTable->addColumn(
                 'applied',
                 'datetime',
                 ['default' => 'CURRENT_TIMESTAMP']
             );
-        $myTable->setPrimaryKey(['id']);
+            $myTable->setPrimaryKey(['id']);
 
-        $schemaM->createTable($myTable);
-        $this->tableExist = true;
+            $schemaM->createTable($myTable);
+            $this->tableExist = true;
         endif;
     }
 }

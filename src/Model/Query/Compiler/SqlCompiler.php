@@ -50,7 +50,7 @@ abstract class SqlCompiler implements CompilerInterface, SqlCompilableinterface
      *
      * @return bool
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -67,10 +67,10 @@ abstract class SqlCompiler implements CompilerInterface, SqlCompilableinterface
         if ($restricted):
             if ($reverse && !array_key_exists($field->getRelatedQueryName(), $requested)):
                 return false;
-        endif;
-        if (!$reverse && !array_key_exists($field->getName(), $requested)):
+            endif;
+            if (!$reverse && !array_key_exists($field->getName(), $requested)):
                 return false;
-        endif;
+            endif;
         endif;
 
         if (!$restricted && $field->isNull()):

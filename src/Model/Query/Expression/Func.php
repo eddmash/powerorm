@@ -19,7 +19,7 @@ use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
  * Base type of all expressions that involve database functions like COALESCE and LOWER, or aggregates like SUM
  * Class Func.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -86,13 +86,14 @@ class Func extends BaseExpression
         return $obj;
     }
 
-    /**@inheritdoc*/
+    /**@inheritdoc */
     public function asSql(CompilerInterface $compiler, ConnectionInterface $connection, $function = null)
     {
         $sqlParts = [];
 
         if (!is_null($function)):
-            $func = $function; else:
+            $func = $function;
+        else:
             $func = ArrayHelper::pop($this->extra, 'function', $this->function);
         endif;
 
@@ -103,8 +104,8 @@ class Func extends BaseExpression
 
         foreach ($this->getSourceExpressions() as $expression) :
             list($sql, $param) = $compiler->compile($expression);
-        $sqlParts[] = $sql;
-        $params = array_merge($params, $param);
+            $sqlParts[] = $sql;
+            $params = array_merge($params, $param);
         endforeach;
 
         $template = $this->getTemplate($func, implode($this->argJoiner, $sqlParts));

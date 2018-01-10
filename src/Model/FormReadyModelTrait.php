@@ -69,19 +69,19 @@ trait FormReadyModelTrait
         foreach ($this->getMeta()->getConcreteFields() as $field) :
             if (in_array($field->getName(), $exclude)) :
                 continue;
-        endif;
-        $value = $this->{$field->getAttrName()};
-        // Skip validation for empty fields with blank=True. The developer
-        // is responsible for making sure they have a valid value.
-        if ($field->formBlank && empty($value)) :
+            endif;
+            $value = $this->{$field->getAttrName()};
+            // Skip validation for empty fields with blank=True. The developer
+            // is responsible for making sure they have a valid value.
+            if ($field->formBlank && empty($value)) :
                 continue;
-        endif;
+            endif;
 
-        try {
-            $this->{$field->getAttrName()} = $field->clean($this, $value);
-        } catch (ValidationError $error) {
-            $errors[$field->getName()] = $error->getErrorList();
-        }
+            try {
+                $this->{$field->getAttrName()} = $field->clean($this, $value);
+            } catch (ValidationError $error) {
+                $errors[$field->getName()] = $error->getErrorList();
+            }
         endforeach;
 
         if (!empty($errors)) :

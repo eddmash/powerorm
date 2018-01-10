@@ -22,7 +22,7 @@ use Exception;
  * You usually won’t need to use this directly; a primary key field will automatically be added to your model
  * if you don’t specify otherwise. See Automatic primary key fields.
  *
- * @since 1.0.1
+ * @since  1.0.1
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -98,7 +98,7 @@ class AutoField extends Field
         endif;
 
         try {
-            $value = (int) $value;
+            $value = (int)$value;
             if ($value):
                 return $value;
             endif;

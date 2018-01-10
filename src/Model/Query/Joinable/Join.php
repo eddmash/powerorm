@@ -34,7 +34,7 @@ class Join extends BaseJoin
         /* @var $to RelatedField */
         foreach ($fields as $index => $relFields) :
             list($from, $to) = $relFields;
-        $joinConditions[] = sprintf(
+            $joinConditions[] = sprintf(
                 ' %s.%s = %s.%s',
                 $this->getParentAlias(),
                 $from->getColumnName(),
@@ -71,7 +71,7 @@ class Join extends BaseJoin
      *
      * @return Join
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -88,7 +88,7 @@ class Join extends BaseJoin
      *
      * @return Join
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -107,7 +107,7 @@ class Join extends BaseJoin
      *
      * @return static
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *

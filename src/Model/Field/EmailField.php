@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 /**
  * A CharField that checks that the value is a valid email address.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */

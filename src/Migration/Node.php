@@ -66,7 +66,7 @@ class Node
         /** @var $parent Node */
         foreach ($this->parent as $parent) :
             $parentAncenstors = $parent->getAncestors();
-        $ancestors[$this->appName] = array_merge(
+            $ancestors[$this->appName] = array_merge(
                 $parentAncenstors[$this->appName],
                 $ancestors[$this->appName]
             );
@@ -90,7 +90,7 @@ class Node
         /** @var $child Node */
         foreach ($this->children as $child) :
             $childDescendats = $child->getDescendants();
-        $descendants[$this->appName] = array_merge(
+            $descendants[$this->appName] = array_merge(
                 $childDescendats[$this->appName],
                 $descendants[$this->appName]
             );

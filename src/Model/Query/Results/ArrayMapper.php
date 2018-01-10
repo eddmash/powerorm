@@ -18,9 +18,9 @@ class ArrayMapper extends Mapper
      * @internal param Model $model
      * @internal param array $results
      *
-     * @since 1.1.0
+     * @since    1.1.0
      *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @author   Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function __invoke()
     {

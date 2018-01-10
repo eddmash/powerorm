@@ -47,7 +47,7 @@ class Node implements \Countable
         if (!$squash):
             $this->children->add($node);
 
-        return $node;
+            return $node;
         endif;
 
         if ($connectorType == $this->connector):
@@ -56,26 +56,28 @@ class Node implements \Countable
                 ($connectorType == $node->connector || 1 == count($node))
             ):
                 $children = array_merge($node->getChildren()->toArray(), $this->getChildren()->toArray());
-        $this->children = new ArrayCollection();
-        foreach ($children as $child) :
+                $this->children = new ArrayCollection();
+                foreach ($children as $child) :
                     $this->children->add($child);
-        endforeach;
+                endforeach;
 
-        return $this; else:
+                return $this;
+            else:
                 $this->children->add($node);
 
-        return $node;
-        endif; else:
+                return $node;
+            endif;
+        else:
             //more or less of cloning this node
             $obj = new static($this->children, $this->connector, $this->negated);
 
-        // update the connector to use btwn the current node and the passed in node
-        $this->connector = $connectorType;
+            // update the connector to use btwn the current node and the passed in node
+            $this->connector = $connectorType;
 
-        // update the children
-        $this->children = [$obj, $node];
+            // update the children
+            $this->children = [$obj, $node];
 
-        return $node;
+            return $node;
         endif;
     }
 
@@ -98,7 +100,7 @@ class Node implements \Countable
     /**
      * Count elements of an object.
      *
-     * @see http://php.net/manual/en/countable.count.php
+     * @see   http://php.net/manual/en/countable.count.php
      *
      * @return int The custom count as an integer.
      *             </p>
@@ -127,7 +129,7 @@ class Node implements \Countable
         $children = ltrim($children, '[');
         $children = trim($children);
 
-//        $children = trim($children, ",");
+        //        $children = trim($children, ",");
         return sprintf('(%s : %s)', $this->connector, $children);
     }
 }

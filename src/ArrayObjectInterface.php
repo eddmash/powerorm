@@ -14,7 +14,7 @@ namespace Eddmash\PowerOrm;
 /**
  * Interface that allows objects to work as arrays.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */

@@ -50,7 +50,7 @@ function getFieldNamesFromMeta(Meta $meta)
 /**
  * Represents a lazy database lookup for a set of objects.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -88,8 +88,12 @@ class Queryset implements QuerysetInterface
     private $_fields;
     protected $kwargs = [];
 
-    public function __construct(ConnectionInterface $connection = null, Model $model = null, Query $query = null, $kwargs = [])
-    {
+    public function __construct(
+        ConnectionInterface $connection = null,
+        Model $model = null,
+        Query $query = null,
+        $kwargs = []
+    ) {
         $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
         $this->query = (null == $query) ? $this->getQueryBuilder() : $query;
@@ -100,7 +104,7 @@ class Queryset implements QuerysetInterface
     /**
      * @return ConnectionInterface
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -117,7 +121,7 @@ class Queryset implements QuerysetInterface
      *
      * @return self
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -147,6 +151,13 @@ class Queryset implements QuerysetInterface
         $this->query->addSelect($selects, true);
     }
 
+    /**
+     * @return mixed
+     * @throws InvalidArgumentException
+     * @throws MultipleObjectsReturned
+     * @throws ObjectDoesNotExist
+     * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
+     */
     public function get()
     {
         $queryset = $this->_filterOrExclude(
@@ -157,7 +168,8 @@ class Queryset implements QuerysetInterface
         $resultCount = count($queryset);
 
         if (1 == $resultCount):
-            return $queryset->getResults()[0]; elseif (!$resultCount):
+            return $queryset->getResults()[0];
+        elseif (!$resultCount):
             throw new ObjectDoesNotExist(
                 sprintf(
                     '%s matching query does not exist.',
@@ -190,7 +202,7 @@ class Queryset implements QuerysetInterface
      *
      * @return Queryset
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -209,7 +221,7 @@ class Queryset implements QuerysetInterface
      *
      * @throws ValueError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -220,9 +232,9 @@ class Queryset implements QuerysetInterface
         $names = $this->_fields;
         if (is_null($this->_fields)):
             $names = [];
-        foreach ($this->model->getMeta()->getFields() as $field) :
+            foreach ($this->model->getMeta()->getFields() as $field) :
                 $names[] = $field->getName();
-        endforeach;
+            endforeach;
         endif;
         $clone = $this->_clone();
         foreach ($args as $alias => $arg) :
@@ -230,17 +242,18 @@ class Queryset implements QuerysetInterface
                 throw new ValueError(
                     sprintf("The annotation '%s' conflicts with a field on the model.", $alias)
                 );
-        endif;
-        $clone->query->addAnnotation(['annotation' => $arg, 'alias' => $alias, 'isSummary' => false]);
+            endif;
+            $clone->query->addAnnotation(['annotation' => $arg, 'alias' => $alias, 'isSummary' => false]);
         endforeach;
 
         foreach ($clone->query->annotations as $alias => $annotation) :
             if ($annotation->containsAggregates() && array_key_exists($alias, $args)):
                 if (is_null($clone->_fields)):
-                    $clone->query->groupBy = true; else:
+                    $clone->query->groupBy = true;
+                else:
                     $clone->query->setGroupBy();
-        endif;
-        endif;
+                endif;
+            endif;
         endforeach;
 
         return $clone;
@@ -249,7 +262,7 @@ class Queryset implements QuerysetInterface
     /**
      * Returns a new QuerySet instance with the ordering changed.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
@@ -257,7 +270,7 @@ class Queryset implements QuerysetInterface
      *
      * @return Queryset
      */
-    public function orderBy($fieldNames = array())
+    public function orderBy($fieldNames = [])
     {
         assert($this->query->isFilterable(), 'Cannot reorder a query once a limiting has been done.');
         $clone = $this->_clone();
@@ -274,7 +287,7 @@ class Queryset implements QuerysetInterface
      *
      * @throws TypeError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -284,10 +297,10 @@ class Queryset implements QuerysetInterface
         $query = $this->query->deepClone();
         foreach ($kwargs as $alias => $annotation) :
             $query->addAnnotation(['annotation' => $annotation, 'alias' => $alias, 'isSummary' => true]);
-        // ensure we have an aggrated function
-        if (!$query->annotations[$alias]->containsAggregates()) :
+            // ensure we have an aggrated function
+            if (!$query->annotations[$alias]->containsAggregates()) :
                 throw new TypeError(sprintf('%s is not an aggregate expression', $alias));
-        endif;
+            endif;
         endforeach;
 
         return $query->getAggregation($this->connection, array_keys($kwargs));
@@ -320,8 +333,10 @@ class Queryset implements QuerysetInterface
         $obj = $this->_clone();
 
         if (empty($fields)):
-            $obj->query->selectRelected = false; elseif ($fields):
-            $obj->query->addSelectRelected($fields); else:
+            $obj->query->selectRelected = false;
+        elseif ($fields):
+            $obj->query->addSelectRelected($fields);
+        else:
             $obj->query->selectRelected = true;
         endif;
 
@@ -346,10 +361,10 @@ class Queryset implements QuerysetInterface
         if (!$this->_resultsCache):
             $instance = $this->all()->limit(0, 1);
 
-        return $instance->query->hasResults($this->connection);
+            return $instance->query->hasResults($this->connection);
         endif;
 
-        return (bool) $this->_resultsCache;
+        return (bool)$this->_resultsCache;
     }
 
     /**
@@ -358,7 +373,7 @@ class Queryset implements QuerysetInterface
      *
      * @return $this
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -380,7 +395,7 @@ class Queryset implements QuerysetInterface
      *
      * @throws \Doctrine\DBAL\DBALException
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -408,8 +423,8 @@ class Queryset implements QuerysetInterface
 
     /**
      * @param Model $model
-     * @param $fields
-     * @param $returnId
+     * @param       $fields
+     * @param       $returnId
      *
      * @return mixed
      */
@@ -423,7 +438,7 @@ class Queryset implements QuerysetInterface
         foreach ($fields as $name => $field) :
             $value = $this->prepareValueForDatabaseSave($field, $field->preSave($model, true));
 
-        $qb->setValue($field->getColumnName(), $qb->createNamedParameter($value));
+            $qb->setValue($field->getColumnName(), $qb->createNamedParameter($value));
         endforeach;
 
         // save to db
@@ -436,7 +451,7 @@ class Queryset implements QuerysetInterface
 
     /**
      * @param Field $field
-     * @param $preSave
+     * @param       $preSave
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      *
      * @return mixed
@@ -451,7 +466,8 @@ class Queryset implements QuerysetInterface
         $instance = $this->_clone();
 
         if ($negate):
-            $instance->query->addQ(not_($conditions)); else:
+            $instance->query->addQ(not_($conditions));
+        else:
             $instance->query->addQ(q_($conditions));
         endif;
 
@@ -468,7 +484,7 @@ class Queryset implements QuerysetInterface
      *
      * @throws InvalidArgumentException
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -483,7 +499,7 @@ class Queryset implements QuerysetInterface
         if (1 == count($conditions)):
             if ($conditions[0] instanceof Node):
                 return $conditions;
-        endif;
+            endif;
         endif;
 
         $conditions = (empty($conditions)) ? [[]] : $conditions;
@@ -498,7 +514,7 @@ class Queryset implements QuerysetInterface
      *
      * @return $this
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -519,7 +535,7 @@ class Queryset implements QuerysetInterface
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -537,7 +553,7 @@ class Queryset implements QuerysetInterface
     /**
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -546,7 +562,7 @@ class Queryset implements QuerysetInterface
         if (false === $this->_evaluated):
             $this->_resultsCache = call_user_func($this->getMapper());
 
-        $this->_evaluated = true;
+            $this->_evaluated = true;
         endif;
 
         return $this->_resultsCache;
@@ -571,7 +587,7 @@ class Queryset implements QuerysetInterface
      *
      * @throws TypeError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -600,7 +616,7 @@ class Queryset implements QuerysetInterface
      *
      * @throws \Eddmash\PowerOrm\Exception\NotImplemented
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -628,7 +644,7 @@ class Queryset implements QuerysetInterface
      *
      * @throws \Doctrine\DBAL\DBALException
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -694,7 +710,7 @@ class Queryset implements QuerysetInterface
     /**
      * @return Queryset
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -729,18 +745,19 @@ class Queryset implements QuerysetInterface
     /**
      * Ready this instance for use as argument in filter.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function _prepareAsFilterValue()
     {
         if (is_null($this->_fields)):
-            $queryset = $this->asArray(['pk']); else:
+            $queryset = $this->asArray(['pk']);
+        else:
             if (count($this->_fields) > 1):
                 throw new TypeError('Cannot use multi-field values as a filter value.');
-        endif;
-        $queryset = $this->_clone();
+            endif;
+            $queryset = $this->_clone();
         endif;
 
         return $queryset->query->toSubQuery($queryset->connection);

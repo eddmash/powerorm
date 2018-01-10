@@ -15,7 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -35,26 +35,26 @@ class CheckCommand extends BaseCommand
         if ($input->getOption('list-tags')):
             $output->writeln(implode(PHP_EOL, $availableTags));
 
-        return;
+            return;
         endif;
 
         $tags = $input->getOption('tag');
         if ($tags):
             $invalidTags = [];
-        foreach ($tags as $tag) :
+            foreach ($tags as $tag) :
                 if (!BaseOrm::getCheckRegistry()->tagExists($tag)):
                     $invalidTags[] = $tag;
-        endif;
-        endforeach;
+                endif;
+            endforeach;
 
-        if ($invalidTags):
+            if ($invalidTags):
                 throw new CommandError(
                     sprintf(
                         'There is no system check with the "%s" tag(s).',
                         implode(', ', $invalidTags)
                     )
                 );
-        endif;
+            endif;
         endif;
 
         $failLevel = $input->getOption('fail-level');
@@ -67,7 +67,7 @@ class CheckCommand extends BaseCommand
                         $failLevel
                     )
                 );
-        endif;
+            endif;
 
         endif;
 

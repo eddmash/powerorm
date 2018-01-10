@@ -7,7 +7,7 @@ use Eddmash\PowerOrm\Console\Base;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 
 /**
- * @since 1.0.0
+ * @since  1.0.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -63,6 +63,7 @@ abstract class CheckMessage extends Base
         );
 
         $msg = PHP_EOL.str_pad('', 3, ' ').$this->message;
+
         return sprintf(
             'Issue <fg=red;options=bold>%s</> : <fg=black>(%s)</> %s %s',
             $this->id,

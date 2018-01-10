@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Model\Field\Field;
 /**
  * {@inheritdoc}
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -28,7 +28,7 @@ class ManyToOneRel extends ForeignObjectRel
     /**
      * Returns the Field in the 'toModel' object to which this relationship is tied.
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @return Field
      *

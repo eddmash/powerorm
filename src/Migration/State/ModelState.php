@@ -95,7 +95,7 @@ class ModelState extends BaseObject
                         )
                     );
                 }
-        endforeach;
+            endforeach;
         endif;
 
         $overrides = $model->getMeta()->getOverrides();
@@ -104,8 +104,8 @@ class ModelState extends BaseObject
         foreach ($overrides as $name => $value) :
             if (in_array($name, $ignore)):
                 continue;
-        endif;
-        $meta[$name] = $value;
+            endif;
+            $meta[$name] = $value;
         endforeach;
 
         $extends = '';
@@ -135,7 +135,7 @@ class ModelState extends BaseObject
     public function toModel(&$registry)
     {
         $metaData = $this->getMeta();
-//        var_dump($this);
+        //        var_dump($this);
         $extends = $this->extends;
 
         $model = $this->createInstance($this->name, $extends);
@@ -204,7 +204,7 @@ class ModelState extends BaseObject
 
     public function __toString()
     {
-        return (string) sprintf("<ModelState: '%s'>", $this->name);
+        return (string)sprintf("<ModelState: '%s'>", $this->name);
     }
 
     public function &getMeta()

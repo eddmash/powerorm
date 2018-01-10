@@ -18,9 +18,9 @@ class ArrayValueMapper extends Mapper
      * @internal param Model $model
      * @internal param array $results
      *
-     * @since 1.1.0
+     * @since    1.1.0
      *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @author   Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function __invoke()
     {
@@ -30,10 +30,10 @@ class ArrayValueMapper extends Mapper
         $values = [];
         foreach ($sqlCompiler->getResultsIterator($results) as $result) :
             $vals = [];
-        foreach ($result as $name => $item) :
+            foreach ($result as $name => $item) :
                 $vals[] = $item;
-        endforeach;
-        $values[] = $vals;
+            endforeach;
+            $values[] = $vals;
         endforeach;
 
         return $values;

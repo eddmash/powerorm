@@ -33,7 +33,7 @@ namespace Eddmash\PowerOrm\Migration;
  * Note that all migrations come out of migrations and into the Loader or Graph as instances, having been
  * initialized with their app name.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */

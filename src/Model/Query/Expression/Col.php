@@ -58,14 +58,15 @@ class Col extends BaseExpression
      *
      * @throws \Eddmash\PowerOrm\Exception\FieldError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getDbConverters(ConnectionInterface $connection)
     {
         if ($this->getTargetField()->getName() === $this->getOutputField()->getName()):
-            return $this->getOutputField()->getDbConverters($connection); else:
+            return $this->getOutputField()->getDbConverters($connection);
+        else:
             return array_merge(
                 $this->getOutputField()->getDbConverters($connection),
                 $this->getTargetField()->getDbConverters($connection)

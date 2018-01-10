@@ -30,15 +30,16 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
         } catch (\Exception $e) {
             $relPk = $modelInstance->getPkValue();
             if (empty($relPk)):
-                $relObj = null; else:
+                $relObj = null;
+            else:
                 $filterArgs = $this->field->getForwardRelatedFilter($modelInstance);
 
-            try {
-                $relObj = $this->getQueryset($modelInstance)->get($filterArgs);
-                $relObj->{$this->field->getCacheName()} = $modelInstance;
-            } catch (ObjectDoesNotExist $exception) {
-                $relObj = null;
-            }
+                try {
+                    $relObj = $this->getQueryset($modelInstance)->get($filterArgs);
+                    $relObj->{$this->field->getCacheName()} = $modelInstance;
+                } catch (ObjectDoesNotExist $exception) {
+                    $relObj = null;
+                }
             endif;
             $modelInstance->{$this->field->getCacheName()} = $relObj;
         }
@@ -65,22 +66,23 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
                 unset($modelInstance->{$this->field->getCacheName()});
                 unset($relObj->{$this->field->relation->getCacheName()});
             } catch (AttributeError $exception) {
-            } else:
+            }
+        else:
 
             $relatedPks = [];
-        foreach ($this->field->relation->fromField->getForeignRelatedFields() as $foreignRelatedField) :
+            foreach ($this->field->relation->fromField->getForeignRelatedFields() as $foreignRelatedField) :
                 $relatedPks[] = $modelInstance->{$foreignRelatedField->getAttrName()};
-        endforeach;
-        foreach ($this->field->relation->fromField->getLocalRelatedFields() as $idx => $localRelatedField) :
+            endforeach;
+            foreach ($this->field->relation->fromField->getLocalRelatedFields() as $idx => $localRelatedField) :
                 $value->{$localRelatedField->getAttrName()} = $relatedPks[$idx];
-        endforeach;
+            endforeach;
 
-        // Set the related instance cache to avoid an SQL query
-        // when accessing the attribute we just set.
-        $modelInstance->{$this->field->getCacheName()} = $value;
-        // Set the related instance cache to avoid an SQL query
-        // when accessing the attribute we just set.
-        $value->{$this->field->relation->getCacheName()} = $modelInstance;
+            // Set the related instance cache to avoid an SQL query
+            // when accessing the attribute we just set.
+            $modelInstance->{$this->field->getCacheName()} = $value;
+            // Set the related instance cache to avoid an SQL query
+            // when accessing the attribute we just set.
+            $value->{$this->field->relation->getCacheName()} = $modelInstance;
         endif;
     }
 

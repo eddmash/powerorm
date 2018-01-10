@@ -81,14 +81,15 @@ class OrderBy extends BaseExpression
         return $expression[0];
     }
 
-    /**@inheritdoc*/
+    /**@inheritdoc */
     public function asSql(CompilerInterface $compiler, ConnectionInterface $connection, $template = null)
     {
         if (is_null($template)):
             if ($this->nullsLast):
-                $template = sprintf('%s NULLS LAST', $this->template); elseif ($this->nullsFirst):
+                $template = sprintf('%s NULLS LAST', $this->template);
+            elseif ($this->nullsFirst):
                 $template = sprintf('%s NULLS FIRST', $this->template);
-        endif;
+            endif;
         endif;
         list($expSql, $expParams) = $compiler->compile($this->expression);
 
@@ -135,6 +136,7 @@ class OrderBy extends BaseExpression
         foreach ($this->getSourceExpressions() as $sourceExpression) :
             $cols[] = $sourceExpression->getGroupByCols();
         endforeach;
+
         return $cols;
     }
 }

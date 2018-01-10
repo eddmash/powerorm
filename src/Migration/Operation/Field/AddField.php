@@ -40,7 +40,8 @@ class AddField extends FieldOperation
         // remove default if preserveDefault==false, we dont want it in future updates.
         if (false === $this->preserveDefault):
             $field = $this->field->deepClone();
-        $field->default = NOT_PROVIDED; else:
+            $field->default = NOT_PROVIDED;
+        else:
             $field = $this->field;
         endif;
         $state->getModelState($this->modelName)->fields[$this->name] = $field;
@@ -56,16 +57,16 @@ class AddField extends FieldOperation
         /* @var $field Field */
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-        $field = $toModel->getMeta()->getField($this->name);
-        if (false === $this->preserveDefault):
+            $field = $toModel->getMeta()->getField($this->name);
+            if (false === $this->preserveDefault):
                 $field->default = $this->field->default;
-        endif;
+            endif;
 
-        $schemaEditor->addField($fromModel, $field);
+            $schemaEditor->addField($fromModel, $field);
 
-        if (false === $this->preserveDefault):
+            if (false === $this->preserveDefault):
                 $field->default = NOT_PROVIDED;
-        endif;
+            endif;
         endif;
     }
 

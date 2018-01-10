@@ -21,7 +21,7 @@ define('POWERORM_HOME', dirname(dirname(__FILE__)));
 /**
  * Class Application.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -29,7 +29,7 @@ class Application
 {
     /**
      * @param array $config
-     * @param $composerLoader
+     * @param       $composerLoader
      *
      * @return BaseOrm
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
@@ -40,7 +40,7 @@ class Application
     }
 
     /**
-     * @param $config
+     * @param             $config
      * @param ClassLoader $composerLoader
      *
      * @return BaseOrm
@@ -50,6 +50,7 @@ class Application
     {
         $settings = new Settings($config);
         $orm = BaseOrm::setup($settings);
+
         return $orm;
     }
 

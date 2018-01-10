@@ -11,17 +11,17 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
  *
  * @version    2.0
  *
- * @author Carsten Brandt <mail@cebe.cc>
+ * @author     Carsten Brandt <mail@cebe.cc>
  *
- * @see http://www.yiiframework.com/
+ * @see        http://www.yiiframework.com/
  *
- * @copyright Copyright (c) 2008 Yii Software LLC
- * @license http://www.yiiframework.com/license/
+ * @copyright  Copyright (c) 2008 Yii Software LLC
+ * @license    http://www.yiiframework.com/license/
  * Class Console
  *
- * @since 1.1.0
+ * @since      1.1.0
  *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ * @author     Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
 class Console
 {
@@ -198,7 +198,7 @@ class Console
             $output = [];
             exec('mode con', $output);
             if (isset($output, $output[1]) && false !== strpos($output[1], 'CON')) {
-                return $size = [(int) preg_replace('~\D~', '', $output[3]), (int) preg_replace('~\D~', '', $output[4])];
+                return $size = [(int)preg_replace('~\D~', '', $output[3]), (int)preg_replace('~\D~', '', $output[4])];
             }
         } else {
             // try stty if available
@@ -213,12 +213,12 @@ class Console
             }
 
             // fallback to tput, which may not be updated on terminal resize
-            if (($width = (int) exec('tput cols 2>&1')) > 0 && ($height = (int) exec('tput lines 2>&1')) > 0) {
+            if (($width = (int)exec('tput cols 2>&1')) > 0 && ($height = (int)exec('tput lines 2>&1')) > 0) {
                 return $size = [$width, $height];
             }
 
             // fallback to ENV variables, which may not be updated on terminal resize
-            if (($width = (int) getenv('COLUMNS')) > 0 && ($height = (int) getenv('LINES')) > 0) {
+            if (($width = (int)getenv('COLUMNS')) > 0 && ($height = (int)getenv('LINES')) > 0) {
                 return $size = [$width, $height];
             }
         }

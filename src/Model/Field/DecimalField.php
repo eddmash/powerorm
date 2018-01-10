@@ -38,7 +38,7 @@ use Eddmash\PowerOrm\Db\ConnectionInterface;
  *
  * The default form widget for this field is a 'text'.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */

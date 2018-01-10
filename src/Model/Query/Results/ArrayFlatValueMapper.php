@@ -22,7 +22,7 @@ class ArrayFlatValueMapper extends Mapper
         foreach ($sqlCompiler->getResultsIterator($results) as $result) :
             foreach ($result as $name => $item) :
                 $values[] = $item;
-        endforeach;
+            endforeach;
         endforeach;
 
         return $values;

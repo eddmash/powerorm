@@ -44,6 +44,7 @@ abstract class Application extends Component implements AppInterface
     private function getFileName()
     {
         $reflector = new ReflectionClass(static::class);
+
         return $reflector->getFileName();
     }
 }

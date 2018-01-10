@@ -25,6 +25,7 @@ abstract class ModelOperation extends Operation
     {
         $arr = parent::__debugInfo();
         $arr['name'] = $this->name;
+
         return $arr;
     }
 }

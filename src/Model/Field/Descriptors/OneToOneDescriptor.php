@@ -26,7 +26,7 @@ namespace Eddmash\PowerOrm\Model\Field\Descriptors;
  *
  * ``restaurant->place`` is a ``ForwardOneToOneDescriptor`` instance.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */

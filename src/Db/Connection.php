@@ -16,14 +16,15 @@ use Eddmash\PhpGis\Db\Backends\Operations\BaseOperations;
 
 class Connection extends \Doctrine\DBAL\Connection implements ConnectionInterface
 {
+    /**
+     * @return \Eddmash\PhpGis\Db\Backends\Operations\OperationsInterface|void
+     */
     public function getOperations()
     {
-        return BaseOperations::getPlatformOperations($this->getDatabasePlatform());
     }
 
     public function getFeatures()
     {
-        return BaseFeatures::getFeatures($this->getDatabasePlatform());
     }
 
     /**

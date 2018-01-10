@@ -16,7 +16,7 @@ use Eddmash\PowerOrm\Exception\ClassNotFoundException;
 /**
  * A Helper class for dealing with common class related tasks.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -48,7 +48,7 @@ class ClassHelper
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -66,13 +66,13 @@ class ClassHelper
     /**
      * Format a namespace to have a  leading or a closing backslash or both.
      *
-     * @param $namespace
+     * @param            $namespace
      * @param bool|false $leadingBackslash
      * @param bool|true  $closingBackslash
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -102,7 +102,7 @@ class ClassHelper
      *
      * @throws ClassNotFoundException
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -128,7 +128,7 @@ class ClassHelper
      *
      * @return array this an array of ReflectionClass
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -139,10 +139,10 @@ class ClassHelper
         $parents = [];
         while ($reflectionClass->getParentClass()):
             $reflectionClass = $reflectionClass->getParentClass();
-        if (in_array($reflectionClass->getName(), $stopAt)):
+            if (in_array($reflectionClass->getName(), $stopAt)):
                 break;
-        endif;
-        $parents[$reflectionClass->getName()] = $reflectionClass;
+            endif;
+            $parents[$reflectionClass->getName()] = $reflectionClass;
         endwhile;
 
         return $parents;
@@ -155,7 +155,7 @@ class ClassHelper
         $name = rtrim($name, '\\');
         if ($pos = strrpos($name, '\\')) :
             $namespace = substr($name, 0, $pos);
-        $name = substr($name, $pos + 1);
+            $name = substr($name, $pos + 1);
         endif;
 
         return [$namespace, $name];
@@ -171,7 +171,7 @@ class ClassHelper
 
     public static function get_php_classes($php_code)
     {
-        $classes = array();
+        $classes = [];
         $tokens = token_get_all($php_code);
 
         $count = count($tokens);
@@ -197,7 +197,7 @@ class ClassHelper
      *
      * @return mixed|string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -274,15 +274,16 @@ class ClassHelper
             if (ArrayHelper::hasKey($map, $name)):
 
                 $name = $map[$name];
-        endif;
+            endif;
 
-        $setterMethod = sprintf('set%s', ucfirst($name));
+            $setterMethod = sprintf('set%s', ucfirst($name));
 
-        if (method_exists($object, $setterMethod)):
-                call_user_func([$object, $setterMethod], $value); elseif (property_exists($object, $name)):
+            if (method_exists($object, $setterMethod)):
+                call_user_func([$object, $setterMethod], $value);
+            elseif (property_exists($object, $name)):
 
                 $object->{$name} = $value;
-        endif;
+            endif;
 
         endforeach;
 

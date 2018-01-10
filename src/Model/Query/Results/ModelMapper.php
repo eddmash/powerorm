@@ -24,9 +24,9 @@ class ModelMapper extends Mapper
      * @internal param Model $model
      * @internal param array $results
      *
-     * @since 1.1.0
+     * @since    1.1.0
      *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @author   Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
@@ -50,7 +50,7 @@ class ModelMapper extends Mapper
         /* @var $col Col */
         foreach (array_slice($select, $modelFieldsStart, $modelFieldsEnd) as $colInfo) :
             $col = $colInfo[0];
-        $initList[] = $col->getTargetField()->getAttrName();
+            $initList[] = $col->getTargetField()->getAttrName();
         endforeach;
 
         /* @var $modelClass Model */
@@ -62,17 +62,17 @@ class ModelMapper extends Mapper
 
             $vals = array_slice($result, $modelFieldsStart, $modelFieldsEnd);
 
-        $obj = $modelClass::fromDb($connection, $initList, $vals);
+            $obj = $modelClass::fromDb($connection, $initList, $vals);
 
-        foreach ($annotationMap as $name => $pos) :
+            foreach ($annotationMap as $name => $pos) :
                 $obj->{$name} = $result[$pos];
-        endforeach;
-        if ($relatedPopulators):
+            endforeach;
+            if ($relatedPopulators):
                 foreach ($relatedPopulators as $relatedPopulator) :
                     $relatedPopulator->populate($result, $obj);
-        endforeach;
-        endif;
-        $mapped[] = $obj;
+                endforeach;
+            endif;
+            $mapped[] = $obj;
         endforeach;
 
         return $mapped;
@@ -81,12 +81,12 @@ class ModelMapper extends Mapper
     /**
      * Creates mappers to use for related model.
      *
-     * @param $klassInfo
+     * @param            $klassInfo
      * @param Connection $connection
      *
      * @return RelatedMappers[]
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *

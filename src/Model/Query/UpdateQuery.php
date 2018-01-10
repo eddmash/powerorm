@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Model\Query\Compiler\SQLUpdateCompiler;
 /**
  * Represents an "update" SQL query.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -43,9 +43,9 @@ class UpdateQuery extends Query
         $valuesSeq = [];
         foreach ($values as $name => $value) :
             $field = $this->model->getMeta()->getField($name);
-        $model = $field->scopeModel->getMeta()->concreteModel;
-        $isDirect = (!($field->autoCreated && !$field->concrete) || !$field->concrete);
-        if (!$isDirect || ($field->isRelation && $field->manyToMany)):
+            $model = $field->scopeModel->getMeta()->concreteModel;
+            $isDirect = (!($field->autoCreated && !$field->concrete) || !$field->concrete);
+            if (!$isDirect || ($field->isRelation && $field->manyToMany)):
                 throw new  FieldError(
                     sprintf(
                         'Cannot update model field %r (only non-relations and '.
@@ -53,13 +53,13 @@ class UpdateQuery extends Query
                         $field
                     )
                 );
-        endif;
-        if ($model->getMeta()->getModelName() !== $this->model->getMeta()->getModelName()):
+            endif;
+            if ($model->getMeta()->getModelName() !== $this->model->getMeta()->getModelName()):
                 $this->addRelatedUpdate($model, $field, $value);
 
-        continue;
-        endif;
-        $valuesSeq[] = [$field, $model, $value];
+                continue;
+            endif;
+            $valuesSeq[] = [$field, $model, $value];
         endforeach;
 
         return $this->addUpdateFields($valuesSeq);

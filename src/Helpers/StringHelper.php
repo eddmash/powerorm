@@ -26,7 +26,7 @@ use Eddmash\PowerOrm\BaseOrm;
 /**
  * Class Strings.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -134,7 +134,7 @@ class StringHelper
     {
         if ($caseSensitive):
             $string = strtolower($string);
-        $subString = strtolower($subString);
+            $subString = strtolower($subString);
         endif;
 
         return false !== strpos($string, $subString);
@@ -177,6 +177,6 @@ class StringHelper
             return preg_split($pattern, $string);
         endif;
 
-        return (array) $string;
+        return (array)$string;
     }
 }

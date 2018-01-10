@@ -74,11 +74,11 @@ EOF
         $helper->describe(
             $output,
             $this->getApplication(),
-            array(
+            [
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
                 'namespace' => $input->getArgument('namespace'),
-            )
+            ]
         );
     }
 
@@ -88,7 +88,7 @@ EOF
     private function createDefinition()
     {
         return new InputDefinition(
-            array(
+            [
                 new InputArgument('namespace', InputArgument::OPTIONAL, 'The namespace name'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command list'),
                 new InputOption(
@@ -98,7 +98,7 @@ EOF
                     'The output format (txt, xml, json, or md)',
                     'txt'
                 ),
-            )
+            ]
         );
     }
 }

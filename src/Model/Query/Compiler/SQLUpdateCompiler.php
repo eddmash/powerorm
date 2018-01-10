@@ -41,7 +41,7 @@ class SQLUpdateCompiler extends SqlFetchBaseCompiler
      *
      * @throws TypeError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -58,19 +58,20 @@ class SQLUpdateCompiler extends SqlFetchBaseCompiler
         /* @var $model Model */
         foreach ($this->query->getValues() as $valItem) :
             $field = $valItem[0];
-        $model = $valItem[1];
-        $value = $valItem[2];
+            $model = $valItem[1];
+            $value = $valItem[2];
 
-        $name = $field->getColumnName();
-        $qb->set($name, '?');
+            $name = $field->getColumnName();
+            $qb->set($name, '?');
 
-        //todo resolve_expression,
-        if (method_exists($value, 'prepareDatabaseSave')):
+            //todo resolve_expression,
+            if (method_exists($value, 'prepareDatabaseSave')):
                 if ($field->isRelation):
                     $value = $field->prepareValueBeforeSave(
                         $value->prepareDatabaseSave($field),
                         $connection
-                    ); else:
+                    );
+                else:
                     throw new TypeError(
                         "Tried to update field '%s' with a model instance, '%s'. Use a value compatible with '%s'.",
                         $field->getName(),
@@ -78,11 +79,12 @@ class SQLUpdateCompiler extends SqlFetchBaseCompiler
                         get_class($field)
                     );
 
-        endif; else:
+                endif;
+            else:
                 $value = $field->prepareValueBeforeSave($value, $connection);
-        endif;
-        // prepare value
-        $params[] = $value;
+            endif;
+            // prepare value
+            $params[] = $value;
         endforeach;
 
         list($sql, $whereParams) = $this->compile($this->where);

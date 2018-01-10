@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Helpers\Tools;
  * Base class for powerorm classes, provides some base functionalities to classes that inherit from it.
  * Class BaseObject.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -72,7 +72,7 @@ class BaseObject
      *
      * @return bool
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -88,7 +88,7 @@ class BaseObject
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -103,7 +103,7 @@ class BaseObject
      * @param $signal_name
      * @param $object
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -119,7 +119,7 @@ class BaseObject
      *
      * @return \ReflectionClass
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

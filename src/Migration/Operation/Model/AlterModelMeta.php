@@ -35,10 +35,13 @@ class AlterModelMeta extends Operation
         $meta = array_replace($meta, $this->getMeta());
 
         foreach (self::$alterableOptions as $alterableOption) :
-            if (!ArrayHelper::hasKey($this->getMeta(), $alterableOption) && ArrayHelper::hasKey($meta, $alterableOption)):
+            if (!ArrayHelper::hasKey($this->getMeta(), $alterableOption) && ArrayHelper::hasKey(
+                    $meta,
+                    $alterableOption
+                )):
 
                 unset($meta[$alterableOption]);
-        endif;
+            endif;
         endforeach;
         $modelState->setMeta($meta);
     }

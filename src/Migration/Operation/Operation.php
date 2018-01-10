@@ -79,12 +79,12 @@ abstract class Operation extends DeconstructableObject implements OperationInter
 
         if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Migration\Operation\Model')):
             $alias = 'modelOperation';
-        $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Model as %s', $alias);
+            $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Model as %s', $alias);
         endif;
 
         if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Migration\Operation\Field')):
             $alias = 'fieldOperation';
-        $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Field as %s', $alias);
+            $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Field as %s', $alias);
         endif;
 
         return [
@@ -191,7 +191,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -220,6 +220,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
     {
         try {
             $app = BaseOrm::getInstance()->getComponent($this->getAppLabel());
+
             /* @var $app \Eddmash\PowerOrm\Components\AppInterface */
             return $app;
         } catch (ComponentException $e) {

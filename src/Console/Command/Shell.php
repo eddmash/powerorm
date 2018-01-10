@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * a php shell.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -30,13 +30,14 @@ class Shell extends BaseCommand
     {
         if (class_exists('\Psy\Shell')):
             $shell = new \Psy\Shell();
-        $shell->run(); else:
+            $shell->run();
+        else:
 
             $message = sprintf(
                 '<error>%s</error>',
                 "Shell command depends on Psych, please install as shown 'composer require psy/psysh:@stable'"
             );
-        $output->writeln($message);
+            $output->writeln($message);
         endif;
     }
 

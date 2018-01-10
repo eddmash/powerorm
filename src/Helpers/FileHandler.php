@@ -17,7 +17,7 @@ use SplFileInfo;
 /**
  * Responsible for creating files. creates files with the extension "php".
  *
- * @since 1.0.0
+ * @since  1.0.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -63,8 +63,8 @@ class FileHandler extends BaseObject
         if ($fileHandle):
             fprintf($fileHandle, $content);
 
-        fclose($fileHandle);
-        chmod($file, 0777);
+            fclose($fileHandle);
+            chmod($file, 0777);
         endif;
 
         return file_exists($file);
@@ -85,9 +85,9 @@ class FileHandler extends BaseObject
         /** @var $file SplFileInfo */
         foreach ($files as $file) :
             $fileName = $file->getBaseName('.'.$ext);
-        if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext):
+            if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext):
                 return $file;
-        endif;
+            endif;
 
         endforeach;
 
@@ -116,7 +116,7 @@ class FileHandler extends BaseObject
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -137,12 +137,13 @@ class FileHandler extends BaseObject
         foreach ($dirIterator as $file) :
             if ($file->isDot()):
                 continue;
-        endif;
+            endif;
 
-        if ($file->isDir() && $recurse):
-                $_fileList = array_merge($_fileList, (new static($file->getRealPath()))->readDir($ext, $recurse)); else:
+            if ($file->isDir() && $recurse):
+                $_fileList = array_merge($_fileList, (new static($file->getRealPath()))->readDir($ext, $recurse));
+            else:
                 $_fileList = $this->addFile($_fileList, $file, $ext, $_fileObj);
-        endif;
+            endif;
         endforeach;
 
         return $_fileList;
@@ -151,12 +152,12 @@ class FileHandler extends BaseObject
     /**
      * @param array        $_fileList
      * @param \SplFileInfo $file
-     * @param $ext
-     * @param bool|false $_fileObj if true returns a file object, if false returns a file pathname
+     * @param              $ext
+     * @param bool|false   $_fileObj if true returns a file object, if false returns a file pathname
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -165,17 +166,19 @@ class FileHandler extends BaseObject
         if (!empty($ext)):
             if ($ext == $file->getExtension()):
                 if ($_fileObj):
-                    $_fileList[] = clone $file; else:
+                    $_fileList[] = clone $file;
+                else:
                     $_fileList[] = $file->getRealPath();
-        endif;
-        endif;
+                endif;
+            endif;
 
-        return $_fileList;
+            return $_fileList;
         endif;
 
         // add everything
         if ($_fileObj):
-            $_fileList[] = clone $file; else:
+            $_fileList[] = clone $file;
+        else:
             $_fileList[] = $file->getRealPath();
         endif;
 

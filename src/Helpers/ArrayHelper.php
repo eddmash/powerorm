@@ -29,7 +29,7 @@ use Eddmash\PowerOrm\Exception\KeyError;
 /**
  * Class Arrays.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -82,15 +82,15 @@ class ArrayHelper
      * Return the value for key if key is in the array, else default. If default is not given, it defaults to null.
      * This never raise 'PHP Notice:  Undefined index: '.
      *
-     * @param $haystack
-     * @param $key
+     * @param      $haystack
+     * @param      $key
      * @param null $default
      *
      * @return mixed
      *
      * @throws KeyError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -111,15 +111,15 @@ class ArrayHelper
      * error
      * This never raise 'PHP Notice:  Undefined index: '.
      *
-     * @param $haystack
-     * @param $key
+     * @param      $haystack
+     * @param      $key
      * @param null $default
      *
      * @return mixed
      *
      * @throws KeyError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -127,9 +127,10 @@ class ArrayHelper
     {
         if (array_key_exists($key, $haystack)):
             $value = $haystack[$key];
-        unset($haystack[$key]);
+            unset($haystack[$key]);
 
-        return $value; elseif (self::STRICT !== $default):
+            return $value;
+        elseif (self::STRICT !== $default):
             return $default;
         endif;
 
@@ -144,7 +145,7 @@ class ArrayHelper
      *
      * @return bool
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -159,11 +160,14 @@ class ArrayHelper
         $empty = empty($array);
 
         if (!$empty):
-            array_walk_recursive($array, function ($item) use (&$empty) {
-                if (!empty($item)):
-                    $empty = false;
-                endif;
-            });
+            array_walk_recursive(
+                $array,
+                function ($item) use (&$empty) {
+                    if (!empty($item)):
+                        $empty = false;
+                    endif;
+                }
+            );
         endif;
 
         return $empty;

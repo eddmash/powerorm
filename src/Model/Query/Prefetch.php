@@ -57,7 +57,7 @@ class Prefetch
         $this->queryset = $queryset;
 
         if ($toAttr):
-//            $this->prefetchTo =
+            //            $this->prefetchTo =
         endif;
         $this->toAttr = $toAttr;
     }
@@ -77,7 +77,7 @@ class Prefetch
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

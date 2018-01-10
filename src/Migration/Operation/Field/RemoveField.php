@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
 /**
  * Removes a field from a model.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -34,7 +34,7 @@ class RemoveField extends FieldOperation
         foreach ($fields as $name => $field) :
             if ($name !== $this->name):
                 $fieldsNew[$name] = $field;
-        endif;
+            endif;
         endforeach;
         $state->getModelState($this->modelName)->fields = $fieldsNew;
     }
@@ -67,7 +67,7 @@ class RemoveField extends FieldOperation
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-        $schemaEditor->addField($fromModel, $toModel->getMeta()->getField($this->name));
+            $schemaEditor->addField($fromModel, $toModel->getMeta()->getField($this->name));
         endif;
     }
 }

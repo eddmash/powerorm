@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
 /**
  * Interface ModelInterface.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -32,9 +32,9 @@ interface ModelInterface extends DeConstructableInterface
      *
      * @internal param array $conditions
      *
-     * @since 1.1.0
+     * @since    1.1.0
      *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @author   Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public static function objects(Model $modelInstance = null);
 
@@ -46,7 +46,7 @@ interface ModelInterface extends DeConstructableInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -66,7 +66,7 @@ interface ModelInterface extends DeConstructableInterface
      *
      * @return array
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

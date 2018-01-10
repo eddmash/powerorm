@@ -39,7 +39,7 @@ class HelpCommand extends BaseCommand
         $this
             ->setName('help')
             ->setDefinition(
-                array(
+                [
                     new InputArgument('command_name', InputArgument::OPTIONAL, 'The command name', 'help'),
                     new InputOption(
                         'format',
@@ -49,7 +49,7 @@ class HelpCommand extends BaseCommand
                         'txt'
                     ),
                     new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw command help'),
-                )
+                ]
             )
             ->setDescription('Displays help for a command')
             ->setHelp(
@@ -90,10 +90,10 @@ EOF
         $helper->describe(
             $output,
             $this->command,
-            array(
+            [
                 'format' => $input->getOption('format'),
                 'raw_text' => $input->getOption('raw'),
-            )
+            ]
         );
 
         $this->command = null;

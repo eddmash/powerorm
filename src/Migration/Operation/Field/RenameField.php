@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
 /**
  * Renames a field on the model. Might affect db_column too.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -36,9 +36,10 @@ class RenameField extends FieldOperation
         $fieldsNew = [];
         foreach ($fields as $name => $field) :
             if ($name === $this->oldName):
-                $fieldsNew[$this->newName] = $field; else:
+                $fieldsNew[$this->newName] = $field;
+            else:
                 $fieldsNew[$name] = $field;
-        endif;
+            endif;
         endforeach;
 
         $state->getModelState($this->modelName)->fields = $fieldsNew;
@@ -60,7 +61,7 @@ class RenameField extends FieldOperation
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-        $schemaEditor->alterField(
+            $schemaEditor->alterField(
                 $fromModel,
                 $fromModel->getMeta()->getField($this->oldName),
                 $toModel->getMeta()->getField($this->newName)
@@ -76,7 +77,7 @@ class RenameField extends FieldOperation
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-        $schemaEditor->alterField(
+            $schemaEditor->alterField(
                 $fromModel,
                 $fromModel->getMeta()->getField($this->newName),
                 $toModel->getMeta()->getField($this->oldName)

@@ -43,31 +43,32 @@ abstract class SimpleObjectSerializer implements SerializerInterface
         /** @var $item Model */
         foreach ($items as $item) :
             $this->startObject($item);
-        $concreteModel = $item->getMeta()->concreteModel;
-        $localFields = $concreteModel->getMeta()->localFields;
-        foreach ($localFields as $field) :
+            $concreteModel = $item->getMeta()->concreteModel;
+            $localFields = $concreteModel->getMeta()->localFields;
+            foreach ($localFields as $field) :
                 if ($field->isSerializable()):
                     if (!$field->isRelation):
                         if (empty($this->selectedFields) || in_array($field->getAttrName(), $this->selectedFields)):
-                            $this->handleField($item, $field); else:
+                            $this->handleField($item, $field);
+                        else:
                             // instead of user_id we need user
                             $name = substr($field->getAttrName(), 0, -3);
-        if (empty($this->selectedFields) || in_array($name, $this->selectedFields)):
+                            if (empty($this->selectedFields) || in_array($name, $this->selectedFields)):
                                 $this->handleForeignField($item, $field);
-        endif;
-        endif;
-        endif;
-        endif;
-        endforeach;
-        $m2mFields = $concreteModel->getMeta()->localManyToMany;
-        foreach ($m2mFields as $m2mField) :
+                            endif;
+                        endif;
+                    endif;
+                endif;
+            endforeach;
+            $m2mFields = $concreteModel->getMeta()->localManyToMany;
+            foreach ($m2mFields as $m2mField) :
                 if ($m2mField->isSerializable()):
                     if (empty($this->selectedFields) || in_array($m2mField->getAttrName(), $this->selectedFields)):
                         $this->handleM2MField($item, $m2mField);
-        endif;
-        endif;
-        endforeach;
-        $this->endObject($item);
+                    endif;
+                endif;
+            endforeach;
+            $this->endObject($item);
         endforeach;
 
         $this->endSerialization();
@@ -85,7 +86,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      * @param Model $model
      * @param Field $field
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -99,9 +100,9 @@ abstract class SimpleObjectSerializer implements SerializerInterface
                 return $model->getPkValue();
             };
 
-        foreach ($model->{$field->getName()}->all() as $item) :
+            foreach ($model->{$field->getName()}->all() as $item) :
                 $vals[] = $m2mValues($item);
-        endforeach;
+            endforeach;
         endif;
         $this->_fields[$field->getName()] = $vals;
     }
@@ -116,7 +117,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -131,7 +132,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -145,7 +146,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -159,7 +160,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -175,7 +176,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      *
      * @return mixed
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

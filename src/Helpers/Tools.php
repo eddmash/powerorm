@@ -8,7 +8,7 @@ use Eddmash\PowerOrm\Exception\InvalidArgumentException;
 use Eddmash\PowerOrm\Model\Model;
 
 /**
- * Class Tools.
+ * Class Helpers.
  *
  * @since  1.1.0
  *
@@ -40,53 +40,64 @@ class Tools
     public static function stringify(
         $data,
         $indent = 1,
-        $close = '',
-        $start = '',
-        $level = 0
+        $level = 0,
+        $elementLineBreak = false,
+        $outerBrackets = true,
+        $indentChar = null
     ) {
-        $indentCharacter = "\t";
+        $indentCharacter = str_pad("", 4, " ");
+        if ($indentChar):
+            $indentCharacter = $indentChar;
+        endif;
         $linebreak = PHP_EOL;
         $stringState = '';
 
-        if (false == $indent) {
+        if (false === $indent) {
             $linebreak = '';
             $indentCharacter = '';
             $indent = 0;
         }
 
-        if (!empty($start)) {
-            $stringState .= str_repeat($indentCharacter, $indent)."$start";
-        }
-
         $totalCount = (is_array($data)) ? count($data) : 1;
-        $counter = 1;
+        $counter = 0;
 
         // unify everything to an array, on the first round for consistencies.
         if (0 == $level) {
-            $data = [$data];
+            $data = ($outerBrackets) ? [$data] : (array)$data;
         }
 
         foreach ($data as $key => $value) {
-            $stringState .= str_repeat($indentCharacter, $indent);
 
-            $nextIndent = (false == $indent) ? $indent : $indent + 1;
+            $indentation = str_repeat($indentCharacter, $indent);
+            $stringState .= $indentation;
+
+            $nextIndent = (false === $indent) ? $indent : $indent + 1;
 
             if (is_array($value)) {
                 // HANDLE VALUE IF ARRAY
 
-                $stringState .= '[ '.$linebreak;
+                $stringState .= '['.$linebreak;
 
                 if (!is_numeric($key)) {
                     $stringState .= "'$key'=>";
                 }
 
-                $stringState .= self::stringify($value, $nextIndent, $close, $start, ++$level);
+                $stringState .= self::stringify(
+                    $value,
+                    $nextIndent,
+                    ++$level,
+                    $elementLineBreak
+                );
 
-                $stringState .= $linebreak;
-                $stringState .= (false != $indent) ? str_repeat($indentCharacter, $indent - 1) : '';
-                $stringState .= ' ]';
+                $stringState .= ($elementLineBreak) ? '' : $linebreak;
+                $multiplier = ($indent) ? $indent - 1 : 0;
+                $stringState .= (false !== $indent) ?
+                    str_repeat($indentCharacter, $multiplier) : '';
+                //
+                $stringState .= $indentation.']';
             } elseif (is_object($value)) {
-                // HANDLE VALUE THAT ARE OBJECTS THAT IMPLEMENT DeConstructableInterface interface
+                // HANDLE VALUE THAT ARE OBJECTS THAT
+                // IMPLEMENT DeConstructableInterface interface
 
                 if ($value instanceof DeConstructableInterface) {
                     $skel = $value->deconstruct();
@@ -95,7 +106,12 @@ class Tools
 
                     $constructorArgs = $skel['constructorArgs'];
 
-                    $string = self::stringify(reset($constructorArgs), $nextIndent, $close, $start, ++$level);
+                    $string = self::stringify(
+                        reset($constructorArgs),
+                        $nextIndent,
+                        ++$level,
+                        $elementLineBreak
+                    );
 
                     $stringState .= sprintf('%1$s(%2$s)', $class, $string);
                 } else {
@@ -119,17 +135,20 @@ class Tools
                 }
             }
 
-            if ($counter != $totalCount && $level > 1) {
-                $stringState .= ', '.$linebreak;
+            if ($counter != $totalCount) {
+                $stringState .= ',';
+            }
+
+
+            if ($level > 1 || $elementLineBreak) {
+                $stringState .= $linebreak;
             }
 
             ++$counter;
         }
 
-        if (!empty($close)) {
-            $stringState .= $close;
-            $stringState .= $linebreak;
-        }
+        $stringState = rtrim($stringState, ",".$linebreak);
+        $stringState .= $linebreak;
 
         return $stringState;
     }
@@ -276,9 +295,10 @@ class Tools
         foreach ($relModels as $relM) :
             if (is_string($relM)):
 
-                $relatedModels[] = $relM; elseif ($relM instanceof Model):
+                $relatedModels[] = $relM;
+            elseif ($relM instanceof Model):
                 $relatedModels[] = $relM->getMeta()->getNamespacedModelName();
-        endif;
+            endif;
         endforeach;
 
         $kwargs['scopeModel'] = $scopeModel;
@@ -288,7 +308,8 @@ class Tools
     public static function resolveRelation($model, $relModel)
     {
         if (is_string($relModel) && BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $relModel):
-            return self::resolveRelation($model, $model); elseif ($relModel instanceof Model):
+            return self::resolveRelation($model, $model);
+        elseif ($relModel instanceof Model):
             return $relModel->getMeta()->getNamespacedModelName();
         endif;
 
@@ -336,9 +357,9 @@ class Tools
         if (!is_array($fields)):
             if (is_null($messg)):
                 $messg = sprintf("method '%s()' expects parameters to be an array", __FUNCTION__);
-        endif;
+            endif;
 
-        throw new InvalidArgumentException($messg);
+            throw new InvalidArgumentException($messg);
         endif;
     }
 }

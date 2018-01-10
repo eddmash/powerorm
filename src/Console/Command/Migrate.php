@@ -75,7 +75,8 @@ class Migrate extends BaseCommand
         $name = $input->getArgument('migration_name');
 
         if ($input->getOption('fake')):
-            $fake = true; else:
+            $fake = true;
+        else:
             $fake = false;
         endif;
 
@@ -87,7 +88,8 @@ class Migrate extends BaseCommand
         // target migrations to act on
         if ($appLabel && $name):
             if ('zero' == $name):
-                $targets[$appLabel] = $name; else:
+                $targets[$appLabel] = $name;
+            else:
                 try {
                     $migration = $executor->loader->getMigrationByPrefix(
                         $appLabel,
@@ -112,29 +114,31 @@ class Migrate extends BaseCommand
                         )
                     );
                 }
-        $targets[$migration->getAppLabel()] = $migration->getName();
-        endif; elseif ($appLabel):
+                $targets[$migration->getAppLabel()] = $migration->getName();
+            endif;
+        elseif ($appLabel):
             $migratedApps = $executor->loader->getMigratedApps();
 
-        if (!in_array($appLabel, $migratedApps)):
+            if (!in_array($appLabel, $migratedApps)):
                 throw new CommandError(
                     sprintf(
                         "App '%s' does not have migrations.",
                         $appLabel
                     )
                 );
-        endif;
-        $leaves = $executor->loader->graph->getLeafNodes();
-        foreach ($leaves as $app => $appLeaves) :
+            endif;
+            $leaves = $executor->loader->graph->getLeafNodes();
+            foreach ($leaves as $app => $appLeaves) :
                 if ($appLabel == $app):
                     $targets[$app] = $appLeaves[0];
-        break;
-        endif;
-        endforeach; else:
+                    break;
+                endif;
+            endforeach;
+        else:
             $leaves = $executor->loader->graph->getLeafNodes();
-        foreach ($leaves as $app => $appLeaves) :
+            foreach ($leaves as $app => $appLeaves) :
                 $targets[$app] = $appLeaves[0];
-        endforeach;
+            endforeach;
         endif;
 
         // get migration plan
@@ -147,28 +151,29 @@ class Migrate extends BaseCommand
         if (empty($plan)):
             $output->writeln('  No migrations to apply.');
 
-        //detect if we need to make migrations
-        $auto_detector = new AutoDetector(
+            //detect if we need to make migrations
+            $auto_detector = new AutoDetector(
                 $executor->loader->getProjectState(),
                 ProjectState::fromApps($registry),
                 NonInteractiveAsker::createObject($input, $output)
             );
 
-        $changes = $auto_detector->getChanges($executor->loader->graph);
+            $changes = $auto_detector->getChanges($executor->loader->graph);
 
-        if (!empty($changes)):
+            if (!empty($changes)):
 
                 $output->writeln(
                     '<warning>  Your models have changes that are not yet reflected '.
                     "in a migration, and so won't be applied.</warning>"
                 );
 
-        $output->writeln(
+                $output->writeln(
                     "<warning>  Run 'php pmanager.php makemigrations' to make new ".
                     "migrations, and then re-run 'php pmanager.php migrate' to apply them.</warning>"
                 );
 
-        endif; else:
+            endif;
+        else:
             // migrate
             $executor->migrate($targets, $plan, $fake);
 

@@ -59,7 +59,7 @@ class Registry extends BaseObject
     {
         if (false == $this->ready) :
             $this->hydrateRegistry();
-        $this->ready = true;
+            $this->ready = true;
         endif;
 
         return;
@@ -95,8 +95,8 @@ class Registry extends BaseObject
 
             if ($component instanceof AppInterface):
                 $fileHandler = new FileHandler($component->getModelsPath());
-        $files[$component->getName()] = $fileHandler->readDir('php');
-        endif;
+                $files[$component->getName()] = $fileHandler->readDir('php');
+            endif;
 
         endforeach;
 
@@ -123,8 +123,8 @@ class Registry extends BaseObject
         foreach ($this->allModels as $name => $model) :
             if ($model->getMeta()->autoCreated):
                 continue;
-        endif;
-        $models[$name] = $model;
+            endif;
+            $models[$name] = $model;
         endforeach;
 
         return $models;
@@ -156,24 +156,29 @@ class Registry extends BaseObject
 
                     $reflect = new \ReflectionClass($class);
 
-        // if we cannot create an instance of a class just skip,
-        // e.g traits abstrat etc
 
-        if (!$reflect->isInstantiable()) :
+                    // if we cannot create an instance of a class just skip,
+                    // e.g traits abstrat etc
+
+                    if (!$reflect->isInstantiable()) :
                         continue;
-        endif;
+                    endif;
 
-        if ($this->hasModel($class)):
+                    if ($this->hasModel($class) ||
+                        !$reflect->isSubclassOf(Model::class)):
                         continue;
-        endif;
+                    endif;
 
-        $obj = new $class();
-        $obj->setupClassInfo(
+
+                    $obj = new $class();
+
+
+                    $obj->setupClassInfo(
                         null,
                         ['meta' => ['appName' => $appName]]
                     );
-        endforeach;
-        endforeach;
+                endforeach;
+            endforeach;
         endif;
     }
 
@@ -229,13 +234,13 @@ class Registry extends BaseObject
             foreach ($files as $file) :
                 $className = ClassHelper::getClassFromFile($file);
 
-        if (!class_exists($className)):
+                if (!class_exists($className)):
                     throw new ClassNotFoundException(
                         sprintf('The class [ %s ] could not be located', $className)
                     );
-        endif;
-        $models[$appName][] = $className;
-        endforeach;
+                endif;
+                $models[$appName][] = $className;
+            endforeach;
         endforeach;
 
         return $models;
@@ -315,6 +320,6 @@ class Registry extends BaseObject
 
     public function __toString()
     {
-        return (string) sprintf('%s Object', $this->getFullClassName());
+        return (string)sprintf('%s Object', $this->getFullClassName());
     }
 }

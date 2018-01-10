@@ -50,13 +50,14 @@ class RelatedMappers
         if (!$fromParent):
 
             $this->colStart = reset($selectFields);
-        $this->colsEnd = count($selectFields);
+            $this->colsEnd = count($selectFields);
 
-        /* @var $col Col */
-        foreach (array_slice($select, $this->colStart, $this->colsEnd) as $colInfo) :
+            /* @var $col Col */
+            foreach (array_slice($select, $this->colStart, $this->colsEnd) as $colInfo) :
                 $col = $colInfo[0];
-        $this->initList[] = $col->getTargetField()->getAttrName();
-        endforeach; else:
+                $this->initList[] = $col->getTargetField()->getAttrName();
+            endforeach;
+        else:
             // todo map from parent fields
         endif;
 
@@ -66,11 +67,12 @@ class RelatedMappers
         $reverse = ArrayHelper::getValue($klassInfo, 'reverse');
         if ($reverse):
             $this->cacheName = $field->relation->getCacheName();
-        $this->reverseCacheName = $field->getCacheName(); else:
+            $this->reverseCacheName = $field->getCacheName();
+        else:
             $this->cacheName = $field->getCacheName();
-        if ($field->isUnique()):
+            if ($field->isUnique()):
                 $this->reverseCacheName = $field->relation->getCacheName();
-        endif;
+            endif;
         endif;
     }
 
@@ -85,7 +87,7 @@ class RelatedMappers
         if ($relObj && $this->relatedPopulators):
             foreach ($this->relatedPopulators as $relatedPopulator) :
                 $relatedPopulator->populate($row, $relObj);
-        endforeach;
+            endforeach;
         endif;
 
         // set on the original model

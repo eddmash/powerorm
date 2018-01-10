@@ -87,9 +87,9 @@ class MigrationFile
         foreach ($this->migration->getOperations() as $op) :
             list($opString, $importString) = FormatFileContent::formatObject($op);
 
-        array_push($stringedOperations, $opString);
+            array_push($stringedOperations, $opString);
 
-        $imports = array_merge($imports, $importString);
+            $imports = array_merge($imports, $importString);
         endforeach;
 
         $imports = array_unique($imports);
@@ -98,7 +98,7 @@ class MigrationFile
 
         foreach ($imports as $import) :
             $import = sprintf('use %s;', $import);
-        $importPaths .= $import.PHP_EOL;
+            $importPaths .= $import.PHP_EOL;
         endforeach;
 
         $opContent = '['.PHP_EOL;
@@ -108,8 +108,6 @@ class MigrationFile
         $opContent .= "\t\t]";
 
         $dependencies = $this->migration->getDependency();
-
-        $indent = (count($dependencies) <= 1) ? false : 3;
 
         $namespace = sprintf(
             "%s\Migrations",
@@ -125,7 +123,16 @@ class MigrationFile
             $namespace,
             $importPaths,
             $this->migration->getName(),
-            Tools::stringify($dependencies, $indent),
+            "\n".rtrim(
+                Tools::stringify(
+                    $dependencies,
+                    3,
+                    0,
+                    true,
+                    false
+                ),
+                PHP_EOL
+            ),
             $opContent
         );
     }
@@ -163,7 +170,11 @@ class MigrationFile
         $content->addItem('public function getDependency(){');
 
         $content->addIndent();
-        $content->addItem('return %s;');
+        $content->addItem('return [');
+
+        $content->addItem('%s');
+
+        $content->addItem('];');
         $content->reduceIndent();
 
         $content->addItem('}'.PHP_EOL);

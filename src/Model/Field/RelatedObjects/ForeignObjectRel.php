@@ -157,7 +157,7 @@ class ForeignObjectRel extends BaseObject
      *
      * @return string
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -204,8 +204,8 @@ class ForeignObjectRel extends BaseObject
         return !empty($this->relatedName) && '+' === substr($this->relatedName, -1);
     }
 
-//    public function __toString()
-//    {
-//        return sprintf('<%s %s>', static::class, $this->toModel->getMeta()->modelName);
-//    }
+    //    public function __toString()
+    //    {
+    //        return sprintf('<%s %s>', static::class, $this->toModel->getMeta()->modelName);
+    //    }
 }

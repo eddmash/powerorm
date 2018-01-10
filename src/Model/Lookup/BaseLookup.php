@@ -20,7 +20,7 @@ use Eddmash\PowerOrm\Model\Query\Expression\Col;
 /**
  * Class Filter.
  *
- * @since 1.1.0
+ * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
@@ -44,7 +44,7 @@ abstract class BaseLookup implements LookupInterface
     protected $lhs;
     protected $rhsValueIsIterable = false;
 
-    /**@inheritdoc*/
+    /**@inheritdoc */
     public function __construct($lhs, $rhs)
     {
         $this->rhs = $rhs;
@@ -59,7 +59,7 @@ abstract class BaseLookup implements LookupInterface
     }
 
     /**
-     * @param $value
+     * @param                $value
      * @param BaseExpression $lhs
      *
      * @return mixed
@@ -67,7 +67,7 @@ abstract class BaseLookup implements LookupInterface
      * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
      * @throws \Eddmash\PowerOrm\Exception\FieldError
      *
-     * @since 1.1.0
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
@@ -75,22 +75,22 @@ abstract class BaseLookup implements LookupInterface
     {
         if ($value instanceof Model):
             $path = $lhs->getOutputField()->getPathInfo();
-        $sources = end($path)['targetFields'];
+            $sources = end($path)['targetFields'];
 
-        /** @var $source Field */
-        foreach ($sources as $source) :
+            /** @var $source Field */
+            foreach ($sources as $source) :
 
                 while (!$value instanceof $source->scopeModel && $source->relation):
                     $name = $source->relation->getName();
-        $source = $source->relation->getFromModel()->getMeta()->getField($name);
-        endwhile;
+                    $source = $source->relation->getFromModel()->getMeta()->getField($name);
+                endwhile;
 
-        try {
-            return $value->{$source->getAttrName()};
-        } catch (AttributeError $attributeError) {
-            return $value->pk;
-        }
-        endforeach;
+                try {
+                    return $value->{$source->getAttrName()};
+                } catch (AttributeError $attributeError) {
+                    return $value->pk;
+                }
+            endforeach;
         endif;
 
         return $value;
@@ -116,22 +116,23 @@ abstract class BaseLookup implements LookupInterface
         if ($this->rhsValueIsIterable) :
 
             $preparedValues = [];
-        foreach ($this->rhs as $rh) :
+            foreach ($this->rhs as $rh) :
                 if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
 
                     $preparedValues[] = $this->lhs->getOutputField()->prepareValue($rh);
-        endif;
-        endforeach;
+                endif;
+            endforeach;
 
-        return $preparedValues; else:
+            return $preparedValues;
+        else:
             $this->rhs = static::getNomalizedValue($value, $this->lhs);
-        if (method_exists($this->rhs, '_prepare')):
+            if (method_exists($this->rhs, '_prepare')):
                 return $this->rhs->_prepare($this->lhs->getOutputField());
-        endif;
+            endif;
 
-        if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
+            if ($this->prepareRhs && method_exists($this->lhs->getOutputField(), 'prepareValue')):
                 return $this->lhs->getOutputField()->prepareValue($this->rhs);
-        endif;
+            endif;
         endif;
 
         // it might be, this is just a pure php value
@@ -152,14 +153,15 @@ abstract class BaseLookup implements LookupInterface
 
             foreach ($values as $value) :
                 $preparedValues[] = $this->lhs->getOutputField()->convertToDatabaseValue($value, $connection);
-        endforeach; else:
+            endforeach;
+        else:
             $preparedValues[] = $this->lhs->getOutputField()->convertToDatabaseValue($values, $connection);
         endif;
 
         return $preparedValues;
     }
 
-    /**@inheritdoc*/
+    /**@inheritdoc */
     public function processRHS(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         $value = $this->rhs;
@@ -170,13 +172,13 @@ abstract class BaseLookup implements LookupInterface
         if (method_exists($value, 'asSql')):
             list($sql, $params) = $compiler->compile($value);
 
-        return [sprintf('( %s )', $sql), $params];
+            return [sprintf('( %s )', $sql), $params];
         endif;
 
         return ['?', $this->prepareLookupForDb($this->rhs, $connection)];
     }
 
-    /**@inheritdoc*/
+    /**@inheritdoc */
     public function getLookupOperation($rhs)
     {
         if ($this->operator):
@@ -187,7 +189,7 @@ abstract class BaseLookup implements LookupInterface
         throw new NotImplemented('The no operator was given for the lookup');
     }
 
-    /**@inheritdoc*/
+    /**@inheritdoc */
     public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         list($lhs_sql, $params) = $this->processLHS($compiler, $connection);
