@@ -50,7 +50,7 @@ class ProjectState extends DeconstructableObject
      *
      * @throws \Eddmash\PowerOrm\Exception\TypeError
      */
-    public static function fromApps($registry)
+    public static function currentAppsState($registry)
     {
         $modelStates = [];
 

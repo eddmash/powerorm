@@ -18,8 +18,7 @@ use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\SqlCompilableinterface;
 
-abstract class BaseExpression extends Combinable
-    implements ResolvableExpInterface, SortableInterface, SqlCompilableinterface
+abstract class BaseExpression extends Combinable implements ResolvableExpInterface, SortableInterface, SqlCompilableinterface
 {
     /**
      * @var Field

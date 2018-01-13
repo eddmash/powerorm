@@ -177,6 +177,6 @@ class StringHelper
             return preg_split($pattern, $string);
         endif;
 
-        return (array)$string;
+        return (array) $string;
     }
 }

@@ -233,7 +233,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      */
     private function buildCondition($lookup, $lhs, $rhs)
     {
-        $lookup = (array)$lookup;
+        $lookup = (array) $lookup;
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
         $lookup = $lookup::createObject($lhs, $rhs);
@@ -508,7 +508,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                     sprintf(
                         'Invalid lookup "%s" for model %s".',
                         $name,
-                        $this->getMeta()->getNamespacedModelName()
+                        $this->getMeta()->getNSModelName()
                     )
                 );
             endif;
@@ -606,7 +606,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                     throw new FieldError(
                         sprintf(
                             "Cannot resolve keyword '%s.%s' into field. Choices are: [ %s ]",
-                            $meta->getNamespacedModelName(),
+                            $meta->getNSModelName(),
                             $name,
                             implode(', ', $available)
                         )

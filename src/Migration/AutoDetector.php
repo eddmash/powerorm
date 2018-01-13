@@ -318,7 +318,7 @@ class AutoDetector extends BaseObject
     /**
      * @param Operation  $operation
      * @param array      $dependencies
-     * @param bool|false $pushToTop some operations should come before others, use this determine which
+     * @param bool|false $pushToTop    some operations should come before others, use this determine which
      *
      * @since  1.1.0
      *
@@ -562,7 +562,7 @@ class AutoDetector extends BaseObject
     {
         $name = explode('_', $name);
 
-        return (int)str_replace($this->migrationNamePrefix, '', $name[0]);
+        return (int) str_replace($this->migrationNamePrefix, '', $name[0]);
     }
 
     private function getOldModelName($modelName)
@@ -693,7 +693,7 @@ class AutoDetector extends BaseObject
             // depend on related model being created if primary key is a relationship field
             if (null !== $primaryKeyRel):
                 $opDep[] = [
-                    'target' => $primaryKeyRel->getMeta()->getNamespacedModelName(),
+                    'target' => $primaryKeyRel->getMeta()->getNSModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];
@@ -744,7 +744,7 @@ class AutoDetector extends BaseObject
 
                 // depend on the related model also
                 $opDep[] = [
-                    'target' => $relationField->relation->toModel->getMeta()->getNamespacedModelName(),
+                    'target' => $relationField->relation->toModel->getMeta()->getNSModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];
@@ -757,7 +757,7 @@ class AutoDetector extends BaseObject
                 ):
 
                     $opDep[] = [
-                        'target' => $relationField->relation->through->getMeta()->getNamespacedModelName(),
+                        'target' => $relationField->relation->through->getMeta()->getNSModelName(),
                         'type' => self::TYPE_MODEL,
                         'action' => self::ACTION_CREATED,
                     ];
@@ -869,7 +869,7 @@ class AutoDetector extends BaseObject
             /** @var $reverseRelatedField RelatedField */
             foreach ($reverseRelatedFields as $reverseRelatedField) :
                 $modelName = $reverseRelatedField
-                    ->relation->toModel->getMeta()->getNamespacedModelName();
+                    ->relation->toModel->getMeta()->getNSModelName();
                 $fieldName = $reverseRelatedField->relation->fromField->getName();
                 $opDep[] = [
                     'target' => $fieldName,
@@ -1390,7 +1390,7 @@ class AutoDetector extends BaseObject
 
             // depend on related model being created
             $opDep[] = [
-                'target' => $field->relation->toModel->getMeta()->getNamespacedModelName(),
+                'target' => $field->relation->toModel->getMeta()->getNSModelName(),
                 'type' => self::TYPE_MODEL,
                 'action' => self::ACTION_CREATED,
             ];
@@ -1402,7 +1402,7 @@ class AutoDetector extends BaseObject
             ):
 
                 $opDep[] = [
-                    'target' => $field->relation->through->getMeta()->getNamespacedModelName(),
+                    'target' => $field->relation->through->getMeta()->getNSModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];

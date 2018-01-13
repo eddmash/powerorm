@@ -29,6 +29,7 @@ interface ResolvableExpInterface
      * @return
      *
      * @internal param null $query
+     *
      * @author   : Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function resolveExpression(

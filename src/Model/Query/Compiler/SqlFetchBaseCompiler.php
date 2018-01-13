@@ -271,13 +271,13 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         foreach ($meta->getConcreteFields() as $field) :
             $model = $field->scopeModel->getMeta()->concreteModel;
-            if ($meta->getNamespacedModelName() == $model->getMeta()->getNamespacedModelName()):
+            if ($meta->getNSModelName() == $model->getMeta()->getNSModelName()):
                 $model = null;
             endif;
             if ($fromParent && !is_null($model) &&
                 is_subclass_of(
                     $fromParent->getMeta()->concreteModel,
-                    $model->getMeta()->concreteModel->getMeta()->getNamespacedModelName()
+                    $model->getMeta()->concreteModel->getMeta()->getNSModelName()
                 )
             ):
                 // Avoid loading data for already loaded parents.
@@ -436,8 +436,8 @@ class SqlFetchBaseCompiler extends SqlCompiler
                 $alias = end($joinList);
                 $fromParent = false;
                 if (
-                    is_subclass_of($rModel, $meta->getNamespacedModelName()) &&
-                    $rModel->getMeta()->getNamespacedModelName() === $meta->getNamespacedModelName()
+                    is_subclass_of($rModel, $meta->getNSModelName()) &&
+                    $rModel->getMeta()->getNSModelName() === $meta->getNSModelName()
                 ):
                     $fromParent = true;
                 endif;

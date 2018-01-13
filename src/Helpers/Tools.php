@@ -45,7 +45,7 @@ class Tools
         $outerBrackets = true,
         $indentChar = null
     ) {
-        $indentCharacter = str_pad("", 4, " ");
+        $indentCharacter = str_pad('', 4, ' ');
         if ($indentChar):
             $indentCharacter = $indentChar;
         endif;
@@ -63,11 +63,10 @@ class Tools
 
         // unify everything to an array, on the first round for consistencies.
         if (0 == $level) {
-            $data = ($outerBrackets) ? [$data] : (array)$data;
+            $data = ($outerBrackets) ? [$data] : (array) $data;
         }
 
         foreach ($data as $key => $value) {
-
             $indentation = str_repeat($indentCharacter, $indent);
             $stringState .= $indentation;
 
@@ -93,7 +92,7 @@ class Tools
                 $multiplier = ($indent) ? $indent - 1 : 0;
                 $stringState .= (false !== $indent) ?
                     str_repeat($indentCharacter, $multiplier) : '';
-                //
+
                 $stringState .= $indentation.']';
             } elseif (is_object($value)) {
                 // HANDLE VALUE THAT ARE OBJECTS THAT
@@ -139,7 +138,6 @@ class Tools
                 $stringState .= ',';
             }
 
-
             if ($level > 1 || $elementLineBreak) {
                 $stringState .= $linebreak;
             }
@@ -147,7 +145,7 @@ class Tools
             ++$counter;
         }
 
-        $stringState = rtrim($stringState, ",".$linebreak);
+        $stringState = rtrim($stringState, ','.$linebreak);
         $stringState .= $linebreak;
 
         return $stringState;
@@ -276,7 +274,8 @@ class Tools
      * Schedule `callback` to be called once `model` and all `related_models` have been imported and registered with
      * the app registry.
      *
-     * @param callback $callback   will be called with the newly-loaded model classes as its any optional keyword arguments
+     * @param callback $callback   will be called with the newly-loaded model
+     *                             classes as its optional keyword arguments
      * @param Model    $scopeModel the model on which the method was invoked
      * @param mixed    $relModel   the related models that needs to be resolved
      * @param array    $kwargs
@@ -284,33 +283,51 @@ class Tools
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
      */
-    public static function lazyRelatedOperation($callback, Model $scopeModel, $relModel, $kwargs = [])
-    {
+    public static function lazyRelatedOperation(
+        $callback,
+        Model $scopeModel,
+        $relModel,
+        $kwargs = []
+    ) {
         $relModel = self::resolveRelation($scopeModel, $relModel);
 
-        $relModels = (is_array($relModel)) ? $relModel : [$relModel];
+        $relModels = (array) $relModel;
 
-        $relatedModels = [];
+        $modelsToResolve = [];
         foreach ($relModels as $relM) :
             if (is_string($relM)):
 
-                $relatedModels[] = $relM;
+                $modelsToResolve[] = $relM;
             elseif ($relM instanceof Model):
-                $relatedModels[] = $relM->getMeta()->getNamespacedModelName();
+                $modelsToResolve[] = $relM->getMeta()->getNSModelName();
             endif;
         endforeach;
 
         $kwargs['scopeModel'] = $scopeModel;
-        $scopeModel->getMeta()->registry->lazyModelOps($callback, $relatedModels, $kwargs);
+        $scopeModel->getMeta()->getRegistry()
+            ->lazyModelOps($callback, $modelsToResolve, $kwargs);
     }
 
+    /**
+     * Resolve the model name incase is self-referencing model.
+     *
+     * @param $model
+     * @param $relModel
+     *
+     * @return mixed
+     *
+     * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
+     */
     public static function resolveRelation($model, $relModel)
     {
-        if (is_string($relModel) && BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $relModel):
+        if (is_string($relModel) &&
+            BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $relModel):
             return self::resolveRelation($model, $model);
         elseif ($relModel instanceof Model):
-            return $relModel->getMeta()->getNamespacedModelName();
+            return $relModel->getMeta()->getNSModelName();
         endif;
 
         return $relModel;

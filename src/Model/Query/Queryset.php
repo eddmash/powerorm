@@ -153,10 +153,9 @@ class Queryset implements QuerysetInterface
 
     /**
      * @return mixed
-     * @throws InvalidArgumentException
+     *
      * @throws MultipleObjectsReturned
      * @throws ObjectDoesNotExist
-     * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
      */
     public function get()
     {
@@ -173,7 +172,7 @@ class Queryset implements QuerysetInterface
             throw new ObjectDoesNotExist(
                 sprintf(
                     '%s matching query does not exist.',
-                    $this->model->getMeta()->getNamespacedModelName()
+                    $this->model->getMeta()->getNSModelName()
                 )
             );
         endif;
@@ -181,7 +180,7 @@ class Queryset implements QuerysetInterface
         throw new MultipleObjectsReturned(
             sprintf(
                 '"get() returned more than one %s -- it returned %s!"',
-                $this->model->getMeta()->getNamespacedModelName(),
+                $this->model->getMeta()->getNSModelName(),
                 $resultCount
             )
         );
@@ -364,7 +363,7 @@ class Queryset implements QuerysetInterface
             return $instance->query->hasResults($this->connection);
         endif;
 
-        return (bool)$this->_resultsCache;
+        return (bool) $this->_resultsCache;
     }
 
     /**
@@ -436,7 +435,10 @@ class Queryset implements QuerysetInterface
 
         /** @var $field Field */
         foreach ($fields as $name => $field) :
-            $value = $this->prepareValueForDatabaseSave($field, $field->preSave($model, true));
+            $value = $this->prepareValueForDatabaseSave(
+                $field,
+                $field->preSave($model, true)
+            );
 
             $qb->setValue($field->getColumnName(), $qb->createNamedParameter($value));
         endforeach;
@@ -580,7 +582,8 @@ class Queryset implements QuerysetInterface
      * @param array $fields     the fields to select, if null all fields in the model are selected
      * @param bool  $valuesOnly if true return
      * @param bool  $flat       if true returns the results as one array others it returns
-     *                          results as array of arrays each which represents a record in the database for the selected field.
+     *                          results as array of arrays each which represents a record in the database for the
+     *                          selected field.
      *                          (only works when valueOnly is true)
      *
      * @return Queryset

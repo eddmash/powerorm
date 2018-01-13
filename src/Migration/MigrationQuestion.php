@@ -86,7 +86,7 @@ class MigrationQuestion
 
         $msg .= 'Select an option: ';
 
-        $selected = (int)$asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
+        $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if (2 == $selected):
             return;
@@ -125,7 +125,7 @@ class MigrationQuestion
 
         $msg .= 'Select an option:';
 
-        $selected = (int)$asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
+        $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if (2 == $selected):
             return NOT_PROVIDED;

@@ -109,7 +109,7 @@ class ManyToManyField extends RelatedField
     {
         $hasMany = HasManyField::createObject(
             [
-                'to' => $this->scopeModel->getMeta()->getNamespacedModelName(),
+                'to' => $this->scopeModel->getMeta()->getNSModelName(),
                 'toField' => $relation->fromField->getName(),
                 'fromField' => $this,
                 'autoCreated' => true,
@@ -140,7 +140,7 @@ class ManyToManyField extends RelatedField
      */
     public function createManyToManyIntermediaryModel($field, $model)
     {
-        $modelName = $model->getMeta()->getNamespacedModelName();
+        $modelName = $model->getMeta()->getNSModelName();
 
         if (is_string($field->relation->toModel)):
             $toModelName = Tools::resolveRelation($model, $field->relation->toModel);
@@ -149,10 +149,15 @@ class ManyToManyField extends RelatedField
             $toNamespacedModelName = $ref->getName();
         else:
             $toModelName = $field->relation->toModel->getMeta()->getModelName();
-            $toNamespacedModelName = $field->relation->toModel->getMeta()->getNamespacedModelName();
+            $toNamespacedModelName = $field->relation->toModel
+                ->getMeta()->getNSModelName();
         endif;
 
-        $className = sprintf('%1$s_%2$s', $model->getMeta()->getModelName(), $field->getName());
+        $className = sprintf(
+            '%1$s_%2$s',
+            $model->getMeta()->getModelName(),
+            $field->getName()
+        );
         $from = strtolower($model->getMeta()->getModelName());
         $to = strtolower($toModelName);
         if ($from == $to):
@@ -232,11 +237,14 @@ class ManyToManyField extends RelatedField
     {
         if (null !== $this->relation->through):
             return $this->relation->through->getMeta()->getDbTable();
-        elseif ($this->getDbTable()):
-            return $this->getDbTable();
+        elseif ($this->dbTable):
+            return $this->dbTable;
         else:
             // oracle allows identifier of 30 chars max
-            return StringHelper::truncate(sprintf('%s_%s', $meta->getDbTable(), $this->getName()), 30);
+            return StringHelper::truncate(
+                sprintf('%s_%s', $meta->getDbTable(), $this->getName()),
+                30
+            );
         endif;
     }
 
@@ -289,9 +297,9 @@ class ManyToManyField extends RelatedField
         /** @var $field RelatedField */
         foreach ($this->relation->through->getMeta()->getFields() as $field) :
             if ($field->isRelation &&
-                $field->relation->toModel->getMeta()->getNamespacedModelName() == $relation->getFromModel()
-                    ->getMeta()
-                    ->getNamespacedModelName() &&
+                $field->relation->toModel->getMeta()->getNSModelName() == $relation->getFromModel()
+                                                                                   ->getMeta()
+                                                                                   ->getNSModelName() &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
 
@@ -324,8 +332,8 @@ class ManyToManyField extends RelatedField
         /** @var $field RelatedField */
         foreach ($this->relation->through->getMeta()->getFields() as $field) :
             if ($field->isRelation &&
-                $field->relation->toModel->getMeta()->getNamespacedModelName() == $relation->toModel->getMeta()
-                    ->getNamespacedModelName() &&
+                $field->relation->toModel->getMeta()->getNSModelName() == $relation->toModel->getMeta()
+                                                                                            ->getNSModelName() &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
                 $this->{$cache_attr} = ('name' == $attr) ? call_user_func([$field, 'getName']) : $field->{$attr};

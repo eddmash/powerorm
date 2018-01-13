@@ -16,7 +16,7 @@ use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Eddmash\PhpGis\Db\Backends\Features\BaseFeatures;
 use Eddmash\PhpGis\Db\Backends\Operations\OperationsInterface;
 
-interface ConnectionInterface
+interface ConnectionInterface extends \Doctrine\DBAL\Driver\Connection
 {
     /**
      * Gets the parameters used during instantiation.

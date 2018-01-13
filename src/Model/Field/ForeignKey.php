@@ -193,6 +193,9 @@ class ForeignKey extends RelatedField
             return;
         endif;
 
-        return $this->getRelatedField()->prepareValueBeforeSave($value, $connection, false);
+        return $this->getRelatedField()->prepareValueBeforeSave(
+            $value,
+            $connection
+        );
     }
 }

@@ -88,7 +88,6 @@ class Executor extends BaseObject
             $applied = $this->loader->appliedMigrations;
         endif;
         /** @var $target ["appName"=> "migrationName"] */
-
         foreach ($targets as $appName => $target) :
             // if target is 'zero' unmigrate all
             if ('zero' == $target):

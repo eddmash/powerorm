@@ -154,7 +154,7 @@ class Migrate extends BaseCommand
             //detect if we need to make migrations
             $auto_detector = new AutoDetector(
                 $executor->loader->getProjectState(),
-                ProjectState::fromApps($registry),
+                ProjectState::currentAppsState($registry),
                 NonInteractiveAsker::createObject($input, $output)
             );
 

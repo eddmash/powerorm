@@ -140,7 +140,7 @@ class CreateModel extends ModelOperation
                 if ($operation->field->relation) :
                     foreach ($inBetween as $between) :
                         $modelName = $operation->field->relation
-                            ->toModel->getMeta()->getNamespacedModelName();
+                            ->toModel->getMeta()->getNSModelName();
                         if ($between->referencesModel($modelName)) :
                             return false;
                         endif;
@@ -150,7 +150,7 @@ class CreateModel extends ModelOperation
                             $operation->field->relation->through
                         ) :
                             $modelName = $operation->field->relation
-                                ->through->getMeta()->getNamespacedModelName();
+                                ->through->getMeta()->getNSModelName();
                             if ($between->referencesModel($modelName)) :
                                 return false;
                             endif;

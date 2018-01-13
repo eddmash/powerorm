@@ -46,6 +46,7 @@ class ReverseManyToOneDescriptor extends BaseDescriptor
      * @internal param $modelName
      *
      * @return Queryset
+     *
      * @author   : Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function queryset($modelInstance, $reverse = true)

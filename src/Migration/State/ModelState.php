@@ -76,7 +76,7 @@ class ModelState extends BaseObject
                     sprintf(
                         "Couldn't reconstruct field %s on %s: %s",
                         $name,
-                        $model->getMeta()->getNamespacedModelName()
+                        $model->getMeta()->getNSModelName()
                     )
                 );
             }
@@ -91,7 +91,7 @@ class ModelState extends BaseObject
                         sprintf(
                             "Couldn't reconstruct field %s on %s: %s",
                             $name,
-                            $model->getMeta()->getNamespacedModelName()
+                            $model->getMeta()->getNSModelName()
                         )
                     );
                 }
@@ -118,7 +118,7 @@ class ModelState extends BaseObject
             'extends' => $extends,
         ];
 
-        return new static($model->getMeta()->getNamespacedModelName(), $fields, $kwargs);
+        return new static($model->getMeta()->getNSModelName(), $fields, $kwargs);
     }
 
     /**
@@ -127,6 +127,11 @@ class ModelState extends BaseObject
      * @param Registry $registry
      *
      * @return Model
+     *
+     * @throws TypeError
+     * @throws \Eddmash\PowerOrm\Exception\FieldError
+     * @throws \Eddmash\PowerOrm\Exception\LookupError
+     * @throws \Eddmash\PowerOrm\Exception\MethodNotExtendableException
      *
      * @since  1.1.0
      *
@@ -138,11 +143,16 @@ class ModelState extends BaseObject
         //        var_dump($this);
         $extends = $this->extends;
 
-        $model = $this->createInstance($this->name, $extends);
+        $model = $this->createInstance(
+            sprintf('%s', $this->name),
+            $extends
+        );
+
         $fields = [];
         foreach ($this->fields as $name => $field) :
             $fields[$name] = $field->deepClone();
         endforeach;
+
         $model->setupClassInfo($fields, ['meta' => $metaData, 'registry' => $registry]);
 
         return $model;
@@ -204,7 +214,7 @@ class ModelState extends BaseObject
 
     public function __toString()
     {
-        return (string)sprintf("<ModelState: '%s'>", $this->name);
+        return (string) sprintf("<ModelState: '%s'>", $this->name);
     }
 
     public function &getMeta()

@@ -55,6 +55,7 @@ class OneToManyDescriptor extends BaseDescriptor
      * @internal param $modelName
      *
      * @return O2MManager
+     *
      * @author   : Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function queryset($modelInstance, $reverse = false)

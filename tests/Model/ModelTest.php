@@ -45,11 +45,12 @@ class ModelTest extends PHPUnit_Framework_TestCase
     public function testConcreteHierachyMeta()
     {
         $proxy = new ConcreteModel();
-        list($concreteParentName, $immediateParent, $parentIsAbstract, $classFields) = Model::getHierarchyMeta($proxy);
+        /** @var $immediateParent ReflectionObject */
+        list($concreteParentName, $immediateParent, $classFields) = Model::getHierarchyMeta($proxy);
 
         $this->assertEquals(ConcreteModel::class, $concreteParentName);
-        $this->assertEquals(AbstractModel::class, $immediateParent);
-        $this->assertEquals(true, $parentIsAbstract);
+        $this->assertEquals(AbstractModel::class, $immediateParent->getName());
+        $this->assertEquals(true, $immediateParent->isAbstract());
 
         $fields = [
             'country',
@@ -61,22 +62,24 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     public function testProxyHasDirectConcreteBaseHierachyMeta()
     {
+        /** @var $immediateParent ReflectionObject */
         $proxy = new DirectConcreateBaseProxy();
-        list($concreteParentName, $immediateParent, $parentIsAbstract) = Model::getHierarchyMeta($proxy);
+        list($concreteParentName, $immediateParent) = Model::getHierarchyMeta($proxy);
 
         $this->assertEquals(ConcreteModel::class, $concreteParentName);
-        $this->assertEquals(ConcreteModel::class, $immediateParent);
-        $this->assertEquals(false, $parentIsAbstract);
+        $this->assertEquals(ConcreteModel::class, $immediateParent->getName());
+        $this->assertEquals(false, $immediateParent->isAbstract());
     }
 
     public function testProxyHasInDirectConcreteBaseHierachyMeta()
     {
+        /** @var $immediateParent ReflectionObject */
         $proxy = new InDirectConcreateBaseProxy();
-        list($concreteParentName, $immediateParent, $parentIsAbstract) = Model::getHierarchyMeta($proxy);
+        list($concreteParentName, $immediateParent) = Model::getHierarchyMeta($proxy);
 
         $this->assertEquals(ConcreteModel::class, $concreteParentName);
-        $this->assertEquals(InnerAbstractClass::class, $immediateParent);
-        $this->assertEquals(true, $parentIsAbstract);
+        $this->assertEquals(InnerAbstractClass::class, $immediateParent->getName());
+        $this->assertEquals(true, $immediateParent->isAbstract());
     }
 }
 

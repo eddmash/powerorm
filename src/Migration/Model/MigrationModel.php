@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Migration\Model;
 
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
-use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Model\Model;
 
 class MigrationModel extends Model
@@ -26,29 +25,44 @@ class MigrationModel extends Model
         $extendedClass = '';
 
         list($namespace, $className) = ClassHelper::getNamespaceNamePair($className);
-        if ($namespace):
-            $namespace = sprintf('namespace %s;', $namespace);
-        endif;
+
         if (empty($extends) || Model::isModelBase($extends)):
-            $extends = ClassHelper::getFormatNamespace(Model::getFullClassName(), true, false);
+            $extends = ClassHelper::getFormatNamespace(
+                Model::getFullClassName(),
+                true,
+                false
+            );
         else:
-            $extendedClass = sprintf('%s%s', ClassHelper::getFormatNamespace($namespace, true), $extends);
+            $extendedClass = sprintf(
+                '%s%s',
+                ClassHelper::getFormatNamespace($namespace, true),
+                $extends
+            );
 
             $use = sprintf('use %s;', $extendedClass);
 
-            $extends = trim(substr($extends, strripos($extends, '\\')), '\\');
+            $extends = trim(
+                substr(
+                    $extends,
+                    strripos($extends, '\\')
+                ),
+                '\\'
+            );
         endif;
 
-        if (!StringHelper::isEmpty($extendedClass) && !ClassHelper::classExists($extendedClass, $namespace)):
-
-            self::$deferedClasses[$extends][] = ['class' => $className, 'extends' => $extends];
-
-            return false;
-        endif;
-
-        $class = sprintf(self::getTemplate(), $namespace, $use, $className, $extends);
-
-        $className = sprintf('%s%s', ClassHelper::getFormatNamespace($namespace, true), $className);
+        $class = sprintf(
+            self::getTemplate(),
+            sprintf('namespace %s;', $namespace),
+            $use,
+            $className,
+            $extends
+        );
+        dump($class);
+        $className = sprintf(
+            '%s%s',
+            ClassHelper::getFormatNamespace($namespace, true),
+            $className
+        );
 
         if (ArrayHelper::hasKey(self::$deferedClasses, $className)):
 

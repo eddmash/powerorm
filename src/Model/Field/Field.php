@@ -37,8 +37,7 @@ use Eddmash\PowerOrm\Model\Lookup\RegisterLookupTrait;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 
-class Field extends DeconstructableObject
-    implements FieldInterface, DescriptorInterface
+class Field extends DeconstructableObject implements FieldInterface, DescriptorInterface
 {
     use RegisterLookupTrait;
     use FormFieldReadyTrait;
@@ -283,7 +282,7 @@ class Field extends DeconstructableObject
     /**
      * @param array $config
      *
-     * @return *OgrField
+     * @return Field
      *
      * @since  1.1.0
      *
@@ -556,10 +555,10 @@ class Field extends DeconstructableObject
     {
         try {
             return Type::getType($this->dbType(BaseOrm::getDbConnection()))
-                ->convertToPHPValue(
-                    $value,
-                    BaseOrm::getDbConnection()->getDatabasePlatform()
-                );
+                       ->convertToPHPValue(
+                           $value,
+                           BaseOrm::getDbConnection()->getDatabasePlatform()
+                       );
         } catch (\Exception $exception) {
             throw new ValidationError($exception->getMessage(), 'invalid');
         }
@@ -605,8 +604,8 @@ class Field extends DeconstructableObject
      * The attribute name is in $this->getAttrName() (this is set up by OgrField).
      *
      * @param Model $model
-     * @param bool  $add is whether the instance is being saved to the database
-     *                   for the first time
+     * @param bool  $add   is whether the instance is being saved to the database
+     *                     for the first time
      *
      * @return mixed
      *
@@ -659,6 +658,8 @@ class Field extends DeconstructableObject
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function convertToDatabaseValue($value, $connection, $prepared = false)
     {
@@ -667,10 +668,10 @@ class Field extends DeconstructableObject
         endif;
 
         return Type::getType($this->dbType($connection))
-            ->convertToDatabaseValue(
-                $value,
-                $connection->getDatabasePlatform()
-            );
+                   ->convertToDatabaseValue(
+                       $value,
+                       $connection->getDatabasePlatform()
+                   );
     }
 
     /**
@@ -846,8 +847,10 @@ class Field extends DeconstructableObject
     public function __debugInfo()
     {
         $meta = parent::__debugInfo();
-        $meta['scopeModel'] = $this->scopeModel->getMeta()
-            ->getNamespacedModelName();
+        if ($this->scopeModel):
+            $meta['scopeModel'] = $this->scopeModel->getMeta()
+                                                   ->getNSModelName();
+        endif;
 
         return $meta;
     }

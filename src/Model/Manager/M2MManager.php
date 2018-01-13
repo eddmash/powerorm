@@ -105,7 +105,7 @@ class M2MManager extends BaseM2MManager
             throw new ValueError(
                 sprintf(
                     '"%s" needs to have a value for field "%s" before this many-to-many relationship can be used.',
-                    $this->instance->getMeta()->getNamespacedModelName(),
+                    $this->instance->getMeta()->getNSModelName(),
                     $this->fromFieldName
                 )
             );
@@ -138,7 +138,7 @@ class M2MManager extends BaseM2MManager
                 sprintf(
                     'Cannot use remove() on a ManyToManyField which specifies '.
                     "an intermediary model. Use %s's Manager instead.",
-                    $meta->getNamespacedModelName()
+                    $meta->getNSModelName()
                 )
             );
         endif;
@@ -201,7 +201,7 @@ class M2MManager extends BaseM2MManager
             $newIds = array_unique($newIds);
 
             /** @var $throughClass Model */
-            $throughClass = $this->through->getMeta()->getNamespacedModelName();
+            $throughClass = $this->through->getMeta()->getNSModelName();
 
             $oldVals = $throughClass::objects($this->through)->asArray([$toFieldName], true, true)->filter(
                 [

@@ -80,7 +80,7 @@ class AutoField extends Field
             !$model->getMeta()->hasAutoField,
             sprintf(
                 "The Model '%s' more than one AutoField, which is not allowed.",
-                $this->scopeModel->getMeta()->getNamespacedModelName()
+                $this->scopeModel->getMeta()->getNSModelName()
             )
         );
 
@@ -98,12 +98,14 @@ class AutoField extends Field
         endif;
 
         try {
-            $value = (int)$value;
+            $value = intval($value);
             if ($value):
                 return $value;
             endif;
 
-            throw new ValueError(sprintf("'%s' value must be an integer.", $value));
+            throw new ValueError(
+                sprintf("'%s' value must be an integer.", $value)
+            );
         } catch (Exception $exception) {
             throw new ValueError(sprintf("'%s' value must be an integer.", $value));
         }

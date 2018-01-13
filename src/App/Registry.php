@@ -16,6 +16,7 @@ use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
+use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
@@ -156,7 +157,6 @@ class Registry extends BaseObject
 
                     $reflect = new \ReflectionClass($class);
 
-
                     // if we cannot create an instance of a class just skip,
                     // e.g traits abstrat etc
 
@@ -169,9 +169,7 @@ class Registry extends BaseObject
                         continue;
                     endif;
 
-
                     $obj = new $class();
-
 
                     $obj->setupClassInfo(
                         null,
@@ -192,18 +190,29 @@ class Registry extends BaseObject
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws AppRegistryNotReady
      */
     public function getModel($name)
     {
         $this->isAppReady();
 
         if (!$this->hasModel($name)) {
-            throw new LookupError(sprintf('The model { %s } Does not exist', $name));
+            throw new LookupError(
+                sprintf('The model { %s } Does not exist', $name)
+            );
         }
 
         return $this->allModels[$name];
     }
 
+    /**
+     * Checks model has been loaded by the orm.
+     *
+     * @param $name model name to check if it has been loaded
+     *
+     * @return bool
+     */
     public function hasModel($name)
     {
         return ArrayHelper::hasKey($this->allModels, $name);
@@ -248,7 +257,7 @@ class Registry extends BaseObject
 
     public function registerModel(Model $model)
     {
-        $name = $model->getMeta()->getNamespacedModelName();
+        $name = $model->getMeta()->getNSModelName();
         if (!ArrayHelper::hasKey($this->allModels, $name)) {
             $this->allModels[$name] = $model;
         }
@@ -256,23 +265,31 @@ class Registry extends BaseObject
     }
 
     /**
-     * @param callback $callback   the callback to invoke when a model has been created
-     * @param array    $modelNames the model we are waiting for to be created, the model object is passed to
-     *                             the callback as the first argument
-     * @param array    $kwargs     an associative array to be passed to the callback
+     * @param callback $callback        the callback to invoke when a model
+     *                                  has been created
+     * @param array    $modelsToResolve the model we are waiting for to be
+     *                                  created, the model object is passed to
+     *                                  the callback as the first argument
+     * @param array    $kwargs          an associative array to be passed to
+     *                                  the callback
      *
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function lazyModelOps($callback, $modelNames, $kwargs)
+    public function lazyModelOps($callback, $modelsToResolve, $kwargs)
     {
         // get the first
-        $modelName = $modelNames[0];
+        $modelName = $modelsToResolve[0];
 
         // recurse the others
-        if (isset($modelNames[1]) && !empty(array_slice($modelNames, 1))) {
-            $this->lazyModelOps($callback, array_slice($modelNames, 1), $kwargs);
+        if (isset($modelsToResolve[1]) &&
+            !empty(array_slice($modelsToResolve, 1))) {
+            $this->lazyModelOps(
+                $callback,
+                array_slice($modelsToResolve, 1),
+                $kwargs
+            );
         }
 
         try {
@@ -284,11 +301,28 @@ class Registry extends BaseObject
         }
     }
 
-    public function getRegisteredModel($name)
+    /**
+     * Gets a registered model. This method is used internally to get a
+     * registered model without the possibility of side effects incase it not
+     * registerd.
+     *
+     * @param $modelName
+     *
+     * @return mixed
+     *
+     * @throws LookupError
+     */
+    protected function getRegisteredModel($modelName)
     {
-        $model = ArrayHelper::getValue($this->allModels, $name);
+        try {
+            $model = ArrayHelper::getValue($this->allModels, $modelName);
+        } catch (KeyError $e) {
+            $model = null;
+        }
         if (null == $model):
-            throw new LookupError(sprintf("Model '%s' not registered.", $name));
+            throw new LookupError(
+                sprintf("Model '%s' not registered.", $modelName)
+            );
         endif;
 
         return $model;
@@ -301,10 +335,10 @@ class Registry extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function resolvePendingOps($model)
+    protected function resolvePendingOps($model)
     {
-        if (isset($this->_pendingOps[$model->getMeta()->getNamespacedModelName()])) {
-            $todoActions = $this->_pendingOps[$model->getMeta()->getNamespacedModelName()];
+        if (isset($this->_pendingOps[$model->getMeta()->getNSModelName()])) {
+            $todoActions = $this->_pendingOps[$model->getMeta()->getNSModelName()];
             foreach ($todoActions as $todoAction) {
                 list($callback, $kwargs) = $todoAction;
                 $kwargs['relatedModel'] = $model;
@@ -320,6 +354,6 @@ class Registry extends BaseObject
 
     public function __toString()
     {
-        return (string)sprintf('%s Object', $this->getFullClassName());
+        return (string) sprintf('%s Object', $this->getFullClassName());
     }
 }

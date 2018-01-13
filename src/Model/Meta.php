@@ -7,6 +7,7 @@ use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
+use Eddmash\PowerOrm\Exception\ImproperlyConfigured;
 use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
@@ -91,11 +92,12 @@ class Meta extends DeconstructableObject implements MetaInterface
     public $primaryKey;
 
     /**
-     * Holds the parent of the model, this is mostly for multi-inheritance.
+     * Holds the field that points to a parent of the scope model,
+     * this is mostly for multi-inheritance.
      *
-     * @var array
+     * @var RelatedField
      */
-    public $parents = [];
+    protected $parents;
 
     /**
      * Holds many to many relationship that the model initiated.
@@ -138,7 +140,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @var Registry
      */
-    public $registry;
+    protected $registry;
 
     // todo
     public $uniqueTogether = [];
@@ -241,7 +243,7 @@ class Meta extends DeconstructableObject implements MetaInterface
                     "%s has no field named %s. The App registry isn't".
                     ' ready yet, so if this is an autoCreated '.
                     "related field, it won't  be available yet.",
-                    $this->getNamespacedModelName(),
+                    $this->getNSModelName(),
                     $name
                 )
             );
@@ -363,6 +365,7 @@ class Meta extends DeconstructableObject implements MetaInterface
 
             // collect all relation fields for this each model
             foreach ($allModels as $name => $model) :
+
                 // just get the forward fields
                 $fields = $model->getMeta()->fetchFields(
                     [
@@ -374,10 +377,15 @@ class Meta extends DeconstructableObject implements MetaInterface
 
                 foreach ($fields as $field) :
 
-                    if ($field->isRelation && !empty($field->getRelatedModel())):
-                        $concreteModel = $field->relation->toModel
-                            ->getMeta()->concreteModel
-                            ->getMeta()->getNamespacedModelName();
+                    if ($field->isRelation &&
+                        $field->getRelatedModel() &&
+                        !is_string($field->getRelatedModel())):
+
+                        $concreteModel = $field->relation
+                            ->getToModel()
+                            ->getMeta()
+                            ->concreteModel
+                            ->getMeta()->getNSModelName();
                         $allRelations[$concreteModel][] = $field;
                     endif;
 
@@ -396,7 +404,8 @@ class Meta extends DeconstructableObject implements MetaInterface
 
         // we get the model from the registry
         // to ensure we get the same model instance and same meta class for the model.
-        return $this->registry->getModel($this->getNamespacedModelName())->getMeta()->_reverseRelationTreeCache;
+        return $this->registry->getModel($this->getNSModelName())
+                              ->getMeta()->_reverseRelationTreeCache;
     }
 
     /**
@@ -520,14 +529,21 @@ class Meta extends DeconstructableObject implements MetaInterface
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws ImproperlyConfigured
      */
     public function prepare(Model $model)
     {
         if (empty($this->primaryKey)):
             if (!empty($this->parents)):
-                $field = current(array_values($this->parents));
+                $field = $this->parents;
                 $field->primaryKey = true;
                 $this->setupPrimaryKey($field);
+                if (!$field->relation->parentLink):
+                    throw new ImproperlyConfigured(
+                        sprintf('Add parentLink=True to %s.', $field)
+                    );
+                endif;
             else:
 
                 $field = AutoField::createObject(
@@ -594,7 +610,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         return $this->modelName;
     }
 
-    public function getNamespacedModelName()
+    public function getNSModelName()
     {
         return $this->namspacedModelName;
     }
@@ -696,5 +712,23 @@ class Meta extends DeconstructableObject implements MetaInterface
     public function setAppName($appName)
     {
         $this->appName = $appName;
+    }
+
+    /**
+     * @return Registry
+     */
+    public function getRegistry()
+    {
+        return $this->registry;
+    }
+
+    public function getParentLinks()
+    {
+        return $this->parents;
+    }
+
+    public function setParentLinks(Field $parentLink)
+    {
+        $this->parents = $parentLink;
     }
 }

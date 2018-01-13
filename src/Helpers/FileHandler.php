@@ -153,7 +153,7 @@ class FileHandler extends BaseObject
      * @param array        $_fileList
      * @param \SplFileInfo $file
      * @param              $ext
-     * @param bool|false   $_fileObj if true returns a file object, if false returns a file pathname
+     * @param bool|false   $_fileObj  if true returns a file object, if false returns a file pathname
      *
      * @return array
      *

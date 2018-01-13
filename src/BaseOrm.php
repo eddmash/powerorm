@@ -135,7 +135,8 @@ class BaseOrm extends BaseObject
     {
         if (empty($this->getSettings()->getDatabase())):
 
-            $message = 'The database configuration have no been provided, consult documentation for options';
+            $message = 'The database configuration have no '.
+                'been provided, consult documentation for options';
 
             throw new OrmException($message);
         endif;
@@ -145,7 +146,10 @@ class BaseOrm extends BaseObject
             $db['wrapperClass'] = \Eddmash\PowerOrm\Db\Connection::class;
             $this->getSettings()->setDatabase($db);
             try {
-                static::$connection = DriverManager::getConnection($this->getSettings()->getDatabase(), $config);
+                static::$connection = DriverManager::getConnection(
+                    $this->getSettings()->getDatabase(),
+                    $config
+                );
             } catch (DBALException $exception) {
                 throw new OrmException($exception->getMessage());
             }

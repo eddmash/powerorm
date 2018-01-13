@@ -159,7 +159,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function reduce(self $operation, $inBetween)
+    public function reduce($operation, $inBetween)
     {
         return false;
     }

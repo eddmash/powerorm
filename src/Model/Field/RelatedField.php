@@ -93,17 +93,20 @@ class RelatedField extends Field
     private function checkRelationModelExists()
     {
         $relModel = $this->relation->toModel;
+        $isString = is_string($this->relation->toModel);
         if ($relModel instanceof Model):
-            $relModel = $relModel->getMeta()->getNamespacedModelName();
+            $relModel = $relModel->getMeta()->getNSModelName();
         endif;
 
-        $relMissing = $this->scopeModel->getMeta()->registry->hasModel($relModel);
+        $hasModel = $this->scopeModel->getMeta()
+                                     ->getRegistry()
+                                     ->hasModel($relModel);
 
         $error = [];
 
-        if (!$relMissing) :
-            $msg = "OgrField defines a relation with model '%s', which is either ".
-                'does not exist, or is abstract.';
+        if (!$hasModel && $isString) :
+            $msg = "Field defines a relation with model '%s', which belongs to".
+                " an app that's not registered with the Orm or is abstract.";
 
             $error = [
                 CheckError::createObject(
@@ -173,7 +176,7 @@ class RelatedField extends Field
             $msg = sprintf(
                 "The name '%s' is invalid relatedName for field %s.%s",
                 $relatedName,
-                $this->scopeModel->getMeta()->getNamespacedModelName(),
+                $this->scopeModel->getMeta()->getNSModelName(),
                 $this->getName()
             );
 
@@ -205,19 +208,33 @@ class RelatedField extends Field
         if (is_string($this->relation->getToModel())):
             return [];
         endif;
+
         $error = [];
         $relMeta = $this->relation->getToModel()->getMeta();
         $relName = $this->relation->getAccessorName();
         $relQueryName = $this->getRelatedQueryName();
         $isHidden = $this->relation->isHidden();
-        $fieldName = sprintf('%s.%s', $this->scopeModel->getMeta()->getNamespacedModelName(), $this->getName());
+        $fieldName = sprintf(
+            '%s.%s',
+            $this->scopeModel->getMeta()->getNSModelName(),
+            $this->getName()
+        );
 
-        foreach ($relMeta->getFields(true, false, false) as $clashField) :
-            $clashName = sprintf('%s.%s', $relMeta->getNamespacedModelName(), $clashField->getName());
+        foreach ($relMeta->getFields(
+            true,
+            false,
+            false
+        ) as $clashField) :
+            $clashName = sprintf(
+                '%s.%s',
+                $relMeta->getNSModelName(),
+                $clashField->getName()
+            );
             if (!$isHidden && $clashField->getName() == $relName):
                 $msg = "Reverse accessor for '%s' clashes with field name '%s'.";
                 $hint = sprintf(
-                    "Rename field '%s', or add/change a relatedName argument to the definition ".
+                    "Rename field '%s', or add/change a ".
+                    'relatedName argument to the definition '.
                     "for field '%s'.",
                     $clashName,
                     $fieldName
@@ -238,7 +255,8 @@ class RelatedField extends Field
                 $msg = "Reverse query name for '%s' clashes with field name '%s'.";
 
                 $hint = sprintf(
-                    "Rename field '%s', or add/change a relatedName argument to the ".
+                    "Rename field '%s', or add/change a".
+                    ' relatedName argument to the '.
                     "definition for field '%s'.",
                     $clashName,
                     $fieldName
@@ -263,14 +281,18 @@ class RelatedField extends Field
             endif;
             $clashName = sprintf(
                 '%s.%s',
-                $reverseRelatedObject->scopeModel->getMeta()->getNamespacedModelName(),
+                $reverseRelatedObject->scopeModel
+                    ->getMeta()->getNSModelName(),
                 $reverseRelatedObject->getName()
             );
 
-            if (!$isHidden && $reverseRelatedObject->relation->getAccessorName() === $relName):
+            if (!$isHidden &&
+                $reverseRelatedObject->relation->getAccessorName() === $relName):
 
-                $msg = "Reverse accessor for '%s' clashes with reverse accessor for '%s'.";
-                $hint = "Add or change a relatedName argument to the definition for '%s' or '%s'.";
+                $msg = "Reverse accessor for '%s' clashes with".
+                    " reverse accessor for '%s'.";
+                $hint = 'Add or change a relatedName argument '.
+                    "to the definition for '%s' or '%s'.";
                 $error[] = CheckError::createObject(
                     [
                         'message' => sprintf($msg, $fieldName, $clashName),
@@ -299,13 +321,16 @@ class RelatedField extends Field
     }
 
     /**
-     * Points to the model the field relates to. For example, Author in ForeignKey(['model'=>Author]).
+     * Points to the model the field relates to.
+     * For example, Author in ForeignKey(['model'=>Author]).
      *
      * @return Model
      *
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
      */
     public function getRelatedModel()
     {
@@ -323,7 +348,7 @@ class RelatedField extends Field
         $namespace = str_replace(
             '\\',
             '_',
-            rtrim($this->scopeModel->getMeta()->getNamespacedModelName(), '\\')
+            rtrim($this->scopeModel->getMeta()->getNSModelName(), '\\')
         );
         if ($this->relation->relatedName):
             $this->relation->relatedName = sprintf($this->relation->relatedName, $namespace);
@@ -383,7 +408,7 @@ class RelatedField extends Field
             $inverseField = $this->inverseField;
             $hasMany = $inverseField::createObject(
                 [
-                    'to' => $this->scopeModel->getMeta()->getNamespacedModelName(),
+                    'to' => $this->scopeModel->getMeta()->getNSModelName(),
                     'toField' => $relation->fromField->getName(),
                     'fromField' => $this,
                     'autoCreated' => true,
@@ -420,7 +445,7 @@ class RelatedField extends Field
         if (is_string($this->relation->toModel)):
             $kwargs['to'] = $this->relation->toModel;
         else:
-            $name = $this->relation->toModel->getMeta()->getNamespacedModelName();
+            $name = $this->relation->toModel->getMeta()->getNSModelName();
 
             $kwargs['to'] = $name;
         endif;
@@ -506,17 +531,25 @@ class RelatedField extends Field
      */
     public function getLocalRelatedFields()
     {
-        return isset($this->getRelatedFields()[0]) ? [$this->getRelatedFields()[0]] : [];
+        $isset = isset($this->getRelatedFields()[0]);
+
+        return $isset ? [$this->getRelatedFields()[0]] : [];
     }
 
     public function getForeignRelatedFieldsValues(Model $modelInstance)
     {
-        return $this->getInstanceValueForFields($modelInstance, $this->getForeignRelatedFields());
+        return $this->getInstanceValueForFields(
+            $modelInstance,
+            $this->getForeignRelatedFields()
+        );
     }
 
     public function getLocalRelatedFieldsValues(Model $modelInstance)
     {
-        return $this->getInstanceValueForFields($modelInstance, $this->getLocalRelatedFields());
+        return $this->getInstanceValueForFields(
+            $modelInstance,
+            $this->getLocalRelatedFields()
+        );
     }
 
     /**
@@ -618,5 +651,13 @@ class RelatedField extends Field
 
     public function getReverseRelatedFilter(Model $model)
     {
+    }
+
+    public function __debugInfo()
+    {
+        $args = parent::__debugInfo();
+        $args['rel'] = $this->relation;
+
+        return $args;
     }
 }

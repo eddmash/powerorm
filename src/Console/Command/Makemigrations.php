@@ -60,7 +60,7 @@ class Makemigrations extends BaseCommand
 
         $autodetector = new AutoDetector(
             $loader->getProjectState(),
-            ProjectState::fromApps($registry),
+            ProjectState::currentAppsState($registry),
             $asker
         );
 

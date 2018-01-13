@@ -64,7 +64,7 @@ class ManyToOneDescriptor extends BaseDescriptor
             throw new RelatedObjectDoesNotExist(
                 sprintf(
                     '%s has no %s.',
-                    $this->field->scopeModel->getMeta()->getNamespacedModelName(),
+                    $this->field->scopeModel->getMeta()->getNSModelName(),
                     $this->field->getName()
                 )
             );
@@ -83,9 +83,9 @@ class ManyToOneDescriptor extends BaseDescriptor
                 sprintf(
                     'Cannot assign "%s": "%s->%s" must be a "%s" instance.',
                     $value,
-                    $this->field->scopeModel->getMeta()->getNamespacedModelName(),
+                    $this->field->scopeModel->getMeta()->getNSModelName(),
                     $this->field->getName(),
-                    $this->field->relation->toModel->getMeta()->getNamespacedModelName()
+                    $this->field->relation->toModel->getMeta()->getNSModelName()
                 )
             );
         endif;
@@ -97,9 +97,15 @@ class ManyToOneDescriptor extends BaseDescriptor
 
         list($fromField, $toField) = $this->field->getRelatedFields();
         if (is_null($value)):
-            // if we have a previosly set related object on for the inverse side of this relationship
-            // we need to clear it on that related object to since we will be setting it to null on this side
-            $relObj = ArrayHelper::getValue($modelInstance->_fieldCache, $this->field->getCacheName(), null);
+            // if we have a previosly set related object on for the inverse
+            // side of this relationship
+            // we need to clear it on that related object to since
+            // we will be setting it to null on this side
+            $relObj = ArrayHelper::getValue(
+                $modelInstance->_fieldCache,
+                $this->field->getCacheName(),
+                null
+            );
 
             if ($relObj):
                 $relObj->{$this->field->relation->getCacheName()} = null;
@@ -132,6 +138,7 @@ class ManyToOneDescriptor extends BaseDescriptor
      * @internal param $modelName
      *
      * @return BaseManager
+     *
      * @author   : Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function getManager($modelInstance, $reverse = false)

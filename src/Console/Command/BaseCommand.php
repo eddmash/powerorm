@@ -4,7 +4,7 @@ namespace Eddmash\PowerOrm\Console\Command;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckMessage;
-use Eddmash\PowerOrm\Exception\NotImplemented;
+use Eddmash\PowerOrm\Exception\CommandError;
 use Eddmash\PowerOrm\Exception\SystemCheckError;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -42,9 +42,20 @@ abstract class BaseCommand extends Command
         $this->setName($this->guessCommandName());
     }
 
+    /**
+     * Place all you command logic here.
+     *
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return CommandError
+     */
     public function handle(InputInterface $input, OutputInterface $output)
     {
-        return new NotImplemented('Subclasses of the class Command must implement the handle()');
+        return new CommandError(
+            'Subclasses of the class '.
+            'Command must implement the handle()'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -58,7 +69,15 @@ abstract class BaseCommand extends Command
         $inLinePad = str_pad('', $maxLength, ' ');
         $outLinePad = str_pad('', $maxLength, '*');
 
-        $output->writeln(sprintf($message, POWERORM_VERSION, $versionPad, $inLinePad, $outLinePad));
+        $output->writeln(
+            sprintf(
+                $message,
+                POWERORM_VERSION,
+                $versionPad,
+                $inLinePad,
+                $outLinePad
+            )
+        );
 
         if ($this->systemCheck):
             try {
@@ -69,11 +88,7 @@ abstract class BaseCommand extends Command
             }
         endif;
 
-        $out = $this->handle($input, $output);
-
-        if (!empty($output) && !empty($out)):
-            $output->writeln('success');
-        endif;
+        $this->handle($input, $output);
     }
 
     public function check(
@@ -106,17 +121,20 @@ abstract class BaseCommand extends Command
             endif;
 
             // info
-            if ($check->level >= CheckMessage::INFO && $check->level < CheckMessage::WARNING && !$check->isSilenced()):
+            if ($check->level >= CheckMessage::INFO &&
+                $check->level < CheckMessage::WARNING && !$check->isSilenced()):
                 $info[] = $check;
             endif;
 
             // warning
-            if ($check->level >= CheckMessage::WARNING && $check->level < CheckMessage::ERROR && !$check->isSilenced()):
+            if ($check->level >= CheckMessage::WARNING &&
+                $check->level < CheckMessage::ERROR && !$check->isSilenced()):
                 $warning[] = $check;
             endif;
 
             //error
-            if ($check->level >= CheckMessage::ERROR && $check->level < CheckMessage::CRITICAL && !$check->isSilenced()
+            if ($check->level >= CheckMessage::ERROR &&
+                $check->level < CheckMessage::CRITICAL && !$check->isSilenced()
             ):
                 $errors[] = $check;
             endif;

@@ -742,7 +742,7 @@ class SchemaEditor extends BaseObject
 
     /**
      * @param string $table
-     * @param string $type accepts (unique, primary_key, index) as values
+     * @param string $type  accepts (unique, primary_key, index) as values
      *
      * @return Index[]
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
@@ -775,7 +775,7 @@ class SchemaEditor extends BaseObject
 
     public function addSql($sql)
     {
-        foreach ((array)$sql as $query) :
+        foreach ((array) $sql as $query) :
 
             $this->sqls[] = $query;
 
