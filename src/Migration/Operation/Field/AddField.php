@@ -50,8 +50,11 @@ class AddField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
-    {
+    public function databaseForwards(
+        SchemaEditor $schemaEditor,
+        ProjectState $fromState,
+        ProjectState $toState
+    ) {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
 
         /* @var $field Field */
@@ -102,6 +105,11 @@ class AddField extends FieldOperation
 
     public function __toString()
     {
-        return sprintf('%s <%s:%s>', $this->getFullClassName(), $this->modelName, $this->name);
+        return sprintf(
+            '%s <%s:%s>',
+            $this->getFullClassName(),
+            $this->modelName,
+            $this->name
+        );
     }
 }

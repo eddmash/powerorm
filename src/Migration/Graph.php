@@ -248,6 +248,7 @@ class Graph
         endif;
 
         $state = ProjectState::createObject();
+        $state->fromDisk(true);
         if (empty($leaves)):
             return $state;
         endif;

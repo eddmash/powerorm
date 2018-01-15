@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Migration\Model;
 
-use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -22,7 +21,6 @@ class MigrationModel extends Model
     public static function defineClass($className, $extends = '')
     {
         $use = '';
-        $extendedClass = '';
 
         list($namespace, $className) = ClassHelper::getNamespaceNamePair($className);
 
@@ -33,11 +31,7 @@ class MigrationModel extends Model
                 false
             );
         else:
-            $extendedClass = sprintf(
-                '%s%s',
-                ClassHelper::getFormatNamespace($namespace, true),
-                $extends
-            );
+            $extendedClass = $extends;
 
             $use = sprintf('use %s;', $extendedClass);
 
@@ -57,20 +51,12 @@ class MigrationModel extends Model
             $className,
             $extends
         );
-        dump($class);
+
         $className = sprintf(
             '%s%s',
             ClassHelper::getFormatNamespace($namespace, true),
             $className
         );
-
-        if (ArrayHelper::hasKey(self::$deferedClasses, $className)):
-
-            foreach (self::$deferedClasses[$className] as $deferedClass) :
-
-                self::defineClass($deferedClass['class'], $deferedClass['extends']);
-            endforeach;
-        endif;
 
         if (!ClassHelper::classExists($className, $namespace)):
             eval($class);

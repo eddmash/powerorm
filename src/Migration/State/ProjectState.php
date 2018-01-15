@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\DeconstructableObject;
 class ProjectState extends DeconstructableObject
 {
     protected $modelStates;
+    private $fromDisk;
 
     public function __construct($modelStates = [])
     {
@@ -73,6 +74,7 @@ class ProjectState extends DeconstructableObject
         if (is_null($name)):
             $name = $model->name;
         endif;
+        $model->fromDisk($this->fromDisk);
         $this->modelStates[$name] = $model;
     }
 
@@ -119,7 +121,10 @@ class ProjectState extends DeconstructableObject
             $modelStates[$name] = $modelState->deepClone();
         endforeach;
 
-        return static::createObject($modelStates);
+        $project = static::createObject($modelStates);
+        $project->fromDisk($this->fromDisk);
+
+        return $project;
     }
 
     public function deconstruct()
@@ -134,5 +139,10 @@ class ProjectState extends DeconstructableObject
     public function getModelState($oldModelName)
     {
         return $this->modelStates[$oldModelName];
+    }
+
+    public function fromDisk($fromMigration = false)
+    {
+        $this->fromDisk = $fromMigration;
     }
 }

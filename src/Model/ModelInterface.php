@@ -71,4 +71,23 @@ interface ModelInterface extends DeConstructableInterface
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function getMetaSettings();
+
+    /**
+     * All the model fields are set on this model.
+     *
+     * <pre><code>public function fields(){
+     *      $this->username = ORM::CharField(['max_length'=>30]);
+     *      $this->first_name = ORM::CharField(['max_length'=>30]);
+     *      $this->last_name = ORM::CharField(['max_length'=>30]);
+     *      $this->password = ORM::CharField(['max_length'=>255]);
+     *      $this->phone_number = ORM::CharField(['max_length'=>30]);
+     * }</code></pre>.
+     *
+     * @return array
+     *
+     * @since  1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function unboundFields();
 }

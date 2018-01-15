@@ -108,6 +108,113 @@ class FormatFileContent
         return str_repeat($tab, $by);
     }
 
+    private static function handleAssocArray(
+        self $content,
+        $key,
+        $val,
+        &$import
+    ) {
+        $key_arr = static::forceString($key);
+
+        if (is_array($val)):
+
+            $content->addIndent();
+            $content->addItem(
+                sprintf(
+                    '%1$s=>[ ',
+                    $key_arr[0]
+                )
+            );
+
+            foreach ($val as $val_key => $in_val) :
+                if ($in_val instanceof DeConstructableInterface):
+                    $in_key = self::forceString($val_key);
+                    static::handleDeconstructable($content, $in_key[0], $in_val, $import);
+                else:
+                    $val_arr = static::forceString($in_val);
+                    $import = array_merge($import, $val_arr[1]);
+
+                    $content->addIndent();
+                    $content->addItem(
+                        sprintf(
+                            "'%1\$s'=> %2\$s,",
+                            $val_key,
+                            $val_arr[0]
+                        )
+                    );
+                    $content->reduceIndent();
+                endif;
+
+            endforeach;
+
+            $content->addItem('],');
+            $content->reduceIndent();
+        elseif ($val instanceof DeConstructableInterface):
+
+            self::handleDeconstructable($content, $key_arr[0], $val, $import);
+        else:
+            $val_arr = static::forceString($val);
+            $content->addIndent();
+            $content->addItem(
+                sprintf(
+                    '%1$s=> %2$s,',
+                    $key_arr[0],
+                    $val_arr[0]
+                )
+            );
+            $content->reduceIndent();
+        endif;
+
+        // imports
+        if (!empty($key_arr[1])):
+            $import = array_merge($import, $key_arr[1]);
+        endif;
+
+        if (!empty($val_arr[1])):
+            $import = array_merge($import, $val_arr[1]);
+        endif;
+    }
+
+    private static function handleDeconstructable(
+        self $content,
+        $key,
+        DeConstructableInterface $val,
+        &$import
+    ) {
+        $desc_skel = $val->deconstruct();
+
+        $desc_import = [$desc_skel['path']];
+
+        $desc_class = $desc_skel['name'];
+
+        $desc_constructor_args = [
+            $desc_skel['constructorArgs'],
+        ];
+
+        $content->addIndent();
+        $content->addItem(
+            sprintf(
+                '%s=> %s([',
+                $key,
+                $desc_class
+            )
+        );
+
+        foreach ($desc_constructor_args as $arg) :
+            foreach ($arg as $desc_key => $desc_val) :
+                self::handleAssocArray(
+                    $content,
+                    $desc_key,
+                    $desc_val,
+                    $desc_import
+                );
+            endforeach;
+        endforeach;
+        $content->addItem(']),');
+        $content->reduceIndent();
+        $import = array_merge($import, $desc_import);
+    }
+
     /**
      * Converts the buffer into an actual string.
      *
@@ -163,58 +270,7 @@ class FormatFileContent
 
                     foreach ($arg as $key => $val) :
                         if (!is_int($key)):
-                            $key_arr = static::forceString($key);
-
-                            if (is_array($val)):
-
-                                $content->addIndent();
-                                $content->addItem(
-                                    sprintf(
-                                        '%1$s=>[ ',
-                                        $key_arr[0]
-                                    )
-                                );
-
-                                foreach ($val as $val_key => $in_val) :
-
-                                    $val_arr = static::forceString($in_val);
-                                    $import = array_merge($import, $val_arr[1]);
-
-                                    $content->addIndent();
-                                    $content->addItem(
-                                        sprintf(
-                                            "'%1\$s'=> %2\$s,",
-                                            $val_key,
-                                            $val_arr[0]
-                                        )
-                                    );
-                                    $content->reduceIndent();
-
-                                endforeach;
-
-                                $content->addItem('],');
-                                $content->reduceIndent();
-                            else:
-                                $val_arr = static::forceString($val);
-                                $content->addIndent();
-                                $content->addItem(
-                                    sprintf(
-                                        '%1$s=> %2$s,',
-                                        $key_arr[0],
-                                        $val_arr[0]
-                                    )
-                                );
-                                $content->reduceIndent();
-                            endif;
-
-                            // imports
-                            if (!empty($key_arr[1])):
-                                $import = array_merge($import, $key_arr[1]);
-                            endif;
-
-                            if (!empty($val_arr[1])):
-                                $import = array_merge($import, $val_arr[1]);
-                            endif;
+                            static::handleAssocArray($content, $key, $val, $import);
                         else:
 
                             $val_arr = static::forceString($val);
@@ -234,7 +290,6 @@ class FormatFileContent
 
                 endif;
             else:
-
                 $val_array = static::forceString($arg);
                 $content->addItem(sprintf(' %s,', $val_array[0]));
 
@@ -345,7 +400,7 @@ class FormatFileContent
 
             return [
                 sprintf(
-                    '%1$s(%2$s)',
+                    '%s(%s)',
                     $class,
                     $cons_args
                 ),

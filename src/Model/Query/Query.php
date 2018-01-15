@@ -600,7 +600,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                 $field = $meta->getField($name);
             } catch (FieldDoesNotExist $e) {
                 //todo check in annotations to
-                $available = getFieldNamesFromMeta($meta);
+                $available = Tools::getFieldNamesFromMeta($meta);
                 if ($failOnMissing) :
 
                     throw new FieldError(

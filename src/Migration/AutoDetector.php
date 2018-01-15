@@ -216,6 +216,7 @@ class AutoDetector extends BaseObject
             $this->oldProxyKeys,
             $this->newProxyKeys
         );
+
         $this->keptUnmanagedKeys = array_intersect(
             $this->oldUnmanagedKeys,
             $this->newUnmanagedKeys
@@ -277,7 +278,7 @@ class AutoDetector extends BaseObject
             if (empty($appName)):
                 continue;
             endif;
-            $appLeaves = (empty($leaves)) ? [] : $leaves[$appName];
+            $appLeaves = (empty($leaves[$appName])) ? [] : $leaves[$appName];
             $leaf = (empty($appLeaves)) ? '' : $appLeaves[0];
             if (empty($leaf)):
                 $migrationNo = 1;
@@ -633,7 +634,6 @@ class AutoDetector extends BaseObject
         /* @var $relationField Field */
 
         foreach ($allAddedModels as $addedModelName) :
-
             $modelState = $this->toState->getModelState($addedModelName);
             $meta = $this->newRegistry->getModel($addedModelName)->getMeta();
 
@@ -1498,6 +1498,7 @@ class AutoDetector extends BaseObject
     {
         $sorted = $arranged = [];
         $deps = $dependency;
+
         while ($deps):
 
             $noDeps = [];

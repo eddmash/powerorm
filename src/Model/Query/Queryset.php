@@ -25,7 +25,6 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Field;
-use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayFlatValueMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayMapper;
@@ -35,17 +34,6 @@ use function Eddmash\PowerOrm\Model\Query\Expression\not_;
 use function Eddmash\PowerOrm\Model\Query\Expression\q_;
 
 const PRIMARY_KEY_ID = 'pk';
-
-function getFieldNamesFromMeta(Meta $meta)
-{
-    $fieldNames = [];
-    /** @var $field Field */
-    foreach ($meta->getFields() as $field) :
-        $fieldNames[] = $field->getName();
-    endforeach;
-
-    return $fieldNames;
-}
 
 /**
  * Represents a lazy database lookup for a set of objects.

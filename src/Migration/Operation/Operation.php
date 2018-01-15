@@ -76,15 +76,16 @@ abstract class Operation extends DeconstructableObject implements OperationInter
     {
         $path = '';
         $alias = '';
-
-        if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Migration\Operation\Model')):
-            $alias = 'modelOperation';
-            $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Model as %s', $alias);
+        $opsModelName = "Eddmash\PowerOrm\Migration\Operation\Model";
+        $opsFieldName = "Eddmash\PowerOrm\Migration\Operation\Field";
+        if (StringHelper::startsWith($this->getFullClassName(), $opsModelName)):
+            $alias = 'ModelOps';
+            $path = sprintf('%s as %s', $opsModelName, $alias);
         endif;
 
-        if (StringHelper::startsWith($this->getFullClassName(), 'Eddmash\PowerOrm\Migration\Operation\Field')):
-            $alias = 'fieldOperation';
-            $path = sprintf('Eddmash\PowerOrm\Migration\Operation\Field as %s', $alias);
+        if (StringHelper::startsWith($this->getFullClassName(), $opsFieldName)):
+            $alias = 'FieldOps';
+            $path = sprintf('%s as %s', $opsFieldName, $alias);
         endif;
 
         return [
@@ -124,8 +125,11 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
-    {
+    public function databaseForwards(
+        SchemaEditor $schemaEditor,
+        ProjectState $fromState,
+        ProjectState $toState
+    ) {
         return;
     }
 
@@ -140,8 +144,11 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
-    {
+    public function databaseBackwards(
+        SchemaEditor $schemaEditor,
+        ProjectState $fromState,
+        ProjectState $toState
+    ) {
         return;
     }
 
@@ -159,7 +166,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function reduce($operation, $inBetween)
+    public function reduce(self $operation, $inBetween)
     {
         return false;
     }

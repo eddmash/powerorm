@@ -28,6 +28,7 @@ use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
+use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
@@ -38,7 +39,6 @@ use Eddmash\PowerOrm\Model\Manager\BaseManager;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 use Eddmash\PowerOrm\Signals\Signal;
 use ReflectionObject;
-use function Eddmash\PowerOrm\Model\Query\getFieldNamesFromMeta;
 
 /**
  * Base class for all models in the ORM, this class cannot be instantiated on its own.
@@ -50,13 +50,14 @@ use function Eddmash\PowerOrm\Model\Query\getFieldNamesFromMeta;
  */
 abstract class Model extends DeconstructableObject implements ModelInterface, ArrayObjectInterface
 {
+    const FAKENAMESPACE = '_Fake';
     use ModelFieldsTrait;
     use FormReadyModelTrait;
-
     const SELF = 'this';
     const CASCADE = 'cascade';
-    const DEBUG_IGNORE = ['tableName', 'managed', 'verboseName', 'isNew', 'proxy'];
+    const DEBUG_IGNORE = ['tableName', 'managed', 'verboseNjame', 'isNew', 'proxy'];
     const MODELBASE = '\Eddmash\PowerOrm\Model\Model';
+    const META_SETTING_METHOD = 'getMetaSettings';
     public static $managerClass;
     /**
      * Holds all the fields tha belong to this model.
@@ -190,8 +191,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         try {
             $registry->isAppReady();
+            $name = Tools::unifyModelName(get_class($this));
 
-            $model = $registry->getModel(get_class($this));
+            $model = $registry->getModel($name);
 
             //todo do a deep clone to be sure all is copied or do
             // a by ref assignment ie.
@@ -200,7 +202,133 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             $this->_fieldCache = $model->_fieldCache;
         } catch (AppRegistryNotReady $exception) {
+        } catch (LookupError $e) {
         }
+    }
+
+    /**
+     * @return Meta
+     */
+    public function getMeta()
+    {
+        return $this->meta;
+    }
+
+    /**
+     * @return Meta
+     *
+     * @throws AppRegistryNotReady
+     * @throws LookupError
+     */
+    public static function getClassMeta()
+    {
+        return BaseOrm::getRegistry()->getModel(static::class)->getMeta();
+    }
+
+    /**
+     * @param Meta $meta
+     */
+    public function setMeta($meta)
+    {
+        $this->meta = $meta;
+    }
+
+    public function setFieldValues($kwargs)
+    {
+        // we need meta to exists
+        if (is_null($this->getMeta()) || empty($kwargs)):
+            return;
+        endif;
+
+        if ($kwargs):
+            // get also related field if we have kwargs
+            $fields = $this->getMeta()->getNonM2MForwardFields();
+        else:
+            // otherwise get only the concrete fields
+            $fields = $this->getMeta()->getConcreteFields();
+        endif;
+
+        /* @var $field Field */
+        foreach ($fields as $name => $field) :
+            if (!array_key_exists($field->getAttrName(), $kwargs) &&
+                is_null($field->getColumnName())):
+                continue;
+            endif;
+
+            $val = null;
+            $isRelated = false;
+            $relObject = null;
+            if ($kwargs):
+                if ($field instanceof RelatedField):
+                    try {
+                        $relObject = ArrayHelper::getValue(
+                            $kwargs,
+                            $field->getName(),
+                            ArrayHelper::STRICT
+                        );
+                        $isRelated = true;
+                        // Object instance was passed in, You can
+                        // pass in null for related objects if it's allowed.
+                        if (is_null($relObject) && $field->isNull()):
+                            $val = null;
+                        endif;
+                    } catch (KeyError $e) {
+                        try {
+                            $val = ArrayHelper::getValue(
+                                $kwargs,
+                                $field->getAttrName(),
+                                ArrayHelper::STRICT
+                            );
+                        } catch (KeyError $e) {
+                            $val = $field->getDefault();
+                        }
+                    }
+                else:
+                    try {
+                        $val = ArrayHelper::getValue(
+                            $kwargs,
+                            $field->getAttrName(),
+                            ArrayHelper::STRICT
+                        );
+                    } catch (KeyError $e) {
+                        $val = $field->getDefault();
+                    }
+                endif;
+            else:
+                $val = $field->getDefault();
+            endif;
+
+            if ($isRelated):
+                $this->{$field->getName()} = $relObject;
+            else:
+                $this->{$field->getAttrName()} = $val;
+            endif;
+        endforeach;
+    }
+
+    public static function isModelBase($className)
+    {
+        $base = trim(self::class, '\\');
+
+        return in_array($className, [$base]);
+    }
+
+    /**
+     * @param ConnectionInterface $connection
+     * @param                     $fieldNames
+     * @param                     $values
+     *
+     * @return static
+     *
+     * @since  1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public static function fromDb(ConnectionInterface $connection, $fieldNames, $values)
+    {
+        $vals = array_combine($fieldNames, $values);
+
+        return new static($vals);
     }
 
     /**
@@ -213,10 +341,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param array $fields
      * @param array $kwargs
      *
-     * @throws \Eddmash\PowerOrm\Exception\FieldError
-     * @throws \Eddmash\PowerOrm\Exception\LookupError
-     * @throws \Eddmash\PowerOrm\Exception\MethodNotExtendableException
-     * @throws \Eddmash\PowerOrm\Exception\TypeError
+     * @throws AppRegistryNotReady
+     * @throws FieldError
+     * @throws MethodNotExtendableException
+     * @throws TypeError
+     * @throws \Eddmash\PowerOrm\Exception\ImproperlyConfigured
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function setupClassInfo($fields = [], $kwargs = [])
@@ -237,8 +366,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
             $this->loadMeta($registry);
         else:
+
             // get meta settings for this model
-            $metaSettings = $this->getMetaSettings();
+
+            $metaSettings = Tools::getClassMetaSettings($this);
 
             if ($kwargs):
                 if (ArrayHelper::hasKey($kwargs, 'meta')):
@@ -263,16 +394,16 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 $classFields, $parentLink
                 ) = self::getHierarchyMeta($this);
 
+            //            dump(get_class($this));
+            //            dump(array_keys($classFields));
             $this->setupFields($fields, $classFields);
 
             // proxy model setup
+            /** @var $concreteParent Model */
             if ($this->getMeta()->proxy):
-                try {
-                    $concreteParent = $meta->getRegistry()
-                                           ->getModel($concreteParentName);
-                } catch (LookupError $e) {
-                    $concreteParent = $concreteParentName::createObject();
-                }
+                $concreteParentName = Tools::unifyModelName($concreteParentName);
+                $concreteParent = $this->getMeta()->getRegistry()
+                                       ->getRegisteredModel($concreteParentName);
                 $this->proxySetup($concreteParent);
             else:
                 $this->getMeta()->concreteModel = $this;
@@ -289,14 +420,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // register the model
             $meta->getRegistry()->registerModel($this);
         endif;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMetaSettings()
-    {
-        return [];
     }
 
     /**
@@ -330,7 +453,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @param bool|true $fromOldest do we traverse from BaseObject to the child
      *                              model
      *
-     * @return array The concrete model in the hierarchy of the $model, this can be null if
+     * @return array The concrete parent model in the hierarchy of the $model, this can
+     *               be null if
      *               the model does not have any non-abstract parent
      *               e.g Eddmash\PowerOrm\Model\Models
      *               - The immediate Model, this is the actual class the model extends, unlike
@@ -349,7 +473,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function getHierarchyMeta(
+    final public static function getHierarchyMeta(
         $model,
         $method = 'unboundFields',
         $args = null,
@@ -371,7 +495,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $modelFields = [];
 
         $parentLink = null;
-        $concreteParent = null;
+        $concreteParent = '';
 
         $immediateParent = null;
         $immediateParentObject = null;
@@ -399,10 +523,24 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // check for at least one concrete parent nearest to the last child
             // model. since we are going downwards we keep updating the
             // concrete variable.
-            if (!($isOnCurrentModel && $isProxy) &&
-                $reflectionParent->isInstantiable()):
+            // also a concrete parent cannot be a proxy model.
+            if (!$isOnCurrentModel && $reflectionParent->isInstantiable()):
+                if ($reflectionParent):
 
-                $concreteParent = $reflectionParent;
+                    $meta = Tools::getClassMetaSettings(
+                        $model,
+                        $reflectionParent->getName()
+                    );
+                    $parentIsProxy = ArrayHelper::getValue(
+                        $meta,
+                        'proxy',
+                        false
+                    );
+                    if (!$parentIsProxy):
+                        $concreteParent = $reflectionParent;
+                    endif;
+
+                endif;
             endif;
 
             // ************ get the fields *******************
@@ -415,32 +553,17 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $methName = $methodReflection->getDeclaringClass()->getName();
             if (strtolower($methName) === strtolower($parentName)):
                 //ensure its private to avoid method inheritance
-                if (!$methodReflection->isPrivate()):
-                    throw new MethodNotExtendableException(
-                        sprintf(
-                            "The method '%s::%s' should be ".
-                            'implemented as private',
-                            $parentName,
-                            $method
-                        )
-                    );
-                endif;
                 $parentMethodCall = sprintf(
                     '%1$s::%2$s',
                     $parentName,
                     $method
                 );
 
-                if (null != $args):
-                    if (is_array($args)):
-                        $fields = call_user_func_array([$model, $parentMethodCall], $args);
-                    else:
+                $fields = Tools::invokeCallable(
+                    [$model, $parentMethodCall],
+                    $args
+                );
 
-                        $fields = call_user_func([$model, $parentMethodCall], $args);
-                    endif;
-                else:
-                    $fields = call_user_func([$model, $parentMethodCall]);
-                endif;
             else:
                 $fields = [];
             endif;
@@ -523,56 +646,58 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
         // ********************* Multi-table inheritance ******************
 
-        $thisModelFields = $modelFields[$model->getMeta()->getNSModelName()];
+        $thisModelFields = $modelFields[get_class($model)];
         // Check if current model fields contain at-least one OneToOneField
         // pointing to the immediate parent if its not abstract
-        // we do this for non-proxy, non-abstract models
-        if (!$immediateParentObject->isAbstract() &&
-            !$isProxy &&
-            !$currentModelRef->isAbstract()):
+        // we do this for parents that are non-proxy, non-abstract models
 
-            foreach ($thisModelFields as $field) :
-                if ($field instanceof OneToOneField):
-                    $relModelName = (string) $field->relation->toModel;
-                    if ($relModelName == $immediateParent):
-                        $parentLink = $field;
+        if ($concreteParent):
+
+            if (!$isProxy && !$currentModelRef->isAbstract()):
+
+                foreach ($thisModelFields as $field) :
+                    if ($field instanceof OneToOneField):
+                        $relModelName = (string) $field->relation->toModel;
+                        if ($relModelName == $immediateParent):
+                            $parentLink = $field;
+                        endif;
                     endif;
-                endif;
-            endforeach;
+                endforeach;
+                if (is_null($parentLink)):
 
-            if (is_null($parentLink)):
-                $attrName = sprintf(
-                    '%s_ptr',
-                    strtolower($immediateParentObject->getShortName())
-                );
-
-                if (array_key_exists($attrName, $thisModelFields)):
-                    throw new FieldError(
-                        sprintf(
-                            "Auto-generated field '%s' in class".
-                            '%s for parent_link to base class %s clashes with '.
-                            'declared field of the same name.',
-                            $attrName,
-                            $currentModelRef->getName(),
-                            $immediateParentObject->getName()
-                        )
+                    $attrName = sprintf(
+                        '%s_ptr',
+                        strtolower($concreteParent->getShortName())
                     );
+
+                    if (array_key_exists($attrName, $thisModelFields)):
+                        throw new FieldError(
+                            sprintf(
+                                "Auto-generated field '%s' in class".
+                                '%s for parent_link to base class %s clashes with '.
+                                'declared field of the same name.',
+                                $attrName,
+                                $currentModelRef->getName(),
+                                $concreteParent->getName()
+                            )
+                        );
+                    endif;
+                    $parentLink = self::OneToOneField(
+                        [
+                            'to' => $concreteParent->getName(),
+                            'name' => $attrName,
+                            'parentLink' => true,
+                            'autoCreated' => true,
+                            'onDelete' => Delete::CASCADE,
+                        ]
+                    );
+                    $thisModelFields[$attrName] = $parentLink;
                 endif;
-                $parentLink = self::OneToOneField(
-                    [
-                        'to' => $immediateParent,
-                        'name' => $attrName,
-                        'parentLink' => true,
-                        'autoCreated' => true,
-                        'onDelete' => Delete::CASCADE,
-                    ]
-                );
-                $thisModelFields[$attrName] = $parentLink;
             endif;
         endif;
 
         return [
-            (null == $concreteParent) ?: $concreteParent->getName(),
+            (empty($concreteParent)) ? null : $concreteParent->getName(),
             $immediateParentObject,
             $thisModelFields,
             $parentLink,
@@ -599,17 +724,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function proxySetup($concreteParent)
+    private function proxySetup(self $concreteParent)
     {
         $this->getMeta()->setupProxy($concreteParent);
         $this->getMeta()->concreteModel = $concreteParent->getMeta()->concreteModel;
-    }
-
-    public static function isModelBase($className)
-    {
-        $base = trim(self::class, '\\');
-
-        return in_array($className, [$base]);
     }
 
     /**
@@ -620,95 +738,20 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $this->getMeta()->prepare($this);
     }
 
-    public function setFieldValues($kwargs)
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetaSettings()
     {
-        // we need meta to exists
-        if (is_null($this->getMeta()) || empty($kwargs)):
-            return;
-        endif;
-
-        if ($kwargs):
-            // get also related field if we have kwargs
-            $fields = $this->getMeta()->getNonM2MForwardFields();
-        else:
-            // otherwise get only the concrete fields
-            $fields = $this->getMeta()->getConcreteFields();
-        endif;
-
-        /* @var $field Field */
-        foreach ($fields as $name => $field) :
-            if (!array_key_exists($field->getAttrName(), $kwargs) &&
-                is_null($field->getColumnName())):
-                continue;
-            endif;
-
-            $val = null;
-            $isRelated = false;
-            $relObject = null;
-            if ($kwargs):
-                if ($field instanceof RelatedField):
-                    try {
-                        $relObject = ArrayHelper::getValue(
-                            $kwargs,
-                            $field->getName(),
-                            ArrayHelper::STRICT
-                        );
-                        $isRelated = true;
-                        // Object instance was passed in, You can
-                        // pass in null for related objects if it's allowed.
-                        if (is_null($relObject) && $field->isNull()):
-                            $val = null;
-                        endif;
-                    } catch (KeyError $e) {
-                        try {
-                            $val = ArrayHelper::getValue(
-                                $kwargs,
-                                $field->getAttrName(),
-                                ArrayHelper::STRICT
-                            );
-                        } catch (KeyError $e) {
-                            $val = $field->getDefault();
-                        }
-                    }
-                else:
-                    try {
-                        $val = ArrayHelper::getValue(
-                            $kwargs,
-                            $field->getAttrName(),
-                            ArrayHelper::STRICT
-                        );
-                    } catch (KeyError $e) {
-                        $val = $field->getDefault();
-                    }
-                endif;
-            else:
-                $val = $field->getDefault();
-            endif;
-
-            if ($isRelated):
-                $this->{$field->getName()} = $relObject;
-            else:
-                $this->{$field->getAttrName()} = $val;
-            endif;
-        endforeach;
+        return [];
     }
 
     /**
-     * @param ConnectionInterface $connection
-     * @param                     $fieldNames
-     * @param                     $values
-     *
-     * @return static
-     *
-     * @since  1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
-    public static function fromDb(ConnectionInterface $connection, $fieldNames, $values)
+    public function prepareMeta($config = [])
     {
-        $vals = array_combine($fieldNames, $values);
-
-        return new static($vals);
+        return new Meta($config);
     }
 
     public function checks()
@@ -731,7 +774,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                         [
                             'message' => sprintf(
                                 'Proxy model "%s" contains model fields.',
-                                $this->getFullClassName()
+                                static::class
                             ),
                             'hint' => null,
                             'context' => $this,
@@ -765,17 +808,28 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     /**
      * {@inheritdoc}
      */
-    public function prepareMeta($config = [])
-    {
-        return new Meta($config);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function deconstruct()
     {
         // TODO: Implement deconstruct() method.
+    }
+
+    /**
+     * @ignore
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        $pk = '';
+        if ($this->getMeta()->primaryKey) :
+            $attrName = $this->getMeta()->primaryKey->getAttrName();
+            try {
+                $pk = $this->{$attrName};
+            } catch (\Exception $e) {
+            }
+        endif;
+
+        return sprintf('%s %s', $this->getShortClassName(), $pk);
     }
 
     /**
@@ -917,7 +971,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                         $name,
                         implode(
                             ', ',
-                            getFieldNamesFromMeta($this->getMeta())
+                            Tools::getFieldNamesFromMeta($this->getMeta())
                         )
                     )
                 );
@@ -956,21 +1010,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // the model dynamically
             $this->_nonModelfields[$name] = $value;
         }
-    }
-
-    /**
-     * @ignore
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        $pk = '';
-        if ($this->getMeta()->primaryKey) :
-            $pk = $this->{$this->getMeta()->primaryKey->getAttrName()};
-        endif;
-
-        return sprintf('%s %s', $this->getShortClassName(), $pk);
     }
 
     /**
@@ -1372,32 +1411,15 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     }
 
     /**
-     * Do an INSERT. If update_pk is defined then this method should return
-     * the new pk for the model.
+     * @param Model|null $modelInstance
      *
-     * @param Model   $model
-     * @param Field[] $fields   fields that are on this model
-     * @param         $returnId
-     *
-     * @return mixed
-     *
-     * @since  1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function doInsert($model, $fields, $returnId)
-    {
-        return $model::objects()->_insert($this, $fields, $returnId);
-    }
-
-    /**
      * @return Queryset
      *
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function objects($modelInstance = null)
+    public static function objects(self $modelInstance = null)
     {
         $manager = static::getManagerClass();
         if (is_null($modelInstance)) :
@@ -1418,6 +1440,43 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         endif;
 
         return static::$managerClass;
+    }
+
+    /**
+     * Do an INSERT. If update_pk is defined then this method should return
+     * the new pk for the model.
+     *
+     * @param Model   $model
+     * @param Field[] $fields   fields that are on this model
+     * @param         $returnId
+     *
+     * @return mixed
+     *
+     * @since  1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    private function doInsert($model, $fields, $returnId)
+    {
+        return $model::objects()->_insert($this, $fields, $returnId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unboundFields()
+    {
+        return [];
+    }
+
+    public function __debugInfo()
+    {
+        $meta = parent::__debugInfo();
+        foreach ($this->_fieldCache as $name => $item) :
+            $meta[$name] = $item;
+        endforeach;
+
+        return $meta;
     }
 
     /**
@@ -1444,64 +1503,5 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $name = $field->relation->getRelatedField()->getAttrName();
 
         return $this->{$name};
-    }
-
-    public function __debugInfo()
-    {
-        $meta = parent::__debugInfo();
-        foreach ($this->_fieldCache as $name => $item) :
-            $meta[$name] = $item;
-        endforeach;
-
-        return $meta;
-    }
-
-    /**
-     * @return Meta
-     *
-     * @throws AppRegistryNotReady
-     * @throws LookupError
-     */
-    public static function getClassMeta()
-    {
-        return BaseOrm::getRegistry()->getModel(static::class)->getMeta();
-    }
-
-    /**
-     * @return Meta
-     */
-    public function getMeta()
-    {
-        return $this->meta;
-    }
-
-    /**
-     * @param Meta $meta
-     */
-    public function setMeta($meta)
-    {
-        $this->meta = $meta;
-    }
-
-    /**
-     * All the model fields are set on this model.
-     *
-     * <pre><code>public function fields(){
-     *      $this->username = ORM::CharField(['max_length'=>30]);
-     *      $this->first_name = ORM::CharField(['max_length'=>30]);
-     *      $this->last_name = ORM::CharField(['max_length'=>30]);
-     *      $this->password = ORM::CharField(['max_length'=>255]);
-     *      $this->phone_number = ORM::CharField(['max_length'=>30]);
-     * }</code></pre>.
-     *
-     * @return array
-     *
-     * @since  1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    private function unboundFields()
-    {
-        return [];
     }
 }

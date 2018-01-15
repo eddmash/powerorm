@@ -20,6 +20,7 @@ use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Migration\Model\MigrationModel;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
+use ReflectionObject;
 
 /**
  * Represents a PowerOrm Model.
@@ -41,6 +42,7 @@ class ModelState extends BaseObject
     /** @var Field[] */
     public $fields = [];
     public $extends;
+    private $fromDisk = false;
 
     public function __construct($name, $fields, $kwargs = [])
     {
@@ -63,7 +65,7 @@ class ModelState extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function fromModel($model, $excludeRels = false)
+    public static function fromModel(Model $model, $excludeRels = false)
     {
         $fields = [];
 
@@ -109,10 +111,18 @@ class ModelState extends BaseObject
         endforeach;
 
         $extends = '';
-        $parent = $model->getParent();
-        if (!$parent->isAbstract() && !Model::isModelBase($parent->getName())):
-            $extends = $parent->getName();
+
+        /** @var $immediateParent ReflectionObject */
+        list($concreteParent, $immediateParent) = Model::getHierarchyMeta($model);
+
+        if ($immediateParent):
+            if ($immediateParent->isAbstract()):
+                $extends = (is_null($concreteParent)) ? '' : $concreteParent;
+            else:
+                $extends = $immediateParent->getName();
+            endif;
         endif;
+
         $kwargs = [
             'meta' => $meta,
             'extends' => $extends,
@@ -143,11 +153,32 @@ class ModelState extends BaseObject
         //        var_dump($this);
         $extends = $this->extends;
 
+        $className = $this->name;
+
+        // if we are loading migrations from disk we need to namespace different
+        // so that we can be able to compare the two states. this way we avoid
+        // possibility of loading the same state information about an app
+        // i.e. we might end up always loading the state of the apps base on
+        // whats currently shown the models
+        if ($this->fromDisk):
+            $className = sprintf(
+                '%s\\%s',
+                Model::FAKENAMESPACE,
+                $className
+            );
+            if ($extends):
+                $extends = sprintf(
+                    '%s\\%s',
+                    Model::FAKENAMESPACE,
+                    $extends
+                );
+            endif;
+        endif;
+
         $model = $this->createInstance(
-            sprintf('%s', $this->name),
+            $className,
             $extends
         );
-
         $fields = [];
         foreach ($this->fields as $name => $field) :
             $fields[$name] = $field->deepClone();
@@ -176,8 +207,10 @@ class ModelState extends BaseObject
     /**
      * Defines a new model class.
      *
-     * we create a new namespace and define new classes because, we might be dealing with a model that has been dropped
-     * Meaning if we try to load the model using the normal way, we will get and error of model does not exist.
+     * we create a new namespace and define new classes because, we might be
+     * dealing with a model that has been dropped
+     * Meaning if we try to load the model using the normal way, we will get
+     * and error of model does not exist.
      *
      * @param string $className
      * @param string $extends
@@ -190,9 +223,10 @@ class ModelState extends BaseObject
      */
     private static function createInstance($className, $extends = '')
     {
-        if (!class_exists($className)):
-            $className = MigrationModel::defineClass($className, $extends);
-        endif;
+        //        if (!class_exists($className)):
+        $className = MigrationModel::defineClass($className, $extends);
+
+        //        endif;
 
         return new $className();
     }
@@ -205,11 +239,14 @@ class ModelState extends BaseObject
             $fields[$name] = $field->deepClone();
         endforeach;
 
-        return static::createObject(
+        $model = static::createObject(
             $this->name,
             $fields,
             ['meta' => $this->getMeta(), 'extends' => $this->extends]
         );
+        $model->fromDisk($this->fromDisk);
+
+        return $model;
     }
 
     public function __toString()
@@ -225,5 +262,10 @@ class ModelState extends BaseObject
     public function setMeta($meta)
     {
         $this->meta = $meta;
+    }
+
+    public function fromDisk($fromDisk)
+    {
+        $this->fromDisk = $fromDisk;
     }
 }

@@ -5,6 +5,9 @@ namespace Eddmash\PowerOrm\Helpers;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Exception\InvalidArgumentException;
+use Eddmash\PowerOrm\Exception\ValueError;
+use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
 
 /**
@@ -16,6 +19,77 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class Tools
 {
+    /**
+     * sorts the operations in topological order using kahns algorithim.
+     * http://faculty.simpson.edu/lydia.sinapova/www/cmsc250/LN250_Weiss/L20-TopSort.htm.
+     *
+     * @param $operations
+     * @param $dependency
+     *
+     * @return array
+     *
+     * @since  1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws ValueError
+     */
+    public static function topologicalSort($dependency)
+    {
+        $sorted = [];
+        $deps = $dependency;
+
+        while ($deps):
+
+            $noDeps = [];
+
+            foreach ($deps as $parent => $dep) :
+                if (empty($dep)):
+                    $noDeps[] = $parent;
+                endif;
+            endforeach;
+
+            // we don't have  a vertice with 0 indegree hence we have loop
+            if (empty($noDeps)):
+                throw new ValueError(
+                    sprintf(
+                        'Cyclic dependency on topological sort',
+                        self::stringify($deps)
+                    )
+                );
+            endif;
+
+            $sorted = array_merge($sorted, $noDeps);
+
+            $newDeps = [];
+
+            foreach ($deps as $parent => $dep) :
+                // if parent has already been added to sort skip it
+                if (!in_array($parent, $noDeps)):
+                    //if its already sorted remove it
+
+                    $newDeps[$parent] = array_diff($dep, $sorted);
+                endif;
+            endforeach;
+
+            $deps = $newDeps;
+
+        endwhile;
+
+        return $sorted;
+    }
+
+    public static function getFieldNamesFromMeta(Meta $meta)
+    {
+        $fieldNames = [];
+        /** @var $field Field */
+        foreach ($meta->getFields() as $field) :
+            $fieldNames[] = $field->getName();
+        endforeach;
+
+        return $fieldNames;
+    }
+
     public static function normalizeKey($name)
     {
         return strtolower($name);
@@ -308,7 +382,7 @@ class Tools
 
         $kwargs['scopeModel'] = $scopeModel;
         $scopeModel->getMeta()->getRegistry()
-            ->lazyModelOps($callback, $modelsToResolve, $kwargs);
+                   ->lazyModelOps($callback, $modelsToResolve, $kwargs);
     }
 
     /**
@@ -378,5 +452,79 @@ class Tools
 
             throw new InvalidArgumentException($messg);
         endif;
+    }
+
+    /**
+     * Basically strips off the fake namespace we use when doing migrations.
+     *
+     * @param $concreteParentName
+     *
+     * @return mixed
+     */
+    public static function unifyModelName($modelName)
+    {
+        return str_replace(
+            Model::FAKENAMESPACE.'\\',
+            '',
+            $modelName
+        );
+    }
+
+    /**
+     * Returns meta settings related to the passed in model instance, passed in
+     * class.
+     *
+     * @param Model  $model
+     * @param null   $class  this most of the time will be a parent in the models
+     *                       hierarchy that we want to get its settings if it all it set any
+     * @param string $method
+     *
+     * @return array|mixed
+     */
+    public static function getClassMetaSettings(
+        Model $model,
+        $class = null,
+        $method = 'getMetaSettings'
+    ) {
+        $metaSettings = [];
+        if ($class):
+            $r = new \ReflectionClass($class);
+        else:
+            $r = new \ReflectionObject($model);
+        endif;
+        if ($r->hasMethod($method)):
+
+            $metaMeth = $r->getMethod($method);
+            $declaringClass = $metaMeth->getDeclaringClass()->getName();
+            if (strtolower($r->getName()) === strtolower($declaringClass)):
+                if ($class):
+                    $method = sprintf('%s::%s', $class, $method);
+                endif;
+                $metaSettings = static::invokeCallable([$model, $method]);
+            endif;
+        endif;
+
+        return $metaSettings;
+    }
+
+    /**
+     * @param      $callable
+     * @param null $args
+     *
+     * @return mixed
+     */
+    public static function invokeCallable($callable, $args = null)
+    {
+        if (null != $args):
+            if (is_array($args)):
+                $results = call_user_func_array($callable, $args);
+            else:
+                $results = call_user_func($callable, $args);
+            endif;
+        else:
+            $results = call_user_func($callable);
+        endif;
+
+        return $results;
     }
 }

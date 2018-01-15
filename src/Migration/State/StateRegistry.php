@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Migration\State;
 
 use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\Helpers\Tools;
 
 class StateRegistry extends Registry
 {
@@ -39,8 +40,17 @@ class StateRegistry extends Registry
     protected function hydrate($modelStates)
     {
         /** @var $modelState ModelState */
+        $depends = [];
         foreach ($modelStates as $name => $modelState) :
+            $extends = ($modelState->extends) ? [$modelState->extends] : [];
+            $depends[$name] = $extends;
 
+        endforeach;
+//        dump($depends);
+        $orderedClasses = Tools::topologicalSort($depends);
+
+        foreach ($orderedClasses as $class) :
+            $modelState = $modelStates[$class];
             $modelState->toModel($this);
         endforeach;
         $this->ready = true;

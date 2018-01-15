@@ -12,6 +12,7 @@ use Eddmash\PowerOrm\Exception\OrmException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
@@ -566,7 +567,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function setupProxy($parent)
+    public function setupProxy(Model $parent)
     {
         $this->dbTable = $parent->getMeta()->getDbTable();
         $this->primaryKey = $parent->getMeta()->primaryKey;
@@ -612,6 +613,13 @@ class Meta extends DeconstructableObject implements MetaInterface
 
     public function getNSModelName()
     {
+        if (StringHelper::startsWith(
+            $this->namspacedModelName,
+            Model::FAKENAMESPACE
+        )):
+            return Tools::unifyModelName($this->namspacedModelName);
+        endif;
+
         return $this->namspacedModelName;
     }
 

@@ -12,7 +12,6 @@
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
 use Eddmash\PowerOrm\Db\SchemaEditor;
-use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\FieldOperation;
@@ -54,19 +53,10 @@ class CreateModel extends ModelOperation
 
         if (isset($constructorArgs['extends'])):
 
-            if (StringHelper::isEmpty($constructorArgs['extends']) || Model::isModelBase($constructorArgs['extends'])):
-
+            if (StringHelper::isEmpty($constructorArgs['extends']) ||
+                Model::isModelBase($constructorArgs['extends'])):
                 unset($constructorArgs['extends']);
-            else:
-                $namespace = '';
-                if ($this->getApp()):
-                    $namespace = $this->getApp()->getNamespace();
-                endif;
-                $constructorArgs['extends'] =
-                    ClassHelper::getNameFromNs(
-                        $constructorArgs['extends'],
-                        $namespace
-                    );
+
             endif;
         endif;
 

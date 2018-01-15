@@ -18,9 +18,12 @@ use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\LookupError;
+use Eddmash\PowerOrm\Exception\OrmException;
+use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
+use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Model;
 
 /**
@@ -151,14 +154,16 @@ class Registry extends BaseObject
         /* @var $obj Model */
 
         if (!empty($modelClasses)) :
+            $classPopulationOrder = [];
+            $classToAppMap = [];
             foreach ($modelClasses as $appName => $classes) :
 
                 foreach ($classes as $class) :
-
+                    $classToAppMap[$class] = $appName;
                     $reflect = new \ReflectionClass($class);
 
                     // if we cannot create an instance of a class just skip,
-                    // e.g traits abstrat etc
+                    // e.g traits abstract etc
 
                     if (!$reflect->isInstantiable()) :
                         continue;
@@ -169,14 +174,43 @@ class Registry extends BaseObject
                         continue;
                     endif;
 
-                    $obj = new $class();
+                    // callback to get non-abstract parent, since this needs to
+                    // created before we can create this child class instance
+                    // if none is found return empty array
+                    $callback = function (\ReflectionClass $reflect, &$classes) use (&$callback) {
+                        $parentClass = $reflect->getParentClass()->getName();
 
-                    $obj->setupClassInfo(
-                        null,
-                        ['meta' => ['appName' => $appName]]
-                    );
+                        if (Model::class === $parentClass):
+                            $extends = [];
+                        else:
+                            if ($reflect->getParentClass()->isAbstract()):
+                                $extends = $callback($reflect->getParentClass());
+                            else:
+                                $extends = [$parentClass];
+                            endif;
+                        endif;
+
+                        return $extends;
+                    };
+                    $classPopulationOrder[$class] = $callback($reflect, $classPopulationOrder);
                 endforeach;
             endforeach;
+
+            try {
+                $classPopulationOrder = Tools::topologicalSort($classPopulationOrder);
+            } catch (ValueError $e) {
+                throw new OrmException($e->getMessage());
+            }
+            foreach ($classPopulationOrder as $class) :
+
+                $obj = new $class();
+
+                $obj->setupClassInfo(
+                    null,
+                    ['meta' => ['appName' => $classToAppMap[$class]]]
+                );
+            endforeach;
+
         endif;
     }
 
@@ -310,9 +344,11 @@ class Registry extends BaseObject
      *
      * @return mixed
      *
+     * @internal
+     *
      * @throws LookupError
      */
-    protected function getRegisteredModel($modelName)
+    public function getRegisteredModel($modelName)
     {
         try {
             $model = ArrayHelper::getValue($this->allModels, $modelName);
