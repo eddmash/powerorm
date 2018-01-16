@@ -46,7 +46,7 @@ class StateRegistry extends Registry
             $depends[$name] = $extends;
 
         endforeach;
-//        dump($depends);
+        
         $orderedClasses = Tools::topologicalSort($depends);
 
         foreach ($orderedClasses as $class) :

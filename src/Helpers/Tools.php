@@ -53,7 +53,7 @@ class Tools
             if (empty($noDeps)):
                 throw new ValueError(
                     sprintf(
-                        'Cyclic dependency on topological sort',
+                        'Cyclic dependency on topological sort %s',
                         self::stringify($deps)
                     )
                 );
