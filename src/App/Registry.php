@@ -39,7 +39,7 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class Registry extends BaseObject
 {
-    private $allModels = [];
+    protected $allModels = [];
     private $_pendingOps = [];
     
     protected $modelsReady;
@@ -141,7 +141,13 @@ class Registry extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
+     * @throws AppRegistryNotReady
      * @throws ClassNotFoundException
+     * @throws OrmException
+     * @throws \Eddmash\PowerOrm\Exception\FieldError
+     * @throws \Eddmash\PowerOrm\Exception\ImproperlyConfigured
+     * @throws \Eddmash\PowerOrm\Exception\MethodNotExtendableException
+     * @throws \Eddmash\PowerOrm\Exception\TypeError
      */
     protected function hydrateRegistry()
     {

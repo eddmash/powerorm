@@ -177,7 +177,7 @@ class Executor extends BaseObject
         if (empty($plan)):
             $plan = $this->getMigrationPlan($targets);
         endif;
-
+        
         $migrationsToRun = $this->getMigrationsFromPlan($plan);
 
         $targets = [];

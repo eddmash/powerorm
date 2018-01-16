@@ -319,7 +319,8 @@ class AutoDetector extends BaseObject
     /**
      * @param Operation  $operation
      * @param array      $dependencies
-     * @param bool|false $pushToTop    some operations should come before others, use this determine which
+     * @param bool|false $pushToTop some operations should come before
+     *                              others, use this determine which
      *
      * @since  1.1.0
      *
@@ -869,7 +870,7 @@ class AutoDetector extends BaseObject
             /** @var $reverseRelatedField RelatedField */
             foreach ($reverseRelatedFields as $reverseRelatedField) :
                 $modelName = $reverseRelatedField
-                    ->relation->toModel->getMeta()->getNSModelName();
+                    ->relation->getFromModel()->getMeta()->getNSModelName();
                 $fieldName = $reverseRelatedField->relation->fromField->getName();
                 $opDep[] = [
                     'target' => $fieldName,
@@ -893,7 +894,7 @@ class AutoDetector extends BaseObject
                 DeleteModel::createObject(['name' => $modelState->name]),
                 $opDep
             );
-
+            
         endforeach;
     }
 
@@ -1457,6 +1458,7 @@ class AutoDetector extends BaseObject
         $graphDependency = [];
         foreach ($this->generatedOperations as $index => $operation) :
             $graphDependency[$index] = [];
+        
             //check if a dependency exists on the current ops
             foreach ($operation->getDependency() as $dep) :
 

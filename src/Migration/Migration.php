@@ -12,8 +12,8 @@ namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppInterface;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Exception\CommandError;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
@@ -41,20 +41,20 @@ class Migration implements MigrationInterface
     protected $description;
     protected $dependency = [];
     private $appLabel;
-
+    
     public function __construct($name)
     {
         $this->name = $name;
-
+        
         $this->operations = $this->getOperations();
         $this->requires = $this->getDependency();
     }
-
+    
     public static function createObject($param)
     {
         return new static($param);
     }
-
+    
     /**
      * @return mixed
      */
@@ -62,17 +62,17 @@ class Migration implements MigrationInterface
     {
         return $this->name;
     }
-
+    
     public static function createShortName($name)
     {
         $pos = strripos($name, '\\');
         if ($pos):
             $name = trim(substr($name, $pos), '\\');
         endif;
-
+        
         return $name;
     }
-
+    
     /**
      * @param mixed $name
      */
@@ -80,7 +80,7 @@ class Migration implements MigrationInterface
     {
         $this->name = $name;
     }
-
+    
     /**
      * Operations to apply during this migration, in order.
      *
@@ -90,7 +90,7 @@ class Migration implements MigrationInterface
     {
         return $this->operations;
     }
-
+    
     /**
      * @param mixed $operations
      */
@@ -98,7 +98,7 @@ class Migration implements MigrationInterface
     {
         $this->operations = $operations;
     }
-
+    
     /**
      * @return mixed
      */
@@ -106,7 +106,7 @@ class Migration implements MigrationInterface
     {
         return $this->description;
     }
-
+    
     /**
      * @param mixed $description
      */
@@ -114,7 +114,7 @@ class Migration implements MigrationInterface
     {
         $this->description = $description;
     }
-
+    
     /**
      * Operations to apply during this migration, in order.
      *
@@ -124,7 +124,7 @@ class Migration implements MigrationInterface
     {
         return $this->dependency;
     }
-
+    
     /**
      * @param mixed $dependency
      */
@@ -132,7 +132,7 @@ class Migration implements MigrationInterface
     {
         $this->dependency[$appName] = $dependency;
     }
-
+    
     /**
      * Takes a project_state representing all migrations prior to this one and a schema for a live database and
      * applies the migration  in a forwards order.
@@ -155,7 +155,7 @@ class Migration implements MigrationInterface
     {
         /** @var $operation Operation */
         foreach ($this->operations as $operation) :
-
+            
             if (!$operation->isReducibleToSql()):
                 $schemaEditor->addSql(
                     '-- MIGRATION NOW PERFORMS'.
@@ -168,32 +168,31 @@ class Migration implements MigrationInterface
                     $operation->getDescription()
                 )
             );
-
+            
             if (!$operation->isReducibleToSql()):
                 continue;
             endif;
-
+            
             // preserve state before operation
             $oldState = $state->deepClone();
-
+            
             $operation->updateState($state);
             $operation->setAppLabel($this->getAppLabel());
-
-            $forwardCallback = function (ConnectionInterface $connection) use (
-                $operation,
-                $schemaEditor,
-                $oldState,
-                $state
-            ) {
+            
+            $schemaEditor->connection->beginTransaction();
+            try {
                 $operation->databaseForwards($schemaEditor, $oldState, $state);
-            };
-
-            $schemaEditor->connection->transactional($forwardCallback);
+                $schemaEditor->connection->commit();
+            } catch (\Exception $e) {
+                $schemaEditor->connection->rollBack();
+                throw new CommandError($e->getMessage());
+            }
+        
         endforeach;
-
+        
         return $state;
     }
-
+    
     /**
      *  Takes a project_state representing all migrations prior to this one and a schema for a live database and applies
      * the migration in a reverse order.
@@ -219,7 +218,7 @@ class Migration implements MigrationInterface
     {
         // we
         $itemsToRun = [];
-
+        
         // Phase 1 --
         /* @var $operation Operation */
         /** @var $newState ProjectState */
@@ -243,46 +242,49 @@ class Migration implements MigrationInterface
                 ]
             );
         endforeach;
-
+        
         // Phase 2 -- Since we are un applying the old state is where we want to go back to
         //   and the new state is where we are moving away from i.e
         //   we are moving from $newState to $oldState
-
+        
         foreach ($itemsToRun as $runItem) :
-
-            $schemaEditor->connection->transactional(
-                function () use ($runItem, $schemaEditor) {
-                    /** @var $operation Operation */
-                    $operation = $runItem['operation'];
-
-                    if (!$operation->isReducibleToSql()):
-                        $schemaEditor->addSql(
-                            '-- MIGRATION NOW PERFORMS'.
-                            ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
-                        );
-                    endif;
+            
+            $schemaEditor->connection->beginTransaction();
+            try {
+                /** @var $operation Operation */
+                $operation = $runItem['operation'];
+                
+                if (!$operation->isReducibleToSql()):
                     $schemaEditor->addSql(
-                        sprintf(
-                            '<fg=yellow>-- %s </>',
-                            ucfirst($operation->getDescription())
-                        )
+                        '-- MIGRATION NOW PERFORMS'.
+                        ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
                     );
-
-                    if ($operation->isReducibleToSql()):
-
-                        $operation->databaseBackwards(
-                            $schemaEditor,
-                            $runItem['newState'],
-                            $runItem['oldState']
-                        );
-                    endif;
-                }
-            );
+                endif;
+                $schemaEditor->addSql(
+                    sprintf(
+                        '<fg=yellow>-- %s </>',
+                        ucfirst($operation->getDescription())
+                    )
+                );
+                
+                if ($operation->isReducibleToSql()):
+                    
+                    $operation->databaseBackwards(
+                        $schemaEditor,
+                        $runItem['newState'],
+                        $runItem['oldState']
+                    );
+                endif;
+                $schemaEditor->connection->commit();
+            } catch (\Exception $exception) {
+                $schemaEditor->connection->rollBack();
+                throw new CommandError($exception->getMessage());
+            }
         endforeach;
-
+        
         return $state;
     }
-
+    
     /**
      * Takes a ProjectState and returns a new one with the migration's operations applied to it.
      *
@@ -305,27 +307,27 @@ class Migration implements MigrationInterface
         if ($preserveState):
             $newState = $state->deepClone();
         endif;
-
+        
         /** @var $operation Operation */
         foreach ($this->operations as $operation) :
             $operation->setAppLabel($this->getAppLabel());
             $operation->updateState($newState);
-
+        
         endforeach;
-
+        
         return $newState;
     }
-
+    
     public function __toString()
     {
         return sprintf('<Migration %s>', $this->name);
     }
-
+    
     public function setAppLabel($label)
     {
         $this->appLabel = $label;
     }
-
+    
     /**
      * @return mixed
      */
@@ -333,7 +335,7 @@ class Migration implements MigrationInterface
     {
         return $this->appLabel;
     }
-
+    
     /**
      * @return AppInterface|null
      */
@@ -341,7 +343,7 @@ class Migration implements MigrationInterface
     {
         try {
             $app = BaseOrm::getInstance()->getComponent($this->getAppLabel());
-
+            
             /* @var $app AppInterface */
             return $app;
         } catch (\Exception $e) {

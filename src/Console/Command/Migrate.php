@@ -118,7 +118,7 @@ class Migrate extends BaseCommand
             endif;
         elseif ($appLabel):
             $migratedApps = $executor->loader->getMigratedApps();
-
+        
             if (!in_array($appLabel, $migratedApps)):
                 throw new CommandError(
                     sprintf(
@@ -136,6 +136,7 @@ class Migrate extends BaseCommand
             endforeach;
         else:
             $leaves = $executor->loader->graph->getLeafNodes();
+        
             foreach ($leaves as $app => $appLeaves) :
                 $targets[$app] = $appLeaves[0];
             endforeach;
