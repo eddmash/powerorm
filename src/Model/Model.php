@@ -399,7 +399,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $this->setupFields($fields, $classFields);
 
             // proxy model setup
-            /** @var $concreteParent Model */
+            /* @var $concreteParent Model */
             if ($this->getMeta()->proxy):
                 $concreteParentName = Tools::unifyModelName($concreteParentName);
                 $concreteParent = $this->getMeta()->getRegistry()

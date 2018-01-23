@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
-use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 
 /**
@@ -109,14 +108,7 @@ class MigrationFile
 
         $dependencies = $this->migration->getDependency();
 
-        $namespace = sprintf(
-            "%s\Migrations",
-            ClassHelper::getFormatNamespace(
-                $app->getNamespace(),
-                false,
-                false
-            )
-        );
+        $namespace = $this->migration->getNamespace($app);
 
         return sprintf(
             $this->getFileTemplate(),

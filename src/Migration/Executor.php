@@ -77,6 +77,8 @@ class Executor extends BaseObject
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
      */
     public function getMigrationPlan($targets, $cleanStart = false)
     {
@@ -87,6 +89,7 @@ class Executor extends BaseObject
         else:
             $applied = $this->loader->appliedMigrations;
         endif;
+
         /** @var $target ["appName"=> "migrationName"] */
         foreach ($targets as $appName => $target) :
             // if target is 'zero' unmigrate all
@@ -94,20 +97,20 @@ class Executor extends BaseObject
 
                 $rootNodes = $this->loader->graph->getRootNodes();
                 foreach ($rootNodes as $rootAppName => $rootNode) :
-                    $descs = $this->loader
-                        ->graph->getDecedentsTree($rootAppName, $rootNode);
+                    $descs = $this->loader->graph
+                        ->getDecedentsTree($rootAppName, $rootNode);
 
-                    foreach ($descs as $descAppName => $desMigrations) :
-                        foreach ($desMigrations as $migrationName) :
-                            if (!empty($applied[$descAppName][$migrationName])):
-                                $plan[$descAppName][$migrationName] = [
-                                    'migration' => $this->loader->graph
-                                        ->getMigration($descAppName, $migrationName),
-                                    'unapply' => true,
-                                ];
-                                unset($applied[$descAppName][$migrationName]);
-                            endif;
-                        endforeach;
+                    foreach ($descs as $migrationName => $migrApp) :
+
+                        if (!empty($applied[$migrApp][$migrationName])):
+                            $plan[$migrApp][$migrationName] = [
+                                'migration' => $this->loader->graph
+                                    ->getMigration($migrApp, $migrationName),
+                                'unapply' => true,
+                            ];
+                            unset($applied[$migrApp][$migrationName]);
+                        endif;
+
                     endforeach;
                 endforeach;
             elseif (!empty($applied[$appName][$target])):
@@ -124,17 +127,16 @@ class Executor extends BaseObject
                         $childNode->name
                     );
 
-                    foreach ($descedants as $descAppName => $migrations) :
-                        foreach ($migrations as $migrationName) :
-                            if (!empty($applied[$descAppName][$migrationName])):
-                                $plan[$descAppName][$migrationName] = [
-                                    'migration' => $this->loader->graph
-                                        ->getMigration($descAppName, $migrationName),
-                                    'unapply' => true,
-                                ];
-                                unset($applied[$descAppName][$migrationName]);
-                            endif;
-                        endforeach;
+                    foreach ($descedants as $migrationName => $descAppName) :
+
+                        if (!empty($applied[$descAppName][$migrationName])):
+                            $plan[$descAppName][$migrationName] = [
+                                'migration' => $this->loader->graph
+                                    ->getMigration($descAppName, $migrationName),
+                                'unapply' => true,
+                            ];
+                            unset($applied[$descAppName][$migrationName]);
+                        endif;
                     endforeach;
 
                 endforeach;
@@ -143,17 +145,15 @@ class Executor extends BaseObject
                     ->getAncestryTree($appName, $target);
 
                 // if not applied and its not target is not zero, then apply it.
-                foreach ($ancestries as $ansAppName => $migrations) :
-                    foreach ($migrations as $migrationName) :
-                        if (empty($applied[$ansAppName][$migrationName])):
-                            $plan[$ansAppName][$migrationName] = [
-                                'migration' => $this->loader->graph
-                                    ->getMigration($ansAppName, $migrationName),
-                                'unapply' => false,
-                            ];
-                            $applied[$ansAppName][] = $migrationName;
-                        endif;
-                    endforeach;
+                foreach ($ancestries as $migrationName => $migrationApp) :
+                    if (empty($applied[$migrationApp][$migrationName])):
+                        $plan[$migrationApp][$migrationName] = [
+                            'migration' => $this->loader->graph
+                                ->getMigration($migrationApp, $migrationName),
+                            'unapply' => false,
+                        ];
+                        $applied[$migrationApp][] = $migrationName;
+                    endif;
                 endforeach;
             endif;
         endforeach;
@@ -168,6 +168,9 @@ class Executor extends BaseObject
      * @param $plan
      * @param $fake
      *
+     * @throws \Eddmash\PowerOrm\Exception\NotImplemented
+     * @throws \Exception
+     *
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -177,7 +180,7 @@ class Executor extends BaseObject
         if (empty($plan)):
             $plan = $this->getMigrationPlan($targets);
         endif;
-        
+
         $migrationsToRun = $this->getMigrationsFromPlan($plan);
 
         $targets = [];
@@ -185,6 +188,7 @@ class Executor extends BaseObject
         foreach ($leaves as $app => $appLeaves) :
             $targets[$app] = $appLeaves[0];
         endforeach;
+
         // the full plan that would be executed if we to run on a new database
         $fullPlan = $this->getMigrationsFromPlan(
             $this->getMigrationPlan($targets, true)
@@ -192,6 +196,7 @@ class Executor extends BaseObject
 
         // Holds all states right before a migration is applied
         // if the migration is being run.
+        /** @var $states ProjectState[][] */
         $states = [];
         $state = ProjectState::createObject();
 
@@ -200,9 +205,12 @@ class Executor extends BaseObject
         foreach ($fullPlan as $appName => $appMigrations) :
             foreach ($appMigrations as $migName => $migration) :
                 // we use the migration to mutate state
-                // after we mutate we remove the migration from the $migrationsToRun list.
-                // so if we get to a point where we dont have any more $migrationsToRun break
-                // this is to avoid any further mutations by other migrations not in the list.
+                // after we mutate we remove the migration from the
+                // $migrationsToRun list.
+                // so if we get to a point where we don't have any more
+                // $migrationsToRun break
+                // this is to avoid any further mutations by other migrations
+                // not in the list.
                 if (empty($migrationsToRun)):
                     break;
                 endif;
@@ -215,11 +223,11 @@ class Executor extends BaseObject
 
                 // $run will be false if the migration is not in the
                 // $migrationsToRun list
-                // so there is not need to preserve state else if its in the list
-                // we need to  we will get a new state object
+                // so there is no need to preserve state else if its in the list
+                // we will get a new state object
                 // that has been altered by the migration.
-                // we do this because we need the object stored in the states array
-                // in the condition it was right before
+                // we do this because we need the object stored in the states
+                // array in the condition it was right before
                 // the migration was applied.
                 // remember in PHP objects are passed by reference.
                 $state = $migration->updateState($state, $run);
@@ -236,6 +244,7 @@ class Executor extends BaseObject
                         $fake
                     );
                 elseif (false === $migrationMeta['unapply']):
+
                     $this->applyMigration(
                         $states[$appName][$mName],
                         $migrationMeta['migration'],
@@ -254,6 +263,9 @@ class Executor extends BaseObject
      * @param bool         $fake
      *
      * @return mixed
+     *
+     * @throws \Eddmash\PowerOrm\Exception\NotImplemented
+     * @throws \Exception
      *
      * @since  1.1.0
      *
@@ -295,6 +307,9 @@ class Executor extends BaseObject
      * @param bool         $fake
      *
      * @return mixed
+     *
+     * @throws \Eddmash\PowerOrm\Exception\NotImplemented
+     * @throws \Exception
      *
      * @since  1.1.0
      *

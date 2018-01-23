@@ -96,9 +96,17 @@ class ManyToManyField extends RelatedField
                 $field->doRelatedClass($related, $this->relation);
             };
 
-            Tools::lazyRelatedOperation($callback, $this->scopeModel, $this->relation->through, ['fromField' => $this]);
+            Tools::lazyRelatedOperation(
+                $callback,
+                $this->scopeModel,
+                $this->relation->through,
+                ['fromField' => $this]
+            );
         else:
-            $this->relation->through = $this->createManyToManyIntermediaryModel($this, $this->scopeModel);
+            $this->relation->through = $this->createM2MIntermediaryModel(
+                $this,
+                $this->scopeModel
+            );
         endif;
     }
 
@@ -138,12 +146,15 @@ class ManyToManyField extends RelatedField
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function createManyToManyIntermediaryModel($field, $model)
+    public function createM2MIntermediaryModel($field, $model)
     {
         $modelName = $model->getMeta()->getNSModelName();
 
         if (is_string($field->relation->toModel)):
-            $toModelName = Tools::resolveRelation($model, $field->relation->toModel);
+            $toModelName = Tools::resolveRelation(
+                $model,
+                $field->relation->toModel
+            );
             $ref = new \ReflectionClass($toModelName);
             $toModelName = $ref->getShortName();
             $toNamespacedModelName = $ref->getName();
@@ -197,9 +208,25 @@ class ManyToManyField extends RelatedField
         $intermediaryClass->addItem('}');
         $intermediaryClass->addItem('public function getMetaSettings(){');
         $intermediaryClass->addItem('return [');
-        $intermediaryClass->addItem(sprintf("'dbTable' => '%s',", $field->getM2MDbTable($model->getMeta())));
-        $intermediaryClass->addItem(sprintf("'verboseName' => '%s',", sprintf('%s-%s relationship', $from, $to)));
-        $intermediaryClass->addItem(sprintf("'uniqueTogether' => ['%s','%s'],", $from, $to));
+        $intermediaryClass->addItem(
+            sprintf(
+                "'dbTable' => '%s',",
+                $field->getM2MDbTable($model->getMeta())
+            )
+        );
+        $intermediaryClass->addItem(
+            sprintf(
+                "'verboseName' => '%s',",
+                sprintf('%s-%s relationship', $from, $to)
+            )
+        );
+        $intermediaryClass->addItem(
+            sprintf(
+                "'uniqueTogether' => ['%s','%s'],",
+                $from,
+                $to
+            )
+        );
         $intermediaryClass->addItem("'autoCreated' => true");
         $intermediaryClass->addItem('];');
         $intermediaryClass->addItem('}');

@@ -31,32 +31,35 @@ class Showmigrations extends BaseCommand
             $leaf = $appLeaves[0];
             $list = $loader->graph->getAncestryTree($appName, $leaf);
 
-            foreach ($list as $ansAppName => $migrations) :
+            $output->writeln(
+                sprintf(
+                    '<options=bold>%s</>',
+                    ucfirst($appName)
+                )
+            );
 
+            foreach ($list as $item => $itemApp) :
+                if ($itemApp != $appName):
+                    continue;
+                endif;
+
+                $itemArr = explode('\\', $item);
+                $migrationName = array_pop($itemArr);
+
+                if (!empty($loader->appliedMigrations[$itemApp][$item])):
+                    $indicator = '<info>(applied)</info>';
+                else:
+                    $indicator = '<fg=yellow>(pending)</>';
+                endif;
                 $output->writeln(
+                    str_pad(' ', 2, ' ').
                     sprintf(
-                        '<options=bold>%s</>',
-                        ucfirst($ansAppName)
+                        '%1$s %2$s',
+                        $indicator,
+                        $migrationName
                     )
                 );
-                foreach ($migrations as $item) :
-                    $itemArr = explode('\\', $item);
-                    $migrationName = array_pop($itemArr);
 
-                    if (!empty($loader->appliedMigrations[$ansAppName][$item])):
-                        $indicator = '<info>(applied)</info>';
-                    else:
-                        $indicator = '<fg=yellow>(pending)</>';
-                    endif;
-                    $output->writeln(
-                        str_pad(' ', 2, ' ').
-                        sprintf(
-                            '%1$s %2$s',
-                            $indicator,
-                            $migrationName
-                        )
-                    );
-                endforeach;
             endforeach;
         endforeach;
     }
@@ -67,7 +70,7 @@ class Showmigrations extends BaseCommand
     protected function configure()
     {
         $this->setName($this->guessCommandName())
-            ->setDescription($this->help)
-            ->setHelp($this->help);
+             ->setDescription($this->help)
+             ->setHelp($this->help);
     }
 }

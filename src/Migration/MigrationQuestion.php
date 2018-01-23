@@ -150,6 +150,7 @@ class MigrationQuestion
         $default_val = '';
         $msg = PHP_EOL.'Please enter the default value now, ensure its a valid PHP '.PHP_EOL;
         while (true):
+
             $default = $asker->ask(new Question($msg));
             if (empty($default)):
                 $msg = " Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL;

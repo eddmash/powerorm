@@ -50,24 +50,36 @@ class RemoveField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
-    {
+    public function databaseForwards(
+        SchemaEditor $schemaEditor,
+        ProjectState $fromState,
+        ProjectState $toState
+    ) {
         $fromModel = $fromState->getRegistry()->getModel($this->modelName);
 
         if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
-            $schemaEditor->removeField($fromModel, $fromModel->getMeta()->getField($this->name));
+            $schemaEditor->removeField(
+                $fromModel,
+                $fromModel->getMeta()->getField($this->name)
+            );
         endif;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
-    {
+    public function databaseBackwards(
+        SchemaEditor $schemaEditor,
+        ProjectState $fromState,
+        ProjectState $toState
+    ) {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-            $schemaEditor->addField($fromModel, $toModel->getMeta()->getField($this->name));
+            $schemaEditor->addField(
+                $fromModel,
+                $toModel->getMeta()->getField($this->name)
+            );
         endif;
     }
 }

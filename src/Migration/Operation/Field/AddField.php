@@ -25,6 +25,11 @@ use Eddmash\PowerOrm\Model\Field\Field;
 class AddField extends FieldOperation
 {
     /**
+     * @var bool
+     */
+    public $preserveDefault = true;
+
+    /**
      * {@inheritdoc}
      */
     public function getDescription()
@@ -37,7 +42,9 @@ class AddField extends FieldOperation
      */
     public function updateState(ProjectState $state)
     {
-        // remove default if preserveDefault==false, we dont want it in future updates.
+        // remove default if preserveDefault==false,
+        // we dont want it in future updates.
+
         if (false === $this->preserveDefault):
             $field = $this->field->deepClone();
             $field->default = NOT_PROVIDED;

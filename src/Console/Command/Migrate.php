@@ -32,27 +32,27 @@ class Migrate extends BaseCommand
     protected function configure()
     {
         $this->setName($this->guessCommandName())
-            ->setDescription($this->help)
-            ->setHelp($this->help)
-            ->addArgument(
-                'app_label',
-                InputArgument::OPTIONAL,
-                'App label of the application containing'.
-                ' the migration.'
-            )
-            ->addArgument(
-                'migration_name',
-                InputArgument::OPTIONAL,
-                'Database state will be brought to the state after that migration. '.
-                'Use the name "zero" to unapply all migrations.'
-            )
-            ->addOption(
-                'fake',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Mark migrations as run without actually running them.',
-                null
-            );
+             ->setDescription($this->help)
+             ->setHelp($this->help)
+             ->addArgument(
+                 'app_label',
+                 InputArgument::OPTIONAL,
+                 'App label of the application containing'.
+                 ' the migration.'
+             )
+             ->addArgument(
+                 'migration_name',
+                 InputArgument::OPTIONAL,
+                 'Database state will be brought to the state after that migration. '.
+                 'Use the name "zero" to unapply all migrations.'
+             )
+             ->addOption(
+                 'fake',
+                 null,
+                 InputOption::VALUE_OPTIONAL,
+                 'Mark migrations as run without actually running them.',
+                 null
+             );
     }
 
     /**
@@ -66,8 +66,10 @@ class Migrate extends BaseCommand
      * @throws \Eddmash\PowerOrm\Exception\ComponentException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
+     * @throws \Eddmash\PowerOrm\Exception\NotImplemented
      * @throws \Eddmash\PowerOrm\Exception\OrmException
      * @throws \Eddmash\PowerOrm\Exception\TypeError
+     * @throws \Exception
      */
     public function handle(InputInterface $input, OutputInterface $output)
     {
@@ -118,7 +120,7 @@ class Migrate extends BaseCommand
             endif;
         elseif ($appLabel):
             $migratedApps = $executor->loader->getMigratedApps();
-        
+
             if (!in_array($appLabel, $migratedApps)):
                 throw new CommandError(
                     sprintf(
@@ -136,7 +138,7 @@ class Migrate extends BaseCommand
             endforeach;
         else:
             $leaves = $executor->loader->graph->getLeafNodes();
-        
+
             foreach ($leaves as $app => $appLeaves) :
                 $targets[$app] = $appLeaves[0];
             endforeach;
@@ -169,8 +171,9 @@ class Migrate extends BaseCommand
                 );
 
                 $output->writeln(
-                    "<warning>  Run 'php pmanager.php makemigrations' to make new ".
-                    "migrations, and then re-run 'php pmanager.php migrate' to apply them.</warning>"
+                    "<warning>  Run 'php pmanager.php makemigrations' ".
+                    'to make new migrations, and then re-run '.
+                    "'php pmanager.php migrate' to apply them.</warning>"
                 );
 
             endif;

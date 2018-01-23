@@ -55,8 +55,10 @@ class ForeignObjectRel extends BaseObject
     public $fromField;
 
     /**
-     * When True and used in a model which inherits from another concrete model, indicates that this field should be
-     * used as the link back to the parent class, rather than the extra OneToOneField which would normally be
+     * When True and used in a model which inherits from another concrete model,
+     * indicates that this field should be
+     * used as the link back to the parent class, rather than the extra
+     * OneToOneField which would normally be
      * implicitly created by subclassing.
      *
      * @var
@@ -70,7 +72,8 @@ class ForeignObjectRel extends BaseObject
      * It’s also the default value for related_query_name
      * (the name to use for the reverse filter name from the target model).
      *
-     * If you’d prefer Django not to create a backwards relation, set related_name to '+' or end it with '+'.
+     * If you’d prefer Django not to create a backwards relation,
+     * set related_name to '+' or end it with '+'.
      *
      * @var
      */

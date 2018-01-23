@@ -99,9 +99,6 @@ class OrderBy extends BaseExpression
         ];
 
         $template = ($template) ? $template : $this->template;
-        dump($this->descending);
-        dump($template);
-        dump($params);
 
         return [vsprintf($template, $params), $expParams];
     }

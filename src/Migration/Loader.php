@@ -91,14 +91,13 @@ class Loader extends BaseObject
         // first add all the migrations into the graph
         foreach ($migrations as $name => $migration) :
 
-            $this->graph->addNode($name, $migration);
+            $this->graph->addNode($migration->getName(), $migration);
         endforeach;
 
         // the for each migration set its dependencies
         /** @var $migration Migration */
         foreach ($migrations as $name => $migration) :
             foreach ($migration->getDependency() as $appName => $parent) :
-
                 $this->graph->addDependency(
                     $name,
                     [$appName => $parent],
@@ -200,7 +199,6 @@ class Loader extends BaseObject
         foreach ($this->getMigrationsClasses() as $appName => $classes) :
             foreach ($classes as $fileName) :
                 $migrationName = $fileName;
-
                 $migration = $migrationName::createObject($fileName);
                 $migration->setAppLabel($appName);
                 $this->setMigratedApps($appName);

@@ -29,11 +29,6 @@ abstract class FieldOperation extends Operation
      */
     public $field;
 
-    /**
-     * @var bool
-     */
-    public $preserveDefault = false;
-
     public function referencesModel($modelName)
     {
         return strtolower($this->modelName) === strtolower($modelName);

@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
 use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 /**
@@ -23,6 +24,24 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
  */
 class AlterField extends FieldOperation
 {
+    /**
+     * @var bool
+     */
+    public $preserveDefault = true;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConstructorArgs()
+    {
+        $args = parent::getConstructorArgs();
+        if (ArrayHelper::getValue($args, 'preserveDefault', false)):
+            unset($args['preserveDefault']);
+        endif;
+
+        return $args;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -67,8 +86,11 @@ class AlterField extends FieldOperation
     /**
      * {@inheritdoc}
      */
-    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
-    {
+    public function databaseBackwards(
+        SchemaEditor $schemaEditor,
+        ProjectState $fromState,
+        ProjectState $toState
+    ) {
         $this->alterField($schemaEditor, $fromState, $toState);
     }
 
@@ -86,6 +108,7 @@ class AlterField extends FieldOperation
      * @throws \Eddmash\PowerOrm\Exception\LookupError
      * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
      * @throws \Eddmash\PowerOrm\Exception\ValueError
+     * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
      */
     private function alterField($schemaEditor, $fromState, $toState)
     {

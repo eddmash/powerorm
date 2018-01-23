@@ -12,6 +12,9 @@
 namespace Eddmash\PowerOrm\Migration\State;
 
 use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\Exception\OrmException;
+use Eddmash\PowerOrm\Exception\ValueError;
+use Eddmash\PowerOrm\Helpers\Tools;
 
 class StateRegistry extends Registry
 {
@@ -21,10 +24,10 @@ class StateRegistry extends Registry
     public function __construct($modelStates)
     {
         parent::__construct();
-        
+
         $this->hydrate($modelStates);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -32,14 +35,31 @@ class StateRegistry extends Registry
     {
         return new static($modelStates);
     }
-    
+
     /**
      * {@inheritdoc}
      */
     protected function hydrate($modelStates)
     {
+        // we need to order in away that parents are created before children
+        // remember this models are created in the _Fake namespace hence
+        // they don't exist.
+        $creationOrder = [];
         /** @var $modelState ModelState */
         foreach ($modelStates as $name => $modelState) :
+            $creationOrder[$modelState->name] = [];
+            if ($modelState->extends):
+                $creationOrder[$modelState->name][] = $modelState->extends;
+            endif;
+        endforeach;
+        try {
+            $creationOrder = Tools::topologicalSort($creationOrder);
+        } catch (ValueError $e) {
+            throw new OrmException(static::class.'::'.$e->getMessage());
+        }
+
+        foreach ($creationOrder as $depend) :
+            $modelState = $modelStates[$depend];
             $modelState->toModel($this);
         endforeach;
         $this->ready = true;

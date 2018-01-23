@@ -12,9 +12,12 @@
 namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\BaseObject;
+use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Components\Application;
 use Eddmash\PowerOrm\Console\Question\Asker;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\AlterField;
 use Eddmash\PowerOrm\Migration\Operation\Field\RemoveField;
@@ -34,12 +37,15 @@ use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
 
 /**
- * Takes a pair of ProjectStates, and compares them to see what the first would need doing to
- * make it match the second (the second usually being the project's current state).
+ * Takes a pair of ProjectStates, and compares them to see what the first would
+ * need doing to make it match the second (the second usually being the
+ * project's current state).
  *
- * Note that this naturally operates on entire projects at a time, as it's likely that changes interact
- * (for example, you can't add a ForeignKey without having a migration to add the table it depends on first).
- * A user interface may offer single-app usage if it wishes, with the caveat that it may not always be possible.
+ * Note that this naturally operates on entire projects at a time, as it's likely
+ * that changes interact (for example, you can't add a ForeignKey without
+ * having a migration to add the table it depends on first).
+ * A user interface may offer single-app usage if it wishes, with the caveat
+ * that it may not always be possible.
  *
  * @since  1.1.0
  *
@@ -125,6 +131,11 @@ class AutoDetector extends BaseObject
     private $generatedOperations;
 
     /**
+     * @var Migration[][]
+     */
+    private $migrations = [];
+
+    /**
      * @param ProjectState $fromState
      * @param ProjectState $toState
      * @param Asker        $asker
@@ -148,7 +159,7 @@ class AutoDetector extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getChanges($graph, $migrationName = null)
+    public function getChanges(Graph $graph, $migrationName = null)
     {
         $changes = $this->detectChanges($graph);
 
@@ -162,7 +173,7 @@ class AutoDetector extends BaseObject
      *
      * @return array
      */
-    private function detectChanges($graph)
+    private function detectChanges(Graph $graph)
     {
         $this->generatedOperations = [];
         $this->oldRegistry = $this->fromState->getRegistry();
@@ -255,7 +266,11 @@ class AutoDetector extends BaseObject
         $this->generateAlteredFields();
         $this->generateAlteredDbTable();
 
-        return ($this->generatedOperations) ? $this->createMigration() : [];
+        $this->sortOperations();
+        $this->createMigrations($graph);
+        $this->optimize();
+
+        return $this->migrations;
     }
 
     /**
@@ -272,13 +287,13 @@ class AutoDetector extends BaseObject
     private function arrangeForGraph($changes, $graph, $migrationName = null)
     {
         $leaves = $graph->getLeafNodes();
-
-        /** @var $migration Migration */
-        foreach ($changes as $appName => &$migration) :
+        $nameMap = [];
+        /* @var $appMigration Migration */
+        foreach ($changes as $appName => &$appMigrations) :
             if (empty($appName)):
                 continue;
             endif;
-            $appLeaves = (empty($leaves[$appName])) ? [] : $leaves[$appName];
+            $appLeaves = ArrayHelper::getValue($leaves, $appName, []);
             $leaf = (empty($appLeaves)) ? '' : $appLeaves[0];
             if (empty($leaf)):
                 $migrationNo = 1;
@@ -286,31 +301,59 @@ class AutoDetector extends BaseObject
                 $migrationNo = $this->getMigrationNumber(
                         Migration::createShortName($leaf)
                     ) + 1;
-
             endif;
 
-            // set name for migration
-            if (empty($leaf)):
-                // this mean we don't have previous migrations
-                $migrationName = $this->suggestName();
-            else:
-                // first set previous as dependency of this
-                $migration->setDependency($appName, $leaf);
+            foreach ($appMigrations as $index => &$appMigration) :
 
-                $migrationNo = str_pad(
-                    $migrationNo,
-                    4,
-                    '0',
-                    STR_PAD_LEFT
-                );
-                $migrationName = $this->suggestName(
-                    $migration->getOperations(),
-                    $migrationNo
-                );
+                if (0 == $index && $leaf):
+                    // first set previous as dependency of this
+                    $appMigration->setDependency($appName, $leaf);
+                endif;
+                $newName = $migrationName;
+                if (0 == $index && !$leaf):
+                    // this mean we don't have previous migrations
+                    $newName = ($newName) ? $newName : $this->suggestName();
+                else:
+
+                    $migrationNo = str_pad(
+                        $migrationNo,
+                        4,
+                        '0',
+                        STR_PAD_LEFT
+                    );
+                    $newName = $this->suggestName(
+                        $appMigration->getOperations(),
+                        $migrationNo
+                    );
+                endif;
+                $nameMap[$appName][$appMigration->getName()] =
+                    $this->createNsName($appMigration, $appName, $newName);
+                $appMigration->setName($newName);
+                ++$migrationNo;
+            endforeach;
+
+        endforeach;
+
+        foreach ($changes as $appName => &$appMigrations) :
+            if (empty($appName)):
+                continue;
             endif;
 
-            $migration->setName($migrationName);
+            // resolve migration names especially on dependencies
+            foreach ($appMigrations as $index => &$appMigration) :
+                $deps = [];
 
+                foreach ($appMigration->getDependency() as $parent => $migName) :
+
+                    if (isset($nameMap[$parent][$migName])):
+                        $deps[$parent] = $nameMap[$parent][$migName];
+                    else:
+                        $deps[$parent] = $migName;
+                    endif;
+                endforeach;
+
+                $appMigration->addDependency($deps);
+            endforeach;
         endforeach;
 
         return $changes;
@@ -319,12 +362,14 @@ class AutoDetector extends BaseObject
     /**
      * @param Operation  $operation
      * @param array      $dependencies
-     * @param bool|false $pushToTop some operations should come before
-     *                              others, use this determine which
+     * @param bool|false $pushToTop    some operations should come before
+     *                                 others, use this determine which
      *
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
     public function addOperation(
         $appLabel,
@@ -335,42 +380,187 @@ class AutoDetector extends BaseObject
         $operation->setDependency($dependencies);
         $operation->setAppLabel($appLabel);
 
+        $ops = ArrayHelper::getValue($this->generatedOperations, $appLabel, []);
+
         if ($pushToTop):
-            array_unshift($this->generatedOperations, $operation);
+            array_unshift($ops, $operation);
         else:
-            array_push($this->generatedOperations, $operation);
+            array_push($ops, $operation);
         endif;
+        $this->generatedOperations[$appLabel] = $ops;
     }
 
-    private function createMigration()
+    private function createMigrations(Graph $graph)
     {
-        $this->sortOperations();
+        $chopping = false;
 
-        $operations = Optimize::run($this->generatedOperations);
+        /** @var $appOps Operation[] */
+        $multiArraySum = function ($arrs) {
+            $sum = 0;
+            foreach ($arrs as $arr) :
+                $sum += count($arr);
+            endforeach;
 
-        $app = [];
+            return $sum;
+        };
+        $opsCount = $multiArraySum(array_values($this->generatedOperations));
+        while ($opsCount > 0):
+            foreach ($this->generatedOperations as $appName => $appOps) :
+                $migrationOps = [];
+                $migrationDeps = [];
 
-        /** @var $operations \Eddmash\PowerOrm\Migration\Operation\Operation[] */
-        foreach ($operations as $operation) :
-            $app[$operation->getAppLabel()][] = $operation;
+                foreach ($appOps as $appOp) :
+                    $opDeps = [];
+                    $depSatisfied = true;
+
+                    // ** GET ALL OPERATION DEPENDENCIES ************
+
+                    foreach ($appOp->getDependency() as $dep) :
+
+                        $app = $dep['app'];
+                        // the current operation depends on an another app
+                        // we need to ensure the dependency has been resolved
+                        // on the other app
+                        if ($app != $appName):
+                            $otherAppOps = ArrayHelper::getValue(
+                                $this->generatedOperations,
+                                $app,
+                                []
+                            );
+                            foreach ($otherAppOps as $otherAppOp) :
+                                // check if an operation depends on another
+                                // operation that is current in our list of
+                                // generated operations, if this is the case,
+                                // stop going throught the apps operations
+                                // until the other app operations have been
+                                // resolved into a migration we can depend on.
+                                if ($this->checkDependency($otherAppOp, $dep)):
+                                    $depSatisfied = false;
+                                    break;
+                                endif;
+                            endforeach;
+
+                            //****** ADD MIGRATION DEPENDENCIES ****************
+
+                            // this will happen if we depending on another apps
+                            // operation, we need the app to be resolved into
+                            // a migration we can depend on first
+                            if (!$depSatisfied):
+                                break;
+                            else:
+                                // if the other app we depended on has it
+                                // migration created
+                                // depend on the last migration for that app
+                                if (ArrayHelper::hasKey($this->migrations, $app)):
+
+                                    $appMig = end($this->migrations[$app]);
+
+                                    $opDeps[$app] = $appMig->getName();
+                                else:
+                                    // if the app we depend on is not part of the
+                                    // current set of operations, we check if it
+                                    // has already been migrated.
+                                    // we only check if we have gone through all
+                                    // the operations atleast once.
+                                    if ($chopping):
+                                        if ($graph && $graph->getLeafNodes($app)):
+
+                                            $migs = $graph->getLeafNodes($app);
+                                            $opDeps[$app] = $migs[0];
+                                        endif;
+                                    else:
+                                        $depSatisfied = false;
+                                    endif;
+                                endif;
+                            endif;
+                        endif;
+
+                    endforeach;
+
+                    // ******** ADD MIGRATION DEPENDENCY FOR THE APP *********
+
+                    if ($depSatisfied):
+                        $migrationDeps = array_merge(
+                            $migrationDeps,
+                            $opDeps
+                        );
+
+                        // add operation to list operations and
+                        // remove it from list
+                        $migrationOps[] = $appOp;
+                        $this->generatedOperations[$appName] = array_slice(
+                            $this->generatedOperations[$appName],
+                            1
+                        );
+                    else:
+                        // just break since app needs to have all its
+                        // dependecies resolved
+                        break;
+                    endif;
+                endforeach;
+
+                if ($depSatisfied):
+
+                    if (!$this->generatedOperations[$appName] || $chopping):
+                        $appMigs = ArrayHelper::getValue(
+                            $this->migrations,
+                            $appName,
+                            []
+                        );
+                        $count = count($appMigs) + 1;
+
+                        $migration = new Migration(
+                            sprintf('auto_%s', $count)
+                        );
+                        // optimize the migrations
+                        $migration->setOperations($migrationOps);
+                        $migration->setAppLabel($appName);
+                        $migration->addDependency($migrationDeps);
+                        $this->migrations[$appName][] = $migration;
+                    else:
+                        $this->generatedOperations[$appName] = array_merge(
+                            $migrationOps,
+                            $this->generatedOperations
+                        );
+                    endif;
+                endif;
+            endforeach;
+
+            $currSum = $multiArraySum(array_values($this->generatedOperations));
+            if ($currSum == $opsCount):
+                if (!$chopping):
+                    $chopping = true;
+                else:
+                    throw new ValueError(
+                        sprintf(
+                            'Cannot resolve operation dependencies: %s',
+                            Tools::stringify($this->generatedOperations)
+                        )
+                    );
+
+                endif;
+            endif;
+            $opsCount = $currSum;
+        endwhile;
+    }
+
+    private function optimize()
+    {
+        foreach ($this->migrations as $appName => $migrations) :
+            foreach ($migrations as $migration) :
+                $migration->setOperations(
+                    Optimize::run($migration->getOperations())
+                );
+            endforeach;
         endforeach;
-
-        $migrations = [];
-        foreach ($app as $label => $ops) :
-            $migration = new Migration('auto');
-            // optimize the migrations
-            $migration->setOperations($ops);
-            $migration->setAppLabel($label);
-            $migrations[$label] = $migration;
-        endforeach;
-
-        return $migrations;
     }
 
     /**
-     * Return a definition of the fields that ignores field names and what related fields actually relate to.
+     * Return a definition of the fields that ignores field names and what
+     * related fields actually relate to.
      *
-     * Used for detecting renames (as, of course, the related fields change during renames)
+     * Used for detecting renames (as, of course, the related fields change
+     * during renames)
      *
      * @param $fields
      *
@@ -409,9 +599,9 @@ class AutoDetector extends BaseObject
      */
     public function deepDeconstruct($value)
     {
-        if (!$value instanceof BaseObject || ($value instanceof BaseObject && !$value->hasMethod(
-                    'deconstruct'
-                ))):
+        if (!$value instanceof BaseObject ||
+            ($value instanceof BaseObject &&
+                !$value->hasMethod('deconstruct'))):
             return $value;
         endif;
 
@@ -604,7 +794,8 @@ class AutoDetector extends BaseObject
     // ******************** GENERATIONS CHANGES ***********************
 
     /**
-     * Find all new models (both managed and unmanaged) and make create operations for them as well as separate
+     * Find all new models (both managed and unmanaged) and make create
+     * operations for them as well as separate
      * operations to create any foreign key or M2M relationships .
      *
      * @since  1.1.0
@@ -685,6 +876,7 @@ class AutoDetector extends BaseObject
             // first, check for operations that drops a proxy version of us has been dropped
             $opDep = [
                 [
+                    'app' => $meta->getAppName(),
                     'target' => $addedModelName,
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_DROPPED,
@@ -694,6 +886,7 @@ class AutoDetector extends BaseObject
             // depend on related model being created if primary key is a relationship field
             if (null !== $primaryKeyRel):
                 $opDep[] = [
+                    'app' => $primaryKeyRel->getMeta()->getAppName(),
                     'target' => $primaryKeyRel->getMeta()->getNSModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
@@ -710,7 +903,6 @@ class AutoDetector extends BaseObject
                 endif;
                 $uFields[$uname] = $ufield;
             endforeach;
-
             // create operation
             $this->addOperation(
                 $meta->getAppName(),
@@ -738,6 +930,7 @@ class AutoDetector extends BaseObject
             foreach ($relatedFields as $fieldName => $relationField) :
                 // we need the current model to be in existence
                 $opDep[] = [
+                    'app' => $meta->getAppName(),
                     'target' => $addedModelName,
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
@@ -745,7 +938,10 @@ class AutoDetector extends BaseObject
 
                 // depend on the related model also
                 $opDep[] = [
-                    'target' => $relationField->relation->toModel->getMeta()->getNSModelName(),
+                    'app' => $relationField->relation->toModel->getMeta()
+                                                              ->getAppName(),
+                    'target' => $relationField->relation->toModel
+                        ->getMeta()->getNSModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];
@@ -753,12 +949,16 @@ class AutoDetector extends BaseObject
                 // if the through model was not automatically created, depend on it also
                 if ($relationField->relation->hasProperty(
                         'through'
-                    ) && null != !$relationField->relation &&
+                    ) &&
+                    null != !$relationField->relation &&
                     !$relationField->relation->through->getMeta()->autoCreated
                 ):
 
                     $opDep[] = [
-                        'target' => $relationField->relation->through->getMeta()->getNSModelName(),
+                        'app' => $relationField->relation->through
+                            ->getMeta()->getAppName(),
+                        'target' => $relationField->relation->through
+                            ->getMeta()->getNSModelName(),
                         'type' => self::TYPE_MODEL,
                         'action' => self::ACTION_CREATED,
                     ];
@@ -810,7 +1010,7 @@ class AutoDetector extends BaseObject
 
             $modelState = $this->fromState->getModelState($deletedModel);
             $meta = $this->fromState->getRegistry()
-                ->getModel($deletedModel)->getMeta();
+                                    ->getModel($deletedModel)->getMeta();
 
             // at this point if we the model is un manged just stop ,
             // since we just need to have it recorded in our
@@ -880,6 +1080,8 @@ class AutoDetector extends BaseObject
                 ];
                 if (!$reverseRelatedField->relation->isManyToMany()):
                     $opDep[] = [
+                        'app' => $reverseRelatedField->relation
+                            ->getFromModel()->getMeta()->getAppName(),
                         'target' => $fieldName,
                         'model' => $modelName,
                         'type' => self::TYPE_FIELD,
@@ -894,7 +1096,7 @@ class AutoDetector extends BaseObject
                 DeleteModel::createObject(['name' => $modelState->name]),
                 $opDep
             );
-            
+
         endforeach;
     }
 
@@ -970,7 +1172,8 @@ class AutoDetector extends BaseObject
     /**
      * Makes CreateModel statements for proxy models.
      *
-     * We use the same statements as that way there's less code duplication, but of course for proxy models we can skip
+     * We use the same statements as that way there's less code duplication,
+     * but of course for proxy models we can skip
      * all that pointless field stuff and just chuck out an operation.
      *
      * @since  1.1.0
@@ -983,12 +1186,14 @@ class AutoDetector extends BaseObject
 
         /* @var $modelState ModelState */
         foreach ($addedProxies as $addedProxy) :
-            $meta = $this->toState->getRegistry()->getModel($addedProxy)->getMeta();
+            $meta = $this->toState->getRegistry()
+                                  ->getModel($addedProxy)->getMeta();
             $modelState = $this->toState->getModelState($addedProxy);
             assert($modelState->getMeta()['proxy']);
 
             $opDep = [
                 [
+                    'app' => $meta->getAppName(),
                     'target' => $addedProxy,
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_DROPPED,
@@ -1024,7 +1229,7 @@ class AutoDetector extends BaseObject
         foreach ($droppedProxies as $droppedProxy) :
             $modelState = $this->fromState->getModelState($droppedProxy);
             $meta = $this->fromState->getRegistry()->getModel($droppedProxy)
-                ->getMeta();
+                                    ->getMeta();
 
             // create operation
             $this->addOperation(
@@ -1039,7 +1244,8 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * Works out if any non-schema-affecting options have changed and makes an operation to represent them in state
+     * Works out if any non-schema-affecting options have changed and makes
+     * an operation to represent them in state
      * changes.
      *
      * @since  1.1.0
@@ -1122,7 +1328,8 @@ class AutoDetector extends BaseObject
         /* @var $field Field */
         foreach ($this->keptModelKeys as $modelName) :
             $oldModelName = $this->getOldModelName($modelName);
-            $meta = $this->toState->getRegistry()->getModel($modelName)->getMeta();
+            $meta = $this->toState->getRegistry()
+                                  ->getModel($modelName)->getMeta();
             $oldModelState = $this->fromState->getModelState($oldModelName);
 
             $newModel = $this->newRegistry->getModel($modelName);
@@ -1142,14 +1349,14 @@ class AutoDetector extends BaseObject
                         $oldModelState->getFieldByName($remField)
                     );
 
-                    if (null !== $field->relation && null !== $field->relation->toModel &&
+                    if (!is_null($field->relation) &&
+                        !is_null($field->relation->toModel) &&
                         isset($oldFieldDef['constructorArgs']['to'])
                     ):
                         $oldRelTo = $oldFieldDef['constructorArgs']['to'];
                         if (in_array($oldRelTo, $this->renamedModels)):
-                            $oldFieldDef['constructorArgs']['to'] = $this->getOldModelName(
-                                $oldRelTo
-                            );
+                            $oldFieldDef['constructorArgs']['to'] =
+                                $this->getOldModelName($oldRelTo);
                         endif;
                     endif;
 
@@ -1265,9 +1472,9 @@ class AutoDetector extends BaseObject
 
             foreach ($keptFieldKeys as $keptField) :
                 $oldFieldName = $this->getOldFieldName($modelName, $keptField);
-                $oldField = $this->oldRegistry->getModel(
-                    $oldModelName
-                )->getMeta()->getField($oldFieldName);
+                $oldField = $this->oldRegistry->getModel($oldModelName)
+                                              ->getMeta()
+                                              ->getField($oldFieldName);
 
                 $meta = $this->newRegistry->getModel(
                     $modelName
@@ -1344,10 +1551,12 @@ class AutoDetector extends BaseObject
             $oldModelState = $this->fromState->getModelState($oldModelName);
             $newModelState = $this->toState->getModelState($oldModelName);
             $meta = $this->toState->getRegistry()->getModel($modelName)->getMeta();
-            $oldDbTableName = (!isset($oldModelState->getMeta()['dbTable'])) ? '' : $oldModelState->getMeta(
-            )['dbTable'];
-            $newDbTableName = (!isset($newModelState->getMeta()['dbTable'])) ? '' : $newModelState->getMeta(
-            )['dbTable'];
+            $oldDbTableName =
+                (!isset($oldModelState->getMeta()['dbTable'])) ? '' :
+                    $oldModelState->getMeta()['dbTable'];
+            $newDbTableName =
+                (!isset($newModelState->getMeta()['dbTable'])) ? '' :
+                    $newModelState->getMeta()['dbTable'];
 
             if ($oldDbTableName !== $newDbTableName) :
                 $this->addOperation(
@@ -1391,6 +1600,7 @@ class AutoDetector extends BaseObject
 
             // depend on related model being created
             $opDep[] = [
+                'app' => $field->relation->toModel->getMeta()->getAppName(),
                 'target' => $field->relation->toModel->getMeta()->getNSModelName(),
                 'type' => self::TYPE_MODEL,
                 'action' => self::ACTION_CREATED,
@@ -1403,7 +1613,9 @@ class AutoDetector extends BaseObject
             ):
 
                 $opDep[] = [
-                    'target' => $field->relation->through->getMeta()->getNSModelName(),
+                    'app' => $field->relation->through->getMeta()->getAppName(),
+                    'target' => $field->relation->through->getMeta()
+                                                         ->getNSModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];
@@ -1412,7 +1624,8 @@ class AutoDetector extends BaseObject
 
         endif;
 
-        if (!$field->isNull() && !$field->hasDefault() && !$field instanceof ManyToManyField):
+        if (!$field->isNull() && !$field->hasDefault() &&
+            !$field instanceof ManyToManyField):
             $def = MigrationQuestion::askNotNullAddition(
                 $this->asker,
                 $modelName,
@@ -1441,6 +1654,7 @@ class AutoDetector extends BaseObject
     private function findRemovedFields($modelName, $fieldName)
     {
         $meta = $this->newRegistry->getModel($modelName)->getMeta();
+
         $this->addOperation(
             $meta->getAppName(),
             RemoveField::createObject(
@@ -1452,30 +1666,41 @@ class AutoDetector extends BaseObject
         );
     }
 
+    /**
+     * @param Operation[] $operations
+     *
+     * @throws ValueError
+     */
     private function sortOperations()
     {
+        /** @var $appOperations Operation[] */
         // get a map of operations and what operations the depend on.
-        $graphDependency = [];
-        foreach ($this->generatedOperations as $index => $operation) :
-            $graphDependency[$index] = [];
-        
-            //check if a dependency exists on the current ops
-            foreach ($operation->getDependency() as $dep) :
+        foreach ($this->generatedOperations as $appName => $appOperations) :
+            $graphDependency = [];
 
-                foreach ($this->generatedOperations as $inIndex => $operation2) :
+            foreach ($appOperations as $index => $operation) :
+                $graphDependency[$index] = [];
 
-                    if ($this->checkDependency($operation2, $dep)):
-                        $graphDependency[$index][] = $inIndex;
+                //check if a dependency exists on the current ops
+                foreach ($operation->getDependency() as $dep) :
+
+                    if ($dep['app'] == $appName):
+                        foreach ($appOperations as $inIndex => $operation2) :
+
+                            if ($this->checkDependency($operation2, $dep)):
+                                $graphDependency[$index][] = $inIndex;
+                            endif;
+                        endforeach;
                     endif;
+
                 endforeach;
-
             endforeach;
-        endforeach;
 
-        $this->generatedOperations = $this->topologicalSort(
-            $this->generatedOperations,
-            $graphDependency
-        );
+            $this->generatedOperations[$appName] = $this->topologicalSort(
+                $appOperations,
+                $graphDependency
+            );
+        endforeach;
     }
 
     public function sortModels()
@@ -1533,5 +1758,19 @@ class AutoDetector extends BaseObject
         endforeach;
 
         return $sorted;
+    }
+
+    private function createNsName(Migration $migration, $appName, $newName)
+    {
+        /**
+         * @var Application
+         */
+        $component = BaseOrm::getInstance()->getComponent($appName);
+
+        return sprintf(
+            "%s\%s",
+            $migration->getNamespace($component),
+            $newName
+        );
     }
 }

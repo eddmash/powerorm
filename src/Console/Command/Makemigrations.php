@@ -75,9 +75,12 @@ class Makemigrations extends BaseCommand
         $this->writeMigrations($changes, $input, $output);
     }
 
-    private function writeMigrations($migrationChanges, InputInterface $input, OutputInterface $output)
-    {
-        /* @var $migration Migration */
+    private function writeMigrations(
+        $migrationChanges,
+        InputInterface $input,
+        OutputInterface $output
+    ) {
+        /* @var $appMigration Migration */
         /* @var $op Operation */
 
         foreach (BaseOrm::getInstance()->getComponents() as $component) :
@@ -91,40 +94,43 @@ class Makemigrations extends BaseCommand
                             $component->getName()
                         )
                     );
-                    $migration = ArrayHelper::getValue(
+                    $appMigrations = ArrayHelper::getValue(
                         $migrationChanges,
                         $component->getName()
                     );
-                    $migrationFile = MigrationFile::createObject($migration);
 
-                    $fileName = $migrationFile->getFileName();
+                    foreach ($appMigrations as $appMigration) :
+                        $migrationFile = MigrationFile::createObject($appMigration);
 
-                    $output->writeln(sprintf('  <options=bold>%s</>', $fileName));
+                        $fileName = $migrationFile->getFileName();
 
-                    $operations = $migration->getOperations();
-                    foreach ($operations as $op) :
-                        $output->writeln(
-                            sprintf(
-                                '    - %s',
-                                ucwords($op->getDescription())
-                            )
-                        );
-                    endforeach;
+                        $output->writeln(sprintf('  <options=bold>%s</>', $fileName));
 
-                    if ($input->getOption('dry-run')):
+                        $operations = $appMigration->getOperations();
+                        foreach ($operations as $op) :
+                            $output->writeln(
+                                sprintf(
+                                    '    - %s',
+                                    ucwords($op->getDescription())
+                                )
+                            );
+                        endforeach;
 
-                        if (OutputInterface::VERBOSITY_DEBUG === $output->getVerbosity()) :
-                            $output->writeln($migrationFile->getContent());
+                        if ($input->getOption('dry-run')):
+
+                            if (OutputInterface::VERBOSITY_DEBUG === $output->getVerbosity()) :
+                                $output->writeln($migrationFile->getContent());
+                            endif;
+
+                            continue;
                         endif;
+                        $handler = new FileHandler(
+                            $component->getMigrationsPath(),
+                            $fileName
+                        );
 
-                        continue;
-                    endif;
-                    $handler = new FileHandler(
-                        $component->getMigrationsPath(),
-                        $fileName
-                    );
-
-                    $handler->write($migrationFile->getContent());
+                        $handler->write($migrationFile->getContent());
+                    endforeach;
                 endif;
             endif;
         endforeach;
@@ -136,14 +142,14 @@ class Makemigrations extends BaseCommand
     protected function configure()
     {
         $this->setName($this->guessCommandName())
-            ->setDescription($this->help)
-            ->setHelp($this->help)
-            ->addOption(
-                'dry-run',
-                null,
-                InputOption::VALUE_NONE,
-                'Just show what migrations would be made; don\'t actually write them.',
-                null
-            );
+             ->setDescription($this->help)
+             ->setHelp($this->help)
+             ->addOption(
+                 'dry-run',
+                 null,
+                 InputOption::VALUE_NONE,
+                 'Just show what migrations would be made; don\'t actually write them.',
+                 null
+             );
     }
 }

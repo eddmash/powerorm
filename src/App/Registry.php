@@ -41,21 +41,21 @@ class Registry extends BaseObject
 {
     protected $allModels = [];
     private $_pendingOps = [];
-    
+
     protected $modelsReady;
     public $ready;
-    
+
     public function __construct()
     {
         // Whether the registry is populated.
         $this->ready = false;
     }
-    
+
     public static function createObject($config = [])
     {
         return new static();
     }
-    
+
     /**
      * @throws \Eddmash\PowerOrm\Exception\ClassNotFoundException
      */
@@ -65,10 +65,10 @@ class Registry extends BaseObject
             $this->hydrateRegistry();
             $this->ready = true;
         endif;
-        
+
         return;
     }
-    
+
     /**
      * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
      */
@@ -78,14 +78,14 @@ class Registry extends BaseObject
             throw new AppRegistryNotReady('Registry has not been loaded yet.');
         }
     }
-    
+
     /**
      * Models that extend the PModel, but extend the CI_Model.
      *
      * @var array
      */
     protected $allNonOrmModels = [];
-    
+
     /**
      * Returns a list of all model files.
      *
@@ -94,19 +94,19 @@ class Registry extends BaseObject
     public function getModelFiles()
     {
         $files = [];
-        
+
         foreach (BaseOrm::getInstance()->getComponents() as $component) :
-            
+
             if ($component instanceof AppInterface):
                 $fileHandler = new FileHandler($component->getModelsPath());
                 $files[$component->getName()] = $fileHandler->readDir('php');
             endif;
-        
+
         endforeach;
-        
+
         return $files;
     }
-    
+
     /**
      * Returns the list of all the models that extend the PModel in the current app.
      *
@@ -117,11 +117,11 @@ class Registry extends BaseObject
     public function getModels($includeAutoCreated = false)
     {
         $this->isAppReady();
-        
+
         if ($includeAutoCreated):
             return $this->allModels;
         endif;
-        
+
         $models = [];
         /** @var $model Model */
         foreach ($this->allModels as $name => $model) :
@@ -130,10 +130,10 @@ class Registry extends BaseObject
             endif;
             $models[$name] = $model;
         endforeach;
-        
+
         return $models;
     }
-    
+
     /**
      * Loads all the models in the current application.
      *
@@ -154,9 +154,9 @@ class Registry extends BaseObject
         if ($this->ready):
             return;
         endif;
-        
+
         $modelClasses = $this->getModelClasses();
-        
+
         $callback = function (\ReflectionClass $reflect) use (
             &$callback,
             &$classList
@@ -173,35 +173,35 @@ class Registry extends BaseObject
                 endif;
             endif;
             $classList = array_merge($classList, $extends);
-            
+
             return $extends;
         };
-        
+
         /* @var $obj Model */
-        
+
         if (!empty($modelClasses)) :
             $classPopulationOrder = [];
             $classToAppMap = [];
             $classList = [];
-            
+
             foreach ($modelClasses as $appName => $classes) :
-                
+
                 foreach ($classes as $class) :
                     $classToAppMap[$class] = $appName;
                     $reflect = new \ReflectionClass($class);
-                    
+
                     // if we cannot create an instance of a class just skip,
                     // e.g traits abstract etc
-                    
+
                     if (!$reflect->isInstantiable()) :
                         continue;
                     endif;
-                    
+
                     if ($this->hasModel($class) ||
                         !$reflect->isSubclassOf(Model::class)):
                         continue;
                     endif;
-                    
+
                     // callback to get non-abstract parent, since this needs to
                     // created before we can create this child class instance
                     // if none is found return empty array
@@ -210,35 +210,35 @@ class Registry extends BaseObject
                 endforeach;
             endforeach;
             $classList = array_unique($classList);
-            
+
             foreach ($classList as $class) :
                 if (!ArrayHelper::hasKey($classToAppMap, $class)):
                     throw new OrmException(
                         "Make '$class' abstract or register it as ".
-                        "an application model"
+                        'an application model'
                     );
                 endif;
             endforeach;
-            
+
             try {
                 $classPopulationOrder = Tools::topologicalSort($classPopulationOrder);
             } catch (ValueError $e) {
                 throw new OrmException($e->getMessage());
             }
-            
+
             foreach ($classPopulationOrder as $class) :
-                
+
                 $obj = new $class();
-                
+
                 $obj->setupClassInfo(
                     null,
                     ['meta' => ['appName' => $classToAppMap[$class]]]
                 );
             endforeach;
-        
+
         endif;
     }
-    
+
     /**
      * @param string $name
      *
@@ -255,16 +255,16 @@ class Registry extends BaseObject
     public function getModel($name)
     {
         $this->isAppReady();
-        
+
         if (!$this->hasModel($name)) {
             throw new LookupError(
                 sprintf('The model { %s } Does not exist', $name)
             );
         }
-        
+
         return $this->allModels[$name];
     }
-    
+
     /**
      * Checks model has been loaded by the orm.
      *
@@ -276,7 +276,7 @@ class Registry extends BaseObject
     {
         return ArrayHelper::hasKey($this->allModels, $name);
     }
-    
+
     /**
      * Returns a list of all model names in lowercase or false if not models were found.
      *
@@ -291,17 +291,17 @@ class Registry extends BaseObject
     public function getModelClasses()
     {
         $models = [];
-        
+
         $modelFiles = $this->getModelFiles();
-        
+
         if (empty($modelFiles)) {
             return false;
         }
-        
+
         foreach ($this->getModelFiles() as $appName => $files) :
             foreach ($files as $file) :
                 $className = ClassHelper::getClassFromFile($file);
-                
+
                 if (!class_exists($className)):
                     throw new ClassNotFoundException(
                         sprintf('The class [ %s ] could not be located', $className)
@@ -310,10 +310,10 @@ class Registry extends BaseObject
                 $models[$appName][] = $className;
             endforeach;
         endforeach;
-        
+
         return $models;
     }
-    
+
     public function registerModel(Model $model)
     {
         $name = $model->getMeta()->getNSModelName();
@@ -322,7 +322,7 @@ class Registry extends BaseObject
         }
         $this->resolvePendingOps($model);
     }
-    
+
     /**
      * @param callback $callback        the callback to invoke when a model
      *                                  has been created
@@ -340,7 +340,7 @@ class Registry extends BaseObject
     {
         // get the first
         $modelName = $modelsToResolve[0];
-        
+
         // recurse the others
         if (isset($modelsToResolve[1]) &&
             !empty(array_slice($modelsToResolve, 1))) {
@@ -350,7 +350,7 @@ class Registry extends BaseObject
                 $kwargs
             );
         }
-        
+
         try {
             $model = $this->getRegisteredModel($modelName);
             $kwargs['relatedModel'] = $model;
@@ -359,7 +359,7 @@ class Registry extends BaseObject
             $this->_pendingOps[$modelName][] = [$callback, $kwargs];
         }
     }
-    
+
     /**
      * Gets a registered model. This method is used internally to get a
      * registered model without the possibility of side effects incase it not
@@ -385,10 +385,10 @@ class Registry extends BaseObject
                 sprintf("Model '%s' not registered.", $modelName)
             );
         endif;
-        
+
         return $model;
     }
-    
+
     /**
      * @param Model $model
      *
@@ -407,14 +407,14 @@ class Registry extends BaseObject
             }
         }
     }
-    
+
     public function getPendingOperations()
     {
         return $this->_pendingOps;
     }
-    
+
     public function __toString()
     {
-        return (string)sprintf('%s Object', $this->getFullClassName());
+        return (string) sprintf('%s Object', $this->getFullClassName());
     }
 }

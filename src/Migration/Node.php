@@ -22,7 +22,14 @@ namespace Eddmash\PowerOrm\Migration;
 class Node
 {
     public $name;
+    /**
+     * @var Node[]
+     */
     public $children;
+
+    /**
+     * @var Node[]
+     */
     public $parent;
     public $appName;
 
@@ -37,7 +44,7 @@ class Node
     /**
      * @param Node $parent
      */
-    public function addParent($parent)
+    public function addParent(self $parent)
     {
         $this->parent[] = $parent;
     }
@@ -45,31 +52,30 @@ class Node
     /**
      * @param Node $child
      */
-    public function addChild($child)
+    public function addChild(self $child)
     {
         $this->children[] = $child;
     }
 
     /**
-     * Get ancestors from the first ancestor aka adam and eve to upto this node.that is oldest at index '0'.
+     * Get ancestors from the first ancestor aka adam and eve to upto this
+     * node.that is oldest at index '0'.
      *
      * @return array
      */
     public function getAncestors($ignoreSelf = false)
     {
-        $ancestors[$this->appName] = [];
+        $ancestors = [];
 
         if (false === $ignoreSelf):
-            $ancestors[$this->appName][] = $this->name;
+            $ancestors[$this->name] = $this->appName;
         endif;
 
         /** @var $parent Node */
         foreach ($this->parent as $parent) :
             $parentAncenstors = $parent->getAncestors();
-            $ancestors[$this->appName] = array_merge(
-                $parentAncenstors[$this->appName],
-                $ancestors[$this->appName]
-            );
+
+            $ancestors = array_merge($parentAncenstors, $ancestors);
         endforeach;
 
         return $ancestors;
@@ -85,15 +91,12 @@ class Node
     {
         $descendants = [];
 
-        $descendants[$this->appName][] = $this->name;
+        $descendants[$this->name] = $this->appName;
 
         /** @var $child Node */
         foreach ($this->children as $child) :
             $childDescendats = $child->getDescendants();
-            $descendants[$this->appName] = array_merge(
-                $childDescendats[$this->appName],
-                $descendants[$this->appName]
-            );
+            $descendants = array_merge($childDescendats, $descendants);
         endforeach;
 
         return $descendants;
