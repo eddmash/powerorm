@@ -9,8 +9,10 @@
  * file that was distributed with this source code.
  */
 use Eddmash\PowerOrm\App\Settings;
+use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Model;
 
+const TESTAPPNAME = 'test';
 class ModelTest extends PHPUnit_Framework_TestCase
 {
     protected function setUp()
@@ -18,39 +20,48 @@ class ModelTest extends PHPUnit_Framework_TestCase
         \Eddmash\PowerOrm\BaseOrm::setup(new Settings([]));
     }
 
-    public function testFieldMethodIsNotPublic()
+    public function testAppName()
     {
-        $this->expectException(\Eddmash\PowerOrm\Exception\MethodNotExtendableException::class);
-        new PublicFieldMethodModel();
+        $proxy = new ConcreteModel();
+        $this->modelSetup($proxy);
+        $this->assertEquals(TESTAPPNAME, $proxy->getMeta()->getAppName());
     }
 
-    public function testFieldCrashInChildModel()
+    public function testFieldClashInChildModel()
     {
         $this->expectException(\Eddmash\PowerOrm\Exception\FieldError::class);
-        new FieldCrashModel();
+        $proxy = new FieldClashModel();
+        $this->modelSetup($proxy);
     }
 
     public function testNoFieldsInParentAbstracClassForProxyClass()
     {
         $this->expectException(\Eddmash\PowerOrm\Exception\TypeError::class);
-        new AbstractWithFieldsBaseProxyModel();
+        $proxy = new AbstractWithFieldsBaseProxyModel();
+        $this->modelSetup($proxy);
     }
 
     public function testProxyHasConcreteBase()
     {
         $this->expectException(\Eddmash\PowerOrm\Exception\TypeError::class);
-        new AbstractBaseProxyModel();
+        $proxy = new AbstractBaseProxyModel();
+        $this->modelSetup($proxy);
     }
 
     public function testConcreteHierachyMeta()
     {
         $proxy = new ConcreteModel();
+        $this->modelSetup($proxy);
         /** @var $immediateParent ReflectionObject */
-        list($concreteParentName, $immediateParent, $classFields) = Model::getHierarchyMeta($proxy);
+        list(
+            $concreteParentName, $immediateParent,
+            $classFields, $parentLink
+            ) = Model::getHierarchyMeta($proxy);
 
-        $this->assertEquals(ConcreteModel::class, $concreteParentName);
+        $this->assertEquals(null, $concreteParentName);
         $this->assertEquals(AbstractModel::class, $immediateParent->getName());
         $this->assertEquals(true, $immediateParent->isAbstract());
+        $this->assertEquals(null, $parentLink);
 
         $fields = [
             'country',
@@ -60,10 +71,33 @@ class ModelTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($fields, array_keys($classFields));
     }
 
+    public function testParentLinkHierachy()
+    {
+        $proxy = new ChildConcreteWithImmediateParentProxy();
+        $this->modelSetup($proxy);
+        /** @var $immediateParent ReflectionObject */
+        list(
+            $concreteParentName, $immediateParent,
+            $classFields, $parentLink
+            ) = Model::getHierarchyMeta($proxy);
+
+        $this->assertEquals(ConcreteModel::class, $concreteParentName);
+        $this->assertEquals(DirectConcreateBaseProxy::class, $immediateParent->getName());
+        $this->assertEquals(false, $immediateParent->isAbstract());
+        $this->assertEquals(OneToOneField::class, get_class($parentLink));
+
+        $fields = [
+            'child',
+            'concretemodel_ptr',
+        ];
+        $this->assertEquals($fields, array_keys($classFields));
+    }
+
     public function testProxyHasDirectConcreteBaseHierachyMeta()
     {
         /** @var $immediateParent ReflectionObject */
         $proxy = new DirectConcreateBaseProxy();
+        $this->modelSetup($proxy);
         list($concreteParentName, $immediateParent) = Model::getHierarchyMeta($proxy);
 
         $this->assertEquals(ConcreteModel::class, $concreteParentName);
@@ -75,17 +109,25 @@ class ModelTest extends PHPUnit_Framework_TestCase
     {
         /** @var $immediateParent ReflectionObject */
         $proxy = new InDirectConcreateBaseProxy();
+        $this->modelSetup($proxy);
         list($concreteParentName, $immediateParent) = Model::getHierarchyMeta($proxy);
 
         $this->assertEquals(ConcreteModel::class, $concreteParentName);
         $this->assertEquals(InnerAbstractClass::class, $immediateParent->getName());
         $this->assertEquals(true, $immediateParent->isAbstract());
     }
+
+    private function modelSetup(Model $proxy)
+    {
+        $proxy->setupClassInfo([], ['meta' => ['appName' => TESTAPPNAME]]);
+
+        return $proxy;
+    }
 }
 
 abstract class AbstractModel extends \Eddmash\PowerOrm\Model\Model
 {
-    private function unboundFields()
+    public function unboundFields()
     {
         return [
             'country' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
@@ -94,9 +136,9 @@ abstract class AbstractModel extends \Eddmash\PowerOrm\Model\Model
     }
 }
 
-class FieldCrashModel extends AbstractModel
+class FieldClashModel extends AbstractModel
 {
-    private function unboundFields()
+    public function unboundFields()
     {
         return [
             'school' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
@@ -124,18 +166,9 @@ class AbstractBaseProxyModel extends Model
     }
 }
 
-class PublicFieldMethodModel extends Model
-{
-    public function unboundFields()
-    {
-        return [
-        ];
-    }
-}
-
 class ConcreteModel extends AbstractModel
 {
-    private function unboundFields()
+    public function unboundFields()
     {
         return [
             'town' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
@@ -149,6 +182,16 @@ class DirectConcreateBaseProxy extends ConcreteModel
     {
         return [
             'proxy' => true,
+        ];
+    }
+}
+
+class ChildConcreteWithImmediateParentProxy extends DirectConcreateBaseProxy
+{
+    public function unboundFields()
+    {
+        return [
+            'child' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
         ];
     }
 }
