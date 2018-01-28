@@ -92,13 +92,6 @@ This is intended for advanced users to manipulate the current migration state di
 changes; be warned that using **--fake** runs the risk of putting the migration state table into a state where manual
 recovery will be needed to make migrations run correctly.
 
-generatedata
-------------
-
-This generates dummy data for the models detected by powerorm on you project. This might be usefull when developing.
-This command depends on the library ``powerorfaker`` which can be installed via composer
-
-
 showmigrations
 --------------
 
@@ -137,4 +130,4 @@ if this option is not available the command will through an ``CommandError`` if 
 robot
 -----
 
-A little fun is good for the soul, draws a robot because...why not ?
+A little fun is good for the soul, draws a robot because...well, why not ?
