@@ -14,7 +14,7 @@ Via composer **(recommended)**::
 
 Or add this to the composer.json file::
 
-	composer require eddmash/powerorm:@dev
+	"eddmash/powerorm": "@dev"
 
 You could also Download or Clone package from github.
 
