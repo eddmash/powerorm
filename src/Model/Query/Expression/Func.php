@@ -33,7 +33,7 @@ class Func extends BaseExpression
     /**
      * @var BaseExpression[]
      */
-    private $expression;
+    protected $expression;
 
     /**
      * Func constructor.
@@ -76,25 +76,38 @@ class Func extends BaseExpression
         $summarize = false,
         $forSave = false
     ) {
-        $obj = clone  $this;
+        $obj = clone $this;
         $obj->summarize = $summarize;
 
         foreach ($obj->expression as $key => $item) :
-            $obj->expression[$key] = $item->resolveExpression($resolver, $allowJoins, $reuse, $summarize, $forSave);
+            $obj->expression[$key] = $item->resolveExpression(
+                $resolver,
+                $allowJoins,
+                $reuse,
+                $summarize,
+                $forSave
+            );
         endforeach;
 
         return $obj;
     }
 
     /**@inheritdoc */
-    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection, $function = null)
-    {
+    public function asSql(
+        CompilerInterface $compiler,
+        ConnectionInterface $connection,
+        $function = null
+    ) {
         $sqlParts = [];
 
         if (!is_null($function)):
             $func = $function;
         else:
-            $func = ArrayHelper::pop($this->extra, 'function', $this->function);
+            $func = ArrayHelper::pop(
+                $this->extra,
+                'function',
+                $this->function
+            );
         endif;
 
         if ($this->extra) :
@@ -102,7 +115,7 @@ class Func extends BaseExpression
         endif;
         $params = [];
 
-        foreach ($this->getSourceExpressions() as $expression) :
+        foreach ($this->expression as $expression) :
             list($sql, $param) = $compiler->compile($expression);
             $sqlParts[] = $sql;
             $params = array_merge($params, $param);

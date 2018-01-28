@@ -24,8 +24,10 @@ class F extends Combinable implements ResolvableExpInterface
     }
 
     /**
-     * Provides the chance to do any preprocessing or validation before being added to the query.e.g.
-     * in Exp::Count('username') we need the username to converted to an actual model field.
+     * Provides the chance to do any preprocessing or validation before being
+     * added to the query.e.g.
+     * in count_('username') we need the username to converted to an actual
+     * model field.
      *
      * @param ExpResolverInterface $resolver
      * @param bool                 $allowJoins
@@ -46,7 +48,12 @@ class F extends Combinable implements ResolvableExpInterface
         $summarize = false,
         $forSave = false
     ) {
-        return $resolver->resolveExpression($this->name, $allowJoins, $reuse, $summarize);
+        return $resolver->resolveExpression(
+            $this->name,
+            $allowJoins,
+            $reuse,
+            $summarize
+        );
     }
 
     /**

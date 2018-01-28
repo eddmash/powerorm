@@ -13,5 +13,10 @@ namespace Eddmash\PowerOrm\Model\Query\Expression;
 
 interface ExpResolverInterface
 {
-    public function resolveExpression($name, $allowJoins = true, &$reuse = null, $summarize = false);
+    public function resolveExpression(
+        $name,
+        $allowJoins = true,
+        &$reuse = null,
+        $summarize = false
+    );
 }

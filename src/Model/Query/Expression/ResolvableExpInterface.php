@@ -14,15 +14,21 @@ namespace Eddmash\PowerOrm\Model\Query\Expression;
 interface ResolvableExpInterface
 {
     /**
-     * Provides the chance to do any preprocessing or validation before being added to the query.e.g.
-     * in Exp::Count('username') we need the username to converted to an actual model field.
+     * Provides the chance to do any preprocessing or validation before being
+     * added to the query.e.g.
+     * in Exp::Count('username') we need the username to converted to an actual
+     * model field.
      *
      *
      *
      * @param ExpResolverInterface $resolver
-     * @param bool                 $allowJoins boolean allowing or denying use of joins in this query
-     * @param null                 $reuse      a set of reusable joins for multijoins
-     * @param bool                 $summarize  a boolean that, when True, signals that the query being computed is a terminal
+     * @param bool                 $allowJoins boolean allowing or denying use
+     *                                         of joins in this query
+     * @param null                 $reuse      a set of reusable joins for
+     *                                         multijoins
+     * @param bool                 $summarize  a boolean that, when True,
+     *                                         signals that the query being
+     *                                         computed is a terminal
      *                                         aggregate query
      * @param bool                 $forSave    tells if this item is allowed in insert/update queries
      *

@@ -72,7 +72,7 @@ class ForeignObjectRel extends BaseObject
      * It’s also the default value for related_query_name
      * (the name to use for the reverse filter name from the target model).
      *
-     * If you’d prefer Django not to create a backwards relation,
+     * If you’d prefer Powerorm not to create a backwards relation,
      * set related_name to '+' or end it with '+'.
      *
      * @var
@@ -152,8 +152,10 @@ class ForeignObjectRel extends BaseObject
     }
 
     /**
-     * This method encapsulates the logic that decides what name to give an accessor descriptor that retrieves
-     * related many-to-one or many-to-many objects. It uses the lower-cased object_name + "_set",
+     * This method encapsulates the logic that decides what name to give an
+     * accessor descriptor that retrieves
+     * related many-to-one or many-to-many objects. It uses the lower-cased
+     * object_name + "_set",
      * but this can be overridden with the "related_name" option.
      *
      * @param Model|null $model

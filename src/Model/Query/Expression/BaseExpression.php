@@ -21,6 +21,10 @@ use Eddmash\PowerOrm\Model\Query\Compiler\SqlCompilableinterface;
 abstract class BaseExpression extends Combinable implements ResolvableExpInterface, SortableInterface, SqlCompilableinterface
 {
     /**
+     * @var bool true only when expression is an aggregation expression
+     */
+    protected $summarize = false;
+    /**
      * @var Field
      */
     protected $outputField;
@@ -57,6 +61,14 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     public function setSourceExpressions($expression)
     {
         return assert(0 == count($expression), 'Setting empty expression');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSummarize()
+    {
+        return $this->summarize;
     }
 
     /**
@@ -123,10 +135,12 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
         return $this->outputField;
     }
 
-    /**Attempts to infer the output type of the expression. If the output fields of all source fields match then we
+    /**Attempts to infer the output type of the expression. If the output fields
+     * of all source fields match then we
      * can simply infer the same type here. This isn't always correct, but it makes sense most of the time.
      *
-     * Consider the difference between `2 + 2` and `2 / 3`. Inferring the type here is a convenience for the common
+     * Consider the difference between `2 + 2` and `2 / 3`. Inferring the type
+     * here is a convenience for the common
      * case.  The user should supply their own outputField with more complex computations.
      *
      *  If a source does not have an `_outputField` then we exclude it from this check. If all sources are `null`,
@@ -167,8 +181,10 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     }
 
     /**
-     * Provides the chance to do any preprocessing or validation before being added to the query.e.g.
-     * in Exp::Count('username') we need the username to converted to an actual model field.
+     * Provides the chance to do any preprocessing or validation before being
+     * added to the query.e.g.
+     * in Exp::Count('username') we need the username to converted to an actual
+     * model field.
      *
      * @param ExpResolverInterface $resolver
      * @param bool                 $allowJoins

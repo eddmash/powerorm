@@ -30,7 +30,6 @@ use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Aggregates\BaseAggregate;
 use Eddmash\PowerOrm\Model\Query\Compiler\SqlFetchBaseCompiler;
 use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
@@ -43,6 +42,7 @@ use Eddmash\PowerOrm\Model\Query\Joinable\WhereNode;
 use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 use const Eddmash\PowerOrm\Model\Query\Expression\ORDER_PATTERN;
 use function Eddmash\PowerOrm\Model\Query\Expression\count_;
+use function Eddmash\PowerOrm\Model\Query\Expression\ref_;
 
 const INNER = 'INNER JOIN';
 const LOUTER = 'LEFT OUTER JOIN';
@@ -96,7 +96,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     public $useDefaultCols = true;
 
     /**
-     * @var BaseAggregate[]
+     * @var BaseExpression[]
      */
     public $annotations = [];
     public $distict;
@@ -194,10 +194,18 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         foreach ($fieldNames as $fieldName) :
             $names = StringHelper::split(BaseLookup::$lookupPattern, $fieldName);
-            list($field, $targets, $joinList, $paths) = $this->setupJoins($names, $meta, $alias);
+            list($field, $targets, $joinList, $paths) = $this->setupJoins(
+                $names,
+                $meta,
+                $alias
+            );
 
             /** @var $targets Field[] */
-            list($targets, $finalAlias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
+            list($targets, $finalAlias, $joinList) = $this->trimJoins(
+                $targets,
+                $joinList,
+                $paths
+            );
 
             foreach ($targets as $target) :
                 $this->addSelect($target->getColExpression($finalAlias));
@@ -242,7 +250,8 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     }
 
     /**
-     * Builds a WhereNode for a single filter clause, but doesn't add it to this Query. Query.add_q() will then add
+     * Builds a WhereNode for a single filter clause, but doesn't add it to
+     * this Query. Query.add_q() will then add
      * this filter to the where Node.
      *
      * @param $condition
@@ -253,13 +262,22 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function buildFilter($conditions, $connector = AND_CONNECTOR, $allowJoins = true, &$canReuse = null)
-    {
+    private function buildFilter(
+        $conditions,
+        $connector = AND_CONNECTOR,
+        $allowJoins = true,
+        &$canReuse = null
+    ) {
         reset($conditions);
         $name = key($conditions);
         $value = current($conditions);
         list($lookups, $fieldParts) = $this->solveLookupType($name);
-        list($value, $lookups, $usedJoins) = $this->prepareLookupValue($value, $lookups, $canReuse, $allowJoins);
+        list($value, $lookups, $usedJoins) = $this->prepareLookupValue(
+            $value,
+            $lookups,
+            $canReuse,
+            $allowJoins
+        );
 
         $whereClass = ($this->whereClass);
         $clause = $whereClass::createObject();
@@ -277,11 +295,18 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                 $canReuse[] = $list;
             endforeach;
         endif;
-        $usedJoins = array_merge(array_unique($usedJoins), array_unique($joinList));
+        $usedJoins = array_merge(
+            array_unique($usedJoins),
+            array_unique($joinList)
+        );
 
         /* @var $targets Field[] */
         /* @var $field Field */
-        list($targets, $alias, $joinList) = $this->trimJoins($targets, $joinList, $paths);
+        list($targets, $alias, $joinList) = $this->trimJoins(
+            $targets,
+            $joinList,
+            $paths
+        );
 
         if ($field->isRelation) :
             $lookupClass = $field->getLookup($lookups[0]);
@@ -356,22 +381,43 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $this->changeToInnerjoin($aliases);
     }
 
-    private function _addQ(Q $q, &$usedAliases, $allowJoins = true, $currentNegated = false)
-    {
+    private function _addQ(
+        Q $q,
+        &$usedAliases,
+        $allowJoins = true,
+        $currentNegated = false
+    ) {
         $connector = $q->getConnector();
 
         // current is true only if one and only is true.
         $currentNegated = $currentNegated ^ $q->isNegated();
 
-        $whereClass = ($this->whereClass);
-        $targetClause = $whereClass::createObject(null, $connector, $q->isNegated());
+        $whereClass = $this->whereClass;
+        $targetClause = $whereClass::createObject(
+            null,
+            $connector,
+            $q->isNegated()
+        );
 
-        $joinpromoter = new JoinPromoter($connector, count($q->getChildren()), $currentNegated);
+        $joinpromoter = new JoinPromoter(
+            $connector,
+            count($q->getChildren()),
+            $currentNegated
+        );
         foreach ($q->getChildren() as $child) :
             if ($child instanceof Node):
-                list($childClause, $neededInner) = $this->_addQ($child, $usedAliases, $allowJoins);
+                list($childClause, $neededInner) = $this->_addQ(
+                    $child,
+                    $usedAliases,
+                    $allowJoins
+                );
             else:
-                list($childClause, $neededInner) = $this->buildFilter($child, $connector, $allowJoins, $usedAliases);
+                list($childClause, $neededInner) = $this->buildFilter(
+                    $child,
+                    $connector,
+                    $allowJoins,
+                    $usedAliases
+                );
             endif;
 
             if ($childClause):
@@ -380,7 +426,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
             $joinpromoter->addVotes($neededInner);
         endforeach;
-        //todo join
+
         $neededInner = $joinpromoter->updateJoinType($this);
 
         return [$targetClause, $neededInner];
@@ -404,8 +450,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     }
 
     /**
-     * Adds items from the 'ordering' sequence to the query's "order by" clause. These items are either
-     * field names (not column names) -- possibly with a direction prefix ('-' or '?') -- or OrderBy
+     * Adds items from the 'ordering' sequence to the query's "order by" clause.
+     * These items are either
+     * field names (not column names) -- possibly with a direction
+     * prefix ('-' or '?') -- or OrderBy
      * expressions.
      *
      * If 'ordering' is empty, all ordering is cleared from the query.
@@ -427,10 +475,12 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                 $errors[] = $fieldName;
             endif;
 
-            if (is_object($fieldName) && property_exists($fieldName, 'containsAggregate')):
+            if (is_object($fieldName) &&
+                property_exists($fieldName, 'containsAggregate')):
                 throw new FieldError(
                     sprintf(
-                        'Using an aggregate in orderBy() without also including '.
+                        'Using an aggregate in orderBy() without also '.
+                        'including '.
                         'it in annotate() is not allowed: %s',
                         $fieldName
                     )
@@ -439,7 +489,12 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endforeach;
 
         if ($errors):
-            throw new FieldError(sprintf('Invalid orderBy arguments: %s', json_encode($errors)));
+            throw new FieldError(
+                sprintf(
+                    'Invalid orderBy arguments: %s',
+                    json_encode($errors)
+                )
+            );
         endif;
 
         if ($fieldNames):
@@ -605,7 +660,8 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
                     throw new FieldError(
                         sprintf(
-                            "Cannot resolve keyword '%s.%s' into field. Choices are: [ %s ]",
+                            "Cannot resolve keyword '%s.%s' ".
+                            'into field. Choices are: [ %s ]',
                             $meta->getNSModelName(),
                             $name,
                             implode(', ', $available)
@@ -688,7 +744,6 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $joins = [$alias];
 
         $namesPaths = $this->getNamesPath($names, $meta, true);
-
         $pathInfos = $namesPaths['paths'];
 
         /* @var $meta Meta */
@@ -712,7 +767,13 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             $joins[] = $alias;
         endforeach;
 
-        return [$namesPaths['finalField'], $namesPaths['targets'], $joins, $pathInfos, $meta];
+        return [
+            $namesPaths['finalField'],
+            $namesPaths['targets'],
+            $joins,
+            $pathInfos,
+            $meta,
+        ];
     }
 
     public function join(BaseJoin $join, $reuse = null)
@@ -720,7 +781,8 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         // check if we can resuse an alias
         $resuableAliases = [];
         foreach ($this->tableAliasMap as $key => $item) :
-            if ((null == $reuse || ArrayHelper::hasKey($reuse, $key)) && $join->equal($item)):
+            if ((null == $reuse || ArrayHelper::hasKey($reuse, $key)) &&
+                $join->equal($item)):
                 $resuableAliases[] = $key;
             endif;
         endforeach;
@@ -754,10 +816,13 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * Change join type from LOUTER to INNER for all joins in aliases.
      *
-     * Similarly to promoteJoins(), this method must ensure no join chains containing first an outer, then an inner
+     * Similarly to promoteJoins(), this method must ensure no join chains
+     * containing first an outer, then an inner
      * join are generated.
-     * If we are demoting {A->C} join in chain {A LOUTER B LOUTER C} then we must demote {A->B} automatically, or
-     * otherwise the demotion of {A->B} doesn't actually change anything in the query results. .
+     * If we are demoting {A->C} join in chain {A LOUTER B LOUTER C} then we
+     * must demote {A->B} automatically, or
+     * otherwise the demotion of {A->B} doesn't actually change anything in the
+     * query results. .
      *
      * @param array $aliases
      *
@@ -928,15 +993,27 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         /** @var $annotation BaseExpression */
         $annotation = ArrayHelper::getValue($kwargs, 'annotation');
         $alias = ArrayHelper::getValue($kwargs, 'alias');
+        // indicate this field annotation produces summarise out over serveral
+        // records, i.e. all aggregate functions e.g. avg(), count() etc
         $isSummary = ArrayHelper::getValue($kwargs, 'isSummary', false);
 
-        $annotation = $annotation->resolveExpression($this, true, null, $isSummary);
+        // we resolve what the annotation points to,
+        // is it a Col that indicates that its using a field on the model
+        // as a source
+        // a Ref which might indicate its using an annotation as its source
 
+        $annotation = $annotation->resolveExpression(
+            $this,
+            true,
+            null,
+            $isSummary
+        );
         $this->annotations[$alias] = $annotation;
     }
 
     /**
-     * Sets up the selectRelated data structure so that we only select certain related models
+     * Sets up the selectRelated data structure so that we only select certain
+     * related models
      * (as opposed to all models, when $this->selectRelated=true).
      *
      * @param array $fields
@@ -974,8 +1051,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getAggregation(ConnectionInterface $connection, $addedAggregateNames = [])
-    {
+    public function getAggregation(
+        ConnectionInterface $connection,
+        $addedAggregateNames = []
+    ) {
         if (!$this->annotations):
             return [];
         endif;
@@ -983,11 +1062,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $hasExistingAnnotations = false;
         foreach ($this->annotations as $alias => $annotation) :
 
-            $hasExistingAnnotations = ($hasExistingAnnotations || !in_array($alias, $addedAggregateNames));
+            $hasExistingAnnotations = ($hasExistingAnnotations ||
+                !in_array($alias, $addedAggregateNames));
         endforeach;
 
-        // we have of this we need to make the core query a subquery and aggregate over it.
-        if ($hasExistingAnnotations || $hasLimit || $this->distict || is_array($this->groupBy)):
+        // we have of $hasExistingAnnotations  we need to make the core query a
+        // subquery and aggregate over it.
+        if ($hasExistingAnnotations || $hasLimit || $this->distict ||
+            is_array($this->groupBy)):
             $outQuery = new AggregateQuery($this->model);
             $innerQuery = $this->deepClone();
 
@@ -1001,14 +1083,16 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             endif;
 
             if (!$innerQuery->distict):
-                // if we are using default columns and we already have aggregate annotations existing
+                // if we are using default columns and we already have
+                // aggregate annotations existing
                 // then we must make sure the inner
                 // query is grouped by the main model's primary key. However,
                 // clearing the select clause can alter results if distinct is
                 // used.
                 if ($innerQuery->useDefaultCols && $hasExistingAnnotations):
                     $innerQuery->groupBy = [
-                        $this->getMeta()->primaryKey->getColExpression($innerQuery->getInitialAlias()),
+                        $this->getMeta()->primaryKey
+                            ->getColExpression($innerQuery->getInitialAlias()),
                     ];
                 endif;
                 $innerQuery->useDefaultCols = false;
@@ -1016,8 +1100,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
             // add annotations to the outerquery todo
             foreach ($innerQuery->annotations as $alias => $annotation) :
-                $outQuery->annotations[$alias] = $annotation;
-                unset($innerQuery->annotations[$alias]);
+                if ($annotation->isSummarize()):
+                    $outQuery->annotations[$alias] = $annotation;
+                    unset($innerQuery->annotations[$alias]);
+                endif;
             endforeach;
 
             if ($innerQuery->select == [] && !$innerQuery->useDefaultCols):
@@ -1034,15 +1120,18 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             $outQuery->select = [];
             $outQuery->useDefaultCols = false;
         endif;
-
         $outQuery->clearOrdering(true);
         $outQuery->clearLimits();
         $outQuery->selectRelected = false;
 
-        $results = $outQuery->getSqlCompiler($connection)->executeSql()->fetch();
+        $results = $outQuery->getSqlCompiler($connection)
+                            ->executeSql()->fetch();
 
         $result = [];
-        foreach (array_combine(array_keys($this->annotations), array_values($results)) as $key => $item) {
+        foreach (array_combine(
+                     array_keys($outQuery->annotations),
+                     array_values($results)
+                 ) as $key => $item) {
             $result[$key] = $item;
         }
 
@@ -1255,22 +1344,37 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         return $preparedValues;
     }
 
-    public function resolveExpression($name, $allowJoins = true, &$reuse = null, $summarize = false)
-    {
-        if (!$allowJoins && StringHelper::contains($name, BaseLookup::LOOKUP_SEPARATOR)):
-            throw new FieldError('Joined field references are not permitted in this query');
+    /**@inheritdoc */
+    public function resolveExpression(
+        $name,
+        $allowJoins = true,
+        &$reuse = null,
+        $summarize = false
+    ) {
+        if (!$allowJoins &&
+            StringHelper::contains($name, BaseLookup::LOOKUP_SEPARATOR)
+        ):
+            throw new FieldError(
+                'Joined field references'.
+                ' are not permitted in this query'
+            );
         endif;
 
         if (ArrayHelper::hasKey($this->annotations, $name)):
+            // Summarize currently means we are doing an aggregate() query
+            // which is executed as a wrapped subquery if any of the
+            // aggregate() elements reference an existing annotation. In
+            // that case we need to return a Ref to the subquery's annotation.
             if ($summarize):
-                //todo
+                return ref_($name, $this->annotations[$name]);
             else:
                 return ArrayHelper::getValue($this->annotations, $name);
             endif;
         else:
+
             $splitNames = StringHelper::split(BaseLookup::$lookupPattern, $name);
 
-            list($field, $sources, $joinList, $paths) = $this->setupJoins(
+            list($field, $orgTargets, $joinList, $paths) = $this->setupJoins(
                 $splitNames,
                 $this->getMeta(),
                 $this->getInitialAlias()
@@ -1279,9 +1383,16 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             /* @var $targets Field[] */
             /* @var $field Field */
 
-            list($targets, $finalAlias, $joinList) = $this->trimJoins($sources, $joinList, $paths);
+            list($targets, $finalAlias, $joinList) = $this->trimJoins(
+                $orgTargets,
+                $joinList,
+                $paths
+            );
             if (count($targets) > 1):
-                throw new FieldError("Referencing multicolumn fields with F() objects isn't supported");
+                throw new FieldError(
+                    'Referencing multicolumn fields'.
+                    " with F() objects isn't supported"
+                );
             endif;
 
             if (!is_null($reuse)):
@@ -1290,7 +1401,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
                 endforeach;
             endif;
 
-            $col = $targets[0]->getColExpression(array_pop($joinList), $sources[0]);
+            $col = $targets[0]->getColExpression(
+                end($joinList),
+                $orgTargets[0]
+            );
 
             return $col;
         endif;

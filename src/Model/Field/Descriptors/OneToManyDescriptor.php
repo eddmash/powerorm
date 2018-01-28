@@ -19,8 +19,8 @@ use Eddmash\PowerOrm\Model\Model;
  *
  * Gets related data from the one side of the relationship
  *
- * user has many cars so this will query cars related to a particular user in this the
- * default attribute to be used will be ::
+ * user has many cars so this will query cars related to a particular user in
+ * this the default attribute to be used will be ::
  *
  *  $user->car_set->all()
  *
@@ -47,7 +47,8 @@ class OneToManyDescriptor extends BaseDescriptor
     }
 
     /**
-     * Creates the queryset to retrieve data for the relationship that relates to this field.
+     * Creates the queryset to retrieve data for the relationship that relates
+     * to this field.
      *
      * @param      $modelInstance
      * @param bool $reverse

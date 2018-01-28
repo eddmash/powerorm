@@ -16,7 +16,7 @@ use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
-abstract class SimpleObjectSerializer implements SerializerInterface
+class SimpleObjectSerializer implements SerializerInterface
 {
     public $objects;
     public $_fields;
@@ -28,10 +28,10 @@ abstract class SimpleObjectSerializer implements SerializerInterface
 
     public static function serialize($items, $fields = [])
     {
-        return (new static())->_serialize($items, $fields);
+        return (new static())->doSerialize($items, $fields);
     }
 
-    private function _serialize($items, $fields = [])
+    private function doSerialize($items, $fields = [])
     {
         $this->items = $items;
         $this->selectedFields = $fields;
@@ -48,12 +48,18 @@ abstract class SimpleObjectSerializer implements SerializerInterface
             foreach ($localFields as $field) :
                 if ($field->isSerializable()):
                     if (!$field->isRelation):
-                        if (empty($this->selectedFields) || in_array($field->getAttrName(), $this->selectedFields)):
+                        if (empty($this->selectedFields) ||
+                            in_array($field->getAttrName(), $this->selectedFields)):
                             $this->handleField($item, $field);
                         else:
                             // instead of user_id we need user
-                            $name = substr($field->getAttrName(), 0, -3);
-                            if (empty($this->selectedFields) || in_array($name, $this->selectedFields)):
+                            $name = substr(
+                                $field->getAttrName(),
+                                0,
+                                -3
+                            );
+                            if (empty($this->selectedFields) ||
+                                in_array($name, $this->selectedFields)):
                                 $this->handleForeignField($item, $field);
                             endif;
                         endif;
@@ -63,7 +69,8 @@ abstract class SimpleObjectSerializer implements SerializerInterface
             $m2mFields = $concreteModel->getMeta()->localManyToMany;
             foreach ($m2mFields as $m2mField) :
                 if ($m2mField->isSerializable()):
-                    if (empty($this->selectedFields) || in_array($m2mField->getAttrName(), $this->selectedFields)):
+                    if (empty($this->selectedFields) ||
+                        in_array($m2mField->getAttrName(), $this->selectedFields)):
                         $this->handleM2MField($item, $m2mField);
                     endif;
                 endif;
@@ -166,8 +173,7 @@ abstract class SimpleObjectSerializer implements SerializerInterface
      */
     public function endObject(Model $model)
     {
-        $this->objects['model'] = $model->getMeta()->getNSModelName();
-        $this->objects['fields'] = $this->dumpObject($model);
+        $this->objects[] = $this->dumpObject($model);
         $this->_fields = null;
     }
 
@@ -185,8 +191,11 @@ abstract class SimpleObjectSerializer implements SerializerInterface
         return $this->objects;
     }
 
-    protected function dumpObject($model)
+    protected function dumpObject(Model $model)
     {
-        return $this->_fields;
+        $object['model'] = $model->getMeta()->getNSModelName();
+        $object['fields'] = $this->_fields;
+
+        return $object;
     }
 }

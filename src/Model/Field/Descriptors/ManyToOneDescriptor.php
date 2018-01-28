@@ -49,10 +49,13 @@ class ManyToOneDescriptor extends BaseDescriptor
                 // cache the value of the model
                 $modelInstance->{$fromField->getCacheName()} = $result;
 
-                // if we are dealing with fields that only supports one field e.g. OneToOneField
-                // If this is a one-to-one relation, set the reverse accessor cache on
-                // the related object to the current instance to avoid an extra SQL
-                // query if it's accessed later on.
+                // if we are dealing with fields that only supports one field
+                // e.g. OneToOneField
+                // If this is a one-to-one relation, set the reverse accessor
+                // cache on
+                // the related object to the current instance to avoid an
+                // extra SQL
+                //query if it's accessed later on.
 
                 if (!is_null($result) && !$this->field->relation->multiple):
                     $result->{$this->field->relation->getCacheName()} = $modelInstance;
@@ -61,9 +64,10 @@ class ManyToOneDescriptor extends BaseDescriptor
         }
         // if this field does not allow null values
         if (is_null($result) && !$this->field->isNull()):
+
             throw new RelatedObjectDoesNotExist(
                 sprintf(
-                    '%s has no %s.',
+                    '%s has no value for %s.',
                     $this->field->scopeModel->getMeta()->getNSModelName(),
                     $this->field->getName()
                 )
@@ -130,7 +134,8 @@ class ManyToOneDescriptor extends BaseDescriptor
     }
 
     /**
-     * Creates the queryset to retrieve data for the relationship that relates to this field.
+     * Creates the queryset to retrieve data for the relationship that relates
+     * to this field.
      *
      * @param      $modelInstance
      * @param bool $reverse

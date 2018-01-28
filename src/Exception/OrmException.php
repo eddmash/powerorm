@@ -2,6 +2,8 @@
 
 namespace Eddmash\PowerOrm\Exception;
 
+use Throwable;
+
 /**
  * Class OrmException.
  *
@@ -11,4 +13,13 @@ namespace Eddmash\PowerOrm\Exception;
  */
 class OrmException extends \Exception
 {
+    /**
+     * @param Throwable $e
+     *
+     * @return static
+     */
+    public static function fromThrowable(\Exception $e)
+    {
+        return new static($e->getMessage(), $e->getCode(), $e);
+    }
 }

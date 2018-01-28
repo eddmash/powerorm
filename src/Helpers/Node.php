@@ -34,8 +34,11 @@ class Node implements \Countable
         $this->negated = $negated;
     }
 
-    public static function createObject($children = null, $connector = null, $negated = false)
-    {
+    public static function createObject(
+        $children = null,
+        $connector = null,
+        $negated = false
+    ) {
         return new static($children, $connector, $negated);
     }
 
@@ -55,7 +58,10 @@ class Node implements \Countable
             if ($node instanceof self && !$node->isNegated() &&
                 ($connectorType == $node->connector || 1 == count($node))
             ):
-                $children = array_merge($node->getChildren()->toArray(), $this->getChildren()->toArray());
+                $children = array_merge(
+                    $node->getChildren()->toArray(),
+                    $this->getChildren()->toArray()
+                );
                 $this->children = new ArrayCollection();
                 foreach ($children as $child) :
                     $this->children->add($child);
@@ -71,7 +77,8 @@ class Node implements \Countable
             //more or less of cloning this node
             $obj = new static($this->children, $this->connector, $this->negated);
 
-            // update the connector to use btwn the current node and the passed in node
+            // update the connector to use btwn the current node and the
+            // passed in node
             $this->connector = $connectorType;
 
             // update the children

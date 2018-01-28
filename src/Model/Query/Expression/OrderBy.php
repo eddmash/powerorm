@@ -47,8 +47,11 @@ class OrderBy extends BaseExpression
      * @throws ValueError
      * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
-    public function __construct(BaseExpression $expression, $descending = false, $kwargs = [])
-    {
+    public function __construct(
+        BaseExpression $expression,
+        $descending = false,
+        $kwargs = []
+    ) {
         parent::__construct(null);
         $nullsFirst = ArrayHelper::getValue($kwargs, 'nullFirst', false);
         $nullsLast = ArrayHelper::getValue($kwargs, 'nullsLast', false);
@@ -82,8 +85,11 @@ class OrderBy extends BaseExpression
     }
 
     /**@inheritdoc */
-    public function asSql(CompilerInterface $compiler, ConnectionInterface $connection, $template = null)
-    {
+    public function asSql(
+        CompilerInterface $compiler,
+        ConnectionInterface $connection,
+        $template = null
+    ) {
         if (is_null($template)):
             if ($this->nullsLast):
                 $template = sprintf('%s NULLS LAST', $this->template);
@@ -91,6 +97,7 @@ class OrderBy extends BaseExpression
                 $template = sprintf('%s NULLS FIRST', $this->template);
             endif;
         endif;
+
         list($expSql, $expParams) = $compiler->compile($this->expression);
 
         $params = [

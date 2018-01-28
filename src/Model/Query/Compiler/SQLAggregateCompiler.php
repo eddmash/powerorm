@@ -18,18 +18,21 @@ class SQLAggregateCompiler extends SqlFetchBaseCompiler
     /**
      * {@inheritdoc}
      */
-    public function asSql(CompilerInterface $compiler = null, ConnectionInterface $connection = null)
-    {
+    public function asSql(
+        CompilerInterface $compiler = null,
+        ConnectionInterface $connection = null
+    ) {
         $sql = $params = [];
 
-        foreach ($this->annotations as $annotation) {
+        foreach ($this->query->annotations as $alias => $annotation) {
             list($annSql, $annParam) = $this->compile($annotation);
             $sql[] = $annSql;
             $params = array_merge($params, $annParam);
         }
         $sql = implode(', ', $sql);
 
-        $sql = sprintf('SELECT %s FROM (%s) subquery', $sql, $this->query->subQuery);
+        $sql = sprintf('SELECT %s FROM (%s) subquery', $sql,
+            $this->query->subQuery);
         $params = array_merge($params, $this->query->subQueryParams);
 
         return [$sql, $params];

@@ -1670,6 +1670,7 @@ class AutoDetector extends BaseObject
      * @param Operation[] $operations
      *
      * @throws ValueError
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
     private function sortOperations()
     {

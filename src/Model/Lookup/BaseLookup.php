@@ -82,7 +82,8 @@ abstract class BaseLookup implements LookupInterface
 
                 while (!$value instanceof $source->scopeModel && $source->relation):
                     $name = $source->relation->getName();
-                    $source = $source->relation->getFromModel()->getMeta()->getField($name);
+                    $source = $source->relation->getFromModel()
+                                               ->getMeta()->getField($name);
                 endwhile;
 
                 try {
@@ -96,8 +97,10 @@ abstract class BaseLookup implements LookupInterface
         return $value;
     }
 
-    public function processLHS(CompilerInterface $compiler, ConnectionInterface $connection)
-    {
+    public function processLHS(
+        CompilerInterface $compiler,
+        ConnectionInterface $connection
+    ) {
         return $compiler->compile($this->lhs);
     }
 

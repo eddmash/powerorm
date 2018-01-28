@@ -30,6 +30,7 @@ use Eddmash\PowerOrm\Model\Query\Results\ArrayFlatValueMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayValueMapper;
 use Eddmash\PowerOrm\Model\Query\Results\ModelMapper;
+use Eddmash\PowerOrm\Serializer\SimpleObjectSerializer;
 use function Eddmash\PowerOrm\Model\Query\Expression\not_;
 use function Eddmash\PowerOrm\Model\Query\Expression\q_;
 
@@ -42,7 +43,7 @@ const PRIMARY_KEY_ID = 'pk';
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Queryset implements QuerysetInterface
+class Queryset implements QuerysetInterface, \JsonSerializable
 {
     /**
      * @var ConnectionInterface
@@ -85,7 +86,11 @@ class Queryset implements QuerysetInterface
         $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
         $this->query = (null == $query) ? $this->getQueryBuilder() : $query;
-        $this->resultMapper = ArrayHelper::pop($kwargs, 'resultMapper', ModelMapper::class);
+        $this->resultMapper = ArrayHelper::pop(
+            $kwargs,
+            'resultMapper',
+            ModelMapper::class
+        );
         $this->kwargs = $kwargs;
     }
 
@@ -149,7 +154,7 @@ class Queryset implements QuerysetInterface
     {
         $queryset = $this->_filterOrExclude(
             false,
-            static::formatFilterConditions(__METHOD__, func_get_args())
+            static::formatConditions(__METHOD__, func_get_args())
         );
 
         $resultCount = count($queryset);
@@ -175,7 +180,8 @@ class Queryset implements QuerysetInterface
     }
 
     /**
-     * This method takes associative array as parameters. or an assocative array whose first item is the connector to
+     * This method takes associative array as parameters. or an assocative array
+     * whose first item is the connector to
      * use for the generated where conditions, Valid choices are :.
      *
      * <code>
@@ -197,16 +203,15 @@ class Queryset implements QuerysetInterface
     {
         return $this->_filterOrExclude(
             false,
-            static::formatFilterConditions(__METHOD__, func_get_args())
+            static::formatConditions(__METHOD__, func_get_args())
         );
     }
 
     /**
-     * Return a query set in which the returned objects have been annotated with extra data or aggregations.
+     * Return a query set in which the returned objects have been annotated
+     * with extra data or aggregations.
      *
      * @return Queryset
-     *
-     * @throws ValueError
      *
      * @since  1.1.0
      *
@@ -214,7 +219,7 @@ class Queryset implements QuerysetInterface
      */
     public function annotate()
     {
-        $args = static::formatFilterConditions(__METHOD__, func_get_args());
+        $args = static::formatConditions(__METHOD__, func_get_args());
 
         $names = $this->_fields;
         if (is_null($this->_fields)):
@@ -259,7 +264,10 @@ class Queryset implements QuerysetInterface
      */
     public function orderBy($fieldNames = [])
     {
-        assert($this->query->isFilterable(), 'Cannot reorder a query once a limiting has been done.');
+        assert(
+            $this->query->isFilterable(),
+            'Cannot reorder a query once a limiting has been done.'
+        );
         $clone = $this->_clone();
         $clone->query->clearOrdering(false);
         $clone->query->addOrdering($fieldNames);
@@ -283,10 +291,18 @@ class Queryset implements QuerysetInterface
         //todo accept non associative items
         $query = $this->query->deepClone();
         foreach ($kwargs as $alias => $annotation) :
-            $query->addAnnotation(['annotation' => $annotation, 'alias' => $alias, 'isSummary' => true]);
-            // ensure we have an aggrated function
+            $query->addAnnotation(
+                [
+                    'annotation' => $annotation,
+                    'alias' => $alias,
+                    'isSummary' => true,
+                ]
+            );
+            // ensure we have an aggregated function
             if (!$query->annotations[$alias]->containsAggregates()) :
-                throw new TypeError(sprintf('%s is not an aggregate expression', $alias));
+                throw new TypeError(
+                    sprintf('%s is not an aggregate expression', $alias)
+                );
             endif;
         endforeach;
 
@@ -339,7 +355,7 @@ class Queryset implements QuerysetInterface
     {
         return $this->_filterOrExclude(
             true,
-            static::formatFilterConditions(__METHOD__, func_get_args())
+            static::formatConditions(__METHOD__, func_get_args())
         );
     }
 
@@ -478,7 +494,7 @@ class Queryset implements QuerysetInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function formatFilterConditions($methondname, $conditions)
+    public static function formatConditions($methondname, $conditions)
     {
         if (count($conditions) > 1):
             throw new InvalidArgumentException(
@@ -564,19 +580,21 @@ class Queryset implements QuerysetInterface
     }
 
     /**
-     * Returns the results as an array of associative array that represents a record in the database.
+     * Returns the results as an array of associative array that represents a
+     * record in the database.
+     *
      * The orm does not try map the into  there  respective models.
      *
-     * @param array $fields     the fields to select, if null all fields in the model are selected
+     * @param array $fields     the fields to select, if null all fields in the
+     *                          model are selected
      * @param bool  $valuesOnly if true return
-     * @param bool  $flat       if true returns the results as one array others it returns
-     *                          results as array of arrays each which represents a record in the database for the
+     * @param bool  $flat       if true returns the results as one array others
+     *                          it returns results as array of arrays each
+     *                          which represents a record in the database for the
      *                          selected field.
      *                          (only works when valueOnly is true)
      *
      * @return Queryset
-     *
-     * @throws TypeError
      *
      * @since  1.1.0
      *
@@ -585,16 +603,23 @@ class Queryset implements QuerysetInterface
     public function asArray($fields = [], $valuesOnly = false, $flat = false)
     {
         if ($flat && 1 != count($fields)):
-            throw new TypeError("'flat' is valid when asArray is called with exactly one field.");
+            throw new TypeError(
+                "'flat' is valid when asArray is called".
+                ' with exactly one field.'
+            );
         endif;
         if ($flat && !$valuesOnly):
-            throw new TypeError("'flat' is valid when asArray is called with valuesOnly=true.");
+            throw new TypeError(
+                "'flat' is valid when asArray ".
+                'is called with valuesOnly=true.'
+            );
         endif;
         $clone = $this->_clone();
         $clone->_fields = $fields;
         $clone->query->setValueSelect($fields);
 
-        $clone->resultMapper = ($valuesOnly) ? ArrayValueMapper::class : ArrayMapper::class;
+        $clone->resultMapper = ($valuesOnly) ? ArrayValueMapper::class :
+            ArrayMapper::class;
         if ($flat):
             $clone->resultMapper = ArrayFlatValueMapper::class;
         endif;
@@ -752,5 +777,20 @@ class Queryset implements QuerysetInterface
         endif;
 
         return $queryset->query->toSubQuery($queryset->connection);
+    }
+
+    /**
+     * Specify data which should be serialized to JSON.
+     *
+     * @see  http://php.net/manual/en/jsonserializable.jsonserialize.php
+     *
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     *               which is a value of any type other than a resource
+     *
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return SimpleObjectSerializer::serialize($this);
     }
 }

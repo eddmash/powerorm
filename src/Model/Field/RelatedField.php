@@ -18,6 +18,7 @@ use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
+use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedExact;
@@ -391,10 +392,11 @@ class RelatedField extends Field
     }
 
     /**
-     * We add some properties to the related model class i.e. the inverse model of the relationship initiated by this
-     * field.
+     * We add some properties to the related model class i.e. the inverse model
+     * of the relationship initiated by this field.
      *
-     * e.g. we add the inverse field to use to query when starting on the inverse side.
+     * e.g. we add the inverse field to use to query when starting on the
+     * inverse side.
      *
      * @param Model|string     $relatedModel
      * @param ForeignObjectRel $relation
@@ -404,7 +406,29 @@ class RelatedField extends Field
         Model $relatedModel,
         ForeignObjectRel $relation
     ) {
-        if (!$this->relation->isHidden()) :
+        $inverseFields = $relatedModel->getMeta()->getFields(
+            false,
+            true,
+            false
+        );
+        $rM = $this->relation->toModel;
+        if ($rM instanceof Model):
+            $rM = $this->relation->toModel->getMeta()->getNSModelName();
+        endif;
+        $createInverse = true;
+        foreach ($inverseFields as $inverseField) :
+            $sM = $inverseField->scopeModel->getMeta()->getNSModelName();
+            if ($inverseField instanceof InverseField):
+                if ($sM === $rM && $this->name == $inverseField->toField):
+                    $relation->relatedName = $inverseField->getName();
+                    $inverseField->relation = $relation;
+                    $createInverse = true;
+                    break;
+                endif;
+            endif;
+
+        endforeach;
+        if (!$this->relation->isHidden() && $createInverse) :
             $inverseField = $this->inverseField;
             $hasMany = $inverseField::createObject(
                 [
@@ -415,7 +439,10 @@ class RelatedField extends Field
                 ]
             );
 
-            $relatedModel->getMeta()->concreteModel->addToClass($relation->getAccessorName(), $hasMany);
+            $relatedModel->getMeta()->concreteModel->addToClass(
+                $relation->getAccessorName(),
+                $hasMany
+            );
         endif;
     }
 

@@ -8,7 +8,7 @@
 
 namespace Eddmash\PowerOrm\Model\Query;
 
-use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\SQLAggregateCompiler;
 
 class AggregateQuery extends Query
@@ -16,10 +16,12 @@ class AggregateQuery extends Query
     public $subQuery;
     public $subQueryParams;
 
-    public function addSubQuery(Query $query, Connection $connection)
+    public function addSubQuery(Query $query, ConnectionInterface $connection)
     {
         $query->isSubQuery = true;
-        list($this->subQuery, $this->subQueryParams) = $query->getSqlCompiler($connection)->asSql();
+        list(
+            $this->subQuery, $this->subQueryParams
+            ) = $query->getSqlCompiler($connection)->asSql();
     }
 
     /**

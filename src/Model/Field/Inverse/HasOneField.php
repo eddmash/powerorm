@@ -18,6 +18,7 @@ class HasOneField extends HasManyField
     public $unique = true;
     /**{inheritdoc}*/
     protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ReverseOneToOneDescriptor';
+    protected $relationClass = "\Eddmash\PowerOrm\Model\Field\RelatedObjects\OneToOneRel";
 
     /**
      * {@inheritdoc}

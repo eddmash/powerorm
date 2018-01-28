@@ -54,8 +54,10 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     public $scopeModel;
 
     /**
-     * Indicates if this field should be serailized when the scope
-     * model is being serailized.
+     * Indicates if this field should be serialized when the scope
+     * model is being serialized.
+     *
+     * This is also used it the scope model is being converted into an array.
      *
      * @var bool
      */
@@ -771,7 +773,8 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
     /**
      * @param                        $alias
-     * @param Field|ForeignObjectRel $outputField
+     * @param Field|ForeignObjectRel $outputField determines inwhich format
+     *                                            data is handled
      *
      * @since  1.1.0
      *

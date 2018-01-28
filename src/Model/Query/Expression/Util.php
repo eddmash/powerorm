@@ -36,6 +36,17 @@ function count_($expression, $distinct = false)
 }
 
 /**
+ * @param $name
+ * @param $expression
+ *
+ * @return Ref
+ */
+function ref_($name, $expression)
+{
+    return new Ref($name, $expression);
+}
+
+/**
  * @param $expression
  *
  * @return Avg
@@ -102,7 +113,12 @@ function sum_($expression)
  */
 function or_()
 {
-    return new Q(Queryset::formatFilterConditions(__FUNCTION__, func_get_args()), OR_CONNECTOR);
+    return new Q(
+        Queryset::formatConditions(
+            __FUNCTION__,
+            func_get_args()
+        ), OR_CONNECTOR
+    );
 }
 
 /**
@@ -116,7 +132,7 @@ function or_()
  */
 function not_()
 {
-    return (new Q(Queryset::formatFilterConditions(__FUNCTION__, func_get_args())))->negate();
+    return (new Q(Queryset::formatConditions(__FUNCTION__, func_get_args())))->negate();
 }
 
 /**
@@ -130,7 +146,12 @@ function not_()
  */
 function q_()
 {
-    return new Q(Queryset::formatFilterConditions(__FUNCTION__, func_get_args()));
+    return new Q(
+        Queryset::formatConditions(
+            __FUNCTION__,
+            func_get_args()
+        )
+    );
 }
 
 /**
@@ -156,7 +177,12 @@ function f_($name)
  */
 function func_()
 {
-    return new Func(Queryset::formatFilterConditions(__FUNCTION__, func_get_args()));
+    return new Func(
+        Queryset::formatConditions(
+            __FUNCTION__,
+            func_get_args()
+        )
+    );
 }
 
 /**

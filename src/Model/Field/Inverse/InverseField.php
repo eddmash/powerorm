@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field\Inverse;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\ValueError;
+use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
@@ -65,6 +66,17 @@ class InverseField extends RelatedField
     public function dbType(ConnectionInterface $connection)
     {
         return;
+    }
+
+    public function contributeToClass($fieldName, $modelObject)
+    {
+        if ($this->autoCreated):
+
+            parent::contributeToClass($fieldName, $modelObject);
+        else:
+
+            Field::contributeToClass($fieldName, $modelObject);
+        endif;
     }
 
     /**

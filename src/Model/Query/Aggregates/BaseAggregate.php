@@ -39,7 +39,12 @@ class BaseAggregate extends Func
         $forSave = false
     ) {
         // Aggregates are not allowed in UPDATE queries, so ignore forSave
-        $obj = parent::resolveExpression($resolver, $allowJoins, $reuse, $summarize);
+        $obj = parent::resolveExpression(
+            $resolver,
+            $allowJoins,
+            $reuse,
+            $summarize
+        );
 
         return $obj;
     }

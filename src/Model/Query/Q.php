@@ -26,8 +26,11 @@ class Q extends Node
     /**
      * {@inheritdoc}
      */
-    public function __construct($children = [], $connector = null, $negated = false)
-    {
+    public function __construct(
+        $children = [],
+        $connector = null,
+        $negated = false
+    ) {
         $items = new ArrayCollection();
         foreach ($children as $name => $child) :
             if ($child instanceof Node):

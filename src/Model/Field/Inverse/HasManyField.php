@@ -29,8 +29,12 @@ class HasManyField extends InverseField
     public function __construct(array $kwargs)
     {
         $this->toField = ArrayHelper::getValue($kwargs, 'toField');
-        $this->fromField = ArrayHelper::getValue($kwargs, 'fromField');
-        $kwargs['rel'] = $this->fromField->relation;
+        $this->fromField = ArrayHelper::getValue($kwargs, 'fromField', $this);
+        if (!ArrayHelper::hasKey($kwargs, 'rel')):
+
+            $kwargs['rel'] = $this->fromField->relation;
+        endif;
+
         parent::__construct($kwargs);
     }
 

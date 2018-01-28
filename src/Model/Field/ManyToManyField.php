@@ -19,6 +19,7 @@ use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Migration\FormatFileContent;
 use Eddmash\PowerOrm\Model\Delete;
 use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
+use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToManyRel;
 use Eddmash\PowerOrm\Model\Meta;
@@ -115,6 +116,27 @@ class ManyToManyField extends RelatedField
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
+        $inverseFields = $relatedModel->getMeta()->getFields(
+            false,
+            true,
+            false
+        );
+        $rM = $this->relation->toModel;
+        if ($rM instanceof Model):
+            $rM = $this->relation->toModel->getMeta()->getNSModelName();
+        endif;
+        $relName = null;
+        foreach ($inverseFields as $inverseField) :
+            $sM = $inverseField->scopeModel->getMeta()->getNSModelName();
+            if ($inverseField instanceof InverseField):
+                if ($sM === $rM && $this->name == $inverseField->toField):
+                    $relName = $inverseField->getName();
+                    $relation->relatedName = $relName;
+                    break;
+                endif;
+            endif;
+
+        endforeach;
         $hasMany = HasManyField::createObject(
             [
                 'to' => $this->scopeModel->getMeta()->getNSModelName(),

@@ -11,6 +11,7 @@ use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\NotImplemented;
+use Eddmash\PowerOrm\Exception\QueryException;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
@@ -73,8 +74,10 @@ class SqlFetchBaseCompiler extends SqlCompiler
         $klassInfo = [];
         $select = [];
         $annotations = [];
-        //keeps track of what position the column is at, helpful because of we perform a join we might a column name
-        // thats repeated a cross multiple tables, we can use the colmn names to map back to model since it will cause
+        //keeps track of what position the column is at, helpful because of we
+        // perform a join we might a column name
+        // thats repeated a cross multiple tables, we can use the colmn names
+        // to map back to model since it will cause
         // issues
         $selectIDX = 0;
         if ($this->query->useDefaultCols):
@@ -90,7 +93,8 @@ class SqlFetchBaseCompiler extends SqlCompiler
             $klassInfo['select_fields'] = $selectList;
         endif;
 
-        // this are used when return the result as array so they are not populated to any model
+        // this are used when return the result as array so they are not
+        // populated to any model
         foreach ($this->query->select as $col) :
             $alias = false;
             $select[] = [$col, $alias];
@@ -116,12 +120,14 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
     public function getOrderBy()
     {
-        // an array of arrays that indicate a colname and its a reference e.g. [['name', false]]
+        // an array of arrays that indicate a colname and its a reference
+        // e.g. [['name', false]]
         $orderByList = [];
         if (!$this->query->defaultOrdering):
             $ordering = $this->query->orderBy;
         else:
-            $ordering = ($this->query->orderBy) ? $this->query->orderBy : $this->query->getMeta()->getOrderBy();
+            $ordering = ($this->query->orderBy) ?
+                $this->query->orderBy : $this->query->getMeta()->getOrderBy();
         endif;
 
         if ($this->query->standardOrdering):
@@ -148,13 +154,16 @@ class SqlFetchBaseCompiler extends SqlCompiler
             endif;
 
             if (array_key_exists($colName, $this->query->annotations)):
-                $orderByList[] = [new OrderBy($this->query->annotations[$colName], $descending), false];
+                $orderByList[] = [
+                    new OrderBy($this->query->annotations[$colName], $descending),
+                    false,
+                ];
 
                 continue;
             endif;
 
-            // we are here we still have a string name, we need to convert it to an
-            // expression that we can use
+            // we are here we still have a string name, we need to convert
+            // it to an expression that we can use
             if ($colName):
                 $orderByList = array_merge(
                     $orderByList,
@@ -173,10 +182,17 @@ class SqlFetchBaseCompiler extends SqlCompiler
         /* @var $orderExp BaseExpression */
         foreach ($orderByList as $orderitem) :
             list($orderExp, $isRef) = $orderitem;
-            $resolved = $orderExp->resolveExpression($this->query, true);
+            $resolved = $orderExp->resolveExpression(
+                $this->query,
+                true
+            );
             list($sql, $params) = $this->compile($resolved);
 
-            preg_match("/(?P<name>.*)\s(?P<order>ASC|DESC)(.*)/", 'demo_entry.id DESC', $match);
+            preg_match(
+                "/(?P<name>.*)\s(?P<order>ASC|DESC)(.*)/",
+                'demo_entry.id DESC',
+                $match
+            );
             $strippedSql = $match['name'];
 
             // ensure we dont add the same field twice
@@ -529,7 +545,11 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
             try {
                 /** @var $from BaseJoin */
-                $from = ArrayHelper::getValue($this->query->tableAliasMap, $alias, ArrayHelper::STRICT);
+                $from = ArrayHelper::getValue(
+                    $this->query->tableAliasMap,
+                    $alias,
+                    ArrayHelper::STRICT
+                );
                 list($fromSql, $fromParams) = $this->compile($from);
                 array_push($result, $fromSql);
                 $params = array_merge($params, $fromParams);
@@ -546,23 +566,30 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @return \Doctrine\DBAL\Statement
      *
+     * @throws QueryException
+     *
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function executeSql($chunked = false)
     {
-        list($sql, $params) = $this->asSql($this, $this->connection);
+        try {
+            list($sql, $params) = $this->asSql($this, $this->connection);
+            $stmt = $this->connection->prepare($sql);
+            foreach ($params as $index => $value) :
+                // Columns/Parameters are 1-based,
+                // so need to start at 1 instead of zero
+                ++$index;
+                $stmt->bindValue($index, $value);
+            endforeach;
 
-        $stmt = $this->connection->prepare($sql);
-        foreach ($params as $index => $value) :
-            ++$index; // Columns/Parameters are 1-based, so need to start at 1 instead of zero
-            $stmt->bindValue($index, $value);
-        endforeach;
+            $stmt->execute();
 
-        $stmt->execute();
-
-        return $stmt;
+            return $stmt;
+        } catch (\Exception $e) {
+            throw QueryException::fromThrowable($e);
+        }
     }
 
     /**
@@ -633,8 +660,10 @@ class SqlFetchBaseCompiler extends SqlCompiler
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function asSql(CompilerInterface $compiler = null, ConnectionInterface $connection = null)
-    {
+    public function asSql(
+        CompilerInterface $compiler = null,
+        ConnectionInterface $connection = null
+    ) {
         list($orderBy, $groupBy) = $this->preSqlSetup();
         $params = [];
         list($fromClause, $fromParams) = $this->getFrom();
@@ -698,6 +727,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
             endforeach;
             $results[] = sprintf('ORDER BY %s', implode(', ', $ordering));
         endif;
+
         if ($this->query->limit) :
             $results[] = 'LIMIT';
             $results[] = $this->query->limit;
@@ -712,39 +742,54 @@ class SqlFetchBaseCompiler extends SqlCompiler
     }
 
     /**
-     * Tries ot resolve a name like 'username' into a model field and then into Col expression
-     * suitable for makin queries.
+     * Tries ot resolve a name like 'username' into a model field and then into
+     * Col expression suitable for making queries.
      *
      * @param        $col
-     * @param        $meta
+     * @param Meta   $meta
      * @param null   $alias
      * @param string $defaultOrder
      * @param array  $alreadyResolved helps avoid infinite loops
      *
      * @return array
      *
+     * @throws KeyError
+     * @throws NotImplemented
+     * @throws \Eddmash\PowerOrm\Exception\ValueError
+     *
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private function resolveOrderName($col, Meta $meta, $alias = null, $defaultOrder = 'ASC', &$alreadyResolved = [])
-    {
+    private function resolveOrderName(
+        $col,
+        Meta $meta,
+        $alias = null,
+        $defaultOrder = 'ASC',
+        &$alreadyResolved = []
+    ) {
         list($col, $order) = Query::getOrderDirection($col, $defaultOrder);
 
         $nameParts = explode(BaseLookup::LOOKUP_SEPARATOR, $col);
 
         /* @var $targetField Field */
-        list($relationField, $targetFields, $alias, $joinList, $paths, $meta) = $this->_setupJoins(
-            $nameParts,
-            $meta,
-            $alias
-        );
+        list(
+            $relationField, $targetFields, $alias, $joinList, $paths,
+            $meta
+            ) = $this->_setupJoins($nameParts, $meta, $alias);
 
-        if ($relationField->isRelation && $meta->getOrderBy() && empty($relationField->getAttrName())):
-            throw new NotImplemented('This capability is yet to be implemented');
+        if ($relationField->isRelation && $meta->getOrderBy() &&
+            empty($relationField->getAttrName())):
+            throw new NotImplemented(
+                'This capability is yet to be implemented'
+            );
         endif;
 
-        list($targets, $finalAlias, $joinList) = $this->query->trimJoins($targetFields, $joinList, $paths);
+        list($targets, $alias, $joinList) = $this->query->trimJoins(
+            $targetFields,
+            $joinList,
+            $paths
+        );
 
         $fields = [];
 
@@ -755,7 +800,10 @@ class SqlFetchBaseCompiler extends SqlCompiler
         /** @var $target Field */
         foreach ($targets as $target):
 
-            $fields[] = [new OrderBy($target->getColExpression($alias), $descending), false];
+            $fields[] = [
+                new OrderBy($target->getColExpression($alias), $descending),
+                false,
+            ];
 
         endforeach;
 
@@ -785,12 +833,10 @@ class SqlFetchBaseCompiler extends SqlCompiler
             $rootAlias = $this->query->getInitialAlias();
         endif;
 
-        list($field, $targets, $joinList, $paths, $meta) = $this->query->setupJoins(
-            $nameParts,
-            $meta,
-            $rootAlias
-        );
-
+        list(
+            $field, $targets, $joinList, $paths,
+            $meta
+            ) = $this->query->setupJoins($nameParts, $meta, $rootAlias);
         $alias = end($joinList);
 
         return [$field, $targets, $alias, $joinList, $paths, $meta];

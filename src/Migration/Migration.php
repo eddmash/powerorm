@@ -187,7 +187,7 @@ class Migration implements MigrationInterface
             if (!$operation->isReducibleToSql()):
                 continue;
             endif;
-            echo $operation->getDescription().'--';
+
             // preserve state before operation
             $oldState = $state->deepClone();
 

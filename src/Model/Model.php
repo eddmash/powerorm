@@ -30,6 +30,7 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\AutoField;
+use Eddmash\PowerOrm\Model\Field\Descriptors\DescriptorInterface;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
@@ -37,7 +38,9 @@ use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
 use Eddmash\PowerOrm\Model\Query\Queryset;
+use Eddmash\PowerOrm\Serializer\SimpleObjectSerializer;
 use Eddmash\PowerOrm\Signals\Signal;
+use JsonSerializable;
 use ReflectionObject;
 
 /**
@@ -48,7 +51,7 @@ use ReflectionObject;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-abstract class Model extends DeconstructableObject implements ModelInterface, ArrayObjectInterface
+abstract class Model extends DeconstructableObject implements ModelInterface, ArrayObjectInterface, JsonSerializable
 {
     const FAKENAMESPACE = '_Fake';
     use ModelFieldsTrait;
@@ -907,7 +910,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function serialize()
     {
-        return serialize($this->_fieldCache);
+        return serialize($this->toArray());
     }
 
     /**
@@ -925,7 +928,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      *
      * @throws AttributeError
      * @throws KeyError
-    <<<<<<< HEAD
+     *
      * @since  1.1.0
      * @since  1.1.0
      *
@@ -953,7 +956,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // the related user object whilst user_id returns the actual value
             // the gets put into the database.
             if ($name === $field->getAttrName()):
-                return $this->_fieldCache[$name];
+                $val = $this->_fieldCache[$name];
+                if (!($val instanceof DescriptorInterface)):
+
+                    return $val;
+                endif;
             endif;
 
             return $field->getValue($this);
@@ -1181,7 +1188,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function prepareSave(
         $updateFields = null,
-        $raw = false,
         $forceInsert = false,
         $forceUpdate = false
     ) {
@@ -1199,12 +1205,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $this->dispatchSignal('powerorm.model.pre_save', $model);
         endif;
 
-        if (!$raw):
-            $this->saveParent($model, $updateFields);
-        endif;
+        $this->saveParent($model, $updateFields);
         $this->saveTable(
             $model,
-            $raw,
             $forceInsert,
             $forceUpdate,
             $updateFields
@@ -1230,10 +1233,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         $meta = $model->getMeta();
 
-        foreach ($meta->getParentLinks() as $key => $field) :
-            // Make sure the link fields are synced between parent and self.todo
+        //        foreach ($meta->getParentLinks() as $key => $field) :
+        // Make sure the link fields are synced between parent and self.todo
 
-        endforeach;
+        //        endforeach;
     }
 
     /**
@@ -1254,7 +1257,6 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     private function saveTable(
         $model,
-        $raw = false,
         $forceInsert = false,
         $forceUpdate = false,
         $updateFields = null
@@ -1503,5 +1505,23 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         $name = $field->relation->getRelatedField()->getAttrName();
 
         return $this->{$name};
+    }
+
+    /**
+     * Converts this models into an array.
+     * For a field to appear in the resulting array it needs to serializable.
+     *
+     * @return mixed
+     */
+    public function toArray()
+    {
+        $serial = SimpleObjectSerializer::serialize($this);
+
+        return $serial[0]['fields'];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }
