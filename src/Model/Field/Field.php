@@ -266,9 +266,13 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     public $formBlank = false;
 
     public $oneToMany = false;
+
     public $oneToOne = false;
+
     public $manyToMany = false;
+
     public $manyToOne = false;
+
     public $inverse = false;
 
     public function __construct($config = [])
@@ -473,7 +477,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
             'Eddmash\PowerOrm\Model\Field'
         )):
             $path = 'Eddmash\PowerOrm\Model\Model';
-            $name = sprintf('Model::%s', $this->getShortClassName());
+            $name = sprintf('Models::%s', $this->getShortClassName());
         endif;
 
         return [

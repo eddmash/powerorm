@@ -7,6 +7,7 @@ $finder = PhpCsFixer\Finder::create()
 return PhpCsFixer\Config::create()
     ->setRules(array(
         '@Symfony' => true,
+        'class_attributes_separation'=>true,
         'braces'=>false,
         'blank_line_before_statement'=>false
         )

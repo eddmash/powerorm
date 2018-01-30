@@ -12,8 +12,8 @@
 namespace Eddmash\PowerOrm\Migration\State;
 
 use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\Exception\CircularDependencyError;
 use Eddmash\PowerOrm\Exception\OrmException;
-use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\Tools;
 
 class StateRegistry extends Registry
@@ -54,7 +54,7 @@ class StateRegistry extends Registry
         endforeach;
         try {
             $creationOrder = Tools::topologicalSort($creationOrder);
-        } catch (ValueError $e) {
+        } catch (CircularDependencyError $e) {
             throw new OrmException(static::class.'::'.$e->getMessage());
         }
 

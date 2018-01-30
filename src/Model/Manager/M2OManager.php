@@ -28,7 +28,9 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
 class M2OManager extends BaseM2OManager
 {
     public $reverse;
+
     public $instance;
+
     public $filters;
 
     /**

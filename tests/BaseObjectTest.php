@@ -1,5 +1,7 @@
 <?php
 
+namespace Eddmash\PowerOrm\Tests;
+
 use Eddmash\PowerOrm\BaseObject;
 
 /**

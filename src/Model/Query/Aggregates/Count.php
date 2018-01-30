@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\Model\Query\Expression\Star;
 class Count extends BaseAggregate
 {
     protected $function = 'COUNT';
+
     protected $name = 'COUNT';
 
     /**

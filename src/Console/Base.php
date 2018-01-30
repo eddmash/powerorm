@@ -14,6 +14,7 @@ use Eddmash\PowerOrm\BaseObject;
 class Base extends BaseObject
 {
     const EXIT_CODE_NORMAL = 0;
+
     const EXIT_CODE_ERROR = 1;
 
     /**
@@ -28,6 +29,7 @@ class Base extends BaseObject
     public $color;
 
     public $help = '';
+
     public $summary = '';
 
     public function wrapText($message, $indent, $refresh = false)

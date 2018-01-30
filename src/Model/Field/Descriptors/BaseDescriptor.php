@@ -19,6 +19,7 @@ use Eddmash\PowerOrm\Model\Model;
 class BaseDescriptor implements DescriptorInterface
 {
     protected $reverse;
+
     /**
      * @var ForeignKey
      */

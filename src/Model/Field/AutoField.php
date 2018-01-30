@@ -79,7 +79,7 @@ class AutoField extends Field
         assert(
             !$model->getMeta()->hasAutoField,
             sprintf(
-                "The Model '%s' more than one AutoField, which is not allowed.",
+                "The Models '%s' more than one AutoField, which is not allowed.",
                 $this->scopeModel->getMeta()->getNSModelName()
             )
         );

@@ -9,22 +9,19 @@
 * file that was distributed with this source code.
 */
 
-use Eddmash\PowerOrm\App\Settings;
+namespace Eddmash\PowerOrm\Tests\Helpers;
+
 use Eddmash\PowerOrm\Helpers\ClassHelper;
+use Eddmash\PowerOrm\Tests\PowerormTest;
 
-class ClassHelperTest extends PHPUnit_Framework_TestCase
+class ClassHelperTest extends PowerormTest
 {
-    protected function setUp()
-    {
-        \Eddmash\PowerOrm\BaseOrm::setup(new Settings([]));
-    }
-
     /**
      * @dataProvider namespaceProvider
      *
-     * @since 1.1.0
+     * @since        1.1.0
      *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @author       Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function testNamespanceNamePair($originalValue, $expectedNamespace, $expectedName)
     {
@@ -50,27 +47,34 @@ class ClassHelperTest extends PHPUnit_Framework_TestCase
         ];
         $mock = $this->getMockForAbstractClass(\Eddmash\PowerOrm\Model\Model::class);
 
-        $this->assertEquals($expected, array_keys(ClassHelper::getParents($mock)), 'Failed to assert expected order of parents');
+        $this->assertEquals(
+            $expected,
+            array_keys(ClassHelper::getParents($mock)),
+            'Failed to assert expected order of parents'
+        );
     }
 
     /**
      * @dataProvider namespaceBothBackslashProvider
      *
-     * @since 1.1.0
+     * @since        1.1.0
      *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @author       Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function testFormatingNamespaceWithOpenAndCloseBackslash($originalValue, $expectedValue)
     {
-        $this->assertEquals($expectedValue, ClassHelper::getFormatNamespace($originalValue, true));
+        $this->assertEquals(
+            $expectedValue,
+            ClassHelper::getFormatNamespace($originalValue, true)
+        );
     }
 
     /**
      * @dataProvider namespaceLeadingBackslashProvider
      *
-     * @since 1.1.0
+     * @since        1.1.0
      *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @author       Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function testFormatingNamespaceWithLeadingBackslash($originalValue, $expectedValue)
     {
@@ -80,9 +84,9 @@ class ClassHelperTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider namespaceClosingBackslashProvider
      *
-     * @since 1.1.0
+     * @since        1.1.0
      *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @author       Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function testFormatingNamespaceWithClosingBackslash($originalValue, $expectedValue)
     {
@@ -92,9 +96,9 @@ class ClassHelperTest extends PHPUnit_Framework_TestCase
     /**
      * @dataProvider nameFromNamespaceProvider
      *
-     * @since 1.1.0
+     * @since        1.1.0
      *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * @author       Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
     public function testGettingNameFromNamespace($originalValue, $expectedValue)
     {

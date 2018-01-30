@@ -4,8 +4,8 @@ namespace Eddmash\PowerOrm\Helpers;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeConstructableInterface;
+use Eddmash\PowerOrm\Exception\CircularDependencyError;
 use Eddmash\PowerOrm\Exception\InvalidArgumentException;
-use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
@@ -32,7 +32,7 @@ class Tools
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
-     * @throws ValueError
+     * @throws CircularDependencyError
      */
     public static function topologicalSort($dependency)
     {
@@ -51,10 +51,10 @@ class Tools
 
             // we don't have  a vertice with 0 indegree hence we have loop
             if (empty($noDeps)):
-                throw new ValueError(
+                throw new CircularDependencyError(
                     sprintf(
                         'Cyclic dependency on topological sort %s',
-                        self::stringify($deps)
+                        json_encode($deps)
                     )
                 );
             endif;

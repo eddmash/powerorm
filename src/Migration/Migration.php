@@ -39,9 +39,13 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
 class Migration implements MigrationInterface
 {
     protected $name;
+
     protected $operations;
+
     protected $description;
+
     protected $dependency = [];
+
     private $appLabel;
 
     public function __construct($name)

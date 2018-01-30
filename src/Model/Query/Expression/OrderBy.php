@@ -20,18 +20,22 @@ use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 class OrderBy extends BaseExpression
 {
     protected $template = '%s %s ';
+
     /**
      * @var Field
      */
     private $expression;
+
     /**
      * @var bool
      */
     private $descending;
+
     /**
      * @var
      */
     private $nullsFirst;
+
     /**
      * @var bool
      */

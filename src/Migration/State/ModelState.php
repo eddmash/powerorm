@@ -23,10 +23,10 @@ use Eddmash\PowerOrm\Model\Model;
 use ReflectionObject;
 
 /**
- * Represents a PowerOrm Model.
+ * Represents a PowerOrm Models.
  *
- * We don't use the actual Model class as it's not designed to have its options changed -instead, we mutate this one
- * and then render it into a Model as required.
+ * We don't use the actual Models class as it's not designed to have its options changed -instead, we mutate this one
+ * and then render it into a Models as required.
  *
  * Note that while you are allowed to mutate .fields, you are not allowed to mutate the Field instances inside there
  * themselves - you must instead assign new ones, as these are not detached during a clone.
@@ -38,10 +38,14 @@ use ReflectionObject;
 class ModelState extends BaseObject
 {
     public $name;
+
     protected $meta = [];
+
     /** @var Field[] */
     public $fields = [];
+
     public $extends;
+
     private $fromDisk = false;
 
     public function __construct($name, $fields, $kwargs = [])

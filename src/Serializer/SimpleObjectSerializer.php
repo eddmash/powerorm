@@ -19,8 +19,11 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
 class SimpleObjectSerializer implements SerializerInterface
 {
     public $objects;
+
     public $_fields;
+
     public $items;
+
     /**
      * @var array
      */

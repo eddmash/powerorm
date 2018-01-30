@@ -29,7 +29,7 @@ use Eddmash\PowerOrm\Model\Field\TimeField;
 
 trait ModelFieldsTrait
 {
-    // ********************* Model Fields ************************************
+    // ********************* Models Fields ************************************
 
     /**
      * @ignore

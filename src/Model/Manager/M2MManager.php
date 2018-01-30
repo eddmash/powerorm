@@ -29,10 +29,12 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
 class M2MManager extends BaseM2MManager
 {
     public $filters = [];
+
     /**
      * @var Model
      */
     private $instance;
+
     /**
      * @var Model
      */

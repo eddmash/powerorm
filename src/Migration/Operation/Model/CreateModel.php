@@ -24,6 +24,7 @@ use Eddmash\PowerOrm\Model\Model;
 class CreateModel extends ModelOperation
 {
     public $fields;
+
     /**
      * @var Meta
      */

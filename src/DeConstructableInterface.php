@@ -29,8 +29,8 @@ interface DeConstructableInterface
      *
      * [
      *      'name'=> 'Charfield',
-     *      'fullName'=> 'Eddmash\PowerOrm\Model\Charfield',// since the path and the name can contain alias, pass this also
-     *      'path'=> 'Eddmash\PowerOrm\Model\Charfield',
+     *      'fullName'=> 'Eddmash\PowerOrm\Models\Charfield',// since the path and the name can contain alias, pass this also
+     *      'path'=> 'Eddmash\PowerOrm\Models\Charfield',
      *      'constructorArgs'=> [
      *          'max_length'=> 20
      *      ]

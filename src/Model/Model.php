@@ -45,7 +45,7 @@ use ReflectionObject;
 
 /**
  * Base class for all models in the ORM, this class cannot be instantiated on its own.
- * Class Model.
+ * Class Models.
  *
  * @since  1.1.0
  *
@@ -54,21 +54,31 @@ use ReflectionObject;
 abstract class Model extends DeconstructableObject implements ModelInterface, ArrayObjectInterface, JsonSerializable
 {
     const FAKENAMESPACE = '_Fake';
+
     use ModelFieldsTrait;
     use FormReadyModelTrait;
+
     const SELF = 'this';
+
     const CASCADE = 'cascade';
+
     const DEBUG_IGNORE = ['tableName', 'managed', 'verboseNjame', 'isNew', 'proxy'];
+
     const MODELBASE = '\Eddmash\PowerOrm\Model\Model';
+
     const META_SETTING_METHOD = 'getMetaSettings';
+
     public static $managerClass;
+
     /**
      * Holds all the fields tha belong to this model.
      *
      * @var array
      */
     public $_fieldCache = [];
+
     public $_nonModelfields = [];
+
     /**
      * Meta information about the model.
      *
@@ -77,12 +87,14 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @var Meta
      */
     protected $meta;
+
     /**
      * Holds the arguments passed to the constructor.
      *
      * @var array
      */
     protected $constructorArgs;
+
     /**
      * Holds the name of the database table that this model represents.
      *
@@ -95,6 +107,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @ignore
      */
     protected $tableName;
+
     /**
      * Indicates if the orm should managed the table being represented by this model.
      *
@@ -127,6 +140,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @var
      */
     protected $managed = true;
+
     /**
      * When using multi-table inheritance, a new database table is created for each subclass of a model.
      *
@@ -149,12 +163,14 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @var
      */
     protected $proxy = false;
+
     /**
      * Human friendly name.
      *
      * @var string
      */
     protected $verboseName;
+
     /**
      * Indicates if this is a new model, in the sense that it has not been
      * loaded with values from the database like
@@ -167,7 +183,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     protected $isNew = true;
 
     /**
-     * Model constructor.
+     * Models constructor.
      *
      * @param array $kwargs the kwargs is an associative array of configurations
      *                      passed to the model,
@@ -461,8 +477,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @return array The concrete parent model in the hierarchy of the $model, this can
      *               be null if
      *               the model does not have any non-abstract parent
-     *               e.g Eddmash\PowerOrm\Model\Models
-     *               - The immediate Model, this is the actual class the model extends, unlike
+     *               e.g Eddmash\PowerOrm\Models\Models
+     *               - The immediate Models, this is the actual class the model extends, unlike
      *               concrete model this is never null.
      *               - The fields in that this model contains, this included those added from
      *               abstract parent classes.

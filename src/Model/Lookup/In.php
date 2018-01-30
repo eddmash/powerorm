@@ -17,7 +17,9 @@ use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 class In extends BaseLookup
 {
     public static $lookupName = 'in';
+
     public $operator = 'IN';
+
     protected $rhsValueIsIterable = true;
 
     public function getLookupOperation($rhs)

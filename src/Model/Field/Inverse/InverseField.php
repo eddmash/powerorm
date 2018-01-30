@@ -26,6 +26,7 @@ use Eddmash\PowerOrm\Model\Model;
 class InverseField extends RelatedField
 {
     public $inverse = true;
+
     public $concrete = false;
 
     /**

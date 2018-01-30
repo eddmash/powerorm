@@ -18,6 +18,7 @@ use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 class Col extends BaseExpression
 {
     private $alias;
+
     /**
      * @var Field
      */

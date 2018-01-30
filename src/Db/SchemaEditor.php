@@ -38,14 +38,17 @@ class SchemaEditor extends BaseObject
      * @var ConnectionInterface
      */
     public $connection;
+
     /**
      * @var AbstractSchemaManager
      */
     private $schemaManager;
+
     /**
      * @var bool
      */
     private $getSqlStatements;
+
     private $sqls;
 
     /**

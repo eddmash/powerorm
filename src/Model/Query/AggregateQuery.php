@@ -14,6 +14,7 @@ use Eddmash\PowerOrm\Model\Query\Compiler\SQLAggregateCompiler;
 class AggregateQuery extends Query
 {
     public $subQuery;
+
     public $subQueryParams;
 
     public function addSubQuery(Query $query, ConnectionInterface $connection)

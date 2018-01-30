@@ -20,9 +20,11 @@ class Recorder
      * @var ConnectionInterface
      */
     private $connection;
+
     //    private $schema;
     //    private $schemaManager;
     private $tableExist;
+
     private $migrationTableName = 'powerorm_migrations';
 
     /**

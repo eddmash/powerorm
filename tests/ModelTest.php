@@ -8,18 +8,25 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-use Eddmash\PowerOrm\App\Settings;
+
+namespace Eddmash\PowerOrm\Tests;
+
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Tests\TestModels\AbstractBaseProxyModel;
+use Eddmash\PowerOrm\Tests\TestModels\AbstractModel;
+use Eddmash\PowerOrm\Tests\TestModels\AbstractWithFieldsBaseProxyModel;
+use Eddmash\PowerOrm\Tests\TestModels\ChildConcreteWithImmediateParentProxy;
+use Eddmash\PowerOrm\Tests\TestModels\ConcreteModel;
+use Eddmash\PowerOrm\Tests\TestModels\DirectConcreateBaseProxy;
+use Eddmash\PowerOrm\Tests\TestModels\FieldClashModel;
+use Eddmash\PowerOrm\Tests\TestModels\InDirectConcreateBaseProxy;
+use Eddmash\PowerOrm\Tests\TestModels\InnerAbstractClass;
+use ReflectionObject;
 
-const TESTAPPNAME = 'test';
-class ModelTest extends PHPUnit_Framework_TestCase
+const TESTAPPNAME = 'MODELTEST';
+class ModelTest extends PowerormTest
 {
-    protected function setUp()
-    {
-        \Eddmash\PowerOrm\BaseOrm::setup(new Settings([]));
-    }
-
     public function testAppName()
     {
         $proxy = new ConcreteModel();
@@ -119,93 +126,13 @@ class ModelTest extends PHPUnit_Framework_TestCase
 
     private function modelSetup(Model $proxy)
     {
-        $proxy->setupClassInfo([], ['meta' => ['appName' => TESTAPPNAME]]);
+        $proxy->setupClassInfo(
+            [],
+            [
+                'meta' => ['appName' => TESTAPPNAME],
+            ]
+        );
 
         return $proxy;
-    }
-}
-
-abstract class AbstractModel extends \Eddmash\PowerOrm\Model\Model
-{
-    public function unboundFields()
-    {
-        return [
-            'country' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
-            'school' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
-        ];
-    }
-}
-
-class FieldClashModel extends AbstractModel
-{
-    public function unboundFields()
-    {
-        return [
-            'school' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
-        ];
-    }
-}
-
-class AbstractWithFieldsBaseProxyModel extends AbstractModel
-{
-    public function getMetaSettings()
-    {
-        return [
-            'proxy' => true,
-        ];
-    }
-}
-
-class AbstractBaseProxyModel extends Model
-{
-    public function getMetaSettings()
-    {
-        return [
-            'proxy' => true,
-        ];
-    }
-}
-
-class ConcreteModel extends AbstractModel
-{
-    public function unboundFields()
-    {
-        return [
-            'town' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
-        ];
-    }
-}
-
-class DirectConcreateBaseProxy extends ConcreteModel
-{
-    public function getMetaSettings()
-    {
-        return [
-            'proxy' => true,
-        ];
-    }
-}
-
-class ChildConcreteWithImmediateParentProxy extends DirectConcreateBaseProxy
-{
-    public function unboundFields()
-    {
-        return [
-            'child' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
-        ];
-    }
-}
-
-abstract class InnerAbstractClass extends ConcreteModel
-{
-}
-
-class InDirectConcreateBaseProxy extends InnerAbstractClass
-{
-    public function getMetaSettings()
-    {
-        return [
-            'proxy' => true,
-        ];
     }
 }

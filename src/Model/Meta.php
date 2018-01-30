@@ -32,7 +32,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     const DEBUG_IGNORE = [
         'scopeModel',
         'registry',
-        'concreteModel',
+        'ConcreteModel',
         'overrides',
     ];
 
@@ -48,7 +48,9 @@ class Meta extends DeconstructableObject implements MetaInterface
     ];
 
     public $modelNamespace;
+
     public $defaultRelatedName;
+
     protected $orderBy = [];
 
     /**
@@ -61,9 +63,11 @@ class Meta extends DeconstructableObject implements MetaInterface
     public $verboseName;
 
     public $managed = true;
+
     public $managerClass;
 
     public $proxy = false;
+
     /**
      * Does this model have an AutoField, will have if primary key was set automatically.
      *

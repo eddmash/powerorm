@@ -19,7 +19,9 @@ use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 class CombinedExpression extends BaseExpression
 {
     private $lhs;
+
     private $connector;
+
     private $rhs;
 
     /**

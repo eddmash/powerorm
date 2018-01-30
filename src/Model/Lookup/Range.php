@@ -17,7 +17,9 @@ use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 class Range extends BaseLookup
 {
     public static $lookupName = 'range';
+
     protected $operator = 'BETWEEN %s AND %s';
+
     protected $rhsValueIsIterable = true;
 
     public function getLookupOperation($rhs)

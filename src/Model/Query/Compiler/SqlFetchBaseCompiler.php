@@ -36,8 +36,11 @@ use const Eddmash\PowerOrm\Model\Query\ORDER_DIRECTION;
 class SqlFetchBaseCompiler extends SqlCompiler
 {
     public $klassInfo = [];
+
     public $annotations = [];
+
     public $select = [];
+
     public $where;
 
     protected function preSqlSetup()

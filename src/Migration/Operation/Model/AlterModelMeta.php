@@ -15,6 +15,7 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
 class AlterModelMeta extends Operation
 {
     public $name;
+
     protected $meta = [];
 
     private static $alterableOptions = ['managed', 'verbosename'];

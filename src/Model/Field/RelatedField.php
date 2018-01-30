@@ -40,6 +40,7 @@ use Eddmash\PowerOrm\Model\Model;
 class RelatedField extends Field
 {
     public $dbConstraint = false;
+
     /**
      * The field on the related object that the relation is to.
      * By default, The Orm uses the primary key of the related object.

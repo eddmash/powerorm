@@ -14,6 +14,7 @@ use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 class Ref extends BaseExpression
 {
     protected $name;
+
     protected $expression;
 
     /**

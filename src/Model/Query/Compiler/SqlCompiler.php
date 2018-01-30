@@ -21,6 +21,7 @@ abstract class SqlCompiler implements CompilerInterface, SqlCompilableinterface
      * @var Query
      */
     public $query;
+
     /**
      * @var Connection
      */

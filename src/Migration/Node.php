@@ -22,15 +22,17 @@ namespace Eddmash\PowerOrm\Migration;
 class Node
 {
     public $name;
-    /**
-     * @var Node[]
-     */
-    public $children;
 
     /**
      * @var Node[]
      */
-    public $parent;
+    public $children = [];
+
+    /**
+     * @var Node[]
+     */
+    public $parent = [];
+
     public $appName;
 
     public function __construct($appName, $name)
@@ -100,5 +102,10 @@ class Node
         endforeach;
 
         return $descendants;
+    }
+
+    public function getNameWithApp()
+    {
+        return sprintf('%s_%s', $this->appName, $this->name);
     }
 }

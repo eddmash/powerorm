@@ -27,13 +27,19 @@ use Eddmash\PowerOrm\Model\Query\Expression\Col;
 abstract class BaseLookup implements LookupInterface
 {
     const AND_CONNECTOR = 'and';
+
     const OR_CONNECTOR = 'or';
+
     const LOOKUP_SEPARATOR = '__';
+
     public static $lookupName = null;
 
     public static $lookupPattern = '/(?<=\w)__[!?.]*/';
+
     public static $whereConcatPattern = '/(?<=^~)/';
+
     public $prepareRhs = true;
+
     protected $rhs;
 
     protected $operator;
@@ -42,6 +48,7 @@ abstract class BaseLookup implements LookupInterface
      * @var Col
      */
     protected $lhs;
+
     protected $rhsValueIsIterable = false;
 
     /**@inheritdoc */

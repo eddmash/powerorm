@@ -16,6 +16,7 @@ use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 class IsNull extends BaseLookup
 {
     public static $lookupName = 'isnull';
+
     public $prepareRhs = false;
 
     /**

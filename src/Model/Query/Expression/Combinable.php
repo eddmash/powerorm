@@ -14,10 +14,15 @@ namespace Eddmash\PowerOrm\Model\Query\Expression;
 class Combinable
 {
     const ADD = '+';
+
     const SUB = '-';
+
     const MUL = '*';
+
     const DIV = '/';
+
     const POW = '^';
+
     // The following is a quoted % operator - it is quoted because it can be
     // used in strings that also have parameter substitution.
     const MOD = '%%';

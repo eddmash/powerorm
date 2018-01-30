@@ -22,6 +22,7 @@ class Settings
         'm/d/Y',      // '10/25/2006'
         'm/d/y',     // '10/25/06'
     ];
+
     private $timeFormats = [
         'H:i:s',     // '14:30:59'
         'H:i:s.u',  // '14:30:59.000200'

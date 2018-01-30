@@ -27,12 +27,14 @@ class Loader extends BaseObject
      * @var Graph
      */
     public $graph;
+
     public $appliedMigrations;
 
     /**
      * @var ConnectionInterface
      */
     private $connection;
+
     private $migratedApps;
 
     /**

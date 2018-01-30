@@ -14,5 +14,6 @@ namespace Eddmash\PowerOrm\Model\Lookup;
 class Exact extends BaseLookup
 {
     public static $lookupName = 'exact';
+
     public $operator = '=';
 }

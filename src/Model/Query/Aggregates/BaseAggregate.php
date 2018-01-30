@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\Model\Query\Expression\Func;
 class BaseAggregate extends Func
 {
     private $containsAggregate = true;
+
     protected $name;
 
     /**

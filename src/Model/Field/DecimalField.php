@@ -30,11 +30,11 @@ use Eddmash\PowerOrm\Db\ConnectionInterface;
  *
  * For example, to store numbers up to 999 with a resolution of 2 decimal places, you’d use:
  *
- * Model::DecimalField(['maxDigits'=>5, 'decimalPlaces'=>2])
+ * Models::DecimalField(['maxDigits'=>5, 'decimalPlaces'=>2])
  *
  * And to store numbers up to approximately one billion with a resolution of 10 decimal places:
  *
- * Model::DecimalField(['maxDigits'=>19, 'decimalPlaces'=>10])
+ * Models::DecimalField(['maxDigits'=>19, 'decimalPlaces'=>10])
  *
  * The default form widget for this field is a 'text'.
  *
@@ -45,6 +45,7 @@ use Eddmash\PowerOrm\Db\ConnectionInterface;
 class DecimalField extends Field
 {
     public $maxDigits;
+
     public $decimalPlaces;
 
     /**

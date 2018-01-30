@@ -54,13 +54,19 @@ use Eddmash\PowerOrm\Model\Model;
 class AutoDetector extends BaseObject
 {
     const ACTION_CREATED = 'created';
+
     const ACTION_DROPPED = 'dropped';
+
     const ACTION_ALTER = 'alter';
+
     const TYPE_MODEL = 'model';
+
     const TYPE_FIELD = 'field';
 
     private $fromState;
+
     private $toState;
+
     /**
      * @var Asker
      */
@@ -119,10 +125,15 @@ class AutoDetector extends BaseObject
     private $renamedModels = [];
 
     private $keptProxyKeys;
+
     private $keptUnmanagedKeys;
+
     private $keptModelKeys;
+
     private $oldFieldKeys;
+
     private $newFieldKeys;
+
     private $renamedFields;
 
     /**

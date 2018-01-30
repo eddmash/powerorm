@@ -12,6 +12,7 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
 class RenameModel extends ModelOperation
 {
     public $oldName;
+
     public $newName;
 
     /**

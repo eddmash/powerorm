@@ -15,9 +15,13 @@ abstract class CheckMessage extends Base
 {
     // Levels
     const DEBUG = 10;
+
     const INFO = 20;
+
     const WARNING = 30;
+
     const ERROR = 40;
+
     const CRITICAL = 50;
 
     public $levelsMap = [
@@ -29,9 +33,13 @@ abstract class CheckMessage extends Base
     ];
 
     public $level;
+
     public $message;
+
     public $hint;
+
     public $context;
+
     public $id;
 
     public function __construct($level, $msg, $hint = null, $context = null, $id = null)

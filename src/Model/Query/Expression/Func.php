@@ -26,8 +26,11 @@ use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 class Func extends BaseExpression
 {
     protected $function;
+
     protected $template = '%s(%s)';
+
     protected $argJoiner = ', ';
+
     protected $extra = [];
 
     /**

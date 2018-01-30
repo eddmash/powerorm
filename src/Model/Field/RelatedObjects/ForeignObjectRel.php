@@ -26,7 +26,9 @@ use Eddmash\PowerOrm\Model\Model;
 class ForeignObjectRel extends BaseObject
 {
     public $autoCreated = true;
+
     public $isRelation = true;
+
     public $concrete = false;
 
     /**
@@ -44,6 +46,7 @@ class ForeignObjectRel extends BaseObject
      * @var Model
      */
     public $toModel;
+
     /**
      * @var Model
      */

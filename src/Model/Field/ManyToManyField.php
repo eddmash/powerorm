@@ -51,10 +51,15 @@ class ManyToManyField extends RelatedField
      * @var ManyToManyRel
      */
     public $relation;
+
     public $m2mField;
+
     public $m2mReverseField;
+
     private $hasNullKwarg;
+
     protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ManyToManyDescriptor';
+
     public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasManyField';
 
     public function __construct($kwargs)

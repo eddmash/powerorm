@@ -9,9 +9,11 @@
 * file that was distributed with this source code.
 */
 
+namespace Eddmash\PowerOrm\Tests\Helpers;
+
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 
-class ArrayHelperTest extends PHPUnit_Framework_TestCase
+class ArrayHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerGetArraysValue

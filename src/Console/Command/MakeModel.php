@@ -75,13 +75,13 @@ class MakeModel extends BaseCommand
         $filePath = realpath($path.DIRECTORY_SEPARATOR.$fileName);
 
         if (file_exists($filePath) && !$force):
-            throw new CommandError(sprintf("Model '%s' already exists, use -f option to overwrite", $filePath));
+            throw new CommandError(sprintf("Models '%s' already exists, use -f option to overwrite", $filePath));
         endif;
 
         $handler = new FileHandler($path, $fileName);
 
         if ($handler->write($modelFile)) :
-            $output->write(sprintf("Model '%s' created at '%s' ".PHP_EOL, $orginalModelName, $path));
+            $output->write(sprintf("Models '%s' created at '%s' ".PHP_EOL, $orginalModelName, $path));
         endif;
     }
 
@@ -95,12 +95,12 @@ class MakeModel extends BaseCommand
             $content->addItem(sprintf('namespace %s;', $namespace).PHP_EOL);
         endif;
 
-        $content->addItem('use Eddmash\\PowerOrm\\Model\\Model;'.PHP_EOL);
+        $content->addItem('use Eddmash\\PowerOrm\\Models\\Models;'.PHP_EOL);
 
         $content->addItem('/**');
         $content->addItem(sprintf('* Class %s', $modelName));
         $content->addItem('*/');
-        $content->addItem(sprintf('class %s extends Model', $modelName));
+        $content->addItem(sprintf('class %s extends Models', $modelName));
         $content->addItem('{');
 
         $content->addIndent();

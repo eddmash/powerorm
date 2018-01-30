@@ -24,6 +24,7 @@ abstract class FieldOperation extends Operation
      * @var string
      */
     public $modelName;
+
     /**
      * @var Field
      */

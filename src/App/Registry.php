@@ -15,11 +15,11 @@ use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
+use Eddmash\PowerOrm\Exception\CircularDependencyError;
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Exception\OrmException;
-use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
@@ -40,10 +40,17 @@ use Eddmash\PowerOrm\Model\Model;
 class Registry extends BaseObject
 {
     protected $allModels = [];
+
     private $_pendingOps = [];
 
     protected $modelsReady;
+
     public $ready;
+
+    /***
+     * @var Model[][]
+     */
+    private $appModels;
 
     public function __construct()
     {
@@ -108,30 +115,47 @@ class Registry extends BaseObject
     }
 
     /**
-     * Returns the list of all the models that extend the PModel in the current app.
+     * Returns the list of all the models that extend the PModel in the current
+     * app.
      *
      * @return array
      *
      * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
      */
-    public function getModels($includeAutoCreated = false)
+    public function getModels($includeAutoCreated = false, $app = null)
     {
         $this->isAppReady();
 
-        if ($includeAutoCreated):
+        if ($includeAutoCreated && is_null($app)):
             return $this->allModels;
         endif;
 
-        $models = [];
+        if (!is_null($app)):
+            $appModels = $this->appModels[$app];
+            if (!$includeAutoCreated):
+                $rModels = [];
+                foreach ($appModels as $name => $appModel) :
+                    if (!$appModel->getMeta()->autoCreated):
+                        $rModels[$name] = $appModel;
+                    endif;
+                endforeach;
+                $appModels = $rModels;
+            endif;
+
+            return $appModels;
+        endif;
+
+        $rModels = [];
         /** @var $model Model */
         foreach ($this->allModels as $name => $model) :
-            if ($model->getMeta()->autoCreated):
+            if (!$includeAutoCreated && $model->getMeta()->autoCreated):
                 continue;
             endif;
-            $models[$name] = $model;
+            $rModels[$name] = $model;
+
         endforeach;
 
-        return $models;
+        return $rModels;
     }
 
     /**
@@ -222,7 +246,7 @@ class Registry extends BaseObject
 
             try {
                 $classPopulationOrder = Tools::topologicalSort($classPopulationOrder);
-            } catch (ValueError $e) {
+            } catch (CircularDependencyError $e) {
                 throw new OrmException($e->getMessage());
             }
 
@@ -319,6 +343,7 @@ class Registry extends BaseObject
         $name = $model->getMeta()->getNSModelName();
         if (!ArrayHelper::hasKey($this->allModels, $name)) {
             $this->allModels[$name] = $model;
+            $this->appModels[$model->getMeta()->getAppName()][$name] = $model;
         }
         $this->resolvePendingOps($model);
     }
@@ -382,7 +407,7 @@ class Registry extends BaseObject
         }
         if (null == $model):
             throw new LookupError(
-                sprintf("Model '%s' not registered.", $modelName)
+                sprintf("Models '%s' not registered.", $modelName)
             );
         endif;
 

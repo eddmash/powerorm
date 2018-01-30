@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\DeconstructableObject;
 class ProjectState extends DeconstructableObject
 {
     protected $modelStates;
+
     private $fromDisk;
 
     public function __construct($modelStates = [])

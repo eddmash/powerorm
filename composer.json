@@ -37,7 +37,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Eddmash\\PowerOrm\\": "src/"
+      "Eddmash\\PowerOrm\\": "src/",
+      "Eddmash\\PowerOrm\\Tests\\": "tests/"
     },
     "files": ["src/Model/Query/Expression/Util.php"]
   },

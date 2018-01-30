@@ -34,6 +34,7 @@ class ManyToManyRel extends ForeignObjectRel
      * @var array
      */
     public $through_fields;
+
     public $dbConstraint = true;
 
     public function __construct($kwargs = [])

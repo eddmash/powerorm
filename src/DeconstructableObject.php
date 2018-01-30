@@ -23,6 +23,7 @@ namespace Eddmash\PowerOrm;
 abstract class DeconstructableObject extends BaseObject implements DeConstructableInterface
 {
     private $constructorArgs;
+
     const DEBUG_IGNORE = [];
 
     /**

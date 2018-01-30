@@ -9,6 +9,8 @@
 * file that was distributed with this source code.
 */
 
+namespace Eddmash\PowerOrm\Tests\Helpers;
+
 use Eddmash\PowerOrm\Helpers\StringHelper;
 
 class StringsTest extends \PHPUnit_Framework_TestCase

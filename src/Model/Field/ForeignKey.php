@@ -23,7 +23,9 @@ use Eddmash\PowerOrm\Model\Model;
 class ForeignKey extends RelatedField
 {
     public $manyToOne = true;
+
     public $dbConstraint = true;
+
     public $dbIndex = true;
 
     /**
@@ -35,6 +37,7 @@ class ForeignKey extends RelatedField
 
     /**{inheritdoc}*/
     protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ManyToOneDescriptor';
+
     public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasManyField';
 
     /**

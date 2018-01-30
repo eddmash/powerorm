@@ -16,9 +16,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Node implements \Countable
 {
     protected $connector;
+
     protected $defaultConnector;
 
     protected $children;
+
     /**
      * @var bool
      */

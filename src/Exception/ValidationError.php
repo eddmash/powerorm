@@ -12,6 +12,7 @@ namespace Eddmash\PowerOrm\Exception;
 class ValidationError extends \Exception implements \IteratorAggregate
 {
     private $validationCode;
+
     /**
      * @var ValidationError[]
      */

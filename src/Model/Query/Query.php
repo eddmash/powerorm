@@ -54,11 +54,14 @@ const ORDER_DIRECTION = [
 class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 {
     public $offset;
+
     public $limit;
 
     /** @var WhereNode */
     public $where;
+
     public $tablesAliasList = [];
+
     /**
      * @var
      */
@@ -79,6 +82,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      * @var Col[]
      */
     public $select = [];
+
     public $valueSelect = [];
 
     public $isSubQuery = false;
@@ -99,14 +103,20 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      * @var BaseExpression[]
      */
     public $annotations = [];
+
     public $distict;
+
     public $distictFields = [];
+
     public $orderBy = [];
+
     public $defaultOrdering = true;
 
     // Arbitrary limit for select_related to prevents infinite recursion.
     public $maxDepth = 5;
+
     public $columnInfoCache;
+
     public $usedTableAlias = [];
 
     /**
@@ -123,6 +133,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *           true indicates the asc manner
      */
     public $standardOrdering = true;
+
     /**
      * @var string
      */

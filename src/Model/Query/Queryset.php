@@ -75,6 +75,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      * @var array Holds fields that will be used in the asArray()
      */
     private $_fields;
+
     protected $kwargs = [];
 
     public function __construct(

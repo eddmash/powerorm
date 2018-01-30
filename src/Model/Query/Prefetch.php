@@ -22,6 +22,7 @@ class Prefetch
      * @var string path to the attribute that stores the result
      */
     public $prefetchTo;
+
     /**
      * @var string path we traverse to perform the prefetch
      */
@@ -31,6 +32,7 @@ class Prefetch
      * @var Queryset
      */
     public $queryset;
+
     /**
      * @var null
      */

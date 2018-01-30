@@ -24,7 +24,9 @@ use SplFileInfo;
 class FileHandler extends BaseObject
 {
     public $path;
+
     public $content;
+
     public $fileName;
 
     /**

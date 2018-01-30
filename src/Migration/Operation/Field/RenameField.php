@@ -24,7 +24,9 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
 class RenameField extends FieldOperation
 {
     public $modelName;
+
     public $newName;
+
     public $oldName;
 
     /**

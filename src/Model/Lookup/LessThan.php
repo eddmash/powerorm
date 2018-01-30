@@ -14,5 +14,6 @@ namespace Eddmash\PowerOrm\Model\Lookup;
 class LessThan extends BaseLookup
 {
     public $operator = '<';
+
     public static $lookupName = 'lt';
 }

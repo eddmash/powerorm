@@ -19,13 +19,18 @@ use Eddmash\PowerOrm\Model\Query\Expression\Col;
 class RelatedMappers
 {
     public $colsEnd;
+
     public $colStart;
+
     public $reverseCacheName;
+
     public $initList;
+
     /**
      * @var Model
      */
     private $model;
+
     private $connection;
 
     /**

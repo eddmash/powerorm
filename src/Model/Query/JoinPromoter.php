@@ -18,15 +18,19 @@ use const Eddmash\PowerOrm\Model\Query\Expression\OR_CONNECTOR;
 class JoinPromoter
 {
     public $votes = [];
+
     public $effectiveConnector;
+
     /**
      * @var mixed
      */
     private $connector;
+
     /**
      * @var int
      */
     private $childrenCount;
+
     private $currentNegated;
 
     /**

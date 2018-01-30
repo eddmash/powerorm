@@ -32,6 +32,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * @var array
      */
     private $_dependency;
+
     private $appLabel;
 
     /**

@@ -14,5 +14,6 @@ namespace Eddmash\PowerOrm\Model\Query\Aggregates;
 class Max extends BaseAggregate
 {
     protected $function = 'MAX';
+
     protected $name = 'MAX';
 }

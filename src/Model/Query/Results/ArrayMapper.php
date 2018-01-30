@@ -15,7 +15,7 @@ class ArrayMapper extends Mapper
     /**
      * @return \Eddmash\PowerOrm\Model\Model[]
      *
-     * @internal param Model $model
+     * @internal param Models $model
      * @internal param array $results
      *
      * @since    1.1.0

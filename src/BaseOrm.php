@@ -40,13 +40,21 @@ class BaseOrm extends BaseObject
 
     private static $checkRegistry;
 
+    /**
+     * @var static
+     */
     public static $instance;
+
     public static $SET_NULL = 'set_null';
+
     public static $CASCADE = 'cascade';
+
     public static $PROTECT = 'protect';
+
     public static $SET_DEFAULT = 'set_default';
 
     private $componentsloaded = false;
+
     /**
      * @var ComponentInterface[]
      */
@@ -70,6 +78,7 @@ class BaseOrm extends BaseObject
      * @var ConnectionInterface
      */
     private static $connection;
+
     /**
      * @var Settings
      */
@@ -296,6 +305,7 @@ class BaseOrm extends BaseObject
     private function loadComponents()
     {
         if (!$this->componentsloaded):
+
             foreach ($this->getSettings()->getComponents() as $componentClass) :
                 $component = new $componentClass();
                 if ($component instanceof ComponentInterface):

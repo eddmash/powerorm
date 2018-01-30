@@ -24,6 +24,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
      * @var bool true only when expression is an aggregation expression
      */
     protected $summarize = false;
+
     /**
      * @var Field
      */

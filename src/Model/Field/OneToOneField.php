@@ -30,6 +30,7 @@ class OneToOneField extends ForeignKey
      * @var bool
      */
     public $manyToOne = false;
+
     public $oneToOne = true;
 
     /**{inheritdoc}*/

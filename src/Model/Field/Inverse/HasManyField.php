@@ -24,6 +24,7 @@ use Eddmash\PowerOrm\Model\Model;
 class HasManyField extends InverseField
 {
     protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\OneToManyDescriptor';
+
     protected $m2mDescriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ManyToManyDescriptor';
 
     public function __construct(array $kwargs)

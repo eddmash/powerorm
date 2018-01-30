@@ -11,6 +11,7 @@
 namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\Exception\NodeNotFoundError;
+use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 class Graph
@@ -18,7 +19,7 @@ class Graph
     /**
      * keeps track of Migrations already taken care of in the graph.
      *
-     * @var \Eddmash\PowerOrm\Migration\Migration[]
+     * @var \Eddmash\PowerOrm\Migration\Migration[][]
      */
     public $nodes;
 
@@ -189,6 +190,21 @@ class Graph
             );
         endif;
 
+        $this->detectCircularDepedency(
+            $appName,
+            $node,
+            function ($node) {
+                list($appName, $node) = explode('_', $node);
+                $parents = [];
+                $node = $this->nodeFamilyTree[$appName][$node];
+                foreach ($node->parent as $parent) :
+                    $parents[] = $parent->getNameWithApp();
+                endforeach;
+
+                return $parents;
+            }
+        );
+
         return $this->getNodeFamilyTree(
             $appName,
             $node
@@ -223,6 +239,22 @@ class Graph
                 )
             );
         endif;
+
+        $this->detectCircularDepedency(
+            $appName,
+            $node,
+            function ($node) {
+                list($appName, $node) = explode('_', $node);
+                $dependents = [];
+                $node = $this->nodeFamilyTree[$appName][$node];
+
+                foreach ($node->children as $parent) :
+                    $dependents[] = $parent->getNameWithApp();
+                endforeach;
+
+                return $dependents;
+            }
+        );
 
         return $this->getNodeFamilyTree($appName, $node)->getDescendants();
     }
@@ -325,5 +357,25 @@ class Graph
     public function getMigration($appName, $migrationName)
     {
         return $this->nodes[$appName][$migrationName];
+    }
+
+    /**
+     * Find any cyclic dependencies.
+     *
+     * @param $appName
+     * @param $node
+     * @param $getDependency
+     *
+     * @throws \Eddmash\PowerOrm\Exception\CircularDependencyError
+     */
+    private function detectCircularDepedency($appName, $node, $getDependency)
+    {
+        $todo = [];
+        foreach ($this->nodeFamilyTree as $app => $appNodes) :
+            foreach ($appNodes as $appNode) :
+                $todo[$appNode->getNameWithApp()] = $getDependency($appNode->getNameWithApp());
+            endforeach;
+        endforeach;
+        Tools::topologicalSort($todo);
     }
 }

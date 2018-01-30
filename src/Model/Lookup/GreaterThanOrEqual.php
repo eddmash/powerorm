@@ -14,5 +14,6 @@ namespace Eddmash\PowerOrm\Model\Lookup;
 class GreaterThanOrEqual extends BaseLookup
 {
     public $operator = '>=';
+
     public static $lookupName = 'gte';
 }

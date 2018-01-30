@@ -22,6 +22,7 @@ class Asker
      * @var InputInterface
      */
     protected $input;
+
     /**
      * @var OutputInterface
      */

@@ -21,6 +21,7 @@ class Mapper
     protected $queryset;
 
     protected $columnInfoCache = [];
+
     /**
      * @var bool
      */
