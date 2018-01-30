@@ -12,6 +12,8 @@ use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Tests\TestApp\Test;
 
+define(BASEPATH, dirname(dirname(__FILE__)));
+
 abstract class PowerormTest extends \PHPUnit_Framework_TestCase
 {
     protected function setUp()

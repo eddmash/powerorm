@@ -25,12 +25,9 @@ class RegistryTest extends PowerormTest
         );
         $this->assertEquals(
             [
-                '/media/edd/NTFS_OTHERS/linuxhome/PhpstormProjects/eddmash'
-                .'/powerorm/tests/TestApp/Models/Author.php',
-                '/media/edd/NTFS_OTHERS/linuxhome/PhpstormProjects/eddmash'.
-                '/powerorm/tests/TestApp/Models/Book.php',
-                '/media/edd/NTFS_OTHERS/linuxhome/PhpstormProjects/eddmash'.
-                '/powerorm/tests/TestApp/Models/NotAModel.php',
+                BASEPATH.'/tests/TestApp/Models/Author.php',
+                BASEPATH.'/tests/TestApp/Models/Book.php',
+                BASEPATH.'/tests/TestApp/Models/NotAModel.php',
             ],
             $files[$name]
         );
