@@ -477,7 +477,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
             'Eddmash\PowerOrm\Model\Field'
         )):
             $path = 'Eddmash\PowerOrm\Model\Model';
-            $name = sprintf('Models::%s', $this->getShortClassName());
+            $name = sprintf('Model::%s', $this->getShortClassName());
         endif;
 
         return [

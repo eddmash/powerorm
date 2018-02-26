@@ -236,7 +236,7 @@ class Loader extends BaseObject
                     $className,
                     $component->getNamespace()
                 );
-                if (!$className):
+                if (!$foundClass):
                     throw new ClassNotFoundException(
                         sprintf(
                             'The class [ %2$s\\%1$s or \\%1$s ] '.
@@ -246,7 +246,7 @@ class Loader extends BaseObject
                         )
                     );
                 endif;
-                $classes[$appName][] = $foundClass;
+                $classes[$appName][] = $className;
             endforeach;
         endforeach;
 
