@@ -246,7 +246,7 @@ class Loader extends BaseObject
                         )
                     );
                 endif;
-                $classes[$appName][] = $className;
+                $classes[$appName][] = $foundClass;
             endforeach;
         endforeach;
 
