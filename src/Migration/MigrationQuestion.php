@@ -89,7 +89,7 @@ class MigrationQuestion
         $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if (2 == $selected):
-            return;
+            exit;
         endif;
 
         return self::getDefault($asker);
@@ -130,7 +130,7 @@ class MigrationQuestion
         if (2 == $selected):
             return NOT_PROVIDED;
         elseif (3 == $selected):
-            return;
+            exit;
         endif;
 
         return self::getDefault($asker);
