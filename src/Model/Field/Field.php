@@ -477,7 +477,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
             'Eddmash\PowerOrm\Model\Field'
         )):
             $path = 'Eddmash\PowerOrm\Model\Model';
-            $name = sprintf('Models::%s', $this->getShortClassName());
+            $name = sprintf('Model::%s', $this->getShortClassName());
         endif;
 
         return [
@@ -511,7 +511,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         foreach ($defaults as $name => $default) :
             $value = ($this->hasProperty($name)) ? $this->{$name} : $default;
 
-            if ($value != $default):
+            if ($value !== $default):
 
                 $constArgs[$name] = $value;
 

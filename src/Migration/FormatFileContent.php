@@ -416,6 +416,10 @@ class FormatFileContent
             return ['false', []];
         endif;
 
+        if (null === $value):
+            return ['null', []];
+        endif;
+
         return [$value, []];
     }
 }
