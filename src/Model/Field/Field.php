@@ -511,7 +511,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         foreach ($defaults as $name => $default) :
             $value = ($this->hasProperty($name)) ? $this->{$name} : $default;
 
-            if ($value != $default):
+            if ($value !== $default):
 
                 $constArgs[$name] = $value;
 
