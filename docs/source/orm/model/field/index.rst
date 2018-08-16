@@ -200,7 +200,7 @@ A many-to-one relationship. Requires a ``to`` argument: the class to which the m
     use Eddmash\PowerOrm\Model\Model;
 
     class Car extends Model{
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'manufacturer' => Model::ForeignKey(['to' => Manufacturer::class])
@@ -214,7 +214,7 @@ A many-to-one relationship. Requires a ``to`` argument: the class to which the m
     class Manufacturer extends Model
     {
 
-        private function unboundFields(){
+        public function unboundFields(){
             return [];
         }
     }

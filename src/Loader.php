@@ -19,13 +19,13 @@ define('POWERORM_VERSION', '1.1.0-beta1');
 define('POWERORM_HOME', dirname(dirname(__FILE__)));
 
 /**
- * Class Application.
+ * Class Loader.
  *
  * @since  1.1.0
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class Application
+class Loader
 {
     /**
      * @param array $config
@@ -45,8 +45,9 @@ class Application
      *
      * @return BaseOrm
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     * @throws Exception\KeyError
      */
-    public static function setup($config, &$composerLoader = null)
+    public static function setup($config)
     {
         $settings = new Settings($config);
         $orm = BaseOrm::setup($settings);
@@ -55,16 +56,15 @@ class Application
     }
 
     /**
-     * @param ClassLoader $composerLoader
-     * @param array       $config
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      *
      * @return \Symfony\Component\Console\Application
+     * @throws \Exception
      */
-    public static function consoleRun($config, &$composerLoader = null, $autoRun = true)
+    public static function consoleRun($config)
     {
-        static::setup($config, $composerLoader);
+        static::setup($config);
 
-        return Manager::run($autoRun);
+        return Manager::run();
     }
 }

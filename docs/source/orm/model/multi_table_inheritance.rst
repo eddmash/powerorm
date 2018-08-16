@@ -18,7 +18,7 @@ For example:
 
     class Place extends Model
     {
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'name' => Model::CharField(['maxLength' => 100]),
@@ -29,7 +29,7 @@ For example:
 
     class Restaurant extends Place
     {
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'serves_hot_dogs' => Model::BooleanField(['default' => false]),

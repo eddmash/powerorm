@@ -24,7 +24,7 @@ This example model defines a User, which has a first_name and last_name:
 
     class User extends Model
     {
-         private function unboundFields(){
+         public function unboundFields(){
              return [
                  'first_name'=>Model::CharField(['maxLength'=>30]),
                  'last_name'=>Model::CharField(['maxLength'=>30]),
@@ -144,7 +144,7 @@ a Manufacturer makes multiple cars but each Car only has one Manufacturer – us
     // models/Car.php
     use Eddmash\PowerOrm\Model\Model;
     class Car extends Model{
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'manufacturer' => Model::ForeignKey(['to' => Manufacturer::class])
@@ -157,7 +157,7 @@ a Manufacturer makes multiple cars but each Car only has one Manufacturer – us
     class Manufacturer extends Model
     {
 
-        private function unboundFields(){
+        public function unboundFields(){
             return [];
         }
     }
@@ -183,7 +183,7 @@ multiple toppings – here's how you'd represent that:
     class Topping extends Model
     {
 
-        private function unboundFields(){
+        public function unboundFields(){
             return [
                 'name'=> Model::CharField(['maxLength'=>50])
             ];
@@ -193,7 +193,7 @@ multiple toppings – here's how you'd represent that:
     // models/Pizza.php
     use Eddmash\PowerOrm\Model\Model;
     class Pizza extends Model{
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'toppings' => Model::ManyToManyField(['to' => Topping::class])
@@ -235,7 +235,7 @@ For our musician example, the code would look something like this:
     class Person extends Model
     {
 
-        private function unboundFields(){
+        public function unboundFields(){
             return [
                 'name'=> Model::CharField(['maxLength'=>50])
             ];
@@ -245,7 +245,7 @@ For our musician example, the code would look something like this:
     // models/Group.php
     use Eddmash\PowerOrm\Model\Model;
     class Group extends Model{
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'name'=> Model::CharField(['maxLength'=>50]),
@@ -257,7 +257,7 @@ For our musician example, the code would look something like this:
     // models/Membership.php
     use Eddmash\PowerOrm\Model\Model;
     class Membership extends Model{
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'person' => Model::ForeignKey(['to' => 'Person']),
@@ -294,7 +294,7 @@ Give your model metadata by return an array of model meta setting from the metho
     class User extends Model
     {
 
-        private function unboundFields(){
+        public function unboundFields(){
             return [
                 'first_name'=>Model::CharField(['maxLength'=>30]),
                 'last_name'=>Model::CharField(['maxLength'=>30]),

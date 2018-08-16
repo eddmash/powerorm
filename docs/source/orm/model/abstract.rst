@@ -19,7 +19,7 @@ child class.:
 
     abstract class CommonInfo extends Model
     {
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'name' => Model::CharField(['maxLength' => 100]),
@@ -30,7 +30,7 @@ child class.:
 
     class Student extends CommonInfo
     {
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'home_group' => Model::CharField(['maxLength' => 5])

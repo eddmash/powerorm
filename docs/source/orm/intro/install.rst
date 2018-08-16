@@ -8,6 +8,16 @@ Setup Powerorm
 
 Install
 -------
+We assume your project structure looks like this ::
+
+    app_base
+        ----vendor/
+        ----composer.json
+        ----src
+            ---- Models
+            ---- Migrations
+
+
 Via composer **(recommended)**::
     
 	composer require eddmash/powerorm:"@dev"
@@ -50,7 +60,7 @@ To load powerorm use the following code and pass the
 
 .. code-block:: php
 
-    \Eddmash\PowerOrm\Application::webRun($config);
+    \Eddmash\PowerOrm\Loader::webRun($config);
 
 This should be load as early as possible, Place it a the beginning of your
 script.
@@ -116,6 +126,20 @@ under the :ref:`component configuration<config_components>` as shown below.
             App::class,
         ]
     ];
+
+Create enable Powerorm on the command line
+------------------------------------------
+To be able to use the orm on the command line create a file on the same level as the **composer.json** file.
+create file named **pmanager.php** and add the following .
+
+.. code-block:: php
+
+    use Eddmash\PowerOrm\Loader;
+    require_once 'vendor/autoload.php';
+    $configs = require_once 'src/config.php';
+    Loader::consoleRun($configs);
+
+See all the available commands :doc:`commands <../ref/commands>`.
 
 With that you ready.
 

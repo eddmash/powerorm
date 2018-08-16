@@ -90,7 +90,7 @@ Example
    class User extends Model
    {
 
-       private function unboundFields()
+       public function unboundFields()
        {
            return [
              'username'=> Model::CharField(['maxLength'=>25])

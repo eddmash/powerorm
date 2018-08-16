@@ -100,7 +100,7 @@ Add this method to the Service class at `application/Config/Services.php`
             return self::getSharedInstance('orm');
         endif;
 
-        return \Eddmash\PowerOrm\Application::webRun(\Config\Powerorm::asArray());
+        return \Eddmash\PowerOrm\Loader::webRun(\Config\Powerorm::asArray());
     }
 
 .. _ci4_load_orm:

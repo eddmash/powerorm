@@ -19,7 +19,7 @@ Throughout this guide (and in the reference), we'll refer to the following model
     class Blog extends Model
     {
 
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'name'=>Model::CharField(['maxLength'=>100]),
@@ -38,7 +38,7 @@ Throughout this guide (and in the reference), we'll refer to the following model
     {
 
 
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'name'=>Model::CharField(['maxLength'=>200]),
@@ -58,7 +58,7 @@ Throughout this guide (and in the reference), we'll refer to the following model
     */
     class Entry extends Model
     {
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'blog'=>Model::ForeignKey(['to'=>Blog::class]),

@@ -56,7 +56,7 @@ The easiest way is using the show() function.
 
     <?php
 
-    $orm = \Eddmash\PowerOrm\Application::webRun(\App\Config\Powerorm::asArray());
+    $orm = \Eddmash\PowerOrm\Loader::webRun(\App\Config\Powerorm::asArray());
 
     /**@var $debugger \Eddmash\PowerOrmDebug\Debugger*/
     $debugger =$orm->debugger;

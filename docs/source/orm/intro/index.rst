@@ -37,7 +37,7 @@ For the table role outlined above, The model for that table would look as below
 
     class Role extends Model
     {
-        private function unboundFields() {
+        public function unboundFields() {
             return [
                 'name' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
                 'code' => Model::CharField(['maxLength' => 10, 'dbIndex' => true]),

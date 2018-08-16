@@ -116,7 +116,7 @@ providers see :ref:`Adding Providers <faker_providers>`
 
     class User extends Model implements FakeableInterface
     {
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 "username" => Model::CharField(['maxLength' => 50]),
@@ -205,7 +205,7 @@ and now you can use the new formaters as shown below.
 
     class Book extends Model implements FakeableInterface
     {
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 "title" => Model::CharField(['maxLength' => 50]),

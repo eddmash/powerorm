@@ -17,7 +17,7 @@ The Model Class
     */
     class Author extends Model
     {
-        private function unboundFields()
+        public function unboundFields()
         {
             return [
                 'name'=>Model::CharField(['maxLength'=>25]),

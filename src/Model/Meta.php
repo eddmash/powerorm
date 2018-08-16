@@ -245,8 +245,8 @@ class Meta extends DeconstructableObject implements MetaInterface
         if (!$this->registry->ready):
             throw new FieldDoesNotExist(
                 sprintf(
-                    "%s has no field named %s. The App registry isn't".
-                    ' ready yet, so if this is an autoCreated '.
+                    "%s has no field named %s. The App registry isn't" .
+                    ' ready yet, so if this is an autoCreated ' .
                     "related field, it won't  be available yet.",
                     $this->getNSModelName(),
                     $name
@@ -410,14 +410,14 @@ class Meta extends DeconstructableObject implements MetaInterface
         // we get the model from the registry
         // to ensure we get the same model instance and same meta class for the model.
         return $this->registry->getModel($this->getNSModelName())
-                              ->getMeta()->_reverseRelationTreeCache;
+            ->getMeta()->_reverseRelationTreeCache;
     }
 
     /**
      * Add the current object to the passed in object.
      *
      * @param string $propertyName the name map the current object to, in the class object passed in
-     * @param Model  $classObject  the object to attach the current object to
+     * @param Model $classObject the object to attach the current object to
      *
      * @since  1.1.0
      *
@@ -688,10 +688,11 @@ class Meta extends DeconstructableObject implements MetaInterface
     public function getDbPrefix()
     {
         $prefix = BaseOrm::getDbPrefix();
+
         if ($this->getApp()):
             $prefix = $this->getApp()->getDbPrefix();
         endif;
-        if (!StringHelper::endsWith($prefix, '_')):
+        if ($prefix && !StringHelper::endsWith($prefix, '_')):
             return sprintf('%s_', $prefix);
         endif;
 

@@ -47,7 +47,6 @@
       "dev-master": "1.1.x-dev"
     }
   },
-  "bin": ["pmanager"],
   "suggest": {
     "eddmash/powerormfaker": "powerormfake generates dummy data when using PowerOrm. An extension of Faker library",
     "eddmash/powerform": "makes it easy to create and process forms and easily integrate with powerorm models"

@@ -47,7 +47,7 @@ Make sure it looks like the one below.
          */
         public function boot()
         {
-            \Eddmash\PowerOrm\Application::webRun(config('powerorm'));
+            \Eddmash\PowerOrm\Loader::webRun(config('powerorm'));
         }
 
         /**

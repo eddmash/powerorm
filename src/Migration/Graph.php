@@ -90,7 +90,7 @@ class Graph
         if (empty($this->nodes[$appName][$child])):
             throw new NodeNotFoundError(
                 sprintf(
-                    'Migration %s dependencies reference '.
+                    'Migration %s dependencies reference ' .
                     'nonexistent child node %s',
                     $migration->getName(),
                     $child
@@ -101,7 +101,7 @@ class Graph
         if (empty($this->nodes[$parentAppName][$parent])):
             throw new NodeNotFoundError(
                 sprintf(
-                    'Migration %s dependencies reference nonexistent'.
+                    'Migration %s dependencies reference nonexistent' .
                     ' parent node %s',
                     $migration->getName(),
                     $parent
@@ -112,10 +112,10 @@ class Graph
         // add to the family tree of both the child and parent
 
         $this->getNodeFamilyTree($appName, $child)
-             ->addParent($this->nodeFamilyTree[$parentAppName][$parent]);
+            ->addParent($this->nodeFamilyTree[$parentAppName][$parent]);
 
         $this->getNodeFamilyTree($parentAppName, $parent)
-             ->addChild($this->nodeFamilyTree[$appName][$child]);
+            ->addChild($this->nodeFamilyTree[$appName][$child]);
     }
 
     /**
@@ -193,8 +193,8 @@ class Graph
         $this->detectCircularDepedency(
             $appName,
             $node,
-            function ($node) {
-                list($appName, $node) = explode('_', $node);
+            function ($full_node_name) {
+                list($appName, $node) = explode('_', $full_node_name, 2);
                 $parents = [];
                 $node = $this->nodeFamilyTree[$appName][$node];
                 foreach ($node->parent as $parent) :
@@ -244,7 +244,7 @@ class Graph
             $appName,
             $node,
             function ($node) {
-                list($appName, $node) = explode('_', $node);
+                list($appName, $node) = explode('_', $node, 2);
                 $dependents = [];
                 $node = $this->nodeFamilyTree[$appName][$node];
 
