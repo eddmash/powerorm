@@ -116,44 +116,6 @@ abstract class Operation extends DeconstructableObject implements OperationInter
     }
 
     /**
-     * @param SchemaEditor $schemaEditor
-     * @param ProjectState $fromState
-     * @param ProjectState $toState
-     *
-     * @return mixed
-     *
-     * @since  1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function databaseForwards(
-        SchemaEditor $schemaEditor,
-        ProjectState $fromState,
-        ProjectState $toState
-    ) {
-        return;
-    }
-
-    /**
-     * @param SchemaEditor $schemaEditor
-     * @param ProjectState $fromState
-     * @param ProjectState $toState
-     *
-     * @return mixed
-     *
-     * @since  1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function databaseBackwards(
-        SchemaEditor $schemaEditor,
-        ProjectState $fromState,
-        ProjectState $toState
-    ) {
-        return;
-    }
-
-    /**
      * Return either a list of operations the actual operation should be
      * replaced with or a boolean that indicates whether or not the specified
      * operation can be optimized across.
@@ -167,7 +129,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function reduce(self $operation, $inBetween)
+    public function reduce(Operation $operation, $inBetween)
     {
         return false;
     }

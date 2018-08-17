@@ -210,7 +210,6 @@ class AutoDetector extends BaseObject
                 $this->oldModelKeys[] = $oldModelName;
             endif;
         endforeach;
-
         // new state
         $newModelNames = array_keys($this->toState->getModelStates());
 
