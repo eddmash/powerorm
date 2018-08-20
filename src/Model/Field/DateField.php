@@ -62,6 +62,24 @@ class DateField extends Field
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getConstructorArgs()
+    {
+        $args = parent::getConstructorArgs();
+
+        if ($this->autoAddNow) {
+            $args['autoAddNow'] = true;
+        }
+        if ($this->autoNow) {
+            $args['autoNow'] = true;
+        }
+
+        return $args;
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function formField($kwargs = [])

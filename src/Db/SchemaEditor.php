@@ -105,7 +105,7 @@ class SchemaEditor extends BaseObject
         foreach ($model->getMeta()->localFields as $fname => $field) :
             $colName = $field->getColumnName();
             $type = $field->dbType($this->connection);
-            // if we don't have a type stop
+            // if we don't have a type skip
             if (empty($type)):
                 continue;
             endif;

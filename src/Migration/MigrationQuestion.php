@@ -148,7 +148,7 @@ class MigrationQuestion
     private static function getDefault(Asker $asker)
     {
         $default_val = '';
-        $msg = PHP_EOL.'Please enter the default value now, ensure its a valid PHP '.PHP_EOL;
+        $msg = PHP_EOL.'Please enter the default value now, ensure its a valid PHP '.PHP_EOL.' >>> ';
         while (true):
 
             $default = $asker->ask(new Question($msg));
