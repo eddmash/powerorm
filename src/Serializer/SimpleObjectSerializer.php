@@ -46,7 +46,7 @@ class SimpleObjectSerializer implements SerializerInterface
         /** @var $item Model */
         foreach ($items as $item) :
             $this->startObject($item);
-            $concreteModel = $item->getMeta()->concreteModel;
+            $concreteModel = $item->getMeta()->getConcreteModel();
             $localFields = $concreteModel->getMeta()->localFields;
             foreach ($localFields as $field) :
                 if ($field->isSerializable()):

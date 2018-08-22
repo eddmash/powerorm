@@ -43,7 +43,7 @@ class UpdateQuery extends Query
         $valuesSeq = [];
         foreach ($values as $name => $value) :
             $field = $this->model->getMeta()->getField($name);
-            $model = $field->scopeModel->getMeta()->concreteModel;
+            $model = $field->scopeModel->getMeta()->getConcreteModel();
             $isDirect = (!($field->autoCreated && !$field->concrete) || !$field->concrete);
             if (!$isDirect || ($field->isRelation && $field->manyToMany)):
                 throw new  FieldError(

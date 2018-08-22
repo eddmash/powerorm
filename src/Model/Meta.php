@@ -138,7 +138,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @var Model
      */
-    public $concreteModel;
+    protected $concreteModel;
 
     /**
      * Holds the registry the model is attached to.
@@ -389,7 +389,7 @@ class Meta extends DeconstructableObject implements MetaInterface
                         $concreteModel = $field->relation
                             ->getToModel()
                             ->getMeta()
-                            ->concreteModel
+                            ->getConcreteModel()
                             ->getMeta()->getNSModelName();
                         $allRelations[$concreteModel][] = $field;
                     endif;
@@ -743,5 +743,23 @@ class Meta extends DeconstructableObject implements MetaInterface
     public function setParentLinks(Field $parentLink)
     {
         $this->parents = $parentLink;
+    }
+
+    /**
+     * @return Model
+     * @author Eddilbert Macharia <edd.cowan@gmail.com>(eddmash.com)
+     */
+    public function getConcreteModel()
+    {
+        return $this->concreteModel;
+    }
+
+    /**
+     * @param Model $concreteModel
+     * @author Eddilbert Macharia <edd.cowan@gmail.com>(eddmash.com)
+     */
+    public function setConcreteModel($concreteModel)
+    {
+        $this->concreteModel = $concreteModel;
     }
 }

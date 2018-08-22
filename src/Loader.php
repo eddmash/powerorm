@@ -34,9 +34,9 @@ class Loader
      * @return BaseOrm
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public static function webRun($config = [], &$composerLoader = null)
+    public static function webRun($config = [])
     {
-        return static::setup($config, $composerLoader);
+        return static::setup($config);
     }
 
     /**
@@ -49,10 +49,7 @@ class Loader
      */
     public static function setup($config)
     {
-        $settings = new Settings($config);
-        $orm = BaseOrm::setup($settings);
-
-        return $orm;
+        return BaseOrm::setup(new Settings($config));
     }
 
     /**

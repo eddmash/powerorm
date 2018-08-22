@@ -67,7 +67,7 @@ class AutoField extends Field
     }
 
     /**
-     * @param string                        $field
+     * @param string $field
      * @param \Eddmash\PowerOrm\Model\Model $model
      *
      * @throws \Eddmash\PowerOrm\Exception\FieldError
@@ -98,13 +98,13 @@ class AutoField extends Field
         endif;
 
         try {
-            $value = intval($value);
-            if ($value):
-                return $value;
+            $newvalue = intval($value);
+            if ($newvalue):
+                return $newvalue;
             endif;
 
             throw new ValueError(
-                sprintf("'%s' value must be an integer.", $value)
+                sprintf("Expected an integer, got '%s' .", $value)
             );
         } catch (Exception $exception) {
             throw new ValueError(sprintf("'%s' value must be an integer.", $value));

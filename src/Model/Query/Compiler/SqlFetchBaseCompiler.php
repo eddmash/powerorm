@@ -289,14 +289,14 @@ class SqlFetchBaseCompiler extends SqlCompiler
         endif;
 
         foreach ($meta->getConcreteFields() as $field) :
-            $model = $field->scopeModel->getMeta()->concreteModel;
+            $model = $field->scopeModel->getMeta()->getConcreteModel();
             if ($meta->getNSModelName() == $model->getMeta()->getNSModelName()):
                 $model = null;
             endif;
             if ($fromParent && !is_null($model) &&
                 is_subclass_of(
-                    $fromParent->getMeta()->concreteModel,
-                    $model->getMeta()->concreteModel->getMeta()->getNSModelName()
+                    $fromParent->getMeta()->getConcreteModel(),
+                    $model->getMeta()->getConcreteModel()->getMeta()->getNSModelName()
                 )
             ):
                 // Avoid loading data for already loaded parents.
@@ -361,7 +361,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
         endif;
 
         foreach ($meta->getNonM2MForwardFields() as $field) :
-            $fieldModel = $field->scopeModel->getMeta()->concreteModel;
+            $fieldModel = $field->scopeModel->getMeta()->getConcreteModel();
             $foundFields[] = $field->getName();
 
             if ($restricted):

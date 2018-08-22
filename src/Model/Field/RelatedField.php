@@ -440,7 +440,7 @@ class RelatedField extends Field
                 ]
             );
 
-            $relatedModel->getMeta()->concreteModel->addToClass(
+            $relatedModel->getMeta()->getConcreteModel()->addToClass(
                 $relation->getAccessorName(),
                 $hasMany
             );
