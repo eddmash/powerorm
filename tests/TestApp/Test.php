@@ -9,9 +9,9 @@
 namespace Eddmash\PowerOrm\Tests\TestApp;
 
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Components\Application;
+use Eddmash\PowerOrm\Components\AppComponent;
 
-class Test extends Application
+class Test extends AppComponent
 {
     public function getName()
     {

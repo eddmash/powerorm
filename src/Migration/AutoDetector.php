@@ -13,7 +13,7 @@ namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Components\Application;
+use Eddmash\PowerOrm\Components\AppComponent;
 use Eddmash\PowerOrm\Console\Question\Asker;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -1774,7 +1774,7 @@ class AutoDetector extends BaseObject
     private function createNsName(Migration $migration, $appName, $newName)
     {
         /**
-         * @var Application
+         * @var AppComponent
          */
         $component = BaseOrm::getInstance()->getComponent($appName);
 

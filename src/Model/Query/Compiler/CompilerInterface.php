@@ -16,4 +16,16 @@ interface CompilerInterface
     public function executeSql($chunked = false);
 
     public function compile(SqlCompilableinterface $node);
+
+    /**
+     * Quotes columns and tables if they are not aliases.
+     * @return \Callable
+     */
+    public function quoteUnlessAliasCallback();
+
+    /**
+     * Quotes columns and tables.
+     * @return \Callable
+     */
+    public function quoteCallback();
 }

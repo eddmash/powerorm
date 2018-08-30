@@ -28,6 +28,8 @@ class Join extends BaseJoin
 
     public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
+        $quoteUnlessAliasCallback = $compiler->quoteUnlessAliasCallback();
+        $quoteCallback = $compiler->quoteCallback();
         $joinConditions = [];
         $fields = [$this->joinField->getJoinColumns()];
         /* @var $from RelatedField */
@@ -36,16 +38,17 @@ class Join extends BaseJoin
             list($from, $to) = $relFields;
             $joinConditions[] = sprintf(
                 ' %s.%s = %s.%s',
-                $this->getParentAlias(),
-                $from->getColumnName(),
-                $this->getTableAlias(),
-                $to->getColumnName()
+                $quoteUnlessAliasCallback($this->getParentAlias()),
+                $quoteCallback($from->getColumnName()),
+                $quoteUnlessAliasCallback($this->getTableAlias()),
+                $quoteCallback($to->getColumnName())
             );
         endforeach;
 
         $onClauseSql = implode(' AND ', $joinConditions);
-        $alias = '';
-        $sql = sprintf('%s %s%s ON (%s)', $this->getJoinType(), $this->getTableName(), $alias, $onClauseSql);
+        $alias = $this->tableAlias == $this->tableName ? '' : $this->tableAlias;
+        $sql = sprintf('%s %s%s ON (%s)', $this->getJoinType(), $quoteUnlessAliasCallback($this->getTableName()),
+            $alias, $onClauseSql);
 
         return [$sql, []];
     }

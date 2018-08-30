@@ -72,7 +72,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @var BaseJoin[]
      */
-    public $tableAliasMap = [];
+    public $tableJoinsMap = [];
 
     public $selectRelected = [];
 
@@ -376,7 +376,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     public function addQ(Q $q)
     {
         $aliases = [];
-        foreach ($this->tableAliasMap as $key => $join) :
+        foreach ($this->tableJoinsMap as $key => $join) :
             if (INNER === $join->getJoinType()):
                 $aliases[] = $key;
             endif;
@@ -791,7 +791,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     {
         // check if we can resuse an alias
         $resuableAliases = [];
-        foreach ($this->tableAliasMap as $key => $item) :
+        foreach ($this->tableJoinsMap as $key => $item) :
             if ((null == $reuse || ArrayHelper::hasKey($reuse, $key)) &&
                 $join->equal($item)):
                 $resuableAliases[] = $key;
@@ -807,7 +807,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         list($alias) = $this->getTableAlias($join->getTableName(), false);
 
         if ($join->getJoinType()):
-            if (LOUTER === $this->tableAliasMap[$join->getParentAlias()]->getJoinType() ||
+            if (LOUTER === $this->tableJoinsMap[$join->getParentAlias()]->getJoinType() ||
                 $join->getNullable()):
 
                 $joinType = LOUTER;
@@ -818,7 +818,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endif;
 
         $join->setTableAlias($alias);
-        $this->tableAliasMap[$alias] = $join;
+        $this->tableJoinsMap[$alias] = $join;
         $this->tablesAliasList[] = $alias;
 
         return $alias;
@@ -847,10 +847,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         /* @var $parent Join */
         while ($aliases):
             $alias = array_pop($aliases);
-            $join = $this->tableAliasMap[$alias];
+            $join = $this->tableJoinsMap[$alias];
             if (LOUTER == $join->getJoinType()):
-                $this->tableAliasMap[$alias] = $join->demote();
-                $parent = $this->tableAliasMap[$join->getParentAlias()];
+                $this->tableJoinsMap[$alias] = $join->demote();
+                $parent = $this->tableJoinsMap[$join->getParentAlias()];
                 if (INNER == $parent->getJoinType()):
                     $aliases[] = $join->getParentAlias();
                 endif;
@@ -879,7 +879,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         /* @var $parent Join */
         while ($aliases):
             $alias = array_pop($aliases);
-            $join = $this->tableAliasMap[$alias];
+            $join = $this->tableJoinsMap[$alias];
 
             // for the first join this should be true because its not a join
             // but a basetable that will be used in the from part of the query
@@ -891,14 +891,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             assert(null !== $join->getJoinType());
 
             $parentAlias = $join->getParentAlias();
-            $parentIsOuter = ($parentAlias && LOUTER == $this->tableAliasMap[$parentAlias]->getJoinType());
+            $parentIsOuter = ($parentAlias && LOUTER == $this->tableJoinsMap[$parentAlias]->getJoinType());
             $aliasIsOuter = (LOUTER == $join->getJoinType());
 
             if (($join->getNullable() || $parentIsOuter) && !$aliasIsOuter):
-                $this->tableAliasMap[$alias] = $join->promote();
+                $this->tableJoinsMap[$alias] = $join->promote();
                 // since we have just change the join type of alias we need to update
                 // any thing else that refers to it
-                foreach ($this->tableAliasMap as $key => $join) :
+                foreach ($this->tableJoinsMap as $key => $join) :
                     if ($join->getParentAlias() == $alias &&
                         !ArrayHelper::hasKey($aliases, $key)
                     ):
@@ -988,7 +988,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         // we create a new alias
         if ($aliases):
-            $aliases[] = sprintf('%s%s', $tableName, count($this->tableAliasMap));
+            $aliases[] = sprintf('%s%s', $tableName, count($this->tableJoinsMap));
         else:
             $this->tableAlias[$tableName] = [$tableName];
         endif;
@@ -1234,7 +1234,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $obj->aliasRefCount = $this->aliasRefCount;
         $obj->useDefaultCols = $this->useDefaultCols;
         $obj->tableAlias = $this->tableAlias;
-        $obj->tableAliasMap = $this->tableAliasMap;
+        $obj->tableJoinsMap = $this->tableJoinsMap;
         $obj->tablesAliasList = $this->tablesAliasList;
         $obj->select = $this->select;
         $obj->groupBy = $this->groupBy;

@@ -549,7 +549,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
             try {
                 /** @var $from BaseJoin */
                 $from = ArrayHelper::getValue(
-                    $this->query->tableAliasMap,
+                    $this->query->tableJoinsMap,
                     $alias,
                     ArrayHelper::STRICT
                 );

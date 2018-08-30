@@ -44,10 +44,10 @@ abstract class SqlCompiler implements CompilerInterface, SqlCompilableinterface
     /**
      * Returns True if this field should be used to descend deeper for selectRelated() purposes.
      *
-     * @param Field $field      the field to be checked
-     * @param bool  $restricted indicating if the field list has been manually restricted using a requested clause
-     * @param array $requested  The selectRelated() array
-     * @param bool  $reverse    True if we are checking a reverse select related
+     * @param Field $field the field to be checked
+     * @param bool $restricted indicating if the field list has been manually restricted using a requested clause
+     * @param array $requested The selectRelated() array
+     * @param bool $reverse True if we are checking a reverse select related
      *
      * @return bool
      *
@@ -80,4 +80,30 @@ abstract class SqlCompiler implements CompilerInterface, SqlCompilableinterface
 
         return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function quoteUnlessAliasCallback()
+    {
+        return function ($name) {
+            if (array_key_exists($name, $this->query->tableAlias) and !array_key_exists($name, $this->query->tableJoinsMap)) {
+                return $name;
+            }
+            return $this->connection->quoteIdentifier($name);
+        };
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function quoteCallback()
+    {
+        return function ($name) {
+
+            return $this->connection->quoteIdentifier($name);
+        };
+    }
+
+
 }

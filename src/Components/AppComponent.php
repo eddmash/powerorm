@@ -12,7 +12,7 @@ use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use ReflectionClass;
 
-abstract class Application extends Component implements AppInterface
+abstract class AppComponent extends Component implements AppInterface
 {
     public function getNamespace()
     {

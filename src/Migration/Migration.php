@@ -12,7 +12,7 @@ namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppInterface;
-use Eddmash\PowerOrm\Components\Application;
+use Eddmash\PowerOrm\Components\AppComponent;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Exception\CommandError;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
@@ -380,7 +380,7 @@ class Migration implements MigrationInterface
     }
 
     /**
-     * @param $app Application
+     * @param $app AppComponent
      *
      * @return string
      */
