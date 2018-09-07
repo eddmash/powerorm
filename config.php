@@ -13,10 +13,10 @@ $config = [
         'driver' => 'pdo_pgsql',
     ],
     'migrations' => [
-        'path' => dirname(__FILE__).'/application/Migrations',
+        'path' => dirname(__FILE__) . '/application/Migrations',
     ],
     'models' => [
-        'path' => dirname(__FILE__).'/application/Models',
+        'path' => dirname(__FILE__) . '/application/Models',
         'namespace' => 'App\Models',
         'autoload' => true,
     ],

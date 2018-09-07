@@ -45,8 +45,8 @@ class OrderBy extends BaseExpression
      * OrderBy constructor.
      *
      * @param BaseExpression $expression
-     * @param bool           $descending
-     * @param array          $kwargs
+     * @param bool $descending
+     * @param array $kwargs
      *
      * @throws ValueError
      * @throws \Eddmash\PowerOrm\Exception\KeyError
@@ -55,7 +55,8 @@ class OrderBy extends BaseExpression
         BaseExpression $expression,
         $descending = false,
         $kwargs = []
-    ) {
+    )
+    {
         parent::__construct(null);
         $nullsFirst = ArrayHelper::getValue($kwargs, 'nullFirst', false);
         $nullsLast = ArrayHelper::getValue($kwargs, 'nullsLast', false);
@@ -93,7 +94,8 @@ class OrderBy extends BaseExpression
         CompilerInterface $compiler,
         ConnectionInterface $connection,
         $template = null
-    ) {
+    )
+    {
         if (is_null($template)):
             if ($this->nullsLast):
                 $template = sprintf('%s NULLS LAST', $this->template);

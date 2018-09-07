@@ -5,18 +5,20 @@
 namespace Eddmash\PowerOrm\Tests\TestApp\Migrations;
 
 use Eddmash\PowerOrm\Migration\Migration;
+use Eddmash\PowerOrm\Migration\Operation\Field as FieldOps;
 use Eddmash\PowerOrm\Migration\Operation\Model as ModelOps;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Migration\Operation\Field as FieldOps;
 
 class m0001_Initial extends Migration
 {
-    public function getDependency() {
+    public function getDependency()
+    {
         return [
         ];
     }
 
-    public function getOperations() {
+    public function getOperations()
+    {
         return [
             ModelOps\CreateModel::createObject(
                 [

@@ -121,37 +121,42 @@ class ManyToManyField extends RelatedField
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        $inverseFields = $relatedModel->getMeta()->getFields(
+        $allForwardFields = $relatedModel->getMeta()->getFields(
             false,
             true,
             false
         );
+
         $rM = $this->relation->toModel;
         if ($rM instanceof Model):
             $rM = $this->relation->toModel->getMeta()->getNSModelName();
         endif;
         $relName = null;
-        foreach ($inverseFields as $inverseField) :
-            $sM = $inverseField->scopeModel->getMeta()->getNSModelName();
-            if ($inverseField instanceof InverseField):
-                if ($sM === $rM && $this->name == $inverseField->toField):
-                    $relName = $inverseField->getName();
+        $createInverse = true;
+        foreach ($allForwardFields as $forwardField) :
+            $sM = $forwardField->scopeModel->getMeta()->getNSModelName();
+            if ($forwardField instanceof InverseField):
+                if ($sM === $rM && $this->name == $forwardField->toField):
+                    $relName = $forwardField->getName();
                     $relation->relatedName = $relName;
+                    $createInverse = false;
                     break;
                 endif;
             endif;
 
         endforeach;
-        $hasMany = HasManyField::createObject(
-            [
-                'to' => $this->scopeModel->getMeta()->getNSModelName(),
-                'toField' => $relation->fromField->getName(),
-                'fromField' => $this,
-                'autoCreated' => true,
-            ]
-        );
+        if ($createInverse) {
+            $hasMany = HasManyField::createObject(
+                [
+                    'to' => $this->scopeModel->getMeta()->getNSModelName(),
+                    'toField' => $relation->fromField->getName(),
+                    'fromField' => $this,
+                    'autoCreated' => true,
+                ]
+            );
+            $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
+        }
 
-        $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
 
         $this->m2mField = function () use ($relation) {
             return $this->getM2MAttr($relation, 'name');
@@ -165,7 +170,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model           $model
+     * @param Model $model
      *
      * @return Model
      *
@@ -344,16 +349,16 @@ class ManyToManyField extends RelatedField
         endif;
 
         $linkName = null;
-        if ($this->relation->through_fields) :
-            $linkName = $this->relation->through_fields[0];
+        if ($this->relation->throughFields) :
+            $linkName = $this->relation->throughFields[0];
         endif;
 
         /** @var $field RelatedField */
         foreach ($this->relation->through->getMeta()->getFields() as $field) :
             if ($field->isRelation &&
                 $field->relation->toModel->getMeta()->getNSModelName() == $relation->getFromModel()
-                                                                                   ->getMeta()
-                                                                                   ->getNSModelName() &&
+                    ->getMeta()
+                    ->getNSModelName() &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
 
@@ -379,15 +384,15 @@ class ManyToManyField extends RelatedField
         endif;
 
         $linkName = null;
-        if ($this->relation->through_fields) :
-            $linkName = $this->relation->through_fields[1];
+        if ($this->relation->throughFields) :
+            $linkName = $this->relation->throughFields[1];
         endif;
 
         /** @var $field RelatedField */
         foreach ($this->relation->through->getMeta()->getFields() as $field) :
             if ($field->isRelation &&
                 $field->relation->toModel->getMeta()->getNSModelName() == $relation->toModel->getMeta()
-                                                                                            ->getNSModelName() &&
+                    ->getNSModelName() &&
                 (is_null($linkName) || $linkName == $field->getName())
             ) :
                 $this->{$cache_attr} = ('name' == $attr) ? call_user_func([$field, 'getName']) : $field->{$attr};
@@ -414,21 +419,22 @@ class ManyToManyField extends RelatedField
         $m2mField = call_user_func($this->m2mField);
         $m2mReverseField = call_user_func($this->m2mReverseField);
 
+
         $field = $model->getMeta()->getField($m2mField);
         $reverseField = $model->getMeta()->getField($m2mReverseField);
 
         if ($direct):
             $paths = array_merge($paths, $field->getReversePathInfo());
-            $paths = array_merge($paths, $reverseField->getPathInfo());
+            $paths = array_merge($paths, $reverseField->getForwardPathInfo());
         else:
             $paths = array_merge($paths, $reverseField->getReversePathInfo());
-            $paths = array_merge($paths, $field->getPathInfo());
+            $paths = array_merge($paths, $field->getForwardPathInfo());
         endif;
 
         return $paths;
     }
 
-    public function getPathInfo()
+    public function getForwardPathInfo()
     {
         return $this->pathInfo(true);
     }
@@ -474,5 +480,31 @@ class ManyToManyField extends RelatedField
     public function saveFromForm(Model $model, $value)
     {
         $model->{$this->getName()}->set($value);
+    }
+
+    /**@inheritdoc */
+    public function getConstructorArgs()
+    {
+        $kwargs = parent::getConstructorArgs();
+
+
+        if ($this->relation->through):
+
+            $kwargs['through'] = is_string($this->relation->through) ? $this->relation->through :
+                $this->relation->through->getMeta()->getNSModelName();
+        endif;
+
+        if (!$this->relation->dbConstraint):
+
+            $kwargs['dbConstraint'] = $this->relation->dbConstraint;
+        endif;
+
+
+        if ($this->relation->throughFields):
+
+            $kwargs['throughFields'] = $this->relation->throughFields;
+        endif;
+
+        return $kwargs;
     }
 }

@@ -55,7 +55,7 @@ class StateRegistry extends Registry
         try {
             $creationOrder = Tools::topologicalSort($creationOrder);
         } catch (CircularDependencyError $e) {
-            throw new OrmException(static::class.'::'.$e->getMessage());
+            throw new OrmException(static::class . '::' . $e->getMessage());
         }
 
         foreach ($creationOrder as $depend) :

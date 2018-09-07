@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Migration\Operation;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
-use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\ComponentException;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -120,7 +119,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * replaced with or a boolean that indicates whether or not the specified
      * operation can be optimized across.
      *
-     * @param Operation   $operation
+     * @param Operation $operation
      * @param Operation[] $inBetween
      *
      * @return mixed
@@ -159,7 +158,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * it preemptively rejects any proxy, unmanaged model.
      *
      * @param ConnectionInterface $connection
-     * @param Model               $model
+     * @param Model $model
      *
      * @return mixed
      *

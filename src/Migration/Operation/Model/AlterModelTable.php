@@ -59,7 +59,8 @@ class AlterModelTable extends Operation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    ) {
+    )
+    {
         $this->alterModelTable($schemaEditor, $fromState, $toState);
     }
 
@@ -70,7 +71,8 @@ class AlterModelTable extends Operation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    ) {
+    )
+    {
         $this->alterModelTable($schemaEditor, $fromState, $toState);
     }
 

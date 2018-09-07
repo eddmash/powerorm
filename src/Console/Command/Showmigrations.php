@@ -52,7 +52,7 @@ class Showmigrations extends BaseCommand
                     $indicator = '<fg=yellow>(pending)</>';
                 endif;
                 $output->writeln(
-                    str_pad(' ', 2, ' ').
+                    str_pad(' ', 2, ' ') .
                     sprintf(
                         '%1$s %2$s',
                         $indicator,
@@ -70,7 +70,7 @@ class Showmigrations extends BaseCommand
     protected function configure()
     {
         $this->setName($this->guessCommandName())
-             ->setDescription($this->help)
-             ->setHelp($this->help);
+            ->setDescription($this->help)
+            ->setHelp($this->help);
     }
 }

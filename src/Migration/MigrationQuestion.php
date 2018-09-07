@@ -70,9 +70,9 @@ class MigrationQuestion
      */
     public static function askNotNullAddition(Asker $asker, $modelName, $fieldName, $field)
     {
-        $msg = 'You are trying to add a non-nullable field "%s" to %s without a default; '.PHP_EOL.
-            'we can\'t do that (the database needs something to populate existing rows).'.PHP_EOL.
-            'Please select a fix:'.PHP_EOL;
+        $msg = 'You are trying to add a non-nullable field "%s" to %s without a default; ' . PHP_EOL .
+            'we can\'t do that (the database needs something to populate existing rows).' . PHP_EOL .
+            'Please select a fix:' . PHP_EOL;
 
         $choices = [
             'Provide a one-off default now (will be set on all existing rows)',
@@ -81,12 +81,12 @@ class MigrationQuestion
 
         foreach ($choices as $index => $choice) :
 
-            $msg .= sprintf("\t%s. %s".PHP_EOL, $index + 1, $choice);
+            $msg .= sprintf("\t%s. %s" . PHP_EOL, $index + 1, $choice);
         endforeach;
 
         $msg .= 'Select an option: ';
 
-        $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
+        $selected = (int)$asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if (2 == $selected):
             return;
@@ -108,9 +108,9 @@ class MigrationQuestion
      */
     public static function askNotNullAlteration(Asker $asker, $modelName, $fieldName)
     {
-        $msg = 'You are trying to add a non-nullable field "%s" to %s without a default; '.PHP_EOL.
-            ' we can\'t do that (the database needs something to populate existing rows).'.PHP_EOL.
-            ' Please select a fix:'.PHP_EOL;
+        $msg = 'You are trying to add a non-nullable field "%s" to %s without a default; ' . PHP_EOL .
+            ' we can\'t do that (the database needs something to populate existing rows).' . PHP_EOL .
+            ' Please select a fix:' . PHP_EOL;
 
         $choices = [
             'Provide a one-off default now (will be set on all existing rows)',
@@ -120,12 +120,12 @@ class MigrationQuestion
 
         foreach ($choices as $index => $choice) :
 
-            $msg .= sprintf("\t%s. %s".PHP_EOL, $index + 1, $choice);
+            $msg .= sprintf("\t%s. %s" . PHP_EOL, $index + 1, $choice);
         endforeach;
 
         $msg .= 'Select an option:';
 
-        $selected = (int) $asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
+        $selected = (int)$asker->ask(new Question(sprintf($msg, $fieldName, $modelName)));
 
         if (2 == $selected):
             return NOT_PROVIDED;
@@ -148,16 +148,16 @@ class MigrationQuestion
     private static function getDefault(Asker $asker)
     {
         $default_val = '';
-        $msg = PHP_EOL.'Please enter the default value now, ensure its a valid PHP '.PHP_EOL.' >>> ';
+        $msg = PHP_EOL . 'Please enter the default value now, ensure its a valid PHP ' . PHP_EOL . ' >>> ';
         while (true):
 
             $default = $asker->ask(new Question($msg));
             if (empty($default)):
-                $msg = " Please enter some value, or 'exit' (with no quotes) to exit.".PHP_EOL;
+                $msg = " Please enter some value, or 'exit' (with no quotes) to exit." . PHP_EOL;
             elseif ('exit' == $default):
                 break;
             elseif (false === $default):
-                Console::error(PHP_EOL.' An error occured while trying to set default value');
+                Console::error(PHP_EOL . ' An error occured while trying to set default value');
 
                 break;
             else:

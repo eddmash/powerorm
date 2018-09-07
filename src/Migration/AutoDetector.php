@@ -149,13 +149,14 @@ class AutoDetector extends BaseObject
     /**
      * @param ProjectState $fromState
      * @param ProjectState $toState
-     * @param Asker        $asker
+     * @param Asker $asker
      */
     public function __construct(
         ProjectState $fromState,
         ProjectState $toState,
         Asker $asker
-    ) {
+    )
+    {
         $this->fromState = $fromState;
         $this->toState = $toState;
         $this->asker = $asker;
@@ -284,8 +285,8 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * @param array  $changes
-     * @param Graph  $graph
+     * @param array $changes
+     * @param Graph $graph
      * @param string $migrationName
      *
      * @return mixed
@@ -370,9 +371,9 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * @param Operation  $operation
-     * @param array      $dependencies
-     * @param bool|false $pushToTop    some operations should come before
+     * @param Operation $operation
+     * @param array $dependencies
+     * @param bool|false $pushToTop some operations should come before
      *                                 others, use this determine which
      *
      * @since  1.1.0
@@ -386,7 +387,8 @@ class AutoDetector extends BaseObject
         $operation,
         $dependencies = [],
         $pushToTop = false
-    ) {
+    )
+    {
         $operation->setDependency($dependencies);
         $operation->setAppLabel($appLabel);
 
@@ -751,7 +753,7 @@ class AutoDetector extends BaseObject
         $name = str_replace('\\', '_', $name);
         if ($appLabel):
             $name = str_replace(
-                ''.$appLabel.'_models_',
+                '' . $appLabel . '_models_',
                 '',
                 strtolower($name)
             );
@@ -764,7 +766,7 @@ class AutoDetector extends BaseObject
     {
         $name = explode('_', $name);
 
-        return (int) str_replace($this->migrationNamePrefix, '', $name[0]);
+        return (int)str_replace($this->migrationNamePrefix, '', $name[0]);
     }
 
     private function getOldModelName($modelName)
@@ -949,7 +951,7 @@ class AutoDetector extends BaseObject
                 // depend on the related model also
                 $opDep[] = [
                     'app' => $relationField->relation->toModel->getMeta()
-                                                              ->getAppName(),
+                        ->getAppName(),
                     'target' => $relationField->relation->toModel
                         ->getMeta()->getNSModelName(),
                     'type' => self::TYPE_MODEL,
@@ -1020,7 +1022,7 @@ class AutoDetector extends BaseObject
 
             $modelState = $this->fromState->getModelState($deletedModel);
             $meta = $this->fromState->getRegistry()
-                                    ->getModel($deletedModel)->getMeta();
+                ->getModel($deletedModel)->getMeta();
 
             // at this point if we the model is un manged just stop ,
             // since we just need to have it recorded in our
@@ -1197,7 +1199,7 @@ class AutoDetector extends BaseObject
         /* @var $modelState ModelState */
         foreach ($addedProxies as $addedProxy) :
             $meta = $this->toState->getRegistry()
-                                  ->getModel($addedProxy)->getMeta();
+                ->getModel($addedProxy)->getMeta();
             $modelState = $this->toState->getModelState($addedProxy);
             assert($modelState->getMeta()['proxy']);
 
@@ -1239,7 +1241,7 @@ class AutoDetector extends BaseObject
         foreach ($droppedProxies as $droppedProxy) :
             $modelState = $this->fromState->getModelState($droppedProxy);
             $meta = $this->fromState->getRegistry()->getModel($droppedProxy)
-                                    ->getMeta();
+                ->getMeta();
 
             // create operation
             $this->addOperation(
@@ -1339,7 +1341,7 @@ class AutoDetector extends BaseObject
         foreach ($this->keptModelKeys as $modelName) :
             $oldModelName = $this->getOldModelName($modelName);
             $meta = $this->toState->getRegistry()
-                                  ->getModel($modelName)->getMeta();
+                ->getModel($modelName)->getMeta();
             $oldModelState = $this->fromState->getModelState($oldModelName);
 
             $newModel = $this->newRegistry->getModel($modelName);
@@ -1483,8 +1485,8 @@ class AutoDetector extends BaseObject
             foreach ($keptFieldKeys as $keptField) :
                 $oldFieldName = $this->getOldFieldName($modelName, $keptField);
                 $oldField = $this->oldRegistry->getModel($oldModelName)
-                                              ->getMeta()
-                                              ->getField($oldFieldName);
+                    ->getMeta()
+                    ->getField($oldFieldName);
 
                 $meta = $this->newRegistry->getModel(
                     $modelName
@@ -1625,7 +1627,7 @@ class AutoDetector extends BaseObject
                 $opDep[] = [
                     'app' => $field->relation->through->getMeta()->getAppName(),
                     'target' => $field->relation->through->getMeta()
-                                                         ->getNSModelName(),
+                        ->getNSModelName(),
                     'type' => self::TYPE_MODEL,
                     'action' => self::ACTION_CREATED,
                 ];

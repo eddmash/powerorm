@@ -288,7 +288,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     /**
      * @param array $config
      *
-     * @return Field
+     * @return static
      *
      * @since  1.1.0
      *
@@ -303,7 +303,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model  $modelObject
+     * @param Model $modelObject
      *
      * @throws FieldError
      *
@@ -561,10 +561,10 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     {
         try {
             return Type::getType($this->dbType(BaseOrm::getDbConnection()))
-                       ->convertToPHPValue(
-                           $value,
-                           BaseOrm::getDbConnection()->getDatabasePlatform()
-                       );
+                ->convertToPHPValue(
+                    $value,
+                    BaseOrm::getDbConnection()->getDatabasePlatform()
+                );
         } catch (\Exception $exception) {
             throw new ValidationError($exception->getMessage(), 'invalid');
         }
@@ -610,7 +610,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * The attribute name is in $this->getAttrName() (this is set up by OgrField).
      *
      * @param Model $model
-     * @param bool  $add   is whether the instance is being saved to the database
+     * @param bool $add is whether the instance is being saved to the database
      *                     for the first time
      *
      * @return mixed
@@ -656,7 +656,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * By default it returns value passed in if prepared=true and
      * prepareValue() if is False.
      *
-     * @param mixed               $value
+     * @param mixed $value
      * @param ConnectionInterface $connection
      *
      * @return mixed
@@ -674,10 +674,10 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         endif;
 
         return Type::getType($this->dbType($connection))
-                   ->convertToDatabaseValue(
-                       $value,
-                       $connection->getDatabasePlatform()
-                   );
+            ->convertToDatabaseValue(
+                $value,
+                $connection->getDatabasePlatform()
+            );
     }
 
     /**
@@ -723,7 +723,8 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         ConnectionInterface $connection,
         $value,
         $expression
-    ) {
+    )
+    {
         return $value;
     }
 
@@ -856,7 +857,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         $meta = parent::__debugInfo();
         if ($this->scopeModel):
             $meta['scopeModel'] = $this->scopeModel->getMeta()
-                                                   ->getNSModelName();
+                ->getNSModelName();
         endif;
 
         return $meta;

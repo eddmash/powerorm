@@ -122,19 +122,19 @@ class Manager extends Base
         if (false === $file):
             $this->error(
                 sprintf(
-                    'Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?'.PHP_EOL,
+                    'Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?' . PHP_EOL,
                     $name,
                     $this->defaultCommandsPaths
                 )
             );
             $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
-            $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
+            $this->normal(sprintf('Type %s for usage.' . PHP_EOL, $message));
 
         endif;
 
         // commands are in the commands namespace
         /** @var $className BaseCommand */
-        $className = ClassHelper::getFormatNamespace($packageName).'Console\Command\\'.$name;
+        $className = ClassHelper::getFormatNamespace($packageName) . 'Console\Command\\' . $name;
 
         return new $className();
     }

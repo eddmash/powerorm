@@ -21,7 +21,8 @@ class SQLAggregateCompiler extends SqlFetchBaseCompiler
     public function asSql(
         CompilerInterface $compiler = null,
         ConnectionInterface $connection = null
-    ) {
+    )
+    {
         $sql = $params = [];
 
         foreach ($this->query->annotations as $alias => $annotation) {

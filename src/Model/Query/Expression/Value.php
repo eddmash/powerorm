@@ -59,7 +59,8 @@ class Value extends BaseExpression
         $summarize =
         false,
         $forSave = false
-    ) {
+    )
+    {
         $c = parent::resolveExpression($resolver, $allowJoins, $reuse, $summarize, $forSave);
         $c->forSave = $forSave;
 

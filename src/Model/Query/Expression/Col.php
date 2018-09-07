@@ -87,4 +87,16 @@ class Col extends BaseExpression
     {
         return [$this];
     }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __debugInfo()
+    {
+        return [
+            'alias' => $this->alias,
+            'targetField' => $this->targetField
+        ];
+    }
 }

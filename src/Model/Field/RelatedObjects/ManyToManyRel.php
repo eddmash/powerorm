@@ -33,7 +33,7 @@ class ManyToManyRel extends ForeignObjectRel
      *
      * @var array
      */
-    public $through_fields;
+    public $throughFields;
 
     public $dbConstraint = true;
 
@@ -43,7 +43,7 @@ class ManyToManyRel extends ForeignObjectRel
             throw new ValueError("Can't supply a through model and db_constraint=false");
         endif;
 
-        if ($this->through_fields && !$this->through):
+        if ($this->throughFields && !$this->through):
             throw new ValueError('Cannot specify through_fields without a through model');
         endif;
         parent::__construct($kwargs);
@@ -52,5 +52,15 @@ class ManyToManyRel extends ForeignObjectRel
     public function getRelatedField()
     {
         throw new NotImplemented();
+    }
+
+    public function __debugInfo()
+    {
+        $meta = parent::__debugInfo();
+
+        $meta['through'] = is_string($this->through) ? $this->through : $this->through->getMeta()->getNSModelName();
+        $meta['throughFields'] = $this->throughFields;
+        $meta['dbConstraint'] = $this->dbConstraint;
+        return $meta;
     }
 }

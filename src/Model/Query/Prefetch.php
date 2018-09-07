@@ -41,9 +41,9 @@ class Prefetch
     /**
      * Prefetch constructor.
      *
-     * @param string        $lookups
+     * @param string $lookups
      * @param Queryset|null $queryset
-     * @param string|null   $toAttr
+     * @param string|null $toAttr
      *
      * @throws ValueError
      */

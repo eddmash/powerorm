@@ -17,6 +17,10 @@ class Node implements \Countable
 {
     protected $connector;
 
+    /**
+     * Default value to use to connect two or more query items
+     * @var string
+     */
     protected $defaultConnector;
 
     protected $children;
@@ -40,7 +44,8 @@ class Node implements \Countable
         $children = null,
         $connector = null,
         $negated = false
-    ) {
+    )
+    {
         return new static($children, $connector, $negated);
     }
 

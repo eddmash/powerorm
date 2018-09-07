@@ -37,7 +37,7 @@ class JoinPromoter
      * JoinPromoter constructor.
      *
      * @param mixed $connector
-     * @param int   $childrenCount
+     * @param int $childrenCount
      * @param       $currentNegated
      */
     public function __construct($connector, $childrenCount, $currentNegated)

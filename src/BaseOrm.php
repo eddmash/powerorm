@@ -144,7 +144,7 @@ class BaseOrm extends BaseObject
     {
         if (empty($this->getSettings()->getDatabase())):
 
-            $message = 'The database configuration have no '.
+            $message = 'The database configuration have not ' .
                 'been provided, consult documentation for options';
 
             throw new OrmException($message);

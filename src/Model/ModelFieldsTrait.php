@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\BigAutoField;
 use Eddmash\PowerOrm\Model\Field\BigIntegerField;
-use Eddmash\PowerOrm\Model\Field\SmallIntegerField;
 use Eddmash\PowerOrm\Model\Field\BooleanField;
 use Eddmash\PowerOrm\Model\Field\CharField;
 use Eddmash\PowerOrm\Model\Field\DateField;
@@ -25,6 +24,7 @@ use Eddmash\PowerOrm\Model\Field\IntegerField;
 use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
+use Eddmash\PowerOrm\Model\Field\SmallIntegerField;
 use Eddmash\PowerOrm\Model\Field\TextField;
 use Eddmash\PowerOrm\Model\Field\TimeField;
 

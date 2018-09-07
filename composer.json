@@ -41,7 +41,9 @@
       "Eddmash\\PowerOrm\\": "src/",
       "Eddmash\\PowerOrm\\Tests\\": "tests/"
     },
-    "files": ["src/Model/Query/Expression/Util.php"]
+    "files": [
+      "src/Model/Query/Expression/Util.php"
+    ]
   },
   "extra": {
     "branch-alias": {

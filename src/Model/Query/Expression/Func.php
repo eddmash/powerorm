@@ -78,7 +78,8 @@ class Func extends BaseExpression
         $reuse = null,
         $summarize = false,
         $forSave = false
-    ) {
+    )
+    {
         $obj = clone $this;
         $obj->summarize = $summarize;
 
@@ -100,7 +101,8 @@ class Func extends BaseExpression
         CompilerInterface $compiler,
         ConnectionInterface $connection,
         $function = null
-    ) {
+    )
+    {
         $sqlParts = [];
 
         if (!is_null($function)):

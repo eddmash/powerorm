@@ -1495,7 +1495,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
 
     public function __debugInfo()
     {
-        $meta = parent::__debugInfo();
+        $meta = [];
         foreach ($this->_fieldCache as $name => $item) :
             $meta[$name] = $item;
         endforeach;

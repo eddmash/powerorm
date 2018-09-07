@@ -23,7 +23,6 @@ use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\Node;
-use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Results\ArrayFlatValueMapper;
@@ -83,7 +82,8 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    ) {
+    )
+    {
         $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
         $this->query = (null == $query) ? $this->getQueryBuilder() : $query;
@@ -109,9 +109,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
 
     /**
      * @param ConnectionInterface $connection
-     * @param Model               $model
-     * @param Query               $query
-     * @param array               $kwargs
+     * @param Model $model
+     * @param Query $query
+     * @param array $kwargs
      *
      * @return self
      *
@@ -124,7 +124,8 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    ) {
+    )
+    {
         return new static($connection, $model, $query, $kwargs);
     }
 
@@ -186,12 +187,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      * use for the generated where conditions, Valid choices are :.
      *
      * <code>
-     *   Role::objects()->filter(
-     *      ["name"=>"asdfasdf"],
-     *      ["or","name__not"=>"tr"],
-     *      ["and","name__in"=>"we"],
-     *      ["or", "name__contains"=>"qwe"]
-     *  );
+     *
      * </code>
      *
      * @return Queryset
@@ -327,12 +323,10 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      * @throws TypeError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public function selectRelated($fields = [])
+    public function selectRelated(?array $fields): self
     {
-        Tools::ensureParamIsArray($fields);
-
         if ($this->_fields) :
-            throw new TypeError('Cannot call selectRelated() after .values() or .asArray()');
+            throw new TypeError('Cannot call selectRelated() after $queryset->asArray()');
         endif;
         $obj = $this->_clone();
 
@@ -349,7 +343,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
 
     public function prefetchRelated()
     {
-        throw new NotImplemented(__METHOD__.' NOT IMPLEMENTED');
+        throw new NotImplemented(__METHOD__ . ' NOT IMPLEMENTED');
     }
 
     public function exclude()
@@ -368,7 +362,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
             return $instance->query->hasResults($this->connection);
         endif;
 
-        return (bool) $this->_resultsCache;
+        return (bool)$this->_resultsCache;
     }
 
     /**
@@ -586,10 +580,10 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      *
      * The orm does not try map the into  there  respective models.
      *
-     * @param array $fields     the fields to select, if null all fields in the
+     * @param array $fields the fields to select, if null all fields in the
      *                          model are selected
-     * @param bool  $valuesOnly if true return
-     * @param bool  $flat       if true returns the results as one array others
+     * @param bool $valuesOnly if true return
+     * @param bool $flat if true returns the results as one array others
      *                          it returns results as array of arrays each
      *                          which represents a record in the database for the
      *                          selected field.
@@ -605,13 +599,13 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     {
         if ($flat && 1 != count($fields)):
             throw new TypeError(
-                "'flat' is valid when asArray is called".
+                "'flat' is valid when asArray is called" .
                 ' with exactly one field.'
             );
         endif;
         if ($flat && !$valuesOnly):
             throw new TypeError(
-                "'flat' is valid when asArray ".
+                "'flat' is valid when asArray " .
                 'is called with valuesOnly=true.'
             );
         endif;
