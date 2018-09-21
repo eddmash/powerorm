@@ -219,8 +219,9 @@ class Meta extends DeconstructableObject implements MetaInterface
     }
 
     /**
-     * Returns a field instance given a field name. The field can be either a forward or reverse field,
-     * unless $manyToMany is specified; if it is, only forward fields will be returned.
+     * Returns a field instance given a field name. The field can be either a forward or
+     * reverse field, unless $manyToMany is specified; if it is, only forward fields will
+     * be returned.
      *
      * @param $name
      *

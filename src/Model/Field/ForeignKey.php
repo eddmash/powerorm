@@ -16,6 +16,8 @@ use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Form\Fields\ModelChoiceField;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Delete;
+use Eddmash\PowerOrm\Model\Field\Descriptors\ManyToOneDescriptor;
+use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToOneRel;
 use Eddmash\PowerOrm\Model\Model;
@@ -36,9 +38,9 @@ class ForeignKey extends RelatedField
     public $relation;
 
     /**{inheritdoc}*/
-    protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ManyToOneDescriptor';
+    protected $descriptor = ManyToOneDescriptor::class;
 
-    public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasManyField';
+    public $inverseField = HasManyField::class;
 
     /**
      * ForeignKey constructor.
