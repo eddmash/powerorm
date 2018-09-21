@@ -12,14 +12,13 @@ Basics
 
 A component in powerorm is any project that needs to extend the orm.
 
-Basically its a class that
-implements **Eddmash\\PowerOrm\\Components\\Component** .
+Basically its a class that implements **Eddmash\\PowerOrm\\Components\\ComponentInterface** interface .
 
 
-This a the component class for the :doc:`Faker<../../faker/index>` library.
+An example of a component class can be found at :doc:`Faker<../../faker/index>` ,
+which is the component class for the faker library.
 
-This library extends the orm by adding a **generatedata** command which is used
-to generate dummy data.
+This library extends the orm to add the **generatedata** command which is used to generate dummy data.
 
 .. code-block:: php
 
@@ -67,8 +66,8 @@ things like where
 For a php project to use powerorm, an application class needs to be created for
 that project.
 
-If you have a project with the namespace App; Create a class the extends the
-**Eddmash\\PowerOrm\\Components\\Application**.
+If you have a project with the namespace **App**.
+Create a class that extends the **Eddmash\\PowerOrm\\Components\\AppComponent**.
 This class should be placed on the same level as your models, migration folders.
 
 .. code-block:: php
@@ -77,9 +76,9 @@ This class should be placed on the same level as your models, migration folders.
 
 
     use Eddmash\PowerOrm\BaseOrm;
-    use Eddmash\PowerOrm\Components\Application;
+    use Eddmash\PowerOrm\Components\AppComponent;
 
-    class App extends Application
+    class App extends AppComponent
     {
 
         public function ready(BaseOrm $baseOrm)
@@ -134,10 +133,10 @@ Component
         Name to use when querying this component, ensure its unique.
 
 
-Application
-***********
+AppComponent
+************
 
-.. php:class:: \\Eddmash\\PowerOrm\\Components\\Application
+.. php:class:: \\Eddmash\\PowerOrm\\Components\\AppComponent
 
     .. php:method:: ready()
 

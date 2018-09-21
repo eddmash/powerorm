@@ -61,7 +61,7 @@ class FormatFileContent
     {
         $indentation = $this->indent($this->indentation);
 
-        $this->buffer[] = $indentation.$item;
+        $this->buffer[] = $indentation . $item;
     }
 
     /**
@@ -113,7 +113,8 @@ class FormatFileContent
         $key,
         $val,
         &$import
-    ) {
+    )
+    {
         $key_arr = static::forceString($key);
 
         if (is_array($val)):
@@ -180,7 +181,8 @@ class FormatFileContent
         $key,
         DeConstructableInterface $val,
         &$import
-    ) {
+    )
+    {
         $desc_skel = $val->deconstruct();
 
         $desc_import = [$desc_skel['path']];
@@ -308,7 +310,7 @@ class FormatFileContent
             sprintf(
                 "%1\$s::createObject(%2\$s\t\t\t)",
                 $class,
-                PHP_EOL.$string.PHP_EOL
+                PHP_EOL . $string . PHP_EOL
             ),
             $import,
         ];

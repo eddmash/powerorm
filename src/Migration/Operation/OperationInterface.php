@@ -60,7 +60,7 @@ interface OperationInterface
      * operation can be optimized across.
      *
      * @param Operation $operation
-     * @param array     $inBetween
+     * @param array $inBetween
      *
      * @return mixed
      *

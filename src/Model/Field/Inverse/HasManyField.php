@@ -54,7 +54,7 @@ class HasManyField extends InverseField
         return $this->fromField->getForwardRelatedFilter($model);
     }
 
-    public function getPathInfo()
+    public function getForwardPathInfo()
     {
         $meta = $this->scopeModel->getMeta();
 

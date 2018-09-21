@@ -18,6 +18,7 @@ use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
+use Eddmash\PowerOrm\Exception\QueryException;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\Node;
@@ -39,10 +40,10 @@ use Eddmash\PowerOrm\Model\Query\Joinable\BaseJoin;
 use Eddmash\PowerOrm\Model\Query\Joinable\BaseTable;
 use Eddmash\PowerOrm\Model\Query\Joinable\Join;
 use Eddmash\PowerOrm\Model\Query\Joinable\WhereNode;
-use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
-use const Eddmash\PowerOrm\Model\Query\Expression\ORDER_PATTERN;
 use function Eddmash\PowerOrm\Model\Query\Expression\count_;
 use function Eddmash\PowerOrm\Model\Query\Expression\ref_;
+use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
+use const Eddmash\PowerOrm\Model\Query\Expression\ORDER_PATTERN;
 
 const INNER = 'INNER JOIN';
 const LOUTER = 'LEFT OUTER JOIN';
@@ -72,7 +73,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @var BaseJoin[]
      */
-    public $tableAliasMap = [];
+    public $tableJoinsMap = [];
 
     public $selectRelected = [];
 
@@ -260,7 +261,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
     /**
      * Builds a WhereNode for a single filter clause, but doesn't add it to
-     * this Query. Query.add_q() will then add
+     * this Query. Query->add_q() will then add
      * this filter to the where Node.
      *
      * @param $condition
@@ -278,6 +279,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         &$canReuse = null
     )
     {
+
         reset($conditions);
         $name = key($conditions);
         $value = current($conditions);
@@ -320,8 +322,12 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         if ($field->isRelation) :
             $lookupClass = $field->getLookup($lookups[0]);
-            $col = $targets[0]->getColExpression($alias, $field);
-            $condition = $lookupClass::createObject($col, $value);
+            if (count($targets) == 1) {
+                $col = $targets[0]->getColExpression($alias, $field);
+                $condition = $lookupClass::createObject($col, $value);
+            } else {
+                throw new QueryException(sprintf("Got %s targets columns", count($targets)));
+            }
         else:
             $col = $targets[0]->getColExpression($alias, $field);
             $condition = $this->buildCondition($lookups, $col, $value);
@@ -376,7 +382,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     public function addQ(Q $q)
     {
         $aliases = [];
-        foreach ($this->tableAliasMap as $key => $join) :
+        foreach ($this->tableJoinsMap as $key => $join) :
             if (INNER === $join->getJoinType()):
                 $aliases[] = $key;
             endif;
@@ -636,13 +642,19 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     }
 
     /**
-     * @param      $names
+     * Resolve the paths to follow when making queries
+     * The names is an array of fields that need to be followed for a specific condition e.g. ['order__product'=>...]
+     *
+     * The order__product is split into ['order', 'product'] which is what is passed to this method.
+     *
+     * @param      $names array of fields to follow
      * @param Meta $meta
      * @param bool $failOnMissing
      *
      * @return array
      *
      * @throws FieldError
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
     public function getNamesPath($names, Meta $meta, $failOnMissing = false)
     {
@@ -687,8 +699,9 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             // field lives in parent, but we are currently in one of its
             // children)
             if ($field->hasMethod('getPathInfo')) :
-                $pathsInfos = $field->getPathInfo();
-                $last = $pathsInfos[count($pathsInfos) - 1];
+                $pathsInfos = $field->getForwardPathInfo();
+                reset($pathsInfos);
+                $last = end($pathsInfos);
 
                 $finalField = ArrayHelper::getValue($last, 'joinField');
                 $targets = ArrayHelper::getValue($last, 'targetFields');
@@ -791,7 +804,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     {
         // check if we can resuse an alias
         $resuableAliases = [];
-        foreach ($this->tableAliasMap as $key => $item) :
+        foreach ($this->tableJoinsMap as $key => $item) :
             if ((null == $reuse || ArrayHelper::hasKey($reuse, $key)) &&
                 $join->equal($item)):
                 $resuableAliases[] = $key;
@@ -807,7 +820,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         list($alias) = $this->getTableAlias($join->getTableName(), false);
 
         if ($join->getJoinType()):
-            if (LOUTER === $this->tableAliasMap[$join->getParentAlias()]->getJoinType() ||
+            if (LOUTER === $this->tableJoinsMap[$join->getParentAlias()]->getJoinType() ||
                 $join->getNullable()):
 
                 $joinType = LOUTER;
@@ -818,7 +831,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         endif;
 
         $join->setTableAlias($alias);
-        $this->tableAliasMap[$alias] = $join;
+        $this->tableJoinsMap[$alias] = $join;
         $this->tablesAliasList[] = $alias;
 
         return $alias;
@@ -827,7 +840,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
     /**
      * Change join type from LOUTER to INNER for all joins in aliases.
      *
-     * Similarly to promoteJoins(), this method must ensure no join chains
+     * Similarly to changeToOuterJoin(), this method must ensure no join chains
      * containing first an outer, then an inner
      * join are generated.
      * If we are demoting {A->C} join in chain {A LOUTER B LOUTER C} then we
@@ -847,10 +860,10 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         /* @var $parent Join */
         while ($aliases):
             $alias = array_pop($aliases);
-            $join = $this->tableAliasMap[$alias];
+            $join = $this->tableJoinsMap[$alias];
             if (LOUTER == $join->getJoinType()):
-                $this->tableAliasMap[$alias] = $join->demote();
-                $parent = $this->tableAliasMap[$join->getParentAlias()];
+                $this->tableJoinsMap[$alias] = $join->demote();
+                $parent = $this->tableJoinsMap[$join->getParentAlias()];
                 if (INNER == $parent->getJoinType()):
                     $aliases[] = $join->getParentAlias();
                 endif;
@@ -879,7 +892,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         /* @var $parent Join */
         while ($aliases):
             $alias = array_pop($aliases);
-            $join = $this->tableAliasMap[$alias];
+            $join = $this->tableJoinsMap[$alias];
 
             // for the first join this should be true because its not a join
             // but a basetable that will be used in the from part of the query
@@ -891,14 +904,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             assert(null !== $join->getJoinType());
 
             $parentAlias = $join->getParentAlias();
-            $parentIsOuter = ($parentAlias && LOUTER == $this->tableAliasMap[$parentAlias]->getJoinType());
+            $parentIsOuter = ($parentAlias && LOUTER == $this->tableJoinsMap[$parentAlias]->getJoinType());
             $aliasIsOuter = (LOUTER == $join->getJoinType());
 
             if (($join->getNullable() || $parentIsOuter) && !$aliasIsOuter):
-                $this->tableAliasMap[$alias] = $join->promote();
+                $this->tableJoinsMap[$alias] = $join->promote();
                 // since we have just change the join type of alias we need to update
                 // any thing else that refers to it
-                foreach ($this->tableAliasMap as $key => $join) :
+                foreach ($this->tableJoinsMap as $key => $join) :
                     if ($join->getParentAlias() == $alias &&
                         !ArrayHelper::hasKey($aliases, $key)
                     ):
@@ -988,7 +1001,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
 
         // we create a new alias
         if ($aliases):
-            $aliases[] = sprintf('%s%s', $tableName, count($this->tableAliasMap));
+            $aliases[] = sprintf('%s%s', $tableName, count($this->tableJoinsMap));
         else:
             $this->tableAlias[$tableName] = [$tableName];
         endif;
@@ -1033,7 +1046,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function addSelectRelected($fields = [])
+    public function addSelectRelected(array $fields)
     {
         if (is_bool($this->selectRelected)):
             $relatedFields = [];
@@ -1041,6 +1054,14 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
             $relatedFields = $this->selectRelected;
         endif;
 
+        // we need the path to follow
+        //
+        //array(
+        //  "order" => array(
+        //    "buyer" => array()
+        //  )
+        //  "product" => array()
+        //)
         foreach ($fields as $field) :
             $names = StringHelper::split(BaseLookup::$lookupPattern, $field);
             // we use by reference so that we assigned the values back to the original array
@@ -1191,7 +1212,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function isFilterable()
+    public function isFilterable(): bool
     {
         return empty($this->offset) && empty($this->limit);
     }
@@ -1234,7 +1255,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface
         $obj->aliasRefCount = $this->aliasRefCount;
         $obj->useDefaultCols = $this->useDefaultCols;
         $obj->tableAlias = $this->tableAlias;
-        $obj->tableAliasMap = $this->tableAliasMap;
+        $obj->tableJoinsMap = $this->tableJoinsMap;
         $obj->tablesAliasList = $this->tablesAliasList;
         $obj->select = $this->select;
         $obj->groupBy = $this->groupBy;

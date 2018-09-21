@@ -56,7 +56,6 @@ abstract class BaseLookup implements LookupInterface
     {
         $this->rhs = $rhs;
         $this->lhs = $lhs;
-
         $this->rhs = $this->prepareLookup();
     }
 
@@ -81,6 +80,7 @@ abstract class BaseLookup implements LookupInterface
     private static function getNomalizedValue($value, $lhs)
     {
         if ($value instanceof Model):
+            dump($lhs->getOutputField());
             $path = $lhs->getOutputField()->getPathInfo();
             $sources = end($path)['targetFields'];
 
@@ -90,7 +90,7 @@ abstract class BaseLookup implements LookupInterface
                 while (!$value instanceof $source->scopeModel && $source->relation):
                     $name = $source->relation->getName();
                     $source = $source->relation->getFromModel()
-                                               ->getMeta()->getField($name);
+                        ->getMeta()->getField($name);
                 endwhile;
 
                 try {
@@ -107,7 +107,8 @@ abstract class BaseLookup implements LookupInterface
     public function processLHS(
         CompilerInterface $compiler,
         ConnectionInterface $connection
-    ) {
+    )
+    {
         return $compiler->compile($this->lhs);
     }
 

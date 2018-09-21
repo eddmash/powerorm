@@ -33,7 +33,7 @@ class ClassHelperTest extends PowerormTest
     public function testGettingClassNameFromFile()
     {
         $classDir = '/var/www/public/ci306/application/migrations';
-        $file = $classDir.'/m0001_Initial.php';
+        $file = $classDir . '/m0001_Initial.php';
 
         $this->assertEquals('m0001_Initial', ClassHelper::getClassNameFromFile($file, $classDir));
     }

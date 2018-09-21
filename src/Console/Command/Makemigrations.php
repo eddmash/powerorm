@@ -39,9 +39,9 @@ class Makemigrations extends BaseCommand
         $issues = $loader->detectConflicts();
 
         if (!empty($issues)):
-            $message = '<error>The following migrations seem to indicate they'.
-                ' are both the latest migration :</error>'.PHP_EOL;
-            $message .= '  %s '.PHP_EOL;
+            $message = '<error>The following migrations seem to indicate they' .
+                ' are both the latest migration :</error>' . PHP_EOL;
+            $message .= '  %s ' . PHP_EOL;
             $output->writeln(
                 sprintf(
                     $message,
@@ -79,7 +79,8 @@ class Makemigrations extends BaseCommand
         $migrationChanges,
         InputInterface $input,
         OutputInterface $output
-    ) {
+    )
+    {
         /* @var $appMigration Migration */
         /* @var $op Operation */
 
@@ -89,7 +90,7 @@ class Makemigrations extends BaseCommand
 
                     $output->writeln(
                         sprintf(
-                            '<fg=green;options=bold>Migrations for '.
+                            '<fg=green;options=bold>Migrations for ' .
                             'the application "%s" :</>',
                             $component->getName()
                         )
@@ -142,14 +143,14 @@ class Makemigrations extends BaseCommand
     protected function configure()
     {
         $this->setName($this->guessCommandName())
-             ->setDescription($this->help)
-             ->setHelp($this->help)
-             ->addOption(
-                 'dry-run',
-                 null,
-                 InputOption::VALUE_NONE,
-                 'Just show what migrations would be made; don\'t actually write them.',
-                 null
-             );
+            ->setDescription($this->help)
+            ->setHelp($this->help)
+            ->addOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NONE,
+                'Just show what migrations would be made; don\'t actually write them.',
+                null
+            );
     }
 }

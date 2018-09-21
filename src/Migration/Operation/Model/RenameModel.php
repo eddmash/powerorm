@@ -6,8 +6,6 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
-use Eddmash\PowerOrm\Db\SchemaEditor;
-use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 class RenameModel extends ModelOperation

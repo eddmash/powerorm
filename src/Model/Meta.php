@@ -320,6 +320,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         return $this->fetchFields(['forward' => false]);
     }
 
+
     /**
      * Returns a list of all concrete fields on the model and its parents.
      *

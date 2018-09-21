@@ -32,31 +32,31 @@ class Migrate extends BaseCommand
     protected function configure()
     {
         $this->setName($this->guessCommandName())
-             ->setDescription($this->help)
-             ->setHelp($this->help)
-             ->addArgument(
-                 'app_label',
-                 InputArgument::OPTIONAL,
-                 'App label of the application containing'.
-                 ' the migration.'
-             )
-             ->addArgument(
-                 'migration_name',
-                 InputArgument::OPTIONAL,
-                 'Database state will be brought to the state after that migration. '.
-                 'Use the name "zero" to unapply all migrations.'
-             )
-             ->addOption(
-                 'fake',
-                 null,
-                 InputOption::VALUE_OPTIONAL,
-                 'Mark migrations as run without actually running them.',
-                 null
-             );
+            ->setDescription($this->help)
+            ->setHelp($this->help)
+            ->addArgument(
+                'app_label',
+                InputArgument::OPTIONAL,
+                'App label of the application containing' .
+                ' the migration.'
+            )
+            ->addArgument(
+                'migration_name',
+                InputArgument::OPTIONAL,
+                'Database state will be brought to the state after that migration. ' .
+                'Use the name "zero" to unapply all migrations.'
+            )
+            ->addOption(
+                'fake',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Mark migrations as run without actually running them.',
+                null
+            );
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return \Eddmash\PowerOrm\Exception\NotImplemented|void
@@ -100,7 +100,7 @@ class Migrate extends BaseCommand
                 } catch (AmbiguityError $e) {
                     throw new CommandError(
                         sprintf(
-                            "More than one migration matches '%s' in ".
+                            "More than one migration matches '%s' in " .
                             "app '%s'. Please be more specific.",
                             $name,
                             $appLabel
@@ -109,7 +109,7 @@ class Migrate extends BaseCommand
                 } catch (KeyError $e) {
                     throw new CommandError(
                         sprintf(
-                            "Cannot find a migration matching '%s' ".
+                            "Cannot find a migration matching '%s' " .
                             "from app '%s'. Is App registered with the ORM ?",
                             $name,
                             $appLabel
@@ -166,13 +166,13 @@ class Migrate extends BaseCommand
             if (!empty($changes)):
 
                 $output->writeln(
-                    '<warning>  Your models have changes that are not yet reflected '.
+                    '<warning>  Your models have changes that are not yet reflected ' .
                     "in a migration, and so won't be applied.</warning>"
                 );
 
                 $output->writeln(
-                    "<warning>  Run 'php pmanager.php makemigrations' ".
-                    'to make new migrations, and then re-run '.
+                    "<warning>  Run 'php pmanager.php makemigrations' " .
+                    'to make new migrations, and then re-run ' .
                     "'php pmanager.php migrate' to apply them.</warning>"
                 );
 

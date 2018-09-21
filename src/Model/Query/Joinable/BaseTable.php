@@ -36,7 +36,8 @@ class BaseTable extends BaseJoin
         endif;
         $tableName = $this->getTableName();
 
-        return [sprintf('%s %s', $tableName, $tableAlias), []];
+        $quoteCallback = $compiler->quoteUnlessAliasCallback();
+        return [sprintf('%s %s', $quoteCallback($tableName), $tableAlias), []];
     }
 
     public function equal($item)

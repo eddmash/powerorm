@@ -212,8 +212,21 @@ class ForeignObjectRel extends BaseObject
         return !empty($this->relatedName) && '+' === substr($this->relatedName, -1);
     }
 
-    //    public function __toString()
-    //    {
-    //        return sprintf('<%s %s>', static::class, $this->toModel->getMeta()->modelName);
-    //    }
+
+    public function __debugInfo()
+    {
+
+        return [
+            'to' => is_string($this->toModel) ? $this->toModel : $this->toModel->getMeta()->getNSModelName(),
+            'fromField' => $this->fromField->getName(),
+            'relatedName' => $this->relatedName,
+            'relatedQueryName' => $this->relatedQueryName,
+            'autoCreated' => $this->autoCreated,
+            'null' => $this->null,
+            'name' => $this->name,
+            'isRelation' => $this->isRelation,
+            'scopeModel' => $this->fromField->scopeModel->getMeta()->getNSModelName(),
+
+        ];
+    }
 }

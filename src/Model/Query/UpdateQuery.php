@@ -48,7 +48,7 @@ class UpdateQuery extends Query
             if (!$isDirect || ($field->isRelation && $field->manyToMany)):
                 throw new  FieldError(
                     sprintf(
-                        'Cannot update model field %r (only non-relations and '.
+                        'Cannot update model field %r (only non-relations and ' .
                         'foreign keys permitted).',
                         $field
                     )

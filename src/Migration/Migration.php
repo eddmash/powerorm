@@ -11,8 +11,8 @@
 namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Components\AppComponent;
 use Eddmash\PowerOrm\Components\AppInterface;
-use Eddmash\PowerOrm\Components\Application;
 use Eddmash\PowerOrm\Db\SchemaEditor;
 use Eddmash\PowerOrm\Exception\CommandError;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
@@ -27,7 +27,7 @@ use Eddmash\PowerOrm\Migration\State\ProjectState;
  *
  * It will have one or more of the following attributes:
  * - getOperations: A list of Operation instances, probably from Eddmash\PowerOrm\Migration\Migration\Operation.
- * - getDependency: A list of tuples of (app_path, migration_name)
+ * - getDependency: A list of array of [app_path, migration_name]
  *
  * Note that all migrations come out of migrations and into the Loader or Graph as instances, having been
  * initialized with their app name.
@@ -177,7 +177,7 @@ class Migration implements MigrationInterface
 
             if (!$operation->isReducibleToSql()):
                 $schemaEditor->addSql(
-                    '-- MIGRATION NOW PERFORMS'.
+                    '-- MIGRATION NOW PERFORMS' .
                     ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
                 );
             endif;
@@ -282,7 +282,7 @@ class Migration implements MigrationInterface
 
                 if (!$operation->isReducibleToSql()):
                     $schemaEditor->addSql(
-                        '-- MIGRATION NOW PERFORMS'.
+                        '-- MIGRATION NOW PERFORMS' .
                         ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
                     );
                 endif;
@@ -319,7 +319,7 @@ class Migration implements MigrationInterface
      * mutated state from a copy.
      *
      * @param ProjectState $state
-     * @param bool|true    $preserveState
+     * @param bool|true $preserveState
      *
      * @return mixed
      *
@@ -380,7 +380,7 @@ class Migration implements MigrationInterface
     }
 
     /**
-     * @param $app Application
+     * @param $app AppComponent
      *
      * @return string
      */

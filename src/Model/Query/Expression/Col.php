@@ -41,11 +41,12 @@ class Col extends BaseExpression
 
     public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
+        $quoteCallback = $compiler->quoteUnlessAliasCallback();
         return [
             sprintf(
                 '%s.%s',
-                $this->alias,
-                $this->targetField->getColumnName()
+                $quoteCallback($this->alias),
+                $quoteCallback($this->targetField->getColumnName())
             ),
             [],
         ];
@@ -85,5 +86,17 @@ class Col extends BaseExpression
     public function getGroupByCols()
     {
         return [$this];
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __debugInfo()
+    {
+        return [
+            'alias' => $this->alias,
+            'targetField' => $this->targetField
+        ];
     }
 }

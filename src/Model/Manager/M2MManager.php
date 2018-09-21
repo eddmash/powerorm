@@ -138,7 +138,7 @@ class M2MManager extends BaseM2MManager
 
             throw new AttributeError(
                 sprintf(
-                    'Cannot use remove() on a ManyToManyField which specifies '.
+                    'Cannot use remove() on a ManyToManyField which specifies ' .
                     "an intermediary model. Use %s's Manager instead.",
                     $meta->getNSModelName()
                 )
