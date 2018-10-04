@@ -18,7 +18,7 @@ before_script:
 - sudo mysql -e "use mysql;update user set plugin='mysql_native_password';"
 - sudo mysql -e "use mysql;FLUSH PRIVILEGES;"
 - sudo mysql_upgrade -u root -proot
-- sudo mysql -e "create database powerormtest;"
+- sudo mysql -u root -proot -e "create database powerormtest;"
 - sudo service mysql restart
 - composer install
 
