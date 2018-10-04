@@ -5,7 +5,21 @@ php:
 - 7.0
 - 7.1
 
+addons:
+  apt:
+    sources:
+      - mysql-5.7-trusty
+    packages:
+      - mysql-server
+      - mysql-client
+
 before_script:
+- sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where user='root';"
+- sudo mysql -e "update user set plugin='mysql_native_password';"
+- sudo mysql -e "FLUSH PRIVILEGES;"
+- sudo mysql_upgrade -u root -proot
+- sudo mysql -e "create database powerormtest;"
+- sudo service mysql restart
 - composer install
 
 script:
