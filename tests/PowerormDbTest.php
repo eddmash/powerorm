@@ -16,7 +16,7 @@ use Eddmash\PowerOrm\Tests\TestApp\Test;
 use PHPUnit\DbUnit\TestCase;
 use PHPUnit\DbUnit\TestCaseTrait;
 
-class PowerormDbTest extends TestCase
+abstract class PowerormDbTest extends TestCase
 {
     use TestCaseTrait;
 
@@ -26,10 +26,6 @@ class PowerormDbTest extends TestCase
     // only instantiate PHPUnit_Extensions_Database_DB_IDatabaseConnection once per test
     private $conn = null;
 
-    /**
-     * @var ConnectionInterface
-     */
-    protected $dbConnection;
 
     protected function setUp(): void
     {
@@ -49,7 +45,6 @@ class PowerormDbTest extends TestCase
                 ]
             )
         );
-        $this->dbConnection = BaseOrm::getDbConnection();
     }
 
     /**
@@ -77,7 +72,7 @@ class PowerormDbTest extends TestCase
 
     private function queryAsSql(Query $query)
     {
-        $compiler = $query->getSqlCompiler($this->dbConnection);
+        $compiler = $query->getSqlCompiler($this->getDbConnection());
         $compiler->quotable = false;
         return $compiler->asSql();
     }
@@ -88,5 +83,10 @@ class PowerormDbTest extends TestCase
 
         $this->assertEquals(trim($sql), $expected[0]);
         $this->assertEquals($params, $expected[1]);
+    }
+
+    public function getDbConnection()
+    {
+        return BaseOrm::getDbConnection();
     }
 }

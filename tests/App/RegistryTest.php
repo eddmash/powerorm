@@ -28,12 +28,16 @@ class RegistryTest extends PowerormTest
                 BASEPATH.'/tests/TestApp/Models/Author.php',
                 BASEPATH.'/tests/TestApp/Models/Book.php',
                 BASEPATH.'/tests/TestApp/Models/NotAModel.php',
+                BASEPATH.'/tests/TestApp/Models/Order.php',
+                BASEPATH.'/tests/TestApp/Models/OrderItem.php',
+                BASEPATH.'/tests/TestApp/Models/Product.php',
+                BASEPATH.'/tests/TestApp/Models/User.php',
             ],
             $files[$name]
         );
     }
 
-    public function testAllModelsWithoutAutoCreated()
+    public function testAllModelsWithoutAutoCreatedExcluded()
     {
         $classes = BaseOrm::getRegistry()->getModels(
             false,
@@ -43,12 +47,16 @@ class RegistryTest extends PowerormTest
             [
                 "Eddmash\PowerOrm\Tests\TestApp\Models\Author",
                 "Eddmash\PowerOrm\Tests\TestApp\Models\Book",
+                "Eddmash\PowerOrm\Tests\TestApp\Models\Order",
+                "Eddmash\PowerOrm\Tests\TestApp\Models\OrderItem",
+                "Eddmash\PowerOrm\Tests\TestApp\Models\Product",
+                "Eddmash\PowerOrm\Tests\TestApp\Models\User",
             ],
             array_keys($classes)
         );
     }
 
-    public function testAllModelsWithAutoCreated()
+    public function testAllModelsWithAutoCreatedIncluded()
     {
         $classes = BaseOrm::getRegistry()->getModels(
             true,
@@ -59,6 +67,10 @@ class RegistryTest extends PowerormTest
                 "Eddmash\PowerOrm\Tests\TestApp\Models\Author",
                 'Book_author',
                 "Eddmash\PowerOrm\Tests\TestApp\Models\Book",
+                "Eddmash\PowerOrm\Tests\TestApp\Models\Order",
+                "Eddmash\PowerOrm\Tests\TestApp\Models\OrderItem",
+                "Eddmash\PowerOrm\Tests\TestApp\Models\Product",
+                "Eddmash\PowerOrm\Tests\TestApp\Models\User",
             ],
             array_keys($classes)
         );

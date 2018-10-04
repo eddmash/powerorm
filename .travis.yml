@@ -23,3 +23,4 @@ before_script:
 
 script:
 - vendor/phpunit/phpunit/phpunit
+- vendor/phpunit/phpunit/phpunit --configuration tests/mysqlconf.xml
