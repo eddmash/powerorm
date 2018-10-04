@@ -52,33 +52,32 @@ class RelatedMappers
 
         $this->initList = [];
 
-        if (!$fromParent):
-
+        if (!$fromParent) {
             $this->colStart = reset($selectFields);
             $this->colsEnd = count($selectFields);
 
             /* @var $col Col */
-            foreach (array_slice($select, $this->colStart, $this->colsEnd) as $colInfo) :
+            foreach (array_slice($select, $this->colStart, $this->colsEnd) as $colInfo) {
                 $col = $colInfo[0];
                 $this->initList[] = $col->getTargetField()->getAttrName();
-            endforeach;
-        else:
+            }
+        } else {
             // todo map from parent fields
-        endif;
+        }
 
         /** @var $field Field */
         $field = ArrayHelper::getValue($klassInfo, 'field');
 
         $reverse = ArrayHelper::getValue($klassInfo, 'reverse');
-        if ($reverse):
+        if ($reverse) {
             $this->cacheName = $field->relation->getCacheName();
             $this->reverseCacheName = $field->getCacheName();
-        else:
+        } else {
             $this->cacheName = $field->getCacheName();
-            if ($field->isUnique()):
+            if ($field->isUnique()) {
                 $this->reverseCacheName = $field->relation->getCacheName();
-            endif;
-        endif;
+            }
+        }
     }
 
     public function populate($row, Model $fromObj)
@@ -89,17 +88,17 @@ class RelatedMappers
         $relObj = $model::fromDb($this->connection, $this->initList, $vals);
 
         // populate its related objects if any
-        if ($relObj && $this->relatedPopulators):
-            foreach ($this->relatedPopulators as $relatedPopulator) :
+        if ($relObj && $this->relatedPopulators) {
+            foreach ($this->relatedPopulators as $relatedPopulator) {
                 $relatedPopulator->populate($row, $relObj);
-            endforeach;
-        endif;
+            }
+        }
 
         // set on the original model
         $fromObj->{$this->cacheName} = $relObj;
         // the cache the original object on the related object
-        if ($relObj && $this->reverseCacheName):
+        if ($relObj && $this->reverseCacheName) {
             $relObj->{$this->reverseCacheName} = $fromObj;
-        endif;
+        }
     }
 }

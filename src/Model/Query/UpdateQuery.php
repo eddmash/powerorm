@@ -41,26 +41,26 @@ class UpdateQuery extends Query
     public function addUpdateValues($values)
     {
         $valuesSeq = [];
-        foreach ($values as $name => $value) :
+        foreach ($values as $name => $value) {
             $field = $this->model->getMeta()->getField($name);
             $model = $field->scopeModel->getMeta()->getConcreteModel();
             $isDirect = (!($field->autoCreated && !$field->concrete) || !$field->concrete);
-            if (!$isDirect || ($field->isRelation && $field->manyToMany)):
+            if (!$isDirect || ($field->isRelation && $field->manyToMany)) {
                 throw new  FieldError(
                     sprintf(
-                        'Cannot update model field %r (only non-relations and ' .
+                        'Cannot update model field %r (only non-relations and '.
                         'foreign keys permitted).',
                         $field
                     )
                 );
-            endif;
-            if ($model->getMeta()->getModelName() !== $this->model->getMeta()->getModelName()):
+            }
+            if ($model->getMeta()->getModelName() !== $this->model->getMeta()->getModelName()) {
                 $this->addRelatedUpdate($model, $field, $value);
 
                 continue;
-            endif;
+            }
             $valuesSeq[] = [$field, $model, $value];
-        endforeach;
+        }
 
         return $this->addUpdateFields($valuesSeq);
     }

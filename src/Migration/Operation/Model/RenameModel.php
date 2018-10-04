@@ -36,6 +36,4 @@ class RenameModel extends ModelOperation
     {
         return sprintf('Rename model %s to %s', $this->oldName, $this->newName);
     }
-
-
 }

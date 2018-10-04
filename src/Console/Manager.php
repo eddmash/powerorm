@@ -51,18 +51,16 @@ class Manager extends Base
 
         $comands = [];
 
-        foreach ($components as $component) :
-
-            foreach ($component->getCommands() as $command) :
-                if (is_object($command) && $command instanceof BaseCommand):
+        foreach ($components as $component) {
+            foreach ($component->getCommands() as $command) {
+                if (is_object($command) && $command instanceof BaseCommand) {
                     $comands[] = $command;
-                endif;
-                if (is_string($command)):
+                }
+                if (is_string($command)) {
                     $comands[] = new $command();
-                endif;
-            endforeach;
-
-        endforeach;
+                }
+            }
+        }
 
         return $comands;
     }
@@ -70,17 +68,16 @@ class Manager extends Base
     public function getDefaultCommands()
     {
         $commands = [];
-        foreach ($this->defaultCommandsPaths as $path) :
+        foreach ($this->defaultCommandsPaths as $path) {
             $files = (new FileHandler($path))->readDir();
-            foreach ($files as $file) :
+            foreach ($files as $file) {
                 $command = basename($file, '.php');
-                if ('BaseCommand' === $command):
+                if ('BaseCommand' === $command) {
                     continue;
-                endif;
+                }
                 $commands[] = $this->fetchCommand($command);
-            endforeach;
-
-        endforeach;
+            }
+        }
 
         return $commands;
     }
@@ -108,33 +105,32 @@ class Manager extends Base
         $file = null;
         $packageName = null;
 
-        foreach ($this->defaultCommandsPaths as $package => $path) :
+        foreach ($this->defaultCommandsPaths as $package => $path) {
             $file_handler = new FileHandler($path);
 
             $file = $file_handler->getFile($name);
-            if (false !== $file):
+            if (false !== $file) {
                 $packageName = $package;
 
                 break;
-            endif;
-        endforeach;
+            }
+        }
 
-        if (false === $file):
+        if (false === $file) {
             $this->error(
                 sprintf(
-                    'Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?' . PHP_EOL,
+                    'Unknown command: ` %1$s`. Does the file exists `%2$s/%1$s.php` ?'.PHP_EOL,
                     $name,
                     $this->defaultCommandsPaths
                 )
             );
             $message = $this->ansiFormat(sprintf('php %s.php help', $this->managerName), Console::FG_YELLOW);
-            $this->normal(sprintf('Type %s for usage.' . PHP_EOL, $message));
-
-        endif;
+            $this->normal(sprintf('Type %s for usage.'.PHP_EOL, $message));
+        }
 
         // commands are in the commands namespace
         /** @var $className BaseCommand */
-        $className = ClassHelper::getFormatNamespace($packageName) . 'Console\Command\\' . $name;
+        $className = ClassHelper::getFormatNamespace($packageName).'Console\Command\\'.$name;
 
         return new $className();
     }
@@ -161,10 +157,9 @@ class Manager extends Base
         self::warningText($output);
         self::errorText($output);
 
-        if ($autoRun) :
-
+        if ($autoRun) {
             $console->run($input, $output);
-        endif;
+        }
 
         return $console;
     }

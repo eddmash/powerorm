@@ -279,10 +279,9 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     {
         ClassHelper::setAttributes($this, $config, ['rel' => 'relation']);
 
-        if (null !== $this->relation):
-
+        if (null !== $this->relation) {
             $this->isRelation = true;
-        endif;
+        }
     }
 
     /**
@@ -303,7 +302,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model $modelObject
+     * @param Model  $modelObject
      *
      * @throws FieldError
      *
@@ -313,7 +312,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      */
     public function contributeToClass($fieldName, $modelObject)
     {
-        if (!StringHelper::isValidVariableName($fieldName)):
+        if (!StringHelper::isValidVariableName($fieldName)) {
             throw new FieldError(
                 sprintf(
                     ' "%s" is not a valid field name on the model "%s" .',
@@ -321,7 +320,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
                     $modelObject->getFullClassName()
                 )
             );
-        endif;
+        }
 
         $this->scopeModel = $modelObject;
         $this->setFromName($fieldName);
@@ -340,13 +339,13 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      */
     public function setFromName($fieldName)
     {
-        if (empty($this->name)):
+        if (empty($this->name)) {
             $this->name = $fieldName;
-        endif;
+        }
         $this->attrName = $this->getAttrName();
         $this->concrete = false === empty($this->getColumnName());
 
-        if (empty($this->verboseName)):
+        if (empty($this->verboseName)) {
             $this->verboseName = ucwords(
                 str_replace(
                     '_',
@@ -354,7 +353,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
                     $this->name
                 )
             );
-        endif;
+        }
     }
 
     /**
@@ -411,13 +410,13 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
 
     public function getDefault()
     {
-        if ($this->hasDefault()):
-            if (is_callable($this->default)):
+        if ($this->hasDefault()) {
+            if (is_callable($this->default)) {
                 return call_user_func($this->default);
-            endif;
+            }
 
             return $this->default;
-        endif;
+        }
 
         return '';
     }
@@ -434,7 +433,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     {
         $errors = [];
 
-        if (!StringHelper::isValidVariableName($this->name)):
+        if (!StringHelper::isValidVariableName($this->name)) {
             $errors = [
                 CheckError::createObject(
                     [
@@ -449,7 +448,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
                     ]
                 ),
             ];
-        endif;
+        }
 
         return $errors;
     }
@@ -475,10 +474,10 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         if (StringHelper::startsWith(
             static::class,
             'Eddmash\PowerOrm\Model\Field'
-        )):
+        )) {
             $path = 'Eddmash\PowerOrm\Model\Model';
             $name = sprintf('Model::%s', $this->getShortClassName());
-        endif;
+        }
 
         return [
             'constructorArgs' => $this->getConstructorArgs(),
@@ -508,15 +507,13 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
             'choices' => [],
         ];
 
-        foreach ($defaults as $name => $default) :
+        foreach ($defaults as $name => $default) {
             $value = ($this->hasProperty($name)) ? $this->{$name} : $default;
 
-            if ($value !== $default):
-
+            if ($value !== $default) {
                 $constArgs[$name] = $value;
-
-            endif;
-        endforeach;
+            }
+        }
 
         return $constArgs;
     }
@@ -584,13 +581,13 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
             false == $opts['include_blank'] : true;
 
         $first_choice = [];
-        if ($include_blank_dash):
+        if ($include_blank_dash) {
             $first_choice = self::BLANK_CHOICE_DASH;
-        endif;
+        }
 
-        if (!empty($this->choices)):
+        if (!empty($this->choices)) {
             return array_merge($first_choice, $this->choices);
-        endif;
+        }
 
         // load from relationships todo
     }
@@ -610,7 +607,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * The attribute name is in $this->getAttrName() (this is set up by OgrField).
      *
      * @param Model $model
-     * @param bool $add is whether the instance is being saved to the database
+     * @param bool  $add   is whether the instance is being saved to the database
      *                     for the first time
      *
      * @return mixed
@@ -656,7 +653,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * By default it returns value passed in if prepared=true and
      * prepareValue() if is False.
      *
-     * @param mixed $value
+     * @param mixed               $value
      * @param ConnectionInterface $connection
      *
      * @return mixed
@@ -669,9 +666,9 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      */
     public function convertToDatabaseValue($value, $connection, $prepared = false)
     {
-        if (false === $prepared):
+        if (false === $prepared) {
             $value = $this->prepareValue($value);
-        endif;
+        }
 
         return Type::getType($this->dbType($connection))
             ->convertToDatabaseValue(
@@ -723,8 +720,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         ConnectionInterface $connection,
         $value,
         $expression
-    )
-    {
+    ) {
         return $value;
     }
 
@@ -752,10 +748,9 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         if (StringHelper::startsWith(
             $fieldName,
             "Eddmash\PowerOrm\Model\Field"
-        )):
-
+        )) {
             $fieldName = $this->getShortClassName();
-        endif;
+        }
 
         return sprintf(
             '< %s : %s (%s)>',
@@ -789,14 +784,14 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      */
     public function getColExpression($alias, $outputField = null)
     {
-        if (is_null($outputField)):
+        if (is_null($outputField)) {
             $outputField = $this;
-        endif;
+        }
 
         if ($alias !== $this->scopeModel->getMeta()->getDbTable() &&
-            $outputField->name !== $this->name):
+            $outputField->name !== $this->name) {
             return Col::createObject($alias, $this, $outputField);
-        endif;
+        }
 
         return Col::createObject($alias, $this);
     }
@@ -828,9 +823,9 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     {
         $descriptor = $this->descriptor;
 
-        if (is_null($this->descriptorInstance)):
+        if (is_null($this->descriptorInstance)) {
             $this->descriptorInstance = new $descriptor($this);
-        endif;
+        }
 
         return $this->descriptorInstance;
     }
@@ -855,10 +850,10 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     public function __debugInfo()
     {
         $meta = parent::__debugInfo();
-        if ($this->scopeModel):
+        if ($this->scopeModel) {
             $meta['scopeModel'] = $this->scopeModel->getMeta()
                 ->getNSModelName();
-        endif;
+        }
 
         return $meta;
     }

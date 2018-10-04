@@ -30,12 +30,12 @@ class Range extends BaseLookup
     /**@inheritdoc */
     public function processRHS(CompilerInterface $compiler, ConnectionInterface $connection)
     {
-        if ($this->valueIsDirect()):
+        if ($this->valueIsDirect()) {
             $element = count($this->rhs);
             $placeholders = array_fill(null, $element, '?');
 
             return [$placeholders, $this->prepareLookupForDb($this->rhs, $connection)];
-        endif;
+        }
 
         return parent::processRHS($compiler, $connection);
     }

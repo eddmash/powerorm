@@ -30,13 +30,14 @@ class In extends BaseLookup
     /**@inheritdoc */
     public function processRHS(CompilerInterface $compiler, ConnectionInterface $connection)
     {
-        if ($this->valueIsDirect()):
+        if ($this->valueIsDirect()) {
             $element = count($this->rhs);
             $placeholders = implode(', ', array_fill(null, $element, '?'));
 
-            return [sprintf('(%s)', $placeholders), $this->prepareLookupForDb($this->rhs, $connection)];
-        else:
+            return [sprintf('(%s)', $placeholders),
+                $this->prepareLookupForDb($this->rhs, $connection), ];
+        } else {
             return parent::processRHS($compiler, $connection);
-        endif;
+        }
     }
 }

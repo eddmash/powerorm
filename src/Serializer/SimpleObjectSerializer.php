@@ -40,21 +40,21 @@ class SimpleObjectSerializer implements SerializerInterface
         $this->selectedFields = $fields;
         $this->startSerialization();
 
-        if (!is_array($items) && !$items instanceof Queryset):
+        if (!is_array($items) && !$items instanceof Queryset) {
             $items = [$items];
-        endif;
+        }
         /** @var $item Model */
-        foreach ($items as $item) :
+        foreach ($items as $item) {
             $this->startObject($item);
             $concreteModel = $item->getMeta()->getConcreteModel();
             $localFields = $concreteModel->getMeta()->localFields;
-            foreach ($localFields as $field) :
-                if ($field->isSerializable()):
-                    if (!$field->isRelation):
+            foreach ($localFields as $field) {
+                if ($field->isSerializable()) {
+                    if (!$field->isRelation) {
                         if (empty($this->selectedFields) ||
-                            in_array($field->getAttrName(), $this->selectedFields)):
+                            in_array($field->getAttrName(), $this->selectedFields)) {
                             $this->handleField($item, $field);
-                        else:
+                        } else {
                             // instead of user_id we need user
                             $name = substr(
                                 $field->getAttrName(),
@@ -62,24 +62,24 @@ class SimpleObjectSerializer implements SerializerInterface
                                 -3
                             );
                             if (empty($this->selectedFields) ||
-                                in_array($name, $this->selectedFields)):
+                                in_array($name, $this->selectedFields)) {
                                 $this->handleForeignField($item, $field);
-                            endif;
-                        endif;
-                    endif;
-                endif;
-            endforeach;
+                            }
+                        }
+                    }
+                }
+            }
             $m2mFields = $concreteModel->getMeta()->localManyToMany;
-            foreach ($m2mFields as $m2mField) :
-                if ($m2mField->isSerializable()):
+            foreach ($m2mFields as $m2mField) {
+                if ($m2mField->isSerializable()) {
                     if (empty($this->selectedFields) ||
-                        in_array($m2mField->getAttrName(), $this->selectedFields)):
+                        in_array($m2mField->getAttrName(), $this->selectedFields)) {
                         $this->handleM2MField($item, $m2mField);
-                    endif;
-                endif;
-            endforeach;
+                    }
+                }
+            }
             $this->endObject($item);
-        endforeach;
+        }
 
         $this->endSerialization();
 
@@ -104,16 +104,16 @@ class SimpleObjectSerializer implements SerializerInterface
     {
         $vals = [];
         /** @var $field ManyToManyField */
-        if ($field->relation->through->getMeta()->autoCreated):
+        if ($field->relation->through->getMeta()->autoCreated) {
             //todo handle natuaral keys
             $m2mValues = function (Model $model) {
                 return $model->getPkValue();
             };
 
-            foreach ($model->{$field->getName()}->all() as $item) :
+            foreach ($model->{$field->getName()}->all() as $item) {
                 $vals[] = $m2mValues($item);
-            endforeach;
-        endif;
+            }
+        }
         $this->_fields[$field->getName()] = $vals;
     }
 

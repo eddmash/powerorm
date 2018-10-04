@@ -37,13 +37,13 @@ class Migrate extends BaseCommand
             ->addArgument(
                 'app_label',
                 InputArgument::OPTIONAL,
-                'App label of the application containing' .
+                'App label of the application containing'.
                 ' the migration.'
             )
             ->addArgument(
                 'migration_name',
                 InputArgument::OPTIONAL,
-                'Database state will be brought to the state after that migration. ' .
+                'Database state will be brought to the state after that migration. '.
                 'Use the name "zero" to unapply all migrations.'
             )
             ->addOption(
@@ -56,7 +56,7 @@ class Migrate extends BaseCommand
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return \Eddmash\PowerOrm\Exception\NotImplemented|void
@@ -76,11 +76,11 @@ class Migrate extends BaseCommand
         $appLabel = $input->getArgument('app_label');
         $name = $input->getArgument('migration_name');
 
-        if ($input->getOption('fake')):
+        if ($input->getOption('fake')) {
             $fake = true;
-        else:
+        } else {
             $fake = false;
-        endif;
+        }
 
         $connection = BaseOrm::getDbConnection();
         $registry = BaseOrm::getRegistry();
@@ -88,10 +88,10 @@ class Migrate extends BaseCommand
         $executor = Executor::createObject($connection);
         $targets = [];
         // target migrations to act on
-        if ($appLabel && $name):
-            if ('zero' == $name):
+        if ($appLabel && $name) {
+            if ('zero' == $name) {
                 $targets[$appLabel] = $name;
-            else:
+            } else {
                 try {
                     $migration = $executor->loader->getMigrationByPrefix(
                         $appLabel,
@@ -100,7 +100,7 @@ class Migrate extends BaseCommand
                 } catch (AmbiguityError $e) {
                     throw new CommandError(
                         sprintf(
-                            "More than one migration matches '%s' in " .
+                            "More than one migration matches '%s' in ".
                             "app '%s'. Please be more specific.",
                             $name,
                             $appLabel
@@ -109,7 +109,7 @@ class Migrate extends BaseCommand
                 } catch (KeyError $e) {
                     throw new CommandError(
                         sprintf(
-                            "Cannot find a migration matching '%s' " .
+                            "Cannot find a migration matching '%s' ".
                             "from app '%s'. Is App registered with the ORM ?",
                             $name,
                             $appLabel
@@ -117,32 +117,32 @@ class Migrate extends BaseCommand
                     );
                 }
                 $targets[$migration->getAppLabel()] = $migration->getName();
-            endif;
-        elseif ($appLabel):
+            }
+        } elseif ($appLabel) {
             $migratedApps = $executor->loader->getMigratedApps();
 
-            if (!in_array($appLabel, $migratedApps)):
+            if (!in_array($appLabel, $migratedApps)) {
                 throw new CommandError(
                     sprintf(
                         "App '%s' does not have migrations.",
                         $appLabel
                     )
                 );
-            endif;
+            }
             $leaves = $executor->loader->graph->getLeafNodes();
-            foreach ($leaves as $app => $appLeaves) :
-                if ($appLabel == $app):
+            foreach ($leaves as $app => $appLeaves) {
+                if ($appLabel == $app) {
                     $targets[$app] = $appLeaves[0];
                     break;
-                endif;
-            endforeach;
-        else:
+                }
+            }
+        } else {
             $leaves = $executor->loader->graph->getLeafNodes();
 
-            foreach ($leaves as $app => $appLeaves) :
+            foreach ($leaves as $app => $appLeaves) {
                 $targets[$app] = $appLeaves[0];
-            endforeach;
-        endif;
+            }
+        }
 
         // get migration plan
         $plan = $executor->getMigrationPlan($targets);
@@ -151,7 +151,7 @@ class Migrate extends BaseCommand
 
         $output->writeln('<comment>Running migrations:</comment>');
 
-        if (empty($plan)):
+        if (empty($plan)) {
             $output->writeln('  No migrations to apply.');
 
             //detect if we need to make migrations
@@ -163,25 +163,22 @@ class Migrate extends BaseCommand
 
             $changes = $auto_detector->getChanges($executor->loader->graph);
 
-            if (!empty($changes)):
-
+            if (!empty($changes)) {
                 $output->writeln(
-                    '<warning>  Your models have changes that are not yet reflected ' .
+                    '<warning>  Your models have changes that are not yet reflected '.
                     "in a migration, and so won't be applied.</warning>"
                 );
 
                 $output->writeln(
-                    "<warning>  Run 'php pmanager.php makemigrations' " .
-                    'to make new migrations, and then re-run ' .
+                    "<warning>  Run 'php pmanager.php makemigrations' ".
+                    'to make new migrations, and then re-run '.
                     "'php pmanager.php migrate' to apply them.</warning>"
                 );
-
-            endif;
-        else:
+            }
+        } else {
             // migrate
             $executor->migrate($targets, $plan, $fake);
-
-        endif;
+        }
 
         BaseOrm::signalDispatch('powerorm.migration.post_migrate');
     }

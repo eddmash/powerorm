@@ -31,9 +31,9 @@ class BaseTable extends BaseJoin
     public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         $tableAlias = '';
-        if ($this->getTableName() !== $this->getTableAlias()):
+        if ($this->getTableName() !== $this->getTableAlias()) {
             $tableAlias = sprintf('%s', $this->getTableAlias());
-        endif;
+        }
         $tableName = $this->getTableName();
 
         $quoteCallback = $compiler->quoteUnlessAliasCallback();
@@ -42,10 +42,10 @@ class BaseTable extends BaseJoin
 
     public function equal($item)
     {
-        if ($item instanceof static):
+        if ($item instanceof static) {
             return
                 $this->tableName == $item->tableName;
-        endif;
+        }
 
         return false;
     }

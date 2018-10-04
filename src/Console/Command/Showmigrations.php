@@ -27,7 +27,7 @@ class Showmigrations extends BaseCommand
 
         $leaves = $loader->graph->getLeafNodes();
 
-        foreach ($leaves as $appName => $appLeaves) :
+        foreach ($leaves as $appName => $appLeaves) {
             $leaf = $appLeaves[0];
             $list = $loader->graph->getAncestryTree($appName, $leaf);
 
@@ -38,30 +38,29 @@ class Showmigrations extends BaseCommand
                 )
             );
 
-            foreach ($list as $item => $itemApp) :
-                if ($itemApp != $appName):
+            foreach ($list as $item => $itemApp) {
+                if ($itemApp != $appName) {
                     continue;
-                endif;
+                }
 
                 $itemArr = explode('\\', $item);
                 $migrationName = array_pop($itemArr);
 
-                if (!empty($loader->appliedMigrations[$itemApp][$item])):
+                if (!empty($loader->appliedMigrations[$itemApp][$item])) {
                     $indicator = '<info>(applied)</info>';
-                else:
+                } else {
                     $indicator = '<fg=yellow>(pending)</>';
-                endif;
+                }
                 $output->writeln(
-                    str_pad(' ', 2, ' ') .
+                    str_pad(' ', 2, ' ').
                     sprintf(
                         '%1$s %2$s',
                         $indicator,
                         $migrationName
                     )
                 );
-
-            endforeach;
-        endforeach;
+            }
+        }
     }
 
     /**

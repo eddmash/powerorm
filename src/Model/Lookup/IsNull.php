@@ -28,9 +28,9 @@ class IsNull extends BaseLookup
 
         $rhs_sql = 'IS NULL';
 
-        if (!$this->rhs):
+        if (!$this->rhs) {
             $rhs_sql = 'IS NOT NULL';
-        endif;
+        }
 
         return [sprintf('%s %s', $lhs_sql, $rhs_sql), $params];
     }

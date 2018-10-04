@@ -87,7 +87,7 @@ class DecimalField extends Field
      */
     private function decimalPlacesCheck()
     {
-        if (empty($this->decimalPlaces)):
+        if (empty($this->decimalPlaces)) {
             return [
                 CheckError::createObject(
                     [
@@ -98,8 +98,8 @@ class DecimalField extends Field
                     ]
                 ),
             ];
-        endif;
-        if (!is_numeric($this->decimalPlaces) || $this->decimalPlaces < 0):
+        }
+        if (!is_numeric($this->decimalPlaces) || $this->decimalPlaces < 0) {
             return [
                 CheckError::createObject(
                     [
@@ -113,7 +113,7 @@ class DecimalField extends Field
                     ]
                 ),
             ];
-        endif;
+        }
 
         return [];
     }
@@ -125,7 +125,7 @@ class DecimalField extends Field
      */
     private function checkMaxDigits()
     {
-        if (empty($this->maxDigits)):
+        if (empty($this->maxDigits)) {
             return [
                 CheckError::createObject(
                     [
@@ -136,9 +136,9 @@ class DecimalField extends Field
                     ]
                 ),
             ];
-        endif;
+        }
 
-        if (!is_numeric($this->maxDigits) || $this->maxDigits < 0):
+        if (!is_numeric($this->maxDigits) || $this->maxDigits < 0) {
             return [
                 CheckError::createObject(
                     [
@@ -152,10 +152,10 @@ class DecimalField extends Field
                     ]
                 ),
             ];
-        endif;
+        }
 
         // ensure max_digits is greater than decimal_places
-        if ($this->maxDigits < $this->decimalPlaces):
+        if ($this->maxDigits < $this->decimalPlaces) {
             return [
                 CheckError::createObject(
                     [
@@ -169,7 +169,7 @@ class DecimalField extends Field
                     ]
                 ),
             ];
-        endif;
+        }
 
         return [];
     }

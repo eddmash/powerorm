@@ -128,9 +128,9 @@ class BaseOrm extends BaseObject
      */
     public function getVersion()
     {
-        if (defined('POWERORM_VERSION')):
+        if (defined('POWERORM_VERSION')) {
             return POWERORM_VERSION;
-        endif;
+        }
     }
 
     /**
@@ -142,14 +142,13 @@ class BaseOrm extends BaseObject
      */
     public function getDatabaseConnection()
     {
-        if (empty($this->getSettings()->getDatabase())):
-
-            $message = 'The database configuration have not ' .
+        if (empty($this->getSettings()->getDatabase())) {
+            $message = 'The database configuration have not '.
                 'been provided, consult documentation for options';
 
             throw new OrmException($message);
-        endif;
-        if (null == static::$connection):
+        }
+        if (null == static::$connection) {
             $config = new Configuration();
             $db = $this->getSettings()->getDatabase();
             $db['wrapperClass'] = \Eddmash\PowerOrm\Db\Connection::class;
@@ -162,7 +161,7 @@ class BaseOrm extends BaseObject
             } catch (DBALException $exception) {
                 throw new OrmException($exception->getMessage());
             }
-        endif;
+        }
 
         return static::$connection;
     }
@@ -182,9 +181,9 @@ class BaseOrm extends BaseObject
     {
         $orm = static::getInstance();
 
-        if ($load):
+        if ($load) {
             $orm->loadRegistry();
-        endif;
+        }
 
         return $orm->registryCache;
     }
@@ -196,10 +195,9 @@ class BaseOrm extends BaseObject
      */
     public static function &getInstance(Settings $settings = null)
     {
-        if (null == static::$instance):
-
+        if (null == static::$instance) {
             static::$instance = new static($settings);
-        endif;
+        }
 
         return static::$instance;
     }
@@ -246,15 +244,13 @@ class BaseOrm extends BaseObject
         $models = self::getRegistry()->getModels();
 
         /** @var $modelObj Model */
-        foreach ($models as $name => $modelObj) :
-
-            if (!$modelObj->hasMethod('checks')):
+        foreach ($models as $name => $modelObj) {
+            if (!$modelObj->hasMethod('checks')) {
                 continue;
-            endif;
+            }
 
             self::getCheckRegistry()->register([$modelObj, 'checks'], [Tags::Model]);
-
-        endforeach;
+        }
     }
 
     /**
@@ -268,9 +264,9 @@ class BaseOrm extends BaseObject
      */
     public static function getCheckRegistry($recreate = false)
     {
-        if (null === self::$checkRegistry || ($recreate && null !== self::$checkRegistry)):
+        if (null === self::$checkRegistry || ($recreate && null !== self::$checkRegistry)) {
             self::$checkRegistry = ChecksRegistry::createObject();
-        endif;
+        }
 
         return self::$checkRegistry;
     }
@@ -304,16 +300,15 @@ class BaseOrm extends BaseObject
      */
     private function loadComponents()
     {
-        if (!$this->componentsloaded):
-
-            foreach ($this->getSettings()->getComponents() as $componentClass) :
+        if (!$this->componentsloaded) {
+            foreach ($this->getSettings()->getComponents() as $componentClass) {
                 $component = new $componentClass();
-                if ($component instanceof ComponentInterface):
+                if ($component instanceof ComponentInterface) {
                     static::getInstance()->addComponent($component);
-                endif;
-            endforeach;
+                }
+            }
             $this->componentsloaded = true;
-        endif;
+        }
     }
 
     /**
@@ -325,23 +320,20 @@ class BaseOrm extends BaseObject
     {
         self::getRegistry()->isAppReady();
 
-        if ($this->componentsloaded):
-
-            foreach ($this->components as $component) :
+        if ($this->componentsloaded) {
+            foreach ($this->components as $component) {
                 $component->ready($this);
-            endforeach;
-        endif;
+            }
+        }
     }
 
     private function addComponent(ComponentInterface $component)
     {
-        if ($component->isQueryable()):
-
+        if ($component->isQueryable()) {
             $this->components[$component->getName()] = $component;
-        else:
-
+        } else {
             $this->components[] = $component;
-        endif;
+        }
     }
 
     /**
@@ -370,9 +362,9 @@ class BaseOrm extends BaseObject
     {
         $this->registryCache->isAppReady();
 
-        if (ArrayHelper::hasKey($this->components, $name)):
+        if (ArrayHelper::hasKey($this->components, $name)) {
             return $this->components[$name]->getInstance();
-        endif;
+        }
 
         return $this->{$name};
     }
@@ -387,9 +379,9 @@ class BaseOrm extends BaseObject
     public function getSignalManager()
     {
         static $manager;
-        if (is_callable($this->getSettings()->getSignalManager()) && null == $manager):
+        if (is_callable($this->getSettings()->getSignalManager()) && null == $manager) {
             $manager = call_user_func($this->getSettings()->getSignalManager(), $this);
-        endif;
+        }
 
         return $manager;
     }
@@ -424,11 +416,11 @@ class BaseOrm extends BaseObject
      */
     public function getComponent($name)
     {
-        foreach ($this->getComponents() as $component) :
-            if ($component->getName() == $name):
+        foreach ($this->getComponents() as $component) {
+            if ($component->getName() == $name) {
                 return $component;
-            endif;
-        endforeach;
+            }
+        }
         throw new ComponentException(
             sprintf("'%s' is not a registered component", $name)
         );

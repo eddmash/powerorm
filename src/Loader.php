@@ -45,6 +45,7 @@ class Loader
      *
      * @return BaseOrm
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     *
      * @throws Exception\KeyError
      */
     public static function setup($config)
@@ -56,6 +57,7 @@ class Loader
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      *
      * @return \Symfony\Component\Console\Application
+     *
      * @throws \Exception
      */
     public static function consoleRun($config)

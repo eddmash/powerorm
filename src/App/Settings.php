@@ -136,9 +136,9 @@ class Settings
         );
 
         ClassHelper::setAttributes($this, $configs);
-        if (!$this->components):
+        if (!$this->components) {
             $this->components = []; // incase nothing is set, guarantee it iterable
-        endif;
+        }
     }
 
     /**

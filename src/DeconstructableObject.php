@@ -41,9 +41,9 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
     {
         $instance = (empty($config)) ? new static() : new static($config);
 
-        if ($instance instanceof self) :
+        if ($instance instanceof self) {
             $instance->setConstructorArgs($config);
-        endif;
+        }
 
         return $instance;
     }
@@ -61,12 +61,12 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
     public function __debugInfo()
     {
         $meta = [];
-        foreach (get_object_vars($this) as $name => $value) :
-            if (in_array($name, $this->getIgnored())):
+        foreach (get_object_vars($this) as $name => $value) {
+            if (in_array($name, $this->getIgnored())) {
                 continue;
-            endif;
+            }
             $meta[$name] = $value;
-        endforeach;
+        }
 
         return $meta;
     }

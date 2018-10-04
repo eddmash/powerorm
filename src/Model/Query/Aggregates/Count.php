@@ -25,14 +25,14 @@ class Count extends BaseAggregate
      */
     public function __construct($expression, $distinct = false, $kwargs = [])
     {
-        if ('*' === $expression):
+        if ('*' === $expression) {
             $expression = new Star();
-        endif;
+        }
         $extra = [];
         $extra['outputField'] = IntegerField::createObject();
-        if ($distinct) :
+        if ($distinct) {
             $extra['distinct'] = 'DISTINCT';
-        endif;
+        }
 
         parent::__construct(
             $expression,

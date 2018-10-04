@@ -59,8 +59,7 @@ class AlterModelTable extends Operation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $this->alterModelTable($schemaEditor, $fromState, $toState);
     }
 
@@ -71,8 +70,7 @@ class AlterModelTable extends Operation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $this->alterModelTable($schemaEditor, $fromState, $toState);
     }
 
@@ -93,7 +91,7 @@ class AlterModelTable extends Operation
     {
         $toModel = $toState->getRegistry()->getModel($this->name);
 
-        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)) {
             $fromModel = $fromState->getRegistry()->getModel($this->name);
             $schemaEditor->alterDbTable(
                 $toModel,
@@ -105,18 +103,17 @@ class AlterModelTable extends Operation
 
             /** @var $newField ManyToManyField */
             /* @var $oldField ManyToManyField */
-            foreach ($toModel->getMeta()->localManyToMany as $newName => $newField) :
-                foreach ($fromModel->getMeta()->localManyToMany as $oldName => $oldField) :
-                    if ($newName === $oldName):
+            foreach ($toModel->getMeta()->localManyToMany as $newName => $newField) {
+                foreach ($fromModel->getMeta()->localManyToMany as $oldName => $oldField) {
+                    if ($newName === $oldName) {
                         $schemaEditor->alterDbTable(
                             $newField->relation->through,
                             $oldField->relation->through->getMeta()->getDbTable(),
                             $newField->relation->through->getMeta()->getDbTable()
                         );
-                    endif;
-                endforeach;
-            endforeach;
-
-        endif;
+                    }
+                }
+            }
+        }
     }
 }

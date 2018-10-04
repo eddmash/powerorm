@@ -38,10 +38,10 @@ class Makemigrations extends BaseCommand
 
         $issues = $loader->detectConflicts();
 
-        if (!empty($issues)):
-            $message = '<error>The following migrations seem to indicate they' .
-                ' are both the latest migration :</error>' . PHP_EOL;
-            $message .= '  %s ' . PHP_EOL;
+        if (!empty($issues)) {
+            $message = '<error>The following migrations seem to indicate they'.
+                ' are both the latest migration :</error>'.PHP_EOL;
+            $message .= '  %s '.PHP_EOL;
             $output->writeln(
                 sprintf(
                     $message,
@@ -50,13 +50,13 @@ class Makemigrations extends BaseCommand
             );
 
             return;
-        endif;
+        }
 
-        if ($input->getOption('no-interaction')):
+        if ($input->getOption('no-interaction')) {
             $asker = NonInteractiveAsker::createObject($input, $output);
-        else:
+        } else {
             $asker = InteractiveAsker::createObject($input, $output);
-        endif;
+        }
 
         $autodetector = new AutoDetector(
             $loader->getProjectState(),
@@ -66,11 +66,11 @@ class Makemigrations extends BaseCommand
 
         $changes = $autodetector->getChanges($loader->graph);
 
-        if (empty($changes)):
+        if (empty($changes)) {
             $output->writeln('No changes were detected');
 
             return;
-        endif;
+        }
 
         $this->writeMigrations($changes, $input, $output);
     }
@@ -79,18 +79,16 @@ class Makemigrations extends BaseCommand
         $migrationChanges,
         InputInterface $input,
         OutputInterface $output
-    )
-    {
+    ) {
         /* @var $appMigration Migration */
         /* @var $op Operation */
 
-        foreach (BaseOrm::getInstance()->getComponents() as $component) :
-            if ($component instanceof AppInterface):
-                if (ArrayHelper::hasKey($migrationChanges, $component->getName())) :
-
+        foreach (BaseOrm::getInstance()->getComponents() as $component) {
+            if ($component instanceof AppInterface) {
+                if (ArrayHelper::hasKey($migrationChanges, $component->getName())) {
                     $output->writeln(
                         sprintf(
-                            '<fg=green;options=bold>Migrations for ' .
+                            '<fg=green;options=bold>Migrations for '.
                             'the application "%s" :</>',
                             $component->getName()
                         )
@@ -100,7 +98,7 @@ class Makemigrations extends BaseCommand
                         $component->getName()
                     );
 
-                    foreach ($appMigrations as $appMigration) :
+                    foreach ($appMigrations as $appMigration) {
                         $migrationFile = MigrationFile::createObject($appMigration);
 
                         $fileName = $migrationFile->getFileName();
@@ -108,33 +106,32 @@ class Makemigrations extends BaseCommand
                         $output->writeln(sprintf('  <options=bold>%s</>', $fileName));
 
                         $operations = $appMigration->getOperations();
-                        foreach ($operations as $op) :
+                        foreach ($operations as $op) {
                             $output->writeln(
                                 sprintf(
                                     '    - %s',
                                     ucwords($op->getDescription())
                                 )
                             );
-                        endforeach;
+                        }
 
-                        if ($input->getOption('dry-run')):
-
-                            if (OutputInterface::VERBOSITY_DEBUG === $output->getVerbosity()) :
+                        if ($input->getOption('dry-run')) {
+                            if (OutputInterface::VERBOSITY_DEBUG === $output->getVerbosity()) {
                                 $output->writeln($migrationFile->getContent());
-                            endif;
+                            }
 
                             continue;
-                        endif;
+                        }
                         $handler = new FileHandler(
                             $component->getMigrationsPath(),
                             $fileName
                         );
 
                         $handler->write($migrationFile->getContent());
-                    endforeach;
-                endif;
-            endif;
-        endforeach;
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -25,32 +25,30 @@ class WhereNode extends Node implements SqlCompilableinterface, CloneInterface
     public function asSql(
         CompilerInterface $compiler,
         ConnectionInterface $connection
-    )
-    {
+    ) {
         $whereSql = [];
         $whereParams = [];
 
         /* @var $lookup BaseLookup */
-        foreach ($this->getChildren() as $child) :
+        foreach ($this->getChildren() as $child) {
             list($sql, $parms) = $compiler->compile($child);
 
             $whereSql[] = $sql;
-            if (!is_array($parms)):
+            if (!is_array($parms)) {
                 $parms = [$parms];
-            endif;
+            }
             $whereParams = array_merge($whereParams, $parms);
-
-        endforeach;
+        }
 
         $conn = sprintf(' %s ', $this->connector);
         $whereSqlString = implode($conn, $whereSql);
-        if ($whereSqlString):
-            if ($this->isNegated()):
+        if ($whereSqlString) {
+            if ($this->isNegated()) {
                 $whereSqlString = sprintf('NOT (%s)', $whereSqlString);
-            elseif (count($whereSql) > 1):
+            } elseif (count($whereSql) > 1) {
                 $whereSqlString = sprintf('(%s)', $whereSqlString);
-            endif;
-        endif;
+            }
+        }
 
         return [$whereSqlString, $whereParams];
     }
@@ -65,12 +63,12 @@ class WhereNode extends Node implements SqlCompilableinterface, CloneInterface
         $obj = new self();
         $obj->defaultConnector = $this->defaultConnector;
         $obj->negated = $this->negated;
-        foreach ($this->getChildren() as $child) :
-            if ($child instanceof CloneInterface):
+        foreach ($this->getChildren() as $child) {
+            if ($child instanceof CloneInterface) {
                 $child = $child->deepClone();
-            endif;
+            }
             $obj->getChildren()->add($child);
-        endforeach;
+        }
 
         return $obj;
     }

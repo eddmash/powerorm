@@ -41,9 +41,9 @@ class Prefetch
     /**
      * Prefetch constructor.
      *
-     * @param string $lookups
+     * @param string        $lookups
      * @param Queryset|null $queryset
-     * @param string|null $toAttr
+     * @param string|null   $toAttr
      *
      * @throws ValueError
      */
@@ -53,14 +53,14 @@ class Prefetch
         $this->prefetchThrough = $lookups;
 
         // we are mapping this prefetches to models so ensure we have an Model mapper
-        if (!is_null($queryset) && !is_subclass_of($queryset->getMapper(), ModelMapper::class)):
+        if (!is_null($queryset) && !is_subclass_of($queryset->getMapper(), ModelMapper::class)) {
             throw new ValueError('Prefetch querysets cannot use values().');
-        endif;
+        }
         $this->queryset = $queryset;
 
-        if ($toAttr):
+        if ($toAttr) {
             //            $this->prefetchTo =
-        endif;
+        }
         $this->toAttr = $toAttr;
     }
 

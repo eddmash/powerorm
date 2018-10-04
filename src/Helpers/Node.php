@@ -18,7 +18,8 @@ class Node implements \Countable
     protected $connector;
 
     /**
-     * Default value to use to connect two or more query items
+     * Default value to use to connect two or more query items.
+     *
      * @var string
      */
     protected $defaultConnector;
@@ -44,43 +45,41 @@ class Node implements \Countable
         $children = null,
         $connector = null,
         $negated = false
-    )
-    {
+    ) {
         return new static($children, $connector, $negated);
     }
 
     public function add($node, $connectorType, $squash = true)
     {
-        if ($this->children->contains($node)):
+        if ($this->children->contains($node)) {
             return $node;
-        endif;
-        if (!$squash):
+        }
+        if (!$squash) {
             $this->children->add($node);
 
             return $node;
-        endif;
+        }
 
-        if ($connectorType == $this->connector):
-
+        if ($connectorType == $this->connector) {
             if ($node instanceof self && !$node->isNegated() &&
                 ($connectorType == $node->connector || 1 == count($node))
-            ):
+            ) {
                 $children = array_merge(
                     $node->getChildren()->toArray(),
                     $this->getChildren()->toArray()
                 );
                 $this->children = new ArrayCollection();
-                foreach ($children as $child) :
+                foreach ($children as $child) {
                     $this->children->add($child);
-                endforeach;
+                }
 
                 return $this;
-            else:
+            } else {
                 $this->children->add($node);
 
                 return $node;
-            endif;
-        else:
+            }
+        } else {
             //more or less of cloning this node
             $obj = new static($this->children, $this->connector, $this->negated);
 
@@ -92,7 +91,7 @@ class Node implements \Countable
             $this->children = [$obj, $node];
 
             return $node;
-        endif;
+        }
     }
 
     /**
@@ -116,7 +115,7 @@ class Node implements \Countable
      *
      * @see   http://php.net/manual/en/countable.count.php
      *
-     * @return int The custom count as an integer.
+     * @return int the custom count as an integer.
      *             </p>
      *             <p>
      *             The return value is cast to an integer

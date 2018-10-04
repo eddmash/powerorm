@@ -56,9 +56,9 @@ class ProjectState extends DeconstructableObject
     {
         $modelStates = [];
 
-        foreach ($registry->getModels() as $modelName => $modelObj) :
+        foreach ($registry->getModels() as $modelName => $modelObj) {
             $modelStates[$modelName] = ModelState::fromModel($modelObj);
-        endforeach;
+        }
 
         return static::createObject($modelStates);
     }
@@ -72,9 +72,9 @@ class ProjectState extends DeconstructableObject
      */
     public function addModelState($model, $name = null)
     {
-        if (is_null($name)):
+        if (is_null($name)) {
             $name = $model->name;
-        endif;
+        }
         $model->fromDisk($this->fromDisk);
         $this->modelStates[$name] = $model;
     }
@@ -118,9 +118,9 @@ class ProjectState extends DeconstructableObject
         $modelStates = [];
 
         /** @var $modelState ModelState */
-        foreach ($this->modelStates as $name => $modelState) :
+        foreach ($this->modelStates as $name => $modelState) {
             $modelStates[$name] = $modelState->deepClone();
-        endforeach;
+        }
 
         $project = static::createObject($modelStates);
         $project->fromDisk($this->fromDisk);

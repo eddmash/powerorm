@@ -56,9 +56,9 @@ class ClassHelper
     {
         $className = static::getFormatNamespace($className, true, true);
         $namespace = static::getFormatNamespace($namespace, true, true);
-        if (StringHelper::startsWith($className, $namespace)):
+        if (StringHelper::startsWith($className, $namespace)) {
             $className = substr($className, strlen($namespace));
-        endif;
+        }
 
         return trim($className, '\\');
     }
@@ -68,7 +68,7 @@ class ClassHelper
      *
      * @param            $namespace
      * @param bool|false $leadingBackslash
-     * @param bool|true $closingBackslash
+     * @param bool|true  $closingBackslash
      *
      * @return string
      *
@@ -81,14 +81,14 @@ class ClassHelper
         $namespace = trim($namespace, '\\');
 
         // if it does not end with a backslash add it.
-        if ($closingBackslash):
+        if ($closingBackslash) {
             $namespace = sprintf('%s\\', $namespace);
-        endif;
+        }
 
         // if it does not start with a backslash add it.
-        if ($leadingBackslash):
+        if ($leadingBackslash) {
             $namespace = sprintf('\\%s', $namespace);
-        endif;
+        }
 
         return $namespace;
     }
@@ -108,16 +108,16 @@ class ClassHelper
      */
     public static function classExists($className, $namespace)
     {
-        if (class_exists($className)):
+        if (class_exists($className)) {
             return $className;
-        endif;
+        }
 
         // add namespace
         $className = sprintf('%s%s', static::getFormatNamespace($namespace, true), $className);
 
-        if (class_exists($className)):
+        if (class_exists($className)) {
             return $className;
-        endif;
+        }
 
         return false;
     }
@@ -137,13 +137,13 @@ class ClassHelper
         $reflectionClass = new \ReflectionObject($instance);
 
         $parents = [];
-        while ($reflectionClass->getParentClass()):
+        while ($reflectionClass->getParentClass()) {
             $reflectionClass = $reflectionClass->getParentClass();
-            if (in_array($reflectionClass->getName(), $stopAt)):
+            if (in_array($reflectionClass->getName(), $stopAt)) {
                 break;
-            endif;
+            }
             $parents[$reflectionClass->getName()] = $reflectionClass;
-        endwhile;
+        }
 
         return $parents;
     }
@@ -153,10 +153,10 @@ class ClassHelper
         $namespace = '';
 
         $name = rtrim($name, '\\');
-        if ($pos = strrpos($name, '\\')) :
+        if ($pos = strrpos($name, '\\')) {
             $namespace = substr($name, 0, $pos);
             $name = substr($name, $pos + 1);
-        endif;
+        }
 
         return [$namespace, $name];
     }
@@ -176,9 +176,9 @@ class ClassHelper
 
         $count = count($tokens);
         for ($i = 2; $i < $count; ++$i) {
-            if ($tokens[$i - 2][0] == T_CLASS
-                && $tokens[$i - 1][0] == T_WHITESPACE
-                && $tokens[$i][0] == T_STRING) {
+            if (T_CLASS == $tokens[$i - 2][0]
+                && T_WHITESPACE == $tokens[$i - 1][0]
+                && T_STRING == $tokens[$i][0]) {
                 $class_name = $tokens[$i][1];
                 $classes[] = $class_name;
             }
@@ -250,42 +250,38 @@ class ClassHelper
         }
 
         //Build the fully-qualified class name and return it
-        return $namespace ? $namespace . '\\' . $class : $class;
+        return $namespace ? $namespace.'\\'.$class : $class;
     }
 
     /**
      * Configures an object with the initial property values.
      *
-     * @param object $object the object to be configured
-     * @param array $properties the property initial values given in terms of name-value pairs
-     * @param array $map if set the the key should be a key on the $properties and the value should a a property on
+     * @param object $object     the object to be configured
+     * @param array  $properties the property initial values given in terms of name-value pairs
+     * @param array  $map        if set the the key should be a key on the $properties and the value should a a property on
      *                           the $object to which the the values of $properties will be assigned to
      *
      * @return object the object itself
      */
     public static function setAttributes($object, $properties, $map = [])
     {
-        if (empty($properties)):
+        if (empty($properties)) {
             return $object;
-        endif;
+        }
 
-        foreach ($properties as $name => $value) :
-
-            if (ArrayHelper::hasKey($map, $name)):
-
+        foreach ($properties as $name => $value) {
+            if (ArrayHelper::hasKey($map, $name)) {
                 $name = $map[$name];
-            endif;
+            }
 
             $setterMethod = sprintf('set%s', ucfirst($name));
 
-            if (method_exists($object, $setterMethod)):
+            if (method_exists($object, $setterMethod)) {
                 call_user_func([$object, $setterMethod], $value);
-            elseif (property_exists($object, $name)):
-
+            } elseif (property_exists($object, $name)) {
                 $object->{$name} = $value;
-            endif;
-
-        endforeach;
+            }
+        }
 
         return $object;
     }

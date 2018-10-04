@@ -92,8 +92,7 @@ class CombinedExpression extends BaseExpression
         $reuse = null,
         $summarize = false,
         $forSave = false
-    )
-    {
+    ) {
         $obj = parent::resolveExpression(
             $resolver,
             $allowJoins,

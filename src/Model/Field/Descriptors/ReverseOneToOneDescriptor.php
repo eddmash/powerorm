@@ -29,9 +29,9 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
             $relObj = $modelInstance->{$this->field->getCacheName()};
         } catch (\Exception $e) {
             $relPk = $modelInstance->getPkValue();
-            if (empty($relPk)):
+            if (empty($relPk)) {
                 $relObj = null;
-            else:
+            } else {
                 $filterArgs = $this->field->getForwardRelatedFilter($modelInstance);
 
                 try {
@@ -40,11 +40,11 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
                 } catch (ObjectDoesNotExist $exception) {
                     $relObj = null;
                 }
-            endif;
+            }
             $modelInstance->{$this->field->getCacheName()} = $relObj;
         }
 
-        if (is_null($relObj) && !$this->field->isNull()):
+        if (is_null($relObj) && !$this->field->isNull()) {
             throw new RelatedObjectDoesNotExist(
                 sprintf(
                     '%s has no %s.',
@@ -52,14 +52,14 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
                     $this->field->relation->getAccessorName()
                 )
             );
-        endif;
+        }
 
         return $relObj;
     }
 
     public function setValue(Model $modelInstance, $value)
     {
-        if (empty($value)):
+        if (empty($value)) {
             //Update the cached related instance (if any) & clear the cache.
             try {
                 $relObj = $modelInstance->{$this->field->getCacheName()};
@@ -67,15 +67,14 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
                 unset($relObj->{$this->field->relation->getCacheName()});
             } catch (AttributeError $exception) {
             }
-        else:
-
+        } else {
             $relatedPks = [];
-            foreach ($this->field->relation->fromField->getForeignRelatedFields() as $foreignRelatedField) :
+            foreach ($this->field->relation->fromField->getForeignRelatedFields() as $foreignRelatedField) {
                 $relatedPks[] = $modelInstance->{$foreignRelatedField->getAttrName()};
-            endforeach;
-            foreach ($this->field->relation->fromField->getLocalRelatedFields() as $idx => $localRelatedField) :
+            }
+            foreach ($this->field->relation->fromField->getLocalRelatedFields() as $idx => $localRelatedField) {
                 $value->{$localRelatedField->getAttrName()} = $relatedPks[$idx];
-            endforeach;
+            }
 
             // Set the related instance cache to avoid an SQL query
             // when accessing the attribute we just set.
@@ -83,7 +82,7 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
             // Set the related instance cache to avoid an SQL query
             // when accessing the attribute we just set.
             $value->{$this->field->relation->getCacheName()} = $modelInstance;
-        endif;
+        }
     }
 
     private function getQueryset($modelInstance)

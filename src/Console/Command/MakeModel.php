@@ -32,7 +32,7 @@ class MakeModel extends BaseCommand
             ->addArgument(
                 'model_name',
                 InputArgument::REQUIRED,
-                'The name of the model to generate. ' .
+                'The name of the model to generate. '.
                 'Use the name "zero" to unapply all migrations.'
             )
             ->addOption(
@@ -62,40 +62,40 @@ class MakeModel extends BaseCommand
 
         $force = $input->getOption('force');
 
-        $path = rtrim($vendorHome, '\\') . DIRECTORY_SEPARATOR . ltrim($modelPath, '\\');
+        $path = rtrim($vendorHome, '\\').DIRECTORY_SEPARATOR.ltrim($modelPath, '\\');
         $path = realpath($path);
 
-        if (!file_exists($path)):
+        if (!file_exists($path)) {
             throw new CommandError(sprintf("directory '%s' does not exist", $path));
-        endif;
+        }
 
         $modelFile = $this->getModelFile($namespace, $modelName);
         $fileName = rtrim(sprintf('%s.php', $modelName), '\\');
 
-        $filePath = realpath($path . DIRECTORY_SEPARATOR . $fileName);
+        $filePath = realpath($path.DIRECTORY_SEPARATOR.$fileName);
 
-        if (file_exists($filePath) && !$force):
+        if (file_exists($filePath) && !$force) {
             throw new CommandError(sprintf("Models '%s' already exists, use -f option to overwrite", $filePath));
-        endif;
+        }
 
         $handler = new FileHandler($path, $fileName);
 
-        if ($handler->write($modelFile)) :
-            $output->write(sprintf("Models '%s' created at '%s' " . PHP_EOL, $orginalModelName, $path));
-        endif;
+        if ($handler->write($modelFile)) {
+            $output->write(sprintf("Models '%s' created at '%s' ".PHP_EOL, $orginalModelName, $path));
+        }
     }
 
     private function getModelFile($namespace, $modelName)
     {
         $content = FormatFileContent::createObject();
 
-        $content->addItem('<?php' . PHP_EOL);
+        $content->addItem('<?php'.PHP_EOL);
 
-        if ($namespace):
-            $content->addItem(sprintf('namespace %s;', $namespace) . PHP_EOL);
-        endif;
+        if ($namespace) {
+            $content->addItem(sprintf('namespace %s;', $namespace).PHP_EOL);
+        }
 
-        $content->addItem('use Eddmash\\PowerOrm\\Models\\Models;' . PHP_EOL);
+        $content->addItem('use Eddmash\\PowerOrm\\Models\\Models;'.PHP_EOL);
 
         $content->addItem('/**');
         $content->addItem(sprintf('* Class %s', $modelName));
@@ -111,7 +111,7 @@ class MakeModel extends BaseCommand
         $content->addItem('return [];');
         $content->reduceIndent();
 
-        $content->addItem('}' . PHP_EOL);
+        $content->addItem('}'.PHP_EOL);
         $content->reduceIndent();
         $content->addItem('}');
 

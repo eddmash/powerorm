@@ -45,21 +45,19 @@ class CreateModel extends ModelOperation
     {
         $constructorArgs = parent::getConstructorArgs();
         if (isset($constructorArgs['meta']) &&
-            isset($constructorArgs['meta']['appName'])):
+            isset($constructorArgs['meta']['appName'])) {
             unset($constructorArgs['meta']['appName']);
-        endif;
-        if (isset($constructorArgs['meta']) && empty($constructorArgs['meta'])):
+        }
+        if (isset($constructorArgs['meta']) && empty($constructorArgs['meta'])) {
             unset($constructorArgs['meta']);
-        endif;
+        }
 
-        if (isset($constructorArgs['extends'])):
-
+        if (isset($constructorArgs['extends'])) {
             if (StringHelper::isEmpty($constructorArgs['extends']) ||
-                Model::isModelBase($constructorArgs['extends'])):
+                Model::isModelBase($constructorArgs['extends'])) {
                 unset($constructorArgs['extends']);
-
-            endif;
-        endif;
+            }
+        }
 
         return $constructorArgs;
     }
@@ -85,9 +83,9 @@ class CreateModel extends ModelOperation
     public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $model = $toState->getRegistry()->getModel($this->name);
-        if ($this->allowMigrateModel($schemaEditor->connection, $model)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $model)) {
             $schemaEditor->createModel($model);
-        endif;
+        }
     }
 
     /**
@@ -96,9 +94,9 @@ class CreateModel extends ModelOperation
     public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $model = $fromState->getRegistry()->getModel($this->name);
-        if ($this->allowMigrateModel($schemaEditor->connection, $model)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $model)) {
             $schemaEditor->deleteModel($model);
-        endif;
+        }
     }
 
     /**
@@ -106,7 +104,7 @@ class CreateModel extends ModelOperation
      * replaced with or a boolean that indicates whether or not the specified
      * operation can be optimized across.
      *
-     * @param Operation $operation
+     * @param Operation   $operation
      * @param Operation[] $inBetween
      *
      * @return mixed
@@ -118,36 +116,35 @@ class CreateModel extends ModelOperation
     public function reduce(Operation $operation, $inBetween)
     {
         if ($operation instanceof DeleteModel &&
-            $this->name === $operation->name && !$this->getMeta()->proxy) :
+            $this->name === $operation->name && !$this->getMeta()->proxy) {
             return [];
-        endif;
+        }
 
         if ($operation instanceof FieldOperation &&
-            strtolower($operation->modelName) === strtolower($this->name)) :
-
-            if ($operation instanceof AddField) :
+            strtolower($operation->modelName) === strtolower($this->name)) {
+            if ($operation instanceof AddField) {
                 // check if there is an operation in between that references
                 // the same model if so, don't merge
-                if ($operation->field->relation) :
-                    foreach ($inBetween as $between) :
+                if ($operation->field->relation) {
+                    foreach ($inBetween as $between) {
                         $modelName = $operation->field->relation
                             ->toModel->getMeta()->getNSModelName();
-                        if ($between->referencesModel($modelName)) :
+                        if ($between->referencesModel($modelName)) {
                             return false;
-                        endif;
+                        }
 
                         if ($operation->field->relation
                                 ->hasProperty('through') &&
                             $operation->field->relation->through
-                        ) :
+                        ) {
                             $modelName = $operation->field->relation
                                 ->through->getMeta()->getNSModelName();
-                            if ($between->referencesModel($modelName)) :
+                            if ($between->referencesModel($modelName)) {
                                 return false;
-                            endif;
-                        endif;
-                    endforeach;
-                endif;
+                            }
+                        }
+                    }
+                }
 
                 $fields = $this->fields;
                 $fields[$operation->field->getName()] = $operation->field;
@@ -165,9 +162,8 @@ class CreateModel extends ModelOperation
                 return [
                     $op,
                 ];
-
-            endif;
-        endif;
+            }
+        }
 
         return parent::reduce($operation, $inBetween);
     }

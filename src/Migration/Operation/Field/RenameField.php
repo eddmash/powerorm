@@ -36,13 +36,13 @@ class RenameField extends FieldOperation
     {
         $fields = $state->getModelState($this->modelName)->fields;
         $fieldsNew = [];
-        foreach ($fields as $name => $field) :
-            if ($name === $this->oldName):
+        foreach ($fields as $name => $field) {
+            if ($name === $this->oldName) {
                 $fieldsNew[$this->newName] = $field;
-            else:
+            } else {
                 $fieldsNew[$name] = $field;
-            endif;
-        endforeach;
+            }
+        }
 
         $state->getModelState($this->modelName)->fields = $fieldsNew;
     }
@@ -61,14 +61,14 @@ class RenameField extends FieldOperation
     public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
-        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)) {
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $schemaEditor->alterField(
                 $fromModel,
                 $fromModel->getMeta()->getField($this->oldName),
                 $toModel->getMeta()->getField($this->newName)
             );
-        endif;
+        }
     }
 
     /**
@@ -77,13 +77,13 @@ class RenameField extends FieldOperation
     public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
-        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)) {
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $schemaEditor->alterField(
                 $fromModel,
                 $fromModel->getMeta()->getField($this->newName),
                 $toModel->getMeta()->getField($this->oldName)
             );
-        endif;
+        }
     }
 }

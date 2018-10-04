@@ -64,15 +64,15 @@ abstract class CheckMessage extends Base
     public function __toString()
     {
         $hint = null;
-        if ($this->hint):
+        if ($this->hint) {
             $hint = sprintf(
                 '<fg=black>%s %s <fg=yellow;options=bold>HINT:</> %s</>',
                 PHP_EOL,
                 str_pad('', 1, ' '),
                 $this->hint
             );
-        endif;
-        $msg = PHP_EOL . str_pad('', 3, ' ') . $this->message;
+        }
+        $msg = PHP_EOL.str_pad('', 3, ' ').$this->message;
 
         return sprintf(
             'Issue <fg=red;options=bold>%s</> : <fg=black>(%s)</> %s %s',
@@ -95,9 +95,9 @@ abstract class CheckMessage extends Base
     {
         $level = (null === $level) ? static::ERROR : $level;
 
-        if (is_string($level)):
+        if (is_string($level)) {
             $level = ArrayHelper::getValue($this->levelsMap, strtolower($level));
-        endif;
+        }
 
         return $level;
     }

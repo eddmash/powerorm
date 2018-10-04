@@ -28,17 +28,16 @@ class Shell extends BaseCommand
 
     public function handle(InputInterface $input, OutputInterface $output)
     {
-        if (class_exists('\Psy\Shell')):
+        if (class_exists('\Psy\Shell')) {
             $shell = new \Psy\Shell();
             $shell->run();
-        else:
-
+        } else {
             $message = sprintf(
                 '<error>%s</error>',
                 "Shell command depends on Psych, please install as shown 'composer require psy/psysh:@stable'"
             );
             $output->writeln($message);
-        endif;
+        }
     }
 
     /**

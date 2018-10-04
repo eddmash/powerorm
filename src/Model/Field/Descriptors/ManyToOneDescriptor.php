@@ -38,10 +38,9 @@ class ManyToOneDescriptor extends BaseDescriptor
         } catch (AttributeError $e) {
             $relObj = $this->field->getLocalRelatedFieldsValues($modelInstance);
 
-            if (empty($relObj)):
+            if (empty($relObj)) {
                 $relObj = null;
-            else:
-
+            } else {
                 $result = $this->getManager($modelInstance)->get();
 
                 /* @var $fromField RelatedField */
@@ -57,14 +56,13 @@ class ManyToOneDescriptor extends BaseDescriptor
                 // extra SQL
                 //query if it's accessed later on.
 
-                if (!is_null($result) && !$this->field->relation->multiple):
+                if (!is_null($result) && !$this->field->relation->multiple) {
                     $result->{$this->field->relation->getCacheName()} = $modelInstance;
-                endif;
-            endif;
+                }
+            }
         }
         // if this field does not allow null values
-        if (is_null($result) && !$this->field->isNull()):
-
+        if (is_null($result) && !$this->field->isNull()) {
             throw new RelatedObjectDoesNotExist(
                 sprintf(
                     '%s has no value for %s.',
@@ -72,7 +70,7 @@ class ManyToOneDescriptor extends BaseDescriptor
                     $this->field->getName()
                 )
             );
-        endif;
+        }
 
         return $result;
     }
@@ -82,7 +80,7 @@ class ManyToOneDescriptor extends BaseDescriptor
      */
     public function setValue(Model $modelInstance, $value)
     {
-        if (null !== $value && !$value instanceof $this->field->relation->toModel):
+        if (null !== $value && !$value instanceof $this->field->relation->toModel) {
             throw new ValueError(
                 sprintf(
                     'Cannot assign "%s": "%s->%s" must be a "%s" instance.',
@@ -92,7 +90,7 @@ class ManyToOneDescriptor extends BaseDescriptor
                     $this->field->relation->toModel->getMeta()->getNSModelName()
                 )
             );
-        endif;
+        }
         /** @var $fromField RelatedField */
 
         /** @var $toField RelatedField */
@@ -100,7 +98,7 @@ class ManyToOneDescriptor extends BaseDescriptor
         /* @var $field RelatedField */
 
         list($fromField, $toField) = $this->field->getRelatedFields();
-        if (is_null($value)):
+        if (is_null($value)) {
             // if we have a previosly set related object on for the inverse
             // side of this relationship
             // we need to clear it on that related object to since
@@ -111,26 +109,26 @@ class ManyToOneDescriptor extends BaseDescriptor
                 null
             );
 
-            if ($relObj):
+            if ($relObj) {
                 $relObj->{$this->field->relation->getCacheName()} = null;
-            endif;
+            }
             // set the attrib value e.g *_id
             $modelInstance->{$fromField->getAttrName()} = null;
-        else:
+        } else {
             // cache the value of the model
             $modelInstance->_fieldCache[$fromField->getCacheName()] = $value;
 
             // set the attrib value e.g *_id
             $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};
-        endif;
+        }
 
         // if we are dealing with fields that only supports one field e.g. OneToOneField
         // If this is a one-to-one relation, set the reverse accessor cache on
         // the related object to the current instance to avoid an extra SQL
         // query if it's accessed later on.
-        if (null !== $value && !$this->field->relation->multiple):
+        if (null !== $value && !$this->field->relation->multiple) {
             $value->{$this->field->relation->getCacheName()} = $modelInstance;
-        endif;
+        }
     }
 
     /**
@@ -148,21 +146,21 @@ class ManyToOneDescriptor extends BaseDescriptor
      */
     public function getManager($modelInstance, $reverse = false)
     {
-        if ($reverse) :
+        if ($reverse) {
             $model = $this->field->getRelatedModel();
-        else:
+        } else {
             $model = $this->field->scopeModel;
-        endif;
+        }
 
         // define BaseM2MQueryset
-        if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)):
+        if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)) {
             $baseClass = $model::getManagerClass();
             $class = sprintf(
                 'namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}',
                 $baseClass
             );
             eval($class);
-        endif;
+        }
 
         $manager = M2OManager::createObject(
             [

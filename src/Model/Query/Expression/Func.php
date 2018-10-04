@@ -78,12 +78,11 @@ class Func extends BaseExpression
         $reuse = null,
         $summarize = false,
         $forSave = false
-    )
-    {
+    ) {
         $obj = clone $this;
         $obj->summarize = $summarize;
 
-        foreach ($obj->expression as $key => $item) :
+        foreach ($obj->expression as $key => $item) {
             $obj->expression[$key] = $item->resolveExpression(
                 $resolver,
                 $allowJoins,
@@ -91,7 +90,7 @@ class Func extends BaseExpression
                 $summarize,
                 $forSave
             );
-        endforeach;
+        }
 
         return $obj;
     }
@@ -101,30 +100,29 @@ class Func extends BaseExpression
         CompilerInterface $compiler,
         ConnectionInterface $connection,
         $function = null
-    )
-    {
+    ) {
         $sqlParts = [];
 
-        if (!is_null($function)):
+        if (!is_null($function)) {
             $func = $function;
-        else:
+        } else {
             $func = ArrayHelper::pop(
                 $this->extra,
                 'function',
                 $this->function
             );
-        endif;
+        }
 
-        if ($this->extra) :
+        if ($this->extra) {
             $sqlParts[] = implode('', $this->extra);
-        endif;
+        }
         $params = [];
 
-        foreach ($this->expression as $expression) :
+        foreach ($this->expression as $expression) {
             list($sql, $param) = $compiler->compile($expression);
             $sqlParts[] = $sql;
             $params = array_merge($params, $param);
-        endforeach;
+        }
 
         $template = $this->getTemplate($func, implode($this->argJoiner, $sqlParts));
 

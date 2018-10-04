@@ -52,7 +52,7 @@ class ForeignKey extends RelatedField
      */
     public function __construct($kwargs)
     {
-        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && null == $kwargs['rel'])):
+        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && null == $kwargs['rel'])) {
             $kwargs['rel'] = ManyToOneRel::createObject(
                 [
                     'fromField' => $this,
@@ -64,7 +64,7 @@ class ForeignKey extends RelatedField
                     'onDelete' => ArrayHelper::getValue($kwargs, 'onDelete', Delete::CASCADE),
                 ]
             );
-        endif;
+        }
 
         $this->toField = ArrayHelper::getValue($kwargs, 'toField');
         $this->fromField = 'this';
@@ -97,9 +97,9 @@ class ForeignKey extends RelatedField
     {
         parent::contributeToInverseClass($relatedModel, $relation);
 
-        if (null == $this->relation->fieldName):
+        if (null == $this->relation->fieldName) {
             $this->relation->fieldName = $relatedModel->getMeta()->primaryKey->getName();
-        endif;
+        }
     }
 
     /**
@@ -124,14 +124,14 @@ class ForeignKey extends RelatedField
     {
         $kwargs = parent::getConstructorArgs();
 
-        if ($this->dbIndex) :
+        if ($this->dbIndex) {
             unset($kwargs['dbIndex']);
-        else:
+        } else {
             $kwargs['dbIndex'] = false;
-        endif;
-        if (false === $this->dbConstraint) :
+        }
+        if (false === $this->dbConstraint) {
             $kwargs['dbConstraint'] = $this->dbConstraint;
-        endif;
+        }
 
         return $kwargs;
     }
@@ -145,9 +145,9 @@ class ForeignKey extends RelatedField
 
     public function getJoinColumns($reverse = false)
     {
-        if ($reverse):
+        if ($reverse) {
             return $this->getReverseRelatedFields();
-        endif;
+        }
 
         return $this->getRelatedFields();
     }
@@ -162,9 +162,9 @@ class ForeignKey extends RelatedField
      */
     public function getColExpression($alias, $outputField = null)
     {
-        if (is_null($outputField)):
+        if (is_null($outputField)) {
             $outputField = $this->getRelatedField();
-        endif;
+        }
 
         return parent::getColExpression($alias, $outputField);
     }
@@ -179,10 +179,10 @@ class ForeignKey extends RelatedField
             'fieldClass',
             ModelChoiceField::class
         );
-        if (!ArrayHelper::hasKey($kwargs, 'queryset')) :
+        if (!ArrayHelper::hasKey($kwargs, 'queryset')) {
             $model = $this->relation->getToModel();
             $kwargs['queryset'] = $model::objects();
-        endif;
+        }
 
         $kwargs['valueField'] = $this->relation->fieldName;
 
@@ -194,9 +194,9 @@ class ForeignKey extends RelatedField
      */
     public function prepareValueBeforeSave($value, $connection)
     {
-        if (is_null($value) || '' === $value):
+        if (is_null($value) || '' === $value) {
             return;
-        endif;
+        }
 
         return $this->getRelatedField()->prepareValueBeforeSave(
             $value,

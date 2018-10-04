@@ -31,11 +31,11 @@ class RemoveField extends FieldOperation
         $fields = $state->getModelState($this->modelName)->fields;
 
         $fieldsNew = [];
-        foreach ($fields as $name => $field) :
-            if ($name !== $this->name):
+        foreach ($fields as $name => $field) {
+            if ($name !== $this->name) {
                 $fieldsNew[$name] = $field;
-            endif;
-        endforeach;
+            }
+        }
         $state->getModelState($this->modelName)->fields = $fieldsNew;
     }
 
@@ -54,16 +54,15 @@ class RemoveField extends FieldOperation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $fromModel = $fromState->getRegistry()->getModel($this->modelName);
 
-        if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)) {
             $schemaEditor->removeField(
                 $fromModel,
                 $fromModel->getMeta()->getField($this->name)
             );
-        endif;
+        }
     }
 
     /**
@@ -73,15 +72,14 @@ class RemoveField extends FieldOperation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
-        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)) {
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $schemaEditor->addField(
                 $fromModel,
                 $toModel->getMeta()->getField($this->name)
             );
-        endif;
+        }
     }
 }

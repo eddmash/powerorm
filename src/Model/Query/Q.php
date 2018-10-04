@@ -30,16 +30,15 @@ class Q extends Node
         $children = [],
         $connector = null,
         $negated = false
-    )
-    {
+    ) {
         $items = new ArrayCollection();
-        foreach ($children as $name => $child) :
-            if ($child instanceof Node):
+        foreach ($children as $name => $child) {
+            if ($child instanceof Node) {
                 $items->add($child);
-            else:
+            } else {
                 $items->add([$name => $child]);
-            endif;
-        endforeach;
+            }
+        }
 
         parent::__construct($items, $connector, $negated);
     }

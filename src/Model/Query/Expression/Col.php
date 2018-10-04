@@ -28,9 +28,9 @@ class Col extends BaseExpression
     {
         $this->alias = $alias;
         $this->targetField = $targetField;
-        if (is_null($outputField)):
+        if (is_null($outputField)) {
             $outputField = $targetField;
-        endif;
+        }
         parent::__construct($outputField);
     }
 
@@ -73,21 +73,20 @@ class Col extends BaseExpression
      */
     public function getDbConverters(ConnectionInterface $connection)
     {
-        if ($this->getTargetField()->getName() === $this->getOutputField()->getName()):
+        if ($this->getTargetField()->getName() === $this->getOutputField()->getName()) {
             return $this->getOutputField()->getDbConverters($connection);
-        else:
+        } else {
             return array_merge(
                 $this->getOutputField()->getDbConverters($connection),
                 $this->getTargetField()->getDbConverters($connection)
             );
-        endif;
+        }
     }
 
     public function getGroupByCols()
     {
         return [$this];
     }
-
 
     /**
      * {@inheritdoc}
@@ -96,7 +95,7 @@ class Col extends BaseExpression
     {
         return [
             'alias' => $this->alias,
-            'targetField' => $this->targetField
+            'targetField' => $this->targetField,
         ];
     }
 }

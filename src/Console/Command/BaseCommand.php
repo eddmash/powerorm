@@ -45,7 +45,7 @@ abstract class BaseCommand extends Command
     /**
      * Place all you command logic here.
      *
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return CommandError
@@ -53,7 +53,7 @@ abstract class BaseCommand extends Command
     public function handle(InputInterface $input, OutputInterface $output)
     {
         return new CommandError(
-            'Subclasses of the class ' .
+            'Subclasses of the class '.
             'Command must implement the handle()'
         );
     }
@@ -79,14 +79,14 @@ abstract class BaseCommand extends Command
             )
         );
 
-        if ($this->systemCheck):
+        if ($this->systemCheck) {
             try {
                 $this->check($input, $output);
             } catch (SystemCheckError $e) {
                 // we get a system check error, stop further processing
                 return;
             }
-        endif;
+        }
 
         $this->handle($input, $output);
     }
@@ -97,8 +97,7 @@ abstract class BaseCommand extends Command
         $tags = null,
         $showErrorCount = null,
         $failLevel = null
-    )
-    {
+    ) {
         $checks = BaseOrm::getCheckRegistry()->runChecks($tags);
 
         $debugs = [];
@@ -111,49 +110,48 @@ abstract class BaseCommand extends Command
         $header = $body = $footer = '';
 
         /** @var $check CheckMessage */
-        foreach ($checks as $check) :
-
-            if ($check->isSerious($failLevel) && !$check->isSilenced()):
+        foreach ($checks as $check) {
+            if ($check->isSerious($failLevel) && !$check->isSilenced()) {
                 $serious[] = $check;
-            endif;
+            }
 
-            if ($check->level < CheckMessage::INFO && !$check->isSilenced()):
+            if ($check->level < CheckMessage::INFO && !$check->isSilenced()) {
                 $debugs[] = $check;
-            endif;
+            }
 
             // info
             if ($check->level >= CheckMessage::INFO &&
-                $check->level < CheckMessage::WARNING && !$check->isSilenced()):
+                $check->level < CheckMessage::WARNING && !$check->isSilenced()) {
                 $info[] = $check;
-            endif;
+            }
 
             // warning
             if ($check->level >= CheckMessage::WARNING &&
-                $check->level < CheckMessage::ERROR && !$check->isSilenced()):
+                $check->level < CheckMessage::ERROR && !$check->isSilenced()) {
                 $warning[] = $check;
-            endif;
+            }
 
             //error
             if ($check->level >= CheckMessage::ERROR &&
                 $check->level < CheckMessage::CRITICAL && !$check->isSilenced()
-            ):
+            ) {
                 $errors[] = $check;
-            endif;
+            }
 
             //critical
-            if ($check->level >= CheckMessage::CRITICAL && !$check->isSilenced()):
+            if ($check->level >= CheckMessage::CRITICAL && !$check->isSilenced()) {
                 $critical[] = $check;
-            endif;
-        endforeach;
+            }
+        }
 
         // get the count of visible issues only, hide the silenced ones
 
         $visibleIssues = count($errors) + count($warning) + count($info)
             + count($debugs) + count($critical);
 
-        if ($visibleIssues):
-            $header = 'System check identified issues: ' . PHP_EOL;
-        endif;
+        if ($visibleIssues) {
+            $header = 'System check identified issues: '.PHP_EOL;
+        }
 
         $errors = array_merge($critical, $errors);
 
@@ -166,47 +164,45 @@ abstract class BaseCommand extends Command
         ];
 
         /* @var $catIssue CheckMessage */
-        foreach ($categorisedIssues as $category => $categoryIssues) :
-            if (empty($categoryIssues)):
+        foreach ($categorisedIssues as $category => $categoryIssues) {
+            if (empty($categoryIssues)) {
                 continue;
-            endif;
-            $body .= sprintf(PHP_EOL . ' %s' . PHP_EOL, strtoupper($category));
+            }
+            $body .= sprintf(PHP_EOL.' %s'.PHP_EOL, strtoupper($category));
 
-            foreach ($categoryIssues as $catIssue) :
-
-                if ($catIssue->isSerious()):
-                    $msg = ' <fg=red>%s</>' . PHP_EOL;
-                else:
-                    $msg = ' <warning>%s</warning>' . PHP_EOL;
-                endif;
+            foreach ($categoryIssues as $catIssue) {
+                if ($catIssue->isSerious()) {
+                    $msg = ' <fg=red>%s</>'.PHP_EOL;
+                } else {
+                    $msg = ' <warning>%s</warning>'.PHP_EOL;
+                }
                 $body .= sprintf($msg, $catIssue);
-            endforeach;
+            }
+        }
 
-        endforeach;
-
-        if ($showErrorCount):
+        if ($showErrorCount) {
             $issueText = (1 === $visibleIssues) ? 'issue' : 'issues';
             $silenced = count($checks) - $visibleIssues;
-            if ($visibleIssues):
+            if ($visibleIssues) {
                 $footer .= PHP_EOL;
-            endif;
+            }
             $footer .= sprintf(
                 ' System check identified %s %s (%s silenced) ',
                 $visibleIssues,
                 $issueText,
                 $silenced
             );
-        endif;
+        }
 
-        if (!empty($serious)):
+        if (!empty($serious)) {
             $header = sprintf('<fg=red;options=bold> SystemCheckError: %s</>', $header);
-            $message = $header . $body . $footer;
+            $message = $header.$body.$footer;
             $output->writeln($message);
 
             throw new SystemCheckError();
-        endif;
+        }
 
-        $message = $header . $body . $footer;
+        $message = $header.$body.$footer;
         $output->writeln($message);
     }
 

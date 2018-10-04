@@ -54,20 +54,20 @@ class M2OManager extends BaseM2OManager
         /** @var ForeignObjectRel $rel */
         $rel = ArrayHelper::getValue($kwargs, 'rel');
 
-        if (false === $this->reverse) :
+        if (false === $this->reverse) {
             $model = $rel->toModel;
             $fromField = $rel->fromField;
             $toField = $rel->getRelatedField();
             $value = $this->instance->{$fromField->getAttrName()};
             $filter[$toField->getAttrName()] = $value;
-        else:
+        } else {
             $model = $rel->getFromModel();
             //todo
             $fromField = $rel->getRelatedField();
             $toField = $rel->fromField;
             $value = $this->instance->{$fromField->getAttrName()};
             $filter[$toField->getName()] = $value;
-        endif;
+        }
 
         $this->filters = $filter;
 

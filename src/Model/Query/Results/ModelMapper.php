@@ -48,32 +48,31 @@ class ModelMapper extends Mapper
         $modelFieldsEnd = count($selectedFields);
 
         /* @var $col Col */
-        foreach (array_slice($select, $modelFieldsStart, $modelFieldsEnd) as $colInfo) :
+        foreach (array_slice($select, $modelFieldsStart, $modelFieldsEnd) as $colInfo) {
             $col = $colInfo[0];
             $initList[] = $col->getTargetField()->getAttrName();
-        endforeach;
+        }
 
         /* @var $modelClass Model */
         $modelClass = ArrayHelper::getValue($klassInfo, 'model');
         $mapped = [];
         $relatedPopulators = static::getRelatedMapper($klassInfo, $select, $connection);
 
-        foreach ($sqlCompiler->getResultsIterator($resultsStatement) as $result) :
-
+        foreach ($sqlCompiler->getResultsIterator($resultsStatement) as $result) {
             $vals = array_slice($result, $modelFieldsStart, $modelFieldsEnd);
 
             $obj = $modelClass::fromDb($connection, $initList, $vals);
 
-            foreach ($annotationMap as $name => $pos) :
+            foreach ($annotationMap as $name => $pos) {
                 $obj->{$name} = $result[$pos];
-            endforeach;
-            if ($relatedPopulators):
-                foreach ($relatedPopulators as $relatedPopulator) :
+            }
+            if ($relatedPopulators) {
+                foreach ($relatedPopulators as $relatedPopulator) {
                     $relatedPopulator->populate($result, $obj);
-                endforeach;
-            endif;
+                }
+            }
             $mapped[] = $obj;
-        endforeach;
+        }
 
         return $mapped;
     }
@@ -96,9 +95,9 @@ class ModelMapper extends Mapper
     {
         $mappers = [];
         $relatedKlassInfo = ArrayHelper::getValue($klassInfo, 'related_klass_infos', []);
-        foreach ($relatedKlassInfo as $klassInfo):
+        foreach ($relatedKlassInfo as $klassInfo) {
             $mappers[] = new RelatedMappers($klassInfo, $select, $connection);
-        endforeach;
+        }
 
         return $mappers;
     }

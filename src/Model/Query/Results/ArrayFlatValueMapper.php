@@ -19,11 +19,11 @@ class ArrayFlatValueMapper extends Mapper
         $results = $sqlCompiler->executeSql();
 
         $values = [];
-        foreach ($sqlCompiler->getResultsIterator($results) as $result) :
-            foreach ($result as $name => $item) :
+        foreach ($sqlCompiler->getResultsIterator($results) as $result) {
+            foreach ($result as $name => $item) {
                 $values[] = $item;
-            endforeach;
-        endforeach;
+            }
+        }
 
         return $values;
     }

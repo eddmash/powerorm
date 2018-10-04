@@ -42,7 +42,7 @@ class AutoField extends Field
     {
         $errors = [];
 
-        if (!$this->primaryKey):
+        if (!$this->primaryKey) {
             $errors = [
                 CheckError::createObject(
                     [
@@ -53,7 +53,7 @@ class AutoField extends Field
                     ]
                 ),
             ];
-        endif;
+        }
 
         return $errors;
     }
@@ -67,7 +67,7 @@ class AutoField extends Field
     }
 
     /**
-     * @param string $field
+     * @param string                        $field
      * @param \Eddmash\PowerOrm\Model\Model $model
      *
      * @throws \Eddmash\PowerOrm\Exception\FieldError
@@ -93,15 +93,15 @@ class AutoField extends Field
      */
     public function convertToPHPValue($value)
     {
-        if (is_null($value)):
+        if (is_null($value)) {
             return $value;
-        endif;
+        }
 
         try {
             $newvalue = intval($value);
-            if ($newvalue):
+            if ($newvalue) {
                 return $newvalue;
-            endif;
+            }
 
             throw new ValueError(
                 sprintf("Expected an integer, got '%s' .", $value)

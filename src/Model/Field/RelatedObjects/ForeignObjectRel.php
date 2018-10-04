@@ -171,13 +171,13 @@ class ForeignObjectRel extends BaseObject
      */
     public function getAccessorName(Model $model = null)
     {
-        if (is_null($model)) :
+        if (is_null($model)) {
             $model = $this->getFromModel();
-        endif;
+        }
 
-        if ($this->relatedName) :
+        if ($this->relatedName) {
             return $this->relatedName;
-        endif;
+        }
 
         $name = strtolower($model->getMeta()->getModelName());
 
@@ -212,10 +212,8 @@ class ForeignObjectRel extends BaseObject
         return !empty($this->relatedName) && '+' === substr($this->relatedName, -1);
     }
 
-
     public function __debugInfo()
     {
-
         return [
             'to' => is_string($this->toModel) ? $this->toModel : $this->toModel->getMeta()->getNSModelName(),
             'fromField' => $this->fromField->getName(),
@@ -226,7 +224,6 @@ class ForeignObjectRel extends BaseObject
             'name' => $this->name,
             'isRelation' => $this->isRelation,
             'scopeModel' => $this->fromField->scopeModel->getMeta()->getNSModelName(),
-
         ];
     }
 }

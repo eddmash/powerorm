@@ -65,7 +65,6 @@ class M2MManager extends BaseM2MManager
     {
         /** @var $qs Queryset */
         $qs = parent::getQueryset();
-
         return $qs->filter($this->filters);
     }
 
@@ -77,17 +76,17 @@ class M2MManager extends BaseM2MManager
         $rel = ArrayHelper::getValue($kwargs, 'rel');
         $this->reverse = ArrayHelper::getValue($kwargs, 'reverse', false);
 
-        if (false === $this->reverse):
+        if (false === $this->reverse) {
             $model = $rel->toModel;
             $this->queryName = $rel->fromField->getRelatedQueryName();
             $this->fromFieldName = call_user_func($rel->fromField->m2mField);
             $this->toFieldName = call_user_func($rel->fromField->m2mReverseField);
-        else:
+        } else {
             $model = $rel->getFromModel();
             $this->queryName = $rel->fromField->getName();
             $this->fromFieldName = call_user_func($rel->fromField->m2mReverseField);
             $this->toFieldName = call_user_func($rel->fromField->m2mField);
-        endif;
+        }
 
         $this->through = $rel->through;
 
@@ -95,15 +94,14 @@ class M2MManager extends BaseM2MManager
         $this->toField = $this->through->getMeta()->getField($this->toFieldName);
         $this->filters = [];
 
-        foreach ([$this->fromField->getRelatedFields()] as $fields) :
+        foreach ([$this->fromField->getRelatedFields()] as $fields) {
             $rhsField = $fields[1];
 
             $key = sprintf('%s__%s', $this->queryName, $rhsField->getName());
             $this->filters[$key] = $this->instance->{$rhsField->getAttrName()};
-        endforeach;
-
+        }
         $this->relatedValues = $this->fromField->getForeignRelatedFieldsValues($this->instance);
-        if (empty($this->relatedValues)):
+        if (empty($this->relatedValues)) {
             throw new ValueError(
                 sprintf(
                     '"%s" needs to have a value for field "%s" before this many-to-many relationship can be used.',
@@ -111,14 +109,14 @@ class M2MManager extends BaseM2MManager
                     $this->fromFieldName
                 )
             );
-        endif;
+        }
 
         parent::__construct($model);
     }
 
     public function add()
     {
-        if (!$this->through->getMeta()->autoCreated) :
+        if (!$this->through->getMeta()->autoCreated) {
             throw new AttributeError(
                 sprintf(
                     "Cannot set values on a ManyToManyField which specifies an intermediary model. 
@@ -126,31 +124,38 @@ class M2MManager extends BaseM2MManager
                     $this->through->getMeta()->getModelName()
                 )
             );
-        endif;
+        }
 
         $this->addItems($this->fromFieldName, $this->toFieldName, func_get_args());
     }
 
     public function remove()
     {
-        if (!$this->through->getMeta()->autoCreated):
+        if (!$this->through->getMeta()->autoCreated) {
             $meta = $this->through->getMeta();
 
             throw new AttributeError(
                 sprintf(
-                    'Cannot use remove() on a ManyToManyField which specifies ' .
+                    'Cannot use remove() on a ManyToManyField which specifies '.
                     "an intermediary model. Use %s's Manager instead.",
                     $meta->getNSModelName()
                 )
             );
-        endif;
+        }
         //todo clear prefetched
         $this->removeItems($this->fromFieldName, $this->toFieldName, func_get_args());
     }
 
+    /**
+     * @param $values
+     * @param array $kwargs
+     *
+     * @throws AttributeError
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
+     */
     public function set($values, $kwargs = [])
     {
-        if (!$this->through->getMeta()->autoCreated) :
+        if (!$this->through->getMeta()->autoCreated) {
             throw new AttributeError(
                 sprintf(
                     "Cannot set values on a ManyToManyField which specifies an intermediary model. 
@@ -158,66 +163,65 @@ class M2MManager extends BaseM2MManager
                     $this->through->getMeta()->getModelName()
                 )
             );
-        endif;
+        }
 
         $clear = ArrayHelper::getValue($kwargs, 'clear', false);
 
-        if ($clear) :
+        if ($clear) {
             $this->clear();
             $this->addItems($this->fromFieldName, $this->toFieldName, $values);
-        else:
-
-            $oldVals = $this->asArray([$this->toField->getRelatedField()->getAttrName()], true, true);
-            $oldIds = $this->evalQueryset($oldVals);
+        } else {
+            $oldIds = $this->asArray([$this->toField->getRelatedField()->getAttrName()], true, true)
+                ->getResults();
 
             $newObjects = [];
-            foreach ($values as $value) :
-                if ($value instanceof Model):
+            foreach ($values as $value) {
+                if ($value instanceof Model) {
                     $fkVal = $this->toField->getForeignRelatedFieldsValues($value)[0];
-                else:
+                } else {
                     $fkVal = $value;
-                endif;
+                }
 
-                if (in_array($fkVal, $oldIds)):
+                if (in_array($fkVal, $oldIds)) {
                     unset($oldIds[array_search($fkVal, $oldIds)]);
-                else:
+                } else {
                     $newObjects[] = $value;
-                endif;
-            endforeach;
+                }
+            }
 
             $this->remove(...$oldIds);
             $this->add(...$newObjects);
-        endif;
+        }
     }
 
     private function addItems($fromFieldName, $toFieldName, $values = [])
     {
         /* @var $field RelatedField */
-        if ($values) :
+        if ($values) {
             $newIds = [];
 
-            foreach ($values as $value) :
+            foreach ($values as $value) {
                 $field = $this->through->getMeta()->getField($this->toFieldName);
                 $newIds[] = $field->getForeignRelatedFieldsValues($value)[0];
-            endforeach;
+            }
             $newIds = array_unique($newIds);
 
             /** @var $throughClass Model */
             $throughClass = $this->through->getMeta()->getNSModelName();
 
-            $oldVals = $throughClass::objects($this->through)->asArray([$toFieldName], true, true)->filter(
+            $oldIds = $throughClass::objects($this->through)->asArray([$toFieldName],
+                true, true)->filter(
                 [
                     $fromFieldName => $this->relatedValues[0],
                 ]
-            );
-            $oldIds = $this->evalQueryset($oldVals);
+            )->getResults();
 
             $newIds = array_diff($newIds, $oldIds);
 
             /** @var $qb QueryBuilder */
             $qb = BaseOrm::getDbConnection()->createQueryBuilder();
 
-            foreach ($newIds as $newId) :
+            foreach ($newIds as $newId) {
                 $qb->insert($this->through->getMeta()->getDbTable());
 
                 $qb->setValue(sprintf('%s_id', $fromFieldName), $qb->createNamedParameter($this->relatedValues[0]));
@@ -225,35 +229,33 @@ class M2MManager extends BaseM2MManager
 
                 // save to db
                 $qb->execute();
-            endforeach;
-
-        endif;
+            }
+        }
     }
 
     public function removeItems($fromFieldName, $toFieldName, $values = [])
     {
-        if (empty($values)):
+        if (empty($values)) {
             return;
-        endif;
+        }
         $oldIds = [];
 
-        foreach ($values as $value) :
-            if ($value instanceof Model):
-
+        foreach ($values as $value) {
+            if ($value instanceof Model) {
                 $field = $this->through->getMeta()->getField($this->toFieldName);
                 $oldIds[] = $field->getForeignRelatedFieldsValues($value)[0];
-            else:
+            } else {
                 $oldIds[] = $value;
-            endif;
-        endforeach;
+            }
+        }
     }
 
     private function evalQueryset(Queryset $queryset)
     {
         $oldIds = [];
-        foreach ($queryset as $oldVal) :
+        foreach ($queryset as $oldVal) {
             $oldIds[] = $oldVal;
-        endforeach;
+        }
 
         return $oldIds;
     }

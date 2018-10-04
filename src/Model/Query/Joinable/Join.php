@@ -34,7 +34,7 @@ class Join extends BaseJoin
         $fields = [$this->joinField->getJoinColumns()];
         /* @var $from RelatedField */
         /* @var $to RelatedField */
-        foreach ($fields as $index => $relFields) :
+        foreach ($fields as $index => $relFields) {
             list($from, $to) = $relFields;
             $joinConditions[] = sprintf(
                 ' %s.%s = %s.%s',
@@ -43,11 +43,12 @@ class Join extends BaseJoin
                 $quoteUnlessAliasCallback($this->getTableAlias()),
                 $quoteCallback($to->getColumnName())
             );
-        endforeach;
+        }
 
         $onClauseSql = implode(' AND ', $joinConditions);
         $alias = $this->tableAlias == $this->tableName ? '' : $this->tableAlias;
-        $sql = sprintf('%s %s%s ON (%s)', $this->getJoinType(), $quoteUnlessAliasCallback($this->getTableName()),
+        $sql = sprintf('%s %s%s ON (%s)', $this->getJoinType(),
+            $quoteUnlessAliasCallback($this->getTableName()),
             $alias, $onClauseSql);
 
         return [$sql, []];
@@ -133,12 +134,12 @@ class Join extends BaseJoin
 
     public function equal($item)
     {
-        if ($item instanceof static):
+        if ($item instanceof static) {
             return
                 $this->tableName == $item->tableName &&
                 $this->parentAlias == $item->parentAlias &&
                 $this->joinField->deconstruct() === $item->joinField->deconstruct();
-        endif;
+        }
 
         return false;
     }

@@ -34,7 +34,7 @@ class CharField extends Field
     {
         $errors = [];
 
-        if (is_null($this->maxLength)):
+        if (is_null($this->maxLength)) {
             $errors = [
                 CheckError::createObject(
                     [
@@ -45,7 +45,7 @@ class CharField extends Field
                     ]
                 ),
             ];
-        elseif ($this->maxLength <= 0 || is_string($this->maxLength)):
+        } elseif ($this->maxLength <= 0 || is_string($this->maxLength)) {
             $errors = [
                 CheckError::createObject(
                     [
@@ -55,7 +55,7 @@ class CharField extends Field
                     ]
                 ),
             ];
-        endif;
+        }
 
         return $errors;
     }
@@ -74,11 +74,11 @@ class CharField extends Field
     public function convertToPHPValue($value)
     {
         $value = parent::convertToPHPValue($value);
-        if (is_string($value) || is_null($value)):
+        if (is_string($value) || is_null($value)) {
             return $value;
-        endif;
+        }
 
-        return (string)$value;
+        return (string) $value;
     }
 
     /**

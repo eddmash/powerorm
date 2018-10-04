@@ -46,16 +46,16 @@ trait FormFieldReadyTrait
             'helpText' => $this->helpText,
         ];
 
-        if ($this->hasDefault()):
+        if ($this->hasDefault()) {
             $defaults['initial'] = $this->getDefault();
-        endif;
+        }
 
-        if ($this->choices):
+        if ($this->choices) {
             $include_blank = true;
 
-            if ($this->formBlank || empty($this->hasDefault()) || !in_array('initial', $kwargs)):
+            if ($this->formBlank || empty($this->hasDefault()) || !in_array('initial', $kwargs)) {
                 $include_blank = false;
-            endif;
+            }
 
             $defaults['choices'] = $this->getChoices(['include_blank' => $include_blank]);
             $defaults['coerce'] = [$this, 'toPhp'];
@@ -65,8 +65,7 @@ trait FormFieldReadyTrait
                 'formChoicesClass',
                 TypedChoiceField::class
             );
-
-        endif;
+        }
 
         $defaults = array_merge($defaults, $kwargs);
 
@@ -119,34 +118,34 @@ trait FormFieldReadyTrait
      */
     public function validate(Model $model, $value)
     {
-        if (!empty($this->choices) && !empty($value)) :
-            foreach ($this->choices as $key => $choice) :
-                if (is_array($choice)) :
-                    foreach ($choice as $inkey => $inchoice) :
-                        if ($value === $inchoice) :
+        if (!empty($this->choices) && !empty($value)) {
+            foreach ($this->choices as $key => $choice) {
+                if (is_array($choice)) {
+                    foreach ($choice as $inkey => $inchoice) {
+                        if ($value === $inchoice) {
                             return;
-                        endif;
-                    endforeach;
-                else:
-                    if ($value === $choice) :
+                        }
+                    }
+                } else {
+                    if ($value === $choice) {
                         return;
-                    endif;
-                endif;
-            endforeach;
+                    }
+                }
+            }
 
             throw new ValidationError(
                 sprintf('Value %s is not a valid choice.', $value),
                 'invalid_choice'
             );
-        endif;
+        }
 
-        if (is_null($value) && !$this->isNull()) :
+        if (is_null($value) && !$this->isNull()) {
             throw new ValidationError('This field cannot be null.', 'null');
-        endif;
+        }
 
-        if (empty($value) && !$this->formBlank) :
+        if (empty($value) && !$this->formBlank) {
             throw new ValidationError('This field cannot be blank.', 'blank');
-        endif;
+        }
     }
 
     /**
@@ -192,23 +191,22 @@ trait FormFieldReadyTrait
      */
     public function runValidators($value)
     {
-        if (empty($value)):
+        if (empty($value)) {
             return;
-        endif;
+        }
 
         // collect all validation errors for this field
         $validationErrors = [];
-        foreach ($this->getFieldValidators() as $validator) :
-
+        foreach ($this->getFieldValidators() as $validator) {
             try {
                 $validator($value);
             } catch (ValidationError $error) {
                 $validationErrors = array_merge($validationErrors, $error->getErrorList());
             }
-        endforeach;
+        }
 
-        if (!empty($validationErrors)):
+        if (!empty($validationErrors)) {
             throw new ValidationError($validationErrors);
-        endif;
+        }
     }
 }

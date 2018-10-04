@@ -8,7 +8,6 @@
 
 namespace Eddmash\PowerOrm\Components;
 
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use ReflectionClass;
 
@@ -28,12 +27,12 @@ abstract class AppComponent extends Component implements AppInterface
 
     public function getModelsPath()
     {
-        return dirname($this->getFileName()) . '/Models';
+        return dirname($this->getFileName()).'/Models';
     }
 
     public function getMigrationsPath()
     {
-        return dirname($this->getFileName()) . '/Migrations';
+        return dirname($this->getFileName()).'/Migrations';
     }
 
     public function getDbPrefix()

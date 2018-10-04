@@ -61,18 +61,18 @@ class OneToManyDescriptor extends BaseDescriptor
      */
     public function queryset($modelInstance, $reverse = false)
     {
-        if ($reverse) :
+        if ($reverse) {
             $model = $this->field->getRelatedModel();
-        else:
+        } else {
             $model = $this->field->scopeModel;
-        endif;
+        }
 
         // define BaseM2MQueryset
-        if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)):
+        if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)) {
             $baseClass = $model::getManagerClass();
             $class = sprintf('namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}', $baseClass);
             eval($class);
-        endif;
+        }
 
         $manager = O2MManager::createObject(
             [

@@ -30,7 +30,7 @@ class FileHandler extends BaseObject
     public $fileName;
 
     /**
-     * @param string $folder the absolute path to the folder to be created/read from
+     * @param string $folder   the absolute path to the folder to be created/read from
      * @param string $fileName the specific file to handle in the folder specified
      */
     public function __construct($folder, $fileName = '')
@@ -53,21 +53,21 @@ class FileHandler extends BaseObject
     public function write($content)
     {
         // create folder if it does not exist
-        if (!file_exists($this->path)):
+        if (!file_exists($this->path)) {
             mkdir($this->path);
-        endif;
+        }
 
         // absolute path to file
-        $file = $this->path . DIRECTORY_SEPARATOR . $this->fileName;
+        $file = $this->path.DIRECTORY_SEPARATOR.$this->fileName;
 
         $fileHandle = fopen($file, 'w');
 
-        if ($fileHandle):
+        if ($fileHandle) {
             fprintf($fileHandle, $content);
 
             fclose($fileHandle);
             chmod($file, 0777);
-        endif;
+        }
 
         return file_exists($file);
     }
@@ -85,13 +85,12 @@ class FileHandler extends BaseObject
         $name = $this->normalizeKey($name);
 
         /** @var $file SplFileInfo */
-        foreach ($files as $file) :
-            $fileName = $file->getBaseName('.' . $ext);
-            if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext):
+        foreach ($files as $file) {
+            $fileName = $file->getBaseName('.'.$ext);
+            if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext) {
                 return $file;
-            endif;
-
-        endforeach;
+            }
+        }
 
         return false;
     }
@@ -99,7 +98,7 @@ class FileHandler extends BaseObject
     /**
      * searches for files in a directory recursively.
      *
-     * @param string $ext the extension of files to return defualt is "php"
+     * @param string    $ext     the extension of files to return defualt is "php"
      * @param bool|true $recurse if true checks inside directories within the directory default is true
      *
      * @return array
@@ -112,8 +111,8 @@ class FileHandler extends BaseObject
     /**
      * Read contents inside a directory.
      *
-     * @param string $ext
-     * @param bool|true $recurse
+     * @param string     $ext
+     * @param bool|true  $recurse
      * @param bool|false $_fileObj if true returns a file object, if false returns a file pathname
      *
      * @return array
@@ -130,32 +129,32 @@ class FileHandler extends BaseObject
         $ext = $this->stableExt($ext);
 
         $directory = $this->stableDir($this->path);
-        if (!file_exists($directory)):
+        if (!file_exists($directory)) {
             return [];
-        endif;
+        }
 
         $dirIterator = new \DirectoryIterator($directory);
 
-        foreach ($dirIterator as $file) :
-            if ($file->isDot()):
+        foreach ($dirIterator as $file) {
+            if ($file->isDot()) {
                 continue;
-            endif;
+            }
 
-            if ($file->isDir() && $recurse):
+            if ($file->isDir() && $recurse) {
                 $_fileList = array_merge($_fileList, (new static($file->getRealPath()))->readDir($ext, $recurse));
-            else:
+            } else {
                 $_fileList = $this->addFile($_fileList, $file, $ext, $_fileObj);
-            endif;
-        endforeach;
+            }
+        }
 
         return $_fileList;
     }
 
     /**
-     * @param array $_fileList
+     * @param array        $_fileList
      * @param \SplFileInfo $file
      * @param              $ext
-     * @param bool|false $_fileObj if true returns a file object, if false returns a file pathname
+     * @param bool|false   $_fileObj  if true returns a file object, if false returns a file pathname
      *
      * @return array
      *
@@ -165,24 +164,24 @@ class FileHandler extends BaseObject
      */
     private function addFile(array $_fileList, \SplFileInfo $file, $ext, $_fileObj)
     {
-        if (!empty($ext)):
-            if ($ext == $file->getExtension()):
-                if ($_fileObj):
+        if (!empty($ext)) {
+            if ($ext == $file->getExtension()) {
+                if ($_fileObj) {
                     $_fileList[] = clone $file;
-                else:
+                } else {
                     $_fileList[] = $file->getRealPath();
-                endif;
-            endif;
+                }
+            }
 
             return $_fileList;
-        endif;
+        }
 
         // add everything
-        if ($_fileObj):
+        if ($_fileObj) {
             $_fileList[] = clone $file;
-        else:
+        } else {
             $_fileList[] = $file->getRealPath();
-        endif;
+        }
 
         return $_fileList;
     }
@@ -195,6 +194,6 @@ class FileHandler extends BaseObject
 
     private function stableDir($name)
     {
-        return (preg_match("/\/$/", $name)) ? $name : $name . '/';
+        return (preg_match("/\/$/", $name)) ? $name : $name.'/';
     }
 }

@@ -46,22 +46,22 @@ class StateRegistry extends Registry
         // they don't exist.
         $creationOrder = [];
         /** @var $modelState ModelState */
-        foreach ($modelStates as $name => $modelState) :
+        foreach ($modelStates as $name => $modelState) {
             $creationOrder[$modelState->name] = [];
-            if ($modelState->extends):
+            if ($modelState->extends) {
                 $creationOrder[$modelState->name][] = $modelState->extends;
-            endif;
-        endforeach;
+            }
+        }
         try {
             $creationOrder = Tools::topologicalSort($creationOrder);
         } catch (CircularDependencyError $e) {
-            throw new OrmException(static::class . '::' . $e->getMessage());
+            throw new OrmException(static::class.'::'.$e->getMessage());
         }
 
-        foreach ($creationOrder as $depend) :
+        foreach ($creationOrder as $depend) {
             $modelState = $modelStates[$depend];
             $modelState->toModel($this);
-        endforeach;
+        }
         $this->ready = true;
     }
 }

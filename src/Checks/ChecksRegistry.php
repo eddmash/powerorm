@@ -37,7 +37,7 @@ class ChecksRegistry
      * Register checks to be run with the check registry.
      *
      * @param callable $check
-     * @param array $tags
+     * @param array    $tags
      *
      * @since  1.1.0
      *
@@ -46,9 +46,9 @@ class ChecksRegistry
     public function register($check, $tags = [])
     {
         $check = ['check' => $check, 'tags' => []];
-        if (!empty($tags)):
+        if (!empty($tags)) {
             $check['tags'] = $tags;
-        endif;
+        }
 
         $this->registeredChecks[] = $check;
     }
@@ -68,30 +68,29 @@ class ChecksRegistry
 
         $checks = $this->getChecks();
 
-        if (!empty($tags)):
+        if (!empty($tags)) {
             $taggedChecks = [];
-            foreach ($checks as $check) :
+            foreach ($checks as $check) {
                 // a check can have many tags
                 // true if any of the tags provided appears in the check tags
-                if (array_intersect($check['tags'], $tags)):
+                if (array_intersect($check['tags'], $tags)) {
                     $taggedChecks[] = $check;
-                endif;
-            endforeach;
+                }
+            }
             $checks = $taggedChecks;
-        endif;
+        }
 
-        foreach ($checks as $check) :
-
+        foreach ($checks as $check) {
             $functionName = '';
-            if (is_array($check['check'])):
-                if (count($check['check']) > 1):
+            if (is_array($check['check'])) {
+                if (count($check['check']) > 1) {
                     $obj = reset($check['check']);
                     $method = end($check['check']);
-                    $functionName = get_class($obj) . '::' . $method;
-                else:
+                    $functionName = get_class($obj).'::'.$method;
+                } else {
                     $functionName = reset($check['check']);
-                endif;
-            endif;
+                }
+            }
 
             $errors = array_merge($errors, call_user_func($check['check']));
 
@@ -103,7 +102,7 @@ class ChecksRegistry
                     $functionName
                 )
             );
-        endforeach;
+        }
 
         return $errors;
     }
@@ -128,10 +127,9 @@ class ChecksRegistry
 
         $checks = $this->getChecks();
 
-        foreach ($checks as $check) :
-
+        foreach ($checks as $check) {
             $availableChecks = array_merge($availableChecks, $check['tags']);
-        endforeach;
+        }
 
         return $availableChecks;
     }

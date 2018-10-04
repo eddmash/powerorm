@@ -61,7 +61,7 @@ class FormatFileContent
     {
         $indentation = $this->indent($this->indentation);
 
-        $this->buffer[] = $indentation . $item;
+        $this->buffer[] = $indentation.$item;
     }
 
     /**
@@ -85,9 +85,9 @@ class FormatFileContent
      */
     public function reduceIndent()
     {
-        if ($this->indentation > 0):
+        if ($this->indentation > 0) {
             --$this->indentation;
-        endif;
+        }
     }
 
     /**
@@ -113,12 +113,10 @@ class FormatFileContent
         $key,
         $val,
         &$import
-    )
-    {
+    ) {
         $key_arr = static::forceString($key);
 
-        if (is_array($val)):
-
+        if (is_array($val)) {
             $content->addIndent();
             $content->addItem(
                 sprintf(
@@ -127,11 +125,11 @@ class FormatFileContent
                 )
             );
 
-            foreach ($val as $val_key => $in_val) :
-                if ($in_val instanceof DeConstructableInterface):
+            foreach ($val as $val_key => $in_val) {
+                if ($in_val instanceof DeConstructableInterface) {
                     $in_key = self::forceString($val_key);
                     static::handleDeconstructable($content, $in_key[0], $in_val, $import);
-                else:
+                } else {
                     $val_arr = static::forceString($in_val);
                     $import = array_merge($import, $val_arr[1]);
 
@@ -144,16 +142,14 @@ class FormatFileContent
                         )
                     );
                     $content->reduceIndent();
-                endif;
-
-            endforeach;
+                }
+            }
 
             $content->addItem('],');
             $content->reduceIndent();
-        elseif ($val instanceof DeConstructableInterface):
-
+        } elseif ($val instanceof DeConstructableInterface) {
             self::handleDeconstructable($content, $key_arr[0], $val, $import);
-        else:
+        } else {
             $val_arr = static::forceString($val);
             $content->addIndent();
             $content->addItem(
@@ -164,16 +160,16 @@ class FormatFileContent
                 )
             );
             $content->reduceIndent();
-        endif;
+        }
 
         // imports
-        if (!empty($key_arr[1])):
+        if (!empty($key_arr[1])) {
             $import = array_merge($import, $key_arr[1]);
-        endif;
+        }
 
-        if (!empty($val_arr[1])):
+        if (!empty($val_arr[1])) {
             $import = array_merge($import, $val_arr[1]);
-        endif;
+        }
     }
 
     private static function handleDeconstructable(
@@ -181,8 +177,7 @@ class FormatFileContent
         $key,
         DeConstructableInterface $val,
         &$import
-    )
-    {
+    ) {
         $desc_skel = $val->deconstruct();
 
         $desc_import = [$desc_skel['path']];
@@ -202,16 +197,16 @@ class FormatFileContent
             )
         );
 
-        foreach ($desc_constructor_args as $arg) :
-            foreach ($arg as $desc_key => $desc_val) :
+        foreach ($desc_constructor_args as $arg) {
+            foreach ($arg as $desc_key => $desc_val) {
                 self::handleAssocArray(
                     $content,
                     $desc_key,
                     $desc_val,
                     $desc_import
                 );
-            endforeach;
-        endforeach;
+            }
+        }
         $content->addItem(']),');
         $content->reduceIndent();
         $import = array_merge($import, $desc_import);
@@ -261,46 +256,40 @@ class FormatFileContent
 
         $content = self::createObject(4);
         $constructorArgs = [$constructorArgs];
-        foreach ($constructorArgs as $arg) :
-
-            if (is_array($arg)):
-
-                if (empty($arg)):
+        foreach ($constructorArgs as $arg) {
+            if (is_array($arg)) {
+                if (empty($arg)) {
                     $content->addItem('[],');
-                else:
+                } else {
                     $content->addItem('[');
 
-                    foreach ($arg as $key => $val) :
-                        if (!is_int($key)):
+                    foreach ($arg as $key => $val) {
+                        if (!is_int($key)) {
                             static::handleAssocArray($content, $key, $val, $import);
-                        else:
-
+                        } else {
                             $val_arr = static::forceString($val);
 
                             $content->addIndent();
                             $content->addItem(sprintf('%s', $val_arr[0]));
                             $content->reduceIndent();
 
-                            if (!empty($val_arr[1])):
+                            if (!empty($val_arr[1])) {
                                 $import = array_merge($import, $val_arr[1]);
-                            endif;
-
-                        endif;
-                    endforeach;
+                            }
+                        }
+                    }
 
                     $content->addItem('],');
-
-                endif;
-            else:
+                }
+            } else {
                 $val_array = static::forceString($arg);
                 $content->addItem(sprintf(' %s,', $val_array[0]));
+            }
 
-            endif;
-
-            if (!empty($val_array[1])):
+            if (!empty($val_array[1])) {
                 $import = array_merge($import, $val_array[1]);
-            endif;
-        endforeach;
+            }
+        }
 
         $string = implode(PHP_EOL, $content->buffer);
 
@@ -310,7 +299,7 @@ class FormatFileContent
             sprintf(
                 "%1\$s::createObject(%2\$s\t\t\t)",
                 $class,
-                PHP_EOL . $string . PHP_EOL
+                PHP_EOL.$string.PHP_EOL
             ),
             $import,
         ];
@@ -329,16 +318,16 @@ class FormatFileContent
      */
     public static function forceString($value)
     {
-        if (is_string($value)):
+        if (is_string($value)) {
             return [sprintf("'%s'", $value), []];
-        endif;
+        }
 
-        if (is_array($value)):
+        if (is_array($value)) {
             $import = [];
             $assoc = [];
 
-            foreach ($value as $key => $val) :
-                if (!is_int($key)):
+            foreach ($value as $key => $val) {
+                if (!is_int($key)) {
                     $key_arr = static::forceString($key);
                     $val_arr = static::forceString($val);
 
@@ -351,30 +340,27 @@ class FormatFileContent
                         )
                     );
 
-                    if (!empty($key_arr[1])):
+                    if (!empty($key_arr[1])) {
                         $import = array_merge($import, $key_arr[1]);
-                    endif;
+                    }
 
-                    if (!empty($val_arr[1])):
+                    if (!empty($val_arr[1])) {
                         $import = array_merge($import, $val_arr[1]);
-                    endif;
-                else:
-
+                    }
+                } else {
                     $val_arr = static::forceString($val);
                     array_push($assoc, $val_arr[0]);
 
-                    if (!empty($val_arr[1])):
+                    if (!empty($val_arr[1])) {
                         $import = array_merge($import, $val_arr[1]);
-                    endif;
-
-                endif;
-
-            endforeach;
+                    }
+                }
+            }
 
             return [sprintf('[%s]', implode(', ', $assoc)), $import];
-        endif;
+        }
 
-        if (is_object($value) && $value instanceof DeConstructableInterface):
+        if (is_object($value) && $value instanceof DeConstructableInterface) {
             $skel = $value->deconstruct();
 
             $import = [$skel['path']];
@@ -383,22 +369,21 @@ class FormatFileContent
 
             $constructor_args = [$skel['constructorArgs']];
             $cons_args = [];
-            foreach ($constructor_args as $arg) :
-
+            foreach ($constructor_args as $arg) {
                 $val_array = static::forceString($arg);
 
                 array_push($cons_args, $val_array[0]);
 
-                if (!empty($val_array[1])):
+                if (!empty($val_array[1])) {
                     $import = array_merge($import, $val_array[1]);
-                endif;
-            endforeach;
+                }
+            }
 
-            if (empty($constructor_args[0])):
+            if (empty($constructor_args[0])) {
                 $cons_args = '';
-            else:
+            } else {
                 $cons_args = implode(',', $cons_args);
-            endif;
+            }
 
             return [
                 sprintf(
@@ -408,19 +393,19 @@ class FormatFileContent
                 ),
                 $import,
             ];
-        endif;
+        }
 
-        if (true === $value):
+        if (true === $value) {
             return ['true', []];
-        endif;
+        }
 
-        if (false === $value):
+        if (false === $value) {
             return ['false', []];
-        endif;
+        }
 
-        if (null === $value):
+        if (null === $value) {
             return ['null', []];
-        endif;
+        }
 
         return [$value, []];
     }

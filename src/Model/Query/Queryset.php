@@ -77,13 +77,23 @@ class Queryset implements QuerysetInterface, \JsonSerializable
 
     protected $kwargs = [];
 
+    /**
+     * Queryset constructor.
+     *
+     * @param ConnectionInterface|null $connection
+     * @param Model|null               $model
+     * @param Query|null               $query
+     * @param array                    $kwargs
+     *
+     * @throws NotImplemented
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
+     */
     public function __construct(
         ConnectionInterface $connection = null,
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    )
-    {
+    ) {
         $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
         $this->query = (null == $query) ? $this->getQueryBuilder() : $query;
@@ -109,9 +119,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
 
     /**
      * @param ConnectionInterface $connection
-     * @param Model $model
-     * @param Query $query
-     * @param array $kwargs
+     * @param Model               $model
+     * @param Query               $query
+     * @param array               $kwargs
      *
      * @return self
      *
@@ -124,8 +134,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    )
-    {
+    ) {
         return new static($connection, $model, $query, $kwargs);
     }
 
@@ -161,16 +170,16 @@ class Queryset implements QuerysetInterface, \JsonSerializable
 
         $resultCount = count($queryset);
 
-        if (1 == $resultCount):
+        if (1 == $resultCount) {
             return $queryset->getResults()[0];
-        elseif (!$resultCount):
+        } elseif (!$resultCount) {
             throw new ObjectDoesNotExist(
                 sprintf(
                     '%s matching query does not exist.',
                     $this->model->getMeta()->getNSModelName()
                 )
             );
-        endif;
+        }
 
         throw new MultipleObjectsReturned(
             sprintf(
@@ -219,31 +228,31 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         $args = static::formatConditions(__METHOD__, func_get_args());
 
         $names = $this->_fields;
-        if (is_null($this->_fields)):
+        if (is_null($this->_fields)) {
             $names = [];
-            foreach ($this->model->getMeta()->getFields() as $field) :
+            foreach ($this->model->getMeta()->getFields() as $field) {
                 $names[] = $field->getName();
-            endforeach;
-        endif;
+            }
+        }
         $clone = $this->_clone();
-        foreach ($args as $alias => $arg) :
-            if (in_array($alias, $names)):
+        foreach ($args as $alias => $arg) {
+            if (in_array($alias, $names)) {
                 throw new ValueError(
                     sprintf("The annotation '%s' conflicts with a field on the model.", $alias)
                 );
-            endif;
+            }
             $clone->query->addAnnotation(['annotation' => $arg, 'alias' => $alias, 'isSummary' => false]);
-        endforeach;
+        }
 
-        foreach ($clone->query->annotations as $alias => $annotation) :
-            if ($annotation->containsAggregates() && array_key_exists($alias, $args)):
-                if (is_null($clone->_fields)):
+        foreach ($clone->query->annotations as $alias => $annotation) {
+            if ($annotation->containsAggregates() && array_key_exists($alias, $args)) {
+                if (is_null($clone->_fields)) {
                     $clone->query->groupBy = true;
-                else:
+                } else {
                     $clone->query->setGroupBy();
-                endif;
-            endif;
-        endforeach;
+                }
+            }
+        }
 
         return $clone;
     }
@@ -287,7 +296,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     {
         //todo accept non associative items
         $query = $this->query->deepClone();
-        foreach ($kwargs as $alias => $annotation) :
+        foreach ($kwargs as $alias => $annotation) {
             $query->addAnnotation(
                 [
                     'annotation' => $annotation,
@@ -296,12 +305,12 @@ class Queryset implements QuerysetInterface, \JsonSerializable
                 ]
             );
             // ensure we have an aggregated function
-            if (!$query->annotations[$alias]->containsAggregates()) :
+            if (!$query->annotations[$alias]->containsAggregates()) {
                 throw new TypeError(
                     sprintf('%s is not an aggregate expression', $alias)
                 );
-            endif;
-        endforeach;
+            }
+        }
 
         return $query->getAggregation($this->connection, array_keys($kwargs));
     }
@@ -325,25 +334,25 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      */
     public function selectRelated(?array $fields): self
     {
-        if ($this->_fields) :
+        if ($this->_fields) {
             throw new TypeError('Cannot call selectRelated() after $queryset->asArray()');
-        endif;
+        }
         $obj = $this->_clone();
 
-        if (empty($fields)):
+        if (empty($fields)) {
             $obj->query->selectRelected = false;
-        elseif ($fields):
+        } elseif ($fields) {
             $obj->query->addSelectRelected($fields);
-        else:
+        } else {
             $obj->query->selectRelected = true;
-        endif;
+        }
 
         return $obj;
     }
 
     public function prefetchRelated()
     {
-        throw new NotImplemented(__METHOD__ . ' NOT IMPLEMENTED');
+        throw new NotImplemented(__METHOD__.' NOT IMPLEMENTED');
     }
 
     public function exclude()
@@ -356,13 +365,13 @@ class Queryset implements QuerysetInterface, \JsonSerializable
 
     public function exists()
     {
-        if (!$this->_resultsCache):
+        if (!$this->_resultsCache) {
             $instance = $this->all()->limit(0, 1);
 
             return $instance->query->hasResults($this->connection);
-        endif;
+        }
 
-        return (bool)$this->_resultsCache;
+        return (bool) $this->_resultsCache;
     }
 
     /**
@@ -396,12 +405,14 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
      */
     public function size()
     {
-        if ($this->_resultsCache):
+        if ($this->_resultsCache) {
             return count($this->_resultsCache);
-        endif;
+        }
 
         return $this->query->getCount($this->connection);
     }
@@ -433,21 +444,21 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         $qb->insert($model->getMeta()->getDbTable());
 
         /** @var $field Field */
-        foreach ($fields as $name => $field) :
+        foreach ($fields as $name => $field) {
             $value = $this->prepareValueForDatabaseSave(
                 $field,
                 $field->preSave($model, true)
             );
 
             $qb->setValue($field->getColumnName(), $qb->createNamedParameter($value));
-        endforeach;
+        }
 
         // save to db
         $qb->execute();
 
-        if ($returnId):
+        if ($returnId) {
             return $this->connection->lastInsertId();
-        endif;
+        }
     }
 
     /**
@@ -466,11 +477,11 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     {
         $instance = $this->_clone();
 
-        if ($negate):
+        if ($negate) {
             $instance->query->addQ(not_($conditions));
-        else:
+        } else {
             $instance->query->addQ(q_($conditions));
-        endif;
+        }
 
         return $instance;
     }
@@ -491,17 +502,17 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      */
     public static function formatConditions($methondname, $conditions)
     {
-        if (count($conditions) > 1):
+        if (count($conditions) > 1) {
             throw new InvalidArgumentException(
                 sprintf("Method '%s' supports a single array input", $methondname)
             );
-        endif;
+        }
 
-        if (1 == count($conditions)):
-            if ($conditions[0] instanceof Node):
+        if (1 == count($conditions)) {
+            if ($conditions[0] instanceof Node) {
                 return $conditions;
-            endif;
-        endif;
+            }
+        }
 
         $conditions = (empty($conditions)) ? [[]] : $conditions;
 
@@ -543,12 +554,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     public function getSql()
     {
         $instance = $this->_clone();
-
-        list($sql, $params) = $instance->query->getSqlCompiler($instance->connection)->asSql();
-
-        $sql = str_replace('?', '%s', $sql);
-
-        return vsprintf($sql, $params);
+        return $instance->query->_getSql();
     }
 
     /**
@@ -560,11 +566,11 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      */
     public function getResults()
     {
-        if (false === $this->_evaluated):
+        if (false === $this->_evaluated) {
             $this->_resultsCache = call_user_func($this->getMapper());
 
             $this->_evaluated = true;
-        endif;
+        }
 
         return $this->_resultsCache;
     }
@@ -580,10 +586,10 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      *
      * The orm does not try map the into  there  respective models.
      *
-     * @param array $fields the fields to select, if null all fields in the
+     * @param array $fields     the fields to select, if null all fields in the
      *                          model are selected
-     * @param bool $valuesOnly if true return
-     * @param bool $flat if true returns the results as one array others
+     * @param bool  $valuesOnly if true return
+     * @param bool  $flat       if true returns the results as one array others
      *                          it returns results as array of arrays each
      *                          which represents a record in the database for the
      *                          selected field.
@@ -594,30 +600,32 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws TypeError
      */
     public function asArray($fields = [], $valuesOnly = false, $flat = false)
     {
-        if ($flat && 1 != count($fields)):
+        if ($flat && 1 != count($fields)) {
             throw new TypeError(
-                "'flat' is valid when asArray is called" .
+                "'flat' is valid when asArray is called".
                 ' with exactly one field.'
             );
-        endif;
-        if ($flat && !$valuesOnly):
+        }
+        if ($flat && !$valuesOnly) {
             throw new TypeError(
-                "'flat' is valid when asArray " .
+                "'flat' is valid when asArray ".
                 'is called with valuesOnly=true.'
             );
-        endif;
+        }
         $clone = $this->_clone();
         $clone->_fields = $fields;
         $clone->query->setValueSelect($fields);
 
         $clone->resultMapper = ($valuesOnly) ? ArrayValueMapper::class :
             ArrayMapper::class;
-        if ($flat):
+        if ($flat) {
             $clone->resultMapper = ArrayFlatValueMapper::class;
-        endif;
+        }
 
         return $clone;
     }
@@ -634,6 +642,42 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     private function getQueryBuilder()
     {
         return Query::createObject($this->model);
+    }
+
+    /**
+     * Specify data which should be serialized to JSON.
+     *
+     * @see  http://php.net/manual/en/jsonserializable.jsonserialize.php
+     *
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     *               which is a value of any type other than a resource
+     *
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return SimpleObjectSerializer::serialize($this);
+    }
+
+    /**
+     * Ready this instance for use as argument in filter.
+     *
+     * @since  1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function _prepareAsFilterValue()
+    {
+        if (is_null($this->_fields)) {
+            $queryset = $this->asArray(['pk']);
+        } else {
+            if (count($this->_fields) > 1) {
+                throw new TypeError('Cannot use multi-field values as a filter value.');
+            }
+            $queryset = $this->_clone();
+        }
+
+        return $queryset->query->toSubQuery($queryset->connection);
     }
 
     // **************************************************************************************************
@@ -737,9 +781,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     public function __toString()
     {
         $results = $this->_clone();
-        if (!$results->query->limit && !$results->query->offset) :
+        if (!$results->query->limit && !$results->query->offset) {
             $results = $results->limit(1, 6);
-        endif;
+        }
 
         $results = $results->getResults();
 
@@ -751,41 +795,5 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     public function __debugInfo()
     {
         return $this->_clone()->getResults();
-    }
-
-    /**
-     * Ready this instance for use as argument in filter.
-     *
-     * @since  1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     */
-    public function _prepareAsFilterValue()
-    {
-        if (is_null($this->_fields)):
-            $queryset = $this->asArray(['pk']);
-        else:
-            if (count($this->_fields) > 1):
-                throw new TypeError('Cannot use multi-field values as a filter value.');
-            endif;
-            $queryset = $this->_clone();
-        endif;
-
-        return $queryset->query->toSubQuery($queryset->connection);
-    }
-
-    /**
-     * Specify data which should be serialized to JSON.
-     *
-     * @see  http://php.net/manual/en/jsonserializable.jsonserialize.php
-     *
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     *               which is a value of any type other than a resource
-     *
-     * @since 5.4.0
-     */
-    public function jsonSerialize()
-    {
-        return SimpleObjectSerializer::serialize($this);
     }
 }

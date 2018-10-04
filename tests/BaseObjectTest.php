@@ -3,13 +3,14 @@
 namespace Eddmash\PowerOrm\Tests;
 
 use Eddmash\PowerOrm\BaseObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Created by http://eddmash.com
  * User: eddmash
  * Date: 9/5/16.
  */
-class BaseObjectTest extends \PHPUnit_Framework_TestCase
+class BaseObjectTest extends TestCase
 {
     /**
      * @var object

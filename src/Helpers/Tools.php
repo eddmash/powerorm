@@ -39,42 +39,40 @@ class Tools
         $sorted = [];
         $deps = $dependency;
 
-        while ($deps):
-
+        while ($deps) {
             $noDeps = [];
 
-            foreach ($deps as $parent => $dep) :
-                if (empty($dep)):
+            foreach ($deps as $parent => $dep) {
+                if (empty($dep)) {
                     $noDeps[] = $parent;
-                endif;
-            endforeach;
+                }
+            }
 
             // we don't have  a vertice with 0 indegree hence we have loop
-            if (empty($noDeps)):
+            if (empty($noDeps)) {
                 throw new CircularDependencyError(
                     sprintf(
                         'Cyclic dependency on topological sort %s',
                         json_encode($deps)
                     )
                 );
-            endif;
+            }
 
             $sorted = array_merge($sorted, $noDeps);
 
             $newDeps = [];
 
-            foreach ($deps as $parent => $dep) :
+            foreach ($deps as $parent => $dep) {
                 // if parent has already been added to sort skip it
-                if (!in_array($parent, $noDeps)):
+                if (!in_array($parent, $noDeps)) {
                     //if its already sorted remove it
 
                     $newDeps[$parent] = array_diff($dep, $sorted);
-                endif;
-            endforeach;
+                }
+            }
 
             $deps = $newDeps;
-
-        endwhile;
+        }
 
         return $sorted;
     }
@@ -83,9 +81,9 @@ class Tools
     {
         $fieldNames = [];
         /** @var $field Field */
-        foreach ($meta->getFields() as $field) :
+        foreach ($meta->getFields() as $field) {
             $fieldNames[] = $field->getName();
-        endforeach;
+        }
 
         return $fieldNames;
     }
@@ -98,11 +96,11 @@ class Tools
     /**
      * Takes an array and turns it into a string .
      *
-     * @param mixed $data the array to be converted to string
-     * @param int $indent how to indent the items in the array
-     * @param string $close item to come at the after of the arrays closing braces
-     * @param string $start item to come at the before of the arrays opening braces
-     * @param int $level at what level we are operating at, level=0 is the encasing level,just unifies the different
+     * @param mixed  $data   the array to be converted to string
+     * @param int    $indent how to indent the items in the array
+     * @param string $close  item to come at the after of the arrays closing braces
+     * @param string $start  item to come at the before of the arrays opening braces
+     * @param int    $level  at what level we are operating at, level=0 is the encasing level,just unifies the different
      *                       forms of data
      *
      * @return string
@@ -118,12 +116,11 @@ class Tools
         $elementLineBreak = false,
         $outerBrackets = true,
         $indentChar = null
-    )
-    {
+    ) {
         $indentCharacter = str_pad('', 4, ' ');
-        if ($indentChar):
+        if ($indentChar) {
             $indentCharacter = $indentChar;
-        endif;
+        }
         $linebreak = PHP_EOL;
         $stringState = '';
 
@@ -138,7 +135,7 @@ class Tools
 
         // unify everything to an array, on the first round for consistencies.
         if (0 == $level) {
-            $data = ($outerBrackets) ? [$data] : (array)$data;
+            $data = ($outerBrackets) ? [$data] : (array) $data;
         }
 
         foreach ($data as $key => $value) {
@@ -150,7 +147,7 @@ class Tools
             if (is_array($value)) {
                 // HANDLE VALUE IF ARRAY
 
-                $stringState .= '[' . $linebreak;
+                $stringState .= '['.$linebreak;
 
                 if (!is_numeric($key)) {
                     $stringState .= "'$key'=>";
@@ -168,7 +165,7 @@ class Tools
                 $stringState .= (false !== $indent) ?
                     str_repeat($indentCharacter, $multiplier) : '';
 
-                $stringState .= $indentation . ']';
+                $stringState .= $indentation.']';
             } elseif (is_object($value)) {
                 // HANDLE VALUE THAT ARE OBJECTS THAT
                 // IMPLEMENT DeConstructableInterface interface
@@ -220,7 +217,7 @@ class Tools
             ++$counter;
         }
 
-        $stringState = rtrim($stringState, ',' . $linebreak);
+        $stringState = rtrim($stringState, ','.$linebreak);
         $stringState .= $linebreak;
 
         return $stringState;
@@ -229,8 +226,8 @@ class Tools
     /**
      * Reads a json file and return the files data converted to there respective php types.
      *
-     * @param string $full_file_path path to the json file to read
-     * @param bool|false $ass_array [optional]  When <b>TRUE</b>, returned objects will be converted into
+     * @param string     $full_file_path path to the json file to read
+     * @param bool|false $ass_array      [optional]  When <b>TRUE</b>, returned objects will be converted into
      *                                   associative arrays
      *
      * @return mixed
@@ -247,7 +244,7 @@ class Tools
      */
     public static function countriesList()
     {
-        $path = dirname(realpath(__FILE__)) . DIRECTORY_SEPARATOR . 'data/countries.json';
+        $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/countries.json';
         $countries = self::readJson($path, true);
 
         $listCountries = [];
@@ -280,7 +277,7 @@ class Tools
      */
     public static function phoneCodesList()
     {
-        $path = dirname(realpath(__FILE__)) . DIRECTORY_SEPARATOR . 'data/phone.json';
+        $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/phone.json';
         $phone_codes = self::readJson($path, true);
 
         $listCodes = [];
@@ -295,7 +292,7 @@ class Tools
     /**
      * Fetches the country based on the phone code passed in.
      *
-     * @param string $code the phone code to search for
+     * @param string     $code              the phone code to search for
      * @param bool|false $show_country_code if to show the country code or its full name
      *
      * @return mixed
@@ -319,7 +316,7 @@ class Tools
      */
     public static function currencyList()
     {
-        $path = dirname(realpath(__FILE__)) . DIRECTORY_SEPARATOR . 'data/currency.json';
+        $path = dirname(realpath(__FILE__)).DIRECTORY_SEPARATOR.'data/currency.json';
         $currency = self::readJson($path, true);
 
         $listCurrency = [];
@@ -349,11 +346,11 @@ class Tools
      * Schedule `callback` to be called once `model` and all `related_models` have been imported and registered with
      * the app registry.
      *
-     * @param callback $callback will be called with the newly-loaded model
+     * @param callback $callback   will be called with the newly-loaded model
      *                             classes as its optional keyword arguments
-     * @param Model $scopeModel the model on which the method was invoked
-     * @param mixed $relModel the related models that needs to be resolved
-     * @param array $kwargs
+     * @param Model    $scopeModel the model on which the method was invoked
+     * @param mixed    $relModel   the related models that needs to be resolved
+     * @param array    $kwargs
      *
      * @since  1.1.0
      *
@@ -366,21 +363,19 @@ class Tools
         Model $scopeModel,
         $relModel,
         $kwargs = []
-    )
-    {
+    ) {
         $relModel = self::resolveRelation($scopeModel, $relModel);
 
-        $relModels = (array)$relModel;
+        $relModels = (array) $relModel;
 
         $modelsToResolve = [];
-        foreach ($relModels as $relM) :
-            if (is_string($relM)):
-
+        foreach ($relModels as $relM) {
+            if (is_string($relM)) {
                 $modelsToResolve[] = $relM;
-            elseif ($relM instanceof Model):
+            } elseif ($relM instanceof Model) {
                 $modelsToResolve[] = $relM->getMeta()->getNSModelName();
-            endif;
-        endforeach;
+            }
+        }
 
         $kwargs['scopeModel'] = $scopeModel;
         $scopeModel->getMeta()->getRegistry()
@@ -400,11 +395,11 @@ class Tools
     public static function resolveRelation($model, $relModel)
     {
         if (is_string($relModel) &&
-            BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $relModel):
+            BaseOrm::RECURSIVE_RELATIONSHIP_CONSTANT == $relModel) {
             return self::resolveRelation($model, $model);
-        elseif ($relModel instanceof Model):
+        } elseif ($relModel instanceof Model) {
             return $relModel->getMeta()->getNSModelName();
-        endif;
+        }
 
         return $relModel;
     }
@@ -438,22 +433,22 @@ class Tools
         } else {
             $message = 'Exception';
         }
-        $message .= " '" . get_class($exception) . "' with message '{$exception->getMessage()}' \n\nin "
-            . $exception->getFile() . ':' . $exception->getLine() . "\n\n"
-            . "Stack trace:\n" . $exception->getTraceAsString();
+        $message .= " '".get_class($exception)."' with message '{$exception->getMessage()}' \n\nin "
+            .$exception->getFile().':'.$exception->getLine()."\n\n"
+            ."Stack trace:\n".$exception->getTraceAsString();
 
         return $message;
     }
 
     public static function ensureParamIsArray($fields, $messg = null)
     {
-        if (!is_array($fields)):
-            if (is_null($messg)):
+        if (!is_array($fields)) {
+            if (is_null($messg)) {
                 $messg = sprintf("method '%s()' expects parameters to be an array", __FUNCTION__);
-            endif;
+            }
 
             throw new InvalidArgumentException($messg);
-        endif;
+        }
     }
 
     /**
@@ -466,7 +461,7 @@ class Tools
     public static function unifyModelName($modelName)
     {
         return str_replace(
-            Model::FAKENAMESPACE . '\\',
+            Model::FAKENAMESPACE.'\\',
             '',
             $modelName
         );
@@ -476,8 +471,8 @@ class Tools
      * Returns meta settings related to the passed in model instance, passed in
      * class.
      *
-     * @param Model $model
-     * @param null $class this most of the time will be a parent in the models
+     * @param Model  $model
+     * @param null   $class  this most of the time will be a parent in the models
      *                       hierarchy that we want to get its settings if it all it set any
      * @param string $method
      *
@@ -487,25 +482,23 @@ class Tools
         Model $model,
         $class = null,
         $method = 'getMetaSettings'
-    )
-    {
+    ) {
         $metaSettings = [];
-        if ($class):
+        if ($class) {
             $r = new \ReflectionClass($class);
-        else:
+        } else {
             $r = new \ReflectionObject($model);
-        endif;
-        if ($r->hasMethod($method)):
-
+        }
+        if ($r->hasMethod($method)) {
             $metaMeth = $r->getMethod($method);
             $declaringClass = $metaMeth->getDeclaringClass()->getName();
-            if (strtolower($r->getName()) === strtolower($declaringClass)):
-                if ($class):
+            if (strtolower($r->getName()) === strtolower($declaringClass)) {
+                if ($class) {
                     $method = sprintf('%s::%s', $class, $method);
-                endif;
+                }
                 $metaSettings = static::invokeCallable([$model, $method]);
-            endif;
-        endif;
+            }
+        }
 
         return $metaSettings;
     }
@@ -518,15 +511,15 @@ class Tools
      */
     public static function invokeCallable($callable, $args = null)
     {
-        if (null != $args):
-            if (is_array($args)):
+        if (null != $args) {
+            if (is_array($args)) {
                 $results = call_user_func_array($callable, $args);
-            else:
+            } else {
                 $results = call_user_func($callable, $args);
-            endif;
-        else:
+            }
+        } else {
             $results = call_user_func($callable);
-        endif;
+        }
 
         return $results;
     }

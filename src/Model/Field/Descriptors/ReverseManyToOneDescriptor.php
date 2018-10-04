@@ -22,9 +22,9 @@ class ReverseManyToOneDescriptor extends BaseDescriptor
      */
     public function getValue(Model $modelInstance)
     {
-        if (empty($modelInstance)):
+        if (empty($modelInstance)) {
             return $this;
-        endif;
+        }
 
         return $this->queryset($modelInstance);
     }
@@ -51,18 +51,18 @@ class ReverseManyToOneDescriptor extends BaseDescriptor
      */
     public function queryset($modelInstance, $reverse = true)
     {
-        if ($reverse) :
+        if ($reverse) {
             $model = $this->field->getRelatedModel();
-        else:
+        } else {
             $model = $this->field->scopeModel;
-        endif;
+        }
 
         // define BaseM2MQueryset
-        if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)):
+        if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)) {
             $baseClass = $model::getManagerClass();
             $class = sprintf('namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}', $baseClass);
             eval($class);
-        endif;
+        }
 
         $manager = M2OManager::createObject(
             [

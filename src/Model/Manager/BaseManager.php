@@ -44,9 +44,9 @@ class BaseManager extends BaseObject implements \IteratorAggregate
      */
     public function __call($name, $arguments)
     {
-        if (!method_exists($this, $name)) :
+        if (!method_exists($this, $name)) {
             return call_user_func_array([$this->getQueryset(), $name], $arguments);
-        endif;
+        }
     }
 
     public function __toString()

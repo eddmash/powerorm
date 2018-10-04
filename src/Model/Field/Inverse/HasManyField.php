@@ -31,10 +31,9 @@ class HasManyField extends InverseField
     {
         $this->toField = ArrayHelper::getValue($kwargs, 'toField');
         $this->fromField = ArrayHelper::getValue($kwargs, 'fromField', $this);
-        if (!ArrayHelper::hasKey($kwargs, 'rel')):
-
+        if (!ArrayHelper::hasKey($kwargs, 'rel')) {
             $kwargs['rel'] = $this->fromField->relation;
-        endif;
+        }
 
         parent::__construct($kwargs);
     }
@@ -83,9 +82,9 @@ class HasManyField extends InverseField
      */
     public function getDescriptor()
     {
-        if ($this->fromField instanceof ManyToManyField) :
+        if ($this->fromField instanceof ManyToManyField) {
             return new $this->m2mDescriptor($this);
-        endif;
+        }
 
         return parent::getDescriptor();
     }

@@ -57,9 +57,9 @@ class Recorder
         $appliedMigrations = $this->connection
             ->fetchAll(sprintf('SELECT * FROM %s', $this->migrationTableName));
         $applied = [];
-        foreach ($appliedMigrations as $item) :
+        foreach ($appliedMigrations as $item) {
             $applied[$item['app']][$item['name']] = $item['name'];
-        endforeach;
+        }
 
         return $applied;
     }
@@ -81,14 +81,12 @@ class Recorder
 
     public function createTable()
     {
-        if ($this->tableExist):
-
+        if ($this->tableExist) {
             return;
-        endif;
+        }
         $schemaM = $this->connection->getSchemaManager();
         $schema = $schemaM->createSchema();
-        if (!$schemaM->tablesExist($this->migrationTableName)):
-
+        if (!$schemaM->tablesExist($this->migrationTableName)) {
             $myTable = $schema->createTable($this->migrationTableName);
             $myTable->addColumn(
                 'id',
@@ -114,6 +112,6 @@ class Recorder
 
             $schemaM->createTable($myTable);
             $this->tableExist = true;
-        endif;
+        }
     }
 }

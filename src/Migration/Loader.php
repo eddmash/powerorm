@@ -41,7 +41,7 @@ class Loader extends BaseObject
      * Loader constructor.
      *
      * @param ConnectionInterface|null $connection
-     * @param bool $loadGraph
+     * @param bool                     $loadGraph
      *
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
@@ -50,9 +50,9 @@ class Loader extends BaseObject
     public function __construct(ConnectionInterface $connection = null, $loadGraph = true)
     {
         $this->connection = $connection;
-        if ($loadGraph):
+        if ($loadGraph) {
             $this->buildGraph();
-        endif;
+        }
     }
 
     /**
@@ -80,35 +80,32 @@ class Loader extends BaseObject
      */
     public function buildGraph()
     {
-        if (!empty($this->connection)):
+        if (!empty($this->connection)) {
             $recoder = new Recorder($this->connection);
 
             $this->appliedMigrations = $recoder->getApplied();
-        endif;
+        }
 
         $migrations = $this->getMigrations();
 
         $this->graph = new Graph();
 
         // first add all the migrations into the graph
-        foreach ($migrations as $name => $migration) :
-
+        foreach ($migrations as $name => $migration) {
             $this->graph->addNode($migration->getName(), $migration);
-        endforeach;
+        }
 
         // the for each migration set its dependencies
         /** @var $migration Migration */
-        foreach ($migrations as $name => $migration) :
-            foreach ($migration->getDependency() as $appName => $parent) :
+        foreach ($migrations as $name => $migration) {
+            foreach ($migration->getDependency() as $appName => $parent) {
                 $this->graph->addDependency(
                     $name,
                     [$appName => $parent],
                     $migration
                 );
-
-            endforeach;
-
-        endforeach;
+            }
+        }
     }
 
     /**
@@ -134,38 +131,38 @@ class Loader extends BaseObject
         $migrations = [];
         /* @var $app AppInterface */
 
-        foreach ($this->getMigrations() as $name => $migration) :
+        foreach ($this->getMigrations() as $name => $migration) {
             $app = $migration->getApp();
-            if ($migration->getAppLabel() != strtolower($appName)):
+            if ($migration->getAppLabel() != strtolower($appName)) {
                 continue;
-            endif;
+            }
             $shortName = ClassHelper::getNameFromNs(
                 $name,
-                $app->getNamespace() . "\Migrations"
+                $app->getNamespace()."\Migrations"
             );
 
             if (StringHelper::startsWith($name, $prefix) ||
-                StringHelper::startsWith($shortName, $prefix)):
+                StringHelper::startsWith($shortName, $prefix)) {
                 $migrations[] = $migration;
-            endif;
-        endforeach;
+            }
+        }
 
-        if (count($migrations) > 1):
+        if (count($migrations) > 1) {
             throw new AmbiguityError(
                 sprintf(
-                    'There is more than one ' .
+                    'There is more than one '.
                     "migration with the prefix '%s'",
                     $prefix
                 )
             );
-        elseif (0 == count($migrations)):
+        } elseif (0 == count($migrations)) {
             throw new KeyError(
                 sprintf(
                     "There no migrations with the prefix '%s'",
                     $prefix
                 )
             );
-        endif;
+        }
 
         return $migrations[0];
     }
@@ -198,15 +195,15 @@ class Loader extends BaseObject
         $migrations = [];
 
         /* @var $migrationName Migration */
-        foreach ($this->getMigrationsClasses() as $appName => $classes) :
-            foreach ($classes as $fileName) :
+        foreach ($this->getMigrationsClasses() as $appName => $classes) {
+            foreach ($classes as $fileName) {
                 $migrationName = $fileName;
                 $migration = $migrationName::createObject($fileName);
                 $migration->setAppLabel($appName);
                 $this->setMigratedApps($appName);
                 $migrations[$fileName] = $migration;
-            endforeach;
-        endforeach;
+            }
+        }
 
         return $migrations;
     }
@@ -228,27 +225,27 @@ class Loader extends BaseObject
         $classes = [];
 
         /* @var $component AppInterface */
-        foreach ($appFiles as $appName => $migrationFiles) :
+        foreach ($appFiles as $appName => $migrationFiles) {
             $component = BaseOrm::getInstance()->getComponent($appName);
-            foreach ($migrationFiles as $migrationFile) :
+            foreach ($migrationFiles as $migrationFile) {
                 $className = ClassHelper::getClassFromFile($migrationFile);
                 $foundClass = ClassHelper::classExists(
                     $className,
                     $component->getNamespace()
                 );
-                if (!$foundClass):
+                if (!$foundClass) {
                     throw new ClassNotFoundException(
                         sprintf(
-                            'The class [ %2$s\\%1$s or \\%1$s ] ' .
+                            'The class [ %2$s\\%1$s or \\%1$s ] '.
                             'could not be located',
                             $className,
                             $component->getNamespace()
                         )
                     );
-                endif;
+                }
                 $classes[$appName][] = $foundClass;
-            endforeach;
-        endforeach;
+            }
+        }
 
         return $classes;
     }
@@ -265,8 +262,8 @@ class Loader extends BaseObject
     public function getMigrationsFiles()
     {
         $files = [];
-        foreach (BaseOrm::getInstance()->getComponents() as $component) :
-            if ($component instanceof AppInterface):
+        foreach (BaseOrm::getInstance()->getComponents() as $component) {
+            if ($component instanceof AppInterface) {
                 $fileHandler = FileHandler::createObject(
                     [
                         'path' => $component->getMigrationsPath(),
@@ -274,8 +271,8 @@ class Loader extends BaseObject
                 );
 
                 $files[$component->getName()] = $fileHandler->getPathFiles();
-            endif;
-        endforeach;
+            }
+        }
 
         return $files;
     }
@@ -294,7 +291,7 @@ class Loader extends BaseObject
         $last_version = basename($last_version);
         $last_version = preg_split('/_/', $last_version)[0];
 
-        return (int)$last_version;
+        return (int) $last_version;
     }
 
     /**
@@ -310,11 +307,11 @@ class Loader extends BaseObject
     {
         $conflicts = [];
         $apps = $this->graph->getLeafNodes();
-        foreach ($apps as $name => $latest) :
-            if (count($latest) > 1):
+        foreach ($apps as $name => $latest) {
+            if (count($latest) > 1) {
                 $conflicts[$name] = $latest;
-            endif;
-        endforeach;
+            }
+        }
 
         return $conflicts;
     }

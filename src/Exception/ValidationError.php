@@ -20,23 +20,23 @@ class ValidationError extends \Exception implements \IteratorAggregate
 
     public function __construct($message, $code = '')
     {
-        if ($message instanceof self) :
+        if ($message instanceof self) {
             $message = $message->getMessage();
             $code = $message->validationCode;
-        endif;
+        }
 
-        if (is_array($message)) :
-            foreach ($message as $item) :
-                if (!$item instanceof self) :
+        if (is_array($message)) {
+            foreach ($message as $item) {
+                if (!$item instanceof self) {
                     $item = new self($item);
-                endif;
+                }
                 $this->errorList = array_merge($this->errorList, $item->errorList);
-            endforeach;
-        else:
+            }
+        } else {
             $this->message = $message;
             $this->validationCode = $code;
             $this->errorList = [$this];
-        endif;
+        }
         parent::__construct($this->message);
     }
 
@@ -73,9 +73,9 @@ class ValidationError extends \Exception implements \IteratorAggregate
     public function getMessages()
     {
         $message = [];
-        foreach ($this->errorList as $item) :
+        foreach ($this->errorList as $item) {
             $message[] = $item->getMessage();
-        endforeach;
+        }
 
         return $message;
     }

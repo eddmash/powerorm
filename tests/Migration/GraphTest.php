@@ -107,9 +107,9 @@ class GraphTest extends PowerormTest
         $graph->addDependency("app2\m1", $app2M1->getDependency(), $app2M1);
         $graph->addDependency("app2\m2", $app2M2->getDependency(), $app2M2);
 
-        foreach ($app2M3->getDependency() as $app => $mig) :
+        foreach ($app2M3->getDependency() as $app => $mig) {
             $graph->addDependency("app2\m3", [$app => $mig], $app2M3);
-        endforeach;
+        }
 
         //get root
         $this->assertEquals(

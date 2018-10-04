@@ -27,10 +27,10 @@ class BaseDescriptor implements DescriptorInterface
 
     public function __construct(Field $field)
     {
-        if ($field instanceof InverseField) :
+        if ($field instanceof InverseField) {
             $this->reverse = true;
             $field = $field->fromField;
-        endif;
+        }
         $this->field = $field;
     }
 

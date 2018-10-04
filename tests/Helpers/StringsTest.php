@@ -12,8 +12,9 @@
 namespace Eddmash\PowerOrm\Tests\Helpers;
 
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use PHPUnit\Framework\TestCase;
 
-class StringsTest extends \PHPUnit_Framework_TestCase
+class StringsTest extends TestCase
 {
     /**
      * @dataProvider providerValidVariableName

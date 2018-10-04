@@ -19,7 +19,7 @@ trait RegisterLookupTrait
 
     /**
      * @param string $class
-     * @param null $name
+     * @param null   $name
      *
      * @since  1.1.0
      *
@@ -28,9 +28,9 @@ trait RegisterLookupTrait
     public static function registerLookup($class, $name = null)
     {
         /* @var $class BaseLookup */
-        if (is_null($name)):
+        if (is_null($name)) {
             $name = strtolower($class::$lookupName);
-        endif;
+        }
         self::$lookups[$name] = $class;
     }
 
@@ -47,9 +47,9 @@ trait RegisterLookupTrait
      */
     public function getLookup($name)
     {
-        if (array_key_exists($name, self::$lookups)):
+        if (array_key_exists($name, self::$lookups)) {
             return self::$lookups[$name];
-        endif;
+        }
 
         throw new FieldError(sprintf('Lookup %s is not recognized', $name));
     }

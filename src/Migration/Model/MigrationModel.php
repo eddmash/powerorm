@@ -24,13 +24,13 @@ class MigrationModel extends Model
 
         list($namespace, $className) = ClassHelper::getNamespaceNamePair($className);
 
-        if (empty($extends) || Model::isModelBase($extends)):
+        if (empty($extends) || Model::isModelBase($extends)) {
             $extends = ClassHelper::getFormatNamespace(
                 Model::getFullClassName(),
                 true,
                 false
             );
-        else:
+        } else {
             $extendedClass = $extends;
 
             $use = sprintf('use %s;', $extendedClass);
@@ -42,7 +42,7 @@ class MigrationModel extends Model
                 ),
                 '\\'
             );
-        endif;
+        }
 
         $class = sprintf(
             self::getTemplate(),
@@ -58,9 +58,9 @@ class MigrationModel extends Model
             $className
         );
 
-        if (!ClassHelper::classExists($className, $namespace)):
+        if (!ClassHelper::classExists($className, $namespace)) {
             eval($class);
-        endif;
+        }
 
         return $className;
     }

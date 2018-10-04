@@ -84,79 +84,73 @@ class Executor extends BaseObject
     {
         $plan = [];
 
-        if ($cleanStart):
+        if ($cleanStart) {
             $applied = [];
-        else:
+        } else {
             $applied = $this->loader->appliedMigrations;
-        endif;
+        }
 
         /** @var $target ["appName"=> "migrationName"] */
-        foreach ($targets as $appName => $target) :
+        foreach ($targets as $appName => $target) {
             // if target is 'zero' unmigrate all
-            if ('zero' == $target):
-
+            if ('zero' == $target) {
                 $rootNodes = $this->loader->graph->getRootNodes();
-                foreach ($rootNodes as $rootAppName => $rootNode) :
+                foreach ($rootNodes as $rootAppName => $rootNode) {
                     $descs = $this->loader->graph
                         ->getDecedentsTree($rootAppName, $rootNode);
 
-                    foreach ($descs as $migrationName => $migrApp) :
-
-                        if (!empty($applied[$migrApp][$migrationName])):
+                    foreach ($descs as $migrationName => $migrApp) {
+                        if (!empty($applied[$migrApp][$migrationName])) {
                             $plan[$migrApp][$migrationName] = [
                                 'migration' => $this->loader->graph
                                     ->getMigration($migrApp, $migrationName),
                                 'unapply' => true,
                             ];
                             unset($applied[$migrApp][$migrationName]);
-                        endif;
-
-                    endforeach;
-                endforeach;
-            elseif (!empty($applied[$appName][$target])):
+                        }
+                    }
+                }
+            } elseif (!empty($applied[$appName][$target])) {
                 // if its applied then we need to unapply it.
 
                 /** @var $childNode Node */
                 $children = $this->loader->graph
                     ->getNodeFamilyTree($appName, $target)->children;
 
-                foreach ($children as $childNode) :
-
+                foreach ($children as $childNode) {
                     $descedants = $this->loader->graph->getDecedentsTree(
                         $childNode->appName,
                         $childNode->name
                     );
 
-                    foreach ($descedants as $migrationName => $descAppName) :
-
-                        if (!empty($applied[$descAppName][$migrationName])):
+                    foreach ($descedants as $migrationName => $descAppName) {
+                        if (!empty($applied[$descAppName][$migrationName])) {
                             $plan[$descAppName][$migrationName] = [
                                 'migration' => $this->loader->graph
                                     ->getMigration($descAppName, $migrationName),
                                 'unapply' => true,
                             ];
                             unset($applied[$descAppName][$migrationName]);
-                        endif;
-                    endforeach;
-
-                endforeach;
-            else:
+                        }
+                    }
+                }
+            } else {
                 $ancestries = $this->loader->graph
                     ->getAncestryTree($appName, $target);
 
                 // if not applied and its not target is not zero, then apply it.
-                foreach ($ancestries as $migrationName => $migrationApp) :
-                    if (empty($applied[$migrationApp][$migrationName])):
+                foreach ($ancestries as $migrationName => $migrationApp) {
+                    if (empty($applied[$migrationApp][$migrationName])) {
                         $plan[$migrationApp][$migrationName] = [
                             'migration' => $this->loader->graph
                                 ->getMigration($migrationApp, $migrationName),
                             'unapply' => false,
                         ];
                         $applied[$migrationApp][] = $migrationName;
-                    endif;
-                endforeach;
-            endif;
-        endforeach;
+                    }
+                }
+            }
+        }
 
         return $plan;
     }
@@ -177,17 +171,17 @@ class Executor extends BaseObject
      */
     public function migrate($targets, $plan, $fake)
     {
-        if (empty($plan)):
+        if (empty($plan)) {
             $plan = $this->getMigrationPlan($targets);
-        endif;
+        }
 
         $migrationsToRun = $this->getMigrationsFromPlan($plan);
 
         $targets = [];
         $leaves = $this->loader->graph->getLeafNodes();
-        foreach ($leaves as $app => $appLeaves) :
+        foreach ($leaves as $app => $appLeaves) {
             $targets[$app] = $appLeaves[0];
-        endforeach;
+        }
 
         // the full plan that would be executed if we to run on a new database
         $fullPlan = $this->getMigrationsFromPlan(
@@ -202,8 +196,8 @@ class Executor extends BaseObject
 
         //Phase 1 -- create all project states before a migration is (un)applied
         /* @var $migration Migration */
-        foreach ($fullPlan as $appName => $appMigrations) :
-            foreach ($appMigrations as $migName => $migration) :
+        foreach ($fullPlan as $appName => $appMigrations) {
+            foreach ($appMigrations as $migName => $migration) {
                 // we use the migration to mutate state
                 // after we mutate we remove the migration from the
                 // $migrationsToRun list.
@@ -211,15 +205,15 @@ class Executor extends BaseObject
                 // $migrationsToRun break
                 // this is to avoid any further mutations by other migrations
                 // not in the list.
-                if (empty($migrationsToRun)):
+                if (empty($migrationsToRun)) {
                     break;
-                endif;
+                }
 
                 $run = !empty($migrationsToRun[$appName][$migName]);
-                if ($run):
+                if ($run) {
                     $states[$appName][$migName] = $state->deepClone();
                     unset($migrationsToRun[$appName][$migName]);
-                endif;
+                }
 
                 // $run will be false if the migration is not in the
                 // $migrationsToRun list
@@ -231,36 +225,35 @@ class Executor extends BaseObject
                 // the migration was applied.
                 // remember in PHP objects are passed by reference.
                 $state = $migration->updateState($state, $run);
-            endforeach;
-        endforeach;
+            }
+        }
 
         // Phase 2 -- Run the migrations
-        foreach ($plan as $appName => $actionPlan) :
-            foreach ($actionPlan as $mName => $migrationMeta) :
-                if ($migrationMeta['unapply']):
+        foreach ($plan as $appName => $actionPlan) {
+            foreach ($actionPlan as $mName => $migrationMeta) {
+                if ($migrationMeta['unapply']) {
                     $this->unApplyMigration(
                         $states[$appName][$mName],
                         $migrationMeta['migration'],
                         $fake
                     );
-                elseif (false === $migrationMeta['unapply']):
-
+                } elseif (false === $migrationMeta['unapply']) {
                     $this->applyMigration(
                         $states[$appName][$mName],
                         $migrationMeta['migration'],
                         $fake
                     );
-                endif;
-            endforeach;
-        endforeach;
+                }
+            }
+        }
     }
 
     /**
      * Rolls back the migrations on the database.
      *
-     * @param ProjectState $state this is the state before the migration is applied
-     * @param Migration $migration the migration to apply
-     * @param bool $fake
+     * @param ProjectState $state     this is the state before the migration is applied
+     * @param Migration    $migration the migration to apply
+     * @param bool         $fake
      *
      * @return mixed
      *
@@ -274,12 +267,12 @@ class Executor extends BaseObject
     public function unApplyMigration($state, $migration, $fake = false)
     {
         Console::stdout(sprintf(' UnApplying %s...', $migration->getName()));
-        if (!$fake):
+        if (!$fake) {
             $state = $migration->unApply(
                 $state,
                 $this->connection->getSchemaEditor()
             );
-        endif;
+        }
 
         $this->recorder->recordUnApplied(
             [
@@ -288,13 +281,13 @@ class Executor extends BaseObject
             ]
         );
 
-        if ($fake):
+        if ($fake) {
             $end = Console::ansiFormat('FAKED', [Console::FG_GREEN]);
-        else:
+        } else {
             $end = Console::ansiFormat('OK', [Console::FG_GREEN]);
-        endif;
+        }
 
-        Console::stdout($end . PHP_EOL);
+        Console::stdout($end.PHP_EOL);
 
         return $state;
     }
@@ -302,9 +295,9 @@ class Executor extends BaseObject
     /**
      * Applies the migration to the database.
      *
-     * @param ProjectState $state this is the state before the migration is applied
-     * @param Migration $migration the migration to apply
-     * @param bool $fake
+     * @param ProjectState $state     this is the state before the migration is applied
+     * @param Migration    $migration the migration to apply
+     * @param bool         $fake
      *
      * @return mixed
      *
@@ -318,12 +311,12 @@ class Executor extends BaseObject
     public function applyMigration($state, $migration, $fake = false)
     {
         Console::stdout(sprintf(' Applying %s...', $migration->getName()));
-        if (!$fake):
+        if (!$fake) {
             $state = $migration->apply(
                 $state,
                 $this->connection->getSchemaEditor()
             );
-        endif;
+        }
 
         $this->recorder->recordApplied(
             [
@@ -332,13 +325,13 @@ class Executor extends BaseObject
             ]
         );
 
-        if ($fake):
+        if ($fake) {
             $end = Console::ansiFormat('FAKED', [Console::FG_GREEN]);
-        else:
+        } else {
             $end = Console::ansiFormat('OK', [Console::FG_GREEN]);
-        endif;
+        }
 
-        Console::stdout($end . PHP_EOL);
+        Console::stdout($end.PHP_EOL);
 
         return $state;
     }
@@ -352,12 +345,12 @@ class Executor extends BaseObject
     {
         /** @var $migration Migration */
         $migrations = [];
-        foreach ($plan as $appName => $actionPlan) :
-            foreach ($actionPlan as $name => $migrationArr) :
+        foreach ($plan as $appName => $actionPlan) {
+            foreach ($actionPlan as $name => $migrationArr) {
                 $migration = $migrationArr['migration'];
                 $migrations[$migration->getAppLabel()][$name] = $migration;
-            endforeach;
-        endforeach;
+            }
+        }
 
         return $migrations;
     }
@@ -367,30 +360,30 @@ class Executor extends BaseObject
         /** @var $migration Migration */
         $state = null;
         $statements = [];
-        foreach ($plan as $backward => $migration) :
-            if (is_null($state)):
+        foreach ($plan as $backward => $migration) {
+            if (is_null($state)) {
                 $state = $this->loader->getProjectState(
                     [$migration->getAppLabel() => [$migration->getName()]],
                     false
                 );
-            endif;
+            }
 
-            if ($backward):
+            if ($backward) {
                 $editor = $this->connection->getSchemaEditor(true);
                 $migration->unApply(
                     $state,
                     $editor
                 );
                 $statements = $editor->getSqls();
-            else:
+            } else {
                 $editor = $this->connection->getSchemaEditor(true);
                 $migration->apply(
                     $state,
                     $editor
                 );
                 $statements = $editor->getSqls();
-            endif;
-        endforeach;
+            }
+        }
 
         return $statements;
     }

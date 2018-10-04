@@ -85,17 +85,17 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     protected function parseExpression($expressions)
     {
         $args = [];
-        foreach ($expressions as $expression) :
-            if ($expression instanceof ResolvableExpInterface) :
+        foreach ($expressions as $expression) {
+            if ($expression instanceof ResolvableExpInterface) {
                 $args[] = $expression;
-            else:
-                if (is_string($expression)) :
+            } else {
+                if (is_string($expression)) {
                     $args[] = f_($expression);
-                else:
+                } else {
                     $args[] = value_($expression);
-                endif;
-            endif;
-        endforeach;
+                }
+            }
+        }
 
         return $args;
     }
@@ -120,18 +120,18 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
      */
     public function getOutputField()
     {
-        if (is_null($this->outputFieldOrNull())) :
+        if (is_null($this->outputFieldOrNull())) {
             throw new FieldError('Cannot resolve expression type, unknown output_field');
-        endif;
+        }
 
         return $this->outputFieldOrNull();
     }
 
     private function outputFieldOrNull()
     {
-        if (is_null($this->resolveOutputField())) :
+        if (is_null($this->resolveOutputField())) {
             $this->resolveOutputField();
-        endif;
+        }
 
         return $this->outputField;
     }
@@ -152,21 +152,21 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
      */
     private function resolveOutputField()
     {
-        if (is_null($this->outputField)) :
+        if (is_null($this->outputField)) {
             $sourceFields = $this->getSourceFields();
-            if (0 == count($sourceFields)) :
+            if (0 == count($sourceFields)) {
                 $this->outputField = null;
-            else:
-                foreach ($sourceFields as $sourceField) :
-                    if (is_null($this->outputField)) :
+            } else {
+                foreach ($sourceFields as $sourceField) {
+                    if (is_null($this->outputField)) {
                         $this->outputField = $sourceField;
-                    endif;
-                    if (!is_null($this->outputField) && !($this->outputField instanceof $sourceField)) :
+                    }
+                    if (!is_null($this->outputField) && !($this->outputField instanceof $sourceField)) {
                         throw new FieldError('Expression contains mixed types. You must set output_field');
-                    endif;
-                endforeach;
-            endif;
-        endif;
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -188,10 +188,10 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
      * model field.
      *
      * @param ExpResolverInterface $resolver
-     * @param bool $allowJoins
-     * @param null $reuse
-     * @param bool $summarize
-     * @param bool $forSave
+     * @param bool                 $allowJoins
+     * @param null                 $reuse
+     * @param bool                 $summarize
+     * @param bool                 $forSave
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      *
@@ -203,8 +203,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
         $reuse = null,
         $summarize = false,
         $forSave = false
-    )
-    {
+    ) {
         $obj = clone $this;
         $obj->copied = true;
 
@@ -214,20 +213,20 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
     private function getSourceFields()
     {
         $fields = [];
-        foreach ($this->getSourceExpressions() as $sourceExpression) :
+        foreach ($this->getSourceExpressions() as $sourceExpression) {
             $fields[] = $sourceExpression->outputFieldOrNull();
-        endforeach;
+        }
 
         return $fields;
     }
 
     public function containsAggregates()
     {
-        foreach ($this->getSourceExpressions() as $sourceExpression) :
-            if ($sourceExpression->containsAggregates()):
+        foreach ($this->getSourceExpressions() as $sourceExpression) {
+            if ($sourceExpression->containsAggregates()) {
                 return true;
-            endif;
-        endforeach;
+            }
+        }
 
         return false;
     }
@@ -292,13 +291,13 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
      */
     public function getGroupByCols()
     {
-        if (!$this->containsAggregates()):
+        if (!$this->containsAggregates()) {
             return [$this];
-        endif;
+        }
         $cols = [];
-        foreach ($this->getSourceExpressions() as $sourceExpression) :
+        foreach ($this->getSourceExpressions() as $sourceExpression) {
             $cols[] = $sourceExpression->getGroupByCols();
-        endforeach;
+        }
 
         return $cols;
     }

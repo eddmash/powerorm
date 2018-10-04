@@ -35,16 +35,16 @@ class Value extends BaseExpression
     public function asSql(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         $val = $this->value;
-        if (!is_null($this->outputField)):
-            if (property_exists($this, 'forSave') && $this->forSave):
+        if (!is_null($this->outputField)) {
+            if (property_exists($this, 'forSave') && $this->forSave) {
                 $val = $this->getOutputField()->prepareValueBeforeSave($val, $connection);
-            else:
+            } else {
                 $val = $this->getOutputField()->convertToDatabaseValue($val, $connection);
-            endif;
-        endif;
-        if (is_null($val)):
+            }
+        }
+        if (is_null($val)) {
             return ['NULL', []];
-        endif;
+        }
 
         return ['?', [$val]];
     }
@@ -59,8 +59,7 @@ class Value extends BaseExpression
         $summarize =
         false,
         $forSave = false
-    )
-    {
+    ) {
         $c = parent::resolveExpression($resolver, $allowJoins, $reuse, $summarize, $forSave);
         $c->forSave = $forSave;
 

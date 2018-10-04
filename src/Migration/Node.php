@@ -69,16 +69,16 @@ class Node
     {
         $ancestors = [];
 
-        if (false === $ignoreSelf):
+        if (false === $ignoreSelf) {
             $ancestors[$this->name] = $this->appName;
-        endif;
+        }
 
         /** @var $parent Node */
-        foreach ($this->parent as $parent) :
+        foreach ($this->parent as $parent) {
             $parentAncenstors = $parent->getAncestors();
 
             $ancestors = array_merge($parentAncenstors, $ancestors);
-        endforeach;
+        }
 
         return $ancestors;
     }
@@ -96,10 +96,10 @@ class Node
         $descendants[$this->name] = $this->appName;
 
         /** @var $child Node */
-        foreach ($this->children as $child) :
+        foreach ($this->children as $child) {
             $childDescendats = $child->getDescendants();
             $descendants = array_merge($childDescendats, $descendants);
-        endforeach;
+        }
 
         return $descendants;
     }

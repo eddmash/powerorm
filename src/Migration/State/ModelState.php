@@ -58,7 +58,7 @@ class ModelState extends BaseObject
     /**
      * Takes a model returns a ModelState representing it.
      *
-     * @param Model $model
+     * @param Model      $model
      * @param bool|false $excludeRels
      *
      * @return static
@@ -74,7 +74,7 @@ class ModelState extends BaseObject
         $fields = [];
 
         /** @var $field Field */
-        foreach ($model->getMeta()->localFields as $name => $field) :
+        foreach ($model->getMeta()->localFields as $name => $field) {
             try {
                 $fields[$name] = $field->deepClone();
             } catch (\Exception $e) {
@@ -86,10 +86,10 @@ class ModelState extends BaseObject
                     )
                 );
             }
-        endforeach;
+        }
 
-        if (false == $excludeRels):
-            foreach ($model->getMeta()->localManyToMany as $name => $field) :
+        if (false == $excludeRels) {
+            foreach ($model->getMeta()->localManyToMany as $name => $field) {
                 try {
                     $fields[$name] = $field->deepClone();
                 } catch (\Exception $e) {
@@ -101,31 +101,31 @@ class ModelState extends BaseObject
                         )
                     );
                 }
-            endforeach;
-        endif;
+            }
+        }
 
         $overrides = $model->getMeta()->getOverrides();
         $meta = [];
         $ignore = ['registry'];
-        foreach ($overrides as $name => $value) :
-            if (in_array($name, $ignore)):
+        foreach ($overrides as $name => $value) {
+            if (in_array($name, $ignore)) {
                 continue;
-            endif;
+            }
             $meta[$name] = $value;
-        endforeach;
+        }
 
         $extends = '';
 
         /** @var $immediateParent ReflectionObject */
         list($concreteParent, $immediateParent) = Model::getHierarchyMeta($model);
 
-        if ($immediateParent):
-            if ($immediateParent->isAbstract()):
+        if ($immediateParent) {
+            if ($immediateParent->isAbstract()) {
                 $extends = (is_null($concreteParent)) ? '' : $concreteParent;
-            else:
+            } else {
                 $extends = $immediateParent->getName();
-            endif;
-        endif;
+            }
+        }
 
         $kwargs = [
             'meta' => $meta,
@@ -164,29 +164,29 @@ class ModelState extends BaseObject
         // possibility of loading the same state information about an app
         // i.e. we might end up always loading the state of the apps base on
         // whats currently shown the models
-        if ($this->fromDisk):
+        if ($this->fromDisk) {
             $className = sprintf(
                 '%s\\%s',
                 Model::FAKENAMESPACE,
                 $className
             );
-            if ($extends):
+            if ($extends) {
                 $extends = sprintf(
                     '%s\\%s',
                     Model::FAKENAMESPACE,
                     $extends
                 );
-            endif;
-        endif;
+            }
+        }
 
         $model = $this->createInstance(
             $className,
             $extends
         );
         $fields = [];
-        foreach ($this->fields as $name => $field) :
+        foreach ($this->fields as $name => $field) {
             $fields[$name] = $field->deepClone();
-        endforeach;
+        }
 
         $model->setupClassInfo($fields, ['meta' => $metaData, 'registry' => $registry]);
 
@@ -200,10 +200,9 @@ class ModelState extends BaseObject
 
     public function getFieldByName($name)
     {
-        if (ArrayHelper::hasKey($this->fields, $name)):
+        if (ArrayHelper::hasKey($this->fields, $name)) {
             return ArrayHelper::getValue($this->fields, $name);
-
-        endif;
+        }
 
         throw new ValueError(sprintf('No field called [ %s ] on model [ %s ]', $name, $this->name));
     }
@@ -239,9 +238,9 @@ class ModelState extends BaseObject
     {
         $fields = [];
         /** @var $field Field */
-        foreach ($this->fields as $name => $field) :
+        foreach ($this->fields as $name => $field) {
             $fields[$name] = $field->deepClone();
-        endforeach;
+        }
 
         $model = static::createObject(
             $this->name,
@@ -255,7 +254,7 @@ class ModelState extends BaseObject
 
     public function __toString()
     {
-        return (string)sprintf("<ModelState: '%s'>", $this->name);
+        return (string) sprintf("<ModelState: '%s'>", $this->name);
     }
 
     public function &getMeta()

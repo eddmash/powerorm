@@ -37,7 +37,7 @@ class JoinPromoter
      * JoinPromoter constructor.
      *
      * @param mixed $connector
-     * @param int $childrenCount
+     * @param int   $childrenCount
      * @param       $currentNegated
      */
     public function __construct($connector, $childrenCount, $currentNegated)
@@ -45,24 +45,24 @@ class JoinPromoter
         $this->connector = $connector;
         $this->currentNegated = $currentNegated;
 
-        if ($this->currentNegated):
-            if (AND_CONNECTOR === $this->connector):
+        if ($this->currentNegated) {
+            if (AND_CONNECTOR === $this->connector) {
                 $this->effectiveConnector = OR_CONNECTOR;
-            else:
+            } else {
                 $this->effectiveConnector = AND_CONNECTOR;
-            endif;
-        else:
+            }
+        } else {
             $this->effectiveConnector = $this->connector;
-        endif;
+        }
         $this->childrenCount = $childrenCount;
     }
 
     public function addVotes($neededInner)
     {
-        foreach ($neededInner as $need):
+        foreach ($neededInner as $need) {
             $count = ArrayHelper::getValue($this->votes, $need, 0) + 1;
             $this->votes[$need] = $count;
-        endforeach;
+        }
     }
 
     public function updateJoinType(Query $query)
@@ -70,18 +70,17 @@ class JoinPromoter
         $changeToInnerJoin = [];
         $changeToOuterJoin = [];
 
-        foreach ($this->votes as $table => $votes) :
-
-            if (OR_CONNECTOR == $this->effectiveConnector && $votes < $this->childrenCount):
+        foreach ($this->votes as $table => $votes) {
+            if (OR_CONNECTOR == $this->effectiveConnector && $votes < $this->childrenCount) {
                 $changeToOuterJoin[] = $table;
-            endif;
+            }
 
             if (AND_CONNECTOR === $this->effectiveConnector ||
                 (OR_CONNECTOR == $this->effectiveConnector && $votes === $this->childrenCount)
-            ):
+            ) {
                 $changeToInnerJoin[] = $table;
-            endif;
-        endforeach;
+            }
+        }
 
         $query->changeToInnerjoin($changeToInnerJoin);
         $query->changeToOuterJoin($changeToOuterJoin);

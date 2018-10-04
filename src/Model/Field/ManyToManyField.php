@@ -64,7 +64,7 @@ class ManyToManyField extends RelatedField
 
     public function __construct($kwargs)
     {
-        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && is_null($kwargs['rel']))):
+        if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && is_null($kwargs['rel']))) {
             $kwargs['rel'] = ManyToManyRel::createObject(
                 [
                     'fromField' => $this,
@@ -76,7 +76,7 @@ class ManyToManyField extends RelatedField
                     'dbConstraint' => ArrayHelper::getValue($kwargs, 'dbConstraint', true),
                 ]
             );
-        endif;
+        }
 
         $this->hasNullKwarg = ArrayHelper::hasKey($kwargs, 'null');
 
@@ -91,7 +91,7 @@ class ManyToManyField extends RelatedField
         parent::contributeToClass($fieldName, $modelObject);
 
         // if through model is set
-        if (!is_null($this->relation->through)):
+        if (!is_null($this->relation->through)) {
             $callback = function ($kwargs) {
                 /* @var $field RelatedField */
                 /** @var $related Model */
@@ -108,12 +108,12 @@ class ManyToManyField extends RelatedField
                 $this->relation->through,
                 ['fromField' => $this]
             );
-        else:
+        } else {
             $this->relation->through = $this->createM2MIntermediaryModel(
                 $this,
                 $this->scopeModel
             );
-        endif;
+        }
     }
 
     /**
@@ -128,23 +128,22 @@ class ManyToManyField extends RelatedField
         );
 
         $rM = $this->relation->toModel;
-        if ($rM instanceof Model):
+        if ($rM instanceof Model) {
             $rM = $this->relation->toModel->getMeta()->getNSModelName();
-        endif;
+        }
         $relName = null;
         $createInverse = true;
-        foreach ($allForwardFields as $forwardField) :
+        foreach ($allForwardFields as $forwardField) {
             $sM = $forwardField->scopeModel->getMeta()->getNSModelName();
-            if ($forwardField instanceof InverseField):
-                if ($sM === $rM && $this->name == $forwardField->toField):
+            if ($forwardField instanceof InverseField) {
+                if ($sM === $rM && $this->name == $forwardField->toField) {
                     $relName = $forwardField->getName();
                     $relation->relatedName = $relName;
                     $createInverse = false;
                     break;
-                endif;
-            endif;
-
-        endforeach;
+                }
+            }
+        }
         if ($createInverse) {
             $hasMany = HasManyField::createObject(
                 [
@@ -156,7 +155,6 @@ class ManyToManyField extends RelatedField
             );
             $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
         }
-
 
         $this->m2mField = function () use ($relation) {
             return $this->getM2MAttr($relation, 'name');
@@ -170,7 +168,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model $model
+     * @param Model           $model
      *
      * @return Model
      *
@@ -182,7 +180,7 @@ class ManyToManyField extends RelatedField
     {
         $modelName = $model->getMeta()->getNSModelName();
 
-        if (is_string($field->relation->toModel)):
+        if (is_string($field->relation->toModel)) {
             $toModelName = Tools::resolveRelation(
                 $model,
                 $field->relation->toModel
@@ -190,11 +188,11 @@ class ManyToManyField extends RelatedField
             $ref = new \ReflectionClass($toModelName);
             $toModelName = $ref->getShortName();
             $toNamespacedModelName = $ref->getName();
-        else:
+        } else {
             $toModelName = $field->relation->toModel->getMeta()->getModelName();
             $toNamespacedModelName = $field->relation->toModel
                 ->getMeta()->getNSModelName();
-        endif;
+        }
 
         $className = sprintf(
             '%1$s_%2$s',
@@ -203,10 +201,10 @@ class ManyToManyField extends RelatedField
         );
         $from = strtolower($model->getMeta()->getModelName());
         $to = strtolower($toModelName);
-        if ($from == $to):
+        if ($from == $to) {
             $to = sprintf('to_%s', $to);
             $from = sprintf('from_%s', $from);
-        endif;
+        }
         $fields = [
             $from => ForeignKey::createObject(
                 [
@@ -264,9 +262,9 @@ class ManyToManyField extends RelatedField
         $intermediaryClass->addItem('}');
         $intermediaryClass->addItem('}');
 
-        if (!class_exists($className, false)):
+        if (!class_exists($className, false)) {
             eval($intermediaryClass->toString());
-        endif;
+        }
 
         /** @var $obj Model */
         $obj = new $className();
@@ -294,17 +292,17 @@ class ManyToManyField extends RelatedField
      */
     private function getM2MDbTable($meta)
     {
-        if (null !== $this->relation->through):
+        if (null !== $this->relation->through) {
             return $this->relation->through->getMeta()->getDbTable();
-        elseif ($this->dbTable):
+        } elseif ($this->dbTable) {
             return $this->dbTable;
-        else:
+        } else {
             // oracle allows identifier of 30 chars max
             return StringHelper::truncate(
                 sprintf('%s_%s', $meta->getDbTable(), $this->getName()),
                 30
             );
-        endif;
+        }
     }
 
     public function checks()
@@ -318,7 +316,7 @@ class ManyToManyField extends RelatedField
     private function checkIgnoredKwargOptions()
     {
         $warnings = [];
-        if ($this->hasNullKwarg):
+        if ($this->hasNullKwarg) {
             $warnings = [
                 CheckWarning::createObject(
                     [
@@ -329,7 +327,7 @@ class ManyToManyField extends RelatedField
                     ]
                 ),
             ];
-        endif;
+        }
 
         return $warnings;
     }
@@ -344,29 +342,25 @@ class ManyToManyField extends RelatedField
     public function getM2MAttr(ForeignObjectRel $relation, $attr)
     {
         $cache_attr = sprintf('_m2m_%s_cache', $attr);
-        if ($this->hasProperty($cache_attr)) :
+        if ($this->hasProperty($cache_attr)) {
             return $this->{$cache_attr};
-        endif;
+        }
 
         $linkName = null;
-        if ($this->relation->throughFields) :
+        if ($this->relation->throughFields) {
             $linkName = $this->relation->throughFields[0];
-        endif;
+        }
 
+        $fromModel = $relation->getFromModel()->getMeta()->getNSModelName();
         /** @var $field RelatedField */
-        foreach ($this->relation->through->getMeta()->getFields() as $field) :
-            if ($field->isRelation &&
-                $field->relation->toModel->getMeta()->getNSModelName() == $relation->getFromModel()
-                    ->getMeta()
-                    ->getNSModelName() &&
-                (is_null($linkName) || $linkName == $field->getName())
-            ) :
-
+        foreach ($this->relation->through->getMeta()->getFields() as $field) {
+            if ($field->isRelation && (is_null($linkName) || $linkName == $field->getName()) &&
+                $field->relation->toModel->getMeta()->getNSModelName() == $fromModel) {
                 $this->{$cache_attr} = ('name' == $attr) ? call_user_func([$field, 'getName']) : $field->{$attr};
 
                 return $this->{$cache_attr};
-            endif;
-        endforeach;
+            }
+        }
     }
 
     /***
@@ -379,66 +373,77 @@ class ManyToManyField extends RelatedField
     public function getM2MReverseAttr(ForeignObjectRel $relation, $attr)
     {
         $cache_attr = sprintf('_m2m_reverse_%s_cache', $attr);
-        if ($this->hasProperty($cache_attr)) :
+        if ($this->hasProperty($cache_attr)) {
             return $this->{$cache_attr};
-        endif;
+        }
 
         $linkName = null;
-        if ($this->relation->throughFields) :
+        if ($this->relation->throughFields) {
             $linkName = $this->relation->throughFields[1];
-        endif;
+        }
 
+        $tomodel = $relation->toModel->getMeta()->getNSModelName();
         /** @var $field RelatedField */
-        foreach ($this->relation->through->getMeta()->getFields() as $field) :
-            if ($field->isRelation &&
-                $field->relation->toModel->getMeta()->getNSModelName() == $relation->toModel->getMeta()
-                    ->getNSModelName() &&
-                (is_null($linkName) || $linkName == $field->getName())
-            ) :
+        foreach ($this->relation->through->getMeta()->getFields(true, false) as $field) {
+            if ($field->isRelation && (is_null($linkName) || $linkName == $field->getName()) &&
+                $field->relation->toModel->getMeta()->getNSModelName() == $tomodel
+            ) {
                 $this->{$cache_attr} = ('name' == $attr) ? call_user_func([$field, 'getName']) : $field->{$attr};
 
                 return $this->{$cache_attr};
-            endif;
-        endforeach;
+            }
+        }
     }
 
     /**
      * Get path from this field to the related model.
      *
+     * @param bool $direct
+     *
      * @return array
+     *
+     * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
+     * @throws \Eddmash\PowerOrm\Exception\ValueError
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     private function pathInfo($direct = false)
     {
         $paths = [];
-        $model = $this->relation->through;
+        $throughModel = $this->relation->through;
+
+        // we get the fields on the through model to use when querying from owning to inverse side
+        // of the many to many relationship
+        // user->role(owning) and role->users_set(inverse)
 
         /* @var $field RelatedField */
         /* @var $reverseField RelatedField */
+        $fromOwningSide = call_user_func($this->m2mField);
+        $fromInverseSide = call_user_func($this->m2mReverseField);
+        $field = $throughModel->getMeta()->getField($fromOwningSide);
+        $reverseField = $throughModel->getMeta()->getField($fromInverseSide);
 
-        $m2mField = call_user_func($this->m2mField);
-        $m2mReverseField = call_user_func($this->m2mReverseField);
-
-
-        $field = $model->getMeta()->getField($m2mField);
-        $reverseField = $model->getMeta()->getField($m2mReverseField);
-
-        if ($direct):
+        if ($direct) {
             $paths = array_merge($paths, $field->getReversePathInfo());
             $paths = array_merge($paths, $reverseField->getForwardPathInfo());
-        else:
+        } else {
             $paths = array_merge($paths, $reverseField->getReversePathInfo());
             $paths = array_merge($paths, $field->getForwardPathInfo());
-        endif;
+        }
 
         return $paths;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getForwardPathInfo()
     {
         return $this->pathInfo(true);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getReversePathInfo()
     {
         return $this->pathInfo(false);
@@ -454,10 +459,10 @@ class ManyToManyField extends RelatedField
             'fieldClass',
             ModelMultipleChoiceField::class
         );
-        if (!ArrayHelper::hasKey($kwargs, 'queryset')) :
+        if (!ArrayHelper::hasKey($kwargs, 'queryset')) {
             $model = $this->relation->getToModel();
             $kwargs['queryset'] = $model::objects();
-        endif;
+        }
 
         return parent::formField($kwargs);
     }
@@ -467,9 +472,9 @@ class ManyToManyField extends RelatedField
      */
     public function valueFromObject($obj)
     {
-        if (!$obj->pk):
+        if (!$obj->pk) {
             return [];
-        endif;
+        }
 
         return $obj->{$this->getName()}->all(); // TODO: Change the autogenerated stub
     }
@@ -487,23 +492,18 @@ class ManyToManyField extends RelatedField
     {
         $kwargs = parent::getConstructorArgs();
 
-
-        if ($this->relation->through):
-
+        if ($this->relation->through) {
             $kwargs['through'] = is_string($this->relation->through) ? $this->relation->through :
                 $this->relation->through->getMeta()->getNSModelName();
-        endif;
+        }
 
-        if (!$this->relation->dbConstraint):
-
+        if (!$this->relation->dbConstraint) {
             $kwargs['dbConstraint'] = $this->relation->dbConstraint;
-        endif;
+        }
 
-
-        if ($this->relation->throughFields):
-
+        if ($this->relation->throughFields) {
             $kwargs['throughFields'] = $this->relation->throughFields;
-        endif;
+        }
 
         return $kwargs;
     }

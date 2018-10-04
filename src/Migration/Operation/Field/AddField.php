@@ -45,12 +45,12 @@ class AddField extends FieldOperation
         // remove default if preserveDefault==false,
         // we dont want it in future updates.
 
-        if (false === $this->preserveDefault):
+        if (false === $this->preserveDefault) {
             $field = $this->field->deepClone();
             $field->default = NOT_PROVIDED;
-        else:
+        } else {
             $field = $this->field;
-        endif;
+        }
         $state->getModelState($this->modelName)->fields[$this->name] = $field;
     }
 
@@ -61,24 +61,23 @@ class AddField extends FieldOperation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
 
         /* @var $field Field */
-        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)) {
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $field = $toModel->getMeta()->getField($this->name);
-            if (false === $this->preserveDefault):
+            if (false === $this->preserveDefault) {
                 $field->default = $this->field->default;
-            endif;
+            }
 
             $schemaEditor->addField($fromModel, $field);
 
-            if (false === $this->preserveDefault):
+            if (false === $this->preserveDefault) {
                 $field->default = NOT_PROVIDED;
-            endif;
-        endif;
+            }
+        }
     }
 
     /**
@@ -88,15 +87,14 @@ class AddField extends FieldOperation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $fromModel = $fromState->getRegistry()->getModel($this->modelName);
-        if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)) {
             $schemaEditor->removeField(
                 $fromModel,
                 $fromModel->getMeta()->getField($this->name)
             );
-        endif;
+        }
     }
 
     /**
@@ -106,9 +104,9 @@ class AddField extends FieldOperation
     {
         $constArgs = parent::getConstructorArgs();
 
-        if (true === $this->preserveDefault):
+        if (true === $this->preserveDefault) {
             unset($constArgs['preserveDefault']);
-        endif;
+        }
 
         return $constArgs;
     }

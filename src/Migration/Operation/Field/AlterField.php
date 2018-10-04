@@ -35,9 +35,9 @@ class AlterField extends FieldOperation
     public function getConstructorArgs()
     {
         $args = parent::getConstructorArgs();
-        if (ArrayHelper::getValue($args, 'preserveDefault', false)):
+        if (ArrayHelper::getValue($args, 'preserveDefault', false)) {
             unset($args['preserveDefault']);
-        endif;
+        }
 
         return $args;
     }
@@ -55,23 +55,23 @@ class AlterField extends FieldOperation
      */
     public function updateState(ProjectState $state)
     {
-        if (false === $this->preserveDefault):
+        if (false === $this->preserveDefault) {
             $alteredField = $this->field->deepClone();
             $alteredField->default = NOT_PROVIDED;
-        else:
+        } else {
             $alteredField = $this->field;
-        endif;
+        }
 
         $fields = $state->getModelState($this->modelName)->fields;
         $newFields = [];
 
-        foreach ($fields as $name => $oldField) :
-            if ($name == $this->name):
+        foreach ($fields as $name => $oldField) {
+            if ($name == $this->name) {
                 $newFields[$name] = $alteredField;
-            else:
+            } else {
                 $newFields[$name] = $oldField;
-            endif;
-        endforeach;
+            }
+        }
         $state->getModelState($this->modelName)->fields = $newFields;
     }
 
@@ -90,8 +90,7 @@ class AlterField extends FieldOperation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $this->alterField($schemaEditor, $fromState, $toState);
     }
 
@@ -114,18 +113,18 @@ class AlterField extends FieldOperation
     private function alterField($schemaEditor, $fromState, $toState)
     {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
-        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)):
+        if ($this->allowMigrateModel($schemaEditor->connection, $toModel)) {
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);
             $fromField = $fromModel->getMeta()->getField($this->name);
             $toField = $toModel->getMeta()->getField($this->name);
-            if (false === $this->preserveDefault):
+            if (false === $this->preserveDefault) {
                 $toField->default = $this->field->default;
-            endif;
+            }
             $schemaEditor->alterField($fromModel, $fromField, $toField);
 
-            if (false === $this->preserveDefault):
+            if (false === $this->preserveDefault) {
                 $toField->default = NOT_PROVIDED;
-            endif;
-        endif;
+            }
+        }
     }
 }

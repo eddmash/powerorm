@@ -43,9 +43,9 @@ trait FormReadyModelTrait
         } catch (ValidationError $error) {
             //todo
         }
-        if (!empty($errors)) :
+        if (!empty($errors)) {
             throw new ValidationError($errors);
-        endif;
+        }
     }
 
     public function clean()
@@ -66,26 +66,26 @@ trait FormReadyModelTrait
         $errors = [];
 
         /** @var $field Field */
-        foreach ($this->getMeta()->getConcreteFields() as $field) :
-            if (in_array($field->getName(), $exclude)) :
+        foreach ($this->getMeta()->getConcreteFields() as $field) {
+            if (in_array($field->getName(), $exclude)) {
                 continue;
-            endif;
+            }
             $value = $this->{$field->getAttrName()};
             // Skip validation for empty fields with blank=True. The developer
             // is responsible for making sure they have a valid value.
-            if ($field->formBlank && empty($value)) :
+            if ($field->formBlank && empty($value)) {
                 continue;
-            endif;
+            }
 
             try {
                 $this->{$field->getAttrName()} = $field->clean($this, $value);
             } catch (ValidationError $error) {
                 $errors[$field->getName()] = $error->getErrorList();
             }
-        endforeach;
+        }
 
-        if (!empty($errors)) :
+        if (!empty($errors)) {
             throw new ValidationError($errors);
-        endif;
+        }
     }
 }

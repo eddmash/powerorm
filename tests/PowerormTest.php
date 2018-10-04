@@ -11,10 +11,11 @@ namespace Eddmash\PowerOrm\Tests;
 use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Tests\TestApp\Test;
+use PHPUnit\Framework\TestCase;
 
-define(BASEPATH, dirname(dirname(__FILE__)));
+define('BASEPATH', dirname(dirname(__FILE__)));
 
-abstract class PowerormTest extends \PHPUnit_Framework_TestCase
+abstract class PowerormTest extends TestCase
 {
     protected function setUp()
     {

@@ -87,27 +87,27 @@ class Graph
         $parentAppName = key($parent);
         $parent = $parent[$parentAppName];
         // both parent and child need to be already in the graph
-        if (empty($this->nodes[$appName][$child])):
+        if (empty($this->nodes[$appName][$child])) {
             throw new NodeNotFoundError(
                 sprintf(
-                    'Migration %s dependencies reference ' .
+                    'Migration %s dependencies reference '.
                     'nonexistent child node %s',
                     $migration->getName(),
                     $child
                 )
             );
-        endif;
+        }
 
-        if (empty($this->nodes[$parentAppName][$parent])):
+        if (empty($this->nodes[$parentAppName][$parent])) {
             throw new NodeNotFoundError(
                 sprintf(
-                    'Migration %s dependencies reference nonexistent' .
+                    'Migration %s dependencies reference nonexistent'.
                     ' parent node %s',
                     $migration->getName(),
                     $parent
                 )
             );
-        endif;
+        }
 
         // add to the family tree of both the child and parent
 
@@ -126,13 +126,11 @@ class Graph
     {
         $leaves = [];
 
-        foreach ($this->nodes as $appName => $nodes) :
-
-            if (!is_null($app) && $app != $appName):
+        foreach ($this->nodes as $appName => $nodes) {
+            if (!is_null($app) && $app != $appName) {
                 continue;
-            endif;
-            foreach ($nodes as $name => $migration) :
-
+            }
+            foreach ($nodes as $name => $migration) {
                 // get the nodes  children
                 $children = $this->getNodeFamilyTree(
                     $appName,
@@ -143,21 +141,21 @@ class Graph
                 // or if it has children and none of them is for app we are
                 // checking then this is the latest migrations
                 $isLatest = true;
-                foreach ($children as $child) :
-                    if ($child->appName == $appName):
+                foreach ($children as $child) {
+                    if ($child->appName == $appName) {
                         $isLatest = false;
-                    endif;
-                endforeach;
+                    }
+                }
 
-                if ($isLatest):
-                    if (!is_null($app)):
+                if ($isLatest) {
+                    if (!is_null($app)) {
                         $leaves[] = $name;
-                    else:
+                    } else {
                         $leaves[$appName][] = $name;
-                    endif;
-                endif;
-            endforeach;
-        endforeach;
+                    }
+                }
+            }
+        }
 
         return $leaves;
     }
@@ -181,14 +179,14 @@ class Graph
      */
     public function getAncestryTree($appName, $node)
     {
-        if (empty($this->nodes[$appName][$node])):
+        if (empty($this->nodes[$appName][$node])) {
             throw new NodeNotFoundError(
                 sprintf(
                     'Migration with the name %s does not exist',
                     $node
                 )
             );
-        endif;
+        }
 
         $this->detectCircularDepedency(
             $appName,
@@ -197,9 +195,9 @@ class Graph
                 list($appName, $node) = explode('_', $full_node_name, 2);
                 $parents = [];
                 $node = $this->nodeFamilyTree[$appName][$node];
-                foreach ($node->parent as $parent) :
+                foreach ($node->parent as $parent) {
                     $parents[] = $parent->getNameWithApp();
-                endforeach;
+                }
 
                 return $parents;
             }
@@ -231,14 +229,14 @@ class Graph
      */
     public function getDecedentsTree($appName, $node)
     {
-        if (empty($this->nodes[$appName][$node])):
+        if (empty($this->nodes[$appName][$node])) {
             throw new NodeNotFoundError(
                 sprintf(
                     'Migration with the name %s does not exist',
                     $node
                 )
             );
-        endif;
+        }
 
         $this->detectCircularDepedency(
             $appName,
@@ -248,9 +246,9 @@ class Graph
                 $dependents = [];
                 $node = $this->nodeFamilyTree[$appName][$node];
 
-                foreach ($node->children as $parent) :
+                foreach ($node->children as $parent) {
                     $dependents[] = $parent->getNameWithApp();
-                endforeach;
+                }
 
                 return $dependents;
             }
@@ -266,19 +264,18 @@ class Graph
     {
         $root = [];
 
-        foreach ($this->nodes as $appName => $nodes) :
-            foreach ($nodes as $name => $migration) :
+        foreach ($this->nodes as $appName => $nodes) {
+            foreach ($nodes as $name => $migration) {
                 // get the nodes  parent
                 $parents = $this->getNodeFamilyTree($appName, $name)->parent;
 
                 // if no parent exist this must be the first migration aka
                 // adam/eve which ever tickles your fancy
-                if (empty($parents)):
+                if (empty($parents)) {
                     $root[$appName] = $name;
-                endif;
-
-            endforeach;
-        endforeach;
+                }
+            }
+        }
 
         return $root;
     }
@@ -296,15 +293,15 @@ class Graph
      */
     public function getState($leaves = null, $atEnd = true)
     {
-        if (is_null($leaves)):
+        if (is_null($leaves)) {
             $leaves = $this->getLeafNodes();
-        endif;
+        }
 
         $state = ProjectState::createObject();
         $state->fromDisk(true);
-        if (empty($leaves)):
+        if (empty($leaves)) {
             return $state;
-        endif;
+        }
 
         // from the leave go up its family tree though its parents and
         // ancestors until we get to the root_node.
@@ -312,35 +309,30 @@ class Graph
         // this leaf from root_node to leaf_node
         // we use this lineage to apply migrations in database
         $lineage = [];
-        foreach ($leaves as $appName => $appLeaves) :
-
+        foreach ($leaves as $appName => $appLeaves) {
             // get lineage
-            foreach ($appLeaves as $leaf) :
+            foreach ($appLeaves as $leaf) {
                 $lineage_members = $this->getAncestryTree($appName, $leaf);
 
-                foreach ($lineage_members as $l_member => $l_app) :
-
-                    if (empty($lineage[$l_member][$l_app])):
-                        if (!$atEnd && in_array($l_member, $appLeaves)):
+                foreach ($lineage_members as $l_member => $l_app) {
+                    if (empty($lineage[$l_member][$l_app])) {
+                        if (!$atEnd && in_array($l_member, $appLeaves)) {
                             continue;
-                        endif;
+                        }
 
                         $lineage[$l_member] = $l_app;
-                    endif;
-
-                endforeach;
-            endforeach;
-
-        endforeach;
+                    }
+                }
+            }
+        }
 
         // use the lineage to update the project state based on the migrations.
         /* @var $migration Migration */
-        foreach ($lineage as $member => $lAppName) :
+        foreach ($lineage as $member => $lAppName) {
             $migration = $this->nodes[$lAppName][$member];
 
             $state = $migration->updateState($state);
-
-        endforeach;
+        }
 
         return $state;
     }
@@ -371,11 +363,11 @@ class Graph
     private function detectCircularDepedency($appName, $node, $getDependency)
     {
         $todo = [];
-        foreach ($this->nodeFamilyTree as $app => $appNodes) :
-            foreach ($appNodes as $appNode) :
+        foreach ($this->nodeFamilyTree as $app => $appNodes) {
+            foreach ($appNodes as $appNode) {
                 $todo[$appNode->getNameWithApp()] = $getDependency($appNode->getNameWithApp());
-            endforeach;
-        endforeach;
+            }
+        }
         Tools::topologicalSort($todo);
     }
 }

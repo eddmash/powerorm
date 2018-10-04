@@ -78,15 +78,15 @@ abstract class Operation extends DeconstructableObject implements OperationInter
         $alias = '';
         $opsModelName = "Eddmash\PowerOrm\Migration\Operation\Model";
         $opsFieldName = "Eddmash\PowerOrm\Migration\Operation\Field";
-        if (StringHelper::startsWith($this->getFullClassName(), $opsModelName)):
+        if (StringHelper::startsWith($this->getFullClassName(), $opsModelName)) {
             $alias = 'ModelOps';
             $path = sprintf('%s as %s', $opsModelName, $alias);
-        endif;
+        }
 
-        if (StringHelper::startsWith($this->getFullClassName(), $opsFieldName)):
+        if (StringHelper::startsWith($this->getFullClassName(), $opsFieldName)) {
             $alias = 'FieldOps';
             $path = sprintf('%s as %s', $opsFieldName, $alias);
-        endif;
+        }
 
         return [
             'name' => sprintf('%1$s\%2$s', $alias, $this->getShortClassName()),
@@ -119,7 +119,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * replaced with or a boolean that indicates whether or not the specified
      * operation can be optimized across.
      *
-     * @param Operation $operation
+     * @param Operation   $operation
      * @param Operation[] $inBetween
      *
      * @return mixed
@@ -158,7 +158,7 @@ abstract class Operation extends DeconstructableObject implements OperationInter
      * it preemptively rejects any proxy, unmanaged model.
      *
      * @param ConnectionInterface $connection
-     * @param Model $model
+     * @param Model               $model
      *
      * @return mixed
      *

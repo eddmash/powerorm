@@ -35,7 +35,7 @@ class SQLUpdateCompiler extends SqlFetchBaseCompiler
      * if the instance passed to a compiler it can be converted into a valid Sql string.
      *
      * @param CompilerInterface $compiler
-     * @param Connection $connection
+     * @param Connection        $connection
      *
      * @return QueryBuilder
      *
@@ -56,7 +56,7 @@ class SQLUpdateCompiler extends SqlFetchBaseCompiler
 
         /* @var $field Field */
         /* @var $model Model */
-        foreach ($this->query->getValues() as $valItem) :
+        foreach ($this->query->getValues() as $valItem) {
             $field = $valItem[0];
             $model = $valItem[1];
             $value = $valItem[2];
@@ -65,35 +65,34 @@ class SQLUpdateCompiler extends SqlFetchBaseCompiler
             $qb->set($name, '?');
 
             //todo resolve_expression,
-            if (method_exists($value, 'prepareDatabaseSave')):
-                if ($field->isRelation):
+            if (method_exists($value, 'prepareDatabaseSave')) {
+                if ($field->isRelation) {
                     $value = $field->prepareValueBeforeSave(
                         $value->prepareDatabaseSave($field),
                         $connection
                     );
-                else:
+                } else {
                     throw new TypeError(
                         "Tried to update field '%s' with a model instance, '%s'. Use a value compatible with '%s'.",
                         $field->getName(),
                         $value,
                         get_class($field)
                     );
-
-                endif;
-            else:
+                }
+            } else {
                 $value = $field->prepareValueBeforeSave($value, $connection);
-            endif;
+            }
             // prepare value
             $params[] = $value;
-        endforeach;
+        }
 
         list($sql, $whereParams) = $this->compile($this->where);
         $qb->where($sql);
         $params = array_merge($params, $whereParams);
 
-        foreach ($params as $index => $param) :
+        foreach ($params as $index => $param) {
             $qb->setParameter($index, $param);
-        endforeach;
+        }
 
         return $qb;
     }

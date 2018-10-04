@@ -72,13 +72,13 @@ class Migration implements MigrationInterface
     public static function createShortName($name, $ns = false)
     {
         $pos = strripos($name, '\\');
-        if ($pos):
-            if (!$ns):
+        if ($pos) {
+            if (!$ns) {
                 $name = trim(substr($name, $pos), '\\');
-            else:
+            } else {
                 $name = trim(substr($name, 0, $pos), '\\');
-            endif;
-        endif;
+            }
+        }
 
         return $name;
     }
@@ -173,14 +173,13 @@ class Migration implements MigrationInterface
     public function apply(ProjectState $state, SchemaEditor $schemaEditor)
     {
         /** @var $operation Operation */
-        foreach ($this->operations as $operation) :
-
-            if (!$operation->isReducibleToSql()):
+        foreach ($this->operations as $operation) {
+            if (!$operation->isReducibleToSql()) {
                 $schemaEditor->addSql(
-                    '-- MIGRATION NOW PERFORMS' .
+                    '-- MIGRATION NOW PERFORMS'.
                     ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
                 );
-            endif;
+            }
             $schemaEditor->addSql(
                 sprintf(
                     '<fg=yellow>-- %s</>',
@@ -188,9 +187,9 @@ class Migration implements MigrationInterface
                 )
             );
 
-            if (!$operation->isReducibleToSql()):
+            if (!$operation->isReducibleToSql()) {
                 continue;
-            endif;
+            }
 
             // preserve state before operation
             $oldState = $state->deepClone();
@@ -207,8 +206,7 @@ class Migration implements MigrationInterface
                 $schemaEditor->connection->rollBack();
                 throw new CommandError($e->getMessage());
             }
-
-        endforeach;
+        }
 
         return $state;
     }
@@ -247,7 +245,7 @@ class Migration implements MigrationInterface
         $newState = $state;
         // we need to reverse the operations so that foreignkeys are removed
         // before model is destroyed
-        foreach ($this->operations as $operation) :
+        foreach ($this->operations as $operation) {
             //Preserve new state from previous run to not tamper the same
             // state over all operations
             $newState = $newState->deepClone();
@@ -266,26 +264,25 @@ class Migration implements MigrationInterface
                     'newState' => $newState,
                 ]
             );
-        endforeach;
+        }
 
         // Phase 2 -- Since we are un applying the old state is where we want
         // to go back to
         //   and the new state is where we are moving away from i.e
         //   we are moving from $newState to $oldState
 
-        foreach ($itemsToRun as $runItem) :
-
+        foreach ($itemsToRun as $runItem) {
             $schemaEditor->connection->beginTransaction();
             try {
                 /** @var $operation Operation */
                 $operation = $runItem['operation'];
 
-                if (!$operation->isReducibleToSql()):
+                if (!$operation->isReducibleToSql()) {
                     $schemaEditor->addSql(
-                        '-- MIGRATION NOW PERFORMS' .
+                        '-- MIGRATION NOW PERFORMS'.
                         ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
                     );
-                endif;
+                }
                 $schemaEditor->addSql(
                     sprintf(
                         '<fg=yellow>-- %s </>',
@@ -293,20 +290,19 @@ class Migration implements MigrationInterface
                     )
                 );
 
-                if ($operation->isReducibleToSql()):
-
+                if ($operation->isReducibleToSql()) {
                     $operation->databaseBackwards(
                         $schemaEditor,
                         $runItem['newState'],
                         $runItem['oldState']
                     );
-                endif;
+                }
                 $schemaEditor->connection->commit();
             } catch (\Exception $exception) {
                 $schemaEditor->connection->rollBack();
                 throw new CommandError($exception->getMessage());
             }
-        endforeach;
+        }
 
         return $state;
     }
@@ -319,7 +315,7 @@ class Migration implements MigrationInterface
      * mutated state from a copy.
      *
      * @param ProjectState $state
-     * @param bool|true $preserveState
+     * @param bool|true    $preserveState
      *
      * @return mixed
      *
@@ -332,16 +328,15 @@ class Migration implements MigrationInterface
     public function updateState($state, $preserveState = true)
     {
         $newState = $state;
-        if ($preserveState):
+        if ($preserveState) {
             $newState = $state->deepClone();
-        endif;
+        }
 
         /** @var $operation Operation */
-        foreach ($this->operations as $operation) :
+        foreach ($this->operations as $operation) {
             $operation->setAppLabel($this->getAppLabel());
             $operation->updateState($newState);
-
-        endforeach;
+        }
 
         return $newState;
     }
@@ -386,9 +381,9 @@ class Migration implements MigrationInterface
      */
     public function getNamespace($app = null)
     {
-        if (null == $app):
+        if (null == $app) {
             $app = $this->getApp();
-        endif;
+        }
 
         return sprintf(
             "%s\Migrations",

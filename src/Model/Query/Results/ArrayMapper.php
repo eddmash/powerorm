@@ -32,9 +32,9 @@ class ArrayMapper extends Mapper
 
         $colList = array_merge($colList, array_keys($sqlCompiler->query->annotations));
         $resuts = [];
-        foreach ($sqlCompiler->getResultsIterator($resultsStatement) as $result) :
+        foreach ($sqlCompiler->getResultsIterator($resultsStatement) as $result) {
             $resuts[] = array_combine($colList, $result);
-        endforeach;
+        }
 
         return $resuts;
     }

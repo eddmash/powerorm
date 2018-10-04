@@ -58,13 +58,13 @@ class Optimize
      */
     public static function run($operations)
     {
-        while (true):
+        while (true) {
             $results = self::optimize($operations);
-            if ($results == $operations):
+            if ($results == $operations) {
                 return $results;
-            endif;
+            }
             $operations = $results;
-        endwhile;
+        }
     }
 
     /**
@@ -82,11 +82,11 @@ class Optimize
     {
         $newOperations = [];
         /** @var $outOperation Operation */
-        foreach ($operations as $outIndex => $outOperation) :
+        foreach ($operations as $outIndex => $outOperation) {
             $inOperations = array_slice($operations, $outIndex + 1);
 
-            if ($inOperations) :
-                foreach ($inOperations as $inIndex => $inOperation) :
+            if ($inOperations) {
+                foreach ($inOperations as $inIndex => $inOperation) {
                     // get how many items to fetch
                     $length = $inIndex;
 
@@ -94,7 +94,7 @@ class Optimize
 
                     $result = $outOperation->reduce($inOperation, $inBetween);
 
-                    if ($result) :
+                    if ($result) {
                         // add the result of the two merging
                         $newOperations = array_merge($newOperations, $result);
                         // add points that fell in between those that merged
@@ -106,14 +106,13 @@ class Optimize
                         );
 
                         return $newOperations;
-                    endif;
-                endforeach;
+                    }
+                }
                 $newOperations[] = $outOperation;
-            else:
+            } else {
                 $newOperations[] = $outOperation;
-            endif;
-
-        endforeach;
+            }
+        }
 
         return $newOperations;
     }

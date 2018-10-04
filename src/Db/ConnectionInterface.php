@@ -109,8 +109,8 @@ interface ConnectionInterface extends \Doctrine\DBAL\Driver\Connection
      * Table expression and columns are not escaped and are not safe for user-input.
      *
      * @param string $tableExpression the expression of the table to insert data into, quoted or unquoted
-     * @param array $data an associative array containing column-value pairs
-     * @param array $types types of the inserted data
+     * @param array  $data            an associative array containing column-value pairs
+     * @param array  $types           types of the inserted data
      *
      * @return int the number of affected rows
      */
@@ -122,9 +122,9 @@ interface ConnectionInterface extends \Doctrine\DBAL\Driver\Connection
      *
      * This method supports PDO binding types as well as DBAL mapping types.
      *
-     * @param string $query the SQL query
-     * @param array $params the query parameters
-     * @param array $types the parameter types
+     * @param string $query  the SQL query
+     * @param array  $params the query parameters
+     * @param array  $types  the parameter types
      *
      * @return int the number of affected rows
      *
@@ -135,9 +135,9 @@ interface ConnectionInterface extends \Doctrine\DBAL\Driver\Connection
     /**
      * Prepares and executes an SQL query and returns the result as an associative array.
      *
-     * @param string $sql the SQL query
-     * @param array $params the query parameters
-     * @param array $types the query parameter types
+     * @param string $sql    the SQL query
+     * @param array  $params the query parameters
+     * @param array  $types  the query parameter types
      *
      * @return array
      */
@@ -149,8 +149,8 @@ interface ConnectionInterface extends \Doctrine\DBAL\Driver\Connection
      * Table expression and columns are not escaped and are not safe for user-input.
      *
      * @param string $tableExpression the expression of the table on which to delete
-     * @param array $identifier The deletion criteria. An associative array containing column-value pairs.
-     * @param array $types the types of identifiers
+     * @param array  $identifier      The deletion criteria. An associative array containing column-value pairs.
+     * @param array  $types           the types of identifiers
      *
      * @return int the number of affected rows
      *
@@ -163,8 +163,8 @@ interface ConnectionInterface extends \Doctrine\DBAL\Driver\Connection
      * as an associative array.
      *
      * @param string $statement the SQL query
-     * @param array $params the query parameters
-     * @param array $types the query parameter types
+     * @param array  $params    the query parameters
+     * @param array  $types     the query parameter types
      *
      * @return array
      */
@@ -175,8 +175,8 @@ interface ConnectionInterface extends \Doctrine\DBAL\Driver\Connection
      * as a numerically indexed array.
      *
      * @param string $statement the SQL query to be executed
-     * @param array $params the prepared statement params
-     * @param array $types the query parameter types
+     * @param array  $params    the prepared statement params
+     * @param array  $types     the query parameter types
      *
      * @return array
      */
@@ -187,9 +187,9 @@ interface ConnectionInterface extends \Doctrine\DBAL\Driver\Connection
      * of the first row of the result.
      *
      * @param string $statement the SQL query to be executed
-     * @param array $params the prepared statement params
-     * @param int $column the 0-indexed column number to retrieve
-     * @param array $types the query parameter types
+     * @param array  $params    the prepared statement params
+     * @param int    $column    the 0-indexed column number to retrieve
+     * @param array  $types     the query parameter types
      *
      * @return mixed
      */

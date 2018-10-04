@@ -12,8 +12,9 @@
 namespace Eddmash\PowerOrm\Tests\Helpers;
 
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
+use PHPUnit\Framework\TestCase;
 
-class ArrayHelperTest extends \PHPUnit_Framework_TestCase
+class ArrayHelperTest extends TestCase
 {
     /**
      * @dataProvider providerGetArraysValue
