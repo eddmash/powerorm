@@ -15,8 +15,8 @@ addons:
 
 before_script:
 - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where user='root';"
-- sudo mysql -e "update user set plugin='mysql_native_password';"
-- sudo mysql -e "FLUSH PRIVILEGES;"
+- sudo mysql -e "use mysql;update user set plugin='mysql_native_password';"
+- sudo mysql -e "use mysql;FLUSH PRIVILEGES;"
 - sudo mysql_upgrade -u root -proot
 - sudo mysql -e "create database powerormtest;"
 - sudo service mysql restart
