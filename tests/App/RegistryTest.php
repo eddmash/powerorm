@@ -18,23 +18,26 @@ class RegistryTest extends PowerormTest
     public function testFilesInModelFolder()
     {
         $files = BaseOrm::getRegistry()->getModelFiles();
+
         $name = array_keys($files)[0];
         $this->assertEquals(
             'testapp',
             $name
         );
-        $this->assertEquals(
-            [
-                BASEPATH.'/tests/TestApp/Models/Author.php',
-                BASEPATH.'/tests/TestApp/Models/Book.php',
-                BASEPATH.'/tests/TestApp/Models/NotAModel.php',
-                BASEPATH.'/tests/TestApp/Models/Order.php',
-                BASEPATH.'/tests/TestApp/Models/OrderItem.php',
-                BASEPATH.'/tests/TestApp/Models/Product.php',
-                BASEPATH.'/tests/TestApp/Models/User.php',
-            ],
-            $files[$name]
-        );
+        $expected = [
+            BASEPATH . '/tests/TestApp/Models/Author.php',
+            BASEPATH . '/tests/TestApp/Models/Book.php',
+            BASEPATH . '/tests/TestApp/Models/NotAModel.php',
+            BASEPATH . '/tests/TestApp/Models/Order.php',
+            BASEPATH . '/tests/TestApp/Models/OrderItem.php',
+            BASEPATH . '/tests/TestApp/Models/Product.php',
+            BASEPATH . '/tests/TestApp/Models/User.php',
+        ];
+        $actual = $files[$name];
+        sort($actual);
+        sort($expected);
+        $this->assertCount(7, $actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testAllModelsWithoutAutoCreatedExcluded()
@@ -59,7 +62,7 @@ class RegistryTest extends PowerormTest
 
         $this->assertCount(6, $actual);
 
-        $this->assertEquals($actual, $expected);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testAllModelsWithAutoCreatedIncluded()
@@ -84,7 +87,7 @@ class RegistryTest extends PowerormTest
         sort($actual);
 
         $this->assertCount(7, $actual);
-        $this->assertEquals($actual, $expected);
+        $this->assertEquals($expected, $actual);
     }
 
     public function testGetModel()
