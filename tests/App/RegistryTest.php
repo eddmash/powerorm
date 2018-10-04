@@ -43,17 +43,23 @@ class RegistryTest extends PowerormTest
             false,
             'testapp'
         );
-        $this->assertEquals(
-            [
-                "Eddmash\PowerOrm\Tests\TestApp\Models\Author",
-                "Eddmash\PowerOrm\Tests\TestApp\Models\Book",
-                "Eddmash\PowerOrm\Tests\TestApp\Models\Order",
-                "Eddmash\PowerOrm\Tests\TestApp\Models\OrderItem",
-                "Eddmash\PowerOrm\Tests\TestApp\Models\Product",
-                "Eddmash\PowerOrm\Tests\TestApp\Models\User",
-            ],
-            array_keys($classes)
-        );
+        $expected = [
+            "Eddmash\PowerOrm\Tests\TestApp\Models\Author",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\Book",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\Order",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\OrderItem",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\Product",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\User",
+        ];
+
+        $actual = array_keys($classes);
+
+        sort($expected);
+        sort($actual);
+
+        $this->assertCount(6, $actual);
+
+        $this->assertEquals($actual, $expected);
     }
 
     public function testAllModelsWithAutoCreatedIncluded()
@@ -62,18 +68,23 @@ class RegistryTest extends PowerormTest
             true,
             'testapp'
         );
-        $this->assertEquals(
-            [
-                "Eddmash\PowerOrm\Tests\TestApp\Models\Author",
-                'Book_author',
-                "Eddmash\PowerOrm\Tests\TestApp\Models\Book",
-                "Eddmash\PowerOrm\Tests\TestApp\Models\Order",
-                "Eddmash\PowerOrm\Tests\TestApp\Models\OrderItem",
-                "Eddmash\PowerOrm\Tests\TestApp\Models\Product",
-                "Eddmash\PowerOrm\Tests\TestApp\Models\User",
-            ],
-            array_keys($classes)
-        );
+
+        $expected = [
+            "Eddmash\PowerOrm\Tests\TestApp\Models\Author",
+            'Book_author',
+            "Eddmash\PowerOrm\Tests\TestApp\Models\Book",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\Order",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\OrderItem",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\Product",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\User",
+        ];
+
+        $actual = array_keys($classes);
+        sort($expected);
+        sort($actual);
+
+        $this->assertCount(7, $actual);
+        $this->assertEquals($actual, $expected);
     }
 
     public function testGetModel()
