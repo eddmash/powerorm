@@ -35,7 +35,7 @@ abstract class PowerormDbTest extends TestCase
                         'dbname' => $GLOBALS['DB_DBNAME'],
                         'user' => $GLOBALS['DB_USER'],
                         'password' => $GLOBALS['DB_PASSWD'],
-                        'driver' => 'pdo_mysql',
+                        'driver' => $GLOBALS['DB_DRIVER'],
                     ],
                     'components' => [
                         Test::class,

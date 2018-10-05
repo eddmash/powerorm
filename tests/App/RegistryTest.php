@@ -25,13 +25,13 @@ class RegistryTest extends PowerormTest
             $name
         );
         $expected = [
-            BASEPATH . '/tests/TestApp/Models/Author.php',
-            BASEPATH . '/tests/TestApp/Models/Book.php',
-            BASEPATH . '/tests/TestApp/Models/NotAModel.php',
-            BASEPATH . '/tests/TestApp/Models/Order.php',
-            BASEPATH . '/tests/TestApp/Models/OrderItem.php',
-            BASEPATH . '/tests/TestApp/Models/Product.php',
-            BASEPATH . '/tests/TestApp/Models/User.php',
+            BASEPATH.'/tests/TestApp/Models/Author.php',
+            BASEPATH.'/tests/TestApp/Models/Book.php',
+            BASEPATH.'/tests/TestApp/Models/NotAModel.php',
+            BASEPATH.'/tests/TestApp/Models/Order.php',
+            BASEPATH.'/tests/TestApp/Models/OrderItem.php',
+            BASEPATH.'/tests/TestApp/Models/Product.php',
+            BASEPATH.'/tests/TestApp/Models/User.php',
         ];
         $actual = $files[$name];
         sort($actual);

@@ -4,6 +4,10 @@ php:
 - 7.1
 - 7.2
 
+env:
+  - DB=mysql
+  - DB=postgres
+
 addons:
   apt:
     sources:
@@ -11,16 +15,24 @@ addons:
     packages:
       - mysql-server
       - mysql-client
+addons:
+  postgresql: "10"
+  apt:
+    packages:
+    - postgresql-10
+    - postgresql-client-10
 
 before_script:
-- sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where user='root';"
-- sudo mysql -e "use mysql;update user set plugin='mysql_native_password';"
-- sudo mysql -e "use mysql;FLUSH PRIVILEGES;"
-- sudo mysql_upgrade -u root -proot
-- sudo mysql -u root -proot -e "create database powerormtest;"
-- sudo service mysql restart
+- sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql -e 'use mysql; update user set authentication_string=PASSWORD('root') where user='root'; fi"
+- sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql -e 'use mysql;update user set plugin='mysql_native_password'; fi"
+- sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql -e 'use mysql;FLUSH PRIVILEGES;'; fi"
+- sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql_upgrade -u root -proot; fi"
+- sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql -u root -proot -e 'create database powerormtest;'; fi"
+- sh -c "if [ '$DB' = 'mysql' ]; sudo service mysql restart; fi"
+- sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'CREATE DATABASE powerormtest;' -U postgres; fi"
+
 - composer install
 
 script:
 - vendor/phpunit/phpunit/phpunit
-- vendor/phpunit/phpunit/phpunit --configuration tests/mysqlconf.xml
+- vendor/phpunit/phpunit/phpunit --configuration tests/dbconfigs/phpunit_$DB.xml
