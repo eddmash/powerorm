@@ -23,8 +23,8 @@ addons:
     - postgresql-client-10
 
 before_script:
-- sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql -e 'use mysql; update user set authentication_string=PASSWORD('root') where user='root'; fi"
-- sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql -e 'use mysql;update user set plugin='mysql_native_password'; fi"
+- sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql -e 'use mysql; update user set authentication_string=PASSWORD('root') where user='root''; fi"
+- sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql -e 'use mysql;update user set plugin='mysql_native_password''; fi"
 - sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql -e 'use mysql;FLUSH PRIVILEGES;'; fi"
 - sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql_upgrade -u root -proot; fi"
 - sh -c "if [ '$DB' = 'mysql' ]; then sudo mysql -u root -proot -e 'create database powerormtest;'; fi"
