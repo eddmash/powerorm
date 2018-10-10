@@ -695,6 +695,8 @@ class SqlFetchBaseCompiler extends SqlCompiler
         $results = array_merge($results, $fromClause);
         $params = array_merge($params, $fromParams);
 
+        list($sql, $whereParams) = $this->compile($this->where);
+
         if ($this->where) {
             list($sql, $whereParams) = $this->compile($this->where);
             if ($sql) {

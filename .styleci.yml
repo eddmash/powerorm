@@ -1,7 +1,6 @@
 preset: symfony
 
 disabled:
-- braces
 - blank_line_before_break
 - blank_line_before_continue
 - blank_line_before_throw

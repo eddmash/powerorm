@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm\App;
 
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Signals\SignalManagerInterface;
@@ -35,6 +36,11 @@ class Settings
     private $signalManager;
 
     private $timezone = '';
+
+//    /**
+//     * @var ConnectionInterface
+//     */
+//    private $connection;
 
     /**
      * The configurations to use to connect to the database.
@@ -136,6 +142,7 @@ class Settings
         );
 
         ClassHelper::setAttributes($this, $configs);
+
         if (!$this->components) {
             $this->components = []; // incase nothing is set, guarantee it iterable
         }

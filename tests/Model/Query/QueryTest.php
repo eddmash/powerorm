@@ -11,12 +11,12 @@ namespace Eddmash\PowerOrm\Tests\Model\Query;
 use function Eddmash\PowerOrm\Model\Query\Expression\not_;
 use function Eddmash\PowerOrm\Model\Query\Expression\q_;
 use Eddmash\PowerOrm\Model\Query\Query;
-use Eddmash\PowerOrm\Tests\PowerormDbTest;
+use Eddmash\PowerOrm\Tests\PowerormTest;
 use Eddmash\PowerOrm\Tests\TestApp\Models\Author;
 use Eddmash\PowerOrm\Tests\TestApp\Models\OrderItem;
 use Eddmash\PowerOrm\Tests\TestApp\Models\User;
 
-class QueryTest extends PowerormDbTest
+class QueryTest extends PowerormTest
 {
     public function testSqlFetchAll()
     {
@@ -98,16 +98,16 @@ class QueryTest extends PowerormDbTest
         $this->assertQuery($query, [$expected, [1]]);
 
         // *************** Queryset
-        $query = new Query(new OrderItem());
-        $query->addQ(q_(['order__buyer' => User::objects()->filter(['id' => 30])]));
-
-        $expected = 'SELECT testapp_orderitem.order_id, testapp_orderitem.product_id, '.
-            'testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id '.
-            'FROM testapp_orderitem  '.
-            'INNER JOIN testapp_order ON ( testapp_orderitem.order_id = testapp_order.id) '.
-            'WHERE testapp_order.buyer_id = '.
-            '( SELECT `testapp_user`.`id` FROM `testapp_user`  WHERE `testapp_user`.`id` = ? )';
-        $this->assertQuery($query, [$expected, [30]]);
+//        $query = new Query(new OrderItem());
+//        $query->addQ(q_(['order__buyer' => User::objects()->filter(['id' => 30])]));
+////
+//        $expected = 'SELECT testapp_orderitem.order_id, testapp_orderitem.product_id, '.
+//            'testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id '.
+//            'FROM testapp_orderitem  '.
+//            'INNER JOIN testapp_order ON ( testapp_orderitem.order_id = testapp_order.id) '.
+//            'WHERE testapp_order.buyer_id = '.
+//            '( SELECT testapp_user.id FROM testapp_user  WHERE testapp_user.id = ? )';
+//        $this->assertQuery($query, [$expected, [30]]);
     }
 
 //

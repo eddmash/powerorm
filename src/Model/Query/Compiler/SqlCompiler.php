@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
-use Doctrine\DBAL\Connection;
+use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Query\Query;
 
@@ -25,14 +25,14 @@ abstract class SqlCompiler implements CompilerInterface, SqlCompilableinterface
     public $query;
 
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     protected $connection;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(Query $query, Connection $connection)
+    public function __construct(Query $query, ConnectionInterface $connection)
     {
         $this->query = $query;
         $this->connection = $connection;

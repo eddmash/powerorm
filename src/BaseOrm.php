@@ -12,7 +12,6 @@
 namespace Eddmash\PowerOrm;
 
 use Doctrine\DBAL\Configuration;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\App\Settings;
@@ -92,6 +91,7 @@ class BaseOrm extends BaseObject
      */
     private function __construct(Settings $settings)
     {
+        static::$connection = null;
         $this->settings = $settings;
         // setup the registry
         $this->registryCache = Registry::createObject();
@@ -110,9 +110,10 @@ class BaseOrm extends BaseObject
      * @return BaseOrm
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
-    public static function setup(Settings $settings)
+    public static function setup(Settings $settings, ConnectionInterface $connection = null)
     {
         $instance = static::getInstance($settings);
+        $instance::$connection = $connection;
         $instance->loadComponents();
         $instance->loadRegistry();
         $instance->registerModelChecks();
@@ -142,12 +143,6 @@ class BaseOrm extends BaseObject
      */
     public function getDatabaseConnection()
     {
-        if (empty($this->getSettings()->getDatabase())) {
-            $message = 'The database configuration have not '.
-                'been provided, consult documentation for options';
-
-            throw new OrmException($message);
-        }
         if (null == static::$connection) {
             $config = new Configuration();
             $db = $this->getSettings()->getDatabase();
@@ -158,9 +153,16 @@ class BaseOrm extends BaseObject
                     $this->getSettings()->getDatabase(),
                     $config
                 );
-            } catch (DBALException $exception) {
+            } catch (\Exception $exception) {
                 throw new OrmException($exception->getMessage());
             }
+        }
+
+        if (!static::$connection && empty($this->getSettings()->getDatabase())) {
+            $message = 'The database configuration have not '.
+                'been provided, consult documentation for options';
+
+            throw new OrmException($message);
         }
 
         return static::$connection;
@@ -424,5 +426,10 @@ class BaseOrm extends BaseObject
         throw new ComponentException(
             sprintf("'%s' is not a registered component", $name)
         );
+    }
+
+    public function setConnection(ConnectionInterface $connection)
+    {
+        static::$connection = $connection;
     }
 }

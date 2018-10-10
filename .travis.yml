@@ -4,33 +4,8 @@ php:
 - 7.1
 - 7.2
 
-env:
-  - DB=mysql
-  - DB=postgres
-
-addons:
-  apt:
-    sources:
-      - mysql-5.7-trusty
-    packages:
-      - mysql-server
-      - mysql-client
-addons:
-  postgresql: "10"
-  apt:
-    packages:
-    - postgresql-10
-    - postgresql-client-10
-
 install:
   - composer install
 
-before_script:
-- sh -c "if [ '$DB' = 'mysql'||'$DB' = 'mariadb' ]; then ./tests/dbconfigs/mysql-setup.sh; fi"
-- sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'CREATE DATABASE powerormtest;' -U postgres; fi"
-- sh -c "if [ '$DB' = 'postgres' ]; then sudo service postgresql restart; fi"
-
-
 script:
 - vendor/phpunit/phpunit/phpunit
-- vendor/phpunit/phpunit/phpunit --configuration tests/dbconfigs/phpunit_$DB.xml
