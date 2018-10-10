@@ -343,7 +343,7 @@ class Registry extends BaseObject
     }
 
     /**
-     * @param callback $callback        the callback to invoke when a model
+     * @param callable $callback        the callback to invoke when a model
      *                                  has been created
      * @param array    $modelsToResolve the model we are waiting for to be
      *                                  created, the model object is passed to

@@ -343,10 +343,10 @@ class Tools
     }
 
     /**
-     * Schedule `callback` to be called once `model` and all `related_models` have been imported and registered with
-     * the app registry.
+     * Schedule `callback` to be called once `model` and all `related_models` have been imported
+     * and registered with the app registry.
      *
-     * @param callback $callback   will be called with the newly-loaded model
+     * @param callable $callback   will be called with the newly-loaded model
      *                             classes as its optional keyword arguments
      * @param Model    $scopeModel the model on which the method was invoked
      * @param mixed    $relModel   the related models that needs to be resolved

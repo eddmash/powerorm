@@ -5,3 +5,6 @@ disabled:
 - blank_line_before_continue
 - blank_line_before_throw
 - blank_line_before_try
+- self_accessor
+- blank_line_before_return
+- concat_without_spaces
