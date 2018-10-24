@@ -71,4 +71,9 @@ class DbalConnectionMock extends Connection
         $this->inserts = [];
         $this->lastInsertId = 0;
     }
+
+    public function quoteIdentifier($str)
+    {
+        return $str;
+    }
 }

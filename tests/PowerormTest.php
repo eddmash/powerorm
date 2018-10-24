@@ -30,6 +30,8 @@ abstract class PowerormTest extends TestCase
             ->getMock();
         $this->conn->method('getDatabasePlatform')
             ->willReturn(new DatabasePlatformMock());
+        $this->conn->expects($this->any())->method('quoteIdentifier')
+            ->will($this->returnArgument(0));
         BaseOrm::setup(
             new Settings(
                 [
@@ -52,7 +54,6 @@ abstract class PowerormTest extends TestCase
     private function queryAsSql(Query $query)
     {
         $compiler = $query->getSqlCompiler($this->conn);
-        $compiler->quotable = false;
         return $compiler->asSql();
     }
 

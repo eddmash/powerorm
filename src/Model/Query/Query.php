@@ -590,6 +590,17 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
         return [$lookup, $fieldParts];
     }
 
+    /**
+     * @param $value
+     * @param $lookups
+     * @param $canReuse
+     * @param bool $allowJoins
+     *
+     * @return array
+     *
+     * @throws ValueError
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
+     */
     private function prepareLookupValue($value, $lookups, &$canReuse, $allowJoins = true)
     {
         $usedJoins = [];

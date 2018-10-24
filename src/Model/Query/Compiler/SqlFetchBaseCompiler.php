@@ -554,6 +554,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
                 list($fromSql, $fromParams) = $this->compile($from);
                 array_push($result, $fromSql);
+
                 $params = array_merge($params, $fromParams);
             } catch (KeyError $e) {
                 continue;
@@ -660,6 +661,8 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws KeyError
      */
     public function asSql(
         CompilerInterface $compiler = null,
@@ -694,8 +697,6 @@ class SqlFetchBaseCompiler extends SqlCompiler
 
         $results = array_merge($results, $fromClause);
         $params = array_merge($params, $fromParams);
-
-        list($sql, $whereParams) = $this->compile($this->where);
 
         if ($this->where) {
             list($sql, $whereParams) = $this->compile($this->where);

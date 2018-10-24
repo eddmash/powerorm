@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Model\Query\Query;
 
 abstract class SqlCompiler implements CompilerInterface, SqlCompilableinterface
 {
-    public $quotable = true;
+    public $quotable = false;
 
     /**
      * @var Query
@@ -93,7 +93,7 @@ abstract class SqlCompiler implements CompilerInterface, SqlCompilableinterface
                 !array_key_exists($name, $this->query->tableJoinsMap)) {
                 return $name;
             }
-            return $this->quotable ? $this->connection->quoteIdentifier($name) : $name;
+            return $this->canQuote() ? $this->connection->quoteIdentifier($name) : $name;
         };
     }
 
@@ -103,7 +103,12 @@ abstract class SqlCompiler implements CompilerInterface, SqlCompilableinterface
     public function quoteCallback()
     {
         return function ($name) {
-            return $this->quotable ? $this->connection->quoteIdentifier($name) : $name;
+            return $this->canQuote() ? $this->connection->quoteIdentifier($name) : $name;
         };
+    }
+
+    private function canQuote()
+    {
+        return method_exists($this->connection, 'quoteIdentifier');
     }
 }

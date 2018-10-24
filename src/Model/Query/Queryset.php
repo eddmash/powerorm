@@ -665,6 +665,8 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws TypeError
      */
     public function _prepareAsFilterValue()
     {
