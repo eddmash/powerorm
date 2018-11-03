@@ -12,10 +12,12 @@ use Eddmash\PowerOrm\Db\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Model\Field\Field;
+use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
+use Eddmash\PowerOrm\Model\Query\Query;
 
 /**
  * Class Filter.
@@ -176,10 +178,14 @@ abstract class BaseLookup implements LookupInterface
     public function processRHS(CompilerInterface $compiler, ConnectionInterface $connection)
     {
         $value = $this->rhs;
+
+        if ($value instanceof Query &&
+            !$this->lhs->getTargetField() instanceof RelatedField) {
+            $value->setValueSelect([$this->lhs->getTargetField()->getColumnName()]);
+        }
         if (method_exists($value, 'getSqlCompiler')) {
             $value = $value->getSqlCompiler($connection);
         }
-
         if (method_exists($value, 'asSql')) {
             list($sql, $params) = $compiler->compile($value);
 

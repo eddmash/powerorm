@@ -10,7 +10,7 @@
     <testsuites>
         <testsuite name="Eddmash Powerorm Test Suite">
             <directory>./tests/</directory>
-            <!--<exclude>./tests/Model/Query/</exclude>-->
+            <exclude>./tests/SingleTest.php</exclude>
         </testsuite>
     </testsuites>
 </phpunit>

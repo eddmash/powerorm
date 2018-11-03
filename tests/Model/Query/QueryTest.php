@@ -75,6 +75,9 @@ class QueryTest extends PowerormTest
         $this->assertQuery($query, [$expected, ['o', 'p']]);
     }
 
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
+     */
     public function testSqlSimpleForeignKey()
     {
         $query = new Query(new OrderItem());
@@ -88,6 +91,9 @@ class QueryTest extends PowerormTest
         $this->assertQuery($query, [$expected, [1]]);
     }
 
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
+     */
     public function testSqlSpanRelationshipFilterByPKField()
     {
         // ********* Scalar value
@@ -114,6 +120,9 @@ class QueryTest extends PowerormTest
         $this->assertQuery($query, [$expected, [30]]);
     }
 
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
+     */
     public function testSqlSpanRelationshipFilterByNotPkField()
     {
         $query = new Query(new OrderItem());
@@ -142,6 +151,9 @@ class QueryTest extends PowerormTest
         $this->assertQuery($query, [$expected, ['a@df.com']]);
     }
 
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
+     */
     public function testSqlReverseM2MFiltering()
     {
         // ********* Scalar value reverse via manually defined Through model
@@ -150,7 +162,8 @@ class QueryTest extends PowerormTest
 
         $expected = 'SELECT testapp_product.name, testapp_product.price, testapp_product.description, '.
             'testapp_product.stock, testapp_product.unit_of_measure, testapp_product.treshhold, '.
-            'testapp_product.visible, testapp_product.image, testapp_product.owner_id, testapp_product.id '.
+            'testapp_product.visible, testapp_product.image, testapp_product.owner_id, testapp_product.created_by_id'.
+            ', testapp_product.id '.
             'FROM testapp_product  '.
             'INNER JOIN testapp_orderitem ON ( testapp_product.id = testapp_orderitem.product_id) '.
             'WHERE testapp_orderitem.order_id = ?';
@@ -162,7 +175,8 @@ class QueryTest extends PowerormTest
 
         $expected = 'SELECT testapp_product.name, testapp_product.price, testapp_product.description, '.
             'testapp_product.stock, testapp_product.unit_of_measure, testapp_product.treshhold, '.
-            'testapp_product.visible, testapp_product.image, testapp_product.owner_id, testapp_product.id '.
+            'testapp_product.visible, testapp_product.image, testapp_product.owner_id, '.
+            'testapp_product.created_by_id, testapp_product.id '.
             'FROM testapp_product  '.
             'INNER JOIN testapp_orderitem ON ( testapp_product.id = testapp_orderitem.product_id) '.
             'WHERE testapp_orderitem.order_id = '.
@@ -190,6 +204,9 @@ class QueryTest extends PowerormTest
         $this->assertQuery($query, [$expected, [1]]);
     }
 
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
+     */
     public function testSqlReverseFkFiltering()
     {
         // *************** scalar

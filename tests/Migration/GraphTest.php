@@ -15,6 +15,9 @@ use Eddmash\PowerOrm\Tests\PowerormTest;
 
 class GraphTest extends PowerormTest
 {
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
+     */
     public function testLinearGraph()
     {
         $app1M1 = new Migration("app1\m1");
@@ -74,6 +77,9 @@ class GraphTest extends PowerormTest
         );
     }
 
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
+     */
     public function testBranchedGraph()
     {
         $app1M1 = new Migration("app1\m1");
@@ -145,6 +151,9 @@ class GraphTest extends PowerormTest
         );
     }
 
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
+     */
     public function testCircularGraphInForwardPlan()
     {
         $app1M1 = new Migration("app1\m1");
@@ -172,6 +181,9 @@ class GraphTest extends PowerormTest
         $graph->getDecedentsTree('app2', "app2\m1");
     }
 
+    /**
+     * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
+     */
     public function testCircularGraphInReversePlan()
     {
         $app1M1 = new Migration("app1\m1");

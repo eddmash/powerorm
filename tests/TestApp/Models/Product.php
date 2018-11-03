@@ -24,6 +24,7 @@ class Product extends Model
             'visible' => Model::BooleanField(),
             'image' => Model::CharField(['maxLength' => 150]),
             'owner' => Model::ForeignKey(['to' => User::class]),
+            'created_by' => Model::ForeignKey(['to' => User::class]),
         ];
     }
 }
