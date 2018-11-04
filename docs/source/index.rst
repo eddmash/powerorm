@@ -7,6 +7,8 @@ A set of Components that easily integrate to you php project.
 
     You can get a `Demo App <https://github.com/eddmash/powerocomponentsdemo>`_
     that show this componets in use.
+    You can get a `Live Demo App <https://powerocomponentsdemo.herokuapp.com>`_
+    that show this componets in use.
 
 
 *******
