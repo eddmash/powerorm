@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Form\Fields\ModelChoiceField;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;

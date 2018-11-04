@@ -9,15 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Db;
+namespace Eddmash\PowerOrm\Backends;
+
+use Eddmash\PowerOrm\Backends\Operations\OperationsInterface;
 
 class Connection extends \Doctrine\DBAL\Connection implements ConnectionInterface
 {
     /**
-     * @return \Eddmash\PhpGis\Db\Backends\Operations\OperationsInterface|void
+     * @return OperationsInterface
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
-    public function getOperations()
+    public function getOperations(): OperationsInterface
     {
+        $name = sprintf("Eddmash\PowerOrm\Backends\Operations\%s",
+            ucfirst($this->getDatabasePlatform()->getName()));
+
+        return new $name();
     }
 
     public function getFeatures()

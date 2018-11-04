@@ -13,13 +13,13 @@ namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\UpdateQuery;
 
-class SQLUpdateCompiler extends SqlFetchBaseCompiler
+class SQLUpdateCompiler extends SqlFetchCompiler
 {
     /**
      * @var UpdateQuery

@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 
 interface SqlCompilableinterface
 {

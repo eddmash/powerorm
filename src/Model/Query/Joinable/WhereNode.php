@@ -11,7 +11,7 @@
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
 use Eddmash\PowerOrm\CloneInterface;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;

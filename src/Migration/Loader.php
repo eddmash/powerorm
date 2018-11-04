@@ -13,7 +13,7 @@ namespace Eddmash\PowerOrm\Migration;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppInterface;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AmbiguityError;
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
 use Eddmash\PowerOrm\Exception\KeyError;

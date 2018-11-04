@@ -9,12 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Db;
+namespace Eddmash\PowerOrm\Backends;
 
 use Closure;
 use Doctrine\DBAL\Exception\InvalidArgumentException;
-use Eddmash\PhpGis\Db\Backends\Features\BaseFeatures;
-use Eddmash\PhpGis\Db\Backends\Operations\OperationsInterface;
+use Eddmash\PowerOrm\Backends\Operations\OperationsInterface;
 
 interface ConnectionInterface extends \Doctrine\DBAL\Driver\Connection
 {
@@ -209,7 +208,7 @@ interface ConnectionInterface extends \Doctrine\DBAL\Driver\Connection
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getOperations();
+    public function getOperations(): OperationsInterface;
 
     /**
      * @return BaseFeatures

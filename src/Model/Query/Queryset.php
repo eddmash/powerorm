@@ -13,7 +13,7 @@ namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\InvalidArgumentException;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -190,6 +190,13 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         );
     }
 
+    public function distinct($fields = [])
+    {
+        $queryset = $this->_clone();
+        $queryset->query->addDistinctFields($fields);
+        return $queryset;
+    }
+
     /**
      * This method takes associative array as parameters. or an assocative array
      * whose first item is the connector to
@@ -267,6 +274,8 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      * @param array $fieldNames
      *
      * @return Queryset
+     *
+     * @throws \Eddmash\PowerOrm\Exception\FieldError
      */
     public function orderBy($fieldNames = [])
     {

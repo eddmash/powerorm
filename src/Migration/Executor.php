@@ -13,7 +13,7 @@ namespace Eddmash\PowerOrm\Migration;
 
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\Console\Console;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 /**

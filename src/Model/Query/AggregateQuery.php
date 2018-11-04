@@ -8,7 +8,7 @@
 
 namespace Eddmash\PowerOrm\Model\Query;
 
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\SQLAggregateCompiler;
 
 class AggregateQuery extends Query

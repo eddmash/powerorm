@@ -7,7 +7,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Type;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -33,7 +33,7 @@ use const Eddmash\PowerOrm\Model\Query\ORDER_DIRECTION;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-class SqlFetchBaseCompiler extends SqlCompiler
+class SqlFetchCompiler extends SqlCompiler
 {
     public $klassInfo = [];
 
@@ -527,6 +527,10 @@ class SqlFetchBaseCompiler extends SqlCompiler
         }
     }
 
+    private function getDistinct()
+    {
+    }
+
     /**
      * @return array
      *
@@ -663,6 +667,7 @@ class SqlFetchBaseCompiler extends SqlCompiler
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      *
      * @throws KeyError
+     * @throws NotImplemented
      */
     public function asSql(
         CompilerInterface $compiler = null,
@@ -670,11 +675,15 @@ class SqlFetchBaseCompiler extends SqlCompiler
     ) {
         list($orderBy, $groupBy) = $this->preSqlSetup();
         $params = [];
+        $distinctFields = $this->getDistinct();
         list($fromClause, $fromParams) = $this->getFrom();
 
         $results = ['SELECT'];
 
         // todo DISTINCT
+        if ($this->query->distinct) {
+            $results[] = $this->connection->getOperations()->distinctSql($distinctFields);
+        }
 
         $cols = [];
 

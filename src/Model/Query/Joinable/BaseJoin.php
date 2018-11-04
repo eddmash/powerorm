@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\SqlCompilableinterface;
 

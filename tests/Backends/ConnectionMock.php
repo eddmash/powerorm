@@ -6,10 +6,11 @@
  * Time: 5:30 AM.
  */
 
-namespace Eddmash\PowerOrm\Tests\Db;
+namespace Eddmash\PowerOrm\Tests\Backends;
 
-use Eddmash\PowerOrm\Db\ConnectionInterface;
-use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\Operations\OperationsInterface;
+use Eddmash\PowerOrm\Backends\SchemaEditor;
 
 class ConnectionMock extends DbalConnectionMock implements ConnectionInterface
 {
@@ -20,7 +21,7 @@ class ConnectionMock extends DbalConnectionMock implements ConnectionInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getOperations()
+    public function getOperations(): OperationsInterface
     {
         // TODO: Implement getOperations() method.
     }

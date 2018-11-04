@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\NotImplemented;
 
 class Recorder

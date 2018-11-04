@@ -13,7 +13,7 @@ namespace Eddmash\PowerOrm\Migration;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppComponent;
 use Eddmash\PowerOrm\Components\AppInterface;
-use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Backends\SchemaEditor;
 use Eddmash\PowerOrm\Exception\CommandError;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Migration\Operation\Operation;

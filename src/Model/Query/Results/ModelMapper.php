@@ -11,7 +11,7 @@
 namespace Eddmash\PowerOrm\Model\Query\Results;
 
 use Doctrine\DBAL\Connection;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;

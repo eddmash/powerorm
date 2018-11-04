@@ -12,7 +12,7 @@
 namespace Eddmash\PowerOrm\Migration\Operation;
 
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\ComponentException;
 use Eddmash\PowerOrm\Exception\NotImplemented;

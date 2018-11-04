@@ -11,8 +11,8 @@ namespace Eddmash\PowerOrm\Tests;
 use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Model\Query\Query;
-use Eddmash\PowerOrm\Tests\Db\ConnectionMock;
-use Eddmash\PowerOrm\Tests\Db\DatabasePlatformMock;
+use Eddmash\PowerOrm\Tests\Backends\ConnectionMock;
+use Eddmash\PowerOrm\Tests\Backends\DatabasePlatformMock;
 use Eddmash\PowerOrm\Tests\TestApp\Test;
 use PHPUnit\Framework\TestCase;
 

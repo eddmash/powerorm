@@ -11,7 +11,7 @@
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
 use Eddmash\PowerOrm\BaseOrm;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;

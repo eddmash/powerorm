@@ -12,7 +12,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Checks\CheckError;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Exception;
 

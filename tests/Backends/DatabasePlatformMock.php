@@ -6,7 +6,7 @@
  * Time: 5:35 AM.
  */
 
-namespace Eddmash\PowerOrm\Tests\Db;
+namespace Eddmash\PowerOrm\Tests\Backends;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;

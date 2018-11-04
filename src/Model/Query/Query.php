@@ -16,7 +16,7 @@ use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\CloneInterface;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\OrmException;
@@ -33,7 +33,7 @@ use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\LookupInterface;
 use Eddmash\PowerOrm\Model\Meta;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Model\Query\Compiler\SqlFetchBaseCompiler;
+use Eddmash\PowerOrm\Model\Query\Compiler\SqlFetchCompiler;
 use Eddmash\PowerOrm\Model\Query\Expression\BaseExpression;
 use Eddmash\PowerOrm\Model\Query\Expression\Col;
 use Eddmash\PowerOrm\Model\Query\Expression\ExpResolverInterface;
@@ -108,9 +108,9 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
      */
     public $annotations = [];
 
-    public $distict;
+    public $distinct;
 
-    public $distictFields = [];
+    public $distinctFields = [];
 
     public $orderBy = [];
 
@@ -529,7 +529,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
     /**
      * @param ConnectionInterface $connection
      *
-     * @return SqlFetchBaseCompiler
+     * @return SqlFetchCompiler
      *
      * @since  1.1.0
      *
@@ -553,7 +553,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
      */
     protected function getCompilerClass()
     {
-        return SqlFetchBaseCompiler::class;
+        return SqlFetchCompiler::class;
     }
 
     private function solveLookupType($name)
@@ -1106,6 +1106,12 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
         $this->selectRelected = $relatedFields;
     }
 
+    public function addDistinctFields(array $fields)
+    {
+        $this->distinct = true;
+        $this->distinctFields = $fields;
+    }
+
     /**
      * @return array
      *
@@ -1129,21 +1135,21 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
 
         // we have of $hasExistingAnnotations  we need to make the core query a
         // subquery and aggregate over it.
-        if ($hasExistingAnnotations || $hasLimit || $this->distict ||
+        if ($hasExistingAnnotations || $hasLimit || $this->distinct ||
             is_array($this->groupBy)) {
             $outQuery = new AggregateQuery($this->model);
             $innerQuery = $this->deepClone();
 
             $innerQuery->selectRelected = false;
 
-            if (!$hasLimit && !$this->distictFields) {
+            if (!$hasLimit && !$this->distinctFields) {
                 // Queries with distinct_fields need ordering and when a limit
                 // is applied we must take the slice from the ordered query.
                 // Otherwise no need for ordering, so clear.
                 $innerQuery->clearOrdering(true);
             }
 
-            if (!$innerQuery->distict) {
+            if (!$innerQuery->distinct) {
                 // if we are using default columns and we already have
                 // aggregate annotations existing
                 // then we must make sure the inner

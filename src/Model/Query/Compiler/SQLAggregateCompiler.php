@@ -11,9 +11,9 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Compiler;
 
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 
-class SQLAggregateCompiler extends SqlFetchBaseCompiler
+class SQLAggregateCompiler extends SqlFetchCompiler
 {
     /**
      * {@inheritdoc}

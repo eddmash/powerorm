@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model\Lookup;
 
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
 
 class IStartsWith extends PatternLookup

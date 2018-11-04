@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Field;
 
-use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Backends\SchemaEditor;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 /**

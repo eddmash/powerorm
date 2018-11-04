@@ -13,7 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\ContributorInterface;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Model\Model;
 

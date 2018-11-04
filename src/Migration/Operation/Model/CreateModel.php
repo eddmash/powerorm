@@ -11,7 +11,7 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
-use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Backends\SchemaEditor;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Field\FieldOperation;

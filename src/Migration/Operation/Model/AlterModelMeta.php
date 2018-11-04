@@ -6,7 +6,7 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
-use Eddmash\PowerOrm\Db\SchemaEditor;
+use Eddmash\PowerOrm\Backends\SchemaEditor;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ModelState;

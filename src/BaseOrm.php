@@ -18,7 +18,7 @@ use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\Checks\ChecksRegistry;
 use Eddmash\PowerOrm\Checks\Tags;
 use Eddmash\PowerOrm\Components\ComponentInterface;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\ComponentException;
 use Eddmash\PowerOrm\Exception\OrmException;
@@ -146,7 +146,7 @@ class BaseOrm extends BaseObject
         if (null == static::$connection) {
             $config = new Configuration();
             $db = $this->getSettings()->getDatabase();
-            $db['wrapperClass'] = \Eddmash\PowerOrm\Db\Connection::class;
+            $db['wrapperClass'] = \Eddmash\PowerOrm\Backends\Connection::class;
             $this->getSettings()->setDatabase($db);
             try {
                 static::$connection = DriverManager::getConnection(

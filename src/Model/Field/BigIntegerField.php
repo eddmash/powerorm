@@ -12,7 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Types\Type;
-use Eddmash\PowerOrm\Db\ConnectionInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 
 /**
  * A 64 bit integer, much like an IntegerField except that it is guaranteed to fit numbers from

@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace Eddmash\PowerOrm\Db;
+namespace Eddmash\PowerOrm\Backends;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -405,6 +405,8 @@ class SchemaEditor extends BaseObject
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     private function alterManyToMany(Model $model, Field $oldField, Field $newField, $strict = false)
     {

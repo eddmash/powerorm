@@ -6,7 +6,7 @@
  * Time: 5:37 AM.
  */
 
-namespace Eddmash\PowerOrm\Tests\Db;
+namespace Eddmash\PowerOrm\Tests\Backends;
 
 use Doctrine\DBAL\Connection;
 
