@@ -10,13 +10,13 @@ Installation
 
 Via composer **(recommended)**::
 
-	composer require eddmash/powerform:"@dev"
+	composer require eddmash/powerform
 
 Or add this to the composer.json file::
 
 	{
 	    "require": {
-	        "eddmash/powerform": "@dev"
+	        "eddmash/powerform": "1.1"(check latest version)
 	    }
 	}
 

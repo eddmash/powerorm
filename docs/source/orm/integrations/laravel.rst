@@ -3,7 +3,8 @@ Integrating with Laravel
 
 This is recipe for using Powerorm with laravel.
 Make sure to install powerorm via composer.
-``composer require eddmash/powerorm:@dev``
+
+``composer require eddmash/powerorm``
 
 Create Powerorm Service Provider
 --------------------------------

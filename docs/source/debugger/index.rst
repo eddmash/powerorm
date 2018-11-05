@@ -14,13 +14,13 @@ Installation
 
 Via composer **(recommended)**::
 
-	composer require eddmash/powerormdebug:"@dev"
+	composer require eddmash/powerormdebug
 
 Or add this to the composer.json file::
 
 	{
 	   "require": {
-	       "eddmash/powerormdebug": "@dev"
+	       "eddmash/powerormdebug": "1.1"(check latest version)
 	   }
 	}
 

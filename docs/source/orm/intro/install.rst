@@ -20,11 +20,11 @@ We assume your project structure looks like this ::
 
 Via composer **(recommended)**::
     
-	composer require eddmash/powerorm:"@dev"
+	composer require eddmash/powerorm
 
 Or add this to the composer.json file::
 
-	"eddmash/powerorm": "@dev"
+	"eddmash/powerorm": "1.1" (check latest version)
 
 You could also Download or Clone package from github.
 

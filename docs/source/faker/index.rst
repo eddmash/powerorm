@@ -12,13 +12,13 @@ Installation
 
 Via composer **(recommended)**::
 
-	composer require eddmash/powerormfaker:"@dev"
+	composer require eddmash/powerormfaker
 
 Or add this to the composer.json file::
 
 	{
 	   "require": {
-	       "eddmash/powerormfaker": "@dev"
+	       "eddmash/powerormfaker": "1.1"(check latest version)
 	   }
 	}
 

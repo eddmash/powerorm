@@ -3,7 +3,8 @@ Integrating with Codeigniter 4
 
 This is recipe for using Powerorm with codeigniter.
 Make sure to install powerorm via composer.
-``composer require eddmash/powerorm:@dev``
+
+``composer require eddmash/powerorm``
 
 
 Codeigniter  4
