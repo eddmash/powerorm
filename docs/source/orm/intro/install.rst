@@ -13,6 +13,7 @@ We assume your project structure looks like this ::
     app_base
         ----vendor/
         ----composer.json
+        ----config.php
         ----src
             ---- Models
             ---- Migrations
@@ -38,9 +39,11 @@ Create configuration
 The orm requires a few
 :doc:`Configurations<configuration>`, things like the database settings.
 
+This will be added in the ``config.php``
+
 .. code-block:: php
 
-    $config = [
+    return [
         'database' => [
             'host' => '127.0.0.1',
             'dbname' => 'tester',
@@ -60,7 +63,8 @@ To load powerorm use the following code and pass the
 
 .. code-block:: php
 
-    \Eddmash\PowerOrm\Loader::webRun($config);
+    $configs = require_once 'config.php';
+    \Eddmash\PowerOrm\Loader::webRun($configs);
 
 This should be load as early as possible, Place it a the beginning of your
 script.
@@ -110,7 +114,7 @@ Once we have the projects application class, we need to register it with the
 orm.
 
 To register we add the App class we have created above into our configurations
-under the :ref:`component configuration<config_components>` as shown below.
+under the :ref:`component configuration<config_components>` setting as shown below.
 
 .. code-block:: php
 
@@ -132,14 +136,16 @@ under the :ref:`component configuration<config_components>` as shown below.
 
 Create enable Powerorm on the command line
 ------------------------------------------
-To be able to use the orm on the command line create a file on the same level as the **composer.json** file.
+To be able to use the orm on the command line create a file on the same level as
+the **composer.json** file.
+
 create file named **pmanager.php** and add the following .
 
 .. code-block:: php
 
     use Eddmash\PowerOrm\Loader;
     require_once 'vendor/autoload.php';
-    $configs = require_once 'src/config.php';
+    $configs = require_once 'config.php';
     Loader::consoleRun($configs);
 
 See all the available commands :doc:`commands <../ref/commands>`.
