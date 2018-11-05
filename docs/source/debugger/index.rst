@@ -48,9 +48,20 @@ To enable the debugbar, add it as component of the orm on the
 Usage
 -----
 DebugBar is very easy to use and you can add it to any of your projects in no time.
-The easiest way is using the show() function.
 
-.. note:: invoke the show() function at the end of the page so that its able to get all the sql queries performed
+- The debugger works by dropping all the static files it requires in the applications
+  assets directory from where they will be served.
+  The assets directory is set by calling the ``setAssetsDirectory`` method of the debugger
+  as shown in the example below.
+  This give you full control on how to serve this files
+- You could also use ``renderAssets`` method to display this assets together as shown in
+  the example below.
+- Lastly to show the debugger invoke the ``show`` method.
+
+.. note::
+
+    invoke the show() function at the end of the page so that its able to get all the
+    sql queries performed
 
 .. code-block:: php
 
@@ -61,9 +72,12 @@ The easiest way is using the show() function.
     /**@var $debugger \Eddmash\PowerOrmDebug\Debugger*/
     $debugger =$orm->debugger;
     $debugger->getDebugBar()["messages"]->addMessage("hello world!");
+    $debugger->setAssetsDirectory('assets');
+
     ?>
     <html>
         <head>
+                <?= $debugger->renderAssets(); ?>
         </head>
         <body>
             ...

@@ -72,24 +72,27 @@ We need to create an :ref:`application class<component_apps>` the will be used
 by the orm to get information about your php project.
 
 If your project is namespaced as App;
-Create a class the extends the `Eddmash\\PowerOrm\\Components\\Application`.
+Create a class the extends the ``Eddmash\\PowerOrm\\Components\\AppComponent``.
 This class should be placed on the same level as your models, migration folders.
 
 .. code-block:: php
 
     namespace App;
 
-
     use Eddmash\PowerOrm\BaseOrm;
-    use Eddmash\PowerOrm\Components\Application;
+    use Eddmash\PowerOrm\Components\AppComponent;
 
-    class App extends Application
+    class App extends AppComponent
     {
 
         public function ready(BaseOrm $baseOrm)
         {
         }
 
+        public function getDbPrefix()
+        {
+            return "php_app";
+        }
     }
 
 Technically this file can be place anywhere in your project tree, To get this
