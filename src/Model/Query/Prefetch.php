@@ -43,9 +43,9 @@ class Prefetch
     /**
      * Prefetch constructor.
      *
-     * @param string        $lookups
+     * @param string $lookups
      * @param Queryset|null $queryset
-     * @param string|null   $toAttr
+     * @param string|null $toAttr
      *
      * @throws ValueError
      */
@@ -76,7 +76,7 @@ class Prefetch
     /**
      * Perform the actual fetching of related objects by level.
      *
-     * @param array             $objList
+     * @param array $objList
      * @param PrefetchInterface $prefetcher
      * @param $lookup
      * @param $level
@@ -200,6 +200,7 @@ class Prefetch
      * @param null $prefix
      *
      * @return Prefetch[]
+     * @throws ValueError
      */
     public static function normalizePrefetchLookup($lookups, $prefix = null): array
     {

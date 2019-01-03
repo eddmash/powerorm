@@ -58,7 +58,7 @@ class ManyToManyRel extends ForeignObjectRel
     {
         $meta = parent::__debugInfo();
 
-        $meta['through'] = is_string($this->through) ? $this->through : $this->through->getMeta()->getNSModelName();
+        $meta['through'] = $this->through;
         $meta['throughFields'] = $this->throughFields;
         $meta['dbConstraint'] = $this->dbConstraint;
         return $meta;

@@ -168,7 +168,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model           $model
+     * @param Model $model
      *
      * @return Model
      *
@@ -225,54 +225,62 @@ class ManyToManyField extends RelatedField
         ];
 
         /* @var $intermediaryObj Model */
-        $intermediaryClass = FormatFileContent::createObject();
+//        $intermediaryClass = FormatFileContent::createObject();
 
-        $intermediaryClass->addItem(
-            sprintf(
-                'class %1$s extends \%2$s{',
-                $className,
-                Model::class
-            )
-        );
-        $intermediaryClass->addItem('public function fields(){');
-        $intermediaryClass->addItem('}');
-        $intermediaryClass->addItem('public function getMetaSettings(){');
-        $intermediaryClass->addItem('return [');
-        $intermediaryClass->addItem(
-            sprintf(
-                "'dbTable' => '%s',",
-                $field->getM2MDbTable($model->getMeta())
-            )
-        );
-        $intermediaryClass->addItem(
-            sprintf(
-                "'verboseName' => '%s',",
-                sprintf('%s-%s relationship', $from, $to)
-            )
-        );
-        $intermediaryClass->addItem(
-            sprintf(
-                "'uniqueTogether' => ['%s','%s'],",
-                $from,
-                $to
-            )
-        );
-        $intermediaryClass->addItem("'autoCreated' => true");
-        $intermediaryClass->addItem('];');
-        $intermediaryClass->addItem('}');
-        $intermediaryClass->addItem('}');
-
-        if (!class_exists($className, false)) {
-            eval($intermediaryClass->toString());
-        }
+//        $intermediaryClass->addItem(
+//            sprintf(
+//                'class %1$s extends \%2$s{',
+//                $className,
+//                Model::class
+//            )
+//        );
+//        $intermediaryClass->addItem('public function fields(){');
+//        $intermediaryClass->addItem('}');
+//        $intermediaryClass->addItem('public function getMetaSettings(){');
+//        $intermediaryClass->addItem('return [');
+//        $intermediaryClass->addItem(
+//            sprintf(
+//                "'dbTable' => '%s',",
+//                $field->getM2MDbTable($model->getMeta())
+//            )
+//        );
+//        $intermediaryClass->addItem(
+//            sprintf(
+//                "'verboseName' => '%s',",
+//                sprintf('%s-%s relationship', $from, $to)
+//            )
+//        );
+//        $intermediaryClass->addItem(
+//            sprintf(
+//                "'uniqueTogether' => ['%s','%s'],",
+//                $from,
+//                $to
+//            )
+//        );
+//        $intermediaryClass->addItem("'autoCreated' => true");
+//        $intermediaryClass->addItem('];');
+//        $intermediaryClass->addItem('}');
+//        $intermediaryClass->addItem('}');
+//
+//        if (!class_exists($className, false)) {
+//            eval($intermediaryClass->toString());
+//        }
 
         /** @var $obj Model */
-        $obj = new $className();
+        $obj = new class() extends Model
+        {
+        };
 
         $obj->setupClassInfo(
             $fields,
             [
-                'meta' => ['appName' => $model->getMeta()->getAppName()],
+                'meta' => [
+                    'appName' => $model->getMeta()->getAppName(),
+                    'dbTable' => $field->getM2MDbTable($model->getMeta()),
+                    'verboseName' => sprintf('%s-%s relationship', $from, $to),
+                    'uniqueTogether' => [$from, $to],
+                    'autoCreated' => true
+                ],
             ]
         );
 

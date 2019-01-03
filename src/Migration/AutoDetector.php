@@ -1550,10 +1550,12 @@ class AutoDetector extends BaseObject
      * @param $modelName
      * @param $fieldName
      *
-     * @since  1.1.0
-     *
+     * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
      * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
      * @throws \Eddmash\PowerOrm\Exception\LookupError
+     * @throws \Eddmash\PowerOrm\Exception\OrmException
+     * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
