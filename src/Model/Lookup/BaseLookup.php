@@ -125,17 +125,23 @@ abstract class BaseLookup implements LookupInterface
         $value = $this->rhs;
 
         if ($this->rhsValueIsIterable) {
-            $preparedValues = [];
-//
-//            foreach ($this->rhs as $rh) {
-//                if ($this->prepareRhs &&
-//                    method_exists($this->lhs->getOutputField(), 'prepareValue')) {
-//
-//                    $preparedValues[] = $this->lhs->getOutputField()->prepareValue($rh);
-//                }
-//            }
+            $this->rhs = array_map(function ($value) {
+                return static::getNomalizedValue($value, $this->lhs);
+            }, $this->rhs);
 
-//            return [];
+            // we validate the fields get approprite value type
+            // e.g a foreignkey of type integer should not get a value like 'abc'
+            if (method_exists($this->lhs, 'getPathInfo')) {
+                $path = $this->lhs->getOutputField()->getPathInfo();
+                $sources = end($path)['targetFields'];
+
+                /** @var $targetField Field* */
+                $targetField = end($sources);
+
+                $this->rhs = array_map(function ($value) use ($targetField) {
+                    return $targetField->prepareValue($value);
+                }, $this->rhs);
+            }
         } else {
             $this->rhs = static::getNomalizedValue($value, $this->lhs);
             if (method_exists($this->rhs, '_prepare')) {

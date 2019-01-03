@@ -16,6 +16,10 @@ use Eddmash\PowerOrm\Exception\NotImplemented;
 interface OperationsInterface
 {
     /**
+     * Returns an SQL DISTINCT clause which removes duplicate rows from the
+     * result set. If any fields are given, only the given fields are being
+     * checked for duplicates.
+     *
      * @param $distinctFields
      *
      * @return string

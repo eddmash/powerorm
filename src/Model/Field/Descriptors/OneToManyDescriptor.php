@@ -67,7 +67,7 @@ class OneToManyDescriptor extends BaseDescriptor
             $model = $this->field->scopeModel;
         }
 
-        // define BaseM2MQueryset
+        // define BaseM2OManager
         if (!class_exists('\Eddmash\PowerOrm\Model\Manager\BaseM2OManager', false)) {
             $baseClass = $model::getManagerClass();
             $class = sprintf('namespace Eddmash\PowerOrm\Model\Manager;class BaseM2OManager extends \%s{}', $baseClass);

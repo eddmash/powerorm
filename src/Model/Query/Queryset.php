@@ -12,8 +12,8 @@
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Backends\ConnectionInterface;
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\InvalidArgumentException;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -76,6 +76,10 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     private $_fields;
 
     protected $kwargs = [];
+
+    private $prefetchRelatedLookups = [];
+
+    private $prefetchRelatedDone = false;
 
     /**
      * Queryset constructor.
@@ -224,7 +228,12 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      * Return a query set in which the returned objects have been annotated
      * with extra data or aggregations.
      *
+     * @param array $args
+     *
      * @return Queryset
+     *
+     * @throws InvalidArgumentException
+     * @throws ValueError
      *
      * @since  1.1.0
      *
@@ -277,7 +286,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      *
      * @throws \Eddmash\PowerOrm\Exception\FieldError
      */
-    public function orderBy($fieldNames = [])
+    public function orderBy($fieldNames = []): self
     {
         assert(
             $this->query->isFilterable(),
@@ -301,7 +310,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function aggregate($kwargs = [])
+    public function aggregate($kwargs = []): self
     {
         //todo accept non associative items
         $query = $this->query->deepClone();
@@ -359,9 +368,48 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         return $obj;
     }
 
-    public function prefetchRelated()
+    /**
+     * Return a new QuerySet instance that will prefetch the specified
+     * Many-To-One and Many-To-Many related objects when the QuerySet is evaluated.
+     *
+     * When prefetchRelated() is called more than once, append to the list of
+     * prefetch lookups. If prefetch_related(None) is called, clear the list.
+     *
+     * @param array|null $lookups
+     *
+     * @return Queryset
+     */
+    public function prefetchRelated(?array $lookups): self
     {
-        throw new NotImplemented(__METHOD__.' NOT IMPLEMENTED');
+        $clone = $this->_clone();
+        if (null === $lookups) {
+            $clone->prefetchRelatedLookups = [];
+        } else {
+            $clone->prefetchRelatedLookups = array_merge(
+                $clone->prefetchRelatedLookups,
+                $lookups);
+        }
+
+        return $clone;
+    }
+
+    /**
+     * Initiates the prefetching action
+     * this method is only triggered if we have already fetched the primary model
+     * e.g. in the following,it will be invoked if user has been fetch
+     * <code>
+     *  User::objects()->prefetchRelated('role')
+     * </code>.
+     *
+     *
+     * @throws InvalidArgumentException
+     * @throws ValueError
+     * @throws \Eddmash\PowerOrm\Exception\KeyError
+     */
+    private function _prefetchRelatedObjects()
+    {
+        prefetchRelatedObjects($this->_resultsCache, $this->prefetchRelatedLookups);
+        $this->prefetchRelatedDone = true;
     }
 
     public function exclude()
@@ -578,6 +626,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         if (false === $this->_evaluated) {
             $this->_resultsCache = call_user_func($this->getMapper());
 
+            if ($this->prefetchRelatedLookups && !$this->prefetchRelatedDone) {
+                $this->_prefetchRelatedObjects();
+            }
             $this->_evaluated = true;
         }
 
@@ -786,7 +837,10 @@ class Queryset implements QuerysetInterface, \JsonSerializable
 
         $kwargs = array_merge(['resultMapper' => $this->resultMapper], $this->kwargs);
 
-        return self::createObject($this->connection, $this->model, $qb, $kwargs);
+        $queryset = self::createObject($this->connection, $this->model, $qb, $kwargs);
+        $queryset->prefetchRelatedLookups = $this->prefetchRelatedLookups;
+
+        return $queryset;
     }
 
     public function __toString()

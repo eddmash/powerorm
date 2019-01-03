@@ -15,7 +15,12 @@ namespace Eddmash\PowerOrm\Model\Manager;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
- * Class M2OQueryset.
+ * Gets related data from the one side of the relationship.
+ *
+ * user has many cars so this will query cars related to a particular user in
+ * this the default attribute to be used will be ::
+ *
+ *  $user->car_set->all()
  *
  * @return Queryset
  *

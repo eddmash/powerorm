@@ -12,10 +12,10 @@ namespace Eddmash\PowerOrm\Model;
 
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\ArrayObjectInterface;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\ContributorInterface;
-use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\AttributeError;
@@ -181,6 +181,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      * @var bool
      */
     protected $isNew = true;
+
+    public $_prefetchedObjectCaches;
 
     /**
      * Models constructor.
@@ -1472,6 +1474,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         foreach ($this->_fieldCache as $name => $item) {
             $meta[$name] = $item;
         }
+        $meta['__meta__'] = $this->meta;
 
         return $meta;
     }

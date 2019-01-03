@@ -17,7 +17,12 @@ use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
- * Class M2OQueryset.
+ * Gets related data from the Many side of the relationship.
+ *
+ * user has many cars so this will query cars related to a particular user in
+ * this the default attribute to be used will be ::
+ *
+ *  $car->user
  *
  * @return Queryset
  *
@@ -25,7 +30,7 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class M2OManager extends BaseM2OManager
+class M2OManager extends BaseM2OManager implements ManagerInterface
 {
     public $reverse;
 
@@ -80,5 +85,13 @@ class M2OManager extends BaseM2OManager
         $qs = parent::getQueryset();
 
         return $qs->filter($this->filters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIterator()
+    {
+        return parent::getIterator();
     }
 }

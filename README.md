@@ -59,7 +59,7 @@ The ORM has the following dependencies:
 - [Symfony polyfill-mbstring component](http://symfony.com/blog/new-in-symfony-2-8-polyfill-components). 
  
 # supports
-php 5.6+ and 7+
+php 7+
 
  # Credits
  I have used the following frameworks as a guiding hand, and in most cases i have replicated how Django framework has

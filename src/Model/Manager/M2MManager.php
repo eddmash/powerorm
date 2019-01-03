@@ -18,7 +18,9 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\PrefetchInterface;
 use Eddmash\PowerOrm\Model\Query\Queryset;
+use Eddmash\PowerOrm\Model\Query\QuerysetInterface;
 
 /**
  * Class M2MQueryset.
@@ -26,7 +28,7 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
  *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
-class M2MManager extends BaseM2MManager
+class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInterface
 {
     public $filters = [];
 
@@ -258,5 +260,34 @@ class M2MManager extends BaseM2MManager
         }
 
         return $oldIds;
+    }
+
+    public function isCached(Model $model): bool
+    {
+        // TODO: Implement isCached() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPrefetchQueryset(array $instances, QuerysetInterface $queryset = null): array
+    {
+        if (!$queryset) {
+            $queryset = parent::getQueryset();
+        }
+
+        $filter = [sprintf('%s__in', $this->queryName) => $instances];
+
+        $queryset = $queryset->filter($filter);
+
+        return [$queryset];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIterator()
+    {
+        return parent::getIterator();
     }
 }

@@ -15,7 +15,7 @@ use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
-class BaseManager extends BaseObject implements \IteratorAggregate
+class BaseManager extends BaseObject implements ManagerInterface
 {
     /**
      * @var Model
