@@ -1579,6 +1579,7 @@ class AutoDetector extends BaseObject
                 'action' => self::ACTION_CREATED,
             ];
 
+            $rel = $field->relation;
             // if it has through also depend on through model being created
             if ($field->relation->hasProperty('through') &&
                 null != $field->relation->through &&

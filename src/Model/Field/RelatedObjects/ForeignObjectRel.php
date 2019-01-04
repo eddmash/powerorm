@@ -215,15 +215,15 @@ class ForeignObjectRel extends BaseObject
     public function __debugInfo()
     {
         return [
-            'to' => is_string($this->toModel) ? $this->toModel : $this->toModel->getMeta()->getNSModelName(),
-            'fromField' => $this->fromField->getName(),
+            'to' => $this->toModel,
+            'fromField' => $this->fromField,
             'relatedName' => $this->relatedName,
             'relatedQueryName' => $this->relatedQueryName,
             'autoCreated' => $this->autoCreated,
             'null' => $this->null,
             'name' => $this->name,
             'isRelation' => $this->isRelation,
-            'scopeModel' => $this->fromField->scopeModel->getMeta()->getNSModelName(),
+            'scopeModel' => $this->fromField->scopeModel,
         ];
     }
 }

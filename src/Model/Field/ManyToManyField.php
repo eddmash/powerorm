@@ -113,6 +113,7 @@ class ManyToManyField extends RelatedField
                 $this,
                 $this->scopeModel
             );
+
         }
     }
 
@@ -172,6 +173,12 @@ class ManyToManyField extends RelatedField
      *
      * @return Model
      *
+     * @throws \Eddmash\PowerOrm\Exception\AppRegistryNotReady
+     * @throws \Eddmash\PowerOrm\Exception\FieldError
+     * @throws \Eddmash\PowerOrm\Exception\ImproperlyConfigured
+     * @throws \Eddmash\PowerOrm\Exception\MethodNotExtendableException
+     * @throws \Eddmash\PowerOrm\Exception\OrmException
+     * @throws \Eddmash\PowerOrm\Exception\TypeError
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -195,7 +202,7 @@ class ManyToManyField extends RelatedField
         }
 
         $className = sprintf(
-            '%1$s_%2$s',
+            '%s_%s_autogen',
             $model->getMeta()->getModelName(),
             $field->getName()
         );
@@ -225,15 +232,15 @@ class ManyToManyField extends RelatedField
         ];
 
         /* @var $intermediaryObj Model */
-//        $intermediaryClass = FormatFileContent::createObject();
-
-//        $intermediaryClass->addItem(
-//            sprintf(
-//                'class %1$s extends \%2$s{',
-//                $className,
-//                Model::class
-//            )
-//        );
+        $intermediaryClass = FormatFileContent::createObject();
+        $intermediaryClass->addItem(sprintf("namespace %s;", $model->getMeta()->getModelNamespace()));
+        $intermediaryClass->addItem(
+            sprintf(
+                'class %s extends \%s{}',
+                $className,
+                Model::class
+            )
+        );
 //        $intermediaryClass->addItem('public function fields(){');
 //        $intermediaryClass->addItem('}');
 //        $intermediaryClass->addItem('public function getMetaSettings(){');
@@ -262,14 +269,13 @@ class ManyToManyField extends RelatedField
 //        $intermediaryClass->addItem('}');
 //        $intermediaryClass->addItem('}');
 //
-//        if (!class_exists($className, false)) {
-//            eval($intermediaryClass->toString());
-//        }
+        if (!class_exists($className, false)) {
+            eval($intermediaryClass->toString());
+        }
 
+        $fullname = sprintf("%s\%s", $model->getMeta()->getModelNamespace(), $className);
         /** @var $obj Model */
-        $obj = new class() extends Model
-        {
-        };
+        $obj = new $fullname();
 
         $obj->setupClassInfo(
             $fields,
