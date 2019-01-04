@@ -113,7 +113,6 @@ class ManyToManyField extends RelatedField
                 $this,
                 $this->scopeModel
             );
-
         }
     }
 
@@ -169,7 +168,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model $model
+     * @param Model           $model
      *
      * @return Model
      *
@@ -179,6 +178,7 @@ class ManyToManyField extends RelatedField
      * @throws \Eddmash\PowerOrm\Exception\MethodNotExtendableException
      * @throws \Eddmash\PowerOrm\Exception\OrmException
      * @throws \Eddmash\PowerOrm\Exception\TypeError
+     *
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
@@ -251,7 +251,7 @@ class ManyToManyField extends RelatedField
                     'dbTable' => $field->getM2MDbTable($model->getMeta()),
                     'verboseName' => sprintf('%s-%s relationship', $from, $to),
                     'uniqueTogether' => [$from, $to],
-                    'autoCreated' => true
+                    'autoCreated' => true,
                 ],
             ]
         );
@@ -480,7 +480,6 @@ class ManyToManyField extends RelatedField
                     $this->relation->through->getMeta()->getModelNamespace(),
                     $this->relation->through->getMeta()->getModelName()
                 );
-
             }
         }
 

@@ -225,7 +225,7 @@ class ModelState extends BaseObject
      */
     private static function createInstance($className, $extends = '')
     {
-         $className = MigrationModel::defineClass($className, $extends);
+        $className = MigrationModel::defineClass($className, $extends);
         return new $className();
     }
 

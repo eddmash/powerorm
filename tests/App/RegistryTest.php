@@ -74,7 +74,7 @@ class RegistryTest extends PowerormTest
 
         $expected = [
             "Eddmash\PowerOrm\Tests\TestApp\Models\Author",
-            'Book_author',
+            'Eddmash\PowerOrm\Tests\TestApp\Models\Book_author_autogen',
             "Eddmash\PowerOrm\Tests\TestApp\Models\Book",
             "Eddmash\PowerOrm\Tests\TestApp\Models\Order",
             "Eddmash\PowerOrm\Tests\TestApp\Models\OrderItem",

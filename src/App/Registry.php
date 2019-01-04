@@ -72,7 +72,6 @@ class Registry extends BaseObject
             try {
                 $this->hydrateRegistry();
                 $this->ready = true;
-
             } catch (\Exception $e) {
                 throw $e;
             }
@@ -239,7 +238,7 @@ class Registry extends BaseObject
             foreach ($classList as $class) {
                 if (!ArrayHelper::hasKey($classToAppMap, $class)) {
                     throw new OrmException(
-                        "Make '$class' abstract or register it as " .
+                        "Make '$class' abstract or register it as ".
                         'an application model'
                     );
                 }
@@ -348,12 +347,12 @@ class Registry extends BaseObject
     }
 
     /**
-     * @param callable $callback the callback to invoke when a model
+     * @param callable $callback        the callback to invoke when a model
      *                                  has been created
-     * @param array $modelsToResolve the model we are waiting for to be
+     * @param array    $modelsToResolve the model we are waiting for to be
      *                                  created, the model object is passed to
      *                                  the callback as the first argument
-     * @param array $kwargs an associative array to be passed to
+     * @param array    $kwargs          an associative array to be passed to
      *                                  the callback
      *
      * @since  1.1.0
@@ -431,7 +430,6 @@ class Registry extends BaseObject
                 $callback($kwargs);
             }
             unset($this->_pendingOps[$name]);
-
         }
     }
 
@@ -442,6 +440,6 @@ class Registry extends BaseObject
 
     public function __toString()
     {
-        return (string)sprintf('%s Object', $this->getFullClassName());
+        return (string) sprintf('%s Object', $this->getFullClassName());
     }
 }

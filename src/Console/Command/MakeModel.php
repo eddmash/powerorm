@@ -16,11 +16,9 @@ use Eddmash\PowerOrm\Components\AppComponent;
 use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Exception\CommandError;
 use Eddmash\PowerOrm\Exception\ComponentException;
-use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Helpers\FileHandler;
 use Eddmash\PowerOrm\Migration\FormatFileContent;
 use Eddmash\PowerOrm\Model\Model;
-use http\Exception\UnexpectedValueException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -49,7 +47,7 @@ class MakeModel extends BaseCommand
                 'extends',
                 'e',
                 InputOption::VALUE_OPTIONAL,
-                'Model generated model will extend.in the form `appname:modelname` ' .
+                'Model generated model will extend.in the form `appname:modelname` '.
                 'e.g. app:user or school:teacher'
             )
             ->addOption(
@@ -72,43 +70,40 @@ class MakeModel extends BaseCommand
 
         if (!$extends) {
             $extendNamespace = Model::class;
-            $extendModelName = basename(str_replace("\\", "/", Model::class));
+            $extendModelName = basename(str_replace('\\', '/', Model::class));
         } else {
-            $extends = explode(":", $extends);
-            if (count($extends) == 1) {
-                throw new CommandError("extends should be in the form of `appname:modelname`" .
-                    " e.g. app:user or school:teacher");
+            $extends = explode(':', $extends);
+            if (1 == count($extends)) {
+                throw new CommandError('extends should be in the form of `appname:modelname`'.
+                    ' e.g. app:user or school:teacher');
             }
-            /**@var $extendComponent AppComponent */
+            /** @var $extendComponent AppComponent */
             list($extendAppName, $extendModelName) = $extends;
             try {
                 $extendComponent = BaseOrm::getInstance()->getComponent($extendAppName);
                 if (!$extendComponent instanceof AppInterface) {
                     throw new CommandError(
-                        sprintf("%s does not implement AppInterface, it needs to be an AppComponent",
+                        sprintf('%s does not implement AppInterface, it needs to be an AppComponent',
                             $extendAppName));
                 }
             } catch (ComponentException $e) {
                 throw new CommandError($e->getMessage());
             }
             $extendModelFolder = basename($extendComponent->getModelsPath());
-            $extendNamespace = ltrim(sprintf("%s\%s", $extendComponent->getNamespace(), $extendModelFolder), "\\");
-
-
+            $extendNamespace = ltrim(sprintf("%s\%s", $extendComponent->getNamespace(), $extendModelFolder), '\\');
         }
 
-        /**@var $component AppComponent */
+        /** @var $component AppComponent */
         try {
             $component = BaseOrm::getInstance()->getComponent($appName);
             if (!$component instanceof AppInterface) {
                 throw new CommandError(
-                    sprintf("%s does not implement AppInterface, it needs to be an AppComponent",
+                    sprintf('%s does not implement AppInterface, it needs to be an AppComponent',
                         $appName));
             }
         } catch (ComponentException $e) {
             throw new CommandError($e->getMessage());
         }
-
 
         $path = $component->getModelsPath();
 
@@ -117,12 +112,12 @@ class MakeModel extends BaseCommand
         }
 
         $modelFolder = basename($path);
-        $namespace = ltrim(sprintf("%s\%s", $component->getNamespace(), $modelFolder), "\\");
+        $namespace = ltrim(sprintf("%s\%s", $component->getNamespace(), $modelFolder), '\\');
 
         $modelFile = $this->getModelFile($namespace, $modelName, $extendNamespace, $extendModelName);
         $fileName = rtrim(sprintf('%s.php', $modelName), '\\');
 
-        $filePath = realpath($path . DIRECTORY_SEPARATOR . $fileName);
+        $filePath = realpath($path.DIRECTORY_SEPARATOR.$fileName);
 
         if (file_exists($filePath) && !$force) {
             throw new CommandError(sprintf("Models '%s' already exists, use -f option to overwrite", $filePath));
@@ -131,7 +126,7 @@ class MakeModel extends BaseCommand
         $handler = new FileHandler($path, $fileName);
 
         if ($handler->write($modelFile)) {
-            $output->write(sprintf("Models '%s' created at '%s' " . PHP_EOL, $orginalModelName, $path));
+            $output->write(sprintf("Models '%s' created at '%s' ".PHP_EOL, $orginalModelName, $path));
         }
     }
 
@@ -140,20 +135,20 @@ class MakeModel extends BaseCommand
         $extendNamespace = $extendNamespace === $namespace ? '' : $extendNamespace;
         $content = FormatFileContent::createObject();
 
-        $content->addItem('<?php' . PHP_EOL);
-        $content->addItem(PHP_EOL . sprintf(
+        $content->addItem('<?php'.PHP_EOL);
+        $content->addItem(PHP_EOL.sprintf(
                 '/** Model file generated at %s on %s by PowerOrm(%s)*/',
                 date('h:m:i'),
                 date('D, jS F Y'),
                 POWERORM_VERSION
-            ) . PHP_EOL);
+            ).PHP_EOL);
 
         if ($namespace) {
-            $content->addItem(sprintf('namespace %s;', $namespace) . PHP_EOL);
+            $content->addItem(sprintf('namespace %s;', $namespace).PHP_EOL);
         }
 
         if ($extendNamespace) {
-            $content->addItem(sprintf('use %s;', $extendNamespace) . PHP_EOL);
+            $content->addItem(sprintf('use %s;', $extendNamespace).PHP_EOL);
         }
 
         $content->addItem('/**');
@@ -170,7 +165,7 @@ class MakeModel extends BaseCommand
         $content->addItem('return [];');
         $content->reduceIndent();
 
-        $content->addItem('}' . PHP_EOL);
+        $content->addItem('}'.PHP_EOL);
         $content->reduceIndent();
         $content->addItem('}');
 
