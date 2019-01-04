@@ -98,12 +98,12 @@ class MigrationFile
 
         foreach ($imports as $import) {
             $import = sprintf('use %s;', $import);
-            $importPaths .= $import.PHP_EOL;
+            $importPaths .= $import . PHP_EOL;
         }
 
-        $opContent = '['.PHP_EOL;
+        $opContent = '[' . PHP_EOL;
         foreach ($stringedOperations as $op) {
-            $opContent .= sprintf("\t\t\t%s,".PHP_EOL, $op);
+            $opContent .= sprintf("\t\t\t%s," . PHP_EOL, $op);
         }
         $opContent .= "\t\t]";
 
@@ -116,7 +116,7 @@ class MigrationFile
             $namespace,
             $importPaths,
             $this->migration->getName(),
-            "\n".rtrim(
+            "\n" . rtrim(
                 Tools::stringify(
                     $dependencies,
                     3,
@@ -144,20 +144,20 @@ class MigrationFile
         $content = FormatFileContent::createObject();
         $content->addItem('<?php');
         $content->addItem(
-            PHP_EOL.sprintf(
+            sprintf(
                 '/**Migration file generated at %s on %s by PowerOrm(%s)*/',
                 date('h:m:i'),
                 date('D, jS F Y'),
                 POWERORM_VERSION
-            ).PHP_EOL
+            ) . PHP_EOL
         );
 
-        $content->addItem('namespace %s;'.PHP_EOL);
+        $content->addItem('namespace %s;' . PHP_EOL);
 
         $content->addItem('use Eddmash\\PowerOrm\\Migration\\Migration;');
         $content->addItem('%s');
 
-        $content->addItem('class %s extends Migration{'.PHP_EOL);
+        $content->addItem('class %s extends Migration{' . PHP_EOL);
 
         $content->addIndent();
         $content->addItem('public function getDependency(){');
@@ -170,7 +170,7 @@ class MigrationFile
         $content->addItem('];');
         $content->reduceIndent();
 
-        $content->addItem('}'.PHP_EOL);
+        $content->addItem('}' . PHP_EOL);
 
         $content->addItem('public function getOperations(){');
 
@@ -178,7 +178,7 @@ class MigrationFile
         $content->addItem('return %s ;');
         $content->reduceIndent();
 
-        $content->addItem('}'.PHP_EOL);
+        $content->addItem('}' . PHP_EOL);
         $content->reduceIndent();
 
         $content->addItem('}');

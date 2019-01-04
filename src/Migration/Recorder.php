@@ -54,8 +54,9 @@ class Recorder
 
     public function getApplied()
     {
+        $sql = sprintf('SELECT * FROM %s', $this->migrationTableName);
         $appliedMigrations = $this->connection
-            ->fetchAll(sprintf('SELECT * FROM %s', $this->migrationTableName));
+            ->fetchAll($sql);
         $applied = [];
         foreach ($appliedMigrations as $item) {
             $applied[$item['app']][$item['name']] = $item['name'];

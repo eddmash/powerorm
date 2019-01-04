@@ -232,48 +232,14 @@ class ManyToManyField extends RelatedField
         ];
 
         /* @var $intermediaryObj Model */
-        $intermediaryClass = FormatFileContent::createObject();
-        $intermediaryClass->addItem(sprintf("namespace %s;", $model->getMeta()->getModelNamespace()));
-        $intermediaryClass->addItem(
-            sprintf(
-                'class %s extends \%s{}',
-                $className,
-                Model::class
-            )
-        );
-//        $intermediaryClass->addItem('public function fields(){');
-//        $intermediaryClass->addItem('}');
-//        $intermediaryClass->addItem('public function getMetaSettings(){');
-//        $intermediaryClass->addItem('return [');
-//        $intermediaryClass->addItem(
-//            sprintf(
-//                "'dbTable' => '%s',",
-//                $field->getM2MDbTable($model->getMeta())
-//            )
-//        );
-//        $intermediaryClass->addItem(
-//            sprintf(
-//                "'verboseName' => '%s',",
-//                sprintf('%s-%s relationship', $from, $to)
-//            )
-//        );
-//        $intermediaryClass->addItem(
-//            sprintf(
-//                "'uniqueTogether' => ['%s','%s'],",
-//                $from,
-//                $to
-//            )
-//        );
-//        $intermediaryClass->addItem("'autoCreated' => true");
-//        $intermediaryClass->addItem('];');
-//        $intermediaryClass->addItem('}');
-//        $intermediaryClass->addItem('}');
-//
-        if (!class_exists($className, false)) {
+        $intermediaryClass = FormatFileContent::modelFileTemplate(
+            $model->getMeta()->getModelNamespace(), $className, Model::class);
+
+        $fullname = sprintf("%s\%s", $model->getMeta()->getModelNamespace(), $className);
+        if (!class_exists($fullname, false)) {
             eval($intermediaryClass->toString());
         }
 
-        $fullname = sprintf("%s\%s", $model->getMeta()->getModelNamespace(), $className);
         /** @var $obj Model */
         $obj = new $fullname();
 
@@ -507,8 +473,15 @@ class ManyToManyField extends RelatedField
         $kwargs = parent::getConstructorArgs();
 
         if ($this->relation->through) {
-            $kwargs['through'] = is_string($this->relation->through) ? $this->relation->through :
-                $this->relation->through->getMeta()->getNSModelName();
+            if (is_string($this->relation->through)) {
+                $kwargs['through'] = $this->relation->through;
+            } elseif (!$this->relation->through->getMeta()->autoCreated) {
+                $kwargs['through'] = sprintf("%s\%s",
+                    $this->relation->through->getMeta()->getModelNamespace(),
+                    $this->relation->through->getMeta()->getModelName()
+                );
+
+            }
         }
 
         if (!$this->relation->dbConstraint) {

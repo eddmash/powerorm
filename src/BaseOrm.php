@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\Checks\ChecksRegistry;
 use Eddmash\PowerOrm\Checks\Tags;
+use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Components\ComponentInterface;
 use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
@@ -159,7 +160,7 @@ class BaseOrm extends BaseObject
         }
 
         if (!static::$connection && empty($this->getSettings()->getDatabase())) {
-            $message = 'The database configuration have not '.
+            $message = 'The database configuration have not ' .
                 'been provided, consult documentation for options';
 
             throw new OrmException($message);
@@ -404,8 +405,14 @@ class BaseOrm extends BaseObject
     /**
      * @return ComponentInterface[]
      */
-    public function getComponents()
+    public function getComponents(bool $appsOnly = false)
     {
+        if ($appsOnly) {
+            $comps = array_filter($this->components, function ($component) {
+                return $component instanceof AppInterface;
+            });
+            return $comps;
+        }
         return $this->components;
     }
 

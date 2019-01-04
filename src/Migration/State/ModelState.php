@@ -154,7 +154,6 @@ class ModelState extends BaseObject
     public function toModel(&$registry)
     {
         $metaData = $this->getMeta();
-        //        var_dump($this);
         $extends = $this->extends;
 
         $className = $this->name;
@@ -162,7 +161,7 @@ class ModelState extends BaseObject
         // if we are loading migrations from disk we need to namespace different
         // so that we can be able to compare the two states. this way we avoid
         // possibility of loading the same state information about an app
-        // i.e. we might end up always loading the state of the apps base on
+        // i.e. we might end up always loading the state of the apps based on
         // whats currently shown the models
         if ($this->fromDisk) {
             $className = sprintf(
@@ -226,11 +225,7 @@ class ModelState extends BaseObject
      */
     private static function createInstance($className, $extends = '')
     {
-        //        if (!class_exists($className)):
-        $className = MigrationModel::defineClass($className, $extends);
-
-        //        endif;
-
+         $className = MigrationModel::defineClass($className, $extends);
         return new $className();
     }
 

@@ -49,7 +49,7 @@ class SchemaEditor extends BaseObject
      */
     private $getSqlStatements;
 
-    private $sqls;
+    protected $sqls;
 
     /**
      * @param ConnectionInterface $connection

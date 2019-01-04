@@ -9,6 +9,8 @@
 namespace Eddmash\PowerOrm\Console\Command;
 
 use Eddmash\PowerOrm\BaseOrm;
+use Eddmash\PowerOrm\Components\AppComponent;
+use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Exception\AmbiguityError;
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
 use Eddmash\PowerOrm\Exception\CommandError;
@@ -16,6 +18,8 @@ use Eddmash\PowerOrm\Exception\ComponentException;
 use Eddmash\PowerOrm\Exception\FileHandlerException;
 use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Migration\Executor;
+use Eddmash\PowerOrm\Migration\Loader;
+use Eddmash\PowerOrm\Migration\Recorder;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,13 +31,13 @@ class Sqlmigrate extends BaseCommand
     {
         parent::configure();
         $this->setDescription(
-            'Prints the SQL statements for '.
+            'Prints the SQL statements for ' .
             'the named migration.'
         )
             ->addArgument(
                 'app_label',
                 InputArgument::REQUIRED,
-                'App label of the application containing'.
+                'App label of the application containing' .
                 ' the migration.'
             )
             ->addArgument(
@@ -44,13 +48,13 @@ class Sqlmigrate extends BaseCommand
                 'backward',
                 null,
                 InputOption::VALUE_NONE,
-                'Creates SQL to unapply the migration,'.
+                'Creates SQL to unapply the migration,' .
                 ' rather than to apply it'
             );
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return \Eddmash\PowerOrm\Exception\NotImplemented|void
@@ -66,9 +70,23 @@ class Sqlmigrate extends BaseCommand
         $appName = $input->getArgument('app_label');
         $migrationName = $input->getArgument('migration_name');
 
+        /**@var $component AppComponent */
+        try {
+            $component = BaseOrm::getInstance()->getComponent($appName);
+            if (!$component instanceof AppInterface) {
+                throw new CommandError(
+                    sprintf("%s does not implement AppInterface, it needs to be an AppComponent",
+                        $appName));
+            }
+        } catch (ComponentException $e) {
+            throw new CommandError($e->getMessage());
+        }
+
         $connection = BaseOrm::getDbConnection();
 
-        $executor = Executor::createObject($connection);
+        $executor = new Executor($connection,
+            Loader::createObject($connection),
+            Recorder::createObject($connection));
         $migratedApps = $executor->loader->getMigratedApps();
 
         if (!in_array($appName, $migratedApps)) {
@@ -85,7 +103,7 @@ class Sqlmigrate extends BaseCommand
         } catch (AmbiguityError $e) {
             throw new CommandError(
                 sprintf(
-                    "More than one migration matches '%s' in ".
+                    "More than one migration matches '%s' in " .
                     "app '%s'. Please be more specific.",
                     $migrationName,
                     $appName
@@ -94,8 +112,8 @@ class Sqlmigrate extends BaseCommand
         } catch (KeyError $e) {
             throw new CommandError(
                 sprintf(
-                    "Cannot find a migration matching '%s' ".
-                    "from app '%s'. Is App registered with the ORM ?",
+                    "Cannot find a migration matching '%s' " .
+                    "from app '%s'.",
                     $migrationName,
                     $appName
                 )

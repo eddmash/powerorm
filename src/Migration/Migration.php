@@ -16,8 +16,10 @@ use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Backends\SchemaEditor;
 use Eddmash\PowerOrm\Exception\CommandError;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
+use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
 use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
+use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 
 /**
  * The base class for all migrations.
@@ -46,7 +48,7 @@ class Migration implements MigrationInterface
 
     protected $dependency = [];
 
-    private $appLabel;
+    protected $appLabel;
 
     public function __construct($name)
     {
@@ -176,7 +178,7 @@ class Migration implements MigrationInterface
         foreach ($this->operations as $operation) {
             if (!$operation->isReducibleToSql()) {
                 $schemaEditor->addSql(
-                    '-- MIGRATION NOW PERFORMS'.
+                    '-- MIGRATION NOW PERFORMS' .
                     ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
                 );
             }
@@ -187,6 +189,16 @@ class Migration implements MigrationInterface
                 )
             );
 
+            if ($operation instanceof AddField && $operation->field instanceof ManyToManyField
+                && !$operation->field->auto && $operation->field->relation->through) {
+                $through = $operation->field->relation->through;
+                if (!is_string($through)) {
+                    $through = sprintf("%s\%s", $operation->field->relation->through->getMeta()->getNSModelName(),
+                        $operation->field->relation->through->getMeta()->getModelName());
+                }
+                $schemaEditor->addSql(sprintf(' -- an M2M field which use `%s` as join model', $through));
+            }
+
             if (!$operation->isReducibleToSql()) {
                 continue;
             }
@@ -194,8 +206,8 @@ class Migration implements MigrationInterface
             // preserve state before operation
             $oldState = $state->deepClone();
 
-            $operation->updateState($state);
             $operation->setAppLabel($this->getAppLabel());
+            $operation->updateState($state);
 
             $schemaEditor->connection->beginTransaction();
 
@@ -279,7 +291,7 @@ class Migration implements MigrationInterface
 
                 if (!$operation->isReducibleToSql()) {
                     $schemaEditor->addSql(
-                        '-- MIGRATION NOW PERFORMS'.
+                        '-- MIGRATION NOW PERFORMS' .
                         ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
                     );
                 }
@@ -315,7 +327,7 @@ class Migration implements MigrationInterface
      * mutated state from a copy.
      *
      * @param ProjectState $state
-     * @param bool|true    $preserveState
+     * @param bool|true $preserveState
      *
      * @return mixed
      *

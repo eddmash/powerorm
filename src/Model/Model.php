@@ -53,7 +53,7 @@ use ReflectionObject;
  */
 abstract class Model extends DeconstructableObject implements ModelInterface, ArrayObjectInterface, JsonSerializable
 {
-    const FAKENAMESPACE = '_Fake';
+    const FAKENAMESPACE = '__Fake__';
 
     use ModelFieldsTrait;
     use FormReadyModelTrait;

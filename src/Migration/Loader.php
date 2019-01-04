@@ -95,7 +95,7 @@ class Loader extends BaseObject
             $this->graph->addNode($migration->getName(), $migration);
         }
 
-        // the for each migration set its dependencies
+        // for each migration set its dependencies
         /** @var $migration Migration */
         foreach ($migrations as $name => $migration) {
             foreach ($migration->getDependency() as $appName => $parent) {
