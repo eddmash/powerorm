@@ -182,7 +182,14 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     protected $isNew = true;
 
-    public $_prefetchedObjectCaches;
+    /**
+     * a cache of related objects that have been prefetched.
+     *
+     * @var array
+     *
+     * @internal
+     */
+    public $_prefetchedObjectCaches = [];
 
     /**
      * Models constructor.
@@ -1474,7 +1481,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         foreach ($this->_fieldCache as $name => $item) {
             $meta[$name] = $item;
         }
+        foreach ($this->_nonModelfields as $name => $item) {
+            $meta[$name] = $item;
+        }
         $meta['__meta__'] = $this->meta;
+        $meta['__prefetchedObjectCaches__'] = $this->_prefetchedObjectCaches;
 
         return $meta;
     }

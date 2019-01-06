@@ -28,6 +28,12 @@ class ManyToManyDescriptor extends BaseDescriptor
 
     public function getValue(Model $modelInstance)
     {
+        $cacheName = $this->field->getCacheName();
+        if ($modelInstance->_prefetchedObjectCaches) {
+            if ($modelInstance->_prefetchedObjectCaches[$cacheName]) {
+                return $modelInstance->_prefetchedObjectCaches[$cacheName];
+            }
+        }
         return $this->queryset($modelInstance);
     }
 

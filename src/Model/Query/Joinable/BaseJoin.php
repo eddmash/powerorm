@@ -107,5 +107,7 @@ abstract class BaseJoin implements SqlCompilableinterface
         $this->nullable = $nullable;
     }
 
+    abstract public function equal($item);
+
     abstract public function asSql(CompilerInterface $compiler, ConnectionInterface $connection);
 }

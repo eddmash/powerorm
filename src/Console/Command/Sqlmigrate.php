@@ -70,7 +70,7 @@ class Sqlmigrate extends BaseCommand
         $appName = $input->getArgument('app_label');
         $migrationName = $input->getArgument('migration_name');
 
-        /** @var $component AppComponent */
+        /* @var $component AppComponent */
         try {
             $component = BaseOrm::getInstance()->getComponent($appName);
             if (!$component instanceof AppInterface) {

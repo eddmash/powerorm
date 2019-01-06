@@ -21,7 +21,13 @@ interface PrefetchInterface
      * @param array                  $instances
      * @param QuerysetInterface|null $queryset
      *
-     * @return Queryset
+     * @return array containing the following:
+     *               - relQs QuerysetInterface used to fetch related records
+     *               - valOnRelatedCallable callable that returns the value of the related model, given a model
+     *               e.g. if we are fetching all roles belonging to a user,
+     *               this callable will return the value of user in the role model pass
+     *               - valOnInstanceCallable callable that returns value of the instance, e.g. value of a user
+     *               - cacheName string indicates where to store the related objects.
      */
     public function getPrefetchQueryset(array $instances, QuerysetInterface $queryset = null): array;
 

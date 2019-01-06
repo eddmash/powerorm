@@ -17,7 +17,6 @@ use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\CloneInterface;
-use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\FieldError;
 use Eddmash\PowerOrm\Exception\OrmException;
@@ -931,7 +930,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
                 continue;
             }
 
-            // only the first alias is allowed to havea null join type
+            // only the first alias is allowed to have null join type
             assert(null !== $join->getJoinType());
 
             $parentAlias = $join->getParentAlias();
@@ -1529,127 +1528,5 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
 
     public function bumpPrefix(Query $outerQuery)
     {
-    }
-}
-
-/**
- * Populate prefetched object caches for a list of model instances based on
- * the lookups/Prefetch instances given.
- *
- * @param Model[]        $instances
- * @param Prefetch|array $lookups
- *
- * @throws ValueError
- * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
- * @throws \Eddmash\PowerOrm\Exception\KeyError
- *
- * @since  1.1.0
- *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
- *
- * @throws AttributeError
- */
-function prefetchRelatedObjects($instances, $lookups)
-{
-    if (!$lookups instanceof Prefetch) {
-        $msg = sprintf("method '%s()' expects parameter 'lookup' to be an array",
-            __FUNCTION__);
-        Tools::ensureParamIsArray($lookups, $msg);
-    }
-
-    if (!$instances) {
-        return;
-    }
-
-    // We need to be able to dynamically add to the list of prefetchRelated
-    // lookups that we look up (see below).  So we need some book keeping to
-    // ensure we don't do duplicate work.
-    $doneQueries = [];  // assoc_array of things like 'foo__bar': [results]
-    $lookups = Prefetch::normalizePrefetchLookup($lookups);
-
-    /* @var $lookup Prefetch */
-    while ($lookups) {
-        $lookup = array_shift($lookups);
-
-        // have already worked on a lookup that has similar name
-        if (array_key_exists($lookup->prefetchTo, $doneQueries)) {
-            // does this lookup contain a queryset
-            // this means its not a duplication but a different request just
-            // containing the same name
-            if ($lookup->queryset) {
-                throw new ValueError(
-                    sprintf(
-                        "'%s' lookup was already seen with a different queryset. ".
-                        'You may need to adjust the ordering of your lookups.',
-                        $lookup->prefetchTo
-                    )
-                );
-            }
-
-            // just pass this is just a duplication
-            continue;
-        }
-
-        $objList = $instances;
-
-        $throughtAttrs = StringHelper::split(BaseLookup::$lookupPattern,
-            $lookup->prefetchThrough);
-
-        // we are going through the lookups e.g.
-        // User::objects()->prefetchRelated(['roles__permission'])
-        // level 0 = roles , level 1 = permissions, etc
-        // $objList will change based on which level we are
-        // level 0 = users , level 1 = roles , etc
-        foreach ($throughtAttrs as $level => $throughtAttr) {
-            if (!$objList) {
-                break;
-            }
-
-            $prefetchTo = $lookup->getCurrentPrefetchTo($level);
-
-            if (array_key_exists($prefetchTo, $doneQueries)) {
-                $objList = ArrayHelper::getValue($doneQueries, $prefetchTo);
-
-                continue; //if its already fetched skip it
-            }
-            // we need to check if all the instances support prefetch
-            $goodForPretch = true;
-            foreach ($objList as $obj) {
-                if (!is_object($obj)) {
-                    $goodForPretch = false;
-                    break;
-                }
-            }
-            if (!$goodForPretch) {
-                break;
-            }
-
-            // we assume all objects are the same(homogeneous)
-            // meaning whatever applies for one object applies for all
-            $oneObject = $objList[0];
-            list($toAttr) = $lookup->getCurrentPrefetchTo($level);
-
-            // we try to get the PrefetchInterface implementation to use
-            // when performing prefect queryset.
-            list($prefetcher, $descriptor, $attrFound, $isFetched) = Prefetch::getPrefetcher(
-                $oneObject,
-                $throughtAttr,
-                $toAttr
-            );
-
-            if (!$attrFound) {
-                throw new AttributeError(
-                    sprintf("Cannot find '%s' on %s object, '%s' is an invalid ".
-                        'parameter to prefetch_related()', $throughtAttr,
-                        $oneObject->getMeta()->getModelName()));
-            }
-
-            if ($prefetcher && !$isFetched) {
-                list($objList, $additionalLookups) = Prefetch::prefetchByLevel(
-                    $objList, $prefetcher, $lookup, $level);
-            } else {
-                // this w
-            }
-        }
     }
 }

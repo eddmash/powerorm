@@ -61,17 +61,17 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      */
     public $query;
 
-    public $_evaluated = false;
-
     /**
      * @var mixed Holds the Queryset Result when Queryset evaluates
      *
      * @internal
      */
-    protected $_resultsCache;
+    public $_resultsCache;
 
     /**
      * @var array Holds fields that will be used in the asArray()
+     *
+     * @internal
      */
     private $_fields;
 
@@ -79,7 +79,14 @@ class Queryset implements QuerysetInterface, \JsonSerializable
 
     private $prefetchRelatedLookups = [];
 
-    private $prefetchRelatedDone = false;
+    /**
+     * Indicate if related objects have been prefeched.
+     *
+     * @internal
+     *
+     * @var bool
+     */
+    public $_prefetchRelatedDone = false;
 
     /**
      * Queryset constructor.
@@ -228,8 +235,6 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      * Return a query set in which the returned objects have been annotated
      * with extra data or aggregations.
      *
-     * @param array $args
-     *
      * @return Queryset
      *
      * @throws InvalidArgumentException
@@ -274,19 +279,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     }
 
     /**
-     * Returns a new QuerySet instance with the ordering changed.
-     *
-     * @since  1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
-     *
-     * @param array $fieldNames
-     *
-     * @return Queryset
-     *
-     * @throws \Eddmash\PowerOrm\Exception\FieldError
+     * {@inheritdoc}
      */
-    public function orderBy($fieldNames = []): self
+    public function orderBy($fieldNames = []): QuerysetInterface
     {
         assert(
             $this->query->isFilterable(),
@@ -300,17 +295,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     }
 
     /**
-     * @param array $kwargs
-     *
-     * @return array
-     *
-     * @throws TypeError
-     *
-     * @since  1.1.0
-     *
-     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
-    public function aggregate($kwargs = []): self
+    public function aggregate($kwargs = []): QuerysetInterface
     {
         //todo accept non associative items
         $query = $this->query->deepClone();
@@ -334,23 +321,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     }
 
     /**
-     * Returns a new QuerySet instance that will select related objects.
-     *
-     * If fields are specified, they must be ForeignKey fields and only those related objects are included in the
-     * selection.
-     *
-     * If select_related(null) is called, the list is cleared.
-     *
-     *
-     * @param array $fields
-     *
-     * @return Queryset
-     *
-     * @throws InvalidArgumentException
-     * @throws TypeError
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
-    public function selectRelated(?array $fields): self
+    public function selectRelated(?array $fields): QuerysetInterface
     {
         if ($this->_fields) {
             throw new TypeError('Cannot call selectRelated() after $queryset->asArray()');
@@ -369,17 +342,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     }
 
     /**
-     * Return a new QuerySet instance that will prefetch the specified
-     * Many-To-One and Many-To-Many related objects when the QuerySet is evaluated.
-     *
-     * When prefetchRelated() is called more than once, append to the list of
-     * prefetch lookups. If prefetch_related(None) is called, clear the list.
-     *
-     * @param array|null $lookups
-     *
-     * @return Queryset
+     * {@inheritdoc}
      */
-    public function prefetchRelated(?array $lookups): self
+    public function prefetchRelated(?array $lookups): QuerysetInterface
     {
         $clone = $this->_clone();
         if (null === $lookups) {
@@ -408,8 +373,8 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      */
     private function _prefetchRelatedObjects()
     {
-        prefetchRelatedObjects($this->_resultsCache, $this->prefetchRelatedLookups);
-        $this->prefetchRelatedDone = true;
+        Prefetch::prefetchRelatedObjects($this->_resultsCache, $this->prefetchRelatedLookups);
+        $this->_prefetchRelatedDone = true;
     }
 
     public function exclude()
@@ -532,6 +497,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
 
     protected function _filterOrExclude($negate, $conditions)
     {
+        if ($conditions) {
+            assert($this->query->isFilterable(), 'Cannot filter a query once a limit has been applied.');
+        }
         $instance = $this->_clone();
 
         if ($negate) {
@@ -623,13 +591,12 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      */
     public function getResults()
     {
-        if (false === $this->_evaluated) {
+        if (is_null($this->_resultsCache)) {
             $this->_resultsCache = call_user_func($this->getMapper());
 
-            if ($this->prefetchRelatedLookups && !$this->prefetchRelatedDone) {
+            if ($this->prefetchRelatedLookups && !$this->_prefetchRelatedDone) {
                 $this->_prefetchRelatedObjects();
             }
-            $this->_evaluated = true;
         }
 
         return $this->_resultsCache;
@@ -838,6 +805,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         $kwargs = array_merge(['resultMapper' => $this->resultMapper], $this->kwargs);
 
         $queryset = self::createObject($this->connection, $this->model, $qb, $kwargs);
+        $queryset->_resultsCache = $this->_resultsCache;
         $queryset->prefetchRelatedLookups = $this->prefetchRelatedLookups;
 
         return $queryset;
@@ -857,8 +825,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         return sprintf('< %s (%s %s) >', get_class($this), implode(', ', $results), $ellipse);
     }
 
-    public function __debugInfo()
-    {
-        return $this->_clone()->getResults();
-    }
+//    public function __debugInfo()
+//    {
+//        return $this->_clone()->getResults();
+
+//    }
 }

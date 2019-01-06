@@ -18,6 +18,7 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\Expression\F;
 use Eddmash\PowerOrm\Model\Query\PrefetchInterface;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 use Eddmash\PowerOrm\Model\Query\QuerysetInterface;
@@ -52,23 +53,7 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
      */
     private $reverse;
 
-    /**
-     * @param array $kwargs
-     *
-     * @return static
-     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
-     */
-    public static function createObject($kwargs = [])
-    {
-        return new static($kwargs);
-    }
-
-    public function getQueryset()
-    {
-        /** @var $qs Queryset */
-        $qs = parent::getQueryset();
-        return $qs->filter($this->filters);
-    }
+    private $prefetchCacheName;
 
     public function __construct($kwargs = [])
     {
@@ -81,11 +66,13 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
         if (false === $this->reverse) {
             $model = $rel->toModel;
             $this->queryName = $rel->fromField->getRelatedQueryName();
+            $this->prefetchCacheName = $rel->fromField->getCacheName();
             $this->fromFieldName = call_user_func($rel->fromField->m2mField);
             $this->toFieldName = call_user_func($rel->fromField->m2mReverseField);
         } else {
             $model = $rel->getFromModel();
             $this->queryName = $rel->fromField->getName();
+            $this->prefetchCacheName = $rel->fromField->getCacheName();
             $this->fromFieldName = call_user_func($rel->fromField->m2mReverseField);
             $this->toFieldName = call_user_func($rel->fromField->m2mField);
         }
@@ -114,6 +101,24 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
         }
 
         parent::__construct($model);
+    }
+
+    /**
+     * @param array $kwargs
+     *
+     * @return static
+     * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     */
+    public static function createObject($kwargs = [])
+    {
+        return new static($kwargs);
+    }
+
+    public function getQueryset()
+    {
+        /** @var $qs Queryset */
+        $qs = parent::getQueryset();
+        return $qs->filter($this->filters);
     }
 
     public function add()
@@ -278,9 +283,31 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
 
         $filter = [sprintf('%s__in', $this->queryName) => $instances];
 
-        $queryset = $queryset->filter($filter);
+        $fk = $this->fromField->getLocalRelatedFields()[0];
 
-        return [$queryset];
+        $annotations = [];
+        $name = sprintf('_prefetch_%s', $fk->getName());
+        $model = strtolower($fk->getRelatedModel()->getMeta()->getModelName());
+        $field = $fk->toField->getName();
+        $annotations[$name] = new F(sprintf('%s__%s', $model, $field));
+
+        $queryset = $queryset->annotate($annotations)->filter($filter);
+
+        return [
+            $queryset,
+            function (Model $relatedObject) {
+                $fk = $this->fromField->getLocalRelatedFields()[0];
+
+                return $relatedObject->{sprintf('_prefetch_%s', $fk->getName())};
+            },
+            function (Model $instance) {
+                $fks = $this->fromField->getForeignRelatedFields();
+                // todo should be in literal type, confirm
+                return $instance->{$fks[0]->getAttrName()};
+            },
+            true,
+            $this->prefetchCacheName,
+        ];
     }
 
     /**

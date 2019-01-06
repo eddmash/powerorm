@@ -132,13 +132,21 @@ class Join extends BaseJoin
         return $join;
     }
 
+    /**
+     * Check if pass in item is equal to this one.
+     *
+     * @param $item
+     *
+     * @return bool
+     */
     public function equal($item)
     {
         if ($item instanceof static) {
+            $v = $this->tableName == $item->tableName;
             return
                 $this->tableName == $item->tableName &&
                 $this->parentAlias == $item->parentAlias &&
-                $this->joinField->deconstruct() === $item->joinField->deconstruct();
+                get_class($this->joinField) === get_class($item->joinField);
         }
 
         return false;

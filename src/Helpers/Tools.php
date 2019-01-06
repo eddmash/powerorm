@@ -440,6 +440,12 @@ class Tools
         return $message;
     }
 
+    /**
+     * @param $fields
+     * @param null $messg
+     *
+     * @throws InvalidArgumentException
+     */
     public static function ensureParamIsArray($fields, $messg = null)
     {
         if (!is_array($fields)) {

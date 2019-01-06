@@ -77,7 +77,7 @@ class MakeModel extends BaseCommand
                 throw new CommandError('extends should be in the form of `appname:modelname`'.
                     ' e.g. app:user or school:teacher');
             }
-            /** @var $extendComponent AppComponent */
+            /* @var $extendComponent AppComponent */
             list($extendAppName, $extendModelName) = $extends;
             try {
                 $extendComponent = BaseOrm::getInstance()->getComponent($extendAppName);
@@ -93,7 +93,7 @@ class MakeModel extends BaseCommand
             $extendNamespace = ltrim(sprintf("%s\%s", $extendComponent->getNamespace(), $extendModelFolder), '\\');
         }
 
-        /** @var $component AppComponent */
+        /* @var $component AppComponent */
         try {
             $component = BaseOrm::getInstance()->getComponent($appName);
             if (!$component instanceof AppInterface) {

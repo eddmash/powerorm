@@ -12,9 +12,13 @@
 namespace Eddmash\PowerOrm\Model\Query;
 
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
+use Eddmash\PowerOrm\Exception\KeyError;
 use Eddmash\PowerOrm\Exception\ValueError;
+use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
+use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
+use Eddmash\PowerOrm\Model\Manager\ManagerInterface;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Results\ModelMapper;
 
@@ -76,24 +80,66 @@ class Prefetch
     /**
      * Perform the actual fetching of related objects by level.
      *
-     * @param array             $objList
+     * @param array             $instances
      * @param PrefetchInterface $prefetcher
      * @param $lookup
      * @param $level
      *
      * @return array
      */
-    public static function prefetchByLevel(array $objList, PrefetchInterface $prefetcher,
+    public static function prefetchByLevel(array $instances, PrefetchInterface $prefetcher,
                                            Prefetch $lookup, $level): array
     {
-        /** @var $relQs QuerysetInterface */
-        list($relQs) = $prefetcher->getPrefetchQueryset($objList,
-            $lookup->getCurrentQueryset($level));
+        $additionaLookups = [];
+        /** @var $relQs QuerysetInterface used to fetch related records */
+        /** @var callable
+         * a call back that returns the value of the related model, given a model
+         * e.g. if we are fetching all roles belonging to a user, this callable will return the value of
+         * user in the role model pass
+         */
+        /** @var callable
+         * a callable that returns value of the instance, e.g. value of a user
+         */
+        $resp = $prefetcher->getPrefetchQueryset($instances, $lookup->getCurrentQueryset($level));
+        list($relQs, $valOnRelatedCallable, $valOnInstanceCallable, $isMany, $cachename) = $resp;
 
-        $relatedObjects = $relQs->getSql();
-//        foreach ($relatedObjects as $relatedObject) {
-//
-//        }
+        $relatedObjects = $relQs->getResults();
+
+        $relMap = [];
+        foreach ($relatedObjects as $relatedObject) {
+            $relAttrVal = $valOnRelatedCallable($relatedObject);
+            $relMap[$relAttrVal][] = $relatedObject;
+        }
+
+        list($toAttr, $hasAsAttr) = $lookup->getCurrentToAttr($level);
+        /** @var $instance Model */
+        foreach ($instances as $instance) {
+            $instanceVal = $valOnInstanceCallable($instance);
+            $vals = ArrayHelper::getValue($relMap, $instanceVal, []);
+
+            if (!$isMany) {
+                $val = $vals ? $vals[0] : null;
+                if ($hasAsAttr) {
+                    $instance->{$toAttr} = $val;
+                } else {
+                    // so we store using the cachename
+                    $instance->_fieldCache[$cachename] = $val;
+                }
+            } else {
+                if ($hasAsAttr) {
+                    $instance->{$toAttr} = $vals;
+                } else {
+                    /** @var $manger ManagerInterface */
+                    $manger = $instance->{$toAttr};
+                    $qs = $manger->getQueryset();
+                    $qs->_prefetchRelatedDone = true;
+                    $qs->_resultsCache = $vals;
+                    $instance->_prefetchedObjectCaches[$cachename] = $qs;
+                }
+            }
+        }
+
+        return [$relatedObjects, $additionaLookups];
     }
 
     /**
@@ -200,8 +246,6 @@ class Prefetch
      * @param null $prefix
      *
      * @return Prefetch[]
-     *
-     * @throws ValueError
      */
     public static function normalizePrefetchLookup($lookups, $prefix = null): array
     {
@@ -230,5 +274,123 @@ class Prefetch
             return $this->queryset;
         }
         return null;
+    }
+
+    /**
+     * Populate prefetched object caches for a list of model instances based on
+     * the lookups/Prefetch instances given.
+     *
+     * @param Model[]        $instances
+     * @param Prefetch|array $lookups
+     *
+     * @throws ValueError
+     * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
+     */
+    public static function prefetchRelatedObjects(array $instances, $lookups)
+    {
+        if (!$lookups instanceof Prefetch) {
+            $msg = sprintf("method '%s()' expects parameter 'lookup' to be an array",
+                __FUNCTION__);
+            Tools::ensureParamIsArray($lookups, $msg);
+        }
+
+        if (!$instances) {
+            return;
+        }
+
+        // We need to be able to dynamically add to the list of prefetchRelated
+        // lookups that we look up (see below).  So we need some book keeping to
+        // ensure we don't do duplicate work.
+        $doneQueries = [];  // assoc_array of things like 'foo__bar': [results]
+        $lookups = Prefetch::normalizePrefetchLookup($lookups);
+
+        /* @var $lookup Prefetch */
+        while ($lookups) {
+            $lookup = array_shift($lookups);
+
+            // have already worked on a lookup that has similar name
+            if (array_key_exists($lookup->prefetchTo, $doneQueries)) {
+                // does this lookup contain a queryset
+                // this means its not a duplication but a different request just
+                // containing the same name
+                if ($lookup->queryset) {
+                    throw new ValueError(
+                        sprintf(
+                            "'%s' lookup was already seen with a different queryset. ".
+                            'You may need to adjust the ordering of your lookups.',
+                            $lookup->prefetchTo
+                        )
+                    );
+                }
+
+                // just pass this is just a duplication
+                continue;
+            }
+
+            $objList = $instances;
+
+            $throughtAttrs = StringHelper::split(BaseLookup::$lookupPattern,
+                $lookup->prefetchThrough);
+
+            // we are going through the lookups e.g.
+            // User::objects()->prefetchRelated(['roles__permission'])
+            // level 0 = roles , level 1 = permissions, etc
+            // $objList will change based on which level we are
+            // level 0 = users , level 1 = roles , etc
+            foreach ($throughtAttrs as $level => $throughtAttr) {
+                if (!$objList) {
+                    break;
+                }
+
+                $prefetchTo = $lookup->getCurrentPrefetchTo($level);
+
+                if (array_key_exists($prefetchTo, $doneQueries)) {
+                    try {
+                        $objList = ArrayHelper::getValue($doneQueries, $prefetchTo, []);
+                    } catch (KeyError $e) {
+                    }
+
+                    continue; //if its already fetched skip it
+                }
+                // we need to check if all the instances support prefetch
+                $goodForPretch = true;
+                foreach ($objList as $obj) {
+                    if (!is_object($obj)) {
+                        $goodForPretch = false;
+                        break;
+                    }
+                }
+                if (!$goodForPretch) {
+                    break;
+                }
+
+                // we assume all objects are the same(homogeneous)
+                // meaning whatever applies for one object applies for all
+                $oneObject = $objList[0];
+                list($toAttr) = $lookup->getCurrentPrefetchTo($level);
+
+                // we try to get the PrefetchInterface implementation to use
+                // when performing prefect queryset.
+                list($prefetcher, $descriptor, $attrFound, $isFetched) = Prefetch::getPrefetcher(
+                    $oneObject,
+                    $throughtAttr,
+                    $toAttr
+                );
+
+                if (!$attrFound) {
+                    throw new AttributeError(
+                        sprintf("Cannot find '%s' on %s object, '%s' is an invalid ".
+                            'parameter to prefetch_related()', $throughtAttr,
+                            $oneObject->getMeta()->getModelName()));
+                }
+
+                if ($prefetcher && !$isFetched) {
+                    list($objList, $additionalLookups) = Prefetch::prefetchByLevel(
+                        $objList, $prefetcher, $lookup, $level);
+                } else {
+                    // this w
+                }
+            }
+        }
     }
 }

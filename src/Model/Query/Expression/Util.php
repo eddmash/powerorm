@@ -11,11 +11,13 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
+use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Aggregates\Avg;
 use Eddmash\PowerOrm\Model\Query\Aggregates\Count;
 use Eddmash\PowerOrm\Model\Query\Aggregates\Max;
 use Eddmash\PowerOrm\Model\Query\Aggregates\Min;
 use Eddmash\PowerOrm\Model\Query\Aggregates\Sum;
+use Eddmash\PowerOrm\Model\Query\Prefetch;
 use Eddmash\PowerOrm\Model\Query\Q;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
@@ -195,4 +197,16 @@ function func_()
 function value_($name)
 {
     return new Value($name);
+}
+
+/**
+ * @param Model[]        $instances
+ * @param Prefetch|array $lookups
+ *
+ * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
+ * @throws \Eddmash\PowerOrm\Exception\ValueError
+ */
+function prefetchRelatedObjects_(array $instances, $lookups)
+{
+    Prefetch::prefetchRelatedObjects($instances, $lookups);
 }
