@@ -185,13 +185,14 @@ class ForeignObjectRel extends BaseObject
     }
 
     /**
-     * The name we use to cache the value of this field on a scope model ones it has been fetched from the database.
+     * The name we use to cache the value of this field on a scope model ones it has
+     * been fetched from the database.
      *
      * @return mixed
      */
     public function getCacheName()
     {
-        return sprintf('_%s_cache', $this->getAccessorName());
+        return $this->getAccessorName();
     }
 
     public function getPathInfo()

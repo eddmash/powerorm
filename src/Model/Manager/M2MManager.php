@@ -257,16 +257,6 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
         }
     }
 
-    private function evalQueryset(Queryset $queryset)
-    {
-        $oldIds = [];
-        foreach ($queryset as $oldVal) {
-            $oldIds[] = $oldVal;
-        }
-
-        return $oldIds;
-    }
-
     public function isCached(Model $model): bool
     {
         // TODO: Implement isCached() method.

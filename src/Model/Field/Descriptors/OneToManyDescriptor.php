@@ -35,6 +35,10 @@ class OneToManyDescriptor extends BaseDescriptor
      */
     public function getValue(Model $modelInstance)
     {
+        $cacheName = $this->field->getCacheName();
+//        if ($modelInstance->{$cacheName}) {
+//            return $modelInstance->{$cacheName};
+//        }
         return $this->queryset($modelInstance);
     }
 

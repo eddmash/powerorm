@@ -181,7 +181,7 @@ For example, ``App\Models\Blog->objects->all()`` returns a :doc:`QuerySet<querys
 the database.
 
 Retrieving all objects
-----------------------
+^^^^^^^^^^^^^^^^^^^^^^
 
 The simplest way to retrieve objects from a table is to get all of them. To do this, use the :ref:`all()<queryset_all>`
 method on a :doc:`Manager<manager>`:
@@ -194,7 +194,7 @@ The :ref:`all()<queryset_all>` method returns a :doc:`QuerySet <queryset>` of al
 
 
 Retrieving specific objects with filters
-----------------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The :doc:`QuerySet <queryset>` returned by :ref:`all()<queryset_all>` describes all objects in the database table.
 Usually, though, you'll need to select only a subset of the complete set of objects.
@@ -202,13 +202,13 @@ Usually, though, you'll need to select only a subset of the complete set of obje
 To create such a subset, you refine the initial :doc:`QuerySet <queryset>`, adding filter conditions.
 The two most common ways to refine a :doc:`QuerySet <queryset>` are:
 
-**filter()**
-............
+`filter()`
+
 
 Returns a new :doc:`QuerySet <queryset>` containing objects that match the given lookup parameters.
 
-**exclude()**
-.............
+`exclude()`
+
 
 Returns a new :doc:`QuerySet <queryset>` containing objects that do not match the given lookup parameters.
 
@@ -229,7 +229,7 @@ With the default manager class, it is the same as:
     \App\Models\Author::objects()->all()->filter(['name__contains'=>'joe'])
 
 Chaining filters
-----------------
+................
 
 The result of refining a :doc:`QuerySet <queryset>` is itself a :doc:`QuerySet <queryset>`, so it's possible to chain
 refinements together. For example:
@@ -247,7 +247,7 @@ The final result is a :doc:`QuerySet <queryset>` containing all entries with a h
 excluding any entries with a rating of 3 or less and the blog_text contains the word 'kenya'.
 
 Filtered QuerySets are unique
------------------------------
+.............................
 
 Each time you refine a :doc:`QuerySet <queryset>`, you get a brand-new :doc:`QuerySet <queryset>` that is in no way
 bound to the previous :doc:`QuerySet <queryset>`.
@@ -272,7 +272,7 @@ These three :doc:`QuerySet <queryset>` are separate.
 The initial :doc:`QuerySet <queryset>` ($q1) is unaffected by the refinement process.
 
 QuerySets are lazy
-------------------
+..................
 
 :doc:`QuerySet <queryset>` are lazy – the act of creating a :doc:`QuerySet <queryset>` doesn't involve any database
 activity. You can stack filters together all day long, and Powerorm won't actually run the query until
@@ -294,7 +294,7 @@ When you do, the :doc:`QuerySet <queryset>` is evaluated by accessing the databa
 For more details on exactly when evaluation takes place, see :ref:`When QuerySets are evaluated <querset_evaluation>`.
 
 Retrieving a single object with get()
-.....................................
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 :ref:`filter() <queryset_filter>` will always give you a :doc:`QuerySet <queryset>`, even if only a single object
@@ -322,7 +322,7 @@ again, see Field lookups below.
     In this case, it will raise **MultipleObjectsReturned**.
 
 Other QuerySet methods
-......................
+^^^^^^^^^^^^^^^^^^^^^^
 
 Most of the time you'll use :ref:`all()<queryset_all>`, :ref:`get()<queryset_get>`, :ref:`filter()<queryset_filter>`
 and :ref:`exclude()<queryset_exclude>` when you need to look up objects from the database.
@@ -332,7 +332,7 @@ various QuerySet methods.
 .. _limit_querysets:
 
 Limiting QuerySets
-..................
+^^^^^^^^^^^^^^^^^^
 
 To :ref:`limit() <queryset_limit>` your QuerySet to a certain number of results. This is the equivalent of
 SQL’s LIMIT and OFFSET clauses.
@@ -352,7 +352,7 @@ This returns the sixth through tenth objects (OFFSET 5 LIMIT 5):
 Limiting a :doc:`QuerySet <queryset>` returns a new :doc:`QuerySet <queryset>`.
 
 Field lookups
--------------
+^^^^^^^^^^^^^
 
 Field lookups are how you specify the meat of an SQL **WHERE** clause. They're specified as an associative array to the
 :doc:`QuerySet <queryset>` methods :ref:`filter()<queryset_filter>`, :ref:`exclude()<queryset_exclude>`
@@ -380,7 +380,7 @@ is expected to contain the raw value of the foreign model's primary key. For exa
     \App\Models\Entry::objects()->filter(['blog_id'=>1]);
 
 Lookups that span relationships
--------------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Powerorm offers a powerful and intuitive way to "follow" relationships in lookups, taking care of the SQL **JOINs** for
 you automatically, behind the scenes. To span a relationship, just use the field name of related fields across

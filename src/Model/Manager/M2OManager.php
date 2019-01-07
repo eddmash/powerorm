@@ -39,6 +39,11 @@ class M2OManager extends BaseM2OManager implements ManagerInterface
     public $filters;
 
     /**
+     * @var ForeignObjectRel
+     */
+    protected $relation;
+
+    /**
      * @param array $kwargs
      *
      * @return static
@@ -56,8 +61,8 @@ class M2OManager extends BaseM2OManager implements ManagerInterface
     {
         $this->instance = ArrayHelper::getValue($kwargs, 'instance');
         $this->reverse = ArrayHelper::getValue($kwargs, 'reverse', false);
-        /** @var ForeignObjectRel $rel */
-        $rel = ArrayHelper::getValue($kwargs, 'rel');
+        /* @var ForeignObjectRel $rel */
+        $this->relation = $rel = ArrayHelper::getValue($kwargs, 'rel');
 
         if (false === $this->reverse) {
             $model = $rel->toModel;

@@ -65,6 +65,9 @@ filter()
 Returns a new QuerySet containing objects that match the given lookup parameters.
 Multiple parameters are joined via AND in the underlying SQL statement.
 
+If you need to execute more complex queries (for example, queries with OR statements),
+you can use :ref:`Q objects<queryset_q_object>`.
+
 
 .. _queryset_exclude:
 
@@ -115,6 +118,39 @@ This returns the sixth through tenth objects (OFFSET 5 LIMIT 5):
 
 Limiting a QuerySet returns a new QuerySet.
 
+.. _queryset_selectRelated:
+
+selectRelated()
+.................
+
+Returns a QuerySet that will “follow” foreign-key relationships, selecting additional related-object data when it
+executes its query. This is a performance booster which results in a single more complex query but means later use of
+foreign-key relationships won’t require database queries.
+
+The following examples illustrate the difference between plain lookups and select_related() lookups.
+Here’s standard lookup:
+
+.. _queryset_prefetchRelated:
+
+prefetchRelated()
+.................
+
+Returns a QuerySet that will automatically retrieve, in a single batch, related objects for each of the specified lookups.
+
+This has a similar purpose to :ref:`selectRelated<queryset_selectRelated>`, in that both are designed to stop the
+deluge of database queries that is caused by accessing related objects, but the strategy is quite
+different.
+
+:ref:`selectRelated<queryset_selectRelated>` works by creating an SQL join and including the fields
+of the related object in the `SELECT` statement. For this reason, :ref:`selectRelated<queryset_selectRelated>` gets the
+related objects in the same database query. However, to avoid the much larger result set that would result from joining
+ across a ‘many’ relationship, :ref:`selectRelated<queryset_selectRelated>` is limited to single-valued
+ relationships - foreign key and one-to-one.
+
+`prefetchRelated`, on the other hand, does a separate lookup for each relationship, and does the ‘joining’ in Php.
+This allows it to prefetch many-to-many and many-to-one objects, which cannot be done using
+:ref:`selectRelated<queryset_selectRelated>`, in addition to the foreign key and one-to-one relationships that are
+supported by :ref:`selectRelated<queryset_selectRelated>`.
 
 Methods that do not return QuerySets
 ------------------------------------
@@ -396,4 +432,25 @@ SQL equivalent:
 .. code-block:: sql
 
     SELECT ... WHERE pub_date BETWEEN '2005-01-01' and '2005-05-01';
+
+Query-related tools
+-------------------
+This section provides reference material for query-related tools not documented elsewhere.
+
+.. _queryset_q_object:
+
+Q objects
+.........
+
+A `Q` object, like an :ref:`F object<expression_f>`, encapsulates a SQL expression in a Php object that
+can be used in database-related operations.
+
+In general, `Q` objects make it possible to define and reuse conditions.
+
+Prefetch objects
+..................
+
+The Prefetch object can be used to control the operation of :ref:`prefetchRelated()<queryset_prefetchRelated>`.
+
+
 
