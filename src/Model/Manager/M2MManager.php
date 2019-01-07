@@ -116,6 +116,11 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
 
     public function getQueryset()
     {
+        if ($this->instance->_prefetchedObjectCaches) {
+            if ($this->instance->_prefetchedObjectCaches[$this->prefetchCacheName]) {
+                return $this->instance->_prefetchedObjectCaches[$this->prefetchCacheName];
+            }
+        }
         /** @var $qs Queryset */
         $qs = parent::getQueryset();
         return $qs->filter($this->filters);
@@ -255,11 +260,6 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
                 $oldIds[] = $value;
             }
         }
-    }
-
-    public function isCached(Model $model): bool
-    {
-        // TODO: Implement isCached() method.
     }
 
     /**

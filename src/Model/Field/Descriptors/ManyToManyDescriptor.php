@@ -15,7 +15,7 @@ use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Manager\M2MManager;
 use Eddmash\PowerOrm\Model\Model;
 
-class ManyToManyDescriptor extends BaseDescriptor
+class ManyToManyDescriptor extends BaseDescriptor implements RelationDescriptor
 {
     /** @var RelatedField */
     protected $field;
@@ -28,19 +28,13 @@ class ManyToManyDescriptor extends BaseDescriptor
 
     public function getValue(Model $modelInstance)
     {
-        $cacheName = $this->field->getCacheName();
-        if ($modelInstance->_prefetchedObjectCaches) {
-            if ($modelInstance->_prefetchedObjectCaches[$cacheName]) {
-                return $modelInstance->_prefetchedObjectCaches[$cacheName];
-            }
-        }
-        return $this->queryset($modelInstance);
+        return $this->getManager($modelInstance);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function queryset($modelInstance, $reverse = false)
+    public function getManager(Model $modelInstance, $reverse = false)
     {
         if ($this->reverse) {
             $model = $this->field->getRelatedModel();

@@ -405,4 +405,4 @@ This example retrieves all Blog objects which have at least one Entry whose head
     self
     queryset
     manager
-    custom_lokup
+    expressions

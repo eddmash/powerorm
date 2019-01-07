@@ -31,6 +31,23 @@ class BaseManager extends BaseObject implements ManagerInterface
     }
 
     /**
+     * We don't proxy this method through the `QuerySet` like we do for the rest of the `QuerySet` methods.
+     *
+     * Reason is, invoking the `$querset->all()` triggers copying of the initial queryset into a new one, which
+     * results in the loss of all the cached `prefetch_related` lookups.
+     *
+     * Done by managers that implement the RelationDescriptor
+     *
+     * @return Queryset
+     *
+     * @author Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
+     */
+    public function all()
+    {
+        return $this->getQueryset();
+    }
+
+    /**
      * @return Queryset
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */

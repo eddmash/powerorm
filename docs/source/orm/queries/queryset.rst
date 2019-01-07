@@ -128,7 +128,65 @@ executes its query. This is a performance booster which results in a single more
 foreign-key relationships won’t require database queries.
 
 The following examples illustrate the difference between plain lookups and select_related() lookups.
-Here’s standard lookup:
+
+For example having the following models:
+
+
+.. code-block:: php
+
+    namespace App\Models;
+
+    use Eddmash\PowerOrm\Model\Model;
+
+    class Country extends Model
+    {
+        public function unboundFields()
+        {
+            return [
+                'name' => Model::CharField(['maxLength' => 25])
+            ];
+        }
+    }
+
+    class City extends Model
+    {
+        public function unboundFields()
+        {
+            return [
+                'name' => Model::CharField(['maxLength' => 25]),
+                'population' => Model::IntegerField(),
+                'country' => Model::ForeignKey(['to' => Country::class])
+            ];
+        }
+    }
+
+Retrieving the country a city belongs to will result in two queries
+
+.. code-block:: php
+
+    // this fetches the city from the database
+    $c = City::objects()->get(['id' => 1]);
+    // this fetches the country the city belongs to from the database
+    $c->country;
+
+using `selectRelated()`
+
+.. code-block:: php
+
+    // this fetches the city from the database
+    $c = City::objects()->selectRelated(['country'])->get(['id' => 1]);
+    // Doesn't hit the database, because $c->country has been prepopulated
+    // in the $c query.
+    $c->country;
+
+You can use `selectRelated` with any queryset of objects:
+
+.. code-block:: php
+
+    $cities = City::objects()->selectRelated(['country'])->filter(['name__icontains'=>'den']);
+    foreach ($cities as $city) {
+        $city->country;
+    }
 
 .. _queryset_prefetchRelated:
 
@@ -144,13 +202,89 @@ different.
 :ref:`selectRelated<queryset_selectRelated>` works by creating an SQL join and including the fields
 of the related object in the `SELECT` statement. For this reason, :ref:`selectRelated<queryset_selectRelated>` gets the
 related objects in the same database query. However, to avoid the much larger result set that would result from joining
- across a ‘many’ relationship, :ref:`selectRelated<queryset_selectRelated>` is limited to single-valued
- relationships - foreign key and one-to-one.
+across a ‘many’ relationship, :ref:`selectRelated<queryset_selectRelated>` is limited to single-valued
+relationships - foreign key and one-to-one.
 
 `prefetchRelated`, on the other hand, does a separate lookup for each relationship, and does the ‘joining’ in Php.
 This allows it to prefetch many-to-many and many-to-one objects, which cannot be done using
 :ref:`selectRelated<queryset_selectRelated>`, in addition to the foreign key and one-to-one relationships that are
 supported by :ref:`selectRelated<queryset_selectRelated>`.
+
+
+For example having the following models:
+
+
+.. code-block:: php
+
+    namespace App\Models;
+
+    use Eddmash\PowerOrm\Model\Model;
+
+    class Country extends Model
+    {
+        public function unboundFields()
+        {
+            return [
+                'name' => Model::CharField(['maxLength' => 25])
+            ];
+        }
+    }
+
+    class City extends Model
+    {
+        public function unboundFields()
+        {
+            return [
+                'name' => Model::CharField(['maxLength' => 25]),
+                'population' => Model::IntegerField(),
+                'country' => Model::ForeignKey(['to' => Country::class])
+            ];
+        }
+    }
+
+The problem is, each time we want to get all the cities in a country a different query the database will run
+on the city table for every item in the Country in the QuerySet.
+
+.. code-block:: php
+
+    $countrys = Country::objects()->all();
+
+    foreach ($countrys as $country) {
+        echo $country->id . "." . $country->name . "<br>";
+        $cities = $country->city_set->all();
+        foreach ($cities as $city) {
+            echo '----' . $city->id . "." . $city->name . "<br>";
+
+        }
+    }
+
+
+We can reduce to just two queries using `prefetchRelated`:
+
+.. code-block:: php
+
+    $countrys = Country::objects()->prefetchRelated(['city_set'])->all();
+
+    foreach ($countrys as $country) {
+        echo $country->id . "." . $country->name . "<br>";
+        $cities = $country->city_set->all();
+        foreach ($cities as $city) {
+            echo '----' . $city->id . "." . $city->name . "<br>";
+
+        }
+    }
+
+This will generate two queries
+
+.. code-block:: sql
+
+    // fetches the countries
+    SELECT `app_country`.`name`, `app_country`.`id` FROM `app_country`
+
+    // fetches all the related cities for the countries fetched above,
+    // in this case they were 5 countries
+    SELECT `app_city`.`name`, `app_city`.`population`, `app_city`.`country_id`, `app_city`.`id`
+    FROM `app_city`  WHERE `app_city`.`country_id` IN (?, ?, ?, ?, ?)
 
 Methods that do not return QuerySets
 ------------------------------------

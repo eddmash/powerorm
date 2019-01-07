@@ -28,18 +28,14 @@ use Eddmash\PowerOrm\Model\Model;
  *
  * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  */
-class OneToManyDescriptor extends BaseDescriptor
+class OneToManyDescriptor extends BaseDescriptor implements RelationDescriptor
 {
     /**
      * {@inheritdoc}
      */
     public function getValue(Model $modelInstance)
     {
-        $cacheName = $this->field->getCacheName();
-//        if ($modelInstance->{$cacheName}) {
-//            return $modelInstance->{$cacheName};
-//        }
-        return $this->queryset($modelInstance);
+        return $this->getManager($modelInstance);
     }
 
     /**
@@ -51,19 +47,9 @@ class OneToManyDescriptor extends BaseDescriptor
     }
 
     /**
-     * Creates the queryset to retrieve data for the relationship that relates
-     * to this field.
-     *
-     * @param      $modelInstance
-     * @param bool $reverse
-     *
-     * @internal param $modelName
-     *
-     * @return O2MManager
-     *
-     * @author   : Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     * {@inheritdoc}
      */
-    public function queryset($modelInstance, $reverse = false)
+    public function getManager(Model $modelInstance, $reverse = false)
     {
         if ($reverse) {
             $model = $this->field->getRelatedModel();

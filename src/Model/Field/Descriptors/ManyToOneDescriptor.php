@@ -19,8 +19,10 @@ use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
 use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Model\Query\PrefetchInterface;
+use Eddmash\PowerOrm\Model\Query\QuerysetInterface;
 
-class ManyToOneDescriptor extends BaseDescriptor
+class ManyToOneDescriptor extends BaseDescriptor implements PrefetchInterface
 {
     /** @var RelatedField */
     protected $field;
@@ -172,5 +174,18 @@ class ManyToOneDescriptor extends BaseDescriptor
         );
 
         return $manager;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPrefetchQueryset(array $instances, QuerysetInterface $queryset = null): array
+    {
+        // TODO: Implement getPrefetchQueryset() method.
+    }
+
+    public function isCached(Model $instance)
+    {
+        return $instance->{$this->field->getCacheName()};
     }
 }

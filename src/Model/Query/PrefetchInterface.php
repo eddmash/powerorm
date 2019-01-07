@@ -30,6 +30,4 @@ interface PrefetchInterface
      *               - cacheName string indicates where to store the related objects.
      */
     public function getPrefetchQueryset(array $instances, QuerysetInterface $queryset = null): array;
-
-    public function isCached(Model $model): bool;
 }

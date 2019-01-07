@@ -805,7 +805,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         $kwargs = array_merge(['resultMapper' => $this->resultMapper], $this->kwargs);
 
         $queryset = self::createObject($this->connection, $this->model, $qb, $kwargs);
-        $queryset->_resultsCache = $this->_resultsCache;
+//        $queryset->_resultsCache = $this->_resultsCache;
         $queryset->prefetchRelatedLookups = $this->prefetchRelatedLookups;
 
         return $queryset;

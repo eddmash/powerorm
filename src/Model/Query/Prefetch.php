@@ -11,8 +11,10 @@
 
 namespace Eddmash\PowerOrm\Model\Query;
 
+use Eddmash\PowerOrm\Exception\AttributeError;
 use Eddmash\PowerOrm\Exception\FieldDoesNotExist;
 use Eddmash\PowerOrm\Exception\KeyError;
+use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
@@ -203,19 +205,25 @@ class Prefetch
         // try getting the descriptor from the meta of the instance to avoid
         // invoking queries
         try {
-            $descriptor = $instance->_fieldCache[$throughAttr];
+            $descriptor = ArrayHelper::getValue($instance->_fieldCache, $throughAttr, null);
             $hasAttr = true;
 
             if ($descriptor) {
-                // this is normally descriptors that return a single item.
+                // when we are moving from the many side to the one side
+                // the descriptor implements PrefetchInterface
+                // e.g. users has many cars
+                // if we fetching the owner of a car i.e. car->owner
                 if ($descriptor instanceof PrefetchInterface) {
                     $prefetcher = $descriptor;
+                    // check if the value is already cached
+                    // most likely by a selectRelated()
                     if ($prefetcher->isCached($instance)) {
                         $isFetched = true;
                     }
                 } else {
-                    // we go ahead and get the related manager, which will be used
-                    // to perform queries
+                    // otherwise we go ahead and get the related manager,
+                    // which will be used to perform queries and will also have
+                    // implemented PrefetchInterface
                     $relObj = $instance->{$throughAttr};
                     if ($relObj instanceof PrefetchInterface) {
                         $prefetcher = $relObj;
@@ -388,7 +396,39 @@ class Prefetch
                     list($objList, $additionalLookups) = Prefetch::prefetchByLevel(
                         $objList, $prefetcher, $lookup, $level);
                 } else {
-                    // this w
+                    // Either, the related object has already been fetched,
+                    // most likely by a selectRelated() or hopefully some other property
+                    // that doesn't support prefetching but needs to be traversed.
+
+                    // we need to replace the $objList with the related objects
+                    // this way we can proceed down the prefetch lookups
+
+                    $newObjList = [];
+                    foreach ($objList as $instance) {
+                        // if the related objects have already been prefeched
+                        // use the cache, instaed of doing another query
+                        if (array_key_exists($throughtAttr, $instance->_prefetchedObjectCaches)) {
+                            $newObj = ArrayHelper::getValue($throughtAttr, $instance->_prefetchedObjectCaches, []);
+                        } else {
+                            // try to get the value from the model
+                            try {
+                                $newObj = $instance->{$throughtAttr};
+                            } catch (ObjectDoesNotExist $exception) {
+                                continue;
+                            }
+                        }
+
+                        if (!$newObj) {
+                            continue;
+                        }
+
+                        if (is_array($newObj)) {
+                            $newObjList = array_merge($newObjList, $newObj);
+                        } else {
+                            $newObjList[] = $newObj;
+                        }
+                    }
+                    $objList = $newObjList;
                 }
             }
         }
