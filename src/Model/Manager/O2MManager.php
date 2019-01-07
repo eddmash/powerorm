@@ -1,13 +1,12 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: eddmash
- * Date: 3/20/17
- * Time: 7:38 PM.
+ * This file is part of the powerorm package.
  *
- * @since  1.1.0
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
  *
- * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Eddmash\PowerOrm\Model\Manager;

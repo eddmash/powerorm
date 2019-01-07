@@ -92,9 +92,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      * Queryset constructor.
      *
      * @param ConnectionInterface|null $connection
-     * @param Model|null               $model
-     * @param Query|null               $query
-     * @param array                    $kwargs
+     * @param Model|null $model
+     * @param Query|null $query
+     * @param array $kwargs
      *
      * @throws NotImplemented
      * @throws \Eddmash\PowerOrm\Exception\KeyError
@@ -104,7 +104,8 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    ) {
+    )
+    {
         $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
         $this->query = (null == $query) ? $this->getQueryBuilder() : $query;
@@ -130,9 +131,9 @@ class Queryset implements QuerysetInterface, \JsonSerializable
 
     /**
      * @param ConnectionInterface $connection
-     * @param Model               $model
-     * @param Query               $query
-     * @param array               $kwargs
+     * @param Model $model
+     * @param Query $query
+     * @param array $kwargs
      *
      * @return self
      *
@@ -145,7 +146,8 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         Model $model = null,
         Query $query = null,
         $kwargs = []
-    ) {
+    )
+    {
         return new static($connection, $model, $query, $kwargs);
     }
 
@@ -393,7 +395,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
             return $instance->query->hasResults($this->connection);
         }
 
-        return (bool) $this->_resultsCache;
+        return (bool)$this->_resultsCache;
     }
 
     /**
@@ -613,10 +615,10 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      *
      * The orm does not try map the into  there  respective models.
      *
-     * @param array $fields     the fields to select, if null all fields in the
+     * @param array $fields the fields to select, if null all fields in the
      *                          model are selected
-     * @param bool  $valuesOnly if true return
-     * @param bool  $flat       if true returns the results as one array others
+     * @param bool $valuesOnly if true return
+     * @param bool $flat if true returns the results as one array others
      *                          it returns results as array of arrays each
      *                          which represents a record in the database for the
      *                          selected field.
@@ -634,13 +636,13 @@ class Queryset implements QuerysetInterface, \JsonSerializable
     {
         if ($flat && 1 != count($fields)) {
             throw new TypeError(
-                "'flat' is valid when asArray is called".
+                "'flat' is valid when asArray is called" .
                 ' with exactly one field.'
             );
         }
         if ($flat && !$valuesOnly) {
             throw new TypeError(
-                "'flat' is valid when asArray ".
+                "'flat' is valid when asArray " .
                 'is called with valuesOnly=true.'
             );
         }

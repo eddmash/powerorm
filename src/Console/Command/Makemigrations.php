@@ -1,4 +1,12 @@
 <?php
+/**
+ * This file is part of the powerorm package.
+ *
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Eddmash\PowerOrm\Console\Command;
 
@@ -39,9 +47,9 @@ class Makemigrations extends BaseCommand
         $issues = $loader->detectConflicts();
 
         if (!empty($issues)) {
-            $message = '<error>The following migrations seem to indicate they'.
-                ' are both the latest migration :</error>'.PHP_EOL;
-            $message .= '  %s '.PHP_EOL;
+            $message = '<error>The following migrations seem to indicate they' .
+                ' are both the latest migration :</error>' . PHP_EOL;
+            $message .= '  %s ' . PHP_EOL;
             $output->writeln(
                 sprintf(
                     $message,
@@ -79,7 +87,8 @@ class Makemigrations extends BaseCommand
         $migrationChanges,
         InputInterface $input,
         OutputInterface $output
-    ) {
+    )
+    {
         /* @var $appMigration Migration */
         /* @var $op Operation */
 
@@ -88,7 +97,7 @@ class Makemigrations extends BaseCommand
                 if (ArrayHelper::hasKey($migrationChanges, $component->getName())) {
                     $output->writeln(
                         sprintf(
-                            '<fg=green;options=bold>Migrations for '.
+                            '<fg=green;options=bold>Migrations for ' .
                             'the application "%s" :</>',
                             $component->getName()
                         )

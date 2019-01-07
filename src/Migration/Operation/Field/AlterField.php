@@ -90,7 +90,8 @@ class AlterField extends FieldOperation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    ) {
+    )
+    {
         $this->alterField($schemaEditor, $fromState, $toState);
     }
 

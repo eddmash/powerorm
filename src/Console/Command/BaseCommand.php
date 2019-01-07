@@ -1,4 +1,12 @@
 <?php
+/**
+ * This file is part of the powerorm package.
+ *
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Eddmash\PowerOrm\Console\Command;
 
@@ -45,7 +53,7 @@ abstract class BaseCommand extends Command
     /**
      * Place all you command logic here.
      *
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      *
      * @return CommandError
@@ -53,7 +61,7 @@ abstract class BaseCommand extends Command
     public function handle(InputInterface $input, OutputInterface $output)
     {
         return new CommandError(
-            'Subclasses of the class '.
+            'Subclasses of the class ' .
             'Command must implement the handle()'
         );
     }
@@ -97,7 +105,8 @@ abstract class BaseCommand extends Command
         $tags = null,
         $showErrorCount = null,
         $failLevel = null
-    ) {
+    )
+    {
         $checks = BaseOrm::getCheckRegistry()->runChecks($tags);
 
         $debugs = [];
@@ -150,7 +159,7 @@ abstract class BaseCommand extends Command
             + count($debugs) + count($critical);
 
         if ($visibleIssues) {
-            $header = 'System check identified issues: '.PHP_EOL;
+            $header = 'System check identified issues: ' . PHP_EOL;
         }
 
         $errors = array_merge($critical, $errors);
@@ -168,13 +177,13 @@ abstract class BaseCommand extends Command
             if (empty($categoryIssues)) {
                 continue;
             }
-            $body .= sprintf(PHP_EOL.' %s'.PHP_EOL, strtoupper($category));
+            $body .= sprintf(PHP_EOL . ' %s' . PHP_EOL, strtoupper($category));
 
             foreach ($categoryIssues as $catIssue) {
                 if ($catIssue->isSerious()) {
-                    $msg = ' <fg=red>%s</>'.PHP_EOL;
+                    $msg = ' <fg=red>%s</>' . PHP_EOL;
                 } else {
-                    $msg = ' <warning>%s</warning>'.PHP_EOL;
+                    $msg = ' <warning>%s</warning>' . PHP_EOL;
                 }
                 $body .= sprintf($msg, $catIssue);
             }
@@ -196,13 +205,13 @@ abstract class BaseCommand extends Command
 
         if (!empty($serious)) {
             $header = sprintf('<fg=red;options=bold> SystemCheckError: %s</>', $header);
-            $message = $header.$body.$footer;
+            $message = $header . $body . $footer;
             $output->writeln($message);
 
             throw new SystemCheckError();
         }
 
-        $message = $header.$body.$footer;
+        $message = $header . $body . $footer;
         $output->writeln($message);
     }
 

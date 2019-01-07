@@ -146,7 +146,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
     /**
      * Query constructor.
      *
-     * @param Model     $model
+     * @param Model $model
      * @param WhereNode $whereClass
      *
      * @internal param string $where
@@ -255,7 +255,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
      */
     private function buildCondition($lookup, $lhs, $rhs)
     {
-        $lookup = (array) $lookup;
+        $lookup = (array)$lookup;
         $lookup = $lhs->getLookup($lookup[0]);
         /* @var $lookup LookupInterface */
         return $lookup::createObject($lhs, $rhs);
@@ -279,7 +279,8 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
         $connector = AND_CONNECTOR,
         $allowJoins = true,
         &$canReuse = null
-    ) {
+    )
+    {
         reset($conditions);
         $name = key($conditions);
         $value = current($conditions);
@@ -403,7 +404,8 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
         &$usedAliases,
         $allowJoins = true,
         $currentNegated = false
-    ) {
+    )
+    {
         $connector = $q->getConnector();
 
         // current is true only if one and only is true.
@@ -496,8 +498,8 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
                 property_exists($fieldName, 'containsAggregate')) {
                 throw new FieldError(
                     sprintf(
-                        'Using an aggregate in orderBy() without also '.
-                        'including '.
+                        'Using an aggregate in orderBy() without also ' .
+                        'including ' .
                         'it in annotate() is not allowed: %s',
                         $fieldName
                     )
@@ -708,7 +710,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
                 if ($failOnMissing) {
                     throw new FieldError(
                         sprintf(
-                            "Cannot resolve keyword '%s.%s' ".
+                            "Cannot resolve keyword '%s.%s' " .
                             'into field. Choices are: [ %s ]',
                             $meta->getNSModelName(),
                             $name,
@@ -1122,7 +1124,8 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
     public function getAggregation(
         ConnectionInterface $connection,
         $addedAggregateNames = []
-    ) {
+    )
+    {
         if (!$this->annotations) {
             return [];
         }
@@ -1416,7 +1419,8 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
         $allowJoins = true,
         &$reuse = null,
         $summarize = false
-    ) {
+    )
+    {
         if (!$allowJoins &&
             StringHelper::contains($name, BaseLookup::LOOKUP_SEPARATOR)
         ) {
@@ -1453,7 +1457,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
             );
             if (count($targets) > 1) {
                 throw new FieldError(
-                    'Referencing multicolumn fields'.
+                    'Referencing multicolumn fields' .
                     " with F() objects isn't supported"
                 );
             }

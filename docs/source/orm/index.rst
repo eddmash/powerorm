@@ -9,9 +9,9 @@ Overview
 **************
 
 .. toctree::
-   :titlesonly:
+:titlesonly:
 
-   intro/index
+       intro/index
 
 
 **************
@@ -19,18 +19,18 @@ Model
 **************
 
 .. toctree::
-    :titlesonly:
+:titlesonly:
 
-    model/index
+        model/index
 
 **************
 Queries
 **************
 
 .. toctree::
-    :titlesonly:
+:titlesonly:
 
-    queries/index
+        queries/index
 
 
 **************
@@ -38,18 +38,18 @@ Migration
 **************
 
 .. toctree::
-    :titlesonly:
+:titlesonly:
 
-    migration/index
+        migration/index
 
 ************
 Integrations
 ************
 
 .. toctree::
-    :titlesonly:
+:titlesonly:
 
-    integrations/index
+        integrations/index
 
 
 *****************
@@ -57,8 +57,8 @@ Extra Information
 *****************
 
 .. toctree::
-    :titlesonly:
+:titlesonly:
 
-    ref/index
+        ref/index
 
 

@@ -13,8 +13,8 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use DateTime;
 use Doctrine\DBAL\Types\Type;
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Backends\ConnectionInterface;
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Model\Model;
 
 class DateField extends Field

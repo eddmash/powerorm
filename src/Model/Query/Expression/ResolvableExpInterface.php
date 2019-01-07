@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the powercomponents package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -22,15 +22,15 @@ interface ResolvableExpInterface
      *
      *
      * @param ExpResolverInterface $resolver
-     * @param bool                 $allowJoins boolean allowing or denying use
+     * @param bool $allowJoins boolean allowing or denying use
      *                                         of joins in this query
-     * @param null                 $reuse      a set of reusable joins for
+     * @param null $reuse a set of reusable joins for
      *                                         multijoins
-     * @param bool                 $summarize  a boolean that, when True,
+     * @param bool $summarize a boolean that, when True,
      *                                         signals that the query being
      *                                         computed is a terminal
      *                                         aggregate query
-     * @param bool                 $forSave    tells if this item is allowed in insert/update queries
+     * @param bool $forSave tells if this item is allowed in insert/update queries
      *
      * @return
      *

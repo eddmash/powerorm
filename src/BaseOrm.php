@@ -15,11 +15,11 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\App\Settings;
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Checks\ChecksRegistry;
 use Eddmash\PowerOrm\Checks\Tags;
 use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Components\ComponentInterface;
-use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AppRegistryNotReady;
 use Eddmash\PowerOrm\Exception\ComponentException;
 use Eddmash\PowerOrm\Exception\OrmException;
@@ -160,7 +160,7 @@ class BaseOrm extends BaseObject
         }
 
         if (!static::$connection && empty($this->getSettings()->getDatabase())) {
-            $message = 'The database configuration have not '.
+            $message = 'The database configuration have not ' .
                 'been provided, consult documentation for options';
 
             throw new OrmException($message);

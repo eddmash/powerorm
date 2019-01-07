@@ -11,8 +11,8 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Types\Type;
-use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Backends\ConnectionInterface;
+use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Exception;
 
@@ -67,7 +67,7 @@ class AutoField extends Field
     }
 
     /**
-     * @param string                        $field
+     * @param string $field
      * @param \Eddmash\PowerOrm\Model\Model $model
      *
      * @throws \Eddmash\PowerOrm\Exception\FieldError

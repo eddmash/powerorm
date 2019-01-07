@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the ci304 package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -148,7 +148,7 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
 
             throw new AttributeError(
                 sprintf(
-                    'Cannot use remove() on a ManyToManyField which specifies '.
+                    'Cannot use remove() on a ManyToManyField which specifies ' .
                     "an intermediary model. Use %s's Manager instead.",
                     $meta->getNSModelName()
                 )

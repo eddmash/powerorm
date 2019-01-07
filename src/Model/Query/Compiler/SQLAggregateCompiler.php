@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the powercomponents package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -21,7 +21,8 @@ class SQLAggregateCompiler extends SqlFetchCompiler
     public function asSql(
         CompilerInterface $compiler = null,
         ConnectionInterface $connection = null
-    ) {
+    )
+    {
         $sql = $params = [];
 
         foreach ($this->query->annotations as $alias => $annotation) {

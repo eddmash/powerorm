@@ -150,13 +150,14 @@ class AutoDetector extends BaseObject
     /**
      * @param ProjectState $fromState
      * @param ProjectState $toState
-     * @param Asker        $asker
+     * @param Asker $asker
      */
     public function __construct(
         ProjectState $fromState,
         ProjectState $toState,
         Asker $asker
-    ) {
+    )
+    {
         $this->fromState = $fromState;
         $this->toState = $toState;
         $this->asker = $asker;
@@ -282,8 +283,8 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * @param array  $changes
-     * @param Graph  $graph
+     * @param array $changes
+     * @param Graph $graph
      * @param string $migrationName
      *
      * @return mixed
@@ -364,9 +365,9 @@ class AutoDetector extends BaseObject
     }
 
     /**
-     * @param Operation  $operation
-     * @param array      $dependencies
-     * @param bool|false $pushToTop    some operations should come before
+     * @param Operation $operation
+     * @param array $dependencies
+     * @param bool|false $pushToTop some operations should come before
      *                                 others, use this determine which
      *
      * @since  1.1.0
@@ -380,7 +381,8 @@ class AutoDetector extends BaseObject
         $operation,
         $dependencies = [],
         $pushToTop = false
-    ) {
+    )
+    {
         $operation->setDependency($dependencies);
         $operation->setAppLabel($appLabel);
 
@@ -651,7 +653,7 @@ class AutoDetector extends BaseObject
                 $operation instanceof AddField &&
                 strtolower($operation->name) === strtolower($target) &&
                 strtolower($operation->modelName) === strtolower($model);
-        //            ||(
+            //            ||(
             //                $operation instanceof CreateModel) &&
             //            strtolower($operation->name) === strtolower($target) &&
             //        any(dependency[2] == x for x, y in operation.fields)
@@ -674,7 +676,7 @@ class AutoDetector extends BaseObject
                 $operation instanceof AlterField &&
                 strtolower($operation->modelName) === strtolower($model) &&
                 strtolower($operation->name) === strtolower($target);
-        // Unknown dependency. Raise an error.
+            // Unknown dependency. Raise an error.
         } else {
             throw new ValueError(
                 sprintf(
@@ -747,7 +749,7 @@ class AutoDetector extends BaseObject
         $name = str_replace('\\', '_', $name);
         if ($appLabel) {
             $name = str_replace(
-                ''.$appLabel.'_models_',
+                '' . $appLabel . '_models_',
                 '',
                 strtolower($name)
             );
@@ -760,7 +762,7 @@ class AutoDetector extends BaseObject
     {
         $name = explode('_', $name);
 
-        return (int) str_replace($this->migrationNamePrefix, '', $name[0]);
+        return (int)str_replace($this->migrationNamePrefix, '', $name[0]);
     }
 
     private function getOldModelName($modelName)

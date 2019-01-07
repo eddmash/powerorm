@@ -90,7 +90,7 @@ class Graph
         if (empty($this->nodes[$appName][$child])) {
             throw new NodeNotFoundError(
                 sprintf(
-                    'Migration %s dependencies reference '.
+                    'Migration %s dependencies reference ' .
                     'nonexistent child node %s',
                     $migration->getName(),
                     $child
@@ -101,7 +101,7 @@ class Graph
         if (empty($this->nodes[$parentAppName][$parent])) {
             throw new NodeNotFoundError(
                 sprintf(
-                    'Migration %s dependencies reference nonexistent'.
+                    'Migration %s dependencies reference nonexistent' .
                     ' parent node %s',
                     $migration->getName(),
                     $parent

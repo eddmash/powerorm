@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the ci304 package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -10,8 +10,8 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Joinable;
 
-use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\Backends\ConnectionInterface;
+use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\Helpers\Node;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Query\Compiler\CompilerInterface;
@@ -25,7 +25,8 @@ class WhereNode extends Node implements SqlCompilableinterface, CloneInterface
     public function asSql(
         CompilerInterface $compiler,
         ConnectionInterface $connection
-    ) {
+    )
+    {
         $whereSql = [];
         $whereParams = [];
 

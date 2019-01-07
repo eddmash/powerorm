@@ -1,4 +1,12 @@
 <?php
+/**
+ * This file is part of the powerorm package.
+ *
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Eddmash\PowerOrm\Checks;
 
@@ -72,7 +80,7 @@ abstract class CheckMessage extends Base
                 $this->hint
             );
         }
-        $msg = PHP_EOL.str_pad('', 3, ' ').$this->message;
+        $msg = PHP_EOL . str_pad('', 3, ' ') . $this->message;
 
         return sprintf(
             'Issue <fg=red;options=bold>%s</> : <fg=black>(%s)</> %s %s',

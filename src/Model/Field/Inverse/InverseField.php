@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the ci304 package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -10,8 +10,8 @@
 
 namespace Eddmash\PowerOrm\Model\Field\Inverse;
 
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Backends\ConnectionInterface;
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\RelatedField;

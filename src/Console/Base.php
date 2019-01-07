@@ -1,4 +1,12 @@
 <?php
+/**
+ * This file is part of the powerorm package.
+ *
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Eddmash\PowerOrm\Console;
 
@@ -135,41 +143,41 @@ class Base extends BaseObject
     public function normal($message, $newline = false)
     {
         if ($newline) {
-            $message = $message.PHP_EOL;
+            $message = $message . PHP_EOL;
         }
-        $this->stdout(' '.$message);
+        $this->stdout(' ' . $message);
     }
 
     public function success($message, $newline = false)
     {
         if ($newline) {
-            $message = $message.PHP_EOL;
+            $message = $message . PHP_EOL;
         }
-        $this->stdout(' '.$message, Console::FG_GREEN);
+        $this->stdout(' ' . $message, Console::FG_GREEN);
     }
 
     public function info($message, $newline = false)
     {
         if ($newline) {
-            $message = $message.PHP_EOL;
+            $message = $message . PHP_EOL;
         }
-        $this->stdout(' '.$message, Console::FG_CYAN);
+        $this->stdout(' ' . $message, Console::FG_CYAN);
     }
 
     public function error($message, $newline = false)
     {
         if ($newline) {
-            $message = $message.PHP_EOL;
+            $message = $message . PHP_EOL;
         }
-        $this->stderr(' '.$message, Console::FG_RED);
+        $this->stderr(' ' . $message, Console::FG_RED);
     }
 
     public function warning($message, $newline = false)
     {
         if ($newline) {
-            $message = $message.PHP_EOL;
+            $message = $message . PHP_EOL;
         }
-        $this->stdout(' '.$message, Console::FG_PURPLE);
+        $this->stdout(' ' . $message, Console::FG_PURPLE);
     }
 
     public function input($message = ' ')

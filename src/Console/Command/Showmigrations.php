@@ -1,4 +1,12 @@
 <?php
+/**
+ * This file is part of the powerorm package.
+ *
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Eddmash\PowerOrm\Console\Command;
 
@@ -52,7 +60,7 @@ class Showmigrations extends BaseCommand
                     $indicator = '<fg=yellow>(pending)</>';
                 }
                 $output->writeln(
-                    str_pad(' ', 2, ' ').
+                    str_pad(' ', 2, ' ') .
                     sprintf(
                         '%1$s %2$s',
                         $indicator,

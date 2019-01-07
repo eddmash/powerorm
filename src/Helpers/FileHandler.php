@@ -30,7 +30,7 @@ class FileHandler extends BaseObject
     public $fileName;
 
     /**
-     * @param string $folder   the absolute path to the folder to be created/read from
+     * @param string $folder the absolute path to the folder to be created/read from
      * @param string $fileName the specific file to handle in the folder specified
      */
     public function __construct($folder, $fileName = '')
@@ -58,7 +58,7 @@ class FileHandler extends BaseObject
         }
 
         // absolute path to file
-        $file = $this->path.DIRECTORY_SEPARATOR.$this->fileName;
+        $file = $this->path . DIRECTORY_SEPARATOR . $this->fileName;
 
         $fileHandle = fopen($file, 'w');
 
@@ -86,7 +86,7 @@ class FileHandler extends BaseObject
 
         /** @var $file SplFileInfo */
         foreach ($files as $file) {
-            $fileName = $file->getBaseName('.'.$ext);
+            $fileName = $file->getBaseName('.' . $ext);
             if ($this->normalizeKey($fileName) == $name && $file->getExtension() == $ext) {
                 return $file;
             }
@@ -98,7 +98,7 @@ class FileHandler extends BaseObject
     /**
      * searches for files in a directory recursively.
      *
-     * @param string    $ext     the extension of files to return defualt is "php"
+     * @param string $ext the extension of files to return defualt is "php"
      * @param bool|true $recurse if true checks inside directories within the directory default is true
      *
      * @return array
@@ -111,8 +111,8 @@ class FileHandler extends BaseObject
     /**
      * Read contents inside a directory.
      *
-     * @param string     $ext
-     * @param bool|true  $recurse
+     * @param string $ext
+     * @param bool|true $recurse
      * @param bool|false $_fileObj if true returns a file object, if false returns a file pathname
      *
      * @return array
@@ -151,10 +151,10 @@ class FileHandler extends BaseObject
     }
 
     /**
-     * @param array        $_fileList
+     * @param array $_fileList
      * @param \SplFileInfo $file
      * @param              $ext
-     * @param bool|false   $_fileObj  if true returns a file object, if false returns a file pathname
+     * @param bool|false $_fileObj if true returns a file object, if false returns a file pathname
      *
      * @return array
      *
@@ -194,6 +194,6 @@ class FileHandler extends BaseObject
 
     private function stableDir($name)
     {
-        return (preg_match("/\/$/", $name)) ? $name : $name.'/';
+        return (preg_match("/\/$/", $name)) ? $name : $name . '/';
     }
 }

@@ -1,4 +1,12 @@
 <?php
+/**
+ * This file is part of the powerorm package.
+ *
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Eddmash\PowerOrm\Console;
 
@@ -88,7 +96,7 @@ class Console
      * Will return a string formatted with the given ANSI style.
      *
      * @param string $string the string to be formatted
-     * @param array  $format an array containing formatting values.
+     * @param array $format an array containing formatting values.
      *                       You can pass any of the FG_*, BG_* and TEXT_* constants
      *                       and also [[xtermFgColor]] and [[xtermBgColor]] to specify a format
      *
@@ -98,7 +106,7 @@ class Console
     {
         $code = implode(';', $format);
 
-        return "\033[0m".('' !== $code ? "\033[".$code.'m' : '').$string."\033[0m";
+        return "\033[0m" . ('' !== $code ? "\033[" . $code . 'm' : '') . $string . "\033[0m";
     }
 
     /**
@@ -163,7 +171,7 @@ class Console
      */
     public static function output($string = null)
     {
-        return static::stdout($string.PHP_EOL);
+        return static::stdout($string . PHP_EOL);
     }
 
     /**
@@ -175,7 +183,7 @@ class Console
      */
     public static function error($string = null)
     {
-        return static::stderr($string.PHP_EOL);
+        return static::stderr($string . PHP_EOL);
     }
 
     /**
@@ -225,7 +233,7 @@ class Console
             $output = [];
             exec('mode con', $output);
             if (isset($output, $output[1]) && false !== strpos($output[1], 'CON')) {
-                return $size = [(int) preg_replace('~\D~', '', $output[3]), (int) preg_replace('~\D~', '', $output[4])];
+                return $size = [(int)preg_replace('~\D~', '', $output[3]), (int)preg_replace('~\D~', '', $output[4])];
             }
         } else {
             // try stty if available
@@ -240,12 +248,12 @@ class Console
             }
 
             // fallback to tput, which may not be updated on terminal resize
-            if (($width = (int) exec('tput cols 2>&1')) > 0 && ($height = (int) exec('tput lines 2>&1')) > 0) {
+            if (($width = (int)exec('tput cols 2>&1')) > 0 && ($height = (int)exec('tput lines 2>&1')) > 0) {
                 return $size = [$width, $height];
             }
 
             // fallback to ENV variables, which may not be updated on terminal resize
-            if (($width = (int) getenv('COLUMNS')) > 0 && ($height = (int) getenv('LINES')) > 0) {
+            if (($width = (int)getenv('COLUMNS')) > 0 && ($height = (int)getenv('LINES')) > 0) {
                 return $size = [$width, $height];
             }
         }
@@ -267,9 +275,9 @@ class Console
      *     amet.
      * ```
      *
-     * @param string $text    the text to be wrapped
-     * @param int    $indent  number of spaces to use for indentation
-     * @param bool   $refresh whether to force refresh of screen size.
+     * @param string $text the text to be wrapped
+     * @param int $indent number of spaces to use for indentation
+     * @param bool $refresh whether to force refresh of screen size.
      *                        This will be passed to [[getScreenSize()]]
      *
      * @return string the wrapped text
@@ -291,7 +299,7 @@ class Console
 
                 continue;
             }
-            $lines[$i] = $pad.$line;
+            $lines[$i] = $pad . $line;
         }
 
         return implode("\n", $lines);
@@ -300,8 +308,8 @@ class Console
     /**
      * Prompts the user for input and validates it.
      *
-     * @param string $text    prompt string
-     * @param array  $options the options to validate the input:
+     * @param string $text prompt string
+     * @param array $options the options to validate the input:
      *
      * - `required`: whether it is required or not
      * - `default`: default value if no input is inserted by the user
@@ -328,7 +336,7 @@ class Console
 
         top:
         $input = $options['default']
-            ? static::input("$text [".$options['default'].'] ')
+            ? static::input("$text [" . $options['default'] . '] ')
             : static::input("$text ");
 
         if ('' === $input) {
@@ -355,14 +363,14 @@ class Console
      * Asks user to confirm by typing y or n.
      *
      * @param string $message to print out before waiting for user input
-     * @param bool   $default this value is returned if no selection is made
+     * @param bool $default this value is returned if no selection is made
      *
      * @return bool whether user confirmed
      */
     public static function confirm($message, $default = false)
     {
         while (true) {
-            static::stdout($message.' (yes|no) ['.($default ? 'yes' : 'no').']:');
+            static::stdout($message . ' (yes|no) [' . ($default ? 'yes' : 'no') . ']:');
             $input = trim(static::stdin());
 
             if (empty($input)) {
@@ -383,15 +391,15 @@ class Console
      * Gives the user an option to choose from. Giving '?' as an input will show
      * a list of options to choose from and their explanations.
      *
-     * @param string $prompt  the prompt message
-     * @param array  $options Key-value array of options to choose from
+     * @param string $prompt the prompt message
+     * @param array $options Key-value array of options to choose from
      *
      * @return string An option character the user chose
      */
     public static function select($prompt, $options = [])
     {
         top:
-        static::stdout("$prompt [".implode(',', array_keys($options)).',?]: ');
+        static::stdout("$prompt [" . implode(',', array_keys($options)) . ',?]: ');
         $input = static::stdin();
         if ('?' === $input) {
             foreach ($options as $key => $value) {

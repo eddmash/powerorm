@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the powercomponents package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -37,7 +37,7 @@ class JoinPromoter
      * JoinPromoter constructor.
      *
      * @param mixed $connector
-     * @param int   $childrenCount
+     * @param int $childrenCount
      * @param       $currentNegated
      */
     public function __construct($connector, $childrenCount, $currentNegated)

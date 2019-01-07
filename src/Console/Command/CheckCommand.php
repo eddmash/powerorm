@@ -62,7 +62,7 @@ class CheckCommand extends BaseCommand
             if (!in_array(strtoupper($failLevel), ['ERROR', 'WARNING', 'INFO', 'DEBUG', 'CRITICAL'])) {
                 throw new CommandError(
                     sprintf(
-                        "--fail-level: invalid choice: '%s' ".
+                        "--fail-level: invalid choice: '%s' " .
                         "(choices are 'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG')",
                         $failLevel
                     )
@@ -91,7 +91,7 @@ class CheckCommand extends BaseCommand
                 'fail-level',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Message level that will cause the command to exit with a non-zero status.'.
+                'Message level that will cause the command to exit with a non-zero status.' .
                 '{CRITICAL, ERROR, WARNING, INFO, DEBUG}.',
                 'ERROR'
             )

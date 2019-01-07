@@ -5,24 +5,24 @@ Working with forms
     :local:
     :depth: 2
 
-Handling forms is a complex business. where numerous items of data of several different types may need to be:
+    Handling forms is a complex business. where numerous items of data of several different types may need to be:
 
-- prepared for display in a form,
-- rendered as HTML,
-- edited using a convenient interface,
-- returned to the server,
-- validated and cleaned up, and then saved or passed on for further processing.
+    - prepared for display in a form,
+    - rendered as HTML,
+    - edited using a convenient interface,
+    - returned to the server,
+    - validated and cleaned up, and then saved or passed on for further processing.
 
-Powerform functionality can simplify and automate vast portions of this work, and can also do it more securely
-than most programmers would be able to do in code they wrote themselves.
+    Powerform functionality can simplify and automate vast portions of this work, and can also do it more securely
+    than most programmers would be able to do in code they wrote themselves.
 
-Powerform handles three distinct parts of the work involved in forms:
+    Powerform handles three distinct parts of the work involved in forms:
 
-- preparing and restructuring data to make it ready for rendering.
-- creating HTML forms for the data
-- receiving and processing submitted forms and data from the client.
+    - preparing and restructuring data to make it ready for rendering.
+    - creating HTML forms for the data
+    - receiving and processing submitted forms and data from the client.
 
-It is possible to write code that does all of this manually, but Powerform can take care of it all for you.
+    It is possible to write code that does all of this manually, but Powerform can take care of it all for you.
 
 
 Building a form

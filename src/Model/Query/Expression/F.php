@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the powercomponents package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -30,10 +30,10 @@ class F extends Combinable implements ResolvableExpInterface
      * model field.
      *
      * @param ExpResolverInterface $resolver
-     * @param bool                 $allowJoins
-     * @param null                 $reuse
-     * @param bool                 $summarize
-     * @param bool                 $forSave
+     * @param bool $allowJoins
+     * @param null $reuse
+     * @param bool $summarize
+     * @param bool $forSave
      *
      * @return
      *
@@ -47,7 +47,8 @@ class F extends Combinable implements ResolvableExpInterface
         $reuse = null,
         $summarize = false,
         $forSave = false
-    ) {
+    )
+    {
         return $resolver->resolveExpression(
             $this->name,
             $allowJoins,

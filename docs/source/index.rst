@@ -49,18 +49,18 @@ Extra Information
 *****************
 
 .. toctree::
-    :titlesonly:
-    :maxdepth: 1
+:titlesonly:
+        :maxdepth: 1
 
-    orm/index
-    form/index
-    debugger/index
-    faker/index
-    phpgis/index
-    license
-    changelog
+        orm/index
+        form/index
+        debugger/index
+        faker/index
+        phpgis/index
+        license
+        changelog
 
 
-- :doc:`License Agreement <license>`
+    - :doc:`License Agreement <license>`
 - :doc:`Change Log <changelog>`
 

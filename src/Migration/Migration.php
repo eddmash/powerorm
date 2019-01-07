@@ -10,10 +10,10 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+use Eddmash\PowerOrm\Backends\SchemaEditor;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppComponent;
 use Eddmash\PowerOrm\Components\AppInterface;
-use Eddmash\PowerOrm\Backends\SchemaEditor;
 use Eddmash\PowerOrm\Exception\CommandError;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Migration\Operation\Field\AddField;
@@ -178,7 +178,7 @@ class Migration implements MigrationInterface
         foreach ($this->operations as $operation) {
             if (!$operation->isReducibleToSql()) {
                 $schemaEditor->addSql(
-                    '-- MIGRATION NOW PERFORMS'.
+                    '-- MIGRATION NOW PERFORMS' .
                     ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
                 );
             }
@@ -291,7 +291,7 @@ class Migration implements MigrationInterface
 
                 if (!$operation->isReducibleToSql()) {
                     $schemaEditor->addSql(
-                        '-- MIGRATION NOW PERFORMS'.
+                        '-- MIGRATION NOW PERFORMS' .
                         ' OPERATION THAT CANNOT BE WRITTEN AS SQL:'
                     );
                 }
@@ -327,7 +327,7 @@ class Migration implements MigrationInterface
      * mutated state from a copy.
      *
      * @param ProjectState $state
-     * @param bool|true    $preserveState
+     * @param bool|true $preserveState
      *
      * @return mixed
      *

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the powercomponents package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -13,9 +13,9 @@ namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Eddmash\PowerOrm\Helpers\Node;
-use function Eddmash\PowerOrm\Model\Query\Expression\not_;
 use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 use const Eddmash\PowerOrm\Model\Query\Expression\OR_CONNECTOR;
+use function Eddmash\PowerOrm\Model\Query\Expression\not_;
 
 class Q extends Node
 {
@@ -30,7 +30,8 @@ class Q extends Node
         $children = [],
         $connector = null,
         $negated = false
-    ) {
+    )
+    {
         $items = new ArrayCollection();
         foreach ($children as $name => $child) {
             if ($child instanceof Node) {

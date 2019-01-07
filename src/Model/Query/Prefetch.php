@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the powercomponents package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -49,9 +49,9 @@ class Prefetch
     /**
      * Prefetch constructor.
      *
-     * @param string        $lookups
+     * @param string $lookups
      * @param Queryset|null $queryset
-     * @param string|null   $toAttr
+     * @param string|null $toAttr
      *
      * @throws ValueError
      */
@@ -82,7 +82,7 @@ class Prefetch
     /**
      * Perform the actual fetching of related objects by level.
      *
-     * @param array             $instances
+     * @param array $instances
      * @param PrefetchInterface $prefetcher
      * @param $lookup
      * @param $level
@@ -288,7 +288,7 @@ class Prefetch
      * Populate prefetched object caches for a list of model instances based on
      * the lookups/Prefetch instances given.
      *
-     * @param Model[]        $instances
+     * @param Model[] $instances
      * @param Prefetch|array $lookups
      *
      * @throws ValueError
@@ -324,7 +324,7 @@ class Prefetch
                 if ($lookup->queryset) {
                     throw new ValueError(
                         sprintf(
-                            "'%s' lookup was already seen with a different queryset. ".
+                            "'%s' lookup was already seen with a different queryset. " .
                             'You may need to adjust the ordering of your lookups.',
                             $lookup->prefetchTo
                         )
@@ -387,7 +387,7 @@ class Prefetch
 
                 if (!$attrFound) {
                     throw new AttributeError(
-                        sprintf("Cannot find '%s' on %s object, '%s' is an invalid ".
+                        sprintf("Cannot find '%s' on %s object, '%s' is an invalid " .
                             'parameter to prefetch_related()', $throughtAttr,
                             $oneObject->getMeta()->getModelName()));
                 }

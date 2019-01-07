@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the powercomponents package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -59,7 +59,8 @@ class Value extends BaseExpression
         $summarize =
         false,
         $forSave = false
-    ) {
+    )
+    {
         $c = parent::resolveExpression($resolver, $allowJoins, $reuse, $summarize, $forSave);
         $c->forSave = $forSave;
 

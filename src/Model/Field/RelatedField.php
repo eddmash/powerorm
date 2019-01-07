@@ -107,7 +107,7 @@ class RelatedField extends Field
         $error = [];
 
         if (!$hasModel && $isString) {
-            $msg = "Field defines a relation with model '%s', which does not exist or belongs to".
+            $msg = "Field defines a relation with model '%s', which does not exist or belongs to" .
                 " an app that's not registered with the Orm or the model is abstract.";
 
             $error = [
@@ -137,7 +137,7 @@ class RelatedField extends Field
                         "Reverse query name '%s' must not end with an underscore.",
                         $relatedQueryName
                     ),
-                    'hint' => 'Add or change a relatedName or relatedQueryName '.
+                    'hint' => 'Add or change a relatedName or relatedQueryName ' .
                         'argument for this field.',
                     'context' => $this,
                     'id' => 'fields.E308',
@@ -152,7 +152,7 @@ class RelatedField extends Field
                         $relatedQueryName,
                         BaseLookup::LOOKUP_SEPARATOR
                     ),
-                    'hint' => 'Add or change a relatedName or relatedQueryName '.
+                    'hint' => 'Add or change a relatedName or relatedQueryName ' .
                         'argument for this field.',
                     'context' => $this,
                     'id' => 'fields.E309',
@@ -235,8 +235,8 @@ class RelatedField extends Field
             if (!$isHidden && $clashField->getName() == $relName) {
                 $msg = "Reverse accessor for '%s' clashes with field name '%s'.";
                 $hint = sprintf(
-                    "Rename field '%s', or add/change a ".
-                    'relatedName argument to the definition '.
+                    "Rename field '%s', or add/change a " .
+                    'relatedName argument to the definition ' .
                     "for field '%s'.",
                     $clashName,
                     $fieldName
@@ -255,8 +255,8 @@ class RelatedField extends Field
                 $msg = "Reverse query name for '%s' clashes with field name '%s'.";
 
                 $hint = sprintf(
-                    "Rename field '%s', or add/change a".
-                    ' relatedName argument to the '.
+                    "Rename field '%s', or add/change a" .
+                    ' relatedName argument to the ' .
                     "definition for field '%s'.",
                     $clashName,
                     $fieldName
@@ -286,9 +286,9 @@ class RelatedField extends Field
 
             if (!$isHidden &&
                 $reverseRelatedObject->relation->getAccessorName() === $relName) {
-                $msg = "Reverse accessor for '%s' clashes with".
+                $msg = "Reverse accessor for '%s' clashes with" .
                     " reverse accessor for '%s'.";
-                $hint = 'Add or change a relatedName argument '.
+                $hint = 'Add or change a relatedName argument ' .
                     "to the definition for '%s' or '%s'.";
                 $error[] = CheckError::createObject(
                     [
@@ -393,14 +393,15 @@ class RelatedField extends Field
      * e.g. we add the inverse field to use to query when starting on the
      * inverse side.
      *
-     * @param Model|string     $relatedModel
+     * @param Model|string $relatedModel
      * @param ForeignObjectRel $relation
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      */
     public function contributeToInverseClass(
         Model $relatedModel,
         ForeignObjectRel $relation
-    ) {
+    )
+    {
         $inverseFields = $relatedModel->getMeta()->getFields(
             false,
             true,

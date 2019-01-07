@@ -200,7 +200,7 @@ function value_($name)
 }
 
 /**
- * @param Model[]        $instances
+ * @param Model[] $instances
  * @param Prefetch|array $lookups
  *
  * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException

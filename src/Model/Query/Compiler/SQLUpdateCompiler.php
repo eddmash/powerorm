@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the powercomponents package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -35,7 +35,7 @@ class SQLUpdateCompiler extends SqlFetchCompiler
      * if the instance passed to a compiler it can be converted into a valid Sql string.
      *
      * @param CompilerInterface $compiler
-     * @param Connection        $connection
+     * @param Connection $connection
      *
      * @return QueryBuilder
      *

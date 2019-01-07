@@ -1,4 +1,12 @@
 <?php
+/**
+ * This file is part of the powerorm package.
+ *
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Eddmash\PowerOrm\Checks;
 
@@ -37,7 +45,7 @@ class ChecksRegistry
      * Register checks to be run with the check registry.
      *
      * @param callable $check
-     * @param array    $tags
+     * @param array $tags
      *
      * @since  1.1.0
      *
@@ -86,7 +94,7 @@ class ChecksRegistry
                 if (count($check['check']) > 1) {
                     $obj = reset($check['check']);
                     $method = end($check['check']);
-                    $functionName = get_class($obj).'::'.$method;
+                    $functionName = get_class($obj) . '::' . $method;
                 } else {
                     $functionName = reset($check['check']);
                 }

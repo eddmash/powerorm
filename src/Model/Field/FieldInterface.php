@@ -11,9 +11,9 @@
 
 namespace Eddmash\PowerOrm\Model\Field;
 
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\CloneInterface;
 use Eddmash\PowerOrm\ContributorInterface;
-use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Model\Model;
 
@@ -64,7 +64,7 @@ interface FieldInterface extends DeConstructableInterface, ContributorInterface,
      * The attribute name is in $this->getAttrName() (this is set up by Field).
      *
      * @param Model $model
-     * @param bool  $add   is whether the instance is being saved to the database for the first time
+     * @param bool $add is whether the instance is being saved to the database for the first time
      *
      * @return mixed
      *

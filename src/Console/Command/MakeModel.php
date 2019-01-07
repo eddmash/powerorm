@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the ci306 package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -47,7 +47,7 @@ class MakeModel extends BaseCommand
                 'extends',
                 'e',
                 InputOption::VALUE_OPTIONAL,
-                'Model generated model will extend.in the form `appname:modelname` '.
+                'Model generated model will extend.in the form `appname:modelname` ' .
                 'e.g. app:user or school:teacher'
             )
             ->addOption(
@@ -58,8 +58,10 @@ class MakeModel extends BaseCommand
             );
     }
 
+    /**@inheritdoc */
     public function handle(InputInterface $input, OutputInterface $output)
     {
+
         $appName = $input->getArgument('appname');
         $orginalModelName = $input->getArgument('modelname');
         $orginalModelName = $modelName = ucfirst($orginalModelName);
@@ -74,7 +76,7 @@ class MakeModel extends BaseCommand
         } else {
             $extends = explode(':', $extends);
             if (1 == count($extends)) {
-                throw new CommandError('extends should be in the form of `appname:modelname`'.
+                throw new CommandError('extends should be in the form of `appname:modelname`' .
                     ' e.g. app:user or school:teacher');
             }
             /* @var $extendComponent AppComponent */
@@ -115,9 +117,10 @@ class MakeModel extends BaseCommand
         $namespace = ltrim(sprintf("%s\%s", $component->getNamespace(), $modelFolder), '\\');
 
         $modelFile = $this->getModelFile($namespace, $modelName, $extendNamespace, $extendModelName);
+
         $fileName = rtrim(sprintf('%s.php', $modelName), '\\');
 
-        $filePath = realpath($path.DIRECTORY_SEPARATOR.$fileName);
+        $filePath = realpath($path . DIRECTORY_SEPARATOR . $fileName);
 
         if (file_exists($filePath) && !$force) {
             throw new CommandError(sprintf("Models '%s' already exists, use -f option to overwrite", $filePath));
@@ -126,7 +129,7 @@ class MakeModel extends BaseCommand
         $handler = new FileHandler($path, $fileName);
 
         if ($handler->write($modelFile)) {
-            $output->write(sprintf("Models '%s' created at '%s' ".PHP_EOL, $orginalModelName, $path));
+            $output->write(sprintf("Models '%s' created at '%s' " . PHP_EOL, $orginalModelName, $path));
         }
     }
 
@@ -135,20 +138,20 @@ class MakeModel extends BaseCommand
         $extendNamespace = $extendNamespace === $namespace ? '' : $extendNamespace;
         $content = FormatFileContent::createObject();
 
-        $content->addItem('<?php'.PHP_EOL);
-        $content->addItem(PHP_EOL.sprintf(
+        $content->addItem('<?php' . PHP_EOL);
+        $content->addItem(PHP_EOL . sprintf(
                 '/** Model file generated at %s on %s by PowerOrm(%s)*/',
                 date('h:m:i'),
                 date('D, jS F Y'),
                 POWERORM_VERSION
-            ).PHP_EOL);
+            ) . PHP_EOL);
 
         if ($namespace) {
-            $content->addItem(sprintf('namespace %s;', $namespace).PHP_EOL);
+            $content->addItem(sprintf('namespace %s;', $namespace) . PHP_EOL);
         }
 
         if ($extendNamespace) {
-            $content->addItem(sprintf('use %s;', $extendNamespace).PHP_EOL);
+            $content->addItem(sprintf('use %s;', $extendNamespace) . PHP_EOL);
         }
 
         $content->addItem('/**');
@@ -156,7 +159,6 @@ class MakeModel extends BaseCommand
         $content->addItem('*/');
         $content->addItem(sprintf('class %s extends %s', ucfirst($modelName), ucfirst($extendModel)));
         $content->addItem('{');
-
         $content->addIndent();
         $content->addItem('public function unboundFields()');
         $content->addItem('{');
@@ -165,7 +167,7 @@ class MakeModel extends BaseCommand
         $content->addItem('return [];');
         $content->reduceIndent();
 
-        $content->addItem('}'.PHP_EOL);
+        $content->addItem('}' . PHP_EOL);
         $content->reduceIndent();
         $content->addItem('}');
 

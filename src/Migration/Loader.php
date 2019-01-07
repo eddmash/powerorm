@@ -10,10 +10,10 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\BaseObject;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppInterface;
-use Eddmash\PowerOrm\Backends\ConnectionInterface;
 use Eddmash\PowerOrm\Exception\AmbiguityError;
 use Eddmash\PowerOrm\Exception\ClassNotFoundException;
 use Eddmash\PowerOrm\Exception\KeyError;
@@ -41,7 +41,7 @@ class Loader extends BaseObject
      * Loader constructor.
      *
      * @param ConnectionInterface|null $connection
-     * @param bool                     $loadGraph
+     * @param bool $loadGraph
      *
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
@@ -138,7 +138,7 @@ class Loader extends BaseObject
             }
             $shortName = ClassHelper::getNameFromNs(
                 $name,
-                $app->getNamespace()."\Migrations"
+                $app->getNamespace() . "\Migrations"
             );
 
             if (StringHelper::startsWith($name, $prefix) ||
@@ -150,7 +150,7 @@ class Loader extends BaseObject
         if (count($migrations) > 1) {
             throw new AmbiguityError(
                 sprintf(
-                    'There is more than one '.
+                    'There is more than one ' .
                     "migration with the prefix '%s'",
                     $prefix
                 )
@@ -236,7 +236,7 @@ class Loader extends BaseObject
                 if (!$foundClass) {
                     throw new ClassNotFoundException(
                         sprintf(
-                            'The class [ %2$s\\%1$s or \\%1$s ] '.
+                            'The class [ %2$s\\%1$s or \\%1$s ] ' .
                             'could not be located',
                             $className,
                             $component->getNamespace()
@@ -291,7 +291,7 @@ class Loader extends BaseObject
         $last_version = basename($last_version);
         $last_version = preg_split('/_/', $last_version)[0];
 
-        return (int) $last_version;
+        return (int)$last_version;
     }
 
     /**

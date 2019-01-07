@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the powercomponents package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -45,7 +45,8 @@ class Node implements \Countable
         $children = null,
         $connector = null,
         $negated = false
-    ) {
+    )
+    {
         return new static($children, $connector, $negated);
     }
 

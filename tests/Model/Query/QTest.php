@@ -1,17 +1,28 @@
 <?php
+/**
+ * This file is part of the powerorm package.
+ *
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Eddmash\PowerOrm\Tests\Model\Query;
 
-use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
-use const Eddmash\PowerOrm\Model\Query\Expression\OR_CONNECTOR;
 use Eddmash\PowerOrm\Model\Query\Q;
 use PHPUnit\Framework\TestCase;
+use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
+use const Eddmash\PowerOrm\Model\Query\Expression\OR_CONNECTOR;
 
 /**
- * Created by PhpStorm.
- * User: edd
- * Date: 10/4/18
- * Time: 7:53 AM.
+ *
+ * This file is part of the powerorm package.
+ *
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 class QTest extends TestCase
 {

@@ -12,8 +12,8 @@
 namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Types\Type;
-use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\Backends\ConnectionInterface;
+use Eddmash\PowerOrm\Checks\CheckError;
 
 /**
  * A fixed-precision decimal number. SQl column DECIMAL(M,D).

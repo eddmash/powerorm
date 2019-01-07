@@ -53,7 +53,7 @@ class SchemaEditor extends BaseObject
 
     /**
      * @param ConnectionInterface $connection
-     * @param bool                $getSql
+     * @param bool $getSql
      */
     public function __construct(ConnectionInterface $connection, $getSql = false)
     {
@@ -74,7 +74,8 @@ class SchemaEditor extends BaseObject
     public static function createObject(
         ConnectionInterface $connection,
         $getSql = false
-    ) {
+    )
+    {
         return new static($connection, $getSql);
     }
 
@@ -169,7 +170,7 @@ class SchemaEditor extends BaseObject
     /**
      * Renames the table a model points to.
      *
-     * @param Model  $model
+     * @param Model $model
      * @param string $oldDbTableName
      * @param string $newDbTableName
      *
@@ -339,9 +340,9 @@ class SchemaEditor extends BaseObject
      * Requires a copy of the old field as well so we can only perform changes that are required.
      * If strict is true, raises errors if the old column does not match old_field precisely.
      *
-     * @param Model      $model
-     * @param Field      $oldField
-     * @param Field      $newField
+     * @param Model $model
+     * @param Field $oldField
+     * @param Field $newField
      * @param bool|false $strict
      *
      * @throws ValueError
@@ -357,7 +358,7 @@ class SchemaEditor extends BaseObject
         if ((is_null($oldType) && is_null($oldField->relation)) || (is_null($newType) && is_null($newField->relation))) {
             throw new ValueError(
                 sprintf(
-                    'Cannot alter field %s into %s - they do not properly define '.
+                    'Cannot alter field %s into %s - they do not properly define ' .
                     'db_type (are you using a badly-written custom field?)',
                     $newField->getName(),
                     $oldField->getName()
@@ -384,7 +385,7 @@ class SchemaEditor extends BaseObject
         } elseif (is_null($oldType) && is_null($newType)) {
             throw new  ValueError(
                 sprintf(
-                    'Cannot alter field %s into %s - they are not compatible types '.
+                    'Cannot alter field %s into %s - they are not compatible types ' .
                     '(you cannot alter to or from M2M fields, or add or remove through= on M2M fields)',
                     $oldField->getName(),
                     $newField->getName()
@@ -397,9 +398,9 @@ class SchemaEditor extends BaseObject
     /**
      * Alters M2Ms to repoint their to= endpoints.
      *
-     * @param Model      $model
-     * @param Field      $oldField
-     * @param Field      $newField
+     * @param Model $model
+     * @param Field $oldField
+     * @param Field $newField
      * @param bool|false $strict
      *
      * @since  1.1.0
@@ -425,7 +426,7 @@ class SchemaEditor extends BaseObject
      * @param Model $model
      * @param Field $oldField
      * @param Field $newField
-     * @param bool  $strict
+     * @param bool $strict
      *
      * @throws ValueError
      * @throws \Doctrine\DBAL\DBALException
@@ -635,7 +636,7 @@ class SchemaEditor extends BaseObject
     }
 
     /**
-     * @param Field      $field
+     * @param Field $field
      * @param bool|false $includeDefault
      *
      * @return array
@@ -744,7 +745,7 @@ class SchemaEditor extends BaseObject
 
     /**
      * @param string $table
-     * @param string $type  accepts (unique, primary_key, index) as values
+     * @param string $type accepts (unique, primary_key, index) as values
      *
      * @return Index[]
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
@@ -777,7 +778,7 @@ class SchemaEditor extends BaseObject
 
     public function addSql($sql)
     {
-        foreach ((array) $sql as $query) {
+        foreach ((array)$sql as $query) {
             $this->sqls[] = $query;
         }
     }
@@ -823,7 +824,7 @@ class SchemaEditor extends BaseObject
     /**
      * Renames a given table to another name.
      *
-     * @param string $name    the current name of the table
+     * @param string $name the current name of the table
      * @param string $newName the new name of the table
      *
      * @throws \Doctrine\DBAL\DBALException

@@ -27,13 +27,13 @@ Then, require the vendor/autoload.php file to enable the autoloading mechanism p
 application won't be able to find the classes of Powerform.
 
 .. toctree::
-   :maxdepth: 2
+:maxdepth: 2
 
-   form
-   form_api
-   fields
-   widgets
-   modelform
-   validations
-   validators
-   example
+       form
+       form_api
+       fields
+       widgets
+       modelform
+       validations
+       validators
+       example

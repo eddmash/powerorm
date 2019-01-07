@@ -35,7 +35,7 @@ class In extends BaseLookup
             $placeholders = implode(', ', array_fill(null, $element, '?'));
 
             return [sprintf('(%s)', $placeholders),
-                $this->prepareLookupForDb($this->rhs, $connection), ];
+                $this->prepareLookupForDb($this->rhs, $connection),];
         } else {
             return parent::processRHS($compiler, $connection);
         }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file is part of the powercomponents package.
+ * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
  *
@@ -92,7 +92,8 @@ class CombinedExpression extends BaseExpression
         $reuse = null,
         $summarize = false,
         $forSave = false
-    ) {
+    )
+    {
         $obj = parent::resolveExpression(
             $resolver,
             $allowJoins,

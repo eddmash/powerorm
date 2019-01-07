@@ -1,9 +1,12 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: edd
- * Date: 12/28/17
- * Time: 10:36 AM.
+ *
+ * This file is part of the powerorm package.
+ *
+ * (c) Eddilbert Macharia <edd.cowan@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Eddmash\PowerOrm\Components;
@@ -27,12 +30,12 @@ abstract class AppComponent extends Component implements AppInterface
 
     public function getModelsPath()
     {
-        return dirname($this->getFileName()).'/Models';
+        return dirname($this->getFileName()) . '/Models';
     }
 
     public function getMigrationsPath()
     {
-        return dirname($this->getFileName()).'/Migrations';
+        return dirname($this->getFileName()) . '/Migrations';
     }
 
     public function getDbPrefix()
