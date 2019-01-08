@@ -64,7 +64,7 @@ class OneToManyDescriptor extends BaseDescriptor implements RelationDescriptor
             eval($class);
         }
 
-        $manager = O2MManager::createObject(
+        return O2MManager::createObject(
             [
                 'model' => $model,
                 'rel' => $this->field->relation,
@@ -72,7 +72,5 @@ class OneToManyDescriptor extends BaseDescriptor implements RelationDescriptor
                 'reverse' => true,
             ]
         );
-
-        return $manager;
     }
 }

@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
 use Eddmash\PowerOrm\Exception\AttributeError;
+use Eddmash\PowerOrm\Exception\NotImplemented;
 use Eddmash\PowerOrm\Exception\RelatedObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
@@ -181,7 +182,8 @@ class ManyToOneDescriptor extends BaseDescriptor implements PrefetchInterface
      */
     public function getPrefetchQueryset(array $instances, QuerysetInterface $queryset = null): array
     {
-        // TODO: Implement getPrefetchQueryset() method.
+        // todo implement
+        throw new NotImplemented();
     }
 
     public function isCached(Model $instance)

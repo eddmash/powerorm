@@ -12,10 +12,18 @@
 
 namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
+use Eddmash\PowerOrm\Model\Manager\ManagerInterface;
 use Eddmash\PowerOrm\Model\Model;
 
 interface RelationDescriptor
 {
+    /**
+     * @param Model $modelInstance
+     *
+     * @return ManagerInterface
+     *
+     * @author Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
+     */
     public function getManager(Model $modelInstance);
 
 //    public function isCached(Model $model): bool;

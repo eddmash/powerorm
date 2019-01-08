@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Model;
 
 use Eddmash\PowerOrm\DeConstructableInterface;
+use Eddmash\PowerOrm\Model\Manager\BaseManager;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
 /**
@@ -28,7 +29,7 @@ interface ModelInterface extends DeConstructableInterface
      *
      * @param Model $modelInstance
      *
-     * @return Queryset
+     * @return BaseManager
      *
      * @internal param array $conditions
      *

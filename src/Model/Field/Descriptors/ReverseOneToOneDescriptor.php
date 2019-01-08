@@ -17,7 +17,7 @@ use Eddmash\PowerOrm\Exception\RelatedObjectDoesNotExist;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
 
-class ReverseOneToOneDescriptor extends BaseDescriptor
+class ReverseOneToOneDescriptor extends BaseDescriptor implements RelationDescriptor
 {
     /** @var RelatedField */
     protected $field;
@@ -35,7 +35,7 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
                 $filterArgs = $this->field->getForwardRelatedFilter($modelInstance);
 
                 try {
-                    $relObj = $this->getQueryset($modelInstance)->get($filterArgs);
+                    $relObj = $this->getManager($modelInstance)->get($filterArgs);
                     $relObj->{$this->field->getCacheName()} = $modelInstance;
                 } catch (ObjectDoesNotExist $exception) {
                     $relObj = null;
@@ -85,7 +85,7 @@ class ReverseOneToOneDescriptor extends BaseDescriptor
         }
     }
 
-    private function getQueryset($modelInstance)
+    public function getManager(Model $modelInstance)
     {
         $relModel = $this->field->relation->getFromModel();
 

@@ -37,7 +37,7 @@ use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
-use Eddmash\PowerOrm\Model\Query\Queryset;
+use Eddmash\PowerOrm\Model\Manager\ManagerInterface;
 use Eddmash\PowerOrm\Serializer\SimpleObjectSerializer;
 use Eddmash\PowerOrm\Signals\Signal;
 use JsonSerializable;
@@ -1419,13 +1419,13 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     /**
      * @param Model|null $modelInstance
      *
-     * @return Queryset
+     * @return ManagerInterface
      *
      * @since  1.1.0
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function objects(self $modelInstance = null)
+    public static function objects(Model $modelInstance = null)
     {
         $manager = static::getManagerClass();
         if (is_null($modelInstance)) {

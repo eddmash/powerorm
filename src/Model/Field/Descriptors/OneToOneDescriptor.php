@@ -24,7 +24,7 @@ namespace Eddmash\PowerOrm\Model\Field\Descriptors;
  *
  * }
  *
- * ``restaurant->place`` is a ``ForwardOneToOneDescriptor`` instance.
+ * ``restaurant->place`` is a ``ManyToOneDescriptor`` instance which returns an object instead of a manager
  *
  * @since  1.1.0
  *

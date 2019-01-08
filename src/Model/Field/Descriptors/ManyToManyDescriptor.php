@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Manager\M2MManager;
+use Eddmash\PowerOrm\Model\Manager\ManagerInterface;
 use Eddmash\PowerOrm\Model\Model;
 
 class ManyToManyDescriptor extends BaseDescriptor implements RelationDescriptor
@@ -34,7 +35,7 @@ class ManyToManyDescriptor extends BaseDescriptor implements RelationDescriptor
     /**
      * {@inheritdoc}
      */
-    public function getManager(Model $modelInstance, $reverse = false)
+    public function getManager(Model $modelInstance, $reverse = false): ManagerInterface
     {
         if ($this->reverse) {
             $model = $this->field->getRelatedModel();
