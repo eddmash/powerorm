@@ -30,10 +30,10 @@ class F extends Combinable implements ResolvableExpInterface
      * model field.
      *
      * @param ExpResolverInterface $resolver
-     * @param bool $allowJoins
-     * @param null $reuse
-     * @param bool $summarize
-     * @param bool $forSave
+     * @param bool                 $allowJoins
+     * @param null                 $reuse
+     * @param bool                 $summarize
+     * @param bool                 $forSave
      *
      * @return
      *
@@ -47,8 +47,7 @@ class F extends Combinable implements ResolvableExpInterface
         $reuse = null,
         $summarize = false,
         $forSave = false
-    )
-    {
+    ) {
         return $resolver->resolveExpression(
             $this->name,
             $allowJoins,

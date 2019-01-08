@@ -188,10 +188,10 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
      * model field.
      *
      * @param ExpResolverInterface $resolver
-     * @param bool $allowJoins
-     * @param null $reuse
-     * @param bool $summarize
-     * @param bool $forSave
+     * @param bool                 $allowJoins
+     * @param null                 $reuse
+     * @param bool                 $summarize
+     * @param bool                 $forSave
      *
      * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
      *
@@ -203,8 +203,7 @@ abstract class BaseExpression extends Combinable implements ResolvableExpInterfa
         $reuse = null,
         $summarize = false,
         $forSave = false
-    )
-    {
+    ) {
         $obj = clone $this;
         $obj->copied = true;
 

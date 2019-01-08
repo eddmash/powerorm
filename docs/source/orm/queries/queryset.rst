@@ -68,6 +68,19 @@ Multiple parameters are joined via AND in the underlying SQL statement.
 If you need to execute more complex queries (for example, queries with OR statements),
 you can use :ref:`Q objects<queryset_q_object>`.
 
+like in the example below the :ref:`not_() helper<helper_not>` and :ref:`or_() helper<helper_or>`
+are used to make :ref:`Q objects<queryset_q_object>` used in querying for blogs whose id is not `1`
+and name contains `president` or `chancellor`
+
+.. code-block:: php
+
+    Blog::objects()
+    ->filter(
+        not_(['name' => 1])
+        ->or_(['name__icontains' => 'president'])
+        ->or_(['name__icontains' => 'chancellor'])
+    )
+    ->limit(0, 5);
 
 .. _queryset_exclude:
 
@@ -285,6 +298,42 @@ This will generate two queries
     // in this case they were 5 countries
     SELECT `app_city`.`name`, `app_city`.`population`, `app_city`.`country_id`, `app_city`.`id`
     FROM `app_city`  WHERE `app_city`.`country_id` IN (?, ?, ?, ?, ?)
+
+You can use the `Prefetch object` to further control the prefetch operation.
+
+In its simplest form `Prefetch` is equivalent to the traditional string based lookups:
+
+For example you may want to prefetch cities with a population greater that 10,000
+
+You can provide a custom queryset with the optional queryset argument. This can be used to change
+the default ordering of the queryset:
+
+.. code-block:: php
+
+    use function Eddmash\PowerOrm\Model\Query\Expression\prefetch_;
+
+    $cityQueryset = City::objects()->filter(['population__gt'=>10000]);
+    $countrys = Country::objects()->prefetchRelated([prefetch_('city_set', $cityQueryset)])->all();
+
+We use the :ref:`prefetch_ helper<helper_prefetch>` to make the `Prefetch object`.
+
+You can also assign the prefetched result to a custom attribute with the optional ``to_attr`` argument.
+The result will be stored directly in a array.
+
+This allows prefetching the same relation multiple times with a different QuerySet; for instance:
+
+.. code-block:: php
+
+    use function Eddmash\PowerOrm\Model\Query\Expression\prefetch_;
+
+    $cityQueryset = City::objects()->filter(['population__gt'=>10000]);
+    $countrys = Country::objects()
+    ->prefetchRelated([
+            prefetch_('city_set'), // this will be accessible via city_set
+            prefetch_('city_set', $cityQueryset, 'highest_population') // this will be accesible via highest_population
+    ])->all();
+
+Accessing ``highest_population`` returns an array.
 
 Methods that do not return QuerySets
 ------------------------------------
@@ -580,6 +629,8 @@ A `Q` object, like an :ref:`F object<expression_f>`, encapsulates a SQL expressi
 can be used in database-related operations.
 
 In general, `Q` objects make it possible to define and reuse conditions.
+
+.. _queryset_prefech_object:
 
 Prefetch objects
 ..................

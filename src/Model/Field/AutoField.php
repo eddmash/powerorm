@@ -67,7 +67,7 @@ class AutoField extends Field
     }
 
     /**
-     * @param string $field
+     * @param string                        $field
      * @param \Eddmash\PowerOrm\Model\Model $model
      *
      * @throws \Eddmash\PowerOrm\Exception\FieldError

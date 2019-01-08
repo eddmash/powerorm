@@ -406,3 +406,4 @@ This example retrieves all Blog objects which have at least one Entry whose head
     queryset
     manager
     expressions
+    helpers

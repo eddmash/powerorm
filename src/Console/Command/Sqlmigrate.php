@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia <edd.cowan@gmail.com>
@@ -34,13 +33,13 @@ class Sqlmigrate extends BaseCommand
     {
         parent::configure();
         $this->setDescription(
-            'Prints the SQL statements for ' .
+            'Prints the SQL statements for '.
             'the named migration.'
         )
             ->addArgument(
                 'app_label',
                 InputArgument::REQUIRED,
-                'App label of the application containing' .
+                'App label of the application containing'.
                 ' the migration.'
             )
             ->addArgument(
@@ -51,13 +50,13 @@ class Sqlmigrate extends BaseCommand
                 'backward',
                 null,
                 InputOption::VALUE_NONE,
-                'Creates SQL to unapply the migration,' .
+                'Creates SQL to unapply the migration,'.
                 ' rather than to apply it'
             );
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @return \Eddmash\PowerOrm\Exception\NotImplemented|void
@@ -106,7 +105,7 @@ class Sqlmigrate extends BaseCommand
         } catch (AmbiguityError $e) {
             throw new CommandError(
                 sprintf(
-                    "More than one migration matches '%s' in " .
+                    "More than one migration matches '%s' in ".
                     "app '%s'. Please be more specific.",
                     $migrationName,
                     $appName
@@ -115,7 +114,7 @@ class Sqlmigrate extends BaseCommand
         } catch (KeyError $e) {
             throw new CommandError(
                 sprintf(
-                    "Cannot find a migration matching '%s' " .
+                    "Cannot find a migration matching '%s' ".
                     "from app '%s'.",
                     $migrationName,
                     $appName

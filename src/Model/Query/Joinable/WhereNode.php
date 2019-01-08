@@ -25,8 +25,7 @@ class WhereNode extends Node implements SqlCompilableinterface, CloneInterface
     public function asSql(
         CompilerInterface $compiler,
         ConnectionInterface $connection
-    )
-    {
+    ) {
         $whereSql = [];
         $whereParams = [];
 

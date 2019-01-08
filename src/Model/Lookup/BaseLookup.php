@@ -107,8 +107,7 @@ abstract class BaseLookup implements LookupInterface
     public function processLHS(
         CompilerInterface $compiler,
         ConnectionInterface $connection
-    )
-    {
+    ) {
         return $compiler->compile($this->lhs);
     }
 

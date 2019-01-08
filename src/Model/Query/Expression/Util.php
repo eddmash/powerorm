@@ -11,7 +11,6 @@
 
 namespace Eddmash\PowerOrm\Model\Query\Expression;
 
-use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Aggregates\Avg;
 use Eddmash\PowerOrm\Model\Query\Aggregates\Count;
 use Eddmash\PowerOrm\Model\Query\Aggregates\Max;
@@ -20,6 +19,7 @@ use Eddmash\PowerOrm\Model\Query\Aggregates\Sum;
 use Eddmash\PowerOrm\Model\Query\Prefetch;
 use Eddmash\PowerOrm\Model\Query\Q;
 use Eddmash\PowerOrm\Model\Query\Queryset;
+use Eddmash\PowerOrm\Model\Query\QuerysetInterface;
 
 const AND_CONNECTOR = 'AND';
 const OR_CONNECTOR = 'OR';
@@ -200,13 +200,13 @@ function value_($name)
 }
 
 /**
- * @param Model[] $instances
- * @param Prefetch|array $lookups
+ * @param string                 $lookups
+ * @param QuerysetInterface|null $queryset
+ * @param string|null            $toAttr
  *
- * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
- * @throws \Eddmash\PowerOrm\Exception\ValueError
+ * @return Prefetch
  */
-function prefetchRelatedObjects_(array $instances, $lookups)
+function prefetch_(string $lookups, QuerysetInterface $queryset = null, string $toAttr = null)
 {
-    Prefetch::prefetchRelatedObjects($instances, $lookups);
+    return new Prefetch($lookups, $queryset, $toAttr);
 }

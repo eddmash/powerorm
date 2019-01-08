@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia <edd.cowan@gmail.com>
@@ -19,7 +18,7 @@ interface PrefetchInterface
     /**
      * Returns a queryset to be used to perform querysets.
      *
-     * @param array $instances
+     * @param array                  $instances
      * @param QuerysetInterface|null $queryset
      *
      * @return array containing the following:

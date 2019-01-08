@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia <edd.cowan@gmail.com>
@@ -19,7 +18,7 @@ class Order extends Model
     {
         return [
             'products' => Model::ManyToManyField(['to' => Product::class,
-                'through' => OrderItem::class,]),
+                'through' => OrderItem::class, ]),
             'buyer' => Model::ForeignKey(['to' => User::class]),
             'date' => Model::DateField(['autoAddNow' => true]),
         ];

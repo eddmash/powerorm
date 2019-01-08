@@ -16,7 +16,6 @@ use const Eddmash\PowerOrm\Model\Query\Expression\AND_CONNECTOR;
 use const Eddmash\PowerOrm\Model\Query\Expression\OR_CONNECTOR;
 
 /**
- *
  * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia <edd.cowan@gmail.com>

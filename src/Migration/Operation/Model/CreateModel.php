@@ -104,7 +104,7 @@ class CreateModel extends ModelOperation
      * replaced with or a boolean that indicates whether or not the specified
      * operation can be optimized across.
      *
-     * @param Operation $operation
+     * @param Operation   $operation
      * @param Operation[] $inBetween
      *
      * @return mixed

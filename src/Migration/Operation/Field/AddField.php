@@ -61,8 +61,7 @@ class AddField extends FieldOperation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
 
         /* @var $field Field */
@@ -88,8 +87,7 @@ class AddField extends FieldOperation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $fromModel = $fromState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)) {
             $schemaEditor->removeField(

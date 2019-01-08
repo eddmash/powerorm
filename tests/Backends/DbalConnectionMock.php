@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia <edd.cowan@gmail.com>
@@ -54,7 +53,7 @@ class DbalConnectionMock extends Connection
     public function quote($input, $type = null)
     {
         if (is_string($input)) {
-            return "'" . $input . "'";
+            return "'".$input."'";
         }
         return $input;
     }

@@ -60,7 +60,7 @@ class Showmigrations extends BaseCommand
                     $indicator = '<fg=yellow>(pending)</>';
                 }
                 $output->writeln(
-                    str_pad(' ', 2, ' ') .
+                    str_pad(' ', 2, ' ').
                     sprintf(
                         '%1$s %2$s',
                         $indicator,

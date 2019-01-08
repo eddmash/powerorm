@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia <edd.cowan@gmail.com>
@@ -30,12 +29,12 @@ abstract class AppComponent extends Component implements AppInterface
 
     public function getModelsPath()
     {
-        return dirname($this->getFileName()) . '/Models';
+        return dirname($this->getFileName()).'/Models';
     }
 
     public function getMigrationsPath()
     {
-        return dirname($this->getFileName()) . '/Migrations';
+        return dirname($this->getFileName()).'/Migrations';
     }
 
     public function getDbPrefix()

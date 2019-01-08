@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * This file is part of the powerorm package.
  *
  * (c) Eddilbert Macharia <edd.cowan@gmail.com>
@@ -51,8 +50,7 @@ class Ref extends BaseExpression
     public function asSql(
         CompilerInterface $compiler,
         ConnectionInterface $connection
-    )
-    {
+    ) {
         return [sprintf('%s ', $this->name), []];
     }
 
@@ -65,8 +63,7 @@ class Ref extends BaseExpression
         $reuse = null,
         $summarize = false,
         $forSave = false
-    )
-    {
+    ) {
         return $this;
     }
 

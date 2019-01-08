@@ -54,8 +54,7 @@ class RemoveField extends FieldOperation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $fromModel = $fromState->getRegistry()->getModel($this->modelName);
 
         if ($this->allowMigrateModel($schemaEditor->connection, $fromModel)) {
@@ -73,8 +72,7 @@ class RemoveField extends FieldOperation
         SchemaEditor $schemaEditor,
         ProjectState $fromState,
         ProjectState $toState
-    )
-    {
+    ) {
         $toModel = $toState->getRegistry()->getModel($this->modelName);
         if ($this->allowMigrateModel($schemaEditor->connection, $toModel)) {
             $fromModel = $fromState->getRegistry()->getModel($this->modelName);

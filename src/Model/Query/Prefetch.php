@@ -18,7 +18,6 @@ use Eddmash\PowerOrm\Exception\ObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
-use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Manager\ManagerInterface;
 use Eddmash\PowerOrm\Model\Model;
@@ -49,9 +48,9 @@ class Prefetch
     /**
      * Prefetch constructor.
      *
-     * @param string $lookups
+     * @param string        $lookups
      * @param Queryset|null $queryset
-     * @param string|null $toAttr
+     * @param string|null   $toAttr
      *
      * @throws ValueError
      */
@@ -60,15 +59,15 @@ class Prefetch
         $this->prefetchTo = $lookups;
         $this->prefetchThrough = $lookups;
 
-        // we are mapping this prefetches to models so ensure we have an Model mapper
-        if (!is_null($queryset) &&
-            !is_subclass_of($queryset->getMapper(), ModelMapper::class)) {
+        // we are mapping this prefetches to models so ensure we have a Model mapper
+        $mapper = $queryset->getMapper();
+        if ($queryset && !$mapper instanceof ModelMapper) {
             throw new ValueError('Prefetch querysets cannot use asArray().');
         }
 
         if ($toAttr) {
             //todo
-            //            $this->prefetchTo =
+            $this->prefetchTo = $toAttr;
         }
         $this->queryset = $queryset;
 
@@ -82,7 +81,7 @@ class Prefetch
     /**
      * Perform the actual fetching of related objects by level.
      *
-     * @param array $instances
+     * @param array             $instances
      * @param PrefetchInterface $prefetcher
      * @param $lookup
      * @param $level
@@ -288,20 +287,15 @@ class Prefetch
      * Populate prefetched object caches for a list of model instances based on
      * the lookups/Prefetch instances given.
      *
-     * @param Model[] $instances
+     * @param Model[]        $instances
      * @param Prefetch|array $lookups
      *
+     * @throws AttributeError
+     * @throws KeyError
      * @throws ValueError
-     * @throws \Eddmash\PowerOrm\Exception\InvalidArgumentException
      */
-    public static function prefetchRelatedObjects(array $instances, $lookups)
+    public static function prefetchRelatedObjects(array $instances, array $lookups)
     {
-        if (!$lookups instanceof Prefetch) {
-            $msg = sprintf("method '%s()' expects parameter 'lookup' to be an array",
-                __FUNCTION__);
-            Tools::ensureParamIsArray($lookups, $msg);
-        }
-
         if (!$instances) {
             return;
         }
@@ -324,7 +318,7 @@ class Prefetch
                 if ($lookup->queryset) {
                     throw new ValueError(
                         sprintf(
-                            "'%s' lookup was already seen with a different queryset. " .
+                            "'%s' lookup was already seen with a different queryset. ".
                             'You may need to adjust the ordering of your lookups.',
                             $lookup->prefetchTo
                         )
@@ -387,7 +381,7 @@ class Prefetch
 
                 if (!$attrFound) {
                     throw new AttributeError(
-                        sprintf("Cannot find '%s' on %s object, '%s' is an invalid " .
+                        sprintf("Cannot find '%s' on %s object, '%s' is an invalid ".
                             'parameter to prefetch_related()', $throughtAttr,
                             $oneObject->getMeta()->getModelName()));
                 }

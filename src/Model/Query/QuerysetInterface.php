@@ -54,10 +54,10 @@ interface QuerysetInterface extends \IteratorAggregate, \ArrayAccess, \Countable
      *
      * The orm does not try map the into  there  respective models.
      *
-     * @param array $fields the fields to select, if null all fields in the
+     * @param array $fields     the fields to select, if null all fields in the
      *                          model are selected
-     * @param bool $valuesOnly if true return
-     * @param bool $flat if true returns the results as one array others
+     * @param bool  $valuesOnly if true return
+     * @param bool  $flat       if true returns the results as one array others
      *                          it returns results as array of arrays each
      *                          which represents a record in the database for the
      *                          selected field.

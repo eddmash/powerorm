@@ -45,8 +45,7 @@ class Node implements \Countable
         $children = null,
         $connector = null,
         $negated = false
-    )
-    {
+    ) {
         return new static($children, $connector, $negated);
     }
 

@@ -276,8 +276,8 @@ class SqlFetchCompiler extends SqlCompiler
      * Returns the fields in the current models/those represented by the alias as Col expression, which know how to be
      * used in a query.
      *
-     * @param null $startAlias
-     * @param Meta|null $meta
+     * @param null       $startAlias
+     * @param Meta|null  $meta
      * @param Model|null $fromParent
      *
      * @return Col[]
@@ -325,11 +325,11 @@ class SqlFetchCompiler extends SqlCompiler
      * Used to get information needed when we are doing selectRelated(),.
      *
      * @param           $select
-     * @param Meta|null $meta the from which we expect to find the related fields
-     * @param null $rootAlias
-     * @param int $curDepth
-     * @param null $requested the set of fields to use in selectRelated
-     * @param null $restricted true when we are to use just a set of relationship fields
+     * @param Meta|null $meta       the from which we expect to find the related fields
+     * @param null      $rootAlias
+     * @param int       $curDepth
+     * @param null      $requested  the set of fields to use in selectRelated
+     * @param null      $restricted true when we are to use just a set of relationship fields
      *
      * @return array
      *
@@ -346,8 +346,7 @@ class SqlFetchCompiler extends SqlCompiler
         $curDepth = 1,
         $requested = null,
         $restricted = null
-    )
-    {
+    ) {
         $relatedKlassInfo = [];
 
         if (!$restricted && $this->query->maxDepth && $curDepth > $this->query->maxDepth) {
@@ -383,7 +382,7 @@ class SqlFetchCompiler extends SqlCompiler
                     if ($nextSpanField || in_array($field->getName(), $requested)) {
                         throw new FieldError(
                             sprintf(
-                                "Non-relational field given in selectRelated: '%s'. " .
+                                "Non-relational field given in selectRelated: '%s'. ".
                                 'Choices are: %s',
                                 $field->getName(),
                                 implode(', ', $this->query->getFieldChoices())
@@ -667,7 +666,7 @@ class SqlFetchCompiler extends SqlCompiler
      * Creates the SQL for this query. Returns the SQL string and list of parameters.
      *
      * @param CompilerInterface $compiler
-     * @param Connection $connection
+     * @param Connection        $connection
      *
      * @return array
      *
@@ -681,8 +680,7 @@ class SqlFetchCompiler extends SqlCompiler
     public function asSql(
         CompilerInterface $compiler = null,
         ConnectionInterface $connection = null
-    )
-    {
+    ) {
         list($orderBy, $groupBy) = $this->preSqlSetup();
         $params = [];
         $distinctFields = $this->getDistinct();
@@ -769,10 +767,10 @@ class SqlFetchCompiler extends SqlCompiler
      * Col expression suitable for making queries.
      *
      * @param        $col
-     * @param Meta $meta
-     * @param null $alias
+     * @param Meta   $meta
+     * @param null   $alias
      * @param string $defaultOrder
-     * @param array $alreadyResolved helps avoid infinite loops
+     * @param array  $alreadyResolved helps avoid infinite loops
      *
      * @return array
      *
@@ -790,8 +788,7 @@ class SqlFetchCompiler extends SqlCompiler
         $alias = null,
         $defaultOrder = 'ASC',
         &$alreadyResolved = []
-    )
-    {
+    ) {
         list($col, $order) = Query::getOrderDirection($col, $defaultOrder);
 
         $nameParts = explode(BaseLookup::LOOKUP_SEPARATOR, $col);

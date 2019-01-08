@@ -78,7 +78,7 @@ class CharField extends Field
             return $value;
         }
 
-        return (string)$value;
+        return (string) $value;
     }
 
     /**

@@ -255,8 +255,8 @@ class Meta extends DeconstructableObject implements MetaInterface
         if (!$this->registry->ready) {
             throw new FieldDoesNotExist(
                 sprintf(
-                    "%s has no field named %s. The App registry isn't" .
-                    ' ready yet, so if this is an autoCreated ' .
+                    "%s has no field named %s. The App registry isn't".
+                    ' ready yet, so if this is an autoCreated '.
                     "related field, it won't  be available yet.",
                     $this->getNSModelName(),
                     $name
@@ -420,7 +420,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      * Add the current object to the passed in object.
      *
      * @param string $propertyName the name map the current object to, in the class object passed in
-     * @param Model $classObject the object to attach the current object to
+     * @param Model  $classObject  the object to attach the current object to
      *
      * @since  1.1.0
      *
