@@ -60,15 +60,15 @@ abstract class DeconstructableObject extends BaseObject implements DeConstructab
 
     public function __debugInfo()
     {
-        $meta = [];
-        foreach (get_object_vars($this) as $name => $value) {
-            if (in_array($name, $this->getIgnored())) {
-                continue;
-            }
-            $meta[$name] = $value;
-        }
+//        $meta = [];
+//        foreach (get_object_vars($this) as $name => $value) {
+//            if (in_array($name, $this->getIgnored())) {
+//                continue;
+//            }
+//            $meta[$name] = $value;
+//        }
 
-        return $meta;
+        return get_object_vars($this);
     }
 
     public function getIgnored()

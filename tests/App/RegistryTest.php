@@ -34,11 +34,13 @@ class RegistryTest extends PowerormTest
             BASEPATH.'/tests/TestApp/Models/OrderItem.php',
             BASEPATH.'/tests/TestApp/Models/Product.php',
             BASEPATH.'/tests/TestApp/Models/User.php',
+            BASEPATH.'/tests/TestApp/Models/MetaTestProfile.php',
+            BASEPATH.'/tests/TestApp/Models/MetaTestUser.php',
         ];
         $actual = $files[$name];
         sort($actual);
         sort($expected);
-        $this->assertCount(7, $actual);
+        $this->assertCount(9, $actual);
         $this->assertEquals($expected, $actual);
     }
 
@@ -55,6 +57,8 @@ class RegistryTest extends PowerormTest
             "Eddmash\PowerOrm\Tests\TestApp\Models\OrderItem",
             "Eddmash\PowerOrm\Tests\TestApp\Models\Product",
             "Eddmash\PowerOrm\Tests\TestApp\Models\User",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\MetaTestProfile",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\MetaTestUser",
         ];
 
         $actual = array_keys($classes);
@@ -62,7 +66,7 @@ class RegistryTest extends PowerormTest
         sort($expected);
         sort($actual);
 
-        $this->assertCount(6, $actual);
+        $this->assertCount(8, $actual);
 
         $this->assertEquals($expected, $actual);
     }
@@ -82,13 +86,15 @@ class RegistryTest extends PowerormTest
             "Eddmash\PowerOrm\Tests\TestApp\Models\OrderItem",
             "Eddmash\PowerOrm\Tests\TestApp\Models\Product",
             "Eddmash\PowerOrm\Tests\TestApp\Models\User",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\MetaTestProfile",
+            "Eddmash\PowerOrm\Tests\TestApp\Models\MetaTestUser",
         ];
 
         $actual = array_keys($classes);
         sort($expected);
         sort($actual);
 
-        $this->assertCount(7, $actual);
+        $this->assertCount(9, $actual);
         $this->assertEquals($expected, $actual);
     }
 

@@ -18,7 +18,6 @@ use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
-use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Lookup\BaseLookup;
 use Eddmash\PowerOrm\Model\Lookup\Related\RelatedExact;
@@ -39,6 +38,8 @@ use Eddmash\PowerOrm\Model\Model;
  */
 class RelatedField extends Field
 {
+    protected $inverseDescriptor;
+
     public $dbConstraint = false;
 
     /**
@@ -224,7 +225,6 @@ class RelatedField extends Field
 
         foreach ($relMeta->getFields(
             true,
-            false,
             false
         ) as $clashField) {
             $clashName = sprintf(
@@ -336,6 +336,14 @@ class RelatedField extends Field
         return $this->relation->toModel;
     }
 
+    private function getInverseDescriptor()
+    {
+        $class = $this->inverseDescriptor;
+        assert($class, 'No reverse descriptor provided');
+
+        return new $class($this);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -383,7 +391,7 @@ class RelatedField extends Field
         // attributes, mostly this is for cases where the instance has been
         // instantiated using new cls() and not
         // values for fields have been set
-        $this->scopeModel->_fieldCache[$this->getName()] = $this->getDescriptor();
+        $this->scopeModel->_valueCache[$this->getName()] = $this->getDescriptor();
     }
 
     /**
@@ -401,41 +409,11 @@ class RelatedField extends Field
         Model $relatedModel,
         ForeignObjectRel $relation
     ) {
-        $inverseFields = $relatedModel->getMeta()->getFields(
-            false,
-            true,
-            false
-        );
-        $rM = $this->relation->toModel;
-        if ($rM instanceof Model) {
-            $rM = $this->relation->toModel->getMeta()->getNSModelName();
-        }
-        $createInverse = true;
-        foreach ($inverseFields as $inverseField) {
-            $sM = $inverseField->scopeModel->getMeta()->getNSModelName();
-            if ($inverseField instanceof InverseField) {
-                if ($sM === $rM && $this->name == $inverseField->toField) {
-                    $relation->relatedName = $inverseField->getName();
-                    $inverseField->relation = $relation;
-                    $createInverse = false;
-                    break;
-                }
-            }
-        }
-        if (!$this->relation->isHidden() && $createInverse) {
-            $inverseField = $this->inverseField;
-            $hasMany = $inverseField::createObject(
-                [
-                    'to' => $this->scopeModel->getMeta()->getNSModelName(),
-                    'toField' => $relation->fromField->getName(),
-                    'fromField' => $this,
-                    'autoCreated' => true,
-                ]
-            );
-
+        if (!$this->relation->isHidden()) {
+            $inverseAccessor = $this->getInverseDescriptor();
             $relatedModel->getMeta()->getConcreteModel()->addToClass(
                 $relation->getAccessorName(),
-                $hasMany
+                $inverseAccessor
             );
         }
     }

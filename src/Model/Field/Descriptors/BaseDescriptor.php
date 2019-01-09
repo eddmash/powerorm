@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model\Field\Descriptors;
 
 use Eddmash\PowerOrm\Model\Field\Field;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
-use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Model;
 
 class BaseDescriptor implements DescriptorInterface
@@ -27,10 +26,6 @@ class BaseDescriptor implements DescriptorInterface
 
     public function __construct(Field $field)
     {
-        if ($field instanceof InverseField) {
-            $this->reverse = true;
-            $field = $field->fromField;
-        }
         $this->field = $field;
     }
 
@@ -39,7 +34,7 @@ class BaseDescriptor implements DescriptorInterface
      */
     public function getValue(Model $modelInstance)
     {
-        return $modelInstance->_fieldCache[$this->field->getAttrName()];
+        return $modelInstance->_valueCache[$this->field->getAttrName()];
     }
 
     /**
@@ -47,6 +42,11 @@ class BaseDescriptor implements DescriptorInterface
      */
     public function setValue(Model $modelInstance, $value)
     {
-        $modelInstance->_fieldCache[$this->field->getAttrName()] = $value;
+        $modelInstance->_valueCache[$this->field->getAttrName()] = $value;
+    }
+
+    public function setReverse($status)
+    {
+        $this->reverse = $status;
     }
 }

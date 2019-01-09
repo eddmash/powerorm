@@ -71,11 +71,11 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public static $managerClass;
 
     /**
-     * Holds all the fields tha belong to this model.
+     * Holds all the field values for this model.
      *
      * @var array
      */
-    public $_fieldCache = [];
+    public $_valueCache = [];
 
     public $_nonModelfields = [];
 
@@ -230,7 +230,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // instance references the same meta instance
             $this->meta = $model->getMeta();
 
-            $this->_fieldCache = $model->_fieldCache;
+            $this->_valueCache = $model->_valueCache;
         } catch (AppRegistryNotReady $exception) {
         } catch (LookupError $e) {
         }
@@ -460,7 +460,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if ($value instanceof ContributorInterface) {
             $value->contributeToClass($name, $this);
         } else {
-            $this->{$name} = $value;
+            $this->_nonModelfields[$name] = $value;
         }
     }
 
@@ -861,7 +861,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function offsetExists($offset)
     {
-        return ArrayHelper::hasKey($this->_fieldCache, $offset);
+        return ArrayHelper::hasKey($this->_valueCache, $offset);
     }
 
     /**
@@ -869,7 +869,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function offsetGet($offset)
     {
-        return $this->_fieldCache[$offset];
+        return $this->_valueCache[$offset];
     }
 
     /**
@@ -878,9 +878,9 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     public function offsetSet($offset, $value)
     {
         if (null === $offset) {
-            $this->_fieldCache[] = $value;
+            $this->_valueCache[] = $value;
         } else {
-            $this->_fieldCache[$offset] = $value;
+            $this->_valueCache[$offset] = $value;
         }
     }
 
@@ -889,7 +889,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function offsetUnset($offset)
     {
-        unset($this->_fieldCache[$offset]);
+        unset($this->_valueCache[$offset]);
     }
 
     /**
@@ -931,7 +931,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
      */
     public function unserialize($serialized)
     {
-        $this->_fieldCache = (array) unserialize((string) $serialized);
+        $this->_valueCache = (array) unserialize((string) $serialized);
     }
 
     /**
@@ -953,7 +953,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         if ('pk' === $name) {
             $pkName = $this->getMeta()->primaryKey->getAttrName();
 
-            return ArrayHelper::getValue($this->_fieldCache, $pkName);
+            return ArrayHelper::getValue($this->_valueCache, $pkName);
         }
 
         try {
@@ -968,7 +968,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             // the related user object whilst user_id returns the actual value
             // the gets put into the database.
             if ($name === $field->getAttrName()) {
-                $val = $this->_fieldCache[$name];
+                $val = $this->_valueCache[$name];
                 if (!($val instanceof DescriptorInterface)) {
                     return $val;
                 }
@@ -980,7 +980,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
                 return ArrayHelper::getValue($this->_nonModelfields, $name);
             }
             if (!ArrayHelper::hasKey(get_object_vars($this), $name) &&
-                !ArrayHelper::hasKey($this->_fieldCache, $name)) {
+                !ArrayHelper::hasKey($this->_valueCache, $name)) {
                 throw new AttributeError(
                     sprintf(
                         "AttributeError: '%s' object has no ".
@@ -996,8 +996,8 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             }
         }
 
-        if (ArrayHelper::hasKey($this->_fieldCache, $name)) {
-            return ArrayHelper::getValue($this->_fieldCache, $name);
+        if (ArrayHelper::hasKey($this->_valueCache, $name)) {
+            return ArrayHelper::getValue($this->_valueCache, $name);
         }
 
         return ArrayHelper::getValue($this->_nonModelfields, $name);
@@ -1008,7 +1008,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         // pk has a special meaning to the orm.
         if ('pk' === $name) {
             $pkName = $this->getMeta()->primaryKey->getAttrName();
-            $this->_fieldCache[$pkName] = $value;
+            $this->_valueCache[$pkName] = $value;
 
             return;
         }
@@ -1018,7 +1018,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
             $field = $this->getMeta()->getField($name);
             if ($field->getAttrName() !== $field->getName() &&
                 $field->getAttrName() === $name) {
-                $this->_fieldCache[$name] = $value;
+                $this->_valueCache[$name] = $value;
             } else {
                 $field->setValue($this, $value);
             }
@@ -1154,7 +1154,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     {
         return parent::hasProperty($name) || array_key_exists(
                 $name,
-                $this->_fieldCache
+                $this->_valueCache
             );
     }
 
@@ -1167,7 +1167,7 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         foreach ($concreteFields as $concreteField) {
             if (!array_key_exists(
                 $concreteField->getName(),
-                $this->_fieldCache
+                $this->_valueCache
             )) {
                 $deferedFields[] = $concreteField->getName();
             }
@@ -1475,20 +1475,20 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
         return [];
     }
 
-    public function __debugInfo()
-    {
-        $meta = [];
-        foreach ($this->_fieldCache as $name => $item) {
-            $meta[$name] = $item;
-        }
-        foreach ($this->_nonModelfields as $name => $item) {
-            $meta[$name] = $item;
-        }
-        $meta['__meta__'] = $this->meta;
-        $meta['__prefetchedObjectCaches__'] = $this->_prefetchedObjectCaches;
-
-        return $meta;
-    }
+//    public function __debugInfo()
+//    {
+//        $meta = [];
+//        foreach ($this->_fieldCache as $name => $item) {
+//            $meta[$name] = $item;
+//        }
+//        foreach ($this->_nonModelfields as $name => $item) {
+//            $meta[$name] = $item;
+//        }
+//        $meta['__meta__'] = $this->meta;
+//        $meta['__prefetchedObjectCaches__'] = $this->_prefetchedObjectCaches;
+//
+//        return $meta;
+//    }
 
     /**
      * Used during save.its usually invoked when saving related fields.

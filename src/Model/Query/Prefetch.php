@@ -124,7 +124,7 @@ class Prefetch
                     $instance->{$toAttr} = $val;
                 } else {
                     // so we store using the cachename
-                    $instance->_fieldCache[$cachename] = $val;
+                    $instance->_valueCache[$cachename] = $val;
                 }
             } else {
                 if ($hasAsAttr) {
@@ -204,7 +204,7 @@ class Prefetch
         // try getting the descriptor from the meta of the instance to avoid
         // invoking queries
         try {
-            $descriptor = ArrayHelper::getValue($instance->_fieldCache, $throughAttr, null);
+            $descriptor = ArrayHelper::getValue($instance->_valueCache, $throughAttr, null);
             $hasAttr = true;
 
             if ($descriptor) {

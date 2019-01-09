@@ -34,7 +34,7 @@ class ManyToManyDescriptor extends BaseDescriptor implements RelationDescriptor
     /**
      * {@inheritdoc}
      */
-    public function getManager(Model $modelInstance, $reverse = false)
+    public function getManager(Model $modelInstance)
     {
         if ($this->reverse) {
             $model = $this->field->getRelatedModel();

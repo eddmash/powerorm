@@ -106,7 +106,7 @@ class ManyToOneDescriptor extends BaseDescriptor implements PrefetchInterface
             // we need to clear it on that related object to since
             // we will be setting it to null on this side
             $relObj = ArrayHelper::getValue(
-                $modelInstance->_fieldCache,
+                $modelInstance->_valueCache,
                 $this->field->getCacheName(),
                 null
             );
@@ -118,7 +118,7 @@ class ManyToOneDescriptor extends BaseDescriptor implements PrefetchInterface
             $modelInstance->{$fromField->getAttrName()} = null;
         } else {
             // cache the value of the model
-            $modelInstance->_fieldCache[$fromField->getCacheName()] = $value;
+            $modelInstance->_valueCache[$fromField->getCacheName()] = $value;
 
             // set the attrib value e.g *_id
             $modelInstance->{$fromField->getAttrName()} = $value->{$toField->getAttrName()};

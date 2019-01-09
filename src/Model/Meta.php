@@ -23,7 +23,6 @@ use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Model\Field\AutoField;
 use Eddmash\PowerOrm\Model\Field\Field;
-use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
@@ -129,11 +128,6 @@ class Meta extends DeconstructableObject implements MetaInterface
     public $localFields = [];
 
     /**
-     * @var InverseField[]
-     */
-    public $inverseFields = [];
-
-    /**
      * Holds the model that this meta represents, the reason for this is because we have proxy models which
      * don't represent actual tables in the database.
      *
@@ -216,12 +210,11 @@ class Meta extends DeconstructableObject implements MetaInterface
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getFields($includeParents = true, $inverse = true, $reverse = true)
+    public function getFields($includeParents = true, $reverse = true)
     {
         return $this->fetchFields(
             [
                 'includeParents' => $includeParents,
-                'inverse' => $inverse,
                 'reverse' => $reverse,
             ]
         );
@@ -289,7 +282,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         $forwardFields = [];
 
         /** @var $field Field */
-        foreach ($this->fetchFields(['reverse' => false, 'inverse' => false]) as $name => $field) {
+        foreach ($this->fetchFields(['reverse' => false]) as $name => $field) {
             if (!$field->manyToMany) {
                 $forwardFields[$name] = $field;
             }
@@ -310,7 +303,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     private function getForwardOnlyField()
     {
         $fFields = [];
-        $fields = $this->fetchFields(['reverse' => false, 'inverse' => false]);
+        $fields = $this->fetchFields(['reverse' => false]);
         foreach ($fields as $field) {
             $fFields[$field->getName()] = $field;
 
@@ -323,7 +316,7 @@ class Meta extends DeconstructableObject implements MetaInterface
         return $fFields;
     }
 
-    private function getReverseOnlyField()
+    public function getReverseOnlyField()
     {
         return $this->fetchFields(['forward' => false]);
     }
@@ -382,7 +375,6 @@ class Meta extends DeconstructableObject implements MetaInterface
                 $fields = $model->getMeta()->fetchFields(
                     [
                         'includeParents' => false,
-                        'inverse' => false,
                         'reverse' => false,
                     ]
                 );
@@ -466,7 +458,7 @@ class Meta extends DeconstructableObject implements MetaInterface
     private function fetchFields($kwargs = [])
     {
         $includeHidden = false;
-        $forward = $inverse = $reverse = $includeParents = true;
+        $forward = $reverse = $includeParents = true;
         extract($kwargs);
 
         $fields = [];
@@ -485,12 +477,6 @@ class Meta extends DeconstructableObject implements MetaInterface
             }
         }
 
-        if ($inverse) {
-            foreach ($this->inverseFields as $inverseField) {
-                $fields[$inverseField->getName()] = $inverseField;
-            }
-        }
-
         if ($forward) {
             $fields = array_merge($fields, array_merge($this->localFields, $this->localManyToMany));
         }
@@ -505,8 +491,6 @@ class Meta extends DeconstructableObject implements MetaInterface
     {
         if (null != $field->relation && $field->manyToMany) {
             $this->localManyToMany[$field->getName()] = $field;
-        } elseif (null != $field->relation && $field->inverse) {
-            $this->inverseFields[$field->getName()] = $field;
         } else {
             $this->localFields[$field->getName()] = $field;
             $this->setupPrimaryKey($field);

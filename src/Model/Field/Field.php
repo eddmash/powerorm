@@ -325,7 +325,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         $this->scopeModel = $modelObject;
         $this->setFromName($fieldName);
         $this->scopeModel->getMeta()->addField($this);
-        $this->scopeModel->_fieldCache[$this->getAttrName()] = $this->getDefault();
+        $this->scopeModel->_valueCache[$this->getAttrName()] = $this->getDefault();
     }
 
     /**

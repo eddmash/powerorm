@@ -18,8 +18,6 @@ use Eddmash\PowerOrm\Helpers\StringHelper;
 use Eddmash\PowerOrm\Helpers\Tools;
 use Eddmash\PowerOrm\Migration\FormatFileContent;
 use Eddmash\PowerOrm\Model\Delete;
-use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
-use Eddmash\PowerOrm\Model\Field\Inverse\InverseField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToManyRel;
 use Eddmash\PowerOrm\Model\Meta;
@@ -121,39 +119,12 @@ class ManyToManyField extends RelatedField
      */
     public function contributeToInverseClass(Model $relatedModel, ForeignObjectRel $relation)
     {
-        $allForwardFields = $relatedModel->getMeta()->getFields(
-            false,
-            true,
-            false
-        );
-
-        $rM = $this->relation->toModel;
-        if ($rM instanceof Model) {
-            $rM = $this->relation->toModel->getMeta()->getNSModelName();
-        }
         $relName = null;
-        $createInverse = true;
-        foreach ($allForwardFields as $forwardField) {
-            $sM = $forwardField->scopeModel->getMeta()->getNSModelName();
-            if ($forwardField instanceof InverseField) {
-                if ($sM === $rM && $this->name == $forwardField->toField) {
-                    $relName = $forwardField->getName();
-                    $relation->relatedName = $relName;
-                    $createInverse = false;
-                    break;
-                }
-            }
-        }
-        if ($createInverse) {
-            $hasMany = HasManyField::createObject(
-                [
-                    'to' => $this->scopeModel->getMeta()->getNSModelName(),
-                    'toField' => $relation->fromField->getName(),
-                    'fromField' => $this,
-                    'autoCreated' => true,
-                ]
-            );
-            $relatedModel->addToClass($relation->getAccessorName(), $hasMany);
+
+        if (!$relation->isHidden()) {
+            $desc = $this->getDescriptor();
+            $desc->setReverse(true);
+            $relatedModel->addToClass($relation->getAccessorName(), $desc);
         }
 
         $this->m2mField = function () use ($relation) {
@@ -364,7 +335,7 @@ class ManyToManyField extends RelatedField
 
         $tomodel = $relation->toModel->getMeta()->getNSModelName();
         /** @var $field RelatedField */
-        foreach ($this->relation->through->getMeta()->getFields(true, false) as $field) {
+        foreach ($this->relation->through->getMeta()->getFields(true) as $field) {
             if ($field->isRelation && (is_null($linkName) || $linkName == $field->getName()) &&
                 $field->relation->toModel->getMeta()->getNSModelName() == $tomodel
             ) {

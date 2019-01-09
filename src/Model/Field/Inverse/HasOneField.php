@@ -27,6 +27,6 @@ class HasOneField extends HasManyField
      */
     public function setValue(Model $modelInstance, $value)
     {
-        $modelInstance->_fieldCache[$this->relation->getAccessorName()] = $this->getDescriptor();
+        $modelInstance->_valueCache[$this->relation->getAccessorName()] = $this->getDescriptor();
     }
 }
