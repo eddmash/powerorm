@@ -32,7 +32,7 @@ use Eddmash\PowerOrm\Model\Query\QuerysetInterface;
  *
  * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
  */
-class O2MManager extends BaseM2OManager implements PrefetchInterface
+class O2MManager extends BaseM2OManager implements ManagerInterface, PrefetchInterface
 {
     public $reverse;
 

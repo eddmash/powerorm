@@ -21,7 +21,6 @@ use Eddmash\PowerOrm\Model\Field\DecimalField;
 use Eddmash\PowerOrm\Model\Field\EmailField;
 use Eddmash\PowerOrm\Model\Field\ForeignKey;
 use Eddmash\PowerOrm\Model\Field\IntegerField;
-use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
 use Eddmash\PowerOrm\Model\Field\ManyToManyField;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Field\SmallIntegerField;
@@ -247,29 +246,5 @@ trait ModelFieldsTrait
     public static function ManyToManyField($opts = [])
     {
         return ManyToManyField::createObject($opts);
-    }
-
-    /**
-     * @ignore
-     *
-     * @param array $opts
-     *
-     * @return HasManyField
-     */
-    public static function HasManyField($opts = [])
-    {
-        return HasManyField::createObject($opts);
-    }
-
-    /**
-     * @ignore
-     *
-     * @param array $opts
-     *
-     * @return HasOneField
-     */
-    public static function HasOneField($opts = [])
-    {
-        return HasOneField::createObject($opts);
     }
 }

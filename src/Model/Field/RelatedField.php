@@ -58,11 +58,6 @@ class RelatedField extends Field
     public $fromField;
 
     /**
-     * @var string The inversefield to use to get value from the inverse side
-     */
-    public $inverseField = '';
-
-    /**
      * RelatedField constructor.
      *
      * @param array $kwargs

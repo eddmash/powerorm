@@ -15,6 +15,11 @@ use Eddmash\PowerOrm\Exception\TypeError;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
+/**
+ * Class BaseManager.
+ *
+ * @author Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
+ */
 class BaseManager extends BaseObject implements ManagerInterface
 {
     /**

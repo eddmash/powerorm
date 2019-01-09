@@ -60,8 +60,7 @@ class Prefetch
         $this->prefetchThrough = $lookups;
 
         // we are mapping this prefetches to models so ensure we have a Model mapper
-        $mapper = $queryset->getMapper();
-        if ($queryset && !$mapper instanceof ModelMapper) {
+        if ($queryset && !$queryset->getMapper() instanceof ModelMapper) {
             throw new ValueError('Prefetch querysets cannot use asArray().');
         }
 

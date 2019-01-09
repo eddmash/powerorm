@@ -58,8 +58,6 @@ class ManyToManyField extends RelatedField
 
     protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\ManyToManyDescriptor';
 
-    public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasManyField';
-
     public function __construct($kwargs)
     {
         if (!isset($kwargs['rel']) || (isset($kwargs['rel']) && is_null($kwargs['rel']))) {

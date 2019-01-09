@@ -18,7 +18,6 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Delete;
 use Eddmash\PowerOrm\Model\Field\Descriptors\ManyToOneDescriptor;
 use Eddmash\PowerOrm\Model\Field\Descriptors\OneToManyDescriptor;
-use Eddmash\PowerOrm\Model\Field\Inverse\HasManyField;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ForeignObjectRel;
 use Eddmash\PowerOrm\Model\Field\RelatedObjects\ManyToOneRel;
 use Eddmash\PowerOrm\Model\Model;
@@ -43,8 +42,6 @@ class ForeignKey extends RelatedField
 
     /**{inheritdoc}*/
     protected $inverseDescriptor = OneToManyDescriptor::class;
-
-    public $inverseField = HasManyField::class;
 
     /**
      * ForeignKey constructor.

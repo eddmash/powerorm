@@ -12,6 +12,19 @@ namespace Eddmash\PowerOrm\Model\Manager;
 
 use Eddmash\PowerOrm\Model\Query\Queryset;
 
+/**
+ * @method self all()
+ * @method self get()
+ * @method self filter()
+ * @method self exists()
+ * @method self exclude()
+ * @method self prefetchRelated()
+ * @method self selectRelated()
+ * @method self annotate()
+ * @method self aggregate()
+ *
+ * @author Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
+ */
 interface ManagerInterface extends \IteratorAggregate
 {
     /**

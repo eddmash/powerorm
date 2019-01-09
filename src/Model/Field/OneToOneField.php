@@ -36,8 +36,6 @@ class OneToOneField extends ForeignKey
     /**{inheritdoc}*/
     protected $descriptor = '\Eddmash\PowerOrm\Model\Field\Descriptors\OneToOneDescriptor';
 
-    public $inverseField = '\Eddmash\PowerOrm\Model\Field\Inverse\HasOneField';
-
     /**
      * OneToOneField constructor.
      *
