@@ -13,6 +13,7 @@ namespace Eddmash\PowerOrm\Tests;
 use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Model\Query\Query;
+use Eddmash\PowerOrm\Model\Query\Queryset;
 use Eddmash\PowerOrm\Tests\Backends\ConnectionMock;
 use Eddmash\PowerOrm\Tests\Backends\DatabasePlatformMock;
 use Eddmash\PowerOrm\Tests\TestApp\Test;
@@ -61,7 +62,13 @@ abstract class PowerormTest extends TestCase
 
     public function assertQuery($query, $expected)
     {
-        list($sql, $params) = $this->queryAsSql($query);
+        if ($query instanceof Queryset) {
+            $query = $query->query;
+        }
+
+        if ($query instanceof Query) {
+            list($sql, $params) = $this->queryAsSql($query);
+        }
 
         $this->assertEquals($expected[0], trim($sql));
         $this->assertEquals($expected[1], $params);

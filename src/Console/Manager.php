@@ -61,12 +61,13 @@ class Manager extends Base
 
         foreach ($components as $component) {
             foreach ($component->getCommands() as $command) {
-                if (is_object($command) && $command instanceof BaseCommand) {
-                    $comands[] = $command;
-                }
                 if (is_string($command)) {
-                    $comands[] = new $command();
+                    $command = new $command($component);
                 }
+                if ($command instanceof BaseCommand) {
+                    $command->setComponent($component);
+                }
+                $comands[] = $command;
             }
         }
 

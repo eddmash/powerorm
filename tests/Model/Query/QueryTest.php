@@ -11,6 +11,7 @@
 namespace Eddmash\PowerOrm\Tests\Model\Query;
 
 use Eddmash\PowerOrm\Model\Query\Query;
+use Eddmash\PowerOrm\Model\Query\Queryset;
 use Eddmash\PowerOrm\Tests\PowerormTest;
 use Eddmash\PowerOrm\Tests\TestApp\Models\Author;
 use Eddmash\PowerOrm\Tests\TestApp\Models\Book;
@@ -34,8 +35,8 @@ class QueryTest extends PowerormTest
 
     public function testSqlFetchFiltered()
     {
-        $query = new Query(new Author());
-        $query->addQ(q_(['email' => 'p']));
+        $query = new Queryset(null, new Author());
+        $query = $query->filter(q_(['email' => 'p']));
         $expected = 'SELECT testapp_author.name, testapp_author.email, testapp_author.id '.
             'FROM testapp_author  '.
             'WHERE testapp_author.email = ?';

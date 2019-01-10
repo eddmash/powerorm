@@ -12,6 +12,7 @@ namespace Eddmash\PowerOrm\Console\Command;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckMessage;
+use Eddmash\PowerOrm\Components\ComponentInterface;
 use Eddmash\PowerOrm\Exception\CommandError;
 use Eddmash\PowerOrm\Exception\SystemCheckError;
 use Symfony\Component\Console\Command\Command;
@@ -44,6 +45,17 @@ abstract class BaseCommand extends Command
     **********************************************************%4$s****
 
     ';
+
+    /**
+     * @var ComponentInterface
+     */
+    protected $component;
+
+    public function __construct(?ComponentInterface $component = null, ?string $name = null)
+    {
+        $this->component = $component;
+        parent::__construct($name);
+    }
 
     protected function configure()
     {
@@ -215,16 +227,52 @@ abstract class BaseCommand extends Command
     }
 
     /**
+     * @param ComponentInterface $component
+     */
+    public function setComponent(ComponentInterface $component)
+    {
+        $this->component = $component;
+    }
+
+    /**
+     * @return ComponentInterface
+     */
+    public function getComponent()
+    {
+        return $this->component;
+    }
+
+    /**
      * Returns the name of the current class in lower case and strips off the "Command".
      *
      * @return string
      */
     public function guessCommandName()
     {
+        $prefix = $this->makePrefix();
+        if ($prefix) {
+            $prefix = sprintf('%s:', $prefix);
+        }
+        return sprintf('%s%s', $prefix, $this->makeName());
+    }
+
+    protected function makeName()
+    {
         $name = get_class($this);
         $name = substr($name, strripos($name, '\\') + 1);
         $name = (false === strripos($name, 'Command')) ? $name : substr($name, 0, strripos($name, 'Command'));
 
         return strtolower($name);
+    }
+
+    protected function makePrefix()
+    {
+        $prefix = '';
+        if ($this->component) {
+            $prefix = $this->getComponent()->getName();
+            $prefix = explode('_', $prefix);
+            $prefix = end($prefix);
+        }
+        return $prefix;
     }
 }
