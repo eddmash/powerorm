@@ -99,10 +99,12 @@ class ManyToManyField extends RelatedField
             };
 
             Tools::lazyRelatedOperation(
-                $callback,
-                $this->scopeModel,
-                $this->relation->through,
-                ['fromField' => $this]
+                [
+                    'fromField' => $this,
+                    'callable' => $callback,
+                    'scopeModel' => $this->scopeModel,
+                    'relatedModel' => $this->relation->through
+                ]
             );
         } else {
             $this->relation->through = $this->createM2MIntermediaryModel(
@@ -137,7 +139,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model           $model
+     * @param Model $model
      *
      * @return Model
      *

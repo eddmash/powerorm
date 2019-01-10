@@ -302,7 +302,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * {@inheritdoc}
      *
      * @param string $fieldName
-     * @param Model  $modelObject
+     * @param Model $modelObject
      *
      * @throws FieldError
      *
@@ -607,7 +607,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * The attribute name is in $this->getAttrName() (this is set up by OgrField).
      *
      * @param Model $model
-     * @param bool  $add   is whether the instance is being saved to the database
+     * @param bool $add is whether the instance is being saved to the database
      *                     for the first time
      *
      * @return mixed
@@ -653,7 +653,7 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
      * By default it returns value passed in if prepared=true and
      * prepareValue() if is False.
      *
-     * @param mixed               $value
+     * @param mixed $value
      * @param ConnectionInterface $connection
      *
      * @return mixed
@@ -720,7 +720,8 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
         ConnectionInterface $connection,
         $value,
         $expression
-    ) {
+    )
+    {
         return $value;
     }
 
@@ -823,11 +824,8 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     {
         $descriptor = $this->descriptor;
 
-        if (is_null($this->descriptorInstance)) {
-            $this->descriptorInstance = new $descriptor($this);
-        }
+        return new $descriptor($this);
 
-        return $this->descriptorInstance;
     }
 
     /**

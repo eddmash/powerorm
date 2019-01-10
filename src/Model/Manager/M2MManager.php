@@ -24,10 +24,7 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
 use Eddmash\PowerOrm\Model\Query\QuerysetInterface;
 
 /**
- * Class M2MQueryset.
- *
- *
- * @author: Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+ * @inheritdoc
  */
 class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInterface
 {
@@ -35,11 +32,13 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
 
     /**
      * @var Model
+     * @internal
      */
     private $instance;
 
     /**
      * @var Model
+     * @internal
      */
     private $through;
 
@@ -54,6 +53,7 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
     private $reverse;
 
     private $prefetchCacheName;
+    private $relatedModelPks;
 
     public function __construct($kwargs = [])
     {
@@ -83,19 +83,29 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
         $this->toField = $this->through->getMeta()->getField($this->toFieldName);
         $this->filters = [];
 
+        // since we are using the through model
+        // we need the pks for the models related to this through model
+        $this->relatedModelPks = [];
         foreach ([$this->fromField->getRelatedFields()] as $fields) {
-            $rhsField = $fields[1];
+            $throughModelField = $fields[0];
+            $relatedModelField = $fields[1];
 
-            $key = sprintf('%s__%s', $this->queryName, $rhsField->getName());
-            $this->filters[$key] = $this->instance->{$rhsField->getAttrName()};
+            $key = sprintf('%s__%s', $this->queryName, $relatedModelField->getName());
+            $this->filters[$key] = $this->instance->{$relatedModelField->getAttrName()};
+
+            $this->relatedModelPks[$throughModelField->getName()] = $relatedModelField->getName();
         }
         $this->relatedValues = $this->fromField->getForeignRelatedFieldsValues($this->instance);
+
+        // check to ensure we don't get a scenario like this
+        // (new Role())->permissions
+        // where role and permission have m2m relationship
         if (empty($this->relatedValues)) {
             throw new ValueError(
                 sprintf(
                     '"%s" needs to have a value for field "%s" before this many-to-many relationship can be used.',
                     $this->instance->getMeta()->getNSModelName(),
-                    $this->fromFieldName
+                    $this->relatedModelPks[$this->fromField->getName()]
                 )
             );
         }
@@ -148,7 +158,7 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
 
             throw new AttributeError(
                 sprintf(
-                    'Cannot use remove() on a ManyToManyField which specifies '.
+                    'Cannot use remove() on a ManyToManyField which specifies ' .
                     "an intermediary model. Use %s's Manager instead.",
                     $meta->getNSModelName()
                 )

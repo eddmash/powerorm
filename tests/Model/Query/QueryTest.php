@@ -85,8 +85,8 @@ class QueryTest extends PowerormTest
         $query = new Query(new OrderItem());
         $query->addQ(q_(['order' => 1]));
 
-        $expected = 'SELECT testapp_orderitem.order_id, testapp_orderitem.product_id, '.
-            'testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id '.
+        $expected = 'SELECT testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id, '.
+            'testapp_orderitem.order_id, testapp_orderitem.product_id '.
             'FROM testapp_orderitem  '.
             'WHERE testapp_orderitem.order_id = ?';
 
@@ -102,8 +102,8 @@ class QueryTest extends PowerormTest
         $query = new Query(new OrderItem());
         $query->addQ(q_(['order__buyer' => 1]));
 
-        $expected = 'SELECT testapp_orderitem.order_id, testapp_orderitem.product_id, '.
-            'testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id '.
+        $expected = 'SELECT testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id, '.
+            'testapp_orderitem.order_id, testapp_orderitem.product_id '.
             'FROM testapp_orderitem  '.
             'INNER JOIN testapp_order ON ( testapp_orderitem.order_id = testapp_order.id) '.
             'WHERE testapp_order.buyer_id = ?';
@@ -113,8 +113,8 @@ class QueryTest extends PowerormTest
         $query = new Query(new OrderItem());
         $query->addQ(q_(['order__buyer' => User::objects()->filter(['id' => 30])]));
 
-        $expected = 'SELECT testapp_orderitem.order_id, testapp_orderitem.product_id, '.
-            'testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id '.
+        $expected = 'SELECT testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id, '.
+            'testapp_orderitem.order_id, testapp_orderitem.product_id '.
             'FROM testapp_orderitem  '.
             'INNER JOIN testapp_order ON ( testapp_orderitem.order_id = testapp_order.id) '.
             'WHERE testapp_order.buyer_id = '.
@@ -130,8 +130,8 @@ class QueryTest extends PowerormTest
         $query = new Query(new OrderItem());
         $query->addQ(q_(['order__buyer__email' => 'a@df.com']));
 
-        $expected = 'SELECT testapp_orderitem.order_id, testapp_orderitem.product_id, '.
-            'testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id '.
+        $expected = 'SELECT testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id, '.
+            'testapp_orderitem.order_id, testapp_orderitem.product_id '.
             'FROM testapp_orderitem  '.
             'INNER JOIN testapp_order ON ( testapp_orderitem.order_id = testapp_order.id) '.
             'INNER JOIN testapp_user ON ( testapp_order.buyer_id = testapp_user.id) '.
@@ -143,8 +143,8 @@ class QueryTest extends PowerormTest
         $query = new Query(new OrderItem());
         $query->addQ(q_(['order__buyer__email' => User::objects()->filter(['email' => 'a@df.com'])]));
 
-        $expected = 'SELECT testapp_orderitem.order_id, testapp_orderitem.product_id, '.
-            'testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id '.
+        $expected = 'SELECT testapp_orderitem.qty, testapp_orderitem.price, testapp_orderitem.id, '.
+            'testapp_orderitem.order_id, testapp_orderitem.product_id '.
             'FROM testapp_orderitem  '.
             'INNER JOIN testapp_order ON ( testapp_orderitem.order_id = testapp_order.id) '.
             'INNER JOIN testapp_user ON ( testapp_order.buyer_id = testapp_user.id) '.

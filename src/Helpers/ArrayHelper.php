@@ -46,8 +46,8 @@ class ArrayHelper
      *
      * Note that an empty array will NOT be considered associative.
      *
-     * @param array $array      the array being checked
-     * @param bool  $allStrings whether the array keys must be all strings in order for
+     * @param array $array the array being checked
+     * @param bool $allStrings whether the array keys must be all strings in order for
      *                          the array to be treated as associative
      *
      * @since 1.1.0
@@ -97,6 +97,7 @@ class ArrayHelper
      */
     public static function getValue($haystack, $key, $default = null)
     {
+        $key = trim($key);
         if (isset($haystack[$key])) {
             return $haystack[$key];
         }
@@ -126,16 +127,12 @@ class ArrayHelper
      */
     public static function pop(&$haystack, $key, $default = self::STRICT)
     {
-        if (array_key_exists($key, $haystack)) {
-            $value = $haystack[$key];
+        $key = trim($key);
+        $val = static::getValue($haystack, $key, $default);
+        if (isset($haystack[$key])) {
             unset($haystack[$key]);
-
-            return $value;
-        } elseif (self::STRICT !== $default) {
-            return $default;
         }
-
-        throw new KeyError(sprintf(' %s does not exist in the array', $key));
+        return $val;
     }
 
     /**

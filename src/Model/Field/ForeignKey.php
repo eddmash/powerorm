@@ -81,6 +81,7 @@ class ForeignKey extends RelatedField
      * @return Field
      *
      * @throws ValueError
+     * @throws \Eddmash\PowerOrm\Exception\FieldDoesNotExist
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */

@@ -26,5 +26,10 @@ interface RelationDescriptor
      */
     public function getManager(Model $modelInstance);
 
-//    public function isCached(Model $model): bool;
+    /**
+     * The name of the manager class to use.
+     * @return string
+     * @author Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
+     */
+    public function getManagerClass(): string;
 }

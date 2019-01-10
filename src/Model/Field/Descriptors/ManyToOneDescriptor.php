@@ -23,7 +23,7 @@ use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\PrefetchInterface;
 use Eddmash\PowerOrm\Model\Query\QuerysetInterface;
 
-class ManyToOneDescriptor extends BaseDescriptor implements PrefetchInterface
+class ManyToOneDescriptor extends BaseDescriptor implements PrefetchInterface, RelationDescriptor
 {
     /** @var RelatedField */
     protected $field;
@@ -135,21 +135,11 @@ class ManyToOneDescriptor extends BaseDescriptor implements PrefetchInterface
     }
 
     /**
-     * Creates the queryset to retrieve data for the relationship that relates
-     * to this field.
-     *
-     * @param      $modelInstance
-     * @param bool $reverse
-     *
-     * @internal param $modelName
-     *
-     * @return BaseManager
-     *
-     * @author   : Eddilbert Macharia (http://eddmash.com)<edd.cowan@gmail.com>
+     * @inheritdoc
      */
-    public function getManager($modelInstance, $reverse = false)
+    public function getManager(Model $modelInstance)
     {
-        if ($reverse) {
+        if ($this->reverse) {
             $model = $this->field->getRelatedModel();
         } else {
             $model = $this->field->scopeModel;
@@ -165,16 +155,23 @@ class ManyToOneDescriptor extends BaseDescriptor implements PrefetchInterface
             eval($class);
         }
 
-        $manager = M2OManager::createObject(
+        $managerClass = $this->getManagerClass();
+        $manager = new $managerClass(
             [
                 'model' => $model,
                 'rel' => $this->field->relation,
                 'instance' => $modelInstance,
-                'reverse' => $reverse,
+                'reverse' => $this->reverse,
             ]
         );
 
         return $manager;
+    }
+
+
+    public function getManagerClass(): string
+    {
+        return M2OManager::class;
     }
 
     /**

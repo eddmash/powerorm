@@ -248,8 +248,8 @@ class Meta extends DeconstructableObject implements MetaInterface
         if (!$this->registry->ready) {
             throw new FieldDoesNotExist(
                 sprintf(
-                    "%s has no field named %s. The App registry isn't".
-                    ' ready yet, so if this is an autoCreated '.
+                    "%s has no field named %s. The App registry isn't" .
+                    ' ready yet, so if this is an autoCreated ' .
                     "related field, it won't  be available yet.",
                     $this->getNSModelName(),
                     $name
@@ -404,15 +404,17 @@ class Meta extends DeconstructableObject implements MetaInterface
 
         // we get the model from the registry
         // to ensure we get the same model instance and same meta class for the model.
-        return $this->registry->getModel($this->getNSModelName())
-            ->getMeta()->_reverseRelationTreeCache;
+
+        $meta = $this->getRegistry()->getModel($this->getNSModelName())
+            ->getMeta();
+        return $meta->_reverseRelationTreeCache;
     }
 
     /**
      * Add the current object to the passed in object.
      *
      * @param string $propertyName the name map the current object to, in the class object passed in
-     * @param Model  $classObject  the object to attach the current object to
+     * @param Model $classObject the object to attach the current object to
      *
      * @since  1.1.0
      *
@@ -472,13 +474,25 @@ class Meta extends DeconstructableObject implements MetaInterface
 
                 // the field to use when working from the inverse side is the relation object
                 if ($includeHidden || !$revField->relation->isHidden()) {
-                    $fields[$revField->relation->getName()] = $revField->relation;
+                    $v = $revField->relation->getAccessorName();
+                    $fields[$revField->relation->getAccessorName()] = $revField->relation;
                 }
             }
         }
 
         if ($forward) {
-            $fields = array_merge($fields, array_merge($this->localFields, $this->localManyToMany));
+            // we order from non-relation, relational fields
+            // usefull when generating @property
+            $relFields = [];
+            $nonRelFields = [];
+            foreach ($this->localFields as $name => $localField) {
+                if ($localField instanceof RelatedField) {
+                    $relFields[$name] = $localField;
+                } else {
+                    $nonRelFields[$name] = $localField;
+                }
+            }
+            $fields = array_merge($nonRelFields, $relFields, $this->localManyToMany, $fields);
         }
 
         return $fields;
@@ -716,6 +730,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getRegistry()
     {
+
         return $this->registry;
     }
 

@@ -17,6 +17,7 @@ use Eddmash\PowerOrm\Model\Model;
 
 class ManyToManyDescriptor extends BaseDescriptor implements RelationDescriptor
 {
+    protected $reverse = false;
     /** @var RelatedField */
     protected $field;
 
@@ -49,7 +50,8 @@ class ManyToManyDescriptor extends BaseDescriptor implements RelationDescriptor
             eval($class);
         }
 
-        $manager = M2MManager::createObject(
+        $managerClass = $this->getManagerClass();
+        $manager = new $managerClass(
             [
                 'model' => $model,
                 'rel' => $this->field->relation,
@@ -59,5 +61,10 @@ class ManyToManyDescriptor extends BaseDescriptor implements RelationDescriptor
         );
 
         return $manager;
+    }
+
+    public function getManagerClass(): string
+    {
+        return M2MManager::class;
     }
 }

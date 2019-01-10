@@ -11,6 +11,8 @@
 
 namespace Eddmash\PowerOrm\App;
 
+use App\Parser\Fixers\FieldFixer;
+use App\Parser\Fixers\PhpdocSeparationFixer;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
 use Eddmash\PowerOrm\Signals\SignalManagerInterface;
@@ -35,11 +37,6 @@ class Settings
     private $signalManager;
 
     private $timezone = '';
-
-//    /**
-//     * @var ConnectionInterface
-//     */
-//    private $connection;
 
     /**
      * The configurations to use to connect to the database.
@@ -124,6 +121,11 @@ class Settings
     private $silencedChecks = [];
 
     private $components;
+
+    private $_fileFixers = [
+        PhpdocSeparationFixer::class,
+        FieldFixer::class,
+    ];
 
     /**
      * Settings constructor.
@@ -286,5 +288,10 @@ class Settings
     public function setComponents($components)
     {
         $this->components = $components;
+    }
+
+    public function getFixers()
+    {
+        return $this->_fileFixers;
     }
 }
