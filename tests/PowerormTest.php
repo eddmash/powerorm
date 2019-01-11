@@ -16,7 +16,7 @@ use Eddmash\PowerOrm\Model\Query\Query;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 use Eddmash\PowerOrm\Tests\Backends\ConnectionMock;
 use Eddmash\PowerOrm\Tests\Backends\DatabasePlatformMock;
-use Eddmash\PowerOrm\Tests\TestApp\TestApp;
+use Eddmash\PowerOrm\Tests\TestApp\MetaApp;
 use Eddmash\PowerOrm\Tests\TestingApps\AutodetectorTest\AutodetectorTestApp;
 use PHPUnit\Framework\TestCase;
 
@@ -27,6 +27,11 @@ abstract class PowerormTest extends TestCase
     // only instantiate PHPUnit_Extensions_Database_DB_IDatabaseConnection once per test
     private $conn = null;
 
+    /**
+     * @var BaseOrm
+     */
+    protected $orm;
+
     protected function setUp(): void
     {
         $this->conn = $this->getMockBuilder(ConnectionMock::class)
@@ -36,17 +41,7 @@ abstract class PowerormTest extends TestCase
             ->willReturn(new DatabasePlatformMock());
         $this->conn->expects($this->any())->method('quoteIdentifier')
             ->will($this->returnArgument(0));
-//        BaseOrm::setup(
-//            new Settings(
-//                [
-//                    'components' => [
-//                        TestApp::class,
-//                        AutodetectorTestApp::class
-//                    ],
-//                ]
-//            ),
-//            $this->conn
-//        );
+
     }
 
     public function getNewOrm(Settings $settings)

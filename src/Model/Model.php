@@ -216,6 +216,10 @@ abstract class Model extends DeconstructableObject implements ModelInterface, Ar
     private function loadMeta(Registry $registry = null)
     {
         if (is_null($registry)) {
+            // we get here when users creates the model and not the orm
+            // hence reuse the same registry
+            // the orm will always pass the registry when it creates models
+            // usually on setup, or making migrations
             $registry = BaseOrm::getRegistry(false);
         }
 

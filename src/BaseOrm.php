@@ -98,9 +98,9 @@ class BaseOrm extends BaseObject
         $this->registryCache = new Registry();
     }
 
-    public static function getCharset()
+    public function getCharset()
     {
-        return self::getInstance()->getSettings()->getCharset();
+        return $this->getSettings()->getCharset();
     }
 
     //********************************** ORM Registry*********************************

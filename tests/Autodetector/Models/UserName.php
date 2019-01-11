@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\TestingApps\AutodetectorTest\Models;
+namespace Eddmash\PowerOrm\Tests\Autodetector\Models;
 
 use Eddmash\PowerOrm\Model\Model;
 

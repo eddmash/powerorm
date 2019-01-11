@@ -8,12 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\TestingApps\AutodetectorTest;
+namespace Eddmash\PowerOrm\Tests\Autodetector;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppComponent;
 
-class AutodetectorTestApp extends AppComponent
+class AutodetectorApp extends AppComponent
 {
     public function getName()
     {

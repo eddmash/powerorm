@@ -14,7 +14,7 @@ namespace Eddmash\PowerOrm\Tests;
 use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\Model\Field\OneToOneField;
 use Eddmash\PowerOrm\Model\Model;
-use Eddmash\PowerOrm\Tests\TestApp\TestApp;
+use Eddmash\PowerOrm\Tests\TestApp\MetaApp;
 use Eddmash\PowerOrm\Tests\TestModels\AbstractBaseProxyModel;
 use Eddmash\PowerOrm\Tests\TestModels\AbstractModel;
 use Eddmash\PowerOrm\Tests\TestModels\AbstractWithFieldsBaseProxyModel;
