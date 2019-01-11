@@ -160,12 +160,12 @@ class QueryTest extends PowerormTest
     {
         // ********* Scalar value reverse via manually defined Through model
         $query = new Query(new Product());
-        $query->addQ(q_(['order' => 1]));
+        $query->addQ(q_(['orders' => 1]));
 
         $expected = 'SELECT testapp_product.name, testapp_product.price, testapp_product.description, '.
             'testapp_product.stock, testapp_product.unit_of_measure, testapp_product.treshhold, '.
-            'testapp_product.visible, testapp_product.image, testapp_product.owner_id, testapp_product.created_by_id'.
-            ', testapp_product.id '.
+            'testapp_product.visible, testapp_product.image, testapp_product.id, testapp_product.owner_id, '.
+            'testapp_product.created_by_id '.
             'FROM testapp_product  '.
             'INNER JOIN testapp_orderitem ON ( testapp_product.id = testapp_orderitem.product_id) '.
             'WHERE testapp_orderitem.order_id = ?';
@@ -173,12 +173,12 @@ class QueryTest extends PowerormTest
 
         // ********* Scalar Queryset reverse via manually defined Through model
         $query = new Query(new Product());
-        $query->addQ(q_(['order' => Order::objects()->filter(['id' => 1])]));
+        $query->addQ(q_(['orders' => Order::objects()->filter(['id' => 1])]));
 
         $expected = 'SELECT testapp_product.name, testapp_product.price, testapp_product.description, '.
             'testapp_product.stock, testapp_product.unit_of_measure, testapp_product.treshhold, '.
-            'testapp_product.visible, testapp_product.image, testapp_product.owner_id, '.
-            'testapp_product.created_by_id, testapp_product.id '.
+            'testapp_product.visible, testapp_product.image, testapp_product.id, testapp_product.owner_id, '.
+            'testapp_product.created_by_id '.
             'FROM testapp_product  '.
             'INNER JOIN testapp_orderitem ON ( testapp_product.id = testapp_orderitem.product_id) '.
             'WHERE testapp_orderitem.order_id = '.

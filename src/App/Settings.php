@@ -11,10 +11,10 @@
 
 namespace Eddmash\PowerOrm\App;
 
-use App\Parser\Fixers\FieldFixer;
-use App\Parser\Fixers\PhpdocSeparationFixer;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Helpers\ClassHelper;
+use Eddmash\PowerOrm\Parser\Fixers\FieldFixer;
+use Eddmash\PowerOrm\Parser\Fixers\PhpdocSeparationFixer;
 use Eddmash\PowerOrm\Signals\SignalManagerInterface;
 
 class Settings

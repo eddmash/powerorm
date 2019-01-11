@@ -18,7 +18,7 @@ class Order extends Model
     {
         return [
             'products' => Model::ManyToManyField(['to' => Product::class,
-                'through' => OrderItem::class, ]),
+                'through' => OrderItem::class, 'relatedName' => 'orders', ]),
             'buyer' => Model::ForeignKey(['to' => User::class]),
             'date' => Model::DateField(['autoAddNow' => true]),
         ];

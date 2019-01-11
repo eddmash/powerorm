@@ -18,6 +18,7 @@ use Eddmash\PowerOrm\Model\Model;
 class ManyToManyDescriptor extends BaseDescriptor implements RelationDescriptor
 {
     protected $reverse = false;
+
     /** @var RelatedField */
     protected $field;
 

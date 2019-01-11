@@ -17,7 +17,6 @@ use Eddmash\PowerOrm\Exception\RelatedObjectDoesNotExist;
 use Eddmash\PowerOrm\Exception\ValueError;
 use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
-use Eddmash\PowerOrm\Model\Manager\BaseManager;
 use Eddmash\PowerOrm\Model\Manager\M2OManager;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Model\Query\PrefetchInterface;
@@ -135,7 +134,7 @@ class ManyToOneDescriptor extends BaseDescriptor implements PrefetchInterface, R
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getManager(Model $modelInstance)
     {
@@ -167,7 +166,6 @@ class ManyToOneDescriptor extends BaseDescriptor implements PrefetchInterface, R
 
         return $manager;
     }
-
 
     public function getManagerClass(): string
     {

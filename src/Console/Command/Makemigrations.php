@@ -10,7 +10,6 @@
 
 namespace Eddmash\PowerOrm\Console\Command;
 
-use App\Parser\Fixer;
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Console\Question\InteractiveAsker;
@@ -28,6 +27,7 @@ use Eddmash\PowerOrm\Migration\Operation\Operation;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 use Eddmash\PowerOrm\Model\Field\RelatedField;
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Parser\Fixer;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,9 +52,9 @@ class Makemigrations extends BaseCommand
         $issues = $loader->detectConflicts();
 
         if (!empty($issues)) {
-            $message = '<error>The following migrations seem to indicate they' .
-                ' are both the latest migration :</error>' . PHP_EOL;
-            $message .= '  %s ' . PHP_EOL;
+            $message = '<error>The following migrations seem to indicate they'.
+                ' are both the latest migration :</error>'.PHP_EOL;
+            $message .= '  %s '.PHP_EOL;
             $output->writeln(
                 sprintf(
                     $message,
@@ -98,8 +98,7 @@ class Makemigrations extends BaseCommand
         $migrationChanges,
         InputInterface $input,
         OutputInterface $output
-    )
-    {
+    ) {
         /* @var $appMigration Migration */
         /* @var $op Operation */
 
@@ -108,7 +107,7 @@ class Makemigrations extends BaseCommand
                 if (ArrayHelper::hasKey($migrationChanges, $component->getName())) {
                     $output->writeln(
                         sprintf(
-                            '<fg=green;options=bold>Migrations for ' .
+                            '<fg=green;options=bold>Migrations for '.
                             'the application "%s" :</>',
                             $component->getName()
                         )
@@ -158,8 +157,7 @@ class Makemigrations extends BaseCommand
         $migrationChanges,
         InputInterface $input,
         OutputInterface $output
-    )
-    {
+    ) {
         /* @var $appMigration Migration */
         /* @var $op Operation */
 
@@ -168,7 +166,7 @@ class Makemigrations extends BaseCommand
                 if (ArrayHelper::hasKey($migrationChanges, $component->getName())) {
                     $output->writeln(
                         sprintf(
-                            "<fg=green;options=bold>Updating `@properties` on models</>",
+                            '<fg=green;options=bold>Updating `@properties` on models</>',
                             $component->getName()
                         )
                     );
@@ -179,18 +177,16 @@ class Makemigrations extends BaseCommand
 
                     $maps = [];
                     foreach ($appMigrations as $appMigration) {
-
                         $operations = $appMigration->getOperations();
                         $maps = array_merge($maps, $this->getModels($operations));
                     }
 
                     Fixer::run($maps, $stats);
 
-                    $output->writeln("Affected models");
+                    $output->writeln('Affected models');
 
                     foreach ($stats as $stat) {
-                        $output->writeln(sprintf("   --- %s", ucfirst($stat)));
-
+                        $output->writeln(sprintf('   --- %s', ucfirst($stat)));
                     }
                 }
             }
@@ -214,7 +210,6 @@ class Makemigrations extends BaseCommand
             );
     }
 
-
     private function getModels($operations)
     {
         $modelPathCallable = function ($name) {
@@ -225,7 +220,7 @@ class Makemigrations extends BaseCommand
                 $model = BaseOrm::getRegistry()->getModel($name->getMeta()->getNSModelName());
             }
             $app = $model->getMeta()->getApp();
-            $path = sprintf("%s%s%s.php", $app->getModelsPath(),
+            $path = sprintf('%s%s%s.php', $app->getModelsPath(),
                 DIRECTORY_SEPARATOR,
                 $model->getMeta()->getModelName());
             return [$model, $path];
@@ -251,10 +246,9 @@ class Makemigrations extends BaseCommand
                         $deps[$mainName][] = $model->getMeta()->getNSModelName();
                     }
                 }
-
             }
             if ($op instanceof ModelOperation) {
-                /**@var $model Model */
+                /** @var $model Model */
                 list($model, $path) = $modelPathCallable($op->name);
                 $mainName = $model->getMeta()->getNSModelName();
 
@@ -263,7 +257,6 @@ class Makemigrations extends BaseCommand
 
                 $forwardFields = $model->getMeta()->getFields(true, false, false);
                 foreach ($forwardFields as $field) {
-
                     if ($field instanceof RelatedField) {
                         $name = $field->getRelatedModel();
                         list($model, $path) = $modelPathCallable($name);
@@ -273,11 +266,9 @@ class Makemigrations extends BaseCommand
                         }
                     }
                 }
-
             }
         }
 
         return $map;
     }
-
 }

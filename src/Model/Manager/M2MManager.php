@@ -24,7 +24,7 @@ use Eddmash\PowerOrm\Model\Query\Queryset;
 use Eddmash\PowerOrm\Model\Query\QuerysetInterface;
 
 /**
- * @inheritdoc
+ * {@inheritdoc}
  */
 class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInterface
 {
@@ -32,12 +32,14 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
 
     /**
      * @var Model
+     *
      * @internal
      */
     private $instance;
 
     /**
      * @var Model
+     *
      * @internal
      */
     private $through;
@@ -53,6 +55,7 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
     private $reverse;
 
     private $prefetchCacheName;
+
     private $relatedModelPks;
 
     public function __construct($kwargs = [])
@@ -158,7 +161,7 @@ class M2MManager extends BaseM2MManager implements PrefetchInterface, ManagerInt
 
             throw new AttributeError(
                 sprintf(
-                    'Cannot use remove() on a ManyToManyField which specifies ' .
+                    'Cannot use remove() on a ManyToManyField which specifies '.
                     "an intermediary model. Use %s's Manager instead.",
                     $meta->getNSModelName()
                 )

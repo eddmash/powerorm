@@ -103,7 +103,7 @@ class ManyToManyField extends RelatedField
                     'fromField' => $this,
                     'callable' => $callback,
                     'scopeModel' => $this->scopeModel,
-                    'relatedModel' => $this->relation->through
+                    'relatedModel' => $this->relation->through,
                 ]
             );
         } else {
@@ -139,7 +139,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model $model
+     * @param Model           $model
      *
      * @return Model
      *

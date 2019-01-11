@@ -29,6 +29,6 @@ class MetaTest extends TestCase
 
         $names = array_keys($fields);
         self::assertCount(2, $fields);
-        self::assertEquals(['metatestprofile_set', 'updatedby'], $names);
+        self::assertEquals(['metatestprofile', 'updatedby'], $names);
     }
 }

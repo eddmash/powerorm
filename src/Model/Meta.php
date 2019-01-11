@@ -248,8 +248,8 @@ class Meta extends DeconstructableObject implements MetaInterface
         if (!$this->registry->ready) {
             throw new FieldDoesNotExist(
                 sprintf(
-                    "%s has no field named %s. The App registry isn't" .
-                    ' ready yet, so if this is an autoCreated ' .
+                    "%s has no field named %s. The App registry isn't".
+                    ' ready yet, so if this is an autoCreated '.
                     "related field, it won't  be available yet.",
                     $this->getNSModelName(),
                     $name
@@ -414,7 +414,7 @@ class Meta extends DeconstructableObject implements MetaInterface
      * Add the current object to the passed in object.
      *
      * @param string $propertyName the name map the current object to, in the class object passed in
-     * @param Model $classObject the object to attach the current object to
+     * @param Model  $classObject  the object to attach the current object to
      *
      * @since  1.1.0
      *
@@ -474,8 +474,8 @@ class Meta extends DeconstructableObject implements MetaInterface
 
                 // the field to use when working from the inverse side is the relation object
                 if ($includeHidden || !$revField->relation->isHidden()) {
-                    $v = $revField->relation->getAccessorName();
-                    $fields[$revField->relation->getAccessorName()] = $revField->relation;
+                    $v = $revField->relation->getName();
+                    $fields[$revField->relation->getName()] = $revField->relation;
                 }
             }
         }
@@ -730,7 +730,6 @@ class Meta extends DeconstructableObject implements MetaInterface
      */
     public function getRegistry()
     {
-
         return $this->registry;
     }
 

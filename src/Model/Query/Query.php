@@ -705,7 +705,7 @@ class Query extends BaseObject implements ExpResolverInterface, CloneInterface, 
             } catch (FieldDoesNotExist $e) {
                 //todo check in annotations to
                 $available = Tools::getFieldNamesFromMeta($meta);
-                if ($failOnMissing) {
+                if ($failOnMissing || 0 === $pos) {
                     throw new FieldError(
                         sprintf(
                             "Cannot resolve keyword '%s.%s' ".

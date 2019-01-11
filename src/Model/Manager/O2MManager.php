@@ -36,25 +36,30 @@ class O2MManager extends BaseM2OManager implements ManagerInterface, PrefetchInt
 {
     /**
      * @internal
+     *
      * @author Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
      */
     public $reverse;
 
     /**
      * @internal
+     *
      * @author Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
      */
     public $instance;
 
     /**
      * @internal
+     *
      * @author Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
      */
     public $filters;
 
     /**
      * @var ForeignObjectRel
+     *
      * @internal
+     *
      * @author Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
      */
     protected $relation;
