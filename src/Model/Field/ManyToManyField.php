@@ -224,6 +224,7 @@ class ManyToManyField extends RelatedField
                     'uniqueTogether' => [$from, $to],
                     'autoCreated' => true,
                 ],
+                'registry'=>$model->getMeta()->getRegistry()
             ]
         );
 

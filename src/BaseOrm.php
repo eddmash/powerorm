@@ -90,12 +90,12 @@ class BaseOrm extends BaseObject
      *
      * @throws Exception\KeyError
      */
-    private function __construct(Settings $settings)
+    public function __construct(Settings $settings)
     {
         static::$connection = null;
         $this->settings = $settings;
         // setup the registry
-        $this->registryCache = Registry::createObject();
+        $this->registryCache = new Registry();
     }
 
     public static function getCharset()
@@ -113,14 +113,7 @@ class BaseOrm extends BaseObject
      */
     public static function setup(Settings $settings, ConnectionInterface $connection = null)
     {
-        $instance = static::getInstance($settings);
-        $instance::$connection = $connection;
-        $instance->loadComponents();
-        $instance->loadRegistry();
-        $instance->registerModelChecks();
-        $instance->componentsReady();
-
-        return $instance;
+        return static::getInstance($settings)->load($connection);
     }
 
     /**
@@ -160,7 +153,7 @@ class BaseOrm extends BaseObject
         }
 
         if (!static::$connection && empty($this->getSettings()->getDatabase())) {
-            $message = 'The database configuration have not '.
+            $message = 'The database configuration have not ' .
                 'been provided, consult documentation for options';
 
             throw new OrmException($message);
@@ -188,7 +181,12 @@ class BaseOrm extends BaseObject
             $orm->loadRegistry();
         }
 
-        return $orm->registryCache;
+        return $orm->getRegistryCache();
+    }
+
+    public function getRegistryCache()
+    {
+        return $this->registryCache;
     }
 
     /**
@@ -228,9 +226,9 @@ class BaseOrm extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function getDbPrefix()
+    public function getDbPrefix()
     {
-        return self::getInstance()->getSettings()->getDbPrefix();
+        return $this->getSettings()->getDbPrefix();
     }
 
     /**
@@ -244,7 +242,7 @@ class BaseOrm extends BaseObject
      */
     private function registerModelChecks()
     {
-        $models = self::getRegistry()->getModels();
+        $models = $this->getRegistryCache()->getModels();
 
         /** @var $modelObj Model */
         foreach ($models as $name => $modelObj) {
@@ -291,6 +289,7 @@ class BaseOrm extends BaseObject
      */
     private function loadRegistry()
     {
+        $this->registryCache->setOrm($this);
         try {
             $this->registryCache->isAppReady();
         } catch (AppRegistryNotReady $e) {
@@ -307,7 +306,7 @@ class BaseOrm extends BaseObject
             foreach ($this->getSettings()->getComponents() as $componentClass) {
                 $component = new $componentClass();
                 if ($component instanceof ComponentInterface) {
-                    static::getInstance()->addComponent($component);
+                    $this->addComponent($component);
                 }
             }
             $this->componentsloaded = true;
@@ -321,7 +320,7 @@ class BaseOrm extends BaseObject
      */
     private function componentsReady()
     {
-        self::getRegistry()->isAppReady();
+        $this->getRegistryCache()->isAppReady();
 
         if ($this->componentsloaded) {
             foreach ($this->components as $component) {
@@ -438,5 +437,19 @@ class BaseOrm extends BaseObject
     public function setConnection(ConnectionInterface $connection)
     {
         static::$connection = $connection;
+    }
+
+    /**
+     * @param ConnectionInterface|null $connection
+     * @throws AppRegistryNotReady
+     */
+    public function load(ConnectionInterface $connection = null)
+    {
+        static::$connection = $connection;
+        $this->loadComponents();
+        $this->loadRegistry();
+        $this->registerModelChecks();
+        $this->componentsReady();
+
     }
 }

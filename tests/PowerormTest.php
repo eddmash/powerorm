@@ -16,7 +16,8 @@ use Eddmash\PowerOrm\Model\Query\Query;
 use Eddmash\PowerOrm\Model\Query\Queryset;
 use Eddmash\PowerOrm\Tests\Backends\ConnectionMock;
 use Eddmash\PowerOrm\Tests\Backends\DatabasePlatformMock;
-use Eddmash\PowerOrm\Tests\TestApp\Test;
+use Eddmash\PowerOrm\Tests\TestApp\TestApp;
+use Eddmash\PowerOrm\Tests\TestingApps\AutodetectorTest\AutodetectorTestApp;
 use PHPUnit\Framework\TestCase;
 
 define('BASEPATH', dirname(dirname(__FILE__)));
@@ -35,23 +36,24 @@ abstract class PowerormTest extends TestCase
             ->willReturn(new DatabasePlatformMock());
         $this->conn->expects($this->any())->method('quoteIdentifier')
             ->will($this->returnArgument(0));
-        BaseOrm::setup(
-            new Settings(
-                [
-//                    'database' => [
-//                        'host' => '127.0.0.1',
-//                        'dbname' => $GLOBALS['DB_DBNAME'],
-//                        'user' => $GLOBALS['DB_USER'],
-//                        'password' => $GLOBALS['DB_PASSWD'],
-//                        'driver' => $GLOBALS['DB_DRIVER'],
+//        BaseOrm::setup(
+//            new Settings(
+//                [
+//                    'components' => [
+//                        TestApp::class,
+//                        AutodetectorTestApp::class
 //                    ],
-                    'components' => [
-                        Test::class,
-                    ],
-                ]
-            ),
-            $this->conn
-        );
+//                ]
+//            ),
+//            $this->conn
+//        );
+    }
+
+    public function getNewOrm(Settings $settings)
+    {
+        $instance = new BaseOrm($settings);
+        $instance->load($this->conn);
+        return $instance;
     }
 
     private function queryAsSql(Query $query)

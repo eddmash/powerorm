@@ -38,17 +38,23 @@ class Loader extends BaseObject
     private $migratedApps;
 
     /**
+     * @var BaseOrm
+     */
+    private $orm;
+
+    /**
      * Loader constructor.
      *
      * @param ConnectionInterface|null $connection
-     * @param bool                     $loadGraph
+     * @param bool $loadGraph
      *
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
      * @throws \Eddmash\PowerOrm\Exception\NodeNotFoundError
      */
-    public function __construct(ConnectionInterface $connection = null, $loadGraph = true)
+    public function __construct(BaseOrm $orm, ConnectionInterface $connection = null, $loadGraph = true)
     {
+        $this->orm = $orm;
         $this->connection = $connection;
         if ($loadGraph) {
             $this->buildGraph();
@@ -138,7 +144,7 @@ class Loader extends BaseObject
             }
             $shortName = ClassHelper::getNameFromNs(
                 $name,
-                $app->getNamespace()."\Migrations"
+                $app->getNamespace() . "\Migrations"
             );
 
             if (StringHelper::startsWith($name, $prefix) ||
@@ -150,7 +156,7 @@ class Loader extends BaseObject
         if (count($migrations) > 1) {
             throw new AmbiguityError(
                 sprintf(
-                    'There is more than one '.
+                    'There is more than one ' .
                     "migration with the prefix '%s'",
                     $prefix
                 )
@@ -226,7 +232,7 @@ class Loader extends BaseObject
 
         /* @var $component AppInterface */
         foreach ($appFiles as $appName => $migrationFiles) {
-            $component = BaseOrm::getInstance()->getComponent($appName);
+            $component = $this->orm->getComponent($appName);
             foreach ($migrationFiles as $migrationFile) {
                 $className = ClassHelper::getClassFromFile($migrationFile);
                 $foundClass = ClassHelper::classExists(
@@ -236,7 +242,7 @@ class Loader extends BaseObject
                 if (!$foundClass) {
                     throw new ClassNotFoundException(
                         sprintf(
-                            'The class [ %2$s\\%1$s or \\%1$s ] '.
+                            'The class [ %2$s\\%1$s or \\%1$s ] ' .
                             'could not be located',
                             $className,
                             $component->getNamespace()
@@ -262,7 +268,7 @@ class Loader extends BaseObject
     public function getMigrationsFiles()
     {
         $files = [];
-        foreach (BaseOrm::getInstance()->getComponents() as $component) {
+        foreach ($this->orm->getComponents(true) as $component) {
             if ($component instanceof AppInterface) {
                 $fileHandler = FileHandler::createObject(
                     [
@@ -291,7 +297,7 @@ class Loader extends BaseObject
         $last_version = basename($last_version);
         $last_version = preg_split('/_/', $last_version)[0];
 
-        return (int) $last_version;
+        return (int)$last_version;
     }
 
     /**

@@ -51,6 +51,7 @@ class Registry extends BaseObject
      * @var Model[][]
      */
     private $appModels;
+    private $orm;
 
     public function __construct()
     {
@@ -106,7 +107,7 @@ class Registry extends BaseObject
     {
         $files = [];
 
-        foreach (BaseOrm::getInstance()->getComponents() as $component) {
+        foreach ($this->getOrm()->getComponents() as $component) {
             if ($component instanceof AppInterface) {
                 $fileHandler = new FileHandler($component->getModelsPath());
                 $files[$component->getName()] = $fileHandler->readDir('php');
@@ -238,7 +239,7 @@ class Registry extends BaseObject
             foreach ($classList as $class) {
                 if (!ArrayHelper::hasKey($classToAppMap, $class)) {
                     throw new OrmException(
-                        "Make '$class' abstract or register it as ".
+                        "Make '$class' abstract or register it as " .
                         'an application model'
                     );
                 }
@@ -251,11 +252,11 @@ class Registry extends BaseObject
             }
 
             foreach ($classPopulationOrder as $class) {
-                $obj = new $class();
+                $obj = new $class(['registry' => $this]);
 
                 $obj->setupClassInfo(
                     null,
-                    ['meta' => ['appName' => $classToAppMap[$class]]]
+                    ['meta' => ['appName' => $classToAppMap[$class]], 'registry' => $this]
                 );
             }
         }
@@ -347,12 +348,12 @@ class Registry extends BaseObject
     }
 
     /**
-     * @param callable $callback        the callback to invoke when a model
+     * @param callable $callback the callback to invoke when a model
      *                                  has been created
-     * @param array    $modelsToResolve the model we are waiting for to be
+     * @param array $modelsToResolve the model we are waiting for to be
      *                                  created, the model object is passed to
      *                                  the callback as the first argument
-     * @param array    $callableArgs    an associative array to be passed to
+     * @param array $callableArgs an associative array to be passed to
      *                                  the callback
      *
      * @since  1.1.0
@@ -440,6 +441,19 @@ class Registry extends BaseObject
 
     public function __toString()
     {
-        return (string) sprintf('%s Object', $this->getFullClassName());
+        return (string)sprintf('%s Object', $this->getFullClassName());
+    }
+
+    public function getOrm(): BaseOrm
+    {
+        return $this->orm;
+    }
+
+    /**
+     * @param mixed $orm
+     */
+    public function setOrm($orm)
+    {
+        $this->orm = $orm;
     }
 }

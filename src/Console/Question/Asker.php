@@ -28,7 +28,7 @@ class Asker
      */
     protected $output;
 
-    public function __construct(InputInterface $input, OutputInterface $output)
+    public function __construct(InputInterface $input=null, OutputInterface $output=null)
     {
         $this->input = $input;
         $this->output = $output;

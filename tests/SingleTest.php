@@ -14,8 +14,8 @@ use Eddmash\PowerOrm\Tests\TestApp\Models\Product;
 
 class SingleTest extends PowerormTest
 {
-    public function testPrefetch()
-    {
-        Product::objects()->prefetchRelated()->getResults();
-    }
+//    public function testPrefetch()
+//    {
+//        Product::objects()->prefetchRelated()->getResults();
+//    }
 }

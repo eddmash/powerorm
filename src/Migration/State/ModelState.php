@@ -58,7 +58,7 @@ class ModelState extends BaseObject
     /**
      * Takes a model returns a ModelState representing it.
      *
-     * @param Model      $model
+     * @param Model $model
      * @param bool|false $excludeRels
      *
      * @return static
@@ -180,7 +180,8 @@ class ModelState extends BaseObject
 
         $model = $this->createInstance(
             $className,
-            $extends
+            $extends,
+            ['registry' => $registry]
         );
         $fields = [];
         foreach ($this->fields as $name => $field) {
@@ -223,10 +224,10 @@ class ModelState extends BaseObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    private static function createInstance($className, $extends = '')
+    private static function createInstance($className, $extends = '', $kwargs = [])
     {
         $className = MigrationModel::defineClass($className, $extends);
-        return new $className();
+        return new $className($kwargs);
     }
 
     public function deepClone()
@@ -249,7 +250,7 @@ class ModelState extends BaseObject
 
     public function __toString()
     {
-        return (string) sprintf("<ModelState: '%s'>", $this->name);
+        return (string)sprintf("<ModelState: '%s'>", $this->name);
     }
 
     public function &getMeta()

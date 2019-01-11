@@ -18,14 +18,15 @@ use Eddmash\PowerOrm\Helpers\Tools;
 
 class StateRegistry extends Registry
 {
+    private $modelStates;
+
     /**
      * {@inheritdoc}
      */
     public function __construct($modelStates)
     {
         parent::__construct();
-
-        $this->hydrate($modelStates);
+        $this->modelStates = $modelStates;
     }
 
     /**
@@ -55,7 +56,7 @@ class StateRegistry extends Registry
         try {
             $creationOrder = Tools::topologicalSort($creationOrder);
         } catch (CircularDependencyError $e) {
-            throw new OrmException(static::class.'::'.$e->getMessage());
+            throw new OrmException(static::class . '::' . $e->getMessage());
         }
 
         foreach ($creationOrder as $depend) {
@@ -63,5 +64,10 @@ class StateRegistry extends Registry
             $modelState->toModel($this);
         }
         $this->ready = true;
+    }
+
+    public function loadStates()
+    {
+        $this->hydrate($this->modelStates);
     }
 }

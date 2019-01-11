@@ -12,6 +12,7 @@
 namespace Eddmash\PowerOrm\Migration\State;
 
 use Eddmash\PowerOrm\App\Registry;
+use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\DeconstructableObject;
 
 class ProjectState extends DeconstructableObject
@@ -100,9 +101,12 @@ class ProjectState extends DeconstructableObject
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getRegistry()
+    public function getRegistry(BaseOrm $orm)
     {
-        return StateRegistry::createObject($this->modelStates);
+        $reg = StateRegistry::createObject($this->modelStates);
+        $reg->setOrm($orm);
+        $reg->loadStates();
+        return $reg;
     }
 
     /**
