@@ -27,6 +27,8 @@ use Eddmash\PowerOrm\Helpers\ArrayHelper;
 use Eddmash\PowerOrm\Model\Model;
 use Eddmash\PowerOrm\Signals\SignalManagerInterface;
 
+define('POWERORM_VERSION', '1.1.0-beta1');
+define('POWERORM_HOME', dirname(dirname(__FILE__)));
 define('NOT_PROVIDED', 'POWERORM_NOT_PROVIDED');
 
 /**
@@ -153,7 +155,7 @@ class BaseOrm extends BaseObject
         }
 
         if (!static::$connection && empty($this->getSettings()->getDatabase())) {
-            $message = 'The database configuration have not ' .
+            $message = 'The database configuration have not '.
                 'been provided, consult documentation for options';
 
             throw new OrmException($message);
@@ -441,6 +443,7 @@ class BaseOrm extends BaseObject
 
     /**
      * @param ConnectionInterface|null $connection
+     *
      * @throws AppRegistryNotReady
      */
     public function load(ConnectionInterface $connection = null)
@@ -450,6 +453,5 @@ class BaseOrm extends BaseObject
         $this->loadRegistry();
         $this->registerModelChecks();
         $this->componentsReady();
-
     }
 }

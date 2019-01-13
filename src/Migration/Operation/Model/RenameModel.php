@@ -6,6 +6,7 @@
 
 namespace Eddmash\PowerOrm\Migration\Operation\Model;
 
+use Eddmash\PowerOrm\Backends\SchemaEditor;
 use Eddmash\PowerOrm\Migration\State\ProjectState;
 
 class RenameModel extends ModelOperation
@@ -35,5 +36,37 @@ class RenameModel extends ModelOperation
     public function getDescription()
     {
         return sprintf('Rename model %s to %s', $this->oldName, $this->newName);
+    }
+
+    /**
+     * @param SchemaEditor $schemaEditor
+     * @param ProjectState $fromState
+     * @param ProjectState $toState
+     *
+     * @return mixed
+     *
+     * @since  1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function databaseForwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
+    {
+        // TODO: Implement databaseForwards() method.
+    }
+
+    /**
+     * @param SchemaEditor $schemaEditor
+     * @param ProjectState $fromState
+     * @param ProjectState $toState
+     *
+     * @return mixed
+     *
+     * @since  1.1.0
+     *
+     * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
+     */
+    public function databaseBackwards(SchemaEditor $schemaEditor, ProjectState $fromState, ProjectState $toState)
+    {
+        // TODO: Implement databaseBackwards() method.
     }
 }

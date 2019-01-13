@@ -10,13 +10,11 @@
 
 namespace Eddmash\PowerOrm\Tests\RegistryApp\Tests;
 
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Exception\LookupError;
 use Eddmash\PowerOrm\Tests\AppAwareTest;
 use Eddmash\PowerOrm\Tests\RegistryApp\Models\Author;
 use Eddmash\PowerOrm\Tests\RegistryApp\RegistryApp;
-use phpDocumentor\Reflection\Types\This;
 
 class RegistryTest extends AppAwareTest
 {
@@ -24,6 +22,7 @@ class RegistryTest extends AppAwareTest
 
     /**
      * @var AppInterface
+     *
      * @author Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
      */
     private $component;
@@ -45,13 +44,13 @@ class RegistryTest extends AppAwareTest
             $name
         );
         $expected = [
-            $this->modelspath . '/Author.php',
-            $this->modelspath . '/Book.php',
-            $this->modelspath . '/NotAModel.php',
-            $this->modelspath . '/Order.php',
-            $this->modelspath . '/OrderItem.php',
-            $this->modelspath . '/Product.php',
-            $this->modelspath . '/User.php'
+            $this->modelspath.'/Author.php',
+            $this->modelspath.'/Book.php',
+            $this->modelspath.'/NotAModel.php',
+            $this->modelspath.'/Order.php',
+            $this->modelspath.'/OrderItem.php',
+            $this->modelspath.'/Product.php',
+            $this->modelspath.'/User.php',
         ];
         $actual = $files[$name];
         sort($actual);

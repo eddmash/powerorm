@@ -8,11 +8,9 @@
 
 namespace Eddmash\PowerOrm\Tests\MetaApp\Tests;
 
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Tests\AppAwareTest;
 use Eddmash\PowerOrm\Tests\MetaApp\MetaApp;
 use Eddmash\PowerOrm\Tests\MetaApp\Models\MetaTestUser;
-use PHPUnit\Framework\TestCase;
 
 class MetaTest extends AppAwareTest
 {

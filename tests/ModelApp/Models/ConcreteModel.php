@@ -8,14 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\TestModels;
+namespace Eddmash\PowerOrm\Tests\ModelApp\Models;
 
-class FieldClashModel extends AbstractModel
+use Eddmash\PowerOrm\Model\Model;
+
+class ConcreteModel extends AbstractModel
 {
     public function unboundFields()
     {
         return [
-            'school' => \Eddmash\PowerOrm\Model\Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
+            'town' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
         ];
     }
 }

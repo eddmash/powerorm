@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\TestModels;
+namespace Eddmash\PowerOrm\Tests\ModelApp\TestModels;
 
 /**
  * This file is part of the powerorm package.

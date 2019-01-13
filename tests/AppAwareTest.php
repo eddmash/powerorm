@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the store
+ * This file is part of the store.
  *
  *
  * Created by : Eddilber Macharia (edd.cowan@gmail.com)<eddmash.com>
@@ -12,18 +12,15 @@
 
 namespace Eddmash\PowerOrm\Tests;
 
-
 use Eddmash\PowerOrm\App\Settings;
 
 abstract class AppAwareTest extends PowerormTest
 {
-
     protected $registry;
 
     protected function setUp(): void
     {
         parent::setUp();
-
 
         $this->orm = $this->getNewOrm(new Settings(
             [
@@ -34,5 +31,5 @@ abstract class AppAwareTest extends PowerormTest
         $this->registry = $this->orm->getRegistryCache();
     }
 
-    protected abstract function getComponents(): array;
+    abstract protected function getComponents(): array;
 }

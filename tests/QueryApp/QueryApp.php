@@ -8,16 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\Autodetector;
+namespace Eddmash\PowerOrm\Tests\QueryApp;
 
 use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Components\AppComponent;
 
-class AutodetectorApp extends AppComponent
+class QueryApp extends AppComponent
 {
     public function getName()
     {
-        return 'autodetectortest';
+        return 'queryapp';
     }
 
     /**

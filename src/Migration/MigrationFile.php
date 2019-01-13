@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm\Migration;
 
+use Eddmash\PowerOrm\Components\AppInterface;
 use Eddmash\PowerOrm\Helpers\Tools;
 
 /**
@@ -77,9 +78,8 @@ class MigrationFile
      *
      * @author Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public function getContent()
+    public function getContent(AppInterface $app)
     {
-        $app = $this->migration->getApp();
         $imports = [];
 
         $stringedOperations = [];

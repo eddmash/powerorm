@@ -8,14 +8,8 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\TestModels;
+namespace Eddmash\PowerOrm\Tests\ModelApp\Models;
 
-class InDirectConcreateBaseProxy extends InnerAbstractClass
+abstract class InnerAbstractClass extends ConcreteModel
 {
-    public function getMetaSettings()
-    {
-        return [
-            'proxy' => true,
-        ];
-    }
 }

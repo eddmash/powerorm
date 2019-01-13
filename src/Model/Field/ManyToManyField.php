@@ -139,7 +139,7 @@ class ManyToManyField extends RelatedField
      * Creates an intermediary model.
      *
      * @param ManyToManyField $field
-     * @param Model $model
+     * @param Model           $model
      *
      * @return Model
      *
@@ -224,7 +224,7 @@ class ManyToManyField extends RelatedField
                     'uniqueTogether' => [$from, $to],
                     'autoCreated' => true,
                 ],
-                'registry' => $model->getMeta()->getRegistry()
+                'registry' => $model->getMeta()->getRegistry(),
             ]
         );
 
@@ -252,7 +252,7 @@ class ManyToManyField extends RelatedField
             // oracle allows identifier of 30 chars max
             return StringHelper::truncate(
                 sprintf('%s_%s', $meta->getDbTable(), $this->getName()),
-                30,null,null,
+                30, null, null,
                 $meta->getRegistry()->getOrm()->getCharset()
             );
         }

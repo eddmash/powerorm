@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\Migration;
+namespace Eddmash\PowerOrm\Tests\MigrationApp\Tests;
 
 use Eddmash\PowerOrm\Exception\CircularDependencyError;
 use Eddmash\PowerOrm\Migration\Graph;

@@ -9,23 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\Autodetector\Models;
+namespace Eddmash\PowerOrm\Tests\MigrationApp\Models;
 
 use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Tests\MetaApp\Models\MetaTestUser;
 
-
-/**
- * Class User
- * @package App\Models
- */
-class UserName extends Model
+class Author extends Model
 {
-
     public function unboundFields()
     {
         return [
-            'name' => Model::CharField(['maxLength' => 30]),
+            'name' => Model::CharField(['maxLength' => 200]),
+            'email' => Model::EmailField(),
+            'user' => Model::ForeignKey(['to' => MetaTestUser::class]),
         ];
     }
-
 }

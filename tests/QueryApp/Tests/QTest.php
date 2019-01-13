@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\Model\Query;
+namespace Eddmash\PowerOrm\Tests\QueryApp\Tests;
 
 use Eddmash\PowerOrm\Model\Query\Q;
 use PHPUnit\Framework\TestCase;

@@ -11,6 +11,7 @@
 
 namespace Eddmash\PowerOrm\Model;
 
+use Eddmash\PowerOrm\App\Registry;
 use Eddmash\PowerOrm\DeConstructableInterface;
 use Eddmash\PowerOrm\Model\Manager\BaseManager;
 
@@ -26,7 +27,7 @@ interface ModelInterface extends DeConstructableInterface
     /**
      * Creates a Queryset that is used to interaract with the database.
      *
-     * @param Model $modelInstance
+     * @param Registry|null $registry
      *
      * @return BaseManager
      *
@@ -36,7 +37,7 @@ interface ModelInterface extends DeConstructableInterface
      *
      * @author   Eddilbert Macharia (http://eddmash.com) <edd.cowan@gmail.com>
      */
-    public static function objects(Model $modelInstance = null);
+    public static function objects(Registry $registry = null);
 
     /**
      * Should return an instance of the Meta class. which is used to hold meta information about the particular model.

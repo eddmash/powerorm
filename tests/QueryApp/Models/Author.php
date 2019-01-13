@@ -9,22 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\Autodetector\Models;
+namespace Eddmash\PowerOrm\Tests\QueryApp\Models;
 
 use Eddmash\PowerOrm\Model\Model;
 
-
-/**
- * Class User
- * @package App\Models
- */
-class UserEmpty extends Model
+class Author extends Model
 {
-
     public function unboundFields()
     {
         return [
+            'name' => Model::CharField(['maxLength' => 200]),
+            'email' => Model::EmailField(),
         ];
     }
-
 }

@@ -8,14 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\TestModels;
+namespace Eddmash\PowerOrm\Tests\ModelApp\Models;
 
-class AbstractWithFieldsBaseProxyModel extends AbstractModel
+class ChildConcreteWithImmediateParentProxy extends DirectConcreateBaseProxy
 {
-    public function getMetaSettings()
+    public function unboundFields()
     {
         return [
-            'proxy' => true,
+            'child' => \Eddmash\PowerOrm\Model\Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
         ];
     }
 }

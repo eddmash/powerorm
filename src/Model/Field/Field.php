@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model\Field;
 
 use Doctrine\DBAL\Types\Type;
 use Eddmash\PowerOrm\Backends\ConnectionInterface;
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Checks\CheckError;
 use Eddmash\PowerOrm\DeconstructableObject;
 use Eddmash\PowerOrm\Exception\FieldError;
@@ -557,10 +556,10 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     public function convertToPHPValue($value)
     {
         try {
-            return Type::getType($this->dbType(BaseOrm::getDbConnection()))
+            return Type::getType($this->dbType($this->getDbConnection()))
                 ->convertToPHPValue(
                     $value,
-                    BaseOrm::getDbConnection()->getDatabasePlatform()
+                    $this->getDbConnection()->getDatabasePlatform()
                 );
         } catch (\Exception $exception) {
             throw new ValidationError($exception->getMessage(), 'invalid');
@@ -901,6 +900,11 @@ class Field extends DeconstructableObject implements FieldInterface, DescriptorI
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    private function getDbConnection()
+    {
+        return $this->scopeModel->getMeta()->getRegistry()->getOrm()->getDatabaseConnection();
     }
 }
 

@@ -13,7 +13,6 @@ namespace Eddmash\PowerOrm\Model\Query;
 
 use Doctrine\DBAL\Connection;
 use Eddmash\PowerOrm\Backends\ConnectionInterface;
-use Eddmash\PowerOrm\BaseOrm;
 use Eddmash\PowerOrm\Exception\InvalidArgumentException;
 use Eddmash\PowerOrm\Exception\MultipleObjectsReturned;
 use Eddmash\PowerOrm\Exception\NotImplemented;
@@ -105,8 +104,8 @@ class Queryset implements QuerysetInterface, \JsonSerializable
         Query $query = null,
         $kwargs = []
     ) {
-        $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->model = $model;
+        $this->connection = (is_null($connection)) ? $this->getConnection() : $connection;
         $this->query = (null == $query) ? $this->getQueryBuilder() : $query;
         $this->resultMapper = ArrayHelper::pop(
             $kwargs,
@@ -125,7 +124,7 @@ class Queryset implements QuerysetInterface, \JsonSerializable
      */
     private function getConnection()
     {
-        return BaseOrm::getDbConnection();
+        return $this->model->getMeta()->getRegistry()->getOrm()->getDatabaseConnection();
     }
 
     /**

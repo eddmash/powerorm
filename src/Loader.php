@@ -15,9 +15,6 @@ use Composer\Autoload\ClassLoader;
 use Eddmash\PowerOrm\App\Settings;
 use Eddmash\PowerOrm\Console\Manager;
 
-define('POWERORM_VERSION', '1.1.0-beta1');
-define('POWERORM_HOME', dirname(dirname(__FILE__)));
-
 /**
  * Class Loader.
  *

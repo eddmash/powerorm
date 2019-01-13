@@ -46,7 +46,7 @@ class Loader extends BaseObject
      * Loader constructor.
      *
      * @param ConnectionInterface|null $connection
-     * @param bool $loadGraph
+     * @param bool                     $loadGraph
      *
      * @throws ClassNotFoundException
      * @throws \Eddmash\PowerOrm\Exception\FileHandlerException
@@ -138,13 +138,14 @@ class Loader extends BaseObject
         /* @var $app AppInterface */
 
         foreach ($this->getMigrations() as $name => $migration) {
-            $app = $migration->getApp();
             if ($migration->getAppLabel() != strtolower($appName)) {
                 continue;
             }
+
+            $app = $this->orm->getComponent($migration->getAppLabel());
             $shortName = ClassHelper::getNameFromNs(
                 $name,
-                $app->getNamespace() . "\Migrations"
+                $app->getNamespace()."\Migrations"
             );
 
             if (StringHelper::startsWith($name, $prefix) ||
@@ -156,7 +157,7 @@ class Loader extends BaseObject
         if (count($migrations) > 1) {
             throw new AmbiguityError(
                 sprintf(
-                    'There is more than one ' .
+                    'There is more than one '.
                     "migration with the prefix '%s'",
                     $prefix
                 )
@@ -242,7 +243,7 @@ class Loader extends BaseObject
                 if (!$foundClass) {
                     throw new ClassNotFoundException(
                         sprintf(
-                            'The class [ %2$s\\%1$s or \\%1$s ] ' .
+                            'The class [ %2$s\\%1$s or \\%1$s ] '.
                             'could not be located',
                             $className,
                             $component->getNamespace()
@@ -297,11 +298,12 @@ class Loader extends BaseObject
         $last_version = basename($last_version);
         $last_version = preg_split('/_/', $last_version)[0];
 
-        return (int)$last_version;
+        return (int) $last_version;
     }
 
     /**
-     * An application should only have one leaf node more than that means there is an issue somewhere.
+     * An application should only have one leaf node more than that means there is an
+     * issue somewhere.
      *
      * @return array
      *

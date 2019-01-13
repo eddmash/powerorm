@@ -8,14 +8,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Eddmash\PowerOrm\Tests\TestModels;
+namespace Eddmash\PowerOrm\Tests\ModelApp\TestModels;
 
-class ChildConcreteWithImmediateParentProxy extends DirectConcreateBaseProxy
+use Eddmash\PowerOrm\Model\Model;
+use Eddmash\PowerOrm\Tests\ModelApp\Models\AbstractModel;
+
+class FieldClashModel extends AbstractModel
 {
     public function unboundFields()
     {
         return [
-            'child' => \Eddmash\PowerOrm\Model\Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
+            'school' => Model::CharField(['maxLength' => 40, 'dbIndex' => true]),
         ];
     }
 }

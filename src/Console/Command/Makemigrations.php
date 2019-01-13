@@ -94,15 +94,16 @@ class Makemigrations extends BaseCommand
         }
     }
 
-    private function writeMigrations(
+    public static function writeMigrations(
         $migrationChanges,
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
+        BaseOrm $orm
     ) {
         /* @var $appMigration Migration */
         /* @var $op Operation */
 
-        foreach (BaseOrm::getInstance()->getComponents() as $component) {
+        foreach ($orm->getComponents() as $component) {
             if ($component instanceof AppInterface) {
                 if (ArrayHelper::hasKey($migrationChanges, $component->getName())) {
                     $output->writeln(
@@ -136,7 +137,7 @@ class Makemigrations extends BaseCommand
 
                         if ($input->getOption('dry-run')) {
                             if (OutputInterface::VERBOSITY_DEBUG === $output->getVerbosity()) {
-                                $output->writeln($migrationFile->getContent());
+                                $output->writeln($migrationFile->getContent($component));
                             }
 
                             continue;
@@ -146,7 +147,7 @@ class Makemigrations extends BaseCommand
                             $fileName
                         );
 
-                        $handler->write($migrationFile->getContent());
+                        $handler->write($migrationFile->getContent($component));
                     }
                 }
             }
